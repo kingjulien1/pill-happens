@@ -21,11 +21,16 @@ const STREAK_ICONS = [
   "confetti",
 ] as const satisfies readonly StreakIconName[];
 
+/** Keep the chosen icon stable for the visit without sending retired badge copy. */
+export function getStreakIcon(): StreakIconName {
+  return STREAK_ICONS[randomInt(STREAK_ICONS.length)];
+}
+
 /** Call once per server request, then pass only the selection to the client. */
 export function getJournalEncouragement(): JournalEncouragement {
   return {
     message: JOURNAL_ENCOURAGEMENTS[randomInt(JOURNAL_ENCOURAGEMENTS.length)],
-    streakIcon: STREAK_ICONS[randomInt(STREAK_ICONS.length)],
+    streakIcon: getStreakIcon(),
     milestoneSeed: randomInt(0x80000000),
   };
 }

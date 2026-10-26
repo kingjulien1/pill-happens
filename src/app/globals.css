@@ -214,27 +214,6 @@
     --brand-edge: #fff1d654;
   }
 }
-.streak-badge {
-  position: relative;
-  isolation: isolate;
-  display: inline-flex;
-  max-width: 100%;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 6px 10px;
-  background: color-mix(in srgb, var(--card) 65%, transparent);
-  backdrop-filter: blur(14px);
-}
-.streak-badge::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -10px 30% -10px 0;
-  background: linear-gradient(110deg, #f9731629, #fed7aa20, transparent);
-  filter: blur(12px);
-}
 .streak-counter-icon {
   color: #9a3412;
 }

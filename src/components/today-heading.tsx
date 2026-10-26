@@ -2,24 +2,19 @@ import { ActionIcon } from "@/components/action-icon";
 import { HeadingText } from "@/components/heading-text";
 import { formatDay } from "@/lib/domain";
 import { streakMilestone } from "@/lib/logging-streak";
-import {
-  milestoneEmoji,
-  type JournalEncouragement,
-} from "@/lib/streak-presentation";
+import type { StreakIconName } from "@/lib/streak-presentation";
 
 export function TodayHeading({
   day,
   current,
-  totalDays,
-  encouragement,
+  streakIcon,
 }: {
   day: string;
   current: number;
-  totalDays: number;
-  encouragement: JournalEncouragement;
+  streakIcon: StreakIconName;
 }) {
-  const { reached, next } = streakMilestone(totalDays);
-  const emoji = milestoneEmoji(encouragement.milestoneSeed, reached ?? next);
+  const { next } = streakMilestone(current);
+  const remaining = next - current;
 
   return (
     <header className="mb-6" data-today-heading>
@@ -39,74 +34,37 @@ export function TodayHeading({
           />
         </h1>
         <div
-          className="flex shrink-0 items-center gap-1.5 text-xs font-medium tabular-nums"
+          className="flex shrink-0 flex-col items-end gap-0.5 text-xs font-medium tabular-nums min-[380px]:flex-row min-[380px]:items-center min-[380px]:gap-1.5"
           data-current-streak={current}
-          aria-label={`${current} consecutive logging ${current === 1 ? "day" : "days"}`}
-          title="Consecutive tracking days with a recorded intake"
+          data-next-milestone={next}
+          data-days-to-next={remaining}
+          title={`Next milestone: ${next} consecutive logging days`}
         >
-          <ActionIcon
-            name={encouragement.streakIcon}
-            weight="fill"
-            className="streak-counter-icon size-[22px]"
-          />
-          <span aria-hidden="true" className="text-muted-foreground/60">
-            ·
+          <span className="sr-only">
+            {current} consecutive logging {current === 1 ? "day" : "days"};{" "}
+            {remaining} {remaining === 1 ? "day" : "days"} until the {next}
+            -day streak milestone.
           </span>
-          <span>
-            {current} {current === 1 ? "day" : "days"}
-          </span>
-        </div>
-      </div>
-
-      <div
-        className="streak-badge mt-3"
-        data-logged-days={totalDays}
-        data-milestone={reached ?? 0}
-        data-next-milestone={next}
-      >
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span aria-hidden="true" className="text-base leading-5">
-            {emoji}
-          </span>
-          <span className="text-xs font-medium tabular-nums">
-            {totalDays} {totalDays === 1 ? "day" : "days"} logged
+          <span aria-hidden="true" className="flex items-center gap-1.5">
+            <ActionIcon
+              name={streakIcon}
+              weight="fill"
+              className="streak-counter-icon size-[22px]"
+            />
+            <span className="text-muted-foreground/60">·</span>
+            <span>
+              {current} {current === 1 ? "day" : "days"}
+            </span>
           </span>
           <span
             aria-hidden="true"
-            className="text-[10px] text-muted-foreground/50"
+            className="inline-flex items-center gap-1 text-[10px] font-normal text-muted-foreground"
           >
-            ·
-          </span>
-          <span className="text-[10px] text-muted-foreground">
-            {reached ? `${reached}-day badge` : "First milestone"}
-          </span>
-        </div>
-        <div className="mt-1 flex items-center gap-2">
-          <div
-            role="progressbar"
-            aria-label="Days logged toward the next milestone"
-            aria-valuemin={0}
-            aria-valuemax={next}
-            aria-valuenow={totalDays}
-            aria-valuetext={`${totalDays} days logged; next milestone at ${next} days`}
-            className="h-0.5 min-w-12 flex-1 overflow-hidden rounded-full bg-primary/10"
-          >
-            <div
-              className="h-full rounded-full bg-primary/60"
-              style={{ width: `${Math.min((totalDays / next) * 100, 100)}%` }}
-            />
-          </div>
-          <span className="text-[9px] leading-3 text-muted-foreground tabular-nums">
-            Next {next} days
+            <span>/</span>
+            <span>{remaining} to next</span>
           </span>
         </div>
       </div>
-      <p
-        className="mt-2 max-w-[42ch] text-[11px] leading-relaxed text-muted-foreground"
-        data-encouragement
-      >
-        {encouragement.message}
-      </p>
     </header>
   );
 }
