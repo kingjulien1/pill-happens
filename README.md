@@ -6,7 +6,7 @@ Built with **Next.js 16.4.3**, **React 19.3.1**, TypeScript, Tailwind CSS 4, and
 
 ## The experience
 
-- **Today:** the compact Today/date heading, with a consecutive logging-day count opposite it. A small glass badge tracks total logged days and milestones, with a short encouragement below. Medication totals and recorded daily maximums follow, then intake entries in creation order from oldest to newest. The logging button uses a bold journal-and-pencil icon and stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
+- **Today:** the compact Today/date heading, with a consecutive logging-day count opposite it. A small glass badge tracks total logged days and milestones, with a short encouragement below. Intake entries follow in creation order from oldest to newest. The logging button uses a bold journal-and-pencil icon and stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
 - **Logging:** a shadcn bottom drawer on mobile and a centered dialog at widths of 768px and above. Choose a medication, select or enter a quantity, check the calculated dose, set the time taken, and optionally add a note.
 - **Medications:** create and edit the name, strength, medication type, color, and icon. Choose from 24 compact color swatches and 20 Lucide icons, or enter a single emoji. Medication-type and medication selection choices include a leading icon. Archive a medication to remove it from new-log choices; restore it whenever needed.
 - **Goals:** record a daily maximum for one medication, with a start date, optional end date, and optional note. Future goals are supported.

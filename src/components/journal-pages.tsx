@@ -324,7 +324,6 @@ export function TodayPage({
         totalDays={streak.totalDays}
         encouragement={encouragement}
       />
-      <DailyOverview data={data} day={today} />
       <section aria-label="Today's entries" className="mt-6">
         <IntakeTimeline data={data} day={today} />
       </section>
