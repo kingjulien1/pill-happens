@@ -88,6 +88,8 @@ Restart the development server after changing the environment. Once a database o
 4. Ensure the three required production variables are configured, then deploy or redeploy so the running app receives them.
 5. Open the deployment, sign in, add a medication from its packaging, and save a test entry. Reload to confirm persistence, then delete that test entry.
 
+The tracked `vercel.json` selects the Next.js preset and pins functions to Frankfurt (`fra1`), matching the initial Neon database region.
+
 The server creates its two tables automatically on first database use. The database connection therefore needs permission to create tables. There is no separate migration command for this prototype.
 
 For Preview deployments, configure the same authentication requirements with a separate Neon database or branch. This keeps preview changes separate from the personal production journal.
