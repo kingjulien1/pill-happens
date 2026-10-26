@@ -15,6 +15,7 @@ import type { JournalEncouragement } from "@/lib/streak-presentation";
 import { MedicationIcon } from "@/components/medication-icon";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
+import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -231,9 +232,7 @@ function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
         </span>
       </div>
       {!entries.length ? (
-        <p className="rounded-2xl border border-dashed border-border px-4 py-5 text-xs leading-relaxed text-muted-foreground">
-          No entries yet. Use “Log an intake” to record one.
-        </p>
+        <EmptyIntakeStack />
       ) : (
         <div className="relative space-y-3 before:absolute before:top-6 before:bottom-6 before:left-[23px] before:w-px before:bg-border">
           {entries.map((entry, index) => {
