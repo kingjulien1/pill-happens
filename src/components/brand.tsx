@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 export function BrandMark({ className }: { className?: string }) {
   return (
     <Tablets
-      size={20}
-      strokeWidth={3}
+      size={30}
+      strokeWidth={3.25}
       aria-hidden="true"
       focusable="false"
-      className={cn("size-5 shrink-0", className)}
+      className={cn("size-[30px] shrink-0", className)}
     />
   );
 }
@@ -20,12 +20,12 @@ export function Brand({ className }: { className?: string }) {
       href="/"
       aria-label="Pill happens home"
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2.5 rounded-2xl border border-primary/15 bg-primary/5 px-3.5 py-2 text-primary transition-colors hover:bg-primary/10",
+        "brand-lockup inline-flex min-h-11 items-center justify-center gap-1.5 px-1 text-primary",
         className,
       )}
     >
       <BrandMark />
-      <span className="text-xl font-bold leading-none tracking-[-.035em]">
+      <span className="text-xs font-bold leading-none tracking-[-.03em]">
         pill happens.
       </span>
     </Link>
