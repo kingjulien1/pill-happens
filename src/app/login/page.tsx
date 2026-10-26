@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Flower2, LockKeyhole } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
 import { HeadingText } from "@/components/heading-text";
+import { Brand } from "@/components/brand";
 import { configurationIssue, isAuthenticated } from "@/lib/server/auth";
 
 export const metadata: Metadata = { title: "Your private space" };
@@ -14,9 +15,8 @@ export default async function LoginPage() {
 
   return (
     <main className="page-enter mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-14 sm:px-8">
-      <div className="mb-8 flex items-center justify-center gap-2.5 text-primary">
-        <Flower2 className="size-5" strokeWidth={1.5} aria-hidden="true" />
-        <span className="text-sm font-medium tracking-tight">Pill happens</span>
+      <div className="mb-8 flex justify-center">
+        <Brand />
       </div>
       <header className="mb-6 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">

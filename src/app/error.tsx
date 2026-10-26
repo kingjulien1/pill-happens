@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Flower2, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeadingText } from "@/components/heading-text";
+import { BrandMark } from "@/components/brand";
 
 export default function ErrorPage({
   reset,
@@ -14,7 +15,7 @@ export default function ErrorPage({
   return (
     <main className="page-enter mx-auto flex min-h-[80dvh] max-w-sm flex-col items-center justify-center px-6 py-14 text-center">
       <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-primary">
-        <Flower2 className="size-6" strokeWidth={1.3} aria-hidden="true" />
+        <BrandMark className="size-6" />
       </div>
       <h1 className="text-2xl font-semibold tracking-tight">
         <HeadingText

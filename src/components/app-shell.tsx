@@ -7,13 +7,13 @@ import {
   History,
   Pill,
   Target,
-  Flower2,
   ArrowUpRight,
   LoaderCircle,
   RefreshCw,
 } from "lucide-react";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
+import { Brand } from "@/components/brand";
 
 const links = [
   { href: "/", label: "Today", Icon: House },
@@ -30,18 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10 ${path === "/" ? "with-intake-dock" : ""}`}
     >
       <header className="mb-8 flex flex-col items-center">
-        <Link
-          href="/"
-          className="mb-7 flex items-center gap-2.5"
-          aria-label="Pill happens home"
-        >
-          <span className="flex size-8 items-center justify-center rounded-full border border-primary/15 bg-primary/5 text-primary">
-            <Flower2 size={17} strokeWidth={1.5} />
-          </span>
-          <span className="text-[15px] font-medium tracking-tight">
-            pill happens<span className="ml-0.5 text-primary">.</span>
-          </span>
-        </Link>
+        <Brand className="mb-5" />
         <nav
           aria-label="Main navigation"
           className="surface flex gap-1 rounded-2xl p-1.5"

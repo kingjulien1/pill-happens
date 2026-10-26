@@ -14,7 +14,7 @@ Built with **Next.js 16.4.3**, **React 19.3.1**, TypeScript, Tailwind CSS 4, and
 - **Corrections:** tap an intake to edit its medication, quantity, time, or note. Delete an intake through an explicit confirmation.
 - **Preferences and backups:** change the journal timezone, sign out, or download a JSON export from the history page.
 
-The layout is designed for mobile, with a narrow reading column, compact centered icon navigation, and generous logging controls. Typography uses the default system sans-serif font, compact headings, and small muted context separated from each title by a dot. Warm rose, amber, and violet accents sit over subtle animated highlights. Light and dark appearance follow the operating system through `prefers-color-scheme`; there is no theme preference or toggle. Reduced-motion preferences disable animation.
+The layout is designed for mobile, with a narrow reading column, compact centered icon navigation, and generous logging controls. Typography uses the default system sans-serif font, compact headings, and small muted context separated from each title by a dot. The brand pairs a bold tablets mark with a matching rose wordmark in one compact container; the app icon uses the same tablets symbol. Warm rose, amber, and violet accents sit over subtle animated highlights. Light and dark appearance follow the operating system through `prefers-color-scheme`; there is no theme preference or toggle. Reduced-motion preferences disable animation.
 
 The app includes a web manifest and icon for a home-screen shortcut. It requires a network connection to load and save; it has no service worker, offline mode, or queued offline writes.
 
