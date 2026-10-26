@@ -26,7 +26,7 @@ export function IntakeAction({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="pointer-events-auto h-16 w-full justify-start gap-3 rounded-[22px] px-5 text-sm shadow-lg shadow-primary/10"
     >
-      <ActionIcon name="create" weight="fill" className="size-8" />
+      <ActionIcon name="log" weight="fill" className="size-8" />
       <span>Log an intake</span>
       <ActionIcon name="next" className="ml-auto size-[22px]" />
     </Button>

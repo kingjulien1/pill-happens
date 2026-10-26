@@ -26,6 +26,13 @@ import { LockKeyIcon } from "@phosphor-icons/react/dist/ssr/LockKey";
 import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { CaretUpIcon } from "@phosphor-icons/react/dist/ssr/CaretUp";
 import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
+import { FireIcon } from "@phosphor-icons/react/dist/ssr/Fire";
+import { SparkleIcon } from "@phosphor-icons/react/dist/ssr/Sparkle";
+import { LightningIcon } from "@phosphor-icons/react/dist/ssr/Lightning";
+import { ShootingStarIcon } from "@phosphor-icons/react/dist/ssr/ShootingStar";
+import { FlowerIcon } from "@phosphor-icons/react/dist/ssr/Flower";
+import { ConfettiIcon } from "@phosphor-icons/react/dist/ssr/Confetti";
+import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr/NotePencil";
 import { cn } from "@/lib/utils";
 
 const icons = {
@@ -57,6 +64,13 @@ const icons = {
   expand: CaretDownIcon,
   collapse: CaretUpIcon,
   open: CaretRightIcon,
+  fire: FireIcon,
+  sparkle: SparkleIcon,
+  lightning: LightningIcon,
+  shootingStar: ShootingStarIcon,
+  flower: FlowerIcon,
+  confetti: ConfettiIcon,
+  log: NotePencilIcon,
 } as const;
 
 export type ActionIconName = keyof typeof icons;

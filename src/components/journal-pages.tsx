@@ -9,7 +9,9 @@ import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
-import { DayHeading } from "@/components/day-heading";
+import { TodayHeading } from "@/components/today-heading";
+import { loggingStreak } from "@/lib/logging-streak";
+import type { JournalEncouragement } from "@/lib/streak-presentation";
 import { MedicationIcon } from "@/components/medication-icon";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
@@ -304,14 +306,24 @@ function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
   );
 }
 
-export function TodayPage() {
+export function TodayPage({
+  encouragement,
+}: {
+  encouragement: JournalEncouragement;
+}) {
   const { data, now } = useJournal();
   const [open, setOpen] = useState(false);
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
+  const streak = loggingStreak(data, today, now);
   return (
     <>
-      <DayHeading day={today} />
+      <TodayHeading
+        day={today}
+        current={streak.current}
+        totalDays={streak.totalDays}
+        encouragement={encouragement}
+      />
       <DailyOverview data={data} day={today} />
       <section aria-label="Today's entries" className="mt-6">
         <IntakeTimeline data={data} day={today} />
@@ -888,11 +900,18 @@ export function DayPage({ day }: { day: string }) {
         <ActionIcon name="back" className="size-4.5" />
         Back to past days
       </Link>
-      <DayHeading day={day} label="Daily log" />
-      <p className="-mt-3 mb-5 text-center text-[10px] leading-relaxed text-muted-foreground">
+      <PageHeading
+        title="Daily log"
+        context={formatDay(day, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}
+      >
         06:00 to 06:00 the next day ·{" "}
         {data.settings.timezone.replaceAll("_", " ")}
-      </p>
+      </PageHeading>
       <DailyOverview data={data} day={day} />
       <div className="my-6">
         <IntakeTimeline data={data} day={day} />

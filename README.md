@@ -6,7 +6,7 @@ Built with **Next.js 16.4.3**, **React 19.3.1**, TypeScript, Tailwind CSS 4, and
 
 ## The experience
 
-- **Today:** a centered, highlighted weekday/date heading with a large bold calendar icon and a 06:00 reset label, followed by compact medication totals and recorded daily maximums, then intake entries in creation order from oldest to newest. Day-detail pages share the same date heading. The logging button stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
+- **Today:** the compact Today/date heading, with a consecutive logging-day count opposite it. A small glass badge tracks total logged days and milestones, with a short encouragement below. Medication totals and recorded daily maximums follow, then intake entries in creation order from oldest to newest. The logging button uses a bold journal-and-pencil icon and stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
 - **Logging:** a shadcn bottom drawer on mobile and a centered dialog at widths of 768px and above. Choose a medication, select or enter a quantity, check the calculated dose, set the time taken, and optionally add a note.
 - **Medications:** create and edit the name, strength, medication type, color, and icon. Choose from 24 compact color swatches and 20 Lucide icons, or enter a single emoji. Medication-type and medication selection choices include a leading icon. Archive a medication to remove it from new-log choices; restore it whenever needed.
 - **Goals:** record a daily maximum for one medication, with a start date, optional end date, and optional note. Future goals are supported.
@@ -23,6 +23,14 @@ The full-page background uses [React Bits Grainient](https://reactbits.dev/backg
 The app includes a web manifest and icon for a home-screen shortcut. It requires a network connection to load and save; it has no service worker, offline mode, or queued offline writes.
 
 ## Tracking days, quantities, and goals
+
+### Logging streaks and milestones
+
+The counter beside Today counts consecutive tracking days with at least one saved intake. If today has no intake yet, an uninterrupted run ending yesterday remains current; an older gap ends that run. The glass badge separately counts all unique logged days, including days before a gap. Its milestones are **2, 3, 4, 5, 7, 10, 13, 15, 17, 20, 25, 30**, followed by **35, 40, 45**, and further five-day increments without a cap. Each milestone gets an uplifting emoji, with progress toward the next badge. Backdated, edited, and deleted entries update both counts immediately.
+
+These counts describe saved records, not dose-goal compliance or proof that every intake was logged. Multiple entries on a day count once, regardless of dose. The journal timezone and 06:00 boundary apply, including daylight-saving changes. Invalid or future timestamps do not contribute.
+
+Each home-page request selects one of **240 prewritten encouragements**, one of six playful streak icons, and an emoji seed on the server. Only that selection reaches the client; the full message bank stays in server-only source files. Selections remain stable during the visit to avoid flickering or hydration mismatches. Encouragements concern recording, reflection, and returning to the journal.
 
 ### A new day begins at 06:00
 

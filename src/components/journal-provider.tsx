@@ -42,8 +42,10 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
       const body = await res.json();
       if (!res.ok)
         throw new Error(body.error || "Your journal couldn't be loaded.");
-      if (!pending.current && startedAtRevision === revision.current)
+      if (!pending.current && startedAtRevision === revision.current) {
         setData(body);
+        setNow(new Date());
+      }
       setError(null);
     } catch {
       setError(
@@ -103,6 +105,8 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok)
         throw new Error(result.error || "Your change couldn't be saved.");
       setData(result);
+      // New intake timestamps can be later than the last minute tick.
+      setNow(new Date());
       setError(null);
     } catch (err) {
       const message =
