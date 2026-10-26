@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { isValidDayKey } from "@/lib/domain";
+import {
+  isMedicationIcon,
+  MEDICATION_COLORS,
+} from "@/lib/medication-appearance";
 
 export const positiveAmount = z
   .number()
@@ -14,7 +18,12 @@ export const medicationSchema = z.object({
     .max(100, "Keep the name under 100 characters."),
   strengthMg: positiveAmount,
   form: z.enum(["tablet", "capsule", "drops", "other"]),
-  color: z.enum(["rose", "amber", "violet"]),
+  color: z.enum(MEDICATION_COLORS.map((color) => color.value)),
+  icon: z
+    .string()
+    .max(64, "Choose an icon or a single emoji.")
+    .refine(isMedicationIcon, "Choose an icon or a single emoji.")
+    .optional(),
 });
 export const medicationPatchSchema = medicationSchema
   .partial()

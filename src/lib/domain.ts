@@ -1,10 +1,14 @@
+import type { MedicationColor } from "@/lib/medication-appearance";
+
 /** Shared data and calendar rules. All stored timestamps are UTC ISO strings. */
 export type Medication = {
   id: string;
   name: string;
   strengthMg: number;
   form: "tablet" | "capsule" | "drops" | "other";
-  color: "rose" | "amber" | "violet";
+  color: MedicationColor;
+  /** Missing on older records; the interface renders the default pill icon. */
+  icon?: string;
   archived: boolean;
   createdAt: string;
 };

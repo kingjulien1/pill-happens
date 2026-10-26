@@ -4,8 +4,13 @@ import {
   goalSchema,
   intakeSchema,
   medicationSchema,
+  medicationPatchSchema,
   settingsSchema,
 } from "./validation";
+import {
+  MEDICATION_COLORS,
+  MEDICATION_ICON_NAMES,
+} from "../medication-appearance";
 
 const medicationId = "6cfa88e7-8474-4b17-a148-545fb825785b";
 const intake = {
@@ -60,6 +65,69 @@ test("medications require a name and preserve user-entered fractional strengths"
     medicationSchema.safeParse({ ...medication, name: "   " }).success,
     false,
   );
+});
+
+test("medication validation accepts every registered color and rejects unknown colors", () => {
+  const medication = { name: "Example", strengthMg: 1, form: "tablet" };
+  for (const { value } of MEDICATION_COLORS) {
+    assert.equal(
+      medicationSchema.parse({ ...medication, color: value }).color,
+      value,
+    );
+  }
+  assert.equal(
+    medicationSchema.safeParse({ ...medication, color: "unregistered" })
+      .success,
+    false,
+  );
+});
+
+test("legacy medications omit the optional icon instead of receiving a persisted default", () => {
+  for (const color of ["rose", "amber", "violet"]) {
+    const result = medicationSchema.parse({
+      name: "Example",
+      strengthMg: 1,
+      form: "tablet",
+      color,
+    });
+    assert.equal(Object.hasOwn(result, "icon"), false);
+  }
+});
+
+test("archiving and unrelated medication patches preserve the existing custom icon", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+    icon: "🌙",
+  };
+  const archivePatch = medicationPatchSchema.parse({ archived: true });
+  assert.deepEqual(archivePatch, { archived: true });
+  assert.equal(Object.assign({ ...medication }, archivePatch).icon, "🌙");
+  const namePatch = medicationPatchSchema.parse({ name: "Renamed" });
+  assert.deepEqual(namePatch, { name: "Renamed" });
+  assert.equal(Object.assign({ ...medication }, namePatch).icon, "🌙");
+});
+
+test("medication icons accept allowlisted names and a single complex emoji", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "mint",
+  };
+  for (const icon of [...MEDICATION_ICON_NAMES, "👩🏽‍⚕️", "🇦🇹", "❤️"]) {
+    assert.equal(medicationSchema.parse({ ...medication, icon }).icon, icon);
+    assert.equal(medicationPatchSchema.parse({ icon }).icon, icon);
+  }
+  for (const icon of ["hello", "🌙🌙", "<svg/>", " ", "🌙".repeat(33), null]) {
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, icon }).success,
+      false,
+    );
+    assert.equal(medicationPatchSchema.safeParse({ icon }).success, false);
+  }
 });
 
 test("goal periods use real calendar days in chronological order", () => {
