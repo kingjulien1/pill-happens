@@ -1,7 +1,13 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { configurationIssueFor, createSessionToken, passwordMatchesValue, SESSION_MAX_AGE, verifySessionToken } from "@/lib/server/security";
+import {
+  configurationIssueFor,
+  createSessionToken,
+  passwordMatchesValue,
+  SESSION_MAX_AGE,
+  verifySessionToken,
+} from "@/lib/server/security";
 
 export { SESSION_MAX_AGE } from "@/lib/server/security";
 
@@ -21,11 +27,18 @@ export function configurationReady(): boolean {
 }
 
 function developmentWithoutPassword(): boolean {
-  return process.env.NODE_ENV !== "production" && !process.env.APP_PASSWORD && !process.env.DATABASE_URL;
+  return (
+    process.env.NODE_ENV !== "production" &&
+    !process.env.APP_PASSWORD &&
+    !process.env.DATABASE_URL
+  );
 }
 
 function credentials() {
-  return { password: process.env.APP_PASSWORD ?? "", secret: process.env.SESSION_SECRET ?? "" };
+  return {
+    password: process.env.APP_PASSWORD ?? "",
+    secret: process.env.SESSION_SECRET ?? "",
+  };
 }
 
 export function passwordMatches(password: string): boolean {

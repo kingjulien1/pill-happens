@@ -94,7 +94,9 @@ function localParts(input: Date | string, timeZone: string) {
 export function isValidDayKey(key: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return false;
   const value = new Date(`${key}T12:00:00.000Z`);
-  return Number.isFinite(value.getTime()) && value.toISOString().slice(0, 10) === key;
+  return (
+    Number.isFinite(value.getTime()) && value.toISOString().slice(0, 10) === key
+  );
 }
 
 export function shiftDayKey(key: string, offset: number): string {
@@ -121,14 +123,20 @@ export function dayKey(input: Date | string, timeZone: string): string {
 export function dayIntakes(data: AppData, key: string): Intake[] {
   return data.intakes
     .filter((entry) => dayKey(entry.takenAt, data.settings.timezone) === key)
-    .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt) || a.id.localeCompare(b.id));
+    .sort(
+      (a, b) =>
+        Date.parse(a.createdAt) - Date.parse(b.createdAt) ||
+        a.id.localeCompare(b.id),
+    );
 }
 
 function cleanDecimal(value: number): number {
   return Number(value.toFixed(8));
 }
 
-export function doseMg(intake: Pick<Intake, "strengthMg" | "quantity">): number {
+export function doseMg(
+  intake: Pick<Intake, "strengthMg" | "quantity">,
+): number {
   return cleanDecimal(intake.strengthMg * intake.quantity);
 }
 
@@ -150,12 +158,14 @@ export function totalsForDay(data: AppData, key: string): DailyTotal[] {
 }
 
 /** Newer effective dates supersede older goals without rewriting history. */
-export function goalForDay(data: AppData, medicationId: string, key: string): Goal | undefined {
+export function goalForDay(
+  data: AppData,
+  medicationId: string,
+  key: string,
+): Goal | undefined {
   const latest = data.goals
     .filter(
-      (goal) =>
-        goal.medicationId === medicationId &&
-        goal.startsOn <= key,
+      (goal) => goal.medicationId === medicationId && goal.startsOn <= key,
     )
     .sort(
       (a, b) =>
@@ -165,15 +175,22 @@ export function goalForDay(data: AppData, medicationId: string, key: string): Go
     )[0];
   // Once superseded, an older goal never silently becomes active again.
   // An expired newest goal leaves no active maximum until another is added.
-  return latest && (!latest.endsOn || latest.endsOn >= key) ? latest : undefined;
+  return latest && (!latest.endsOn || latest.endsOn >= key)
+    ? latest
+    : undefined;
 }
 
 export function formatDose(value: number): string {
-  return new Intl.NumberFormat("en", { maximumFractionDigits: 8 }).format(value);
+  return new Intl.NumberFormat("en", { maximumFractionDigits: 8 }).format(
+    value,
+  );
 }
 
 /** A date key has no timezone: render it as the same calendar day everywhere. */
-export function formatDay(key: string, options?: Intl.DateTimeFormatOptions): string {
+export function formatDay(
+  key: string,
+  options?: Intl.DateTimeFormatOptions,
+): string {
   if (!isValidDayKey(key)) throw new RangeError("Invalid day.");
   return new Intl.DateTimeFormat("en", {
     weekday: "long",
@@ -195,7 +212,9 @@ export function toLocalInput(input: Date | string, timeZone: string): string {
  * local time is rejected rather than silently moved to another intake time.
  */
 export function fromLocalInput(value: string, timeZone: string): string {
-  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value);
+  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(
+    value,
+  );
   if (
     !match ||
     !isValidDayKey(match[1]) ||
@@ -227,7 +246,9 @@ export function fromLocalInput(value: string, timeZone: string): string {
     if (actual === desired) candidates.push(instant);
   }
   if (candidates.length === 0) {
-    throw new RangeError("This local time does not exist because the clocks change. Choose another time.");
+    throw new RangeError(
+      "This local time does not exist because the clocks change. Choose another time.",
+    );
   }
   return new Date(Math.min(...candidates)).toISOString();
 }

@@ -1,0 +1,8 @@
+node_modules
+.next
+.data
+.vercel
+.env*
+package-lock.json
+next-env.d.ts
+AGENTS.md
