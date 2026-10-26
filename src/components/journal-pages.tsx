@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
+import { DayHeading } from "@/components/day-heading";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
@@ -324,16 +325,7 @@ export function TodayPage() {
   const today = dayKey(now, data.settings.timezone);
   return (
     <>
-      <PageHeading
-        title="Today"
-        context={formatDay(today, {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
-        })}
-      >
-        Track your intake, one entry at a time.
-      </PageHeading>
+      <DayHeading day={today} />
       <DailyOverview data={data} day={today} />
       <section aria-label="Today's entries" className="mt-6">
         <IntakeTimeline data={data} day={today} />
@@ -910,18 +902,11 @@ export function DayPage({ day }: { day: string }) {
         <ActionIcon name="back" className="size-4.5" />
         Back to past days
       </Link>
-      <PageHeading
-        title="Daily log"
-        context={formatDay(day, {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })}
-      >
+      <DayHeading day={day} label="Daily log" />
+      <p className="-mt-3 mb-5 text-center text-[10px] leading-relaxed text-muted-foreground">
         06:00 to 06:00 the next day ·{" "}
         {data.settings.timezone.replaceAll("_", " ")}
-      </PageHeading>
+      </p>
       <DailyOverview data={data} day={day} />
       <div className="my-6">
         <IntakeTimeline data={data} day={day} />

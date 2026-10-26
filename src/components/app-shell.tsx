@@ -82,10 +82,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </main>
       <footer className="mt-6 flex min-h-8 items-center justify-center gap-2 text-[10px] leading-4 text-muted-foreground">
-        <span className="whitespace-nowrap">One day at a time.</span>
-        <span aria-hidden="true" className="text-muted-foreground/60">
-          ·
-        </span>
         <a
           href="https://www.fda.gov/drugs/drug-safety-and-availability/fda-requiring-boxed-warning-updated-improve-safe-use-benzodiazepine-drug-class"
           target="_blank"

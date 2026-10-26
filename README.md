@@ -6,7 +6,7 @@ Built with **Next.js 16.4.3**, **React 19.3.1**, TypeScript, Tailwind CSS 4, and
 
 ## The experience
 
-- **Today:** compact medication totals and recorded daily maximums, followed by intake entries in creation order from oldest to newest. The logging button stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
+- **Today:** a centered, highlighted weekday/date heading with a large bold calendar icon and a 06:00 reset label, followed by compact medication totals and recorded daily maximums, then intake entries in creation order from oldest to newest. Day-detail pages share the same date heading. The logging button stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
 - **Logging:** a shadcn bottom drawer on mobile and a centered dialog at widths of 768px and above. Choose a medication, select or enter a quantity, check the calculated dose, set the time taken, and optionally add a note.
 - **Medications:** create and edit the name, strength, form, and color. Archive a medication to remove it from new-log choices; restore it whenever needed.
 - **Goals:** record a daily maximum for one medication, with a start date, optional end date, and optional note. Future goals are supported.
