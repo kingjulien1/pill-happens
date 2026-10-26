@@ -2,8 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   configurationIssueFor,
+  createJournalSessionToken,
   createSessionToken,
+  isJournalId,
   isSameOriginRequest,
+  journalFromSessionToken,
+  LEGACY_JOURNAL_ID,
   passwordMatchesValue,
   SESSION_MAX_AGE,
   verifySessionToken,
@@ -266,4 +270,139 @@ test("changing the password or the signing secret revokes previous sessions", ()
     false,
   );
   assert.throws(() => createSessionToken({ password: "", secret: "" }, now));
+});
+
+const journalA = "7f1f2640-4f12-48ea-9584-23d1878d9b11";
+const journalB = "8f1f2640-4f12-48ea-9584-23d1878d9b22";
+
+test("journal scopes accept only personal or canonical UUIDs", () => {
+  assert.equal(isJournalId(LEGACY_JOURNAL_ID), true);
+  assert.equal(isJournalId(journalA), true);
+  for (const invalid of [
+    null,
+    undefined,
+    1,
+    "",
+    "other",
+    "../personal",
+    "/personal",
+    "personal ",
+    journalA.toUpperCase(),
+    "00000000-0000-0000-0000-000000000000",
+    `${journalA}/state`,
+  ]) {
+    assert.equal(isJournalId(invalid), false);
+    if (typeof invalid === "string") {
+      assert.throws(() => createJournalSessionToken(invalid, credentials, now));
+    }
+  }
+});
+
+test("legacy sessions retain access only to the original personal journal", () => {
+  const token = createSessionToken(credentials, now);
+  assert.equal(journalFromSessionToken(token, credentials, now), "personal");
+  assert.equal(
+    journalFromSessionToken(
+      token,
+      { ...credentials, password: "a-different-owner-password" },
+      now,
+    ),
+    null,
+  );
+  assert.equal(
+    journalFromSessionToken(token, credentials, now + SESSION_MAX_AGE * 1000),
+    null,
+  );
+});
+
+test("scoped sessions identify only their signed journal without including passwords", () => {
+  for (const journalId of ["personal", journalA, journalB]) {
+    const token = createJournalSessionToken(journalId, credentials, now);
+    assert.equal(journalFromSessionToken(token, credentials, now), journalId);
+    assert.equal(verifySessionToken(token, credentials, now), false);
+    assert.notEqual(
+      token,
+      createJournalSessionToken(journalId, credentials, now),
+    );
+    const payload = Buffer.from(token.split(".")[0], "base64url").toString(
+      "utf8",
+    );
+    assert.equal(payload.includes(credentials.password), false);
+    assert.equal(payload.includes(credentials.secret), false);
+  }
+});
+
+test("owner password rotation revokes personal sessions while secret rotation revokes every journal", () => {
+  const changedPassword = { ...credentials, password: "a-new-owner-password" };
+  const changedSecret = { ...credentials, secret: `${credentials.secret}-new` };
+  for (const journalId of ["personal", journalA, journalB]) {
+    const token = createJournalSessionToken(journalId, credentials, now);
+    assert.equal(
+      journalFromSessionToken(token, changedPassword, now),
+      journalId === "personal" ? null : journalId,
+    );
+    assert.equal(journalFromSessionToken(token, changedSecret, now), null);
+    assert.equal(
+      journalFromSessionToken(token, { ...credentials, secret: "short" }, now),
+      null,
+    );
+    assert.throws(() =>
+      createJournalSessionToken(journalId, { ...credentials, secret: "short" }),
+    );
+  }
+});
+
+test("journal scope, version, expiry, and nonce cannot be changed inside a session", () => {
+  const token = createJournalSessionToken(journalA, credentials, now);
+  const [payload, signature] = token.split(".");
+  const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+  for (const change of [
+    { journalId: journalB },
+    { journalId: "personal" },
+    { journalId: "../personal" },
+    { v: 1 },
+    { v: 3 },
+    { exp: data.exp + 1 },
+    { exp: "9999999999" },
+    { nonce: "" },
+    { nonce: "a".repeat(22) },
+  ]) {
+    const altered = Buffer.from(
+      JSON.stringify({ ...data, ...change }),
+    ).toString("base64url");
+    assert.equal(
+      journalFromSessionToken(`${altered}.${signature}`, credentials, now),
+      null,
+    );
+  }
+});
+
+test("scoped sessions expire exactly at their deadline and reject malformed cookies", () => {
+  const token = createJournalSessionToken(journalA, credentials, now);
+  assert.equal(
+    journalFromSessionToken(
+      token,
+      credentials,
+      now + SESSION_MAX_AGE * 1000 - 1,
+    ),
+    journalA,
+  );
+  assert.equal(
+    journalFromSessionToken(token, credentials, now + SESSION_MAX_AGE * 1000),
+    null,
+  );
+  assert.equal(journalFromSessionToken(token, credentials, now - 61_000), null);
+  const [payload, signature] = token.split(".");
+  for (const invalid of [
+    "",
+    "x",
+    "x.x",
+    `${payload}.`,
+    `${payload}.${signature}.extra`,
+    `${payload}.${"a".repeat(43)}`,
+    `${payload}.${signature}!`,
+    "a".repeat(1025),
+  ]) {
+    assert.equal(journalFromSessionToken(invalid, credentials, now), null);
+  }
 });

@@ -3,11 +3,13 @@ import "server-only";
 import { cookies } from "next/headers";
 import {
   configurationIssueFor,
-  createSessionToken,
-  passwordMatchesValue,
+  createJournalSessionToken,
+  journalFromSessionToken,
+  LEGACY_JOURNAL_ID,
   SESSION_MAX_AGE,
-  verifySessionToken,
 } from "@/lib/server/security";
+import { journalRepository } from "./database";
+import { createJournalService } from "./journal-service";
 
 export { SESSION_MAX_AGE } from "@/lib/server/security";
 
@@ -41,19 +43,38 @@ function credentials() {
   };
 }
 
-export function passwordMatches(password: string): boolean {
-  return passwordMatchesValue(password, process.env.APP_PASSWORD ?? "");
+/** File-only development may bypass login, but cannot create unsigned journals. */
+export function passwordAuthenticationReady(): boolean {
+  return (
+    Boolean(process.env.APP_PASSWORD) &&
+    (process.env.SESSION_SECRET?.length ?? 0) >= 32 &&
+    configurationReady()
+  );
 }
 
-export function createSession(): string {
-  return createSessionToken(credentials());
+export function passwordJournals() {
+  if (!passwordAuthenticationReady())
+    throw new Error("Password authentication is not configured.");
+  return createJournalService(
+    journalRepository(),
+    process.env.APP_PASSWORD ?? "",
+  );
+}
+
+export function createSession(journalId: string): string {
+  return createJournalSessionToken(journalId, credentials());
+}
+
+/** The only journal scope accepted by server data access is a verified cookie. */
+export async function authenticatedJournal(): Promise<string | null> {
+  if (!configurationReady()) return null;
+  if (developmentWithoutPassword()) return LEGACY_JOURNAL_ID;
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  return token ? journalFromSessionToken(token, credentials()) : null;
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  if (!configurationReady()) return false;
-  if (developmentWithoutPassword()) return true;
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  return Boolean(token && verifySessionToken(token, credentials()));
+  return (await authenticatedJournal()) !== null;
 }
 
 export function cookieOptions() {
