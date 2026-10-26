@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data, error, refresh } = useJournal();
   return (
     <div className="mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10">
-      <header className="mb-10 flex flex-col items-center">
+      <header className="mb-8 flex flex-col items-center">
         <Link
           href="/"
           className="mb-7 flex items-center gap-2.5"
@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span className="flex size-8 items-center justify-center rounded-full border border-primary/15 bg-primary/5 text-primary">
             <Flower2 size={17} strokeWidth={1.5} />
           </span>
-          <span className="text-[15px] font-medium tracking-[-.03em]">
+          <span className="text-[15px] font-medium tracking-tight">
             pill happens<span className="ml-0.5 text-primary">.</span>
           </span>
         </Link>
@@ -91,10 +91,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </main>
-      <footer className="mt-12 border-t border-border/70 pt-6 text-center">
-        <p className="display text-[18px] italic tracking-[-.02em] text-muted-foreground">
-          A little awareness. One day at a time.
-        </p>
+      <footer className="mt-10 border-t border-border/70 pt-5 text-center">
+        <p className="text-xs text-muted-foreground">One day at a time.</p>
         <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
           Work with your prescriber before changing your dose.
           <br />

@@ -18,6 +18,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { HeadingText } from "@/components/heading-text";
 
 const subscribe = (fn: () => void) => {
   const query = window.matchMedia("(min-width: 768px)");
@@ -28,12 +29,14 @@ export function ResponsiveModal({
   open,
   onOpenChange,
   title,
+  context,
   description,
   children,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  context?: string;
   description: string;
   children: React.ReactNode;
 }) {
@@ -46,8 +49,10 @@ export function ResponsiveModal({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-3xl p-7 sm:max-w-[440px]">
-          <DialogHeader className="mb-2 gap-3">
-            <DialogTitle className="display text-3xl">{title}</DialogTitle>
+          <DialogHeader className="mb-1 gap-1.5">
+            <DialogTitle className="pr-9 text-lg font-semibold tracking-tight">
+              <HeadingText title={title} context={context} />
+            </DialogTitle>
             <DialogDescription className="text-xs leading-relaxed">
               {description}
             </DialogDescription>
@@ -60,8 +65,10 @@ export function ResponsiveModal({
     <Drawer open={open} onOpenChange={onOpenChange} showSwipeHandle>
       <DrawerContent className="rounded-t-[28px]">
         <DrawerHeader className="relative px-6 pt-5 pb-4 text-left!">
-          <DrawerTitle className="display text-3xl">{title}</DrawerTitle>
-          <DrawerDescription className="mt-2 pr-6 text-left text-xs leading-relaxed">
+          <DrawerTitle className="pr-9 text-lg font-semibold tracking-tight">
+            <HeadingText title={title} context={context} />
+          </DrawerTitle>
+          <DrawerDescription className="mt-1.5 pr-6 text-left text-xs leading-relaxed">
             {description}
           </DrawerDescription>
           <DrawerClose

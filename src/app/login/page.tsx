@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Flower2, LockKeyhole } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
+import { HeadingText } from "@/components/heading-text";
 import { configurationIssue, isAuthenticated } from "@/lib/server/auth";
 
 export const metadata: Metadata = { title: "Your private space" };
@@ -13,21 +14,20 @@ export default async function LoginPage() {
 
   return (
     <main className="page-enter mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-14 sm:px-8">
-      <div className="mb-12 flex items-center justify-center gap-2.5 text-primary">
+      <div className="mb-8 flex items-center justify-center gap-2.5 text-primary">
         <Flower2 className="size-5" strokeWidth={1.5} aria-hidden="true" />
         <span className="text-sm font-medium tracking-tight">Pill happens</span>
       </div>
-      <header className="mb-8 text-center">
-        <p className="eyebrow mb-4">One day at a time</p>
-        <h1 className="display text-[2.8rem] leading-[1.12]">
-          A little space,
-          <br />
-          just for you.
+      <header className="mb-6 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <HeadingText
+            title="Sign in"
+            context="Private journal"
+            className="justify-center"
+          />
         </h1>
-        <p className="mx-auto mt-4 max-w-64 text-sm leading-relaxed text-muted-foreground">
-          Keep track, find your rhythm,
-          <br />
-          and take things at your own pace.
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Sign in to keep track of your day.
         </p>
       </header>
       <section
@@ -55,8 +55,8 @@ export default async function LoginPage() {
           <LoginForm />
         )}
       </section>
-      <p className="mt-10 text-center text-xs tracking-wide text-muted-foreground">
-        Small steps. A little more clarity.
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        One day at a time.
       </p>
     </main>
   );

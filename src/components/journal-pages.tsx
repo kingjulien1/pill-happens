@@ -23,13 +23,13 @@ import {
   Plus,
   RotateCcw,
   Settings2,
-  Sun,
   Target,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { ResponsiveModal } from "@/components/responsive-modal";
+import { HeadingText } from "@/components/heading-text";
 import { IntakeForm } from "@/components/intake-form";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
@@ -50,27 +50,21 @@ import {
 } from "@/lib/domain";
 
 function PageHeading({
-  eyebrow,
   title,
+  context,
   children,
-  action,
 }: {
-  eyebrow: string;
   title: string;
+  context: React.ReactNode;
   children?: React.ReactNode;
-  action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-7">
-      <div className="mb-3 flex items-center justify-between">
-        <p className="eyebrow">{eyebrow}</p>
-        {action}
-      </div>
-      <h1 className="display text-[43px] leading-[1.12] sm:text-5xl">
-        {title}
+    <div className="mb-6">
+      <h1 className="text-2xl font-semibold tracking-tight">
+        <HeadingText title={title} context={context} />
       </h1>
       {children && (
-        <p className="mt-3 max-w-[330px] text-xs leading-[1.9] text-muted-foreground">
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
           {children}
         </p>
       )}
@@ -185,7 +179,9 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
       className="surface overflow-hidden rounded-[26px]"
     >
       <div className="flex items-center justify-between px-5 pt-5">
-        <span className="eyebrow">A moment of awareness</span>
+        <h2 className="text-sm font-medium">
+          <HeadingText title="Overview" context="Daily totals" />
+        </h2>
         <Link
           href="/goals"
           aria-label="View daily goals"
@@ -209,7 +205,7 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
               <p className="mb-1 truncate text-xs text-muted-foreground">
                 {firstName}
               </p>
-              <p className="display text-[38px] leading-tight">
+              <p className="text-3xl font-semibold leading-tight tracking-tight tabular-nums">
                 {formatDose(firstTotal?.totalMg ?? 0)}
                 <span className="ml-1.5 font-sans text-sm tracking-normal text-muted-foreground">
                   mg
@@ -218,7 +214,7 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
               <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
                 {firstGoal
                   ? `of ${formatDose(firstGoal.dailyLimitMg)} mg daily maximum`
-                  : "total recorded today"}
+                  : "total recorded"}
               </p>
               {firstGoal &&
                 (firstTotal?.totalMg ?? 0) > firstGoal.dailyLimitMg && (
@@ -229,11 +225,11 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
             </>
           ) : (
             <>
-              <p className="display text-[38px] leading-tight">A fresh page.</p>
+              <p className="text-lg font-medium leading-snug tracking-tight">
+                Nothing logged yet
+              </p>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Every entry helps you see
-                <br />
-                the bigger picture.
+                Your daily totals will appear here.
               </p>
             </>
           )}
@@ -311,7 +307,8 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
     <ResponsiveModal
       open
       onOpenChange={(v) => !v && close()}
-      title="A little correction."
+      title="Edit intake"
+      context="Update entry"
       description="Update this entry. Changes are saved to the day the intake was taken."
     >
       <IntakeForm intake={intake} onSaved={close} />
@@ -357,16 +354,11 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
 function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
   const [editing, setEditing] = useState<Intake | null>(null);
   const entries = dayIntakes(data, day);
-  const { now } = useJournal();
-  const today = now ? dayKey(now, data.settings.timezone) : "";
   return (
     <>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-medium">
-          {day === today ? "Today’s entries" : "Day’s entries"}
-          <span className="ml-2 text-xs font-normal text-muted-foreground">
-            {entries.length ? `(${entries.length})` : ""}
-          </span>
+          <HeadingText title="Entries" context={`${entries.length} logged`} />
         </h2>
         <span className="flex items-center gap-1 text-[9px] text-muted-foreground">
           <Clock3 size={10} />
@@ -455,22 +447,14 @@ export function TodayPage() {
   return (
     <>
       <PageHeading
-        eyebrow="ONE DAY AT A TIME"
-        title="A little more awareness."
-        action={
-          <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <Sun size={12} />
-            {formatDay(today, {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-            })}
-          </span>
-        }
+        title="Today"
+        context={formatDay(today, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        })}
       >
-        A quiet space to keep track, find your rhythm,
-        <br className="hidden min-[370px]:block" /> and move forward at your own
-        pace.
+        Track your intake, one entry at a time.
       </PageHeading>
       <DailyOverview data={data} day={today} />
       <Button
@@ -482,9 +466,7 @@ export function TodayPage() {
             <Plus size={23} strokeWidth={1.5} />
           </span>
           <span className="flex flex-col items-start">
-            <span className="text-base font-medium tracking-[-.02em]">
-              Log an intake
-            </span>
+            <span className="text-base font-medium">Log an intake</span>
             <span className="mt-1 text-[10px] font-normal opacity-75">
               A moment to check in with yourself
             </span>
@@ -508,7 +490,8 @@ export function TodayPage() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="A moment to check in."
+        title="Log intake"
+        context="New entry"
         description="Record what you took, when you took it, and anything on your mind."
       >
         {open && <IntakeForm onSaved={() => setOpen(false)} />}
@@ -544,9 +527,8 @@ export function MedicationsPage() {
   }
   return (
     <>
-      <PageHeading eyebrow="YOUR MEDICATIONS" title="The details matter.">
-        Keep your medication names and strengths in one place. A little clarity
-        for every check-in.
+      <PageHeading title="Medications" context="Your list">
+        Manage medication names, strengths, and forms.
       </PageHeading>
       <Button
         className="mb-7 h-13 w-full gap-2 rounded-2xl"
@@ -560,10 +542,10 @@ export function MedicationsPage() {
       </Button>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-medium">
-          {showArchived ? "Archived" : "Your medications"}
-          <span className="ml-2 text-xs font-normal text-muted-foreground">
-            ({medications.length})
-          </span>
+          <HeadingText
+            title={showArchived ? "Archived" : "Active"}
+            context={`${medications.length} ${medications.length === 1 ? "medication" : "medications"}`}
+          />
         </h2>
         <Button
           variant="ghost"
@@ -640,7 +622,8 @@ export function MedicationsPage() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title={editing ? "Keep the details right." : "A little more clarity."}
+        title={editing ? "Edit medication" : "Add medication"}
+        context={editing ? "Update details" : "Name & strength"}
         description="Use the name and strength printed on your medication packaging."
       >
         {open && (
@@ -679,9 +662,8 @@ export function GoalsPage() {
   }
   return (
     <>
-      <PageHeading eyebrow="GENTLE DIRECTION" title="Your pace. Your path.">
-        Set a daily maximum agreed with your prescriber. Small, considered
-        steps, with room to be human.
+      <PageHeading title="Goals" context="Daily maximums">
+        Keep track of the targets agreed with your prescriber.
       </PageHeading>
       <Button
         className="mb-7 h-13 w-full gap-2 rounded-2xl"
@@ -735,7 +717,7 @@ export function GoalsPage() {
                   </button>
                 </div>
                 <div className="flex items-end justify-between gap-3">
-                  <p className="display text-[37px] leading-none">
+                  <p className="text-[28px] font-semibold leading-none tracking-tight tabular-nums">
                     {formatDose(goal.dailyLimitMg)}
                     <span className="ml-1.5 font-sans text-xs tracking-normal text-muted-foreground">
                       mg / day
@@ -798,7 +780,8 @@ export function GoalsPage() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="A small step forward."
+        title="Set a goal"
+        context="Daily maximum"
         description="Record a daily maximum you have chosen with your prescriber. This does not calculate a taper schedule."
       >
         {open && <GoalForm onSaved={() => setOpen(false)} />}
@@ -807,6 +790,7 @@ export function GoalsPage() {
         open={Boolean(deleting)}
         onOpenChange={(v) => !v && setDeleting(null)}
         title="Remove this goal?"
+        context="Confirm removal"
         description="This also removes it from historical summaries. Your intake entries stay in your journal."
       >
         <div className="mt-2 grid grid-cols-2 gap-3">
@@ -876,7 +860,8 @@ function JournalPreferences() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="Make yourself at home."
+        title="Preferences"
+        context="Your journal"
         description="Your day begins at 06:00 in this timezone. Changing it regroups all of your entries."
       >
         <form
@@ -964,9 +949,8 @@ export function HistoryPage() {
     .reverse();
   return (
     <>
-      <PageHeading eyebrow="YOUR JOURNEY SO FAR" title="A little perspective.">
-        Every day is part of the picture. Look back with curiosity, and a little
-        kindness.
+      <PageHeading title="History" context="Past days">
+        Daily summaries and intake details.
       </PageHeading>
       <div className="mb-5 flex items-center justify-between border-b border-border/70 pb-4">
         <span className="text-xs font-medium">Past days</span>
@@ -1066,21 +1050,15 @@ export function DayPage({ day }: { day: string }) {
         Back to past days
       </Link>
       <PageHeading
-        eyebrow="A PAGE FROM YOUR JOURNEY"
-        title={formatDay(day, {
+        title="Daily log"
+        context={formatDay(day, {
           weekday: "short",
           month: "short",
           day: "numeric",
+          year: "numeric",
         })}
       >
-        {formatDay(day, {
-          weekday: undefined,
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })}{" "}
-        · 06:00 to 06:00 the next day.
-        <br />
+        06:00 to 06:00 the next day ·{" "}
         {data.settings.timezone.replaceAll("_", " ")}
       </PageHeading>
       <DailyOverview data={data} day={day} />
@@ -1118,7 +1096,8 @@ export function DayPage({ day }: { day: string }) {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="Fill in a little detail."
+        title="Log intake"
+        context="Past entry"
         description="Add an intake you missed. Check the date and time before saving."
       >
         {open && <IntakeForm initialDay={day} onSaved={() => setOpen(false)} />}
