@@ -243,8 +243,8 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       setError("Choose an active medication.");
       return;
     }
-    if (!Number.isFinite(dailyLimitMg) || dailyLimitMg <= 0) {
-      setError("Enter a daily maximum greater than zero.");
+    if (!limit.trim() || !Number.isFinite(dailyLimitMg) || dailyLimitMg < 0) {
+      setError("Enter a daily maximum of zero or more.");
       return;
     }
     if (!isValidDayKey(startsOn) || (endsOn && !isValidDayKey(endsOn))) {
@@ -328,7 +328,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
             inputMode="decimal"
             value={limit}
             onChange={(event) => setLimit(event.target.value)}
-            min="0.0001"
+            min="0"
             max="100000"
             step="0.0001"
             required

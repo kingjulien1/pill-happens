@@ -116,6 +116,10 @@ function MedicationIcon({
   );
 }
 
+function usagePercent(total: number, maximum: number) {
+  return maximum > 0 ? (total / maximum) * 100 : total > 0 ? 100 : 0;
+}
+
 function ProgressRing({ percent, label }: { percent: number; label: string }) {
   const bounded = Math.min(Math.max(percent, 0), 100);
   return (
@@ -173,7 +177,7 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
     firstTotal?.medicationName ??
     data.medications.find((m) => m.id === firstId)?.name;
   const percent = firstGoal
-    ? ((firstTotal?.totalMg ?? 0) / firstGoal.dailyLimitMg) * 100
+    ? usagePercent(firstTotal?.totalMg ?? 0, firstGoal.dailyLimitMg)
     : 0;
   return (
     <section
@@ -216,11 +220,12 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
                   ? `of ${formatDose(firstGoal.dailyLimitMg)} mg daily maximum`
                   : "total recorded today"}
               </p>
-              {firstGoal && percent > 100 && (
-                <p className="mt-1 text-[10px] text-primary">
-                  Above your recorded target. Take a moment to check in.
-                </p>
-              )}
+              {firstGoal &&
+                (firstTotal?.totalMg ?? 0) > firstGoal.dailyLimitMg && (
+                  <p className="mt-1 text-[10px] text-primary">
+                    Above your recorded target. Take a moment to check in.
+                  </p>
+                )}
             </>
           ) : (
             <>
@@ -745,14 +750,18 @@ export function GoalsPage() {
                     <div className="mb-2 flex justify-between text-[10px] text-muted-foreground">
                       <span>{formatDose(taken)} mg logged today</span>
                       <span>
-                        {Math.round((taken / goal.dailyLimitMg) * 100)}%
+                        {goal.dailyLimitMg === 0
+                          ? taken > 0
+                            ? "Above maximum"
+                            : "No intake recorded"
+                          : `${Math.round(usagePercent(taken, goal.dailyLimitMg))}%`}
                       </span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-primary/10">
                       <div
                         className="h-full rounded-full bg-primary/65"
                         style={{
-                          width: `${Math.min((taken / goal.dailyLimitMg) * 100, 100)}%`,
+                          width: `${Math.min(usagePercent(taken, goal.dailyLimitMg), 100)}%`,
                         }}
                       />
                     </div>
