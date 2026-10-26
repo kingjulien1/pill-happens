@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
       </header>
-      <main id="main" className="flex-1">
+      <main id="main" className="flex min-w-0 flex-1 flex-col">
         {error ? (
           <div role="alert" className="surface rounded-3xl p-8 text-center">
             <p className="text-sm text-muted-foreground">{error}</p>
@@ -72,13 +72,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : !data ? (
           <div
             role="status"
-            className="flex min-h-64 items-center justify-center gap-2 text-sm text-muted-foreground"
+            className="flex min-h-64 flex-1 items-center justify-center gap-2 text-sm text-muted-foreground"
           >
             <ActionIcon name="loading" className="animate-spin" />
             Opening your space…
           </div>
         ) : (
-          <div key={path} className="page-enter">
+          <div
+            key={path}
+            className={`page-enter min-w-0 flex-1 ${path === "/" ? "flex flex-col" : ""}`}
+          >
             {children}
           </div>
         )}

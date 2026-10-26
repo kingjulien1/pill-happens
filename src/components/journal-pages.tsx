@@ -317,13 +317,13 @@ export function TodayPage({ streakIcon }: { streakIcon: StreakIconName }) {
   const today = dayKey(now, data.settings.timezone);
   const streak = loggingStreak(data, today, now);
   return (
-    <>
+    <div className="flex flex-1 flex-col" data-today-layout>
       <TodayHeading
         day={today}
         current={streak.current}
         streakIcon={streakIcon}
       />
-      <section aria-label="Today's entries" className="mt-6">
+      <section aria-label="Today's entries" className="flex-1">
         <IntakeTimeline data={data} day={today} showSummary={false} />
       </section>
       <IntakeAction
@@ -339,7 +339,7 @@ export function TodayPage({ streakIcon }: { streakIcon: StreakIconName }) {
       >
         {open && <IntakeForm onSaved={() => setOpen(false)} />}
       </ResponsiveModal>
-    </>
+    </div>
   );
 }
 
