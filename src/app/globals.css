@@ -7,7 +7,7 @@
   color-scheme: light dark;
   --background: #faf7f5;
   --foreground: #3e343a;
-  --card: #fffcfac9;
+  --card: #fffcfa;
   --card-foreground: #3e343a;
   --popover: #fffcfa;
   --popover-foreground: #3e343a;
@@ -23,14 +23,14 @@
   --border: #e9dfe0;
   --input: #e0d4d8;
   --ring: #b47a91;
-  --radius: 1rem;
+  --radius: 0.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #1c171c;
     --foreground: #f2e7eb;
-    --card: #272128cf;
+    --card: #272128;
     --card-foreground: #f2e7eb;
     --popover: #292129;
     --popover-foreground: #f2e7eb;
@@ -75,6 +75,8 @@
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+  --font-heading:
+    "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @layer base {
@@ -90,6 +92,13 @@
     isolation: isolate;
     margin: 0;
     min-height: 100dvh;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    letter-spacing: -0.025em;
   }
   button,
   a,
@@ -192,8 +201,13 @@
 .surface {
   background: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 28px #65354d03;
-  backdrop-filter: blur(16px);
+  box-shadow: none;
+}
+.journal-list {
+  border-block: 1px solid var(--border);
+}
+.journal-list > * + * {
+  border-top: 1px solid var(--border);
 }
 .form-field {
   display: flex;
@@ -220,9 +234,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 42px;
-  border-radius: 12px;
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
   color: var(--muted-foreground);
   transition:
     background 0.2s,
