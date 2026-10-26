@@ -237,7 +237,7 @@
 }
 @media (max-width: 767px) {
   .with-intake-dock {
-    /* Let the final entry and footer scroll fully above the floating action. */
+    /* Let the final entry scroll fully above the floating action. */
     padding-bottom: calc(104px + max(20px, env(safe-area-inset-bottom)));
   }
 }

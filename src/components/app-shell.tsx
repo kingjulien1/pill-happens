@@ -83,17 +83,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </main>
-      <footer className="mt-6 flex min-h-8 items-center justify-center gap-2 text-[10px] leading-4 text-muted-foreground">
-        <a
-          href="https://www.fda.gov/drugs/drug-safety-and-availability/fda-requiring-boxed-warning-updated-improve-safe-use-benzodiazepine-drug-class"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Safety guidance on benzodiazepine withdrawal (opens in a new tab)"
-          className="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-md transition-colors hover:text-foreground"
-        >
-          Safety guidance <ActionIcon name="external" className="size-3.5" />
-        </a>
-      </footer>
     </div>
   );
 }
