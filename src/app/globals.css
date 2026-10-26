@@ -123,7 +123,7 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: color-mix(in srgb, #d885a4 10%, var(--background));
+  background: color-mix(in srgb, #6366f1 10%, var(--background));
 }
 .ambient::after {
   content: "";
