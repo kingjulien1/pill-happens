@@ -14,7 +14,13 @@ const subscribe = (onChange: () => void) => {
 const getSnapshot = () => window.matchMedia(mobileQuery).matches;
 const getServerSnapshot = () => false;
 
-export function IntakeAction({ onClick }: { onClick: () => void }) {
+export function IntakeAction({
+  onClick,
+  todayCount,
+}: {
+  onClick: () => void;
+  todayCount: number;
+}) {
   const mobile = useSyncExternalStore(
     subscribe,
     getSnapshot,
@@ -24,10 +30,17 @@ export function IntakeAction({ onClick }: { onClick: () => void }) {
     <Button
       type="button"
       onClick={onClick}
-      className="pointer-events-auto h-16 w-full justify-start gap-3 rounded-[22px] px-5 text-sm shadow-lg shadow-primary/10"
+      className="pointer-events-auto h-16 w-full justify-start gap-2.5 rounded-[22px] px-4 text-[15px] shadow-lg shadow-primary/10 sm:gap-3 sm:px-5"
     >
       <ActionIcon name="log" weight="fill" className="size-8" />
-      <span>Log an intake</span>
+      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-left">
+        <span>Log an intake</span>
+        <span className="inline-flex items-center gap-1.5 text-xs font-normal text-[#bbb7bf] dark:text-[#625d65]">
+          <span aria-hidden="true">/</span>
+          <span className="sr-only">, </span>
+          <span className="tabular-nums">{todayCount} today</span>
+        </span>
+      </span>
       <ActionIcon name="next" className="ml-auto size-[22px]" />
     </Button>
   );

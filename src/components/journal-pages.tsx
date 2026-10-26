@@ -327,7 +327,10 @@ export function TodayPage({
       <section aria-label="Today's entries" className="mt-6">
         <IntakeTimeline data={data} day={today} />
       </section>
-      <IntakeAction onClick={() => setOpen(true)} />
+      <IntakeAction
+        onClick={() => setOpen(true)}
+        todayCount={dayIntakes(data, today).length}
+      />
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
