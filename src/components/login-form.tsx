@@ -39,21 +39,21 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4" aria-busy={pending}>
+    <form onSubmit={submit} className="space-y-5" aria-busy={pending}>
       <div className="form-field">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">Your password</Label>
         <Input
           id="password"
           name="password"
           type="password"
           autoComplete="current-password"
-          placeholder="Enter your password"
+          placeholder="Enter your private password"
           required
           maxLength={1024}
           disabled={pending}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? "login-error" : undefined}
-          className="h-12 rounded-lg bg-background px-3 text-base md:text-base"
+          className="h-12 rounded-xl bg-background/40 px-4 text-base"
         />
         {error && (
           <p
@@ -68,20 +68,24 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={pending}
-        className="h-12 w-full gap-2 rounded-lg text-sm"
+        className="h-12 w-full gap-3 rounded-xl text-sm"
       >
         {pending ? (
           <>
             <ActionIcon name="loading" className="animate-spin" />
-            Signing in…
+            Opening your space…
           </>
         ) : (
           <>
-            Sign in
-            <ActionIcon name="next" />
+            Step inside
+            <ActionIcon name="next" className="size-[22px]" />
           </>
         )}
       </Button>
+      <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <ActionIcon name="secure" className="size-4" />A private journal, just
+        for you.
+      </p>
     </form>
   );
 }

@@ -20,7 +20,7 @@ export function Brand({ className }: { className?: string }) {
       href="/"
       aria-label="Pill happens home"
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2.5 rounded-lg border border-primary/15 bg-transparent px-3 py-2 text-primary transition-colors hover:bg-primary/5",
+        "inline-flex min-h-11 items-center justify-center gap-2.5 rounded-2xl border border-primary/15 bg-primary/5 px-3.5 py-2 text-primary transition-colors hover:bg-primary/10",
         className,
       )}
     >

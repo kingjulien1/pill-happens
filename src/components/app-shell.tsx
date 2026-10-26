@@ -19,13 +19,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data, error, refresh } = useJournal();
   return (
     <div
-      className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(20px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-6 ${path === "/" ? "with-intake-dock" : ""}`}
+      className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10 ${path === "/" ? "with-intake-dock" : ""}`}
     >
-      <header className="mb-6 flex flex-col items-center gap-3">
-        <Brand />
+      <header className="mb-8 flex flex-col items-center">
+        <Brand className="mb-5" />
         <nav
           aria-label="Main navigation"
-          className="grid w-full grid-cols-4 gap-1 border-b border-border pb-3"
+          className="surface flex gap-1 rounded-2xl p-1.5"
         >
           {links.map(({ href, label, icon }) => (
             <Link
@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   : undefined
               }
               data-active={href === "/" ? path === href : path.startsWith(href)}
-              className="nav-link w-full rounded-lg"
+              className="nav-link"
             >
               <ActionIcon
                 name={icon}
@@ -56,24 +56,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
       <main id="main" className="flex-1">
         {error ? (
-          <div role="alert" className="surface rounded-xl p-5">
-            <p className="text-sm leading-6 text-muted-foreground">{error}</p>
+          <div role="alert" className="surface rounded-3xl p-8 text-center">
+            <p className="text-sm text-muted-foreground">{error}</p>
             <Button
               variant="outline"
-              className="mt-4 h-11 gap-2 rounded-lg px-4"
+              className="mt-5 h-11 px-5"
               onClick={() => void refresh()}
             >
-              <ActionIcon name="retry" />
+              <ActionIcon name="retry" className="mr-2" />
               Try again
             </Button>
           </div>
         ) : !data ? (
           <div
             role="status"
-            className="flex min-h-40 items-center justify-center gap-2 text-sm text-muted-foreground"
+            className="flex min-h-64 items-center justify-center gap-2 text-sm text-muted-foreground"
           >
             <ActionIcon name="loading" className="animate-spin" />
-            Loading journal…
+            Opening your space…
           </div>
         ) : (
           <div key={path} className="page-enter">
@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </main>
-      <footer className="mt-5 flex min-h-8 items-center justify-center gap-2 text-[10px] leading-4 text-muted-foreground">
+      <footer className="mt-6 flex min-h-8 items-center justify-center gap-2 text-[10px] leading-4 text-muted-foreground">
         <span className="whitespace-nowrap">One day at a time.</span>
         <span aria-hidden="true" className="text-muted-foreground/60">
           ·
