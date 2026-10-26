@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { X } from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import {
   Dialog,
   DialogContent,
@@ -81,7 +81,7 @@ export function ResponsiveModal({
               />
             }
           >
-            <X size={17} />
+            <ActionIcon name="close" />
           </DrawerClose>
         </DrawerHeader>
         <div className="overflow-y-auto px-6 pt-1 pb-[max(24px,env(safe-area-inset-bottom))]">

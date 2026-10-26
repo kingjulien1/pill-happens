@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, Plus } from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
 
 const mobileQuery = "(max-width: 767px)";
@@ -26,11 +26,9 @@ export function IntakeAction({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="pointer-events-auto h-16 w-full justify-start gap-3 rounded-[22px] px-5 text-sm shadow-lg shadow-primary/10"
     >
-      <span className="flex size-9 items-center justify-center rounded-full bg-primary-foreground/15">
-        <Plus className="size-5" aria-hidden="true" />
-      </span>
+      <ActionIcon name="create" weight="fill" className="size-8" />
       <span>Log an intake</span>
-      <ArrowRight className="ml-auto size-4.5 opacity-70" aria-hidden="true" />
+      <ActionIcon name="next" className="ml-auto size-[22px]" />
     </Button>
   );
 

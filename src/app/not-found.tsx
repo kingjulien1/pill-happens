@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { HeadingText } from "@/components/heading-text";
 import { BrandMark } from "@/components/brand";
 
@@ -23,7 +23,7 @@ export default function NotFound() {
         href="/"
         className="mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
       >
-        <ArrowLeft className="size-4" aria-hidden="true" />
+        <ActionIcon name="back" />
         Back to today
       </Link>
     </main>

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, LoaderCircle, LockKeyhole } from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,19 +72,19 @@ export function LoginForm() {
       >
         {pending ? (
           <>
-            <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+            <ActionIcon name="loading" className="animate-spin" />
             Opening your space…
           </>
         ) : (
           <>
             Step inside
-            <ArrowRight className="size-4" aria-hidden="true" />
+            <ActionIcon name="next" className="size-[22px]" />
           </>
         )}
       </Button>
       <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-        <LockKeyhole className="size-3" aria-hidden="true" />A private journal,
-        just for you.
+        <ActionIcon name="secure" className="size-4" />A private journal, just
+        for you.
       </p>
     </form>
   );

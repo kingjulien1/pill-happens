@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CalendarClock,
-  Check,
-  LoaderCircle,
-  Minus,
-  Plus,
-} from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import {
@@ -88,7 +81,7 @@ export function IntakeForm({
           className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground"
         >
           Add a medication
-          <ArrowRight size={16} />
+          <ActionIcon name="next" />
         </Link>
       </div>
     );
@@ -179,7 +172,7 @@ export function IntakeForm({
               setQuantity(String(Math.max(0.25, Number(quantity) - 0.25)))
             }
           >
-            <Minus />
+            <ActionIcon name="subtract" className="size-[22px]" />
           </Button>
           <Input
             id="intake-quantity"
@@ -200,7 +193,7 @@ export function IntakeForm({
             className="size-12 rounded-xl"
             onClick={() => setQuantity(String(Number(quantity) + 0.25))}
           >
-            <Plus />
+            <ActionIcon name="add" className="size-[22px]" />
           </Button>
         </div>
         <div className="mt-1 grid grid-cols-4 gap-2">
@@ -228,7 +221,7 @@ export function IntakeForm({
       </div>
       <div className="form-field">
         <Label htmlFor="intake-time">
-          <CalendarClock size={14} className="mr-1" />
+          <ActionIcon name="calendar" className="mr-1 size-4.5" />
           Date & time taken
         </Label>
         <Input
@@ -274,7 +267,11 @@ export function IntakeForm({
         disabled={busy}
         className="mt-1 h-13 w-full gap-2 rounded-2xl text-sm"
       >
-        {busy ? <LoaderCircle className="animate-spin" /> : <Check />}
+        {busy ? (
+          <ActionIcon name="loading" className="animate-spin" />
+        ) : (
+          <ActionIcon name="save" />
+        )}
         {busy ? "Saving…" : intake ? "Save changes" : "Save intake"}
       </Button>
     </form>

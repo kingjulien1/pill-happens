@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { RotateCcw } from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
 import { HeadingText } from "@/components/heading-text";
 import { BrandMark } from "@/components/brand";
@@ -28,7 +28,7 @@ export default function ErrorPage({
         Something interrupted this page. Try loading it again.
       </p>
       <Button onClick={reset} className="mt-6 h-12 gap-2.5 rounded-xl px-6">
-        <RotateCcw className="size-4" aria-hidden="true" />
+        <ActionIcon name="retry" />
         Try again
       </Button>
       <Link

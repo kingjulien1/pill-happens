@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { Check, LoaderCircle } from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
@@ -187,7 +187,10 @@ export function MedicationForm({
                   )}
                 >
                   {color === item.value && (
-                    <Check className="size-3 text-white" aria-hidden="true" />
+                    <ActionIcon
+                      name="selected"
+                      className="size-3.5 text-white"
+                    />
                   )}
                 </span>
                 {item.label}
@@ -208,8 +211,10 @@ export function MedicationForm({
         disabled={busy}
         className="h-12 w-full gap-2 rounded-xl text-base"
       >
-        {busy && (
-          <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+        {busy ? (
+          <ActionIcon name="loading" className="animate-spin" />
+        ) : (
+          <ActionIcon name="save" />
         )}
         {busy ? "Saving…" : "Save medication"}
       </Button>
@@ -405,8 +410,10 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         disabled={busy || medications.length === 0}
         className="h-12 w-full gap-2 rounded-xl text-base"
       >
-        {busy && (
-          <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+        {busy ? (
+          <ActionIcon name="loading" className="animate-spin" />
+        ) : (
+          <ActionIcon name="save" />
         )}
         {busy ? "Saving…" : "Save goal"}
       </Button>

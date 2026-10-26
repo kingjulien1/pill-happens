@@ -2,25 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  House,
-  History,
-  Pill,
-  Target,
-  ArrowUpRight,
-  LoaderCircle,
-  RefreshCw,
-} from "lucide-react";
+import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/brand";
 
 const links = [
-  { href: "/", label: "Today", Icon: House },
-  { href: "/history", label: "Past days", Icon: History },
-  { href: "/medications", label: "Medications", Icon: Pill },
-  { href: "/goals", label: "Goals", Icon: Target },
-];
+  { href: "/", label: "Today", icon: "today" },
+  { href: "/history", label: "Past days", icon: "history" },
+  { href: "/medications", label: "Medications", icon: "medications" },
+  { href: "/goals", label: "Goals", icon: "goals" },
+] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
@@ -35,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           aria-label="Main navigation"
           className="surface flex gap-1 rounded-2xl p-1.5"
         >
-          {links.map(({ href, label, Icon }) => (
+          {links.map(({ href, label, icon }) => (
             <Link
               key={href}
               href={href}
@@ -49,7 +41,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               data-active={href === "/" ? path === href : path.startsWith(href)}
               className="nav-link"
             >
-              <Icon size={18} strokeWidth={1.65} />
+              <ActionIcon
+                name={icon}
+                className="size-6"
+                weight={
+                  (href === "/" ? path === href : path.startsWith(href))
+                    ? "fill"
+                    : "bold"
+                }
+              />
             </Link>
           ))}
         </nav>
@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="mt-5 h-11 px-5"
               onClick={() => void refresh()}
             >
-              <RefreshCw className="mr-2" />
+              <ActionIcon name="retry" className="mr-2" />
               Try again
             </Button>
           </div>
@@ -72,7 +72,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             role="status"
             className="flex min-h-64 items-center justify-center gap-2 text-sm text-muted-foreground"
           >
-            <LoaderCircle className="size-4 animate-spin" />
+            <ActionIcon name="loading" className="animate-spin" />
             Opening your space…
           </div>
         ) : (
@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           aria-label="Safety guidance on benzodiazepine withdrawal (opens in a new tab)"
           className="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-md transition-colors hover:text-foreground"
         >
-          Safety guidance <ArrowUpRight size={10} aria-hidden="true" />
+          Safety guidance <ActionIcon name="external" className="size-3.5" />
         </a>
       </footer>
     </div>

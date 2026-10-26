@@ -3,27 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  Archive,
-  ChevronRight,
-  Clock3,
-  Download,
-  History,
-  Leaf,
-  LoaderCircle,
-  LogOut,
-  MoreHorizontal,
-  Pencil,
-  Pill,
-  Plus,
-  RotateCcw,
-  Settings2,
-  Target,
-  Trash2,
-} from "lucide-react";
+import { Clock3, Leaf } from "lucide-react";
+import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { ResponsiveModal } from "@/components/responsive-modal";
@@ -72,18 +53,18 @@ function PageHeading({
 }
 
 function EmptyState({
-  icon: Icon,
+  icon,
   title,
   children,
 }: {
-  icon: typeof Pill;
+  icon: ActionIconName;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="surface flex flex-col items-center rounded-3xl px-7 py-9 text-center">
       <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary/70">
-        <Icon size={22} strokeWidth={1.35} />
+        <ActionIcon name={icon} className="size-7" weight="duotone" />
       </div>
       <h3 className="text-sm font-medium">{title}</h3>
       <div className="mt-2 max-w-[270px] text-xs leading-[1.9] text-muted-foreground">
@@ -104,7 +85,10 @@ function MedicationIcon({
     <span
       className={`med-icon color-${color} flex shrink-0 items-center justify-center rounded-2xl ${small ? "size-10" : "size-12"}`}
     >
-      <Pill size={small ? 17 : 21} strokeWidth={1.6} />
+      <ActionIcon
+        name="medications"
+        className={small ? "size-[22px]" : "size-6"}
+      />
     </span>
   );
 }
@@ -227,6 +211,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
                 className="h-11"
                 onClick={() => void remove()}
               >
+                <ActionIcon name="delete" />
                 Delete entry
               </Button>
             </div>
@@ -237,7 +222,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
             className="h-11 w-full text-xs text-muted-foreground"
             onClick={() => setConfirm(true)}
           >
-            <Trash2 className="mr-2 size-3.5" />
+            <ActionIcon name="delete" className="mr-2" />
             Delete this entry
           </Button>
         )}
@@ -311,7 +296,7 @@ function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
                     </span>
                     <span className="flex items-center gap-1 opacity-60">
                       {String(index + 1).padStart(2, "0")}
-                      <Pencil size={10} />
+                      <ActionIcon name="edit" className="size-4" />
                     </span>
                   </div>
                   {entry.note && (
@@ -404,7 +389,7 @@ export function MedicationsPage() {
           setOpen(true);
         }}
       >
-        <Plus size={17} />
+        <ActionIcon name="medications" />
         Add a medication
       </Button>
       <div className="mb-4 flex items-center justify-between">
@@ -419,7 +404,11 @@ export function MedicationsPage() {
           className="h-11 px-2 text-[10px] text-muted-foreground"
           onClick={() => setShowArchived(!showArchived)}
         >
-          {showArchived ? <RotateCcw size={12} /> : <Archive size={12} />}
+          {showArchived ? (
+            <ActionIcon name="restore" className="size-4" />
+          ) : (
+            <ActionIcon name="archive" className="size-4" />
+          )}
           <span className="ml-1">
             {showArchived ? "Show active" : "Archived"}
           </span>
@@ -427,7 +416,7 @@ export function MedicationsPage() {
       </div>
       {!medications.length ? (
         <EmptyState
-          icon={Pill}
+          icon="medications"
           title={
             showArchived ? "Nothing archived." : "Start with your medication."
           }
@@ -464,7 +453,7 @@ export function MedicationsPage() {
                   setOpen(true);
                 }}
               >
-                <Pencil size={15} />
+                <ActionIcon name="edit" />
               </Button>
               <Button
                 variant="ghost"
@@ -473,7 +462,11 @@ export function MedicationsPage() {
                 aria-label={`${m.archived ? "Restore" : "Archive"} ${m.name}`}
                 onClick={() => void archive(m)}
               >
-                {m.archived ? <RotateCcw size={15} /> : <Archive size={15} />}
+                {m.archived ? (
+                  <ActionIcon name="restore" />
+                ) : (
+                  <ActionIcon name="archive" />
+                )}
               </Button>
             </div>
           ))}
@@ -536,14 +529,11 @@ export function GoalsPage() {
         className="mb-7 h-13 w-full gap-2 rounded-2xl"
         onClick={() => setOpen(true)}
       >
-        <Plus size={17} />
+        <ActionIcon name="goals" />
         Set a daily goal
       </Button>
       {!goals.length ? (
-        <EmptyState
-          icon={Target}
-          title="A little direction, when you’re ready."
-        >
+        <EmptyState icon="goals" title="A little direction, when you’re ready.">
           Add a daily maximum for one medication. Your journal will help you
           keep sight of it.
         </EmptyState>
@@ -580,7 +570,7 @@ export function GoalsPage() {
                     className="flex size-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
                     onClick={() => setDeleting(goal.id)}
                   >
-                    <MoreHorizontal size={19} />
+                    <ActionIcon name="delete" />
                   </button>
                 </div>
                 <div className="flex items-end justify-between gap-3">
@@ -674,6 +664,7 @@ export function GoalsPage() {
             className="h-12 rounded-xl"
             onClick={() => void remove()}
           >
+            <ActionIcon name="delete" />
             Remove goal
           </Button>
         </div>
@@ -712,7 +703,7 @@ function JournalPreferences() {
           download
           className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary"
         >
-          <Download size={12} />
+          <ActionIcon name="export" className="size-4" />
           Export journal
         </a>
         <span className="h-3 w-px bg-border" />
@@ -720,7 +711,7 @@ function JournalPreferences() {
           className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary"
           onClick={() => setOpen(true)}
         >
-          <Settings2 size={12} />
+          <ActionIcon name="settings" className="size-4" />
           Preferences
         </button>
       </div>
@@ -779,9 +770,12 @@ function JournalPreferences() {
             disabled={busy}
           >
             {busy ? (
-              <LoaderCircle className="animate-spin" />
+              <ActionIcon name="loading" className="animate-spin" />
             ) : (
-              "Save preferences"
+              <>
+                <ActionIcon name="save" />
+                Save preferences
+              </>
             )}
           </Button>
         </form>
@@ -792,7 +786,7 @@ function JournalPreferences() {
             className="h-11 w-full gap-2 text-xs text-muted-foreground"
             onClick={() => void logout()}
           >
-            <LogOut size={14} />
+            <ActionIcon name="signOut" />
             Sign out
           </Button>
         </div>
@@ -826,7 +820,7 @@ export function HistoryPage() {
         </span>
       </div>
       {!days.length ? (
-        <EmptyState icon={History} title="Your story starts here.">
+        <EmptyState icon="history" title="Your story starts here.">
           Past days will appear here as you keep logging. Each new day begins at
           06:00.
         </EmptyState>
@@ -860,8 +854,8 @@ export function HistoryPage() {
                         : " · No daily goal"}
                     </p>
                   </div>
-                  <ChevronRight
-                    size={16}
+                  <ActionIcon
+                    name="open"
                     className="mt-1 text-muted-foreground"
                   />
                 </div>
@@ -889,7 +883,7 @@ export function HistoryPage() {
           onClick={() => setLimit((l) => l + 20)}
           className="mt-5 h-12 w-full gap-2 rounded-2xl text-xs"
         >
-          <ArrowDown size={14} />
+          <ActionIcon name="loadMore" />
           Load 20 more days
           <span className="text-muted-foreground">
             ({days.length - limit} left)
@@ -913,7 +907,7 @@ export function DayPage({ day }: { day: string }) {
         href="/history"
         className="mb-5 inline-flex min-h-11 items-center gap-2 text-[11px] text-muted-foreground"
       >
-        <ArrowLeft size={13} />
+        <ActionIcon name="back" className="size-4.5" />
         Back to past days
       </Link>
       <PageHeading
@@ -937,7 +931,7 @@ export function DayPage({ day }: { day: string }) {
           href={`/history/${shiftDayKey(day, -1)}`}
           className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground"
         >
-          <ArrowLeft size={12} />
+          <ActionIcon name="back" className="size-4" />
           Previous day
         </Link>
         {!isFuture && (
@@ -946,7 +940,7 @@ export function DayPage({ day }: { day: string }) {
             className="h-11 gap-1 text-[10px] text-primary"
             onClick={() => setOpen(true)}
           >
-            <Plus size={13} />
+            <ActionIcon name="create" className="size-4.5" />
             Add missed intake
           </Button>
         )}
@@ -956,7 +950,7 @@ export function DayPage({ day }: { day: string }) {
             className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground"
           >
             Next day
-            <ArrowRight size={12} />
+            <ActionIcon name="next" className="size-4" />
           </Link>
         )}
       </div>
