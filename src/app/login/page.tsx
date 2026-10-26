@@ -27,7 +27,7 @@ export default async function LoginPage() {
           />
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Sign in to keep track of your day.
+          Open the journal linked to your password.
         </p>
       </header>
       <section
