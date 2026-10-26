@@ -13,30 +13,30 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <main className="page-enter mx-auto flex min-h-[80dvh] max-w-sm flex-col items-center justify-center px-6 py-14 text-center">
-      <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-primary">
-        <BrandMark className="size-6" />
-      </div>
-      <h1 className="text-2xl font-semibold tracking-tight">
-        <HeadingText
-          title="Something went wrong"
-          context="Please try again"
-          className="justify-center"
-        />
-      </h1>
-      <p className="mt-2 max-w-64 text-sm leading-relaxed text-muted-foreground">
-        Something interrupted this page. Try loading it again.
-      </p>
-      <Button onClick={reset} className="mt-6 h-12 gap-2.5 rounded-xl px-6">
-        <ActionIcon name="retry" />
-        Try again
-      </Button>
-      <Link
-        href="/"
-        className="mt-3 inline-flex min-h-11 items-center px-4 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-      >
-        Back to today
-      </Link>
+    <main className="page-enter mx-auto flex min-h-[80dvh] max-w-md flex-col justify-center px-6 py-10">
+      <section className="surface rounded-xl p-5">
+        <div className="mb-4 flex size-9 items-center justify-center rounded-lg border border-border text-primary">
+          <BrandMark />
+        </div>
+        <h1 className="text-lg leading-6 font-semibold tracking-tight">
+          <HeadingText title="Page error" context="Try again" />
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          Something interrupted this page. Try loading it again.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button onClick={reset} className="h-11 gap-2 rounded-lg px-4">
+            <ActionIcon name="retry" />
+            Try again
+          </Button>
+          <Link
+            href="/"
+            className="inline-flex min-h-11 items-center rounded-lg border border-border px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Back to today
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

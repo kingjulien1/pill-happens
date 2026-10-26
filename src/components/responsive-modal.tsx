@@ -48,12 +48,12 @@ export function ResponsiveModal({
   if (desktop)
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-3xl p-7 sm:max-w-[440px]">
-          <DialogHeader className="mb-1 gap-1.5">
-            <DialogTitle className="pr-9 text-lg font-semibold tracking-tight">
+        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-xl border border-border p-5 shadow-none ring-0 sm:max-w-[440px]">
+          <DialogHeader className="gap-1">
+            <DialogTitle className="pr-9 text-lg leading-6 font-semibold tracking-tight">
               <HeadingText title={title} context={context} />
             </DialogTitle>
-            <DialogDescription className="text-xs leading-relaxed">
+            <DialogDescription className="text-xs leading-5">
               {description}
             </DialogDescription>
           </DialogHeader>
@@ -63,12 +63,12 @@ export function ResponsiveModal({
     );
   return (
     <Drawer open={open} onOpenChange={onOpenChange} showSwipeHandle>
-      <DrawerContent className="rounded-t-[28px]">
-        <DrawerHeader className="relative px-6 pt-5 pb-4 text-left!">
-          <DrawerTitle className="pr-9 text-lg font-semibold tracking-tight">
+      <DrawerContent className="data-[swipe-direction=down]:rounded-t-[14px]">
+        <DrawerHeader className="relative gap-1 px-5 pt-4 pb-3 text-left!">
+          <DrawerTitle className="pr-9 text-lg leading-6 font-semibold tracking-tight">
             <HeadingText title={title} context={context} />
           </DrawerTitle>
-          <DrawerDescription className="mt-1.5 pr-6 text-left text-xs leading-relaxed">
+          <DrawerDescription className="pr-6 text-left text-xs leading-5">
             {description}
           </DrawerDescription>
           <DrawerClose
@@ -76,7 +76,7 @@ export function ResponsiveModal({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4 size-11"
+                className="absolute top-2 right-2 size-11 rounded-lg"
                 aria-label="Close"
               />
             }
@@ -84,7 +84,7 @@ export function ResponsiveModal({
             <ActionIcon name="close" />
           </DrawerClose>
         </DrawerHeader>
-        <div className="overflow-y-auto px-6 pt-1 pb-[max(24px,env(safe-area-inset-bottom))]">
+        <div className="overflow-y-auto px-5 pt-1 pb-[max(20px,env(safe-area-inset-bottom))]">
           {children}
         </div>
       </DrawerContent>

@@ -24,11 +24,11 @@ export function IntakeAction({ onClick }: { onClick: () => void }) {
     <Button
       type="button"
       onClick={onClick}
-      className="pointer-events-auto h-16 w-full justify-start gap-3 rounded-[22px] px-5 text-sm shadow-lg shadow-primary/10"
+      className="pointer-events-auto h-16 w-full justify-start gap-3 rounded-lg px-4 text-sm shadow-none"
     >
-      <ActionIcon name="create" weight="fill" className="size-8" />
+      <ActionIcon name="create" weight="fill" className="size-6" />
       <span>Log an intake</span>
-      <ActionIcon name="next" className="ml-auto size-[22px]" />
+      <ActionIcon name="next" className="ml-auto size-5" />
     </Button>
   );
 
@@ -42,5 +42,5 @@ export function IntakeAction({ onClick }: { onClick: () => void }) {
     );
   }
 
-  return <div className="mt-6">{action}</div>;
+  return <div className="mt-4">{action}</div>;
 }
