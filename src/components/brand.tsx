@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 export function BrandMark({ className }: { className?: string }) {
   return (
     <Tablets
-      size={22}
+      size={16}
       strokeWidth={3.5}
       aria-hidden="true"
       focusable="false"
-      className={cn("size-[22px] shrink-0", className)}
+      className={cn("size-4 shrink-0", className)}
     />
   );
 }
@@ -24,9 +24,9 @@ export function Brand({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="brand-bar inline-flex h-7 items-center justify-center gap-1 px-1.5">
+      <span className="brand-bar inline-flex h-10 min-w-36 items-center justify-center gap-2 px-4.5">
         <BrandMark />
-        <span className="text-[10px] font-semibold leading-none tracking-[-.02em]">
+        <span className="text-xs font-semibold leading-none tracking-[-.02em]">
           pill happens.
         </span>
       </span>
