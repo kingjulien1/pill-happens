@@ -236,6 +236,30 @@
   color: var(--primary);
   background: var(--accent);
 }
+.intake-dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--background) 65%, transparent);
+}
+.intake-dock-inner {
+  max-width: 510px;
+  margin-inline: auto;
+  padding: 16px 24px max(20px, env(safe-area-inset-bottom));
+}
+@media (min-width: 640px) {
+  .intake-dock-inner {
+    padding-inline: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .with-intake-dock {
+    /* Let the final entry and footer scroll fully above the floating action. */
+    padding-bottom: calc(104px + max(20px, env(safe-area-inset-bottom)));
+  }
+}
 input[type="datetime-local"],
 input[type="date"] {
   min-width: 0;

@@ -26,7 +26,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { data, error, refresh } = useJournal();
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10">
+    <div
+      className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10 ${path === "/" ? "with-intake-dock" : ""}`}
+    >
       <header className="mb-8 flex flex-col items-center">
         <Link
           href="/"

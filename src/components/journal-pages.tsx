@@ -7,12 +7,10 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
   Archive,
   ChevronRight,
   Clock3,
   Download,
-  Flower2,
   History,
   Leaf,
   LoaderCircle,
@@ -31,6 +29,7 @@ import { useJournal } from "@/components/journal-provider";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
 import { IntakeForm } from "@/components/intake-form";
+import { IntakeAction } from "@/components/intake-action";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,179 +113,75 @@ function usagePercent(total: number, maximum: number) {
   return maximum > 0 ? (total / maximum) * 100 : total > 0 ? 100 : 0;
 }
 
-function ProgressRing({ percent, label }: { percent: number; label: string }) {
-  const bounded = Math.min(Math.max(percent, 0), 100);
-  return (
-    <div
-      className="relative flex size-[104px] shrink-0 items-center justify-center"
-      aria-label={label}
-    >
-      <svg
-        viewBox="0 0 104 104"
-        className="absolute inset-0 -rotate-90"
-        aria-hidden="true"
-      >
-        <circle
-          cx="52"
-          cy="52"
-          r="45"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="5"
-          className="text-primary/10"
-        />
-        <circle
-          cx="52"
-          cy="52"
-          r="45"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeDasharray={2 * Math.PI * 45}
-          strokeDashoffset={2 * Math.PI * 45 * (1 - bounded / 100)}
-          className="text-primary transition-[stroke-dashoffset] duration-700"
-        />
-      </svg>
-      <Leaf size={27} strokeWidth={1.15} className="text-primary/70" />
-    </div>
-  );
-}
-
 function DailyOverview({ data, day }: { data: AppData; day: string }) {
-  const entries = dayIntakes(data, day);
   const totals = totalsForDay(data, day);
   const activeIds = [
     ...new Set([
-      ...totals.map((t) => t.medicationId),
+      ...totals.map((total) => total.medicationId),
       ...data.goals
-        .filter((g) => goalForDay(data, g.medicationId, day)?.id === g.id)
-        .map((g) => g.medicationId),
+        .filter(
+          (goal) => goalForDay(data, goal.medicationId, day)?.id === goal.id,
+        )
+        .map((goal) => goal.medicationId),
     ]),
   ];
-  const firstId = activeIds[0];
-  const firstTotal = totals.find((t) => t.medicationId === firstId);
-  const firstGoal = firstId ? goalForDay(data, firstId, day) : undefined;
-  const firstName =
-    firstTotal?.medicationName ??
-    data.medications.find((m) => m.id === firstId)?.name;
-  const percent = firstGoal
-    ? usagePercent(firstTotal?.totalMg ?? 0, firstGoal.dailyLimitMg)
-    : 0;
+
   return (
     <section
       aria-label="Daily overview"
-      className="surface overflow-hidden rounded-[26px]"
+      className="surface rounded-2xl px-4 py-3"
     >
-      <div className="flex items-center justify-between px-5 pt-5">
-        <h2 className="text-sm font-medium">
-          <HeadingText title="Overview" context="Daily totals" />
+      <div
+        className={
+          activeIds.length ? "mb-2" : "flex items-center justify-between gap-3"
+        }
+      >
+        <h2 className="text-xs font-medium text-muted-foreground">
+          Daily totals
         </h2>
-        <Link
-          href="/goals"
-          aria-label="View daily goals"
-          className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
-        >
-          <ArrowUpRight size={16} />
-        </Link>
+        {!activeIds.length && (
+          <span className="text-xs text-muted-foreground">No intakes</span>
+        )}
       </div>
-      <div className="flex items-center gap-5 px-5 pb-6 pt-2">
-        <ProgressRing
-          percent={percent}
-          label={
-            firstGoal
-              ? `${formatDose(firstTotal?.totalMg ?? 0)} of ${formatDose(firstGoal.dailyLimitMg)} mg daily maximum for ${firstName}`
-              : `${entries.length} intakes logged`
-          }
-        />
-        <div className="min-w-0 flex-1">
-          {firstId ? (
-            <>
-              <p className="mb-1 truncate text-xs text-muted-foreground">
-                {firstName}
-              </p>
-              <p className="text-3xl font-semibold leading-tight tracking-tight tabular-nums">
-                {formatDose(firstTotal?.totalMg ?? 0)}
-                <span className="ml-1.5 font-sans text-sm tracking-normal text-muted-foreground">
-                  mg
-                </span>
-              </p>
-              <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
-                {firstGoal
-                  ? `of ${formatDose(firstGoal.dailyLimitMg)} mg daily maximum`
-                  : "total recorded"}
-              </p>
-              {firstGoal &&
-                (firstTotal?.totalMg ?? 0) > firstGoal.dailyLimitMg && (
+      {activeIds.length > 0 && (
+        <ul className="space-y-2.5">
+          {activeIds.map((id) => {
+            const total = totals.find((item) => item.medicationId === id);
+            const goal = goalForDay(data, id, day);
+            const amount = total?.totalMg ?? 0;
+            const name =
+              total?.medicationName ??
+              data.medications.find((medication) => medication.id === id)
+                ?.name ??
+              "Medication";
+            return (
+              <li key={id}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span
+                    className="min-w-0 truncate text-xs font-medium"
+                    title={name}
+                  >
+                    {name}
+                  </span>
+                  <span className="shrink-0 text-right text-sm font-medium tabular-nums">
+                    {formatDose(amount)} mg
+                    {goal && (
+                      <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                        / {formatDose(goal.dailyLimitMg)} mg max
+                      </span>
+                    )}
+                  </span>
+                </div>
+                {goal && amount > goal.dailyLimitMg && (
                   <p className="mt-1 text-[10px] text-primary">
-                    Above your recorded target. Take a moment to check in.
+                    Above daily maximum
                   </p>
                 )}
-            </>
-          ) : (
-            <>
-              <p className="text-lg font-medium leading-snug tracking-tight">
-                Nothing logged yet
-              </p>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Your daily totals will appear here.
-              </p>
-            </>
-          )}
-        </div>
-      </div>
-      {activeIds.length > 1 && (
-        <div className="mx-5 mb-5 space-y-3 border-t border-border pt-4">
-          {activeIds.slice(1).map((id) => {
-            const total = totals.find((t) => t.medicationId === id);
-            const goal = goalForDay(data, id, day);
-            return (
-              <div
-                key={id}
-                className="flex items-center justify-between gap-3 text-xs"
-              >
-                <span className="truncate text-muted-foreground">
-                  {total?.medicationName ??
-                    data.medications.find((m) => m.id === id)?.name}
-                </span>
-                <span className="shrink-0">
-                  {formatDose(total?.totalMg ?? 0)} mg
-                  {goal && (
-                    <span className="text-muted-foreground">
-                      {" "}
-                      / {formatDose(goal.dailyLimitMg)} mg
-                    </span>
-                  )}
-                </span>
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
-      <div className="grid grid-cols-3 border-t border-border/70 bg-background/25 px-3 py-4 text-center">
-        <div>
-          <p className="text-sm font-medium tabular-nums">
-            {entries.length.toString().padStart(2, "0")}
-          </p>
-          <p className="mt-1 text-[9px] text-muted-foreground">
-            {entries.length === 1 ? "intake logged" : "intakes logged"}
-          </p>
-        </div>
-        <div className="border-x border-border/70">
-          <p className="text-sm font-medium tabular-nums">
-            {totals.length.toString().padStart(2, "0")}
-          </p>
-          <p className="mt-1 text-[9px] text-muted-foreground">
-            {totals.length === 1 ? "medication" : "medications"}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-medium tabular-nums">06:00</p>
-          <p className="mt-1 text-[9px] text-muted-foreground">
-            new day begins
-          </p>
-        </div>
-      </div>
     </section>
   );
 }
@@ -366,11 +261,9 @@ function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
         </span>
       </div>
       {!entries.length ? (
-        <EmptyState icon={Flower2} title="Nothing logged yet.">
-          A small check-in goes a long way.
-          <br />
-          Your entries will find their home here.
-        </EmptyState>
+        <p className="rounded-2xl border border-dashed border-border px-4 py-5 text-xs leading-relaxed text-muted-foreground">
+          No entries yet. Use “Log an intake” to record one.
+        </p>
       ) : (
         <div className="relative space-y-3 before:absolute before:top-6 before:bottom-6 before:left-[23px] before:w-px before:bg-border">
           {entries.map((entry, index) => {
@@ -457,36 +350,10 @@ export function TodayPage() {
         Track your intake, one entry at a time.
       </PageHeading>
       <DailyOverview data={data} day={today} />
-      <Button
-        className="my-6 h-[78px] w-full justify-between rounded-[23px] px-5 shadow-[0_8px_24px_#9d516c15] hover:-translate-y-px"
-        onClick={() => setOpen(true)}
-      >
-        <span className="flex items-center gap-3.5">
-          <span className="flex size-10 items-center justify-center rounded-full border border-current/20 bg-white/10">
-            <Plus size={23} strokeWidth={1.5} />
-          </span>
-          <span className="flex flex-col items-start">
-            <span className="text-base font-medium">Log an intake</span>
-            <span className="mt-1 text-[10px] font-normal opacity-75">
-              A moment to check in with yourself
-            </span>
-          </span>
-        </span>
-        <ArrowRight size={19} strokeWidth={1.5} />
-      </Button>
-      <section className="mt-2">
+      <section aria-label="Today's entries" className="mt-6">
         <IntakeTimeline data={data} day={today} />
       </section>
-      <div className="mt-5 flex justify-center">
-        <Link
-          href="/history"
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary"
-        >
-          <History size={12} />
-          Look back at past days
-          <ChevronRight size={12} />
-        </Link>
-      </div>
+      <IntakeAction onClick={() => setOpen(true)} />
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
