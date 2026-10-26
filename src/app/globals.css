@@ -267,7 +267,11 @@
   bottom: 0;
   z-index: 30;
   pointer-events: none;
-  background: linear-gradient(to top, var(--background) 65%, transparent);
+  background: linear-gradient(
+    to top,
+    var(--background) calc(100% - 16px),
+    transparent
+  );
 }
 .intake-dock-inner {
   max-width: 510px;
@@ -281,8 +285,8 @@
 }
 @media (max-width: 767px) {
   .with-intake-dock {
-    /* Let the final entry scroll fully above the floating action. */
-    padding-bottom: calc(104px + max(20px, env(safe-area-inset-bottom)));
+    /* Clear the summary row and action when scrolling to the final entry. */
+    padding-bottom: calc(136px + max(20px, env(safe-area-inset-bottom)));
   }
 }
 input[type="datetime-local"],

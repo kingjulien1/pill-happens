@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Clock3, Leaf } from "lucide-react";
+import { Leaf } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
@@ -15,6 +15,7 @@ import type { StreakIconName } from "@/lib/streak-presentation";
 import { MedicationIcon } from "@/components/medication-icon";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
+import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
@@ -217,20 +218,24 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
   );
 }
 
-function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
+function IntakeTimeline({
+  data,
+  day,
+  showSummary = true,
+}: {
+  data: AppData;
+  day: string;
+  showSummary?: boolean;
+}) {
   const [editing, setEditing] = useState<Intake | null>(null);
   const entries = dayIntakes(data, day);
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-medium">
-          <HeadingText title="Entries" context={`${entries.length} logged`} />
-        </h2>
-        <span className="flex items-center gap-1 text-[9px] text-muted-foreground">
-          <Clock3 size={10} />
-          In order logged
-        </span>
-      </div>
+      {showSummary && (
+        <div className="mb-4">
+          <IntakeSummary count={entries.length} />
+        </div>
+      )}
       {!entries.length ? (
         <EmptyIntakeStack />
       ) : (
@@ -319,7 +324,7 @@ export function TodayPage({ streakIcon }: { streakIcon: StreakIconName }) {
         streakIcon={streakIcon}
       />
       <section aria-label="Today's entries" className="mt-6">
-        <IntakeTimeline data={data} day={today} />
+        <IntakeTimeline data={data} day={today} showSummary={false} />
       </section>
       <IntakeAction
         onClick={() => setOpen(true)}
