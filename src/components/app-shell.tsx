@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Brand className="mb-5" />
         <nav
           aria-label="Main navigation"
-          className="surface flex gap-1 rounded-2xl p-1.5"
+          className="journal-nav flex items-center gap-0.5 p-1"
         >
           {links.map(({ href, label, icon }) => (
             <Link
@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <ActionIcon
                 name={icon}
-                className="size-6"
+                className="size-5"
                 weight={
                   (href === "/" ? path === href : path.startsWith(href))
                     ? "fill"
