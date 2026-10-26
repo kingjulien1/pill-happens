@@ -116,7 +116,7 @@ test("production cannot open without a database, password, and sufficiently long
     configurationIssueFor({
       production: true,
       ...credentials,
-      password: "short",
+      password: "abc",
       databaseUrl: "configured",
     }),
   );
@@ -158,6 +158,48 @@ test("password checking handles unequal-length inputs and never accepts an uncon
     false,
   );
   assert.equal(passwordMatchesValue("", ""), false);
+});
+
+test("four-character passwords configure and sign sessions while shorter values fail closed", () => {
+  const shortCredentials = { ...credentials, password: "4826" };
+  assert.equal(
+    configurationIssueFor({
+      production: true,
+      ...shortCredentials,
+      databaseUrl: "configured",
+    }),
+    null,
+  );
+  assert.equal(passwordMatchesValue("4826", shortCredentials.password), true);
+  assert.equal(passwordMatchesValue("4825", shortCredentials.password), false);
+  const token = createSessionToken(shortCredentials, now);
+  assert.equal(verifySessionToken(token, shortCredentials, now), true);
+  assert.equal(
+    verifySessionToken(token, { ...shortCredentials, password: "5297" }, now),
+    false,
+  );
+  assert.equal(
+    verifySessionToken(
+      createSessionToken(credentials, now),
+      shortCredentials,
+      now,
+    ),
+    false,
+  );
+  for (const password of ["", "a", "ab", "abc"]) {
+    const invalid = { ...shortCredentials, password };
+    assert.ok(
+      configurationIssueFor({
+        production: true,
+        ...invalid,
+        databaseUrl: "configured",
+      }),
+    );
+    assert.throws(() => createSessionToken(invalid, now));
+  }
+  assert.throws(() =>
+    createSessionToken({ ...shortCredentials, secret: "short" }, now),
+  );
 });
 
 test("sessions authenticate, expire exactly at the deadline, and have unique nonces", () => {

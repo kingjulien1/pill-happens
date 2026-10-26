@@ -7,6 +7,7 @@ import {
 
 // Pure primitives: actual environment values are supplied only by server-only auth.ts.
 export const SESSION_MAX_AGE = 30 * 24 * 60 * 60;
+export const MIN_PASSWORD_LENGTH = 4;
 
 export type AuthConfiguration = {
   production: boolean;
@@ -76,8 +77,8 @@ export function configurationIssueFor(
     Boolean(config.password);
   if (requiresAuth && !config.password)
     return "Set APP_PASSWORD to protect your private journal.";
-  if (requiresAuth && (config.password?.length ?? 0) < 16)
-    return "APP_PASSWORD must contain at least 16 characters.";
+  if (requiresAuth && (config.password?.length ?? 0) < MIN_PASSWORD_LENGTH)
+    return `APP_PASSWORD must contain at least ${MIN_PASSWORD_LENGTH} characters.`;
   if (requiresAuth && (config.secret?.length ?? 0) < 32)
     return "Set SESSION_SECRET to a random value of at least 32 characters.";
   if (config.production && !config.databaseUrl)
@@ -88,7 +89,10 @@ export function configurationIssueFor(
 type Credentials = { password: string; secret: string };
 
 function sessionKey(credentials: Credentials): Buffer {
-  if (credentials.password.length < 16 || credentials.secret.length < 32) {
+  if (
+    credentials.password.length < MIN_PASSWORD_LENGTH ||
+    credentials.secret.length < 32
+  ) {
     throw new Error("Session credentials have not been configured.");
   }
   return createHmac("sha256", credentials.secret)

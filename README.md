@@ -111,7 +111,7 @@ For Preview deployments, configure the same authentication requirements with a s
 | Variable         | Purpose                                                                                                                                                                                                    |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`   | Neon Postgres connection string. Required in production. The Marketplace integration normally supplies it.                                                                                                 |
-| `APP_PASSWORD`   | The single owner's sign-in password, at least 16 characters. Required in production or when a database or password is configured.                                                                          |
+| `APP_PASSWORD`   | The single owner's sign-in password, at least 4 characters. Required in production or when a database or password is configured.                                                                           |
 | `SESSION_SECRET` | Random session-signing secret, at least 32 characters. Required alongside authentication.                                                                                                                  |
 | `APP_ORIGIN`     | Optional exact origin, such as `https://your-project.vercel.app`, for a reverse proxy that changes the request origin. Normally leave unset. No trailing slash; use environment-specific values if needed. |
 
