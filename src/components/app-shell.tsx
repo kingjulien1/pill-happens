@@ -11,7 +11,6 @@ import {
   ArrowUpRight,
   LoaderCircle,
   RefreshCw,
-  LockKeyhole,
 } from "lucide-react";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
@@ -91,26 +90,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </main>
-      <footer className="mt-10 border-t border-border/70 pt-5 text-center">
-        <p className="text-xs text-muted-foreground">One day at a time.</p>
-        <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
-          Work with your prescriber before changing your dose.
-          <br />
-          Reducing too quickly or stopping suddenly can cause dangerous
-          withdrawal.
-        </p>
+      <footer className="mt-6 flex min-h-8 items-center justify-center gap-2 text-[10px] leading-4 text-muted-foreground">
+        <span className="whitespace-nowrap">One day at a time.</span>
+        <span aria-hidden="true" className="text-muted-foreground/60">
+          ·
+        </span>
         <a
           href="https://www.fda.gov/drugs/drug-safety-and-availability/fda-requiring-boxed-warning-updated-improve-safe-use-benzodiazepine-drug-class"
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-[10px] text-muted-foreground underline decoration-border underline-offset-4"
+          aria-label="Safety guidance on benzodiazepine withdrawal (opens in a new tab)"
+          className="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-md transition-colors hover:text-foreground"
         >
-          About safe withdrawal <ArrowUpRight size={10} />
+          Safety guidance <ArrowUpRight size={10} aria-hidden="true" />
         </a>
-        <div className="mt-5 flex items-center justify-center gap-1.5 text-[9px] tracking-[.1em] text-muted-foreground/75">
-          <LockKeyhole size={10} />
-          YOUR PRIVATE SPACE
-        </div>
       </footer>
     </div>
   );
