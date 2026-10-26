@@ -14,7 +14,9 @@ Built with **Next.js 16.4.3**, **React 19.3.1**, TypeScript, Tailwind CSS 4, and
 - **Corrections:** tap an intake to edit its medication, quantity, time, or note. Delete an intake through an explicit confirmation.
 - **Preferences and backups:** change the journal timezone, sign out, or download a JSON export from the history page.
 
-The layout is designed for mobile, with a narrow reading column, compact centered icon navigation, and generous logging controls. Typography uses the default system sans-serif font, compact headings, and small muted context separated from each title by a dot. The brand pairs a bold tablets mark with a matching rose wordmark in one compact container; the app icon uses the same tablets symbol. Navigation and actions use familiar bold Phosphor icons, filled selected states, and larger symbols for primary actions. Warm rose, amber, and violet accents sit over animated highlights and a subtle indigo base tint beneath the light/dark overlay. Light and dark appearance follow the operating system through `prefers-color-scheme`; there is no theme preference or toggle. Reduced-motion preferences disable animation.
+The layout is designed for mobile, with a narrow reading column, compact centered icon navigation, and generous logging controls. Typography uses the default system sans-serif font, compact headings, and small muted context separated from each title by a dot. The brand pairs a bold tablets mark with a matching wordmark in one compact container; the app icon uses the same tablets symbol. Navigation and actions use familiar bold Phosphor icons, filled selected states, and larger symbols for primary actions. Buttons, branding, and selected states use near-black (`#120f17`) in light mode and brighter cream (`#fff1d6`) in dark mode. Medication markers use the Ember, Clay, and Sand palette; existing saved color identifiers remain compatible.
+
+The full-page background uses [React Bits Grainient](https://reactbits.dev/backgrounds/grainient), with the Ember colors `#120f17`, `#2a0f0a`, `#9a3412`, `#f97316`, and `#fed7aa`. It uses radial mode, flow 0.85, variation 16, speed 2.8, saturation 1.01, scale 0.3, contrast 0.84, silk 0.58, softness 0.96, grain amount 0.07, and grain size 1.2px. Animated grain and the intro are enabled; pointer interaction and click swirl are disabled. A theme-colored scrim keeps journal text readable. Both the background's light mode and the interface follow the operating system through `prefers-color-scheme`, including changes while open; there is no theme toggle. Reduced-motion preferences render a still frame. A static Ember wash covers browsers without WebGL. The adapted source is included under the [React Bits license](licenses/react-bits.txt).
 
 The app includes a web manifest and icon for a home-screen shortcut. It requires a network connection to load and save; it has no service worker, offline mode, or queued offline writes.
 
@@ -154,18 +156,20 @@ The prototype was verified with 30 automated tests, a production build, strict T
 
 ### Source map
 
-| Location                              | Responsibility                                                         |
-| ------------------------------------- | ---------------------------------------------------------------------- |
-| `src/app/(journal)/`                  | Protected routes for today, history, medications, and goals.           |
-| `src/app/login/`                      | Private sign-in and setup guidance.                                    |
-| `src/components/journal-pages.tsx`    | Daily dashboard, history summaries, management pages, and preferences. |
-| `src/components/intake-form.tsx`      | Intake creation and correction.                                        |
-| `src/components/manage-forms.tsx`     | Medication and goal forms.                                             |
-| `src/components/responsive-modal.tsx` | Mobile drawer and desktop dialog behavior.                             |
-| `src/components/ui/`                  | Local shadcn/ui components.                                            |
-| `src/lib/domain.ts`                   | Shared types, 06:00 calendar rules, totals, and goal selection.        |
-| `src/lib/server/`                     | Authentication, validated API helpers, and storage.                    |
-| `src/app/api/`                        | Authenticated journal endpoints, export, and sign-in/out.              |
-| `src/app/globals.css`                 | System theme, colors, ambient animation, and shared visual styles.     |
+| Location                                | Responsibility                                                         |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| `src/app/(journal)/`                    | Protected routes for today, history, medications, and goals.           |
+| `src/app/login/`                        | Private sign-in and setup guidance.                                    |
+| `src/components/journal-pages.tsx`      | Daily dashboard, history summaries, management pages, and preferences. |
+| `src/components/intake-form.tsx`        | Intake creation and correction.                                        |
+| `src/components/manage-forms.tsx`       | Medication and goal forms.                                             |
+| `src/components/responsive-modal.tsx`   | Mobile drawer and desktop dialog behavior.                             |
+| `src/components/journal-background.tsx` | System appearance and the journal's Grainient settings.                |
+| `src/components/grainient.tsx`          | Adapted React Bits WebGL background renderer.                          |
+| `src/components/ui/`                    | Local shadcn/ui components.                                            |
+| `src/lib/domain.ts`                     | Shared types, 06:00 calendar rules, totals, and goal selection.        |
+| `src/lib/server/`                       | Authentication, validated API helpers, and storage.                    |
+| `src/app/api/`                          | Authenticated journal endpoints, export, and sign-in/out.              |
+| `src/app/globals.css`                   | System theme, colors, ambient animation, and shared visual styles.     |
 
 The app starts with an empty journal. It includes no demo medication, suggested doses, medication equivalence calculations, automated reductions, or reminders to take medication.

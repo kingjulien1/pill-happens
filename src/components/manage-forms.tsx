@@ -31,9 +31,9 @@ const forms: { value: Medication["form"]; label: string }[] = [
 ];
 
 const colors: { value: Medication["color"]; label: string; dot: string }[] = [
-  { value: "rose", label: "Rose", dot: "bg-rose-400" },
-  { value: "amber", label: "Amber", dot: "bg-amber-400" },
-  { value: "violet", label: "Violet", dot: "bg-violet-400" },
+  { value: "rose", label: "Ember", dot: "bg-[#f97316]" },
+  { value: "amber", label: "Clay", dot: "bg-[#9a3412]" },
+  { value: "violet", label: "Sand", dot: "bg-[#fed7aa]" },
 ];
 
 const inputClass = "h-12 rounded-xl px-3 text-base md:text-base";
@@ -189,7 +189,12 @@ export function MedicationForm({
                   {color === item.value && (
                     <ActionIcon
                       name="selected"
-                      className="size-3.5 text-white"
+                      className={cn(
+                        "size-3.5",
+                        item.value === "amber"
+                          ? "text-[#fff1d6]"
+                          : "text-[#120f17]",
+                      )}
                     />
                   )}
                 </span>

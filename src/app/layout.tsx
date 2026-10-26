@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
+import { JournalBackground } from "@/components/journal-background";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,8 +22,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf7f5" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c171c" },
+    { media: "(prefers-color-scheme: light)", color: "#fff7ed" },
+    { media: "(prefers-color-scheme: dark)", color: "#120f17" },
   ],
 };
 
@@ -34,12 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="ambient" aria-hidden="true">
-          <div className="glow glow-1" />
-          <div className="glow glow-2" />
-          <div className="glow glow-3" />
-          <div className="glow glow-4" />
-        </div>
+        <JournalBackground />
         {children}
         <Toaster theme="system" position="top-center" richColors closeButton />
       </body>

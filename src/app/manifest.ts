@@ -6,8 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "One day at a time.",
     start_url: "/",
     display: "standalone",
-    background_color: "#faf7f5",
-    theme_color: "#9d516c",
+    background_color: "#fff7ed",
+    theme_color: "#120f17",
     icons: [
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
     ],

@@ -41,11 +41,11 @@
     SOFTWARE.
   -->
   <style>
-    .background { fill: #f2e5ec; }
-    .mark { stroke: #9d516c; }
+    .background { fill: #fff7ed; }
+    .mark { stroke: #120f17; }
     @media (prefers-color-scheme: dark) {
-      .background { fill: #352a32; }
-      .mark { stroke: #dea1b5; }
+      .background { fill: #120f17; }
+      .mark { stroke: #fff1d6; }
     }
   </style>
   <rect class="background" width="64" height="64" rx="20" />

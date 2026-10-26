@@ -5,47 +5,47 @@
 
 :root {
   color-scheme: light dark;
-  --background: #faf7f5;
-  --foreground: #3e343a;
-  --card: #fffcfac9;
-  --card-foreground: #3e343a;
-  --popover: #fffcfa;
-  --popover-foreground: #3e343a;
-  --primary: #9d516c;
-  --primary-foreground: #fff9fb;
-  --secondary: #f1e9e7;
-  --secondary-foreground: #69575e;
-  --muted: #f0eae7;
-  --muted-foreground: #81737a;
-  --accent: #f2e5ec;
-  --accent-foreground: #92506b;
-  --destructive: #ac4453;
-  --border: #e9dfe0;
-  --input: #e0d4d8;
-  --ring: #b47a91;
+  --background: #fff7ed;
+  --foreground: #120f17;
+  --card: #fffaf2ed;
+  --card-foreground: #120f17;
+  --popover: #fffaf2;
+  --popover-foreground: #120f17;
+  --primary: #120f17;
+  --primary-foreground: #fff1d6;
+  --secondary: #efe4d8;
+  --secondary-foreground: #3b2c28;
+  --muted: #f2e8dd;
+  --muted-foreground: #51443b;
+  --accent: #120f1712;
+  --accent-foreground: #120f17;
+  --destructive: #9a3412;
+  --border: #d9cbbd;
+  --input: #bead9e;
+  --ring: #120f17;
   --radius: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1c171c;
-    --foreground: #f2e7eb;
-    --card: #272128cf;
-    --card-foreground: #f2e7eb;
-    --popover: #292129;
-    --popover-foreground: #f2e7eb;
-    --primary: #dea1b5;
-    --primary-foreground: #3a2330;
-    --secondary: #352a32;
-    --secondary-foreground: #e1cad4;
-    --muted: #30262e;
-    --muted-foreground: #b3a0ac;
-    --accent: #422b3a;
-    --accent-foreground: #e5b1c4;
-    --destructive: #ee9aab;
-    --border: #48333f;
-    --input: #58414f;
-    --ring: #c28ba7;
+    --background: #120f17;
+    --foreground: #fff1d6;
+    --card: #1b171aed;
+    --card-foreground: #fff1d6;
+    --popover: #211b1b;
+    --popover-foreground: #fff1d6;
+    --primary: #fff1d6;
+    --primary-foreground: #120f17;
+    --secondary: #302522;
+    --secondary-foreground: #f2ddc4;
+    --muted: #2b2222;
+    --muted-foreground: #c5bcb0;
+    --accent: #fff1d61a;
+    --accent-foreground: #fff1d6;
+    --destructive: #ffbd8a;
+    --border: #50423a;
+    --input: #776255;
+    --ring: #fff1d6;
   }
 }
 
@@ -113,7 +113,7 @@
     outline-offset: 4px;
   }
   ::selection {
-    background: #ce91ab55;
+    background: #f9731640;
   }
 }
 
@@ -123,57 +123,25 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: color-mix(in srgb, #6366f1 10%, var(--background));
+  /* A static Ember wash remains visible before hydration or without WebGL. */
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    #fed7aa,
+    #f97316 38%,
+    #9a3412 65%,
+    #120f17
+  );
 }
 .ambient::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: #fff6;
-}
-.glow {
-  position: absolute;
-  width: clamp(180px, 32vw, 460px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  filter: blur(65px);
-  opacity: 0.2;
-  animation: drift 24s ease-in-out infinite alternate;
-}
-.glow-1 {
-  top: -8%;
-  left: -12%;
-  background: #dfb25e;
-}
-.glow-2 {
-  top: 15%;
-  right: -17%;
-  background: #b88ad6;
-  animation-delay: -11s;
-}
-.glow-3 {
-  bottom: 8%;
-  left: -17%;
-  background: #b88ad6;
-  animation-delay: -7s;
-}
-.glow-4 {
-  bottom: -9%;
-  right: -8%;
-  background: #dfb25e;
-  animation-delay: -17s;
+  /* Keep text readable as the gradient's light and dark areas move. */
+  background: #fff7edb3;
 }
 @media (prefers-color-scheme: dark) {
   .ambient::after {
-    background: #0006;
-  }
-}
-@keyframes drift {
-  from {
-    transform: translate(-8%, -9%) scale(0.94);
-  }
-  to {
-    transform: translate(16%, 18%) scale(1.08);
+    background: #120f17b3;
   }
 }
 @keyframes enter {
@@ -192,7 +160,7 @@
 .surface {
   background: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 28px #65354d03;
+  box-shadow: 0 4px 28px #120f1703;
   backdrop-filter: blur(16px);
 }
 .form-field {
@@ -201,16 +169,16 @@
   gap: 0.6rem;
 }
 .color-rose {
-  --med-color: #ad6c84;
-  --med-bg: #ad6c8415;
+  --med-color: var(--primary);
+  --med-bg: #f9731626;
 }
 .color-amber {
-  --med-color: #ac8245;
-  --med-bg: #ac824515;
+  --med-color: var(--primary);
+  --med-bg: #9a341226;
 }
 .color-violet {
-  --med-color: #9580b1;
-  --med-bg: #9580b115;
+  --med-color: var(--primary);
+  --med-bg: #fed7aa38;
 }
 .med-icon {
   color: var(--med-color);
