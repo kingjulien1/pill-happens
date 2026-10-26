@@ -2,6 +2,12 @@
 
 import { useId, useState, type FormEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
+import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
+import {
+  MedicationIcon,
+  MedicationTypeIcon,
+} from "@/components/medication-icon";
+import { isMedicationIcon } from "@/lib/medication-appearance";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
@@ -21,7 +27,6 @@ import {
   isValidDayKey,
   type Medication,
 } from "@/lib/domain";
-import { cn } from "@/lib/utils";
 
 const forms: { value: Medication["form"]; label: string }[] = [
   { value: "tablet", label: "Tablet" },
@@ -30,15 +35,10 @@ const forms: { value: Medication["form"]; label: string }[] = [
   { value: "other", label: "Other" },
 ];
 
-const colors: { value: Medication["color"]; label: string; dot: string }[] = [
-  { value: "rose", label: "Ember", dot: "bg-[#f97316]" },
-  { value: "amber", label: "Clay", dot: "bg-[#9a3412]" },
-  { value: "violet", label: "Sand", dot: "bg-[#fed7aa]" },
-];
-
 const inputClass = "h-12 rounded-xl px-3 text-base md:text-base";
 const selectClass =
   "h-12 w-full rounded-xl px-3 text-base data-[size=default]:h-12";
+const iconError = "Choose an icon or enter one emoji.";
 
 export function MedicationForm({
   medication,
@@ -59,6 +59,7 @@ export function MedicationForm({
   const [color, setColor] = useState<Medication["color"]>(
     medication?.color ?? "rose",
   );
+  const [icon, setIcon] = useState(medication?.icon ?? "pill");
   const [error, setError] = useState<string | null>(null);
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -74,10 +75,14 @@ export function MedicationForm({
       setError("Enter a strength greater than zero.");
       return;
     }
+    if (!isMedicationIcon(icon)) {
+      setError(iconError);
+      return;
+    }
     try {
       await mutate(
         medication ? `medications/${medication.id}` : "medications",
-        { name: name.trim(), strengthMg, form, color },
+        { name: name.trim(), strengthMg, form, color, icon },
         medication ? "PATCH" : "POST",
       );
       toast.success(medication ? "Medication updated." : "Medication added.");
@@ -132,7 +137,7 @@ export function MedicationForm({
         </div>
 
         <div className="space-y-2.5">
-          <Label htmlFor={`${id}-form`}>Form</Label>
+          <Label htmlFor={`${id}-form`}>Medication type</Label>
           <Select
             name="form"
             value={form}
@@ -145,7 +150,8 @@ export function MedicationForm({
           >
             <SelectTrigger id={`${id}-form`} className={selectClass}>
               <SelectValue>
-                {forms.find((item) => item.value === form)?.label}
+                <MedicationTypeIcon type={form} className="size-5" />
+                <span>{forms.find((item) => item.value === form)?.label}</span>
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -153,56 +159,29 @@ export function MedicationForm({
                 <SelectItem
                   key={item.value}
                   value={item.value}
-                  className="min-h-11 px-3 text-base"
+                  className="min-h-11 pl-3 pr-9 text-base"
                 >
-                  {item.label}
+                  <span className="flex min-w-0 items-center gap-2">
+                    <MedicationTypeIcon type={item.value} className="size-5" />
+                    <span>{item.label}</span>
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <fieldset className="min-w-0 space-y-2.5">
-          <legend className="text-sm font-medium">A little color</legend>
-          <div className="grid grid-cols-3 gap-2">
-            {colors.map((item) => (
-              <Button
-                key={item.value}
-                type="button"
-                variant="outline"
-                aria-label={`${item.label} medication color`}
-                aria-pressed={color === item.value}
-                onClick={() => setColor(item.value)}
-                disabled={busy}
-                className={cn(
-                  "h-11 gap-2 rounded-xl px-2 text-xs",
-                  color === item.value &&
-                    "border-primary/50 bg-primary/5 ring-1 ring-primary/20",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex size-5 shrink-0 items-center justify-center rounded-full",
-                    item.dot,
-                  )}
-                >
-                  {color === item.value && (
-                    <ActionIcon
-                      name="selected"
-                      className={cn(
-                        "size-3.5",
-                        item.value === "amber"
-                          ? "text-[#fff1d6]"
-                          : "text-[#120f17]",
-                      )}
-                    />
-                  )}
-                </span>
-                {item.label}
-              </Button>
-            ))}
-          </div>
-        </fieldset>
+        <MedicationAppearanceFields
+          color={color}
+          icon={icon}
+          onColorChange={setColor}
+          onIconChange={(value) => {
+            setIcon(value);
+            if (isMedicationIcon(value)) {
+              setError((message) => (message === iconError ? null : message));
+            }
+          }}
+        />
       </fieldset>
 
       {error && (
@@ -310,9 +289,20 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           >
             <SelectTrigger id={`${id}-medication`} className={selectClass}>
               <SelectValue placeholder="Choose a medication">
-                {selectedMedication
-                  ? `${selectedMedication.name} · ${formatDose(selectedMedication.strengthMg)} mg`
-                  : null}
+                {selectedMedication ? (
+                  <>
+                    <MedicationIcon
+                      icon={selectedMedication.icon}
+                      color={selectedMedication.color}
+                      small
+                      className="size-6 rounded-md"
+                    />
+                    <span className="min-w-0 truncate">
+                      {selectedMedication.name} ·{" "}
+                      {formatDose(selectedMedication.strengthMg)} mg
+                    </span>
+                  </>
+                ) : null}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -320,9 +310,19 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                 <SelectItem
                   key={medication.id}
                   value={medication.id}
-                  className="min-h-11 px-3 text-base"
+                  className="min-h-11 pl-3 pr-9 text-base"
                 >
-                  {medication.name} · {formatDose(medication.strengthMg)} mg
+                  <span className="flex min-w-0 items-center gap-2">
+                    <MedicationIcon
+                      icon={medication.icon}
+                      color={medication.color}
+                      small
+                      className="size-6 rounded-md"
+                    />
+                    <span className="min-w-0 break-words">
+                      {medication.name} · {formatDose(medication.strengthMg)} mg
+                    </span>
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>

@@ -10,6 +10,7 @@ import { useJournal } from "@/components/journal-provider";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
 import { DayHeading } from "@/components/day-heading";
+import { MedicationIcon } from "@/components/medication-icon";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
@@ -72,25 +73,6 @@ function EmptyState({
         {children}
       </div>
     </div>
-  );
-}
-
-function MedicationIcon({
-  color = "rose",
-  small = false,
-}: {
-  color?: string;
-  small?: boolean;
-}) {
-  return (
-    <span
-      className={`med-icon color-${color} flex shrink-0 items-center justify-center rounded-2xl ${small ? "size-10" : "size-12"}`}
-    >
-      <ActionIcon
-        name="medications"
-        className={small ? "size-[22px]" : "size-6"}
-      />
-    </span>
   );
 }
 
@@ -274,7 +256,11 @@ function IntakeTimeline({ data, day }: { data: AppData; day: string }) {
                 aria-label={`Edit ${entry.medicationName}, ${formatDose(doseMg(entry))} milligrams, ${time}`}
                 className="surface relative flex w-full items-start gap-3.5 rounded-[21px] p-4 text-left transition-colors hover:border-primary/30"
               >
-                <MedicationIcon color={medication?.color} small />
+                <MedicationIcon
+                  color={medication?.color}
+                  icon={medication?.icon}
+                  small
+                />
                 <div className="min-w-0 flex-1 pt-.5">
                   <div className="flex items-baseline justify-between gap-2">
                     <h3 className="truncate text-[13px] font-medium">
@@ -372,7 +358,7 @@ export function MedicationsPage() {
   return (
     <>
       <PageHeading title="Medications" context="Your list">
-        Manage medication names, strengths, and forms.
+        Manage medication names, strengths, and types.
       </PageHeading>
       <Button
         className="mb-7 h-13 w-full gap-2 rounded-2xl"
@@ -424,7 +410,7 @@ export function MedicationsPage() {
               key={m.id}
               className="surface flex items-center gap-3.5 rounded-3xl p-4"
             >
-              <MedicationIcon color={m.color} />
+              <MedicationIcon color={m.color} icon={m.icon} />
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-sm font-medium">{m.name}</h3>
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -544,7 +530,7 @@ export function GoalsPage() {
             return (
               <article key={goal.id} className="surface rounded-3xl p-5">
                 <div className="mb-4 flex items-center gap-3">
-                  <MedicationIcon color={med?.color} small />
+                  <MedicationIcon color={med?.color} icon={med?.icon} small />
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm font-medium">
                       {med?.name ?? "Medication"}

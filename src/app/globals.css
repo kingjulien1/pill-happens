@@ -245,22 +245,6 @@
 .day-heading-year-divider {
   opacity: 0.5;
 }
-.color-rose {
-  --med-color: var(--primary);
-  --med-bg: #f9731626;
-}
-.color-amber {
-  --med-color: var(--primary);
-  --med-bg: #9a341226;
-}
-.color-violet {
-  --med-color: var(--primary);
-  --med-bg: #fed7aa38;
-}
-.med-icon {
-  color: var(--med-color);
-  background: var(--med-bg);
-}
 .nav-link {
   display: flex;
   align-items: center;

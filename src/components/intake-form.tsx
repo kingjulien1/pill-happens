@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
+import { MedicationIcon } from "@/components/medication-icon";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import {
@@ -136,15 +137,41 @@ export function IntakeForm({
             className="h-12 w-full rounded-xl px-3.5 text-base data-[size=default]:h-12"
           >
             <SelectValue>
-              {medication
-                ? `${medication.name} · ${formatDose(strength)} mg`
-                : "Choose medication"}
+              {medication ? (
+                <>
+                  <MedicationIcon
+                    icon={medication.icon}
+                    color={medication.color}
+                    small
+                    className="size-6 rounded-md"
+                  />
+                  <span className="min-w-0 truncate">
+                    {medication.name} · {formatDose(strength)} mg
+                  </span>
+                </>
+              ) : (
+                "Choose medication"
+              )}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {medications.map((m) => (
-              <SelectItem key={m.id} value={m.id} className="min-h-11 px-3">
-                {m.name} · {formatDose(m.strengthMg)} mg
+              <SelectItem
+                key={m.id}
+                value={m.id}
+                className="min-h-11 pl-3 pr-9"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <MedicationIcon
+                    icon={m.icon}
+                    color={m.color}
+                    small
+                    className="size-6 rounded-md"
+                  />
+                  <span className="min-w-0 break-words">
+                    {m.name} · {formatDose(m.strengthMg)} mg
+                  </span>
+                </span>
               </SelectItem>
             ))}
           </SelectContent>

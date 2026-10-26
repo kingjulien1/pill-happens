@@ -1,0 +1,158 @@
+import type { CSSProperties } from "react";
+import {
+  CircleDot,
+  Cloud,
+  Coffee,
+  Droplet,
+  FlaskConical,
+  Flower2,
+  Gem,
+  Heart,
+  Leaf,
+  Moon,
+  Package,
+  Pill,
+  PillBottle,
+  ShieldCheck,
+  Smile,
+  Sparkles,
+  Star,
+  Sun,
+  Syringe,
+  Tablets,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+import type { Medication } from "@/lib/domain";
+import {
+  getMedicationColor,
+  isMedicationIcon,
+  type MedicationIconName,
+} from "@/lib/medication-appearance";
+import { cn } from "@/lib/utils";
+
+const glyphs = {
+  pill: Pill,
+  tablets: Tablets,
+  capsule: PillBottle,
+  droplet: Droplet,
+  syringe: Syringe,
+  "flask-conical": FlaskConical,
+  heart: Heart,
+  sparkles: Sparkles,
+  sun: Sun,
+  moon: Moon,
+  "flower-2": Flower2,
+  leaf: Leaf,
+  star: Star,
+  cloud: Cloud,
+  coffee: Coffee,
+  smile: Smile,
+  "shield-check": ShieldCheck,
+  zap: Zap,
+  "circle-dot": CircleDot,
+  gem: Gem,
+} satisfies Record<MedicationIconName, LucideIcon>;
+
+/** Names and emoji are validated before rendering; emoji stay plain text. */
+export function MedicationGlyph({
+  icon,
+  className,
+}: {
+  icon?: string;
+  className?: string;
+}) {
+  const value =
+    typeof icon === "string" && isMedicationIcon(icon) ? icon : "pill";
+  const Glyph = glyphs[value as MedicationIconName];
+
+  if (Glyph) {
+    return (
+      <Glyph
+        aria-hidden="true"
+        focusable="false"
+        strokeWidth={2.75}
+        className={cn("size-6 shrink-0", className)}
+        data-medication-glyph={value}
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-hidden="true"
+      data-medication-glyph="emoji"
+      className={cn(
+        "inline-flex size-6 shrink-0 items-center justify-center leading-none",
+        className,
+      )}
+      style={{ containerType: "size" }}
+    >
+      <span style={{ fontSize: "85cqi", lineHeight: 1 }}>{value}</span>
+    </span>
+  );
+}
+
+const typeGlyphs = {
+  tablet: Tablets,
+  capsule: Pill,
+  drops: Droplet,
+  other: Package,
+} satisfies Record<Medication["form"], LucideIcon>;
+
+export function MedicationTypeIcon({
+  type,
+  className,
+}: {
+  type: Medication["form"];
+  className?: string;
+}) {
+  const Glyph = typeGlyphs[type] ?? Package;
+  return (
+    <Glyph
+      aria-hidden="true"
+      focusable="false"
+      strokeWidth={2.75}
+      className={cn("size-5 shrink-0", className)}
+      data-medication-type={type}
+    />
+  );
+}
+
+/** A restrained tint keeps every medication color legible in either OS theme. */
+export function MedicationIcon({
+  color,
+  icon,
+  small = false,
+  className,
+}: {
+  color?: string;
+  icon?: string;
+  small?: boolean;
+  className?: string;
+}) {
+  const appearance = getMedicationColor(color);
+  const style = {
+    "--medication-color": appearance.hex,
+    color:
+      "color-mix(in srgb, var(--medication-color) 55%, var(--foreground) 45%)",
+    backgroundColor:
+      "color-mix(in srgb, var(--medication-color) 12%, transparent)",
+  } as CSSProperties;
+
+  return (
+    <span
+      aria-hidden="true"
+      data-medication-mark
+      data-medication-color={appearance.value}
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-2xl",
+        small ? "size-10" : "size-12",
+        className,
+      )}
+      style={style}
+    >
+      <MedicationGlyph icon={icon} className={small ? "size-5" : "size-6"} />
+    </span>
+  );
+}
