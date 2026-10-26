@@ -1,11 +1,12 @@
 # Pill happens
 
-A quiet, private medication journal for one person. Open the app, log an intake, and see the current tracking day at a glance.
+A quiet medication journal for personal use. Open a password's private journal, log an intake, and see the current tracking day at a glance.
 
 Built with **Next.js 16.4.3**, **React 19.3.1**, TypeScript, Tailwind CSS 4, and shadcn/ui components using Base UI. The production app is designed to run on Vercel and store its journal in Neon Postgres connected through the Vercel Marketplace.
 
 ## The experience
 
+- **Password journals:** enter an existing password to open its journal. A password without a journal opens a confirmation drawer on mobile or dialog on desktop. The exact password appears in a highlighted panel; **Create journal** creates an empty, separate journal and signs in. Going back creates nothing and keeps the entered password available to correct. Anyone using the same exact password opens the same journal.
 - **Today:** the compact Today/date heading, with a consecutive logging-day count opposite it. A small glass badge tracks total logged days and milestones, with a short encouragement below. Intake entries follow in creation order from oldest to newest. The logging button uses a bold journal-and-pencil icon and stays fixed near the bottom on mobile, with safe-area spacing; on larger screens it follows the entries.
 - **Logging:** a shadcn bottom drawer on mobile and a centered dialog at widths of 768px and above. Choose a medication, select or enter a quantity, check the calculated dose, set the time taken, and optionally add a note.
 - **Medications:** create and edit the name, strength, medication type, color, and icon. Choose from 24 compact color swatches and 20 Lucide icons, or enter a single emoji. Medication-type and medication selection choices include a leading icon. Archive a medication to remove it from new-log choices; restore it whenever needed.
@@ -73,7 +74,7 @@ npm run dev
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The development command listens on the loopback interface.
 
-With no database or password configured, development runs without sign-in and saves to **`.data/state.json`**. This directory is ignored by Git. Local writes are serialized and replace the file atomically. This storage mode is for a single local development process.
+With no database or password configured, development runs without sign-in and saves to **`.data/state.json`**. With a password and session secret configured, this file remains the original journal and additional password journals use **`.data/journals.json`**. This directory is ignored by Git. Local writes are serialized and replace the file atomically. This storage mode is for a single local development process; production always requires Postgres.
 
 To use environment variables locally, copy the example:
 
@@ -102,7 +103,7 @@ Restart the development server after changing the environment. Once a database o
 
 The tracked `vercel.json` selects the Next.js preset and pins functions to Frankfurt (`fra1`), matching the initial Neon database region.
 
-The server creates its two tables automatically on first database use. The database connection therefore needs permission to create tables. There is no separate migration command for this prototype.
+The server creates its tables automatically on first database use. The database connection therefore needs permission to create tables. The password-journal update adds credential and registry tables and preserves the original `personal` journal row, including its version and timestamp. The repeatable schema statements live in `src/lib/server/journal-repository.ts`; no manual data migration is needed.
 
 For Preview deployments, configure the same authentication requirements with a separate Neon database or branch. This keeps preview changes separate from the personal production journal.
 
@@ -111,24 +112,30 @@ For Preview deployments, configure the same authentication requirements with a s
 | Variable         | Purpose                                                                                                                                                                                                    |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`   | Neon Postgres connection string. Required in production. The Marketplace integration normally supplies it.                                                                                                 |
-| `APP_PASSWORD`   | The single owner's sign-in password, at least 4 characters. Required in production or when a database or password is configured.                                                                           |
+| `APP_PASSWORD`   | Password for the original personal journal, at least 4 characters. Required in production or when a database or password is configured. Additional journal passwords are created through the login screen. |
 | `SESSION_SECRET` | Random session-signing secret, at least 32 characters. Required alongside authentication.                                                                                                                  |
 | `APP_ORIGIN`     | Optional exact origin, such as `https://your-project.vercel.app`, for a reverse proxy that changes the request origin. Normally leave unset. No trailing slash; use environment-specific values if needed. |
 
 Production fails closed until the database, password, and session secret are configured. It never falls back to local file storage in production. The login page displays generic setup guidance when configuration is incomplete.
 
-Changing the password or session secret invalidates existing sessions. Sessions last up to 30 days and use HTTP-only, same-site cookies, marked secure in production. Sign out through **Past days → Preferences**.
+Changing `APP_PASSWORD` changes access to the original personal journal and invalidates its sessions. Changing `SESSION_SECRET` invalidates all sessions; additional journals keep their passwords because password verifiers do not depend on the signing secret. Sessions last up to 30 days and use HTTP-only, same-site cookies, marked secure in production. Sign out through **Past days → Preferences**.
 
 ## Storage and privacy
 
-This is a single-owner app with one shared journal, not a multi-user account system. Authentication protects the application routes and API. Mutations require the same origin, inputs are validated on the server, and sign-in is limited to 10 attempts per 15-minute window for the account. Database-backed rate limiting works across Vercel function instances.
+Each exact password selects one journal. There are no usernames, email addresses, or password-reset flow. Passwords preserve spaces, case, and Unicode without normalization and accept 4–1,024 characters using the input's native length rules. The creation confirmation displays the password in plain text only while it is open. Cancelling creates nothing; an existing password opens its journal directly. Duplicate creation, including simultaneous requests, cannot replace a journal's records.
 
-The production database has two tables:
+Authentication protects the application routes and API. Every data read, mutation, and export derives its journal from the verified session cookie; request parameters cannot select another journal. Existing original-journal sessions remain compatible. Mutations require the same origin, inputs are validated on the server, and sign-in is limited to 10 attempts per 15-minute window across the installation. Creation also has a separate 10-attempt window. Successful sign-in or creation does not reset either counter, so access to one journal cannot bypass the limit for another. Database-backed rate limiting works across Vercel function instances.
 
-| Table                         | Contents                                                                                                                                  |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `pill_happens_state`          | One journal document containing medications, intake snapshots, goals, and timezone settings, plus a version counter and update timestamp. |
-| `pill_happens_login_attempts` | The account's sign-in attempt count and rate-limit window.                                                                                |
+Additional journal passwords use scrypt with a random 16-byte salt, a 64-byte verifier, and constant-time verification. Plain-text passwords are not stored in the credential tables, session cookies, URLs, or browser storage. Password lookup verifies the stored salted hashes rather than maintaining a fast password index. This design is intended for personal use and caps additional journals at 50; lookup time grows with the number of journals.
+
+The production database has four tables:
+
+| Table                           | Contents                                                                                                                                        |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pill_happens_state`            | One document per journal containing medications, intake snapshots, goals, and timezone settings, plus its version counter and update timestamp. |
+| `pill_happens_login_attempts`   | Separate installation-wide sign-in and creation counters and rate-limit windows.                                                                |
+| `pill_happens_journal_registry` | A version counter used to serialize concurrent credential creation.                                                                             |
+| `pill_happens_journals`         | Additional journal identifiers, salted scrypt password verifiers, and creation timestamps.                                                      |
 
 Updates use optimistic version checks and retry on contention to avoid overwriting a simultaneous save. The client also prevents overlapping saves within one open app instance. The full journal is loaded into the client; the 20-day history limit controls the display, rather than database pagination. This is intentionally sized for personal use.
 
@@ -158,9 +165,11 @@ npm run format:check
 npm run build
 ```
 
-Tests use Node's test runner with `tsx`. They cover day boundaries, timezone conversion, daylight-saving transitions, invalid local times, separate medication totals, historical snapshots, goal precedence, calendar validation, server input validation, fail-closed configuration, session tampering and expiry, credential rotation, and origin checks.
+Tests use Node's test runner with `tsx`. They cover day boundaries, timezone conversion, daylight-saving transitions, invalid local times, separate medication totals, historical snapshots, goal precedence, calendar validation, server input validation, fail-closed configuration, session tampering and expiry, credential rotation, and origin checks. Password-journal regressions also run the real SQL repository against an isolated PGlite Postgres engine, without deployment credentials: additive schema preservation, journal isolation, duplicate and concurrent creation, transaction rollback, simultaneous saves, and separate creation quotas.
 
-The prototype was verified with 30 automated tests, a production build, strict TypeScript, ESLint, and formatting checks. Manual browser checks covered the logging and management flow at 320px, 390px, and 1024px; system light and dark appearance; mobile drawers and desktop dialogs; backdating, correction, deletion, and 20-day history loading. Production HTTP checks confirmed that missing configuration blocks data reads and writes and returns a generic setup screen. Test records are removed after browser verification.
+Verification includes 70 automated tests, a production build, strict TypeScript, ESLint, and formatting checks. The password-journal flow also passed 68 isolated HTTP checks using synthetic records, covering CRUD and export separation, exact passwords, duplicate races, origin checks, tampered sessions, and rate limits. Browser checks at 320px, 390px, and 1024px in both color modes cover confirmation, cancellation, long passwords, connection errors, creation conflicts, pending submission, and existing-password sign-in. These checks use fake credentials and do not read production journal records.
+
+Earlier manual checks covered the logging and management flow, backdating, correction, deletion, and 20-day history loading. Production HTTP checks confirmed that missing configuration blocks data reads and writes and returns a generic setup screen.
 
 `npm run build` produces a production build. To run that build locally, configure the production database and authentication variables, then use `npm start`. Like the development command, it listens on `127.0.0.1` by default.
 
@@ -170,6 +179,7 @@ The prototype was verified with 30 automated tests, a production build, strict T
 | --------------------------------------- | ---------------------------------------------------------------------- |
 | `src/app/(journal)/`                    | Protected routes for today, history, medications, and goals.           |
 | `src/app/login/`                        | Private sign-in and setup guidance.                                    |
+| `src/components/login-form.tsx`         | Password lookup and explicit new-journal confirmation.                 |
 | `src/components/journal-pages.tsx`      | Daily dashboard, history summaries, management pages, and preferences. |
 | `src/components/intake-form.tsx`        | Intake creation and correction.                                        |
 | `src/components/manage-forms.tsx`       | Medication and goal forms.                                             |
@@ -178,6 +188,9 @@ The prototype was verified with 30 automated tests, a production build, strict T
 | `src/components/grainient.tsx`          | Adapted React Bits WebGL background renderer.                          |
 | `src/components/ui/`                    | Local shadcn/ui components.                                            |
 | `src/lib/domain.ts`                     | Shared types, 06:00 calendar rules, totals, and goal selection.        |
+| `src/lib/server/journal-repository.ts`  | Repeatable Postgres schema, atomic creation, and scoped persistence.   |
+| `src/lib/server/journal-service.ts`     | Password lookup, duplicate detection, and journal creation policy.     |
+| `src/lib/server/passwords.ts`           | Exact-password validation and salted scrypt verifiers.                 |
 | `src/lib/server/`                       | Authentication, validated API helpers, and storage.                    |
 | `src/app/api/`                          | Authenticated journal endpoints, export, and sign-in/out.              |
 | `src/app/globals.css`                   | System theme, colors, ambient animation, and shared visual styles.     |
