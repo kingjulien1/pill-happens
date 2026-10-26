@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "node --import tsx --test src/lib/*.test.ts src/lib/server/*.test.ts",
     "secrets": "node scripts/generate-secrets.mjs"
   },
