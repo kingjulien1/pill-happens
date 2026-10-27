@@ -25,12 +25,12 @@ function DashedOutline({ className }: { className: string }) {
 
 const blankCards = [
   {
-    className: "z-20 -mt-8 h-16 w-[94%] bg-primary/3",
-    outline: "text-primary/18",
+    className: "z-20 -mt-8 h-16 w-[94%] bg-primary/[0.025] opacity-50",
+    outline: "text-primary/40",
   },
   {
-    className: "z-10 -mt-7 h-14 w-[88%] bg-primary/5",
-    outline: "text-primary/24",
+    className: "z-10 -mt-7 h-14 w-[88%] bg-primary/[0.025] opacity-25",
+    outline: "text-primary/40",
   },
 ];
 
