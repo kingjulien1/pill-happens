@@ -570,75 +570,34 @@
 .intake-log-action {
   position: relative;
   isolation: isolate;
+  -webkit-backdrop-filter: blur(13px);
+  backdrop-filter: blur(13px);
 }
 .intake-log-action > * {
   position: relative;
   z-index: 1;
 }
-.intake-log-action::before {
-  content: "";
+.intake-log-action > .intake-specular-light {
   position: absolute;
   z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(
-    110deg,
-    transparent 28%,
-    #fff7ed00 35%,
-    #fff7eda6 46%,
-    #ffffffd9 50%,
-    #fff7ed73 54%,
-    #fff7ed00 65%,
-    transparent 72%
-  );
-  background-size: 200% 100%;
-  background-position: 100% 0;
-  opacity: 0;
-}
-.intake-log-action::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  box-shadow:
-    inset 0 0 0 1px #fff7edcc,
-    0 0 0 3px #fed7aa26,
-    0 8px 28px #f9731647,
-    0 2px 46px #fed7aa33;
-}
-.intake-log-glint {
-  position: absolute;
+  /* Offset the Button's 1px border, then allow the shader's 24px light padding. */
+  inset: -25px;
   display: block;
-  width: 7px;
-  height: 7px;
-  clip-path: polygon(
-    50% 0,
-    62% 38%,
-    100% 50%,
-    62% 62%,
-    50% 100%,
-    38% 62%,
-    0 50%,
-    38% 38%
-  );
-  background: currentColor;
+  width: calc(100% + 50px);
+  height: calc(100% + 50px);
   pointer-events: none;
+}
+.intake-log-action > .intake-specular-fallback {
+  position: absolute;
+  z-index: 0;
+  inset: -1px;
+  border: 1.2px solid rgb(249 115 22 / 60%);
+  border-radius: inherit;
+  box-shadow: 0 0 8px rgb(255 216 189 / 20%);
+  pointer-events: none;
+}
+.intake-specular-light[data-rendered="true"] + .intake-specular-fallback {
   opacity: 0;
-  transform: scale(0) rotate(45deg);
-}
-.intake-log-glint--first {
-  top: -2px;
-  right: -3px;
-}
-.intake-log-glint--second {
-  bottom: 1px;
-  left: -4px;
-  width: 4px;
-  height: 4px;
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .brand-lockup:hover::before {
@@ -664,106 +623,10 @@
   .intake-log-action:not(:disabled):hover {
     background: var(--action-background);
   }
-  .intake-log-action::after {
-    transition: opacity 300ms ease;
-  }
-  .intake-log-action:not(:disabled):hover::after {
-    opacity: 1;
-  }
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .empty-intake-card:hover {
     transform: translateY(-3px);
-  }
-  .intake-log-copy {
-    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .intake-log-action:not(:disabled):hover .intake-log-copy {
-    transform: translateX(2px);
-  }
-  .intake-log-action:not(:disabled)[data-hover-motion]::before {
-    animation: intake-light-sweep 1100ms cubic-bezier(0.45, 0, 0.55, 1) both;
-  }
-  .intake-log-action:not(:disabled)[data-hover-motion]
-    .intake-log-symbol
-    > svg {
-    animation: intake-note-flourish 850ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  .intake-log-action:not(:disabled)[data-hover-motion] .intake-log-glint {
-    animation: intake-glint 700ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  .intake-log-action:not(:disabled)[data-hover-motion]
-    .intake-log-glint--second {
-    animation-delay: 260ms;
-  }
-  .intake-log-action:not(:disabled)[data-hover-motion] .intake-log-next > svg {
-    animation: intake-arrow-return 850ms 120ms cubic-bezier(0.22, 1, 0.36, 1)
-      both;
-  }
-}
-@keyframes intake-light-sweep {
-  0% {
-    background-position: 100% 0;
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.85;
-  }
-  70% {
-    opacity: 0.6;
-  }
-  100% {
-    background-position: 0% 0;
-    opacity: 0;
-  }
-}
-@keyframes intake-note-flourish {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-  32% {
-    transform: translateY(-2px) rotate(-10deg) scale(1.08);
-  }
-  58% {
-    transform: translateY(0) rotate(6deg) scale(1.04);
-  }
-  80% {
-    transform: translateY(-1px) rotate(-2deg) scale(1.01);
-  }
-}
-@keyframes intake-glint {
-  0%,
-  100% {
-    opacity: 0;
-    transform: translateY(0) scale(0) rotate(45deg);
-  }
-  35% {
-    opacity: 0.65;
-    transform: translateY(-2px) scale(1) rotate(90deg);
-  }
-  75% {
-    opacity: 0.2;
-    transform: translateY(-4px) scale(0.6) rotate(135deg);
-  }
-}
-@keyframes intake-arrow-return {
-  0%,
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  36% {
-    opacity: 0;
-    transform: translateX(140%);
-  }
-  37% {
-    opacity: 0;
-    transform: translateX(-140%);
-  }
-  78% {
-    opacity: 1;
-    transform: translateX(0);
   }
 }
 .intake-dock {
