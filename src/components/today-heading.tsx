@@ -1,6 +1,5 @@
 import { ActionIcon } from "@/components/action-icon";
 import { formatDay } from "@/lib/domain";
-import { streakMilestone } from "@/lib/logging-streak";
 
 export function TodayHeading({
   day,
@@ -13,8 +12,6 @@ export function TodayHeading({
   now: Date;
   timeZone: string;
 }) {
-  const { next } = streakMilestone(current);
-  const remaining = next - current;
   const clock = new Intl.DateTimeFormat("en-GB", {
     timeZone,
     hour: "2-digit",
@@ -60,14 +57,10 @@ export function TodayHeading({
         <div
           className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]"
           data-current-streak={current}
-          data-next-milestone={next}
-          data-days-to-next={remaining}
-          title={`Next milestone: ${next} consecutive logging days`}
+          title={`${current} consecutive logging ${current === 1 ? "day" : "days"}`}
         >
           <span className="sr-only">
-            {current} consecutive logging {current === 1 ? "day" : "days"};{" "}
-            {remaining} {remaining === 1 ? "day" : "days"} until the {next}
-            -day streak milestone.
+            {current} consecutive logging {current === 1 ? "day" : "days"}.
           </span>
           <span aria-hidden="true" className="flex items-center gap-1">
             <ActionIcon
@@ -87,7 +80,7 @@ export function TodayHeading({
             className="inline-flex items-center gap-1 text-[10px] font-normal text-muted-foreground max-[359px]:text-[9px]"
           >
             <span>/</span>
-            <span>{remaining} to next</span>
+            <span>in a row</span>
           </span>
         </div>
       </div>

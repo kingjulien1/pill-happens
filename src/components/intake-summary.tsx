@@ -31,8 +31,7 @@ export function IntakeSummary({
         </span>
       </h2>
       <span className="inline-flex shrink-0 items-center gap-1 text-[10px] leading-none font-normal whitespace-nowrap text-muted-foreground max-[359px]:text-[9px]">
-        <ActionIcon name="calendar" weight="fill" className="size-3.5" />
-        <span>06:00 reset</span>
+        <span>New day at 06:00</span>
       </span>
     </div>
   );
