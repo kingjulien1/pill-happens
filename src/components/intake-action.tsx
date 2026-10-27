@@ -33,16 +33,16 @@ export function IntakeAction({
       <Button
         type="button"
         onClick={onClick}
-        className="pointer-events-auto h-16 w-full justify-start gap-2.5 rounded-[22px] px-4 text-[15px] shadow-lg shadow-primary/10 max-[359px]:gap-2 max-[359px]:px-3 sm:gap-3 sm:px-5"
+        className="pointer-events-auto h-16 w-full justify-start gap-3.5 rounded-[22px] px-4 text-[15px] shadow-lg shadow-primary/10 max-[359px]:gap-3 max-[359px]:px-3 sm:gap-4 sm:px-5"
       >
         <ActionIcon
-          name="log"
-          weight="duotone"
-          className="size-8 max-[359px]:size-7"
+          name="record"
+          weight="bold"
+          className="size-7 max-[359px]:size-[26px]"
         />
-        <span className="flex min-w-0 flex-1 items-center gap-1.5 text-left leading-none whitespace-nowrap max-[359px]:gap-1">
-          <span className="shrink-0 leading-none">Log an intake</span>
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-none font-normal whitespace-nowrap text-inherit max-[359px]:gap-1 max-[359px]:text-[11px]">
+        <span className="flex min-w-0 flex-1 items-center gap-2 text-left leading-none whitespace-nowrap max-[359px]:gap-1.5">
+          <span className="shrink-0 leading-none">Log an Intake</span>
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-none font-normal whitespace-nowrap text-inherit opacity-60 max-[359px]:gap-1 max-[359px]:text-[11px]">
             <span aria-hidden="true" className="leading-none">
               /
             </span>

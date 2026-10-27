@@ -1,5 +1,6 @@
 import { HouseLineIcon } from "@phosphor-icons/react/dist/ssr/HouseLine";
 import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
+import { CalendarHeartIcon } from "@phosphor-icons/react/dist/ssr/CalendarHeart";
 import { PillIcon } from "@phosphor-icons/react/dist/ssr/Pill";
 import { FlagBannerIcon } from "@phosphor-icons/react/dist/ssr/FlagBanner";
 import { PlusCircleIcon } from "@phosphor-icons/react/dist/ssr/PlusCircle";
@@ -34,6 +35,7 @@ import { ShootingStarIcon } from "@phosphor-icons/react/dist/ssr/ShootingStar";
 import { FlowerIcon } from "@phosphor-icons/react/dist/ssr/Flower";
 import { ConfettiIcon } from "@phosphor-icons/react/dist/ssr/Confetti";
 import { MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
+import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr/NotePencil";
 import { cn } from "@/lib/utils";
 
 const icons = {
@@ -60,6 +62,7 @@ const icons = {
   add: PlusIcon,
   subtract: MinusIcon,
   calendar: CalendarCheckIcon,
+  date: CalendarHeartIcon,
   loading: SpinnerGapIcon,
   secure: LockKeyIcon,
   expand: CaretDownIcon,
@@ -73,6 +76,7 @@ const icons = {
   flower: FlowerIcon,
   confetti: ConfettiIcon,
   log: MagicWandIcon,
+  record: NotePencilIcon,
 } as const;
 
 export type ActionIconName = keyof typeof icons;
