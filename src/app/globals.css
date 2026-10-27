@@ -194,14 +194,14 @@
   }
 }
 .brand-lockup {
-  --brand-fill-start: #fff6e5;
-  --brand-fill-middle: #ffe2bf;
-  --brand-fill-end: #ff8a35;
-  --brand-gloss: #fff1d699;
+  --brand-fill-start: #3f271f;
+  --brand-fill-middle: #573426;
+  --brand-fill-end: #6e402b;
+  --brand-gloss: #fed7aa1f;
   --brand-ink: rgb(254 215 170 / 70%);
-  --brand-glow: #ffad66e6;
-  --brand-halo: #ffbd8599;
-  --brand-sheen-opacity: 0.82;
+  --brand-glow: #f973162b;
+  --brand-halo: #ffbd851a;
+  --brand-sheen-opacity: 0.22;
   position: relative;
   isolation: isolate;
   border-radius: 999px;
@@ -210,30 +210,31 @@
   vertical-align: middle;
 }
 .brand-lockup:focus-visible {
-  outline-offset: 8px;
+  outline-offset: 6px;
 }
 .brand-lockup::before {
   content: "";
   position: absolute;
   z-index: -1;
-  /* Keep the orange edge directly against the face, with no base band. */
-  inset: 2px 0;
+  /* A single fine edge follows the compact face; the touch target stays 44px. */
+  inset: 4px 0;
   border: 0;
-  outline: 4px solid rgb(249 115 22 / 90%);
+  outline: 1px solid rgb(249 115 22 / 35%);
   border-radius: inherit;
   pointer-events: none;
   box-shadow:
-    0 0 16px 4px #ffbd85f2,
-    0 0 44px 12px var(--brand-glow),
-    0 10px 90px 24px var(--brand-halo),
-    0 16px 140px 36px #ffbd8566;
-  transition: box-shadow 180ms ease;
+    0 2px 8px #120f170a,
+    0 0 18px var(--brand-glow),
+    0 3px 36px var(--brand-halo);
+  transition:
+    box-shadow 200ms ease,
+    outline-color 200ms ease;
 }
 .brand-lockup::after {
   content: "";
   position: absolute;
   z-index: -2;
-  inset: -26px -46px;
+  inset: -8px -12px;
   border-radius: 999px;
   pointer-events: none;
   background:
@@ -244,9 +245,9 @@
       #f9731600 72%
     ),
     radial-gradient(ellipse at 75% 68%, #ffbd85e6, #f9731680 38%, #f9731600 72%);
-  filter: blur(26px);
-  opacity: 0.95;
-  animation: brand-glow 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  filter: blur(16px);
+  opacity: 0.14;
+  animation: brand-glow 8s ease-in-out infinite;
 }
 .brand-bar {
   position: relative;
@@ -266,7 +267,7 @@
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.8;
   background:
     radial-gradient(ellipse at 20% 0%, var(--brand-gloss), transparent 72%),
     linear-gradient(
@@ -286,7 +287,7 @@
   z-index: 0;
   inset-block: -50%;
   left: 0;
-  width: 48%;
+  width: 32%;
   pointer-events: none;
   background: linear-gradient(
     90deg,
@@ -299,33 +300,25 @@
   filter: blur(1px);
   opacity: 0;
   transform: translateX(-150%) skewX(-22deg);
-  animation: brand-sheen 4.2s ease-in-out infinite;
+  animation: brand-sheen 8.4s ease-in-out infinite;
 }
 .brand-lockup:hover::before,
 .brand-lockup:focus-visible::before {
+  outline-color: rgb(249 115 22 / 55%);
   box-shadow:
-    0 0 20px 6px #ffd0a3,
-    0 0 52px 16px var(--brand-glow),
-    0 10px 104px 28px var(--brand-halo),
-    0 16px 156px 40px #ffbd8580;
+    0 2px 10px #120f1710,
+    0 0 24px var(--brand-glow),
+    0 4px 44px var(--brand-halo);
 }
 @keyframes brand-glow {
   0%,
   100% {
-    opacity: 0.85;
-    transform: translate3d(-22px, -5px, 0) rotate(-12deg) scale(1.08, 0.95);
-  }
-  25% {
-    opacity: 1;
-    transform: translate3d(18px, 10px, 0) rotate(6deg) scale(1.28, 1.18);
+    opacity: 0.12;
+    transform: translate3d(-2px, 1px, 0) scale(0.98);
   }
   50% {
-    opacity: 0.9;
-    transform: translate3d(-8px, 16px, 0) rotate(-4deg) scale(1.42, 1.26);
-  }
-  75% {
-    opacity: 1;
-    transform: translate3d(-18px, -9px, 0) rotate(8deg) scale(1.2, 1.14);
+    opacity: 0.18;
+    transform: translate3d(3px, -1px, 0) scale(1.05);
   }
 }
 @keyframes brand-sheen {
@@ -345,13 +338,13 @@
 }
 @media (prefers-color-scheme: dark) {
   .brand-lockup {
-    --brand-fill-start: #49251a;
-    --brand-fill-middle: color-mix(in srgb, #c86a38 76%, #49251a);
-    --brand-fill-end: #49251a;
-    --brand-gloss: #fed7aa1a;
-    --brand-glow: #ffad66f2;
-    --brand-halo: #ffbd85b3;
-    --brand-sheen-opacity: 0.62;
+    --brand-fill-start: #2a201d;
+    --brand-fill-middle: #3c2922;
+    --brand-fill-end: #2a201d;
+    --brand-gloss: #fed7aa12;
+    --brand-glow: #f9731633;
+    --brand-halo: #ffbd8526;
+    --brand-sheen-opacity: 0.16;
   }
 }
 .brand-mark {

@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 export function BrandMark({ className }: { className?: string }) {
   return (
     <svg
-      width="18"
-      height="18"
+      width="17"
+      height="17"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -15,7 +15,7 @@ export function BrandMark({ className }: { className?: string }) {
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
-      className={cn("brand-mark size-[18px] shrink-0", className)}
+      className={cn("brand-mark size-[17px] shrink-0", className)}
     >
       <g transform="translate(6.5 6.5)">
         <g className="brand-tablet brand-tablet--first">
@@ -59,12 +59,12 @@ export function BrandFace({
   return (
     <span
       className={cn(
-        "brand-bar inline-flex h-10 min-w-36 items-center justify-center gap-2.5 px-4.5",
+        "brand-bar inline-flex h-9 min-w-34 items-center justify-center gap-2 px-4",
         className,
       )}
     >
       <BrandMark />
-      <span className="text-xs font-semibold leading-none tracking-[-.02em]">
+      <span className="text-xs font-[550] leading-none tracking-[-.015em]">
         pill happens.
       </span>
       {children}
