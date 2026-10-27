@@ -1,17 +1,35 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Tablets } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <Tablets
-      size={16}
-      strokeWidth={2.5}
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
-      className={cn("size-4 shrink-0 text-[#f97316]", className)}
-    />
+      className={cn("brand-mark size-[18px] shrink-0", className)}
+    >
+      <g transform="translate(6.5 6.5)">
+        <g className="brand-tablet brand-tablet--first">
+          <circle r="4.8" />
+          <path d="m-3.39 3.39 6.78-6.78" />
+        </g>
+      </g>
+      <g transform="translate(17.5 17.5)">
+        <g className="brand-tablet brand-tablet--second">
+          <circle r="4.8" />
+          <path d="M-4.8 0h9.6" />
+        </g>
+      </g>
+    </svg>
   );
 }
 
@@ -21,7 +39,7 @@ export function Brand({ className }: { className?: string }) {
       href="/"
       aria-label="Pill happens home"
       className={cn(
-        "brand-lockup inline-flex min-h-11 items-center justify-center text-primary",
+        "brand-lockup inline-flex h-11 items-center justify-center",
         className,
       )}
     >
@@ -41,7 +59,7 @@ export function BrandFace({
   return (
     <span
       className={cn(
-        "brand-bar inline-flex h-10 min-w-36 items-center justify-center gap-2 px-4.5",
+        "brand-bar inline-flex h-10 min-w-36 items-center justify-center gap-2.5 px-4.5",
         className,
       )}
     >
