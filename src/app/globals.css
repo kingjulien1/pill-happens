@@ -406,17 +406,31 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  flex: none;
+  box-sizing: border-box;
+  line-height: 0;
+  vertical-align: middle;
+  transform: none;
+  translate: none;
+  rotate: none;
+  scale: none;
   border: 1px solid transparent;
   border-color: color-mix(in srgb, var(--primary) 4%, transparent);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--primary) 1.5%, transparent);
+  background: color-mix(in srgb, var(--accent) 66.6667%, transparent);
   color: var(--foreground);
   transition:
     background 160ms ease,
     border-color 160ms ease;
 }
 .header-icon-button > svg {
-  opacity: 0.28;
+  display: block;
+  flex: none;
+  opacity: 0.333333;
+  transform: none;
+  translate: none;
+  rotate: none;
+  scale: none;
   transition: opacity 160ms ease;
 }
 .header-icon-button:is(:hover, :focus-visible, [data-popup-open]) {
