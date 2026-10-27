@@ -4,31 +4,33 @@ import { cn } from "@/lib/utils";
 
 export function BrandMark({ className }: { className?: string }) {
   return (
+    <span
+      aria-hidden="true"
+      className={cn("brand-mark size-6 shrink-0", className)}
+    >
+      <TabletIcon className="brand-tablet--first" />
+      <TabletIcon className="brand-tablet--second" />
+    </span>
+  );
+}
+
+function TabletIcon({ className }: { className: string }) {
+  return (
     <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
+      width="12"
+      height="12"
+      viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.1"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
-      className={cn("brand-mark size-[17px] shrink-0", className)}
+      className={cn("brand-tablet", className)}
     >
-      <g transform="translate(6.5 6.5)">
-        <g className="brand-tablet brand-tablet--first">
-          <circle r="4.8" />
-          <path d="m-3.39 3.39 6.78-6.78" />
-        </g>
-      </g>
-      <g transform="translate(17.5 17.5)">
-        <g className="brand-tablet brand-tablet--second">
-          <circle r="4.8" />
-          <path d="M-4.8 0h9.6" />
-        </g>
-      </g>
+      <circle cx="8" cy="8" r="5.25" />
+      <path d="M2.75 8h10.5" />
     </svg>
   );
 }

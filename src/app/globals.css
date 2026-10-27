@@ -194,7 +194,7 @@
   --brand-fill-middle: #573426;
   --brand-fill-end: #6e402b;
   --brand-gloss: #fed7aa1f;
-  --brand-ink: #fed7aa;
+  --brand-ink: rgb(254 215 170 / 80%);
   --brand-glow: #f973162b;
   --brand-halo: #ffbd851a;
   --brand-sheen-opacity: 0.22;
@@ -215,7 +215,7 @@
   /* A single fine edge follows the compact face; the touch target stays 44px. */
   inset: 4px 0;
   border: 0;
-  outline: 1px solid rgb(249 115 22 / 35%);
+  outline: 1px solid var(--brand-ink);
   border-radius: inherit;
   pointer-events: none;
   box-shadow:
@@ -300,7 +300,7 @@
 }
 .brand-lockup:hover::before,
 .brand-lockup:focus-visible::before {
-  outline-color: rgb(249 115 22 / 55%);
+  outline-color: #fed7aa;
   box-shadow:
     0 2px 10px #120f1710,
     0 0 24px var(--brand-glow),
@@ -344,57 +344,72 @@
   }
 }
 .brand-mark {
+  position: relative;
   display: block;
   overflow: visible;
-  color: var(--brand-ink, #fed7aa);
+  color: var(--brand-ink, rgb(254 215 170 / 80%));
 }
 .brand-tablet {
-  transform-box: fill-box;
+  position: absolute;
+  display: block;
+  width: 50%;
+  height: 50%;
+  overflow: visible;
+  transform-box: border-box;
   transform-origin: center;
-  animation-duration: 10.8s;
+  animation-duration: 12s;
   animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
   animation-iteration-count: infinite;
 }
 .brand-tablet--first {
-  animation-name: tablet-shuffle-first;
+  top: calc(100% / 12);
+  left: 0;
+  transform: rotate(-35deg);
+  animation-name: tablet-nudge-first;
 }
 .brand-tablet--second {
-  animation-name: tablet-shuffle-second;
+  top: calc(100% * 5 / 12);
+  left: 50%;
+  transform: rotate(0deg);
+  animation-name: tablet-nudge-second;
 }
-@keyframes tablet-shuffle-first {
+/* A gentle roll together, a responsive nudge, then a shared resting pose. */
+@keyframes tablet-nudge-first {
   0%,
+  12%,
+  80%,
+  100% {
+    transform: translate(0, 0) rotate(-35deg);
+  }
+  30%,
+  38% {
+    transform: translate(15%, 10%) rotate(0deg);
+  }
+  48% {
+    transform: translate(1.67%, 1.67%) rotate(-28deg);
+  }
+  62% {
+    transform: translate(-5%, -3.33%) rotate(-48deg);
+  }
+}
+@keyframes tablet-nudge-second {
+  0%,
+  18%,
+  82%,
   100% {
     transform: translate(0, 0) rotate(0deg);
   }
-  18% {
-    transform: translate(0.48px, 0.32px) rotate(10deg);
+  30% {
+    transform: translate(-12.5%, -8.33%) rotate(-24deg);
   }
   38% {
-    transform: translate(-0.96px, -0.45px) rotate(-18deg);
+    transform: translate(-15%, -10%) rotate(-29deg);
   }
-  60% {
-    transform: translate(-0.29px, 0.45px) rotate(-5deg);
+  52% {
+    transform: translate(5%, 3.33%) rotate(12deg);
   }
-  80% {
-    transform: translate(0.29px, 0.19px) rotate(6deg);
-  }
-}
-@keyframes tablet-shuffle-second {
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  18% {
-    transform: translate(-0.19px, -0.13px) rotate(-5deg);
-  }
-  38% {
-    transform: translate(0.8px, 0.38px) rotate(16deg);
-  }
-  60% {
-    transform: translate(0.38px, -0.32px) rotate(6deg);
-  }
-  80% {
-    transform: translate(-0.26px, -0.16px) rotate(-6deg);
+  68% {
+    transform: translate(2.08%, 1.25%) rotate(4deg);
   }
 }
 .streak-counter-icon {
