@@ -82,7 +82,7 @@ export function ActionIcon({
 }: {
   name: ActionIconName;
   className?: string;
-  weight?: "bold" | "fill" | "duotone";
+  weight?: "regular" | "bold" | "fill" | "duotone";
 }) {
   const Icon = icons[name];
   return (

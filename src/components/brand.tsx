@@ -7,10 +7,10 @@ export function BrandMark({ className }: { className?: string }) {
   return (
     <Tablets
       size={16}
-      strokeWidth={3.5}
+      strokeWidth={2.5}
       aria-hidden="true"
       focusable="false"
-      className={cn("size-4 shrink-0", className)}
+      className={cn("size-4 shrink-0 text-[#f97316]", className)}
     />
   );
 }

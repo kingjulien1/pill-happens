@@ -15,7 +15,7 @@ export default async function LoginPage() {
 
   return (
     <main className="page-enter mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-14 sm:px-8">
-      <div className="mb-8 flex justify-center">
+      <div className="mb-28 flex justify-center sm:mb-32">
         <Brand />
       </div>
       <header className="mb-6 text-center">

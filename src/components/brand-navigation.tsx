@@ -27,7 +27,11 @@ export function BrandNavigation({ className }: { className?: string }) {
         )}
       >
         <BrandFace className="min-w-40 px-4">
-          <ActionIcon name="expand" className="brand-menu-chevron size-3.5" />
+          <ActionIcon
+            name="expand"
+            weight="regular"
+            className="brand-menu-chevron size-3.5"
+          />
         </BrandFace>
       </Menu.Trigger>
       <Menu.Portal>

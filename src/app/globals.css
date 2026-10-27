@@ -123,6 +123,7 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+  filter: brightness(1.12);
   /* A static Ember wash remains visible before hydration or without WebGL. */
   background: radial-gradient(
     ellipse at 50% 45%,
@@ -137,11 +138,11 @@
   position: absolute;
   inset: 0;
   /* Keep text readable as the gradient's light and dark areas move. */
-  background: rgb(255 247 237 / 50%);
+  background: rgb(255 247 237 / 45%);
 }
 @media (prefers-color-scheme: dark) {
   .ambient::after {
-    background: rgb(18 15 23 / 50%);
+    background: rgb(18 15 23 / 45%);
   }
 }
 @keyframes enter {
@@ -176,22 +177,22 @@
   --brand-glass-top: #fff7edd9;
   --brand-glass-middle: #fed7aa52;
   --brand-glass-bottom: #fff1d699;
-  --brand-glow: #ffad66c7;
-  --brand-halo: #ffc38a80;
-  --brand-sheen-opacity: 0.32;
+  --brand-glow: #ffad66e6;
+  --brand-halo: #ffbd8599;
+  --brand-sheen-opacity: 0.82;
   position: relative;
   isolation: isolate;
   border-radius: 999px;
 }
 .brand-lockup:focus-visible {
-  outline-offset: 10px;
+  outline-offset: 12px;
 }
 .brand-lockup::before {
   content: "";
   position: absolute;
   z-index: -1;
-  /* A six-pixel glass rim surrounds the smaller, solid brand face. */
-  inset: -4px -6px;
+  /* An eight-pixel glass rim surrounds the smaller, solid brand face. */
+  inset: -6px -8px;
   border: 1.5px solid #f97316;
   border-radius: inherit;
   pointer-events: none;
@@ -206,28 +207,30 @@
   box-shadow:
     inset 0 2px 2px #fff7edcc,
     inset 0 -2px 3px #f9731652,
-    0 0 12px 2px #ffaf70e6,
-    0 0 32px 8px var(--brand-glow),
-    0 8px 64px 16px var(--brand-halo),
-    0 12px 100px 24px #ffbd853d;
+    0 0 16px 4px #ffbd85f2,
+    0 0 44px 12px var(--brand-glow),
+    0 10px 90px 24px var(--brand-halo),
+    0 16px 140px 36px #ffbd8566;
   transition: box-shadow 180ms ease;
 }
 .brand-lockup::after {
   content: "";
   position: absolute;
   z-index: -2;
-  inset: -16px -28px;
+  inset: -26px -46px;
   border-radius: 999px;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse,
-    #ffe2bdcc 8%,
-    #ffad6699 42%,
-    #f9731600 75%
-  );
-  filter: blur(20px);
-  opacity: 0.85;
-  animation: brand-glow 4.5s ease-in-out infinite alternate;
+  background:
+    radial-gradient(
+      ellipse at 28% 35%,
+      #ffe5c2f2,
+      #ffad6699 42%,
+      #f9731600 72%
+    ),
+    radial-gradient(ellipse at 75% 68%, #ffbd85e6, #f9731680 38%, #f9731600 72%);
+  filter: blur(26px);
+  opacity: 0.95;
+  animation: brand-glow 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 .brand-bar {
   position: relative;
@@ -266,12 +269,20 @@
   z-index: 0;
   inset-block: -50%;
   left: 0;
-  width: 35%;
+  width: 48%;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, #fff1d6cc, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #fff1d64d 24%,
+    #fffaf2f2 50%,
+    #fff1d64d 76%,
+    transparent
+  );
+  filter: blur(1px);
   opacity: 0;
-  transform: translateX(-180%) skewX(-18deg);
-  animation: brand-sheen 7.5s ease-in-out infinite;
+  transform: translateX(-150%) skewX(-22deg);
+  animation: brand-sheen 4.2s ease-in-out infinite;
 }
 .brand-lockup:hover .brand-bar,
 .brand-lockup:focus-visible .brand-bar,
@@ -288,35 +299,43 @@
   box-shadow:
     inset 0 2px 2px #fff7ed,
     inset 0 -2px 3px #f9731666,
-    0 0 16px 4px #ffbd85,
-    0 0 40px 12px var(--brand-glow),
-    0 8px 76px 20px var(--brand-halo),
-    0 12px 116px 28px #ffbd8552;
+    0 0 20px 6px #ffd0a3,
+    0 0 52px 16px var(--brand-glow),
+    0 10px 104px 28px var(--brand-halo),
+    0 16px 156px 40px #ffbd8580;
 }
 @keyframes brand-glow {
-  from {
-    opacity: 0.75;
-    transform: scale(0.98);
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: translate3d(-22px, -5px, 0) rotate(-12deg) scale(1.08, 0.95);
   }
-  to {
-    opacity: 0.95;
-    transform: scale(1.06);
+  25% {
+    opacity: 1;
+    transform: translate3d(18px, 10px, 0) rotate(6deg) scale(1.28, 1.18);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate3d(-8px, 16px, 0) rotate(-4deg) scale(1.42, 1.26);
+  }
+  75% {
+    opacity: 1;
+    transform: translate3d(-18px, -9px, 0) rotate(8deg) scale(1.2, 1.14);
   }
 }
 @keyframes brand-sheen {
-  0%,
-  60% {
+  0% {
     opacity: 0;
-    transform: translateX(-180%) skewX(-18deg);
+    transform: translateX(-150%) skewX(-22deg);
   }
-  66%,
-  86% {
+  6%,
+  24% {
     opacity: var(--brand-sheen-opacity);
   }
-  92%,
+  32%,
   100% {
     opacity: 0;
-    transform: translateX(500%) skewX(-18deg);
+    transform: translateX(360%) skewX(-22deg);
   }
 }
 @media (prefers-color-scheme: dark) {
@@ -328,9 +347,9 @@
     --brand-glass-top: #fff1d68c;
     --brand-glass-middle: #fed7aa24;
     --brand-glass-bottom: #f9731659;
-    --brand-glow: #ffad66d9;
-    --brand-halo: #ffc38a8c;
-    --brand-sheen-opacity: 0.16;
+    --brand-glow: #ffad66f2;
+    --brand-halo: #ffbd85b3;
+    --brand-sheen-opacity: 0.62;
   }
 }
 .streak-counter-icon {
