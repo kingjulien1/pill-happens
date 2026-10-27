@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Tablets } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,12 +25,31 @@ export function Brand({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="brand-bar inline-flex h-10 min-w-36 items-center justify-center gap-2 px-4.5">
-        <BrandMark />
-        <span className="text-xs font-semibold leading-none tracking-[-.02em]">
-          pill happens.
-        </span>
-      </span>
+      <BrandFace />
     </Link>
+  );
+}
+
+/** Shared artwork only: the caller provides link or button semantics. */
+export function BrandFace({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        "brand-bar inline-flex h-10 min-w-36 items-center justify-center gap-2 px-4.5",
+        className,
+      )}
+    >
+      <BrandMark />
+      <span className="text-xs font-semibold leading-none tracking-[-.02em]">
+        pill happens.
+      </span>
+      {children}
+    </span>
   );
 }

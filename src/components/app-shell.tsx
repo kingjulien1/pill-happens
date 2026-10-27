@@ -1,18 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
-import { Brand } from "@/components/brand";
-
-const links = [
-  { href: "/", label: "Today", icon: "today" },
-  { href: "/history", label: "Past days", icon: "history" },
-  { href: "/medications", label: "Medications", icon: "medications" },
-  { href: "/goals", label: "Goals", icon: "goals" },
-] as const;
+import { BrandNavigation } from "@/components/brand-navigation";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
@@ -24,36 +16,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header
         className={`flex flex-col items-center ${path === "/" ? "mb-10 sm:mb-12" : "mb-8"}`}
       >
-        <Brand className="mb-5" />
-        <nav
-          aria-label="Main navigation"
-          className="journal-nav flex items-center gap-0.5 p-1"
-        >
-          {links.map(({ href, label, icon }) => (
-            <Link
-              key={href}
-              href={href}
-              aria-label={label}
-              title={label}
-              aria-current={
-                (href === "/" ? path === href : path.startsWith(href))
-                  ? "page"
-                  : undefined
-              }
-              data-active={href === "/" ? path === href : path.startsWith(href)}
-              className="nav-link"
-            >
-              <ActionIcon
-                name={icon}
-                className="size-5"
-                weight={
-                  (href === "/" ? path === href : path.startsWith(href))
-                    ? "fill"
-                    : "bold"
-                }
-              />
-            </Link>
-          ))}
+        <nav aria-label="Main navigation">
+          <BrandNavigation />
         </nav>
       </header>
       <main id="main" className="flex min-w-0 flex-1 flex-col">
