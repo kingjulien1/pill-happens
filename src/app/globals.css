@@ -254,6 +254,19 @@
   overflow: hidden;
   border: 0;
   border-radius: 999px;
+  background: none;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: none;
+}
+.brand-bar::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.85;
   background:
     radial-gradient(ellipse at 20% 0%, var(--brand-gloss), transparent 72%),
     linear-gradient(
@@ -262,9 +275,6 @@
       var(--brand-fill-middle) 58%,
       var(--brand-fill-end)
     );
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  box-shadow: none;
 }
 .brand-bar > * {
   position: relative;

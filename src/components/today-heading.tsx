@@ -93,7 +93,7 @@ export function TodayHeading({
       </div>
       <div
         aria-hidden="true"
-        className="mt-3 h-px bg-[#fed7aa]/63"
+        className="mt-3 h-px bg-[#fed7aa]/25"
         data-heading-divider
       />
     </header>
