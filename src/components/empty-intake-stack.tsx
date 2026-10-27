@@ -22,15 +22,20 @@ function DashedOutline({ className }: { className: string }) {
 }
 
 const blankCards = [
-  { className: "h-16 w-[94%] bg-primary/3", outline: "text-primary/18" },
-  { className: "h-14 w-[88%] bg-primary/5", outline: "text-primary/24" },
-  { className: "h-12 w-[82%] bg-primary/7", outline: "text-primary/30" },
+  {
+    className: "z-20 -mt-8 h-16 w-[94%] bg-primary/3",
+    outline: "text-primary/18",
+  },
+  {
+    className: "z-10 -mt-7 h-14 w-[88%] bg-primary/5",
+    outline: "text-primary/24",
+  },
 ];
 
 export function EmptyIntakeStack() {
   return (
-    <div className="flex flex-col items-center gap-2.5">
-      <div className="relative flex min-h-20 w-full items-center rounded-2xl bg-primary/[0.025] px-4 py-5">
+    <div className="relative isolate flex flex-col items-center">
+      <div className="relative z-30 flex min-h-20 w-full items-center rounded-2xl bg-primary/[0.025] px-4 py-5">
         <DashedOutline className="text-primary/40" />
         <p className="text-xs leading-relaxed text-muted-foreground">
           No entries yet. Use “Log an intake” to record one.
@@ -40,7 +45,8 @@ export function EmptyIntakeStack() {
         <div
           key={className}
           aria-hidden="true"
-          className={`pointer-events-none relative shrink-0 rounded-2xl ${className}`}
+          // Hide covered outlines so they cannot show through the translucent fill.
+          className={`pointer-events-none relative shrink-0 rounded-2xl [clip-path:inset(50%_0_0_0)] ${className}`}
         >
           <DashedOutline className={outline} />
         </div>
