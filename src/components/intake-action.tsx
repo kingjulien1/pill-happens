@@ -33,15 +33,23 @@ export function IntakeAction({
       <Button
         type="button"
         onClick={onClick}
-        className="pointer-events-auto h-16 w-full justify-start gap-2.5 rounded-[22px] px-4 text-[15px] shadow-lg shadow-primary/10 sm:gap-3 sm:px-5"
+        className="pointer-events-auto h-16 w-full justify-start gap-2.5 rounded-[22px] px-4 text-[15px] shadow-lg shadow-primary/10 max-[359px]:gap-2 max-[359px]:px-3 sm:gap-3 sm:px-5"
       >
-        <ActionIcon name="log" weight="fill" className="size-8" />
-        <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-left">
-          <span>Log an intake</span>
-          <span className="inline-flex items-center gap-1.5 text-xs font-normal text-muted-foreground">
-            <span aria-hidden="true">/</span>
+        <ActionIcon
+          name="log"
+          weight="duotone"
+          className="size-8 max-[359px]:size-7"
+        />
+        <span className="flex min-w-0 flex-1 items-center gap-1.5 text-left leading-none whitespace-nowrap max-[359px]:gap-1">
+          <span className="shrink-0 leading-none">Log an intake</span>
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-none font-normal whitespace-nowrap text-muted-foreground max-[359px]:gap-1 max-[359px]:text-[11px]">
+            <span aria-hidden="true" className="leading-none">
+              /
+            </span>
             <span className="sr-only">, </span>
-            <span className="tabular-nums">{todayCount} today</span>
+            <span className="leading-none tabular-nums">
+              {todayCount} today
+            </span>
           </span>
         </span>
         <ActionIcon name="next" className="ml-auto size-[22px]" />

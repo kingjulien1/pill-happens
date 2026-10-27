@@ -18,11 +18,11 @@ export function IntakeSummary({
           weight="fill"
           className="streak-counter-icon size-[22px]"
         />
-        <span>
+        <span className="leading-none">
           Logged {count}
           {today ? " Today" : ""}
-        </span>{" "}
-        <span className="inline-flex items-center gap-1 text-[10px] font-normal text-muted-foreground max-[359px]:text-[9px]">
+        </span>
+        <span className="inline-flex items-center gap-1 text-[10px] leading-none font-normal whitespace-nowrap text-muted-foreground max-[359px]:text-[9px]">
           <span
             aria-hidden="true"
             className="size-[3px] shrink-0 rounded-full bg-current"

@@ -33,7 +33,7 @@ import { LightningIcon } from "@phosphor-icons/react/dist/ssr/Lightning";
 import { ShootingStarIcon } from "@phosphor-icons/react/dist/ssr/ShootingStar";
 import { FlowerIcon } from "@phosphor-icons/react/dist/ssr/Flower";
 import { ConfettiIcon } from "@phosphor-icons/react/dist/ssr/Confetti";
-import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr/NotePencil";
+import { MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
 import { cn } from "@/lib/utils";
 
 const icons = {
@@ -72,7 +72,7 @@ const icons = {
   shootingStar: ShootingStarIcon,
   flower: FlowerIcon,
   confetti: ConfettiIcon,
-  log: NotePencilIcon,
+  log: MagicWandIcon,
 } as const;
 
 export type ActionIconName = keyof typeof icons;
