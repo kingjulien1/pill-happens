@@ -36,6 +36,10 @@ import { FlowerIcon } from "@phosphor-icons/react/dist/ssr/Flower";
 import { ConfettiIcon } from "@phosphor-icons/react/dist/ssr/Confetti";
 import { MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr/NotePencil";
+import { SunHorizonIcon } from "@phosphor-icons/react/dist/ssr/SunHorizon";
+import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ClockCounterClockwise";
+import { FirstAidKitIcon } from "@phosphor-icons/react/dist/ssr/FirstAidKit";
+import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
 import { cn } from "@/lib/utils";
 
 const icons = {
@@ -77,6 +81,10 @@ const icons = {
   confetti: ConfettiIcon,
   log: MagicWandIcon,
   record: NotePencilIcon,
+  navToday: SunHorizonIcon,
+  navHistory: ClockCounterClockwiseIcon,
+  navMedications: FirstAidKitIcon,
+  navGoals: TargetIcon,
 } as const;
 
 export type ActionIconName = keyof typeof icons;
