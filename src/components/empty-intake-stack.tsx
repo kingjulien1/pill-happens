@@ -37,7 +37,7 @@ const blankCards = [
 export function EmptyIntakeStack() {
   return (
     <div className="relative isolate flex flex-col items-center">
-      <div className="relative z-30 flex min-h-20 w-full items-center justify-center gap-3 rounded-2xl bg-primary/[0.025] px-4 py-5">
+      <div className="relative z-30 flex min-h-20 w-full items-center justify-center gap-3 rounded-2xl bg-primary/[0.04] px-4 py-5">
         <DashedOutline className="text-primary/40" />
         <ActionIcon
           name="shootingStar"
