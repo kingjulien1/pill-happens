@@ -1,5 +1,4 @@
 import { ActionIcon } from "@/components/action-icon";
-import { HeadingText } from "@/components/heading-text";
 import { formatDay } from "@/lib/domain";
 import { streakMilestone } from "@/lib/logging-streak";
 import type { StreakIconName } from "@/lib/streak-presentation";
@@ -19,22 +18,25 @@ export function TodayHeading({
   return (
     <header className="mb-6" data-today-heading>
       <div className="flex items-center justify-between gap-3">
-        <h1 className="min-w-0 text-2xl font-semibold tracking-tight">
-          <HeadingText
-            title="Today"
-            context={
-              <time dateTime={day}>
-                {formatDay(day, {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </time>
-            }
-          />
+        <h1 className="min-w-0 text-xs font-medium whitespace-nowrap tabular-nums">
+          <time
+            dateTime={day}
+            aria-label={formatDay(day, {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          >
+            {formatDay(day, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })}
+          </time>
         </h1>
         <div
-          className="flex shrink-0 flex-col items-end gap-0.5 text-xs font-medium tabular-nums min-[380px]:flex-row min-[380px]:items-center min-[380px]:gap-1.5"
+          className="flex shrink-0 items-center gap-1.5 text-xs font-medium tabular-nums"
           data-current-streak={current}
           data-next-milestone={next}
           data-days-to-next={remaining}
