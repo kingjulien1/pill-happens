@@ -316,7 +316,7 @@ export function TodayPage() {
   const today = dayKey(now, data.settings.timezone);
   const streak = loggingStreak(data, today, now);
   return (
-    <div className="flex flex-1 flex-col" data-today-layout>
+    <div className="flex flex-1 flex-col pt-6" data-today-layout>
       <TodayHeading day={today} current={streak.current} />
       <section aria-label="Today's entries" className="flex-1">
         <IntakeTimeline data={data} day={today} showSummary={false} />
