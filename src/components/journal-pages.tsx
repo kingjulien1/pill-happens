@@ -282,11 +282,11 @@ function IntakeTimeline({
                     <span>
                       {time}
                       {localDay !== day ? " · next morning" : ""}{" "}
-                      <span className="mx-1 opacity-50">·</span>{" "}
+                      <span className="mx-1">·</span>{" "}
                       {formatDose(entry.quantity)} ×{" "}
                       {formatDose(entry.strengthMg)} mg
                     </span>
-                    <span className="flex items-center gap-1 opacity-60">
+                    <span className="flex items-center gap-1">
                       {String(index + 1).padStart(2, "0")}
                       <ActionIcon name="edit" className="size-4" />
                     </span>

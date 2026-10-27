@@ -20,7 +20,7 @@ export function HeadingText({
         <span className="inline-flex max-w-full items-baseline gap-2 text-xs font-normal leading-5 tracking-normal text-muted-foreground">
           <span
             aria-hidden="true"
-            className="shrink-0 text-muted-foreground/60"
+            className="shrink-0 text-base leading-none text-muted-foreground"
           >
             ·
           </span>

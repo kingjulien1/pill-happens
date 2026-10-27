@@ -16,7 +16,7 @@
   --secondary: #efe4d8;
   --secondary-foreground: #3b2c28;
   --muted: #f2e8dd;
-  --muted-foreground: #51443b;
+  --muted-foreground: rgb(254 215 170 / 60%);
   --accent: #120f1712;
   --accent-foreground: #120f17;
   --destructive: #9a3412;
@@ -39,7 +39,6 @@
     --secondary: #302522;
     --secondary-foreground: #f2ddc4;
     --muted: #2b2222;
-    --muted-foreground: #c5bcb0;
     --accent: #fff1d61a;
     --accent-foreground: #fff1d6;
     --destructive: #ffbd8a;

@@ -75,7 +75,9 @@ export function TodayHeading({
               weight="fill"
               className="streak-counter-icon size-[22px]"
             />
-            <span className="text-muted-foreground/60">·</span>
+            <span className="text-base leading-none text-muted-foreground">
+              ·
+            </span>
             <span>
               {current} {current === 1 ? "day" : "days"}
             </span>
