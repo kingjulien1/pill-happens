@@ -221,10 +221,12 @@ function IntakeTimeline({
   data,
   day,
   showSummary = true,
+  onLog,
 }: {
   data: AppData;
   day: string;
   showSummary?: boolean;
+  onLog?: () => void;
 }) {
   const [editing, setEditing] = useState<Intake | null>(null);
   const entries = dayIntakes(data, day);
@@ -236,7 +238,7 @@ function IntakeTimeline({
         </div>
       )}
       {!entries.length ? (
-        <EmptyIntakeStack />
+        <EmptyIntakeStack onLog={onLog} />
       ) : (
         <div className="relative space-y-3 before:absolute before:top-6 before:bottom-6 before:left-[23px] before:w-px before:bg-border">
           {entries.map((entry, index) => {
@@ -315,6 +317,7 @@ export function TodayPage() {
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const streak = loggingStreak(data, today, now);
+  const openLog = () => setOpen(true);
   return (
     <div className="flex flex-1 flex-col pt-6" data-today-layout>
       <TodayHeading
@@ -324,10 +327,15 @@ export function TodayPage() {
         timeZone={data.settings.timezone}
       />
       <section aria-label="Today's entries" className="flex-1">
-        <IntakeTimeline data={data} day={today} showSummary={false} />
+        <IntakeTimeline
+          data={data}
+          day={today}
+          showSummary={false}
+          onLog={openLog}
+        />
       </section>
       <IntakeAction
-        onClick={() => setOpen(true)}
+        onClick={openLog}
         todayCount={dayIntakes(data, today).length}
       />
       <ResponsiveModal
@@ -915,7 +923,11 @@ export function DayPage({ day }: { day: string }) {
       </PageHeading>
       <DailyOverview data={data} day={day} />
       <div className="my-6">
-        <IntakeTimeline data={data} day={day} />
+        <IntakeTimeline
+          data={data}
+          day={day}
+          onLog={isFuture ? undefined : () => setOpen(true)}
+        />
       </div>
       <div className="flex items-center justify-between gap-3 border-t pt-4">
         <Link
