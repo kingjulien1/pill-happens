@@ -29,7 +29,7 @@ export function IntakeAction({
   );
   const action = (
     <div className="pointer-events-auto space-y-3">
-      <IntakeSummary count={todayCount} />
+      <IntakeSummary count={todayCount} today />
       <Button
         type="button"
         onClick={onClick}
@@ -38,7 +38,7 @@ export function IntakeAction({
         <ActionIcon name="log" weight="fill" className="size-8" />
         <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-left">
           <span>Log an intake</span>
-          <span className="inline-flex items-center gap-1.5 text-xs font-normal text-[#bbb7bf] dark:text-[#625d65]">
+          <span className="inline-flex items-center gap-1.5 text-xs font-normal text-muted-foreground">
             <span aria-hidden="true">/</span>
             <span className="sr-only">, </span>
             <span className="tabular-nums">{todayCount} today</span>
