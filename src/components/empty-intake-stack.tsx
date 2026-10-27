@@ -47,7 +47,7 @@ export function EmptyIntakeStack({ onLog }: { onLog?: () => void }) {
       >
         <DashedOutline className="text-foreground/40" />
         <ActionIcon name="shootingStar" weight="duotone" className="size-6" />
-        <span className="min-w-0 max-w-52 text-center text-xs leading-relaxed text-balance text-foreground/80">
+        <span className="empty-intake-copy min-w-0 max-w-52 text-center text-xs leading-relaxed text-balance">
           No entries yet. Use “Log an Intake” to record one.
         </span>
       </Card>

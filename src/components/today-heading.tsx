@@ -23,11 +23,6 @@ export function TodayHeading({
     <header className="mb-[37px]" data-today-heading>
       <div className="flex items-center justify-between gap-2">
         <h1 className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]">
-          <ActionIcon
-            name="date"
-            weight="fill"
-            className="streak-counter-icon size-[22px]"
-          />
           <time
             dateTime={day}
             aria-label={formatDay(day, {

@@ -8,8 +8,14 @@ export function BrandMark({ className }: { className?: string }) {
       aria-hidden="true"
       className={cn("brand-mark size-6 shrink-0", className)}
     >
-      <TabletIcon className="brand-tablet--first" />
-      <TabletIcon className="brand-tablet--second" />
+      <span className="brand-tablet-orbit">
+        <span className="brand-tablet-carrier brand-tablet-carrier--first">
+          <TabletIcon className="brand-tablet--first" />
+        </span>
+        <span className="brand-tablet-carrier brand-tablet-carrier--second">
+          <TabletIcon className="brand-tablet--second" />
+        </span>
+      </span>
     </span>
   );
 }
@@ -45,6 +51,9 @@ export function Brand({ className }: { className?: string }) {
         className,
       )}
     >
+      <span aria-hidden="true" className="brand-corona">
+        <span className="brand-corona-track" />
+      </span>
       <BrandFace />
     </Link>
   );
@@ -67,7 +76,7 @@ export function BrandFace({
     >
       <BrandMark />
       <span className="text-xs font-[550] leading-none tracking-[-.015em]">
-        pill happens.
+        pill happens
       </span>
       {children}
     </span>

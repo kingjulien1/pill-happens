@@ -26,6 +26,9 @@
   --secondary-foreground: #fed7aa;
   --muted: #f2e8dd;
   --muted-foreground: rgb(254 215 170 / 60%);
+  --empty-intake-wash: rgb(254 215 170 / 5%);
+  --empty-intake-hover: rgb(254 215 170 / 8%);
+  --empty-intake-copy: rgb(254 215 170 / 80%);
   --accent: #120f1712;
   --accent-foreground: #fed7aa;
   --destructive: #9a3412;
@@ -174,28 +177,25 @@
   gap: 0.6rem;
 }
 .empty-intake-tint {
-  background-color: rgb(254 215 170 / 5%);
+  background-color: var(--empty-intake-wash);
 }
-.empty-intake-card {
+.empty-intake-copy {
+  color: var(--empty-intake-copy);
+}
+.empty-intake-card,
+.header-icon-button--compact {
   -webkit-backdrop-filter: blur(48px);
   backdrop-filter: blur(48px);
   box-shadow:
     inset 0 1px 1px #ffffff59,
     inset 0 -1px 1px #ffffff0f,
     0 8px 28px #120f1708;
+}
+.empty-intake-card {
   transition:
     background-color 300ms ease,
     transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 300ms ease;
-}
-@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .empty-intake-card:hover {
-    background-color: rgb(254 215 170 / 8%);
-    box-shadow:
-      inset 0 1px 1px #ffffff73,
-      inset 0 -1px 1px #ffffff1a,
-      0 12px 32px #120f1714;
-  }
 }
 .brand-lockup {
   --brand-fill-start: #3f271f;
@@ -223,7 +223,7 @@
   /* A single fine edge follows the compact face; the touch target stays 44px. */
   inset: 4px 0;
   border: 0;
-  outline: 1px solid var(--brand-ink);
+  outline: 1px solid rgb(254 215 170 / 65%);
   border-radius: inherit;
   pointer-events: none;
   box-shadow:
@@ -238,20 +238,54 @@
   content: "";
   position: absolute;
   z-index: -2;
-  inset: -8px -12px;
+  inset: -10px -14px;
   border-radius: 999px;
   pointer-events: none;
   background:
-    radial-gradient(
-      ellipse at 28% 35%,
-      #ffe5c2f2,
-      #ffad6699 42%,
-      #f9731600 72%
-    ),
-    radial-gradient(ellipse at 75% 68%, #ffbd85e6, #f9731680 38%, #f9731600 72%);
-  filter: blur(16px);
-  opacity: 0.14;
-  animation: brand-glow 8s ease-in-out infinite;
+    radial-gradient(ellipse at 24% 36%, #ffebd1, #ffbf87b3 40%, #f9731600 74%),
+    radial-gradient(ellipse at 78% 64%, #fed7aa, #f9731680 42%, #f9731600 74%);
+  filter: blur(15px);
+  opacity: 0.3;
+  animation: brand-glow 6.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.brand-corona {
+  position: absolute;
+  z-index: -1;
+  inset: 2px -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  filter: blur(6px);
+  opacity: 0.65;
+}
+.brand-corona-track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  padding: 3px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.brand-corona-track::before {
+  content: "";
+  position: absolute;
+  inset: -150%;
+  background: conic-gradient(
+    transparent 0deg 30deg,
+    #ffeeda 70deg,
+    #ffba82b3 108deg,
+    transparent 155deg 205deg,
+    #fed7aacc 248deg,
+    #f9731680 278deg,
+    transparent 335deg 360deg
+  );
+  animation: brand-corona-turn 6.4s linear infinite;
 }
 .brand-bar {
   position: relative;
@@ -259,7 +293,7 @@
   overflow: hidden;
   border: 0;
   border-radius: 999px;
-  outline: 1px solid #ffe5c7;
+  outline: 1px solid #fff0db;
   outline-offset: -1px;
   background: none;
   -webkit-backdrop-filter: blur(16px);
@@ -309,7 +343,7 @@
   animation: brand-sheen 8.4s ease-in-out infinite;
 }
 .brand-lockup:focus-visible::before {
-  outline-color: #fed7aa;
+  outline-color: rgb(254 215 170 / 85%);
   box-shadow:
     0 2px 10px #120f1710,
     0 0 24px var(--brand-glow),
@@ -318,12 +352,21 @@
 @keyframes brand-glow {
   0%,
   100% {
-    opacity: 0.12;
-    transform: translate3d(-2px, 1px, 0) scale(0.98);
+    opacity: 0.26;
+    transform: translate3d(-5px, 1px, 0) scale(0.96, 1.05) rotate(-3deg);
   }
-  50% {
-    opacity: 0.18;
-    transform: translate3d(3px, -1px, 0) scale(1.05);
+  33.333% {
+    opacity: 0.4;
+    transform: translate3d(4px, -2px, 0) scale(1.06, 0.93) rotate(2deg);
+  }
+  66.667% {
+    opacity: 0.3;
+    transform: translate3d(-1px, 3px, 0) scale(0.99, 1.08) rotate(-1deg);
+  }
+}
+@keyframes brand-corona-turn {
+  to {
+    transform: rotate(360deg);
   }
 }
 @keyframes brand-sheen {
@@ -353,72 +396,101 @@
   }
 }
 .brand-mark {
+  --tablet-loop: 4.8s;
   position: relative;
   display: block;
   overflow: visible;
   color: var(--brand-ink, #fed7aa);
 }
-.brand-tablet {
+.brand-tablet-orbit {
   position: absolute;
-  display: block;
+  inset: 0;
+  transform: rotate(35deg);
+  animation: tablet-orbit var(--tablet-loop) linear infinite;
+}
+.brand-tablet-carrier {
+  position: absolute;
+  top: 25%;
+  left: 25%;
   width: 50%;
   height: 50%;
-  overflow: visible;
-  transform-box: border-box;
-  transform-origin: center;
-  animation-duration: 12s;
+  animation-duration: var(--tablet-loop);
   animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
   animation-iteration-count: infinite;
 }
+.brand-tablet-carrier--first {
+  transform: translateX(-56.25%);
+  animation-name: tablet-approach-first;
+}
+.brand-tablet-carrier--second {
+  transform: translateX(56.25%);
+  animation-name: tablet-approach-second;
+}
+.brand-tablet {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-box: border-box;
+  transform-origin: center;
+  animation-duration: var(--tablet-loop);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
 .brand-tablet--first {
-  top: calc(100% / 12);
-  left: 0;
-  transform: rotate(-35deg);
-  animation-name: tablet-nudge-first;
+  transform: rotate(-70deg);
+  animation-name: tablet-spin-first;
 }
 .brand-tablet--second {
-  top: calc(100% * 5 / 12);
-  left: 50%;
-  transform: rotate(0deg);
-  animation-name: tablet-nudge-second;
+  transform: rotate(-35deg);
+  animation-name: tablet-spin-second;
 }
-/* A gentle roll together, a responsive nudge, then a shared resting pose. */
-@keyframes tablet-nudge-first {
-  0%,
-  12%,
-  80%,
-  100% {
-    transform: translate(0, 0) rotate(-35deg);
+@keyframes tablet-orbit {
+  from {
+    transform: rotate(35deg);
   }
-  30%,
-  38% {
-    transform: translate(15%, 10%) rotate(0deg);
-  }
-  48% {
-    transform: translate(1.67%, 1.67%) rotate(-28deg);
-  }
-  62% {
-    transform: translate(-5%, -3.33%) rotate(-48deg);
+  to {
+    transform: rotate(395deg);
   }
 }
-@keyframes tablet-nudge-second {
+/* Near contact at quarter turns; the visible circle gap stays at 0.125px. */
+@keyframes tablet-approach-first {
   0%,
-  18%,
-  82%,
+  50%,
   100% {
-    transform: translate(0, 0) rotate(0deg);
+    transform: translateX(-56.25%);
   }
-  30% {
-    transform: translate(-12.5%, -8.33%) rotate(-24deg);
+  25%,
+  75% {
+    transform: translateX(-39.583333%);
   }
-  38% {
-    transform: translate(-15%, -10%) rotate(-29deg);
+}
+@keyframes tablet-approach-second {
+  0%,
+  50%,
+  100% {
+    transform: translateX(56.25%);
   }
-  52% {
-    transform: translate(5%, 3.33%) rotate(12deg);
+  25%,
+  75% {
+    transform: translateX(39.583333%);
   }
-  68% {
-    transform: translate(2.08%, 1.25%) rotate(4deg);
+}
+/* Orbit adds one turn: these local spins produce equal +2/-2 absolute turns. */
+@keyframes tablet-spin-first {
+  from {
+    transform: rotate(-70deg);
+  }
+  to {
+    transform: rotate(290deg);
+  }
+}
+@keyframes tablet-spin-second {
+  from {
+    transform: rotate(-35deg);
+  }
+  to {
+    transform: rotate(-1115deg);
   }
 }
 .streak-counter-icon {
@@ -462,6 +534,11 @@
   width: 36px;
   height: 36px;
   border-radius: 12px;
+  background: var(--empty-intake-wash);
+}
+.header-icon-button--compact > svg {
+  color: var(--empty-intake-copy);
+  opacity: 1;
 }
 .header-icon-button:is(:focus-visible, [data-popup-open]) {
   border-color: #f9731640;
@@ -469,6 +546,9 @@
 }
 .header-icon-button:is(:focus-visible, [data-popup-open]) > svg {
   opacity: 1;
+}
+.header-icon-button--compact:is(:focus-visible, [data-popup-open]) {
+  background: var(--empty-intake-hover);
 }
 .header-icon-button:disabled {
   pointer-events: none;
@@ -601,7 +681,7 @@
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .brand-lockup:hover::before {
-    outline-color: #fed7aa;
+    outline-color: rgb(254 215 170 / 85%);
     box-shadow:
       0 2px 10px #120f1710,
       0 0 24px var(--brand-glow),
@@ -613,6 +693,14 @@
   }
   .header-icon-button:hover > svg {
     opacity: 1;
+  }
+  .empty-intake-card:hover,
+  .header-icon-button--compact:hover {
+    background: var(--empty-intake-hover);
+    box-shadow:
+      inset 0 1px 1px #ffffff73,
+      inset 0 -1px 1px #ffffff1a,
+      0 12px 32px #120f1714;
   }
   .brand-menu-link[data-highlighted] {
     background: rgb(254 215 170 / 6%);
