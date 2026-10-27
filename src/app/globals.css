@@ -173,38 +173,60 @@
   --brand-fill-middle: #fed7aa;
   --brand-fill-end: #f97316;
   --brand-gloss: #fff1d699;
-  --brand-glow: #f9731699;
-  --brand-halo: #f973164d;
+  --brand-glass-top: #fff7edd9;
+  --brand-glass-middle: #fed7aa52;
+  --brand-glass-bottom: #fff1d699;
+  --brand-glow: #ffad66c7;
+  --brand-halo: #ffc38a80;
   --brand-sheen-opacity: 0.32;
   position: relative;
   isolation: isolate;
+  border-radius: 999px;
+}
+.brand-lockup:focus-visible {
+  outline-offset: 10px;
 }
 .brand-lockup::before {
   content: "";
   position: absolute;
   z-index: -1;
-  inset: -4px -10px;
+  /* A six-pixel glass rim surrounds the smaller, solid brand face. */
+  inset: -4px -6px;
+  border: 1.5px solid #f97316;
+  border-radius: inherit;
   pointer-events: none;
-  -webkit-backdrop-filter: blur(32px);
-  backdrop-filter: blur(32px);
-  -webkit-mask-image: radial-gradient(ellipse, #000 35%, transparent 75%);
-  mask-image: radial-gradient(ellipse, #000 35%, transparent 75%);
+  background: linear-gradient(
+    145deg,
+    var(--brand-glass-top),
+    var(--brand-glass-middle) 48%,
+    var(--brand-glass-bottom)
+  );
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    inset 0 2px 2px #fff7edcc,
+    inset 0 -2px 3px #f9731652,
+    0 0 12px 2px #ffaf70e6,
+    0 0 32px 8px var(--brand-glow),
+    0 8px 64px 16px var(--brand-halo),
+    0 12px 100px 24px #ffbd853d;
+  transition: box-shadow 180ms ease;
 }
 .brand-lockup::after {
   content: "";
   position: absolute;
-  z-index: -1;
-  inset: -6px -18px;
+  z-index: -2;
+  inset: -16px -28px;
   border-radius: 999px;
   pointer-events: none;
   background: radial-gradient(
     ellipse,
-    #f97316 10%,
-    #f9731699 48%,
-    #9a341200 78%
+    #ffe2bdcc 8%,
+    #ffad6699 42%,
+    #f9731600 75%
   );
-  filter: blur(12px);
-  opacity: 0.65;
+  filter: blur(20px);
+  opacity: 0.85;
   animation: brand-glow 4.5s ease-in-out infinite alternate;
 }
 .brand-bar {
@@ -230,10 +252,8 @@
   box-shadow:
     inset 0 1px 0 #fff1d6b3,
     inset 0 -1px 0 #9a34122e,
-    0 0 0 1px #f9731666,
-    0 4px 14px #9a341229,
-    0 0 24px var(--brand-glow),
-    0 0 44px var(--brand-halo);
+    0 0 0 1px #fff1d699,
+    0 2px 6px #9a341233;
   transition: box-shadow 180ms ease;
 }
 .brand-bar > * {
@@ -260,18 +280,27 @@
     inset 0 1px 0 #fff1d6,
     inset 0 -1px 0 #9a34122e,
     0 0 0 1px #fff1d6cc,
-    0 4px 16px #9a341238,
-    0 0 30px var(--brand-glow),
-    0 0 54px var(--brand-halo);
+    0 2px 8px #9a341247;
+}
+.brand-lockup:hover::before,
+.brand-lockup:focus-visible::before,
+.brand-lockup[data-popup-open]::before {
+  box-shadow:
+    inset 0 2px 2px #fff7ed,
+    inset 0 -2px 3px #f9731666,
+    0 0 16px 4px #ffbd85,
+    0 0 40px 12px var(--brand-glow),
+    0 8px 76px 20px var(--brand-halo),
+    0 12px 116px 28px #ffbd8552;
 }
 @keyframes brand-glow {
   from {
-    opacity: 0.55;
+    opacity: 0.75;
     transform: scale(0.98);
   }
   to {
-    opacity: 0.8;
-    transform: scale(1.05);
+    opacity: 0.95;
+    transform: scale(1.06);
   }
 }
 @keyframes brand-sheen {
@@ -296,8 +325,11 @@
     --brand-fill-middle: color-mix(in srgb, #9a3412 76%, #2a0f0a);
     --brand-fill-end: #2a0f0a;
     --brand-gloss: #fed7aa1a;
-    --brand-glow: #f97316b3;
-    --brand-halo: #f9731666;
+    --brand-glass-top: #fff1d68c;
+    --brand-glass-middle: #fed7aa24;
+    --brand-glass-bottom: #f9731659;
+    --brand-glow: #ffad66d9;
+    --brand-halo: #ffc38a8c;
     --brand-sheen-opacity: 0.16;
   }
 }
