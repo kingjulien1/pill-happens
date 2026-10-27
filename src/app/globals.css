@@ -12,8 +12,9 @@
   --popover: #fffaf2;
   --popover-foreground: #fed7aa;
   --primary: #120f17;
-  --primary-foreground: #fed7aa;
-  --action-background: #120f17;
+  --ink: #120f17;
+  --primary-foreground: var(--ink);
+  --action-background: #fed7aa;
   --secondary: #efe4d8;
   --secondary-foreground: #fed7aa;
   --muted: #f2e8dd;
@@ -53,6 +54,7 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-action-background: var(--action-background);
+  --color-ink: var(--ink);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -194,7 +196,7 @@
   --brand-fill-middle: #573426;
   --brand-fill-end: #6e402b;
   --brand-gloss: #fed7aa1f;
-  --brand-ink: rgb(254 215 170 / 80%);
+  --brand-ink: #fed7aa;
   --brand-glow: #f973162b;
   --brand-halo: #ffbd851a;
   --brand-sheen-opacity: 0.22;
@@ -251,6 +253,8 @@
   overflow: hidden;
   border: 0;
   border-radius: 999px;
+  outline: 1px solid #ffe5c7;
+  outline-offset: -1px;
   background: none;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
@@ -347,7 +351,7 @@
   position: relative;
   display: block;
   overflow: visible;
-  color: var(--brand-ink, rgb(254 215 170 / 80%));
+  color: var(--brand-ink, #fed7aa);
 }
 .brand-tablet {
   position: absolute;
@@ -448,6 +452,11 @@
   rotate: none;
   scale: none;
   transition: opacity 160ms ease;
+}
+.header-icon-button--compact {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
 }
 .header-icon-button:is(:hover, :focus-visible, [data-popup-open]) {
   border-color: #f9731640;

@@ -20,7 +20,7 @@ export function StreakMenu() {
     <Popover.Root key={pathname} modal={false}>
       <Popover.Trigger
         aria-label="View logging streak"
-        className="header-icon-button"
+        className="header-icon-button header-icon-button--compact justify-self-center"
         disabled={!streak}
       >
         <ActionIcon

@@ -25,7 +25,10 @@ export function HeaderNavigation({ className }: { className?: string }) {
     <Menu.Root key={pathname} modal={false}>
       <Menu.Trigger
         aria-label="Open navigation"
-        className={cn("header-icon-button", className)}
+        className={cn(
+          "header-icon-button header-icon-button--compact",
+          className,
+        )}
       >
         <ActionIcon name="menu" className="streak-counter-icon size-5" />
       </Menu.Trigger>
