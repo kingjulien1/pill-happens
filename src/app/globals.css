@@ -137,11 +137,11 @@
   position: absolute;
   inset: 0;
   /* Keep text readable as the gradient's light and dark areas move. */
-  background: #fff7edb3;
+  background: rgb(255 247 237 / 50%);
 }
 @media (prefers-color-scheme: dark) {
   .ambient::after {
-    background: #120f17b3;
+    background: rgb(18 15 23 / 50%);
   }
 }
 @keyframes enter {
