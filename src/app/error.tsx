@@ -14,7 +14,7 @@ export default function ErrorPage({
 }) {
   return (
     <main className="page-enter mx-auto flex min-h-[80dvh] max-w-sm flex-col items-center justify-center px-6 py-14 text-center">
-      <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-primary">
+      <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-foreground">
         <BrandMark className="size-6" />
       </div>
       <h1 className="text-2xl font-semibold tracking-tight">

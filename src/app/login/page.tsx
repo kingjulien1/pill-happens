@@ -36,7 +36,7 @@ export default async function LoginPage() {
       >
         {needsSetup ? (
           <div className="flex flex-col items-center py-2 text-center">
-            <div className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
+            <div className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-accent text-foreground">
               <LockKeyhole
                 className="size-5"
                 strokeWidth={1.5}

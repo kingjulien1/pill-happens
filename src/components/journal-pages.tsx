@@ -68,7 +68,7 @@ function EmptyState({
 }) {
   return (
     <div className="surface flex flex-col items-center rounded-3xl px-7 py-9 text-center">
-      <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary/70">
+      <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-foreground/70">
         <ActionIcon name={icon} className="size-7" weight="duotone" />
       </div>
       <h3 className="text-sm font-medium">{title}</h3>
@@ -143,7 +143,7 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
                   </span>
                 </div>
                 {goal && amount > goal.dailyLimitMg && (
-                  <p className="mt-1 text-[10px] text-primary">
+                  <p className="mt-1 text-[10px] text-foreground">
                     Above daily maximum
                   </p>
                 )}
@@ -464,7 +464,7 @@ export function MedicationsPage() {
         </div>
       )}
       <div className="mt-7 flex gap-3 rounded-2xl border border-border/70 bg-card/40 p-4">
-        <Leaf size={16} className="mt-.5 shrink-0 text-primary/70" />
+        <Leaf size={16} className="mt-.5 shrink-0 text-foreground/70" />
         <p className="text-[11px] leading-[1.8] text-muted-foreground">
           Changes apply to new entries. Past entries keep the name and strength
           you originally recorded.
@@ -571,7 +571,7 @@ export function GoalsPage() {
                       mg / day
                     </span>
                   </p>
-                  <span className="rounded-full bg-primary/7 px-2.5 py-1 text-[9px] text-primary">
+                  <span className="rounded-full bg-primary/7 px-2.5 py-1 text-[9px] text-foreground">
                     {current ? "Active" : future ? "Upcoming" : "Past"}
                   </span>
                 </div>
@@ -619,7 +619,7 @@ export function GoalsPage() {
         </div>
       )}
       <div className="mt-7 flex gap-3 p-1">
-        <Leaf size={17} className="mt-1 shrink-0 text-primary/60" />
+        <Leaf size={17} className="mt-1 shrink-0 text-foreground/60" />
         <p className="text-[11px] leading-[1.9] text-muted-foreground">
           This is a record of your own goals, not a taper plan. Always work with
           your prescriber on dose changes. New goals can start on a future date.
@@ -692,14 +692,14 @@ function JournalPreferences() {
         <a
           href="/api/export"
           download
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary"
+          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground"
         >
           <ActionIcon name="export" className="size-4" />
           Export journal
         </a>
         <span className="h-3 w-px bg-border" />
         <button
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary"
+          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground"
           onClick={() => setOpen(true)}
         >
           <ActionIcon name="settings" className="size-4" />
@@ -928,7 +928,7 @@ export function DayPage({ day }: { day: string }) {
         {!isFuture && (
           <Button
             variant="ghost"
-            className="h-11 gap-1 text-[10px] text-primary"
+            className="h-11 gap-1 text-[10px] text-foreground"
             onClick={() => setOpen(true)}
           >
             <ActionIcon name="create" className="size-4.5" />

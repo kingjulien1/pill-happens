@@ -42,7 +42,7 @@ export function IntakeAction({
         />
         <span className="flex min-w-0 flex-1 items-center gap-1.5 text-left leading-none whitespace-nowrap max-[359px]:gap-1">
           <span className="shrink-0 leading-none">Log an intake</span>
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-none font-normal whitespace-nowrap text-muted-foreground max-[359px]:gap-1 max-[359px]:text-[11px]">
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-none font-normal whitespace-nowrap text-inherit max-[359px]:gap-1 max-[359px]:text-[11px]">
             <span aria-hidden="true" className="leading-none">
               /
             </span>

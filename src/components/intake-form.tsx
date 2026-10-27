@@ -79,7 +79,7 @@ export function IntakeForm({
         <Link
           href="/medications"
           onClick={onSaved}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground"
+          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-action-background text-sm font-medium text-primary-foreground"
         >
           Add a medication
           <ActionIcon name="next" />
@@ -230,7 +230,7 @@ export function IntakeForm({
               key={amount}
               onClick={() => setQuantity(String(amount))}
               aria-pressed={Number(quantity) === amount}
-              className={`h-10 rounded-xl border text-xs transition-colors ${Number(quantity) === amount ? "border-primary/25 bg-accent text-primary" : "border-border text-muted-foreground hover:bg-muted"}`}
+              className={`h-10 rounded-xl border text-xs transition-colors ${Number(quantity) === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
             >
               {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
             </button>

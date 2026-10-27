@@ -238,9 +238,9 @@ export function LoginForm() {
             aria-busy={pending === "create"}
           >
             <div className="flex items-center gap-3">
-              <div className="relative flex size-14 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/8 text-primary">
+              <div className="relative flex size-14 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/8 text-foreground">
                 <ActionIcon name="log" weight="duotone" className="size-8" />
-                <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-popover text-primary">
+                <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-popover text-foreground">
                   <ActionIcon
                     name="sparkle"
                     weight="fill"
@@ -260,7 +260,7 @@ export function LoginForm() {
               aria-labelledby="new-journal-password-label"
               className="min-w-0 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 ring-4 ring-primary/5"
             >
-              <div className="flex items-center justify-between gap-3 text-primary">
+              <div className="flex items-center justify-between gap-3 text-foreground">
                 <p
                   id="new-journal-password-label"
                   className="text-[10px] font-semibold tracking-[.12em] uppercase"

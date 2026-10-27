@@ -26,19 +26,19 @@ function DashedOutline({ className }: { className: string }) {
 const blankCards = [
   {
     className: "z-20 -mt-8 h-16 w-[94%] opacity-50",
-    outline: "text-primary/40",
+    outline: "text-foreground/40",
   },
   {
     className: "z-10 -mt-7 h-14 w-[88%] opacity-25",
-    outline: "text-primary/40",
+    outline: "text-foreground/40",
   },
 ];
 
 export function EmptyIntakeStack() {
   return (
     <div className="relative isolate flex flex-col items-center">
-      <div className="empty-intake-card empty-intake-tint relative z-30 flex min-h-20 w-full items-center justify-center gap-6 rounded-2xl px-6 py-5 text-[#9a3412] dark:text-[#fed7aa]">
-        <DashedOutline className="text-primary/40" />
+      <div className="empty-intake-card empty-intake-tint relative z-30 flex min-h-20 w-full items-center justify-center gap-6 rounded-2xl px-6 py-5 text-foreground">
+        <DashedOutline className="text-foreground/40" />
         <ActionIcon name="shootingStar" weight="duotone" className="size-6" />
         <p className="min-w-0 max-w-52 text-center text-xs leading-relaxed text-balance text-muted-foreground">
           No entries yet. Use “Log an intake” to record one.
