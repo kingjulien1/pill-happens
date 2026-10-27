@@ -1,3 +1,5 @@
+import { ActionIcon } from "@/components/action-icon";
+
 function DashedOutline({ className }: { className: string }) {
   return (
     <svg
@@ -35,9 +37,14 @@ const blankCards = [
 export function EmptyIntakeStack() {
   return (
     <div className="relative isolate flex flex-col items-center">
-      <div className="relative z-30 flex min-h-20 w-full items-center rounded-2xl bg-primary/[0.025] px-4 py-5">
+      <div className="relative z-30 flex min-h-20 w-full items-center justify-center gap-3 rounded-2xl bg-primary/[0.025] px-4 py-5">
         <DashedOutline className="text-primary/40" />
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <ActionIcon
+          name="shootingStar"
+          weight="duotone"
+          className="size-6 text-[#9a3412] dark:text-[#fed7aa]"
+        />
+        <p className="min-w-0 max-w-52 text-center text-xs leading-relaxed text-balance text-muted-foreground">
           No entries yet. Use “Log an intake” to record one.
         </p>
       </div>
