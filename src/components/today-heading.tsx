@@ -23,7 +23,7 @@ export function TodayHeading({
   }).format(now);
 
   return (
-    <header className="mb-6" data-today-heading>
+    <header className="mb-[37px]" data-today-heading>
       <div className="flex items-center justify-between gap-2">
         <h1 className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]">
           <ActionIcon
@@ -91,11 +91,6 @@ export function TodayHeading({
           </span>
         </div>
       </div>
-      <div
-        aria-hidden="true"
-        className="mt-3 h-px bg-[#fed7aa]/25"
-        data-heading-divider
-      />
     </header>
   );
 }
