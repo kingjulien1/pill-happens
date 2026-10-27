@@ -40,8 +40,8 @@ export function EmptyIntakeStack() {
       <div className="empty-intake-card empty-intake-tint relative z-30 flex min-h-20 w-full items-center justify-center gap-6 rounded-2xl px-6 py-5 text-[#9a3412] dark:text-[#fed7aa]">
         <DashedOutline className="text-primary/40" />
         <ActionIcon name="shootingStar" weight="duotone" className="size-6" />
-        <p className="text-base leading-none font-medium whitespace-nowrap">
-          No entries yet
+        <p className="min-w-0 max-w-52 text-center text-xs leading-relaxed text-balance text-muted-foreground">
+          No entries yet. Use “Log an intake” to record one.
         </p>
       </div>
       {blankCards.map(({ className, outline }) => (
