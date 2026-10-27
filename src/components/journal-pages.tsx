@@ -11,7 +11,6 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
 import { TodayHeading } from "@/components/today-heading";
 import { loggingStreak } from "@/lib/logging-streak";
-import type { StreakIconName } from "@/lib/streak-presentation";
 import { MedicationIcon } from "@/components/medication-icon";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
@@ -310,7 +309,7 @@ function IntakeTimeline({
   );
 }
 
-export function TodayPage({ streakIcon }: { streakIcon: StreakIconName }) {
+export function TodayPage() {
   const { data, now } = useJournal();
   const [open, setOpen] = useState(false);
   if (!data || !now) return null;
@@ -318,11 +317,7 @@ export function TodayPage({ streakIcon }: { streakIcon: StreakIconName }) {
   const streak = loggingStreak(data, today, now);
   return (
     <div className="flex flex-1 flex-col" data-today-layout>
-      <TodayHeading
-        day={today}
-        current={streak.current}
-        streakIcon={streakIcon}
-      />
+      <TodayHeading day={today} current={streak.current} />
       <section aria-label="Today's entries" className="flex-1">
         <IntakeTimeline data={data} day={today} showSummary={false} />
       </section>

@@ -1,16 +1,13 @@
 import { ActionIcon } from "@/components/action-icon";
 import { formatDay } from "@/lib/domain";
 import { streakMilestone } from "@/lib/logging-streak";
-import type { StreakIconName } from "@/lib/streak-presentation";
 
 export function TodayHeading({
   day,
   current,
-  streakIcon,
 }: {
   day: string;
   current: number;
-  streakIcon: StreakIconName;
 }) {
   const { next } = streakMilestone(current);
   const remaining = next - current;
@@ -49,7 +46,7 @@ export function TodayHeading({
           </span>
           <span aria-hidden="true" className="flex items-center gap-1.5">
             <ActionIcon
-              name={streakIcon}
+              name="sparkle"
               weight="fill"
               className="streak-counter-icon size-[22px]"
             />

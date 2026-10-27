@@ -285,8 +285,7 @@
   animation: brand-sheen 4.2s ease-in-out infinite;
 }
 .brand-lockup:hover .brand-bar,
-.brand-lockup:focus-visible .brand-bar,
-.brand-lockup[data-popup-open] .brand-bar {
+.brand-lockup:focus-visible .brand-bar {
   box-shadow:
     inset 0 1px 0 #fff1d6,
     inset 0 -1px 0 #9a34122e,
@@ -294,8 +293,7 @@
     0 2px 8px #9a341247;
 }
 .brand-lockup:hover::before,
-.brand-lockup:focus-visible::before,
-.brand-lockup[data-popup-open]::before {
+.brand-lockup:focus-visible::before {
   box-shadow:
     inset 0 2px 2px #fff7ed,
     inset 0 -2px 3px #f9731666,
@@ -360,15 +358,43 @@
     color: #fed7aa;
   }
 }
-.brand-menu-chevron {
-  transition: transform 160ms ease;
+.header-icon-button {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-color: color-mix(in srgb, var(--primary) 4%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary) 1.5%, transparent);
+  color: var(--foreground);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
 }
-.brand-lockup[data-popup-open] .brand-menu-chevron {
-  transform: rotate(180deg);
+.header-icon-button > svg {
+  opacity: 0.28;
+  transition: opacity 160ms ease;
+}
+.header-icon-button:is(:hover, :focus-visible, [data-popup-open]) {
+  border-color: #f9731640;
+  background: var(--accent);
+}
+.header-icon-button:is(:hover, :focus-visible, [data-popup-open]) > svg {
+  opacity: 1;
+}
+.header-icon-button:disabled {
+  pointer-events: none;
+}
+.header-icon-button:disabled > svg {
+  opacity: 0.12;
 }
 .brand-menu {
   position: relative;
-  border: 1px solid color-mix(in srgb, #f97316 25%, var(--border));
+  border: 1px solid transparent;
+  border-color: color-mix(in srgb, #f97316 25%, var(--border));
   border-radius: 20px;
   background:
     linear-gradient(135deg, #f973160d, transparent 48%),

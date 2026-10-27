@@ -4,7 +4,9 @@ import { usePathname } from "next/navigation";
 import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
-import { BrandNavigation } from "@/components/brand-navigation";
+import { Brand } from "@/components/brand";
+import { HeaderNavigation } from "@/components/header-navigation";
+import { StreakMenu } from "@/components/streak-menu";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
@@ -13,10 +15,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div
       className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10 ${path === "/" ? "with-intake-dock" : ""}`}
     >
-      <header className="mb-28 flex flex-col items-center sm:mb-32">
+      <header className="mb-28 grid w-full grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 sm:mb-32">
         <nav aria-label="Main navigation">
-          <BrandNavigation />
+          <HeaderNavigation />
         </nav>
+        <Brand className="justify-self-center" />
+        <StreakMenu />
       </header>
       <main id="main" className="flex min-w-0 flex-1 flex-col">
         {error ? (

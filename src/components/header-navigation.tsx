@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "@base-ui/react/menu";
 import { ActionIcon } from "@/components/action-icon";
-import { BrandFace } from "@/components/brand";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -14,30 +13,21 @@ const links = [
   { href: "/goals", label: "Goals", icon: "goals" },
 ] as const;
 
-export function BrandNavigation({ className }: { className?: string }) {
+export function HeaderNavigation({ className }: { className?: string }) {
   const pathname = usePathname();
 
   return (
     <Menu.Root key={pathname} modal={false}>
       <Menu.Trigger
         aria-label="Open navigation"
-        className={cn(
-          "brand-lockup inline-flex min-h-11 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-primary",
-          className,
-        )}
+        className={cn("header-icon-button", className)}
       >
-        <BrandFace className="min-w-40 px-4">
-          <ActionIcon
-            name="expand"
-            weight="regular"
-            className="brand-menu-chevron size-3.5"
-          />
-        </BrandFace>
+        <ActionIcon name="menu" className="streak-counter-icon size-5" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
           side="bottom"
-          align="center"
+          align="start"
           sideOffset={10}
           collisionPadding={12}
           className="z-50"

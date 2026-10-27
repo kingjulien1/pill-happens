@@ -26,6 +26,7 @@ import { LockKeyIcon } from "@phosphor-icons/react/dist/ssr/LockKey";
 import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { CaretUpIcon } from "@phosphor-icons/react/dist/ssr/CaretUp";
 import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
+import { ListIcon } from "@phosphor-icons/react/dist/ssr/List";
 import { FireIcon } from "@phosphor-icons/react/dist/ssr/Fire";
 import { SparkleIcon } from "@phosphor-icons/react/dist/ssr/Sparkle";
 import { LightningIcon } from "@phosphor-icons/react/dist/ssr/Lightning";
@@ -64,6 +65,7 @@ const icons = {
   expand: CaretDownIcon,
   collapse: CaretUpIcon,
   open: CaretRightIcon,
+  menu: ListIcon,
   fire: FireIcon,
   sparkle: SparkleIcon,
   lightning: LightningIcon,
