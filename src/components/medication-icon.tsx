@@ -165,7 +165,7 @@ export function MedicationIcon({
   const style = {
     "--medication-color": appearance.hex,
     color:
-      "color-mix(in srgb, var(--medication-color) 55%, var(--foreground) 45%)",
+      "color-mix(in srgb, var(--medication-color) var(--medication-symbol-mix), var(--foreground))",
     backgroundColor:
       "color-mix(in srgb, var(--medication-color) 12%, transparent)",
   } as CSSProperties;
