@@ -33,6 +33,7 @@ import {
   isMedicationLucideIcon,
   type MedicationIconName,
 } from "@/lib/medication-appearance";
+import { getSvgIcon } from "@/lib/svg-icon-catalog";
 import { cn } from "@/lib/utils";
 
 const glyphs = {
@@ -60,7 +61,7 @@ const glyphs = {
 
 const DynamicMedicationGlyph = lazy(() => import("./dynamic-medication-glyph"));
 
-/** Names and emoji are validated before rendering; emoji stay plain text. */
+/** Names and emoji are validated; local SVG URLs come only from the catalog. */
 export function MedicationGlyph({
   icon,
   className,
@@ -70,6 +71,28 @@ export function MedicationGlyph({
 }) {
   const value =
     typeof icon === "string" && isMedicationIcon(icon) ? icon : "pill";
+  const svgIcon = getSvgIcon(value);
+  if (svgIcon) {
+    return (
+      <span
+        aria-hidden="true"
+        data-medication-glyph={value}
+        data-medication-svg={value}
+        className={cn("inline-flex size-6 shrink-0", className)}
+        style={{
+          backgroundColor: "currentColor",
+          maskImage: `url("${svgIcon.src}")`,
+          maskSize: "contain",
+          maskPosition: "center",
+          maskRepeat: "no-repeat",
+          WebkitMaskImage: `url("${svgIcon.src}")`,
+          WebkitMaskSize: "contain",
+          WebkitMaskPosition: "center",
+          WebkitMaskRepeat: "no-repeat",
+        }}
+      />
+    );
+  }
   const Glyph = glyphs[value as keyof typeof glyphs];
 
   if (Glyph) {

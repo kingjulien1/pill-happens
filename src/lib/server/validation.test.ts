@@ -11,6 +11,7 @@ import {
   MEDICATION_COLORS,
   MEDICATION_ICON_NAMES,
 } from "../medication-appearance";
+import { SVG_ICON_CATALOG } from "../svg-icon-catalog";
 
 const medicationId = "6cfa88e7-8474-4b17-a148-545fb825785b";
 const intake = {
@@ -94,7 +95,7 @@ test("legacy medications omit the optional icon instead of receiving a persisted
   }
 });
 
-test("archiving and unrelated medication patches preserve the existing custom icon", () => {
+test("archiving and unrelated medication patches preserve emoji and local SVG icons", () => {
   const medication = {
     name: "Example",
     strengthMg: 1,
@@ -102,12 +103,20 @@ test("archiving and unrelated medication patches preserve the existing custom ic
     color: "rose",
     icon: "🌙",
   };
-  const archivePatch = medicationPatchSchema.parse({ archived: true });
-  assert.deepEqual(archivePatch, { archived: true });
-  assert.equal(Object.assign({ ...medication }, archivePatch).icon, "🌙");
-  const namePatch = medicationPatchSchema.parse({ name: "Renamed" });
-  assert.deepEqual(namePatch, { name: "Renamed" });
-  assert.equal(Object.assign({ ...medication }, namePatch).icon, "🌙");
+  for (const icon of [
+    medication.icon,
+    ...SVG_ICON_CATALOG.map(({ value }) => value),
+  ]) {
+    const archivePatch = medicationPatchSchema.parse({ archived: true });
+    assert.deepEqual(archivePatch, { archived: true });
+    assert.equal(
+      Object.assign({ ...medication, icon }, archivePatch).icon,
+      icon,
+    );
+    const namePatch = medicationPatchSchema.parse({ name: "Renamed" });
+    assert.deepEqual(namePatch, { name: "Renamed" });
+    assert.equal(Object.assign({ ...medication, icon }, namePatch).icon, icon);
+  }
 });
 
 test("medication icons accept allowlisted names and a single complex emoji", () => {
@@ -117,11 +126,29 @@ test("medication icons accept allowlisted names and a single complex emoji", () 
     form: "tablet",
     color: "mint",
   };
-  for (const icon of [...MEDICATION_ICON_NAMES, "👩🏽‍⚕️", "🇦🇹", "❤️"]) {
+  for (const icon of [
+    ...MEDICATION_ICON_NAMES,
+    ...SVG_ICON_CATALOG.map(({ value }) => value),
+    "👩🏽‍⚕️",
+    "🇦🇹",
+    "❤️",
+  ]) {
     assert.equal(medicationSchema.parse({ ...medication, icon }).icon, icon);
     assert.equal(medicationPatchSchema.parse({ icon }).icon, icon);
   }
-  for (const icon of ["hello", "🌙🌙", "<svg/>", " ", "🌙".repeat(33), null]) {
+  for (const icon of [
+    "hello",
+    "🌙🌙",
+    "<svg/>",
+    " ",
+    "🌙".repeat(33),
+    "svg:unknown",
+    "svg:../pill-spark",
+    "/icons/medications/pill-spark.svg",
+    "https://example.com/pill.svg",
+    "data:image/svg+xml,<svg/>",
+    null,
+  ]) {
     assert.equal(
       medicationSchema.safeParse({ ...medication, icon }).success,
       false,

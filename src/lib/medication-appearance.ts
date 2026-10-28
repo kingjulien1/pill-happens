@@ -1,4 +1,5 @@
 import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
+import { isMedicationSvgIcon } from "./svg-icon-catalog";
 
 /** Appearance values are persisted in medication records; keep legacy keys stable. */
 export const MEDICATION_COLORS = [
@@ -55,10 +56,10 @@ export function isMedicationLucideIcon(
   return iconNames.has(value);
 }
 
-/** Accept one allowlisted Lucide name or one bounded emoji grapheme, never markup. */
+/** Accept an allowlisted Lucide/local SVG name or one emoji, never markup or URLs. */
 export function isMedicationIcon(value: string): boolean {
   if (!value || value.length > 64) return false;
-  if (isMedicationLucideIcon(value)) return true;
+  if (isMedicationLucideIcon(value) || isMedicationSvgIcon(value)) return true;
   if (Array.from(graphemes.segment(value)).length !== 1) return false;
   return (
     pictographicEmoji.test(value) ||

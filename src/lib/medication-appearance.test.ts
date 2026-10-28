@@ -8,6 +8,7 @@ import {
   MEDICATION_ICON_NAMES,
 } from "./medication-appearance";
 import type { Medication } from "./domain";
+import { SVG_ICON_CATALOG } from "./svg-icon-catalog";
 
 test("the 24-color registry retains the three persisted legacy keys", () => {
   assert.equal(MEDICATION_COLORS.length, 24);
@@ -87,6 +88,29 @@ test("one emoji can include variation selectors, skin tone, ZWJ, flags, and keyc
     "🏴\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}",
   ];
   for (const value of emoji) assert.equal(isMedicationIcon(value), true, value);
+});
+
+test("local SVG names are allowlisted separately from Lucide and never accept paths or markup", () => {
+  assert.ok(SVG_ICON_CATALOG.length > 0);
+  for (const { value } of SVG_ICON_CATALOG) {
+    assert.equal(isMedicationIcon(value), true, value);
+    assert.equal(isMedicationLucideIcon(value), false, value);
+  }
+  for (const value of [
+    "svg:unknown",
+    "SVG:pill-spark",
+    "svg:../pill-spark",
+    "svg:pill-spark.svg",
+    'svg:pill-spark" onload="alert(1)',
+    "/icons/medications/pill-spark.svg",
+    "https://example.com/pill.svg",
+    "data:image/svg+xml,<svg/>",
+    "<svg><script>alert(1)</script></svg>",
+    "svg:constructor",
+    "svg:__proto__",
+  ]) {
+    assert.equal(isMedicationIcon(value), false, value);
+  }
 });
 
 test("emoji validation rejects text, HTML, multiple emoji, fragments, and oversized input", () => {
