@@ -11,6 +11,8 @@
     "format:check": "prettier --check .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --import tsx --test src/lib/*.test.ts src/lib/server/*.test.ts",
+    "icons:tablets": "node --import tsx scripts/generate-tablet-icons.ts",
+    "icons:tablets:check": "node --import tsx scripts/generate-tablet-icons.ts --check",
     "secrets": "node scripts/generate-secrets.mjs"
   },
   "dependencies": {

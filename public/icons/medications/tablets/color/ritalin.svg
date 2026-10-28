@@ -1,0 +1,44 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <defs>
+    <mask
+      id="ritalin-cutouts"
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+    >
+      <circle cx="12" cy="12" r="9" fill="white" stroke="white" />
+      <path d="M12 4v16" fill="none" stroke="black" />
+      <path
+        d="m5.9 14.4 1.7-4.8 1.7 4.8M6.4 13h2.4"
+        stroke-width="1"
+        fill="none"
+        stroke="black"
+      />
+      <path
+        d="M15 9.6v4.8h1.4a1.3 1.3 0 0 0 0-2.6H15m0-2.2h1.3a1.1 1.1 0 0 1 0 2.2"
+        stroke-width="1"
+        fill="none"
+        stroke="black"
+      />
+    </mask>
+  </defs>
+  <rect
+    width="24"
+    height="24"
+    fill="#D4D4D8"
+    stroke="none"
+    mask="url(#ritalin-cutouts)"
+  />
+</svg>
