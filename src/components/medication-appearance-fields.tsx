@@ -28,6 +28,10 @@ const RESULT_LIMIT = 96;
 const pickerPanelClass =
   "relative h-[134px] w-full overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-foreground/[.025] [scrollbar-gutter:stable]";
 const pickerGridClass = "grid grid-cols-8 gap-1 p-2 max-[359px]:grid-cols-6";
+const previewActionClass =
+  "inline-flex h-11 items-center rounded-lg text-[10px] font-medium text-muted-foreground transition-colors hover:[&>span]:bg-foreground/[.06] disabled:opacity-35";
+const previewActionFaceClass =
+  "inline-flex h-7 items-center gap-1.5 rounded-lg border border-foreground/10 bg-foreground/[.025] px-2 transition-colors";
 type SearchPhase = "idle" | "loading" | "ready";
 type SymbolOption = {
   value: string;
@@ -474,31 +478,12 @@ export function MedicationAppearanceFields({
         </fieldset>
       </div>
 
-      <div aria-hidden="true" className="mx-auto h-px w-4/5 bg-foreground/15" />
-
       <section
         aria-labelledby={`${id}-preview-title`}
-        className="w-full min-w-0 space-y-3"
+        className="w-full min-w-0"
       >
-        <h3
-          id={`${id}-preview-title`}
-          className="flex items-center justify-between gap-3 text-[13px] font-[550]"
-        >
-          <span className="inline-flex items-center gap-2">
-            <Eye
-              aria-hidden="true"
-              className="size-5 shrink-0"
-              strokeWidth={2.75}
-              data-appearance-section-icon
-            />
-            Final look
-          </span>
-          <span className="text-[10px] font-normal text-muted-foreground">
-            Live preview
-          </span>
-        </h3>
         <div
-          className="final-look-showcase relative w-full overflow-hidden rounded-3xl border border-foreground/15 bg-foreground/[.025] p-4"
+          className="final-look-showcase relative w-full overflow-hidden rounded-3xl bg-foreground/[.025] p-[18px]"
           style={
             {
               "--preview-accent": selectedColor.hex,
@@ -507,28 +492,45 @@ export function MedicationAppearanceFields({
           }
           data-appearance-preview
         >
+          <span aria-hidden="true" className="final-look-glass-blur-x" />
+          <span aria-hidden="true" className="final-look-glass-blur-y" />
+          <span aria-hidden="true" className="final-look-glass-band" />
           <span aria-hidden="true" className="final-look-ambience" />
           <span aria-hidden="true" className="final-look-rim" />
-          <div className="relative flex items-center justify-between gap-3 text-[10px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <span
-                aria-hidden="true"
-                className="size-1.5 rounded-full"
-                style={{
-                  backgroundColor: fixedColor?.hex ?? selectedColor.hex,
-                }}
-              />
-              {fixedColor?.name ?? selectedColor.label}
-            </span>
-            <span>
-              {source === "Color"
-                ? "Color SVG"
-                : svg?.variant === "outline"
-                  ? "Outline SVG"
-                  : source === "SVG"
-                    ? "Project SVG"
-                    : source}
-            </span>
+          <span aria-hidden="true" className="final-look-accent-edge" />
+          <div
+            className="relative flex items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
+            data-preview-header
+          >
+            <div className="flex min-w-0 items-center gap-2">
+              <h3
+                id={`${id}-preview-title`}
+                className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium"
+              >
+                <Eye
+                  aria-hidden="true"
+                  className="size-3 shrink-0"
+                  strokeWidth={2.25}
+                />
+                Final look
+              </h3>
+              <span className="inline-flex min-w-0 items-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  className="size-1.5 shrink-0 rounded-full"
+                  style={{
+                    backgroundColor: fixedColor?.hex ?? selectedColor.hex,
+                  }}
+                />
+                <span
+                  className="truncate"
+                  title={fixedColor?.name ?? selectedColor.label}
+                >
+                  {fixedColor?.name ?? selectedColor.label}
+                </span>
+              </span>
+            </div>
+            <span className="shrink-0">Live preview</span>
           </div>
           <div className="final-look-icon-stage relative flex justify-center py-5">
             <span aria-hidden="true" className="final-look-icon-halo" />
@@ -586,7 +588,7 @@ export function MedicationAppearanceFields({
               </p>
             </div>
           </div>
-          <div className="relative mt-3 flex items-center justify-between gap-2 border-t border-foreground/10 pt-3">
+          <div className="relative mt-2 flex items-center justify-between gap-2">
             <button
               type="button"
               disabled={!undo}
@@ -596,27 +598,31 @@ export function MedicationAppearanceFields({
                 onIconChange(undo.icon);
                 setUndo(null);
               }}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[11px] text-muted-foreground hover:bg-foreground/5 disabled:opacity-35"
+              className={previewActionClass}
               aria-label="Undo shuffled look"
             >
-              <Undo2
-                className="size-3.5"
-                strokeWidth={2.75}
-                aria-hidden="true"
-              />
-              Undo
+              <span className={previewActionFaceClass} data-preview-action-face>
+                <Undo2
+                  className="size-3"
+                  strokeWidth={2.25}
+                  aria-hidden="true"
+                />
+                Undo
+              </span>
             </button>
             <button
               type="button"
               onClick={shuffleLook}
-              className="inline-flex h-9 items-center gap-2 rounded-xl border border-foreground/15 bg-foreground/5 px-3 text-[11px] font-medium hover:bg-foreground/10"
+              className={previewActionClass}
             >
-              <Shuffle
-                className="size-4"
-                strokeWidth={2.75}
-                aria-hidden="true"
-              />
-              Surprise me
+              <span className={previewActionFaceClass} data-preview-action-face>
+                <Shuffle
+                  className="size-3"
+                  strokeWidth={2.25}
+                  aria-hidden="true"
+                />
+                Surprise me
+              </span>
             </button>
           </div>
           <p className="sr-only" role="status">

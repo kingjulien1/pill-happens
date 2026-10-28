@@ -208,6 +208,9 @@
 }
 .final-look-showcase {
   isolation: isolate;
+  box-shadow:
+    inset 0 0 0 6px color-mix(in srgb, var(--foreground) 4%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--foreground) 8%, transparent);
   --preview-glow: color-mix(
     in srgb,
     var(--preview-accent) 82%,
@@ -219,12 +222,78 @@
     var(--foreground)
   );
 }
+.final-look-glass-band {
+  display: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 6px;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--foreground) 6%, transparent),
+      transparent 44%,
+      color-mix(in srgb, var(--preview-accent) 3%, transparent)
+    ),
+    color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+.final-look-glass-blur-x,
+.final-look-glass-blur-y {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Narrow filter surfaces keep the blur at the edge in browsers that let
+   backdrop filters bleed beyond a composite mask. */
+.final-look-glass-blur-x::before,
+.final-look-glass-blur-x::after,
+.final-look-glass-blur-y::before,
+.final-look-glass-blur-y::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(32px) saturate(1.1);
+  backdrop-filter: blur(32px) saturate(1.1);
+}
+.final-look-glass-blur-x::before,
+.final-look-glass-blur-x::after {
+  top: 0;
+  bottom: 0;
+  width: 6px;
+}
+.final-look-glass-blur-x::before {
+  left: 0;
+}
+.final-look-glass-blur-x::after {
+  right: 0;
+}
+.final-look-glass-blur-y::before,
+.final-look-glass-blur-y::after {
+  right: 0;
+  left: 0;
+  height: 6px;
+}
+.final-look-glass-blur-y::before {
+  top: 0;
+}
+.final-look-glass-blur-y::after {
+  bottom: 0;
+}
+.final-look-glass-band,
+.final-look-accent-edge,
 .final-look-ambience,
 .final-look-rim,
 .final-look-icon-halo,
 .final-look-icon-rim,
 .final-look-journal::before {
   pointer-events: none;
+}
+.final-look-accent-edge {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--preview-accent);
+  border-radius: inherit;
+  opacity: 0.55;
 }
 .final-look-ambience {
   position: absolute;
@@ -274,6 +343,11 @@
   padding: 1px;
 }
 @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .final-look-showcase {
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--foreground) 8%, transparent);
+  }
+  .final-look-glass-band,
   .final-look-rim,
   .final-look-icon-rim {
     display: block;
@@ -286,6 +360,10 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
+}
+.final-look-rim {
+  inset: 6px;
+  border-radius: 18px;
 }
 .final-look-rim::before,
 .final-look-icon-rim::before {
