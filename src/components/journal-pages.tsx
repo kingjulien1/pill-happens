@@ -482,6 +482,7 @@ export function MedicationsPage() {
         open={open}
         onOpenChange={setOpen}
         title={editing ? "Edit medication" : "Add medication"}
+        titleIcon="medications"
         context={editing ? "Update details" : "Name & strength"}
         description="Use the name and strength printed on your medication packaging."
       >

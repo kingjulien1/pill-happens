@@ -1,9 +1,10 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { ActionIcon } from "@/components/action-icon";
+import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -29,6 +30,7 @@ export function ResponsiveModal({
   open,
   onOpenChange,
   title,
+  titleIcon,
   context,
   description,
   children,
@@ -36,6 +38,7 @@ export function ResponsiveModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  titleIcon?: ActionIconName;
   context?: string;
   description: string;
   children: React.ReactNode;
@@ -45,14 +48,45 @@ export function ResponsiveModal({
     () => window.matchMedia("(min-width: 768px)").matches,
     () => false,
   );
+  const heading = (
+    <HeadingText
+      className="items-center gap-y-0"
+      title={
+        <span
+          data-slot="modal-title-line"
+          className="inline-flex min-h-7 items-center gap-2 leading-7"
+        >
+          {titleIcon && <ActionIcon name={titleIcon} className="size-4" />}
+          <span>{title}</span>
+        </span>
+      }
+      context={context}
+    />
+  );
+  const closeButton = (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="absolute -top-2 right-0 size-11 text-foreground"
+      aria-label="Close"
+    />
+  );
   if (desktop)
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-3xl p-7 sm:max-w-[440px]">
+        <DialogContent
+          showCloseButton={false}
+          className="max-h-[90dvh] overflow-y-auto rounded-3xl p-7 sm:max-w-[440px]"
+        >
           <DialogHeader className="mb-1 gap-1.5">
-            <DialogTitle className="pr-9 text-lg font-semibold tracking-tight">
-              <HeadingText title={title} context={context} />
-            </DialogTitle>
+            <div className="relative">
+              <DialogTitle className="pr-13 text-lg font-semibold tracking-tight text-foreground">
+                {heading}
+              </DialogTitle>
+              <DialogClose render={closeButton}>
+                <ActionIcon name="close" className="size-4" />
+              </DialogClose>
+            </div>
             <DialogDescription className="text-xs leading-relaxed">
               {description}
             </DialogDescription>
@@ -64,25 +98,18 @@ export function ResponsiveModal({
   return (
     <Drawer open={open} onOpenChange={onOpenChange} showSwipeHandle>
       <DrawerContent className="rounded-t-[28px]">
-        <DrawerHeader className="relative px-6 pt-5 pb-4 text-left!">
-          <DrawerTitle className="pr-9 text-lg font-semibold tracking-tight">
-            <HeadingText title={title} context={context} />
-          </DrawerTitle>
+        <DrawerHeader className="px-6 pt-5 pb-4 text-left!">
+          <div className="relative">
+            <DrawerTitle className="pr-13 text-lg font-semibold tracking-tight">
+              {heading}
+            </DrawerTitle>
+            <DrawerClose render={closeButton}>
+              <ActionIcon name="close" className="size-4" />
+            </DrawerClose>
+          </div>
           <DrawerDescription className="mt-1.5 pr-6 text-left text-xs leading-relaxed">
             {description}
           </DrawerDescription>
-          <DrawerClose
-            render={
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 right-4 size-11"
-                aria-label="Close"
-              />
-            }
-          >
-            <ActionIcon name="close" />
-          </DrawerClose>
         </DrawerHeader>
         <div className="overflow-y-auto px-6 pt-1 pb-[max(24px,env(safe-area-inset-bottom))]">
           {children}
