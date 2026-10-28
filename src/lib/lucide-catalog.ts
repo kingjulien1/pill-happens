@@ -3,10 +3,16 @@ import {
   LUCIDE_ICON_NAMES,
   type LucideMedicationIconName,
 } from "./lucide-icon-names";
+import {
+  iconSearchText,
+  normalizeIconQuery,
+  toIconComponentName,
+} from "./icon-names";
 
 export type LucideCatalogEntry = {
   value: LucideMedicationIconName;
   label: string;
+  componentName: string;
   keywords: string[];
 };
 
@@ -221,6 +227,7 @@ export const LUCIDE_ICON_CATALOG: readonly LucideCatalogEntry[] =
   LUCIDE_ICON_NAMES.map((value) => ({
     value,
     label: readableName(value),
+    componentName: toIconComponentName(value),
     keywords: [
       ...(aliasesByName.get(value) ?? []),
       ...topicKeywords.flatMap(([pattern, keywords]) =>
@@ -240,21 +247,19 @@ export function getLucideIconLabel(value: string): string | undefined {
   return isLucideIconName(value) ? readableName(value) : undefined;
 }
 
-function normalizeSearch(value: string): string {
-  return value
-    .normalize("NFKD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .replaceAll("ß", "ss")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
 const searchableIcons = LUCIDE_ICON_CATALOG.map((entry) => ({
   entry,
-  name: normalizeSearch(entry.value),
-  text: normalizeSearch(
-    [entry.value, entry.label, ...entry.keywords].join(" "),
+  name: normalizeIconQuery(entry.value),
+  componentName: normalizeIconQuery(entry.componentName),
+  text: iconSearchText(
+    [
+      entry.value,
+      entry.label,
+      entry.componentName,
+      `${entry.componentName}Icon`,
+      ...(aliasesByName.get(entry.value) ?? []),
+    ],
+    entry.keywords,
   ),
 }));
 
@@ -263,15 +268,22 @@ export function searchLucideIcons(
   query: string,
   limit = 96,
 ): LucideCatalogEntry[] {
-  const normalized = normalizeSearch(query);
+  const normalized = normalizeIconQuery(query);
   if (!normalized || limit <= 0 || Number.isNaN(limit)) return [];
   const terms = normalized.split(/\s+/);
   return searchableIcons
     .filter(({ text }) => terms.every((term) => text.includes(term)))
     .sort((left, right) => {
-      const score = (name: string) =>
-        name === normalized ? 0 : name.startsWith(normalized) ? 1 : 2;
-      return score(left.name) - score(right.name);
+      const score = (name: string, componentName: string) =>
+        name === normalized || componentName === normalized
+          ? 0
+          : name.startsWith(normalized)
+            ? 1
+            : 2;
+      return (
+        score(left.name, left.componentName) -
+        score(right.name, right.componentName)
+      );
     })
     .slice(
       0,

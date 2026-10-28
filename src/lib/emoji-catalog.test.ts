@@ -16,10 +16,25 @@ test("the local catalog contains unique, valid medication emoji with bilingual m
   for (const entry of EMOJI_CATALOG) {
     assert.equal(isMedicationIcon(entry.value), true, entry.value);
     assert.ok(entry.label.trim(), entry.value);
+    assert.ok(entry.componentName.trim(), entry.value);
     assert.ok(entry.keywords.length >= 4, entry.label);
     assert.ok(
       entry.keywords.every((keyword) => keyword.trim()),
       entry.label,
+    );
+  }
+});
+
+test("emoji display labels and component-style names are searchable", () => {
+  for (const [query, value] of [
+    ["FourLeafClover", "🍀"],
+    ["fourLeafClover", "🍀"],
+    ["SmilingFaceWithHearts", "🥰"],
+    ["SunBehindASmallCloud", "🌤️"],
+  ]) {
+    assert.ok(
+      searchEmoji(query).some((entry) => entry.value === value),
+      query,
     );
   }
 });

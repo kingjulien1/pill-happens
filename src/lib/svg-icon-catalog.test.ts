@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
+import { EMOJI_CATALOG } from "./emoji-catalog";
+import { normalizeIconQuery } from "./icon-names";
+import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
+import { TABLET_SHAPES } from "./tablet-icons/geometry";
 import {
   getSvgIcon,
   isMedicationSvgIcon,
@@ -19,15 +23,32 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
     SVG_ICON_CATALOG.length,
   );
   const directory = new URL("../../public/icons/medications/", import.meta.url);
+  const files = (base: URL, prefix = ""): string[] =>
+    readdirSync(base, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? files(new URL(`${entry.name}/`, base), `${prefix}${entry.name}/`)
+        : entry.name.endsWith(".svg")
+          ? [`${prefix}${entry.name}`]
+          : [],
+    );
   assert.deepEqual(
-    readdirSync(directory).sort(),
-    SVG_ICON_CATALOG.map(({ src }) => src.split("/").at(-1)).sort(),
+    files(directory).sort(),
+    SVG_ICON_CATALOG.map(({ src }) =>
+      src.slice("/icons/medications/".length),
+    ).sort(),
   );
   for (const entry of SVG_ICON_CATALOG) {
-    assert.match(entry.value, /^svg:[a-z]+(?:-[a-z]+)*$/);
+    assert.match(entry.value, /^svg:(?:color:)?[a-z0-9]+(?:-[a-z0-9]+)*$/);
     assert.ok(entry.value.length <= 64);
-    assert.equal(entry.src, `/icons/medications/${entry.value.slice(4)}.svg`);
+    const slug = entry.value.replace(/^svg:(?:color:)?/, "");
+    assert.equal(
+      entry.src,
+      entry.variant === "mask"
+        ? `/icons/medications/${slug}.svg`
+        : `/icons/medications/tablets/${entry.variant}/${slug}.svg`,
+    );
     assert.ok(entry.label.length > 0);
+    assert.ok(entry.componentName.length > 0);
     assert.equal(isMedicationSvgIcon(entry.value), true);
     assert.equal(getSvgIcon(entry.value), entry);
     const svg = readFileSync(
@@ -36,12 +57,41 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
     );
     assert.match(svg, /^<svg\s/);
     assert.match(svg, /viewBox="0 0 24 24"/);
-    assert.match(svg, /stroke-width="2\.5"/);
+    assert.match(
+      svg,
+      entry.variant === "mask" ? /stroke-width="2\.5"/ : /stroke-width="2"/,
+    );
     assert.match(svg, /<\/(?:svg)>\s*$/);
     assert.doesNotMatch(
       svg,
-      /<(?:script|foreignObject|image|iframe|style)\b|\bon[a-z]+\s*=|\b(?:href|src)\s*=|url\s*\(/i,
+      /<(?:script|foreignObject|image|iframe|style|linearGradient|radialGradient|filter)\b|\bon[a-z]+\s*=|\b(?:href|src)\s*=/i,
     );
+    for (const [, target] of svg.matchAll(/url\(([^)]+)\)/g)) {
+      assert.match(target, /^#[a-z0-9-]+$/, entry.value);
+      assert.ok(svg.includes(`id="${target.slice(1)}"`), entry.value);
+    }
+    if (entry.variant !== "mask") {
+      const root = svg.match(/<svg\b[\s\S]*?>/)![0];
+      for (const attribute of [
+        'xmlns="http://www.w3.org/2000/svg"',
+        'width="24"',
+        'height="24"',
+        'fill="none"',
+        'stroke="currentColor"',
+        'stroke-linecap="round"',
+        'stroke-linejoin="round"',
+      ])
+        assert.ok(root.includes(attribute), `${entry.value}: ${attribute}`);
+    }
+    if (entry.variant === "color") {
+      assert.ok(entry.color);
+      const visible = svg.replace(/<defs>[\s\S]*?<\/defs>/g, "");
+      const paints = [...visible.matchAll(/(?:fill|stroke)="([^"]+)"/g)]
+        .map(([, color]) => color)
+        .filter((color) => color !== "none" && color !== "currentColor");
+      assert.deepEqual([...new Set(paints)], [entry.color.hex]);
+      assert.doesNotMatch(svg, /\b(?:opacity|fill-opacity|stroke-opacity)=/);
+    }
   }
 });
 
@@ -50,6 +100,9 @@ test("SVG values are a strict allowlist rather than arbitrary file paths or mark
     "",
     "svg:unknown",
     "svg:../pill-spark",
+    "svg:color:unknown",
+    "svg:color:../viagra",
+    "svg:color:euthyrox.svg",
     "SVG:pill-spark",
     "pill-spark",
     "/icons/medications/pill-spark.svg",
@@ -62,6 +115,92 @@ test("SVG values are a strict allowlist rather than arbitrary file paths or mark
     assert.equal(isMedicationSvgIcon(value), false, value);
     assert.equal(getSvgIcon(value), undefined, value);
   }
+});
+
+test("tablet variants preserve requested names, dose labels, color metadata, and unique generic aliases", () => {
+  const outlines = SVG_ICON_CATALOG.filter(
+    ({ variant }) => variant === "outline",
+  );
+  const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
+  assert.equal(outlines.length, Object.keys(TABLET_SHAPES).length);
+  assert.equal(colors.length, 12);
+  for (const [slug, label] of [
+    ["bromazepam", "Bromazepam"],
+    ["diazepam", "Diazepam"],
+    ["alprazolam", "Alprazolam"],
+    ["valium", "Valium"],
+    ["ritalin", "Ritalin"],
+    ["quetialan-100", "Quetialan 100mg"],
+    ["dominal-forte", "Dominal Forte"],
+    ["queatialan-25", "Queatialan 25mg"],
+    ["queatialan-200", "Queatialan 200mg"],
+    ["venlafaxin", "Venlafaxin"],
+    ["viagra", "Viagra"],
+    ["euthyrox", "Euthyrox"],
+  ])
+    assert.equal(getSvgIcon(`svg:color:${slug}`)?.label, label);
+  for (const slug of [
+    "valium",
+    "ritalin",
+    "queatialan-200",
+    "venlafaxin",
+    "euthyrox",
+  ])
+    assert.equal(
+      getSvgIcon(`svg:color:${slug}`)?.color?.hex.toLowerCase(),
+      "#d4d4d8",
+    );
+  const existing = new Set(
+    [...LUCIDE_ICON_NAMES, ...EMOJI_CATALOG.map(({ label }) => label)].map(
+      normalizeIconQuery,
+    ),
+  );
+  for (const shape of [
+    "tablet-meridian",
+    "tablet-pebble",
+    "tablet-halo",
+  ] as const) {
+    assert.equal(TABLET_SHAPES[shape].aliases.length, 3);
+    for (const alias of TABLET_SHAPES[shape].aliases) {
+      assert.ok(!existing.has(normalizeIconQuery(alias)), alias);
+      assert.equal(searchSvgIcons(alias)[0].value, `svg:${shape}`);
+    }
+  }
+});
+
+test("SVG component names, display labels, namespaces, and spelling aliases all resolve", () => {
+  for (const [query, value] of [
+    ["TabletMeridian", "svg:tablet-meridian"],
+    ["TabletBisect", "svg:tablet-meridian"],
+    ["TabletEquator", "svg:tablet-meridian"],
+    ["HeartLeaf", "svg:heart-leaf"],
+    ["Quetialan100", "svg:color:quetialan-100"],
+    ["Quetialan100mg", "svg:color:quetialan-100"],
+    ["Queatialan100mg", "svg:color:quetialan-100"],
+    ["Quetialan25mg", "svg:color:queatialan-25"],
+    ["Queatialan 200mg", "svg:color:queatialan-200"],
+    ["ViagraColor", "svg:color:viagra"],
+    ["EuthyroxColor", "svg:color:euthyrox"],
+    ["svg:color:ritalin", "svg:color:ritalin"],
+    ["Venlafaxin", "svg:color:venlafaxin"],
+  ])
+    assert.ok(
+      searchSvgIcons(query).some((entry) => entry.value === value),
+      query,
+    );
+  assert.equal(searchSvgIcons("color").length, 12);
+  assert.ok(
+    searchSvgIcons("colored").every(({ variant }) => variant === "color"),
+  );
+  assert.ok(
+    searchSvgIcons("outline").every(({ variant }) => variant === "outline"),
+  );
+  assert.equal(
+    searchSvgIcons("outline").length,
+    Object.keys(TABLET_SHAPES).length,
+  );
+  assert.equal(searchSvgIcons("euthyrox").length, 2);
+  assert.equal(searchSvgIcons("viagra").length, 2);
 });
 
 test("local SVG discovery supports English, German, direct IDs, and multiple words", () => {

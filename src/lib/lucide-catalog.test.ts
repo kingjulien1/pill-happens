@@ -45,6 +45,14 @@ test("Lucide discovery supports exact names, separate query terms, and package a
   );
   assert.equal(searchLucideIcons("squirrel")[0].value, "squirrel");
   assert.equal(searchLucideIcons("flask-conical")[0].value, "flask-conical");
+  assert.equal(searchLucideIcons("HeartHandshake")[0].value, "heart-handshake");
+  assert.equal(searchLucideIcons("heartHandshake")[0].value, "heart-handshake");
+  assert.equal(
+    searchLucideIcons("HeartHandshakeIcon")[0].value,
+    "heart-handshake",
+  );
+  assert.equal(searchLucideIcons("FlaskConical")[0].value, "flask-conical");
+  assert.equal(searchLucideIcons("CircleDot")[0].value, "circle-dot");
 });
 
 test("English and German category keywords find relevant icons without a remote API", () => {

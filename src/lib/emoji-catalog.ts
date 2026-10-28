@@ -1,6 +1,13 @@
+import {
+  iconSearchText,
+  normalizeIconQuery,
+  toIconComponentName,
+} from "./icon-names";
+
 export type EmojiCatalogEntry = {
   value: string;
   label: string;
+  componentName: string;
   keywords: readonly string[];
 };
 
@@ -14,6 +21,7 @@ function group(
   return rows.map(([value, label, aliases]) => ({
     value,
     label,
+    componentName: toIconComponentName(label),
     keywords: [...category, ...aliases.split("|")],
   }));
 }
@@ -667,19 +675,12 @@ export const EMOJI_CATALOG: readonly EmojiCatalogEntry[] = [
 
 /** Normalize text, while leaving the stored emoji and display labels untouched. */
 export function normalizeEmojiQuery(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "")
-    .replace(/ß/g, "ss")
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return normalizeIconQuery(value);
 }
 
 const searchIndex = EMOJI_CATALOG.map((entry) => ({
   entry,
-  text: normalizeEmojiQuery([entry.label, ...entry.keywords].join(" ")),
+  text: iconSearchText([entry.label, entry.componentName], entry.keywords),
   emoji: entry.value.replace(/\uFE0F/g, ""),
 }));
 

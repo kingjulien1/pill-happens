@@ -1,3 +1,15 @@
+import {
+  iconSearchText,
+  normalizeIconQuery,
+  tabletIconLabel,
+  toIconComponentName,
+} from "./icon-names";
+import {
+  TABLET_ARTWORK,
+  type TabletArtworkColor,
+} from "./tablet-icons/artwork";
+import type { TabletShapeName } from "./tablet-icons/geometry";
+
 /** Original monochrome artwork served from public/icons/medications. */
 const definitions = [
   {
@@ -228,33 +240,87 @@ const definitions = [
 ] as const;
 
 export type SvgMedicationIconName =
-  `svg:${(typeof definitions)[number]["slug"]}`;
+  | `svg:${(typeof definitions)[number]["slug"]}`
+  | (typeof TABLET_ARTWORK)[number]["value"];
 export type SvgIconCatalogEntry = {
   value: SvgMedicationIconName;
   label: string;
+  componentName: string;
+  aliases: readonly string[];
   src: string;
   keywords: readonly string[];
+  variant: "mask" | "outline" | "color";
+  shape?: TabletShapeName;
+  color?: TabletArtworkColor;
 };
 
+const localKeywords = [
+  "svg",
+  "vector",
+  "local",
+  "project",
+  "custom",
+  "lokal",
+  "vektor",
+  "projekt",
+];
+
+function spellingAliases(slug: string): string[] {
+  const alternate = slug.includes("quetialan")
+    ? slug.replace("quetialan", "queatialan")
+    : slug.includes("queatialan")
+      ? slug.replace("queatialan", "quetialan")
+      : null;
+  return alternate
+    ? [alternate, toIconComponentName(alternate), tabletIconLabel(alternate)]
+    : [];
+}
+
 /** Persist stable IDs, never filenames supplied by a user or arbitrary SVG text. */
-export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = definitions.map(
-  ({ slug, label, keywords }) => ({
-    value: `svg:${slug}`,
+export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = [
+  ...definitions.map(({ slug, label, keywords }) => ({
+    value: `svg:${slug}` as const,
     label,
+    componentName: toIconComponentName(slug),
+    aliases: [slug],
+    variant: "mask" as const,
     src: `/icons/medications/${slug}.svg`,
-    keywords: [
-      "svg",
-      "vector",
-      "local",
-      "project",
-      "custom",
-      "lokal",
-      "vektor",
-      "projekt",
-      ...keywords,
+    keywords: [...localKeywords, ...keywords],
+  })),
+  ...TABLET_ARTWORK.map((entry): SvgIconCatalogEntry => ({
+    ...entry,
+    label: tabletIconLabel(entry.slug),
+    aliases: [
+      ...entry.aliases,
+      ...spellingAliases(entry.slug),
+      entry.variant === "color"
+        ? `${entry.componentName}Color`
+        : `${entry.componentName}Icon`,
     ],
-  }),
-);
+    keywords: [
+      ...localKeywords,
+      "tablet",
+      "tablette",
+      "tablets",
+      "medication",
+      "medikament",
+      ...(entry.variant === "color"
+        ? [
+            "color",
+            "colored",
+            "colour",
+            "coloured",
+            "pastel",
+            "flat",
+            "fixed",
+            "farbig",
+            "farbe",
+          ]
+        : ["outline", "stroke", "tintable", "kontur"]),
+      ...entry.keywords,
+    ],
+  })),
+];
 
 const iconsByValue = new Map<string, SvgIconCatalogEntry>(
   SVG_ICON_CATALOG.map((entry) => [entry.value, entry]),
@@ -270,41 +336,42 @@ export function isMedicationSvgIcon(
   return iconsByValue.has(value);
 }
 
-function normalize(value: string): string {
-  return value
-    .normalize("NFKD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .replaceAll("ß", "ss")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-const searchable = SVG_ICON_CATALOG.map((entry) => ({
-  entry,
-  name: normalize(entry.value),
-  slug: normalize(entry.value.slice(4)),
-  text: normalize([entry.value, entry.label, ...entry.keywords].join(" ")),
-}));
+const searchable = SVG_ICON_CATALOG.map((entry) => {
+  const identities = [
+    entry.value,
+    entry.value.slice(4),
+    entry.label,
+    entry.componentName,
+    ...entry.aliases,
+  ];
+  return {
+    entry,
+    names: identities.flatMap((identity) => {
+      const name = normalizeIconQuery(identity);
+      return [name, name.replaceAll(" ", "")];
+    }),
+    text: iconSearchText(identities, entry.keywords),
+  };
+});
 
 /** Search the checked-in collection without an external request or upload. */
 export function searchSvgIcons(
   query: string,
   limit = 96,
 ): SvgIconCatalogEntry[] {
-  const normalized = normalize(query);
+  const normalized = normalizeIconQuery(query);
   if (!normalized || limit <= 0 || Number.isNaN(limit)) return [];
   const terms = normalized.split(/\s+/);
   return searchable
     .filter(({ text }) => terms.every((term) => text.includes(term)))
     .sort((left, right) => {
-      const score = (name: string, slug: string) =>
-        name === normalized || slug === normalized
+      const score = (names: string[]) =>
+        names.includes(normalized)
           ? 0
-          : slug.startsWith(normalized)
+          : names.some((name) => name.startsWith(normalized))
             ? 1
             : 2;
-      return score(left.name, left.slug) - score(right.name, right.slug);
+      return score(left.names) - score(right.names);
     })
     .slice(0, Number.isFinite(limit) ? Math.floor(limit) : searchable.length)
     .map(({ entry }) => entry);
