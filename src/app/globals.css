@@ -11,41 +11,49 @@
 }
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --background: #fff7ed;
-  --foreground: #fed7aa;
+  --foreground: #2a1914;
   --card: #fffaf2ed;
-  --card-foreground: #fed7aa;
+  --card-foreground: var(--foreground);
   --popover: #fffaf2;
-  --popover-foreground: #fed7aa;
+  --popover-foreground: var(--foreground);
   --primary: #120f17;
   --ink: #120f17;
   --primary-foreground: var(--ink);
   --action-background: #fed7aa;
   --secondary: #efe4d8;
-  --secondary-foreground: #fed7aa;
+  --secondary-foreground: var(--foreground);
   --muted: #f2e8dd;
-  --muted-foreground: rgb(254 215 170 / 60%);
-  --empty-intake-wash: rgb(254 215 170 / 5%);
-  --empty-intake-hover: rgb(254 215 170 / 8%);
-  --empty-intake-copy: rgb(254 215 170 / 80%);
+  --muted-foreground: #755447;
+  --empty-intake-wash: rgb(255 250 242 / 62%);
+  --empty-intake-hover: rgb(255 250 242 / 84%);
+  --empty-intake-copy: rgb(42 25 20 / 80%);
+  --medication-symbol-mix: 35%;
   --accent: #120f1712;
-  --accent-foreground: #fed7aa;
+  --accent-foreground: var(--foreground);
   --destructive: #9a3412;
   --border: #d9cbbd;
-  --input: #bead9e;
-  --ring: #120f17;
+  --input: #a1846e;
+  --ring: #9a3412;
   --radius: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
     --background: #120f17;
+    --foreground: #fed7aa;
     --card: #1b171aed;
     --popover: #211b1b;
     --primary: #fff1d6;
     --secondary: #302522;
     --muted: #2b2222;
+    --muted-foreground: rgb(254 215 170 / 60%);
+    --empty-intake-wash: rgb(254 215 170 / 5%);
+    --empty-intake-hover: rgb(254 215 170 / 8%);
+    --empty-intake-copy: rgb(254 215 170 / 80%);
+    --medication-symbol-mix: 55%;
     --accent: #fff1d61a;
     --destructive: #ffbd8a;
     --border: #50423a;
@@ -134,10 +142,10 @@
   /* A static Ember wash remains visible before hydration or without WebGL. */
   background: radial-gradient(
     ellipse at 50% 45%,
-    #fed7aa,
-    #f97316 38%,
-    #9a3412 65%,
-    #120f17
+    #fffaf2,
+    #ffead1 38%,
+    #f4d5b8 65%,
+    #e8d8ce
   );
 }
 .ambient::after {
@@ -145,9 +153,18 @@
   position: absolute;
   inset: 0;
   /* Keep text readable as the gradient's light and dark areas move. */
-  background: rgb(255 247 237 / 45%);
+  background: rgb(255 247 237 / 72%);
 }
 @media (prefers-color-scheme: dark) {
+  .ambient {
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      #fed7aa,
+      #f97316 38%,
+      #9a3412 65%,
+      #120f17
+    );
+  }
   .ambient::after {
     background: rgb(18 15 23 / 45%);
   }
@@ -186,7 +203,7 @@
   z-index: -1;
   inset: -12px;
   border-radius: 24px;
-  background: rgb(18 15 23 / 92%);
+  background: rgb(239 228 216 / 40%);
   pointer-events: none;
 }
 @media (prefers-color-scheme: dark) {
@@ -216,9 +233,9 @@
     box-shadow 300ms ease;
 }
 .brand-lockup {
-  --brand-fill-start: #3f271f;
-  --brand-fill-middle: #573426;
-  --brand-fill-end: #6e402b;
+  --brand-fill-start: #32201a;
+  --brand-fill-middle: #43291f;
+  --brand-fill-end: #543021;
   --brand-gloss: #fed7aa1f;
   --brand-ink: #fed7aa;
   --brand-glow: #f973162b;
@@ -418,7 +435,7 @@
   position: relative;
   display: block;
   overflow: visible;
-  color: var(--brand-ink, #fed7aa);
+  color: var(--brand-ink, var(--foreground));
 }
 .brand-tablet-orbit {
   position: absolute;
@@ -615,9 +632,9 @@
   transform: translateY(-4px) scale(0.97);
 }
 .brand-navigation {
-  border-color: rgb(254 215 170 / 20%);
+  border-color: color-mix(in srgb, var(--foreground) 20%, transparent);
   border-radius: 14px;
-  background: rgb(42 15 10 / 92%);
+  background: color-mix(in srgb, var(--popover) 96%, transparent);
   box-shadow:
     0 12px 28px #120f1726,
     0 2px 6px #120f1714;
@@ -628,7 +645,7 @@
   content: none;
 }
 .brand-navigation-separator {
-  background: rgb(254 215 170 / 12%);
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 .brand-menu-link {
   border-radius: 8px;
@@ -637,17 +654,17 @@
   transition: background 140ms ease;
 }
 .brand-menu-link:focus-visible {
-  background: rgb(254 215 170 / 6%);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 .brand-menu-link[data-active="true"] {
-  background: rgb(254 215 170 / 12%);
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
   font-weight: 600;
 }
 .brand-menu-link[data-active="true"]:focus-visible {
-  background: rgb(254 215 170 / 18%);
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
 }
 .brand-menu-link:focus-visible {
-  outline: 2px solid rgb(254 215 170 / 80%);
+  outline: 2px solid color-mix(in srgb, var(--foreground) 80%, transparent);
   outline-offset: -2px;
 }
 .brand-menu-icon {
@@ -721,10 +738,10 @@
       0 12px 32px #120f1714;
   }
   .brand-menu-link[data-highlighted] {
-    background: rgb(254 215 170 / 6%);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
   }
   .brand-menu-link[data-active="true"][data-highlighted] {
-    background: rgb(254 215 170 / 18%);
+    background: color-mix(in srgb, var(--foreground) 18%, transparent);
   }
   .intake-log-action:not(:disabled):hover {
     background: var(--action-background);
@@ -752,12 +769,24 @@
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgb(18 15 23 / 0%) 0%,
-    rgb(18 15 23 / 10%) 25%,
-    rgb(18 15 23 / 25%) 55%,
-    rgb(18 15 23 / 40%) 80%,
-    rgb(18 15 23 / 40%) 100%
+    rgb(255 247 237 / 0%) 0%,
+    rgb(255 247 237 / 20%) 25%,
+    rgb(255 247 237 / 55%) 55%,
+    rgb(255 247 237 / 90%) 80%,
+    rgb(255 247 237 / 94%) 100%
   );
+}
+@media (prefers-color-scheme: dark) {
+  .intake-dock::before {
+    background: linear-gradient(
+      to bottom,
+      rgb(18 15 23 / 0%) 0%,
+      rgb(18 15 23 / 10%) 25%,
+      rgb(18 15 23 / 25%) 55%,
+      rgb(18 15 23 / 40%) 80%,
+      rgb(18 15 23 / 40%) 100%
+    );
+  }
 }
 .intake-dock-inner {
   max-width: 510px;
