@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "@base-ui/react/menu";
 import { ActionIcon } from "@/components/action-icon";
+import { usePwa } from "@/components/pwa-provider";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -20,6 +21,7 @@ const links = [
 
 export function HeaderNavigation({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { installed, install } = usePwa();
 
   return (
     <Menu.Root key={pathname} modal={false}>
@@ -89,6 +91,23 @@ export function HeaderNavigation({ className }: { className?: string }) {
                 );
               })}
             </Menu.Group>
+            {!installed && (
+              <>
+                <Menu.Separator className="brand-navigation-separator mx-2 my-1 h-px" />
+                <Menu.Item
+                  closeOnClick
+                  onClick={() => void install()}
+                  className="brand-menu-link flex min-h-8 w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs font-medium outline-none"
+                  data-install-app
+                >
+                  <ActionIcon
+                    name="export"
+                    className="brand-menu-icon size-4"
+                  />
+                  <span>Install app</span>
+                </Menu.Item>
+              </>
+            )}
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>

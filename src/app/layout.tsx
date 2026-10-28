@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
 import { JournalBackground } from "@/components/journal-background";
+import { PwaProvider } from "@/components/pwa-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,6 +17,15 @@ export const metadata: Metadata = {
     title: "Pill happens",
   },
   manifest: "/manifest.webmanifest",
+  icons: {
+    apple: [
+      {
+        url: "/icons/app/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
 };
 export const viewport: Viewport = {
   width: "device-width",
@@ -35,9 +45,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <JournalBackground />
-        {children}
-        <Toaster theme="system" position="top-center" richColors closeButton />
+        <PwaProvider>
+          <JournalBackground />
+          {children}
+          <Toaster
+            theme="system"
+            position="top-center"
+            richColors
+            closeButton
+          />
+        </PwaProvider>
       </body>
     </html>
   );

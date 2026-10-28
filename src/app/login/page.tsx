@@ -4,6 +4,7 @@ import { LockKeyhole } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
 import { HeadingText } from "@/components/heading-text";
 import { Brand } from "@/components/brand";
+import { InstallAppButton } from "@/components/install-app-button";
 import { configurationIssue, isAuthenticated } from "@/lib/server/auth";
 
 export const metadata: Metadata = { title: "Your private space" };
@@ -58,6 +59,9 @@ export default async function LoginPage() {
       <p className="mt-6 text-center text-xs text-muted-foreground">
         One day at a time.
       </p>
+      <div className="mt-2 flex justify-center">
+        <InstallAppButton />
+      </div>
     </main>
   );
 }
