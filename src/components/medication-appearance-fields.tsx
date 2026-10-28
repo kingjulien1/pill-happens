@@ -492,6 +492,7 @@ export function MedicationAppearanceFields({
           }
           data-appearance-preview
         >
+          <span aria-hidden="true" className="final-look-pattern" />
           <span aria-hidden="true" className="final-look-glass-blur-x" />
           <span aria-hidden="true" className="final-look-glass-blur-y" />
           <span aria-hidden="true" className="final-look-glass-band" />
@@ -534,7 +535,10 @@ export function MedicationAppearanceFields({
           </div>
           <div className="final-look-icon-stage relative flex justify-center py-5">
             <span aria-hidden="true" className="final-look-icon-halo" />
-            <span className="final-look-icon-frame relative inline-flex size-24 rounded-[28px]">
+            <span
+              className="final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover"
+              data-preview-icon-surface
+            >
               <MedicationIcon
                 color={color}
                 icon={icon}
@@ -559,7 +563,7 @@ export function MedicationAppearanceFields({
             </p>
           )}
           <div
-            className="final-look-journal relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl border border-foreground/10 bg-background/10 p-3"
+            className="final-look-journal relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl bg-popover p-3"
             data-preview-journal-row
           >
             <MedicationIcon

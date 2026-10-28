@@ -222,6 +222,19 @@
     var(--foreground)
   );
 }
+.final-look-pattern {
+  position: absolute;
+  inset: 6px;
+  border-radius: 18px;
+  background-image: radial-gradient(
+    circle,
+    var(--preview-accent) 0.65px,
+    transparent 1px
+  );
+  background-position: center;
+  background-size: 18px 18px;
+  opacity: 0.08;
+}
 .final-look-glass-band {
   display: none;
   position: absolute;
@@ -280,6 +293,7 @@
   bottom: 0;
 }
 .final-look-glass-band,
+.final-look-pattern,
 .final-look-accent-edge,
 .final-look-ambience,
 .final-look-rim,
