@@ -743,7 +743,7 @@ function JournalPreferences() {
               onChange={(e) => setTimezone(e.target.value)}
               list="timezones"
               required
-              className="h-12 rounded-xl text-base"
+              className="h-10 rounded-xl px-3 text-base md:text-sm"
             />
             <datalist id="timezones">
               {[

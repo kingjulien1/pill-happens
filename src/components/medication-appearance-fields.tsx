@@ -263,7 +263,7 @@ export function MedicationAppearanceFields({
           <div className="relative">
             <Search
               aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3.5 z-10 size-5 -translate-y-1/2 text-muted-foreground"
+              className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground"
               strokeWidth={2.75}
             />
             <Input
@@ -293,7 +293,7 @@ export function MedicationAppearanceFields({
               spellCheck={false}
               placeholder="Find its symbol…"
               enterKeyHint="search"
-              className="h-12 rounded-xl pr-11 pl-11 text-base md:text-base [&::-webkit-search-cancel-button]:appearance-none"
+              className="h-10 rounded-xl pr-10 pl-9 text-base md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
             />
             {query && (
               <button

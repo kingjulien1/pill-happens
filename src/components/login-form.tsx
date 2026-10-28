@@ -157,7 +157,7 @@ export function LoginForm() {
     <>
       <form
         onSubmit={submit}
-        className="space-y-5"
+        className="space-y-4"
         aria-busy={pending === "login"}
       >
         <div className="form-field">
@@ -181,7 +181,7 @@ export function LoginForm() {
             aria-describedby={
               error ? "password-hint login-error" : "password-hint"
             }
-            className="h-12 rounded-xl bg-background/40 px-4 text-base"
+            className="h-10 rounded-xl bg-background/40 px-3 text-base md:text-sm"
           />
           <p
             id="password-hint"

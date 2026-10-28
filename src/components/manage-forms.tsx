@@ -37,10 +37,16 @@ const forms: { value: Medication["form"]; label: string }[] = [
   { value: "drops", label: "Drops" },
   { value: "other", label: "Other" },
 ];
+const unitLabels = {
+  tablet: { singular: "tablet", plural: "Tablets" },
+  capsule: { singular: "capsule", plural: "Capsules" },
+  drops: { singular: "drop", plural: "Drops" },
+  other: { singular: "unit", plural: "Units" },
+};
 
-const inputClass = "h-12 rounded-xl px-3 text-base md:text-base";
+const inputClass = "h-10 rounded-xl px-3 text-base md:text-sm";
 const selectClass =
-  "h-12 w-full rounded-xl px-3 text-base data-[size=default]:h-12";
+  "h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10";
 const iconError = "Choose an icon or enter one emoji.";
 
 export function MedicationForm({
@@ -56,6 +62,9 @@ export function MedicationForm({
   const [strength, setStrength] = useState(
     medication ? String(medication.strengthMg) : "",
   );
+  const [defaultQuantity, setDefaultQuantity] = useState(
+    String(medication?.defaultQuantity ?? 1),
+  );
   const [form, setForm] = useState<Medication["form"]>(
     medication?.form ?? "tablet",
   );
@@ -70,12 +79,21 @@ export function MedicationForm({
     if (busy) return;
     setError(null);
     const strengthMg = Number(strength);
+    const quantity = Number(defaultQuantity);
     if (!name.trim()) {
       setError("Enter a medication name.");
       return;
     }
     if (!Number.isFinite(strengthMg) || strengthMg <= 0) {
       setError("Enter a strength greater than zero.");
+      return;
+    }
+    if (
+      !Number.isFinite(quantity) ||
+      quantity < 0.000001 ||
+      quantity > 10_000
+    ) {
+      setError("Enter an intake amount between 0.000001 and 10,000.");
       return;
     }
     if (!isMedicationIcon(icon)) {
@@ -85,7 +103,14 @@ export function MedicationForm({
     try {
       await mutate(
         medication ? `medications/${medication.id}` : "medications",
-        { name: name.trim(), strengthMg, form, color, icon },
+        {
+          name: name.trim(),
+          strengthMg,
+          defaultQuantity: quantity,
+          form,
+          color,
+          icon,
+        },
         medication ? "PATCH" : "POST",
       );
       toast.success(medication ? "Medication updated." : "Medication added.");
@@ -96,9 +121,9 @@ export function MedicationForm({
   }
 
   return (
-    <form onSubmit={save} className="flex flex-col gap-5">
-      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-5">
-        <div className="space-y-2.5">
+    <form onSubmit={save} className="flex flex-col gap-4">
+      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
+        <div className="space-y-2">
           <Label htmlFor={`${id}-name`}>Medication name</Label>
           <Input
             id={`${id}-name`}
@@ -113,33 +138,62 @@ export function MedicationForm({
           />
         </div>
 
-        <div className="space-y-2.5">
-          <Label htmlFor={`${id}-strength`}>Strength per unit (mg)</Label>
-          <Input
-            id={`${id}-strength`}
-            name="strengthMg"
-            type="number"
-            inputMode="decimal"
-            value={strength}
-            onChange={(event) => setStrength(event.target.value)}
-            placeholder="e.g. 1"
-            min="0.0001"
-            max="100000"
-            step="0.0001"
-            required
-            aria-describedby={`${id}-strength-help`}
-            className={inputClass}
-          />
-          <p
-            id={`${id}-strength-help`}
-            className="text-xs leading-relaxed text-muted-foreground"
-          >
-            The amount in one tablet, capsule, or drop. Check the packaging for
-            the exact strength.
-          </p>
+        <div
+          className="grid min-w-0 grid-cols-2 gap-3"
+          data-medication-dose-fields
+        >
+          <div className="min-w-0 space-y-2">
+            <Label htmlFor={`${id}-quantity`}>
+              {unitLabels[form].plural} per intake
+            </Label>
+            <Input
+              id={`${id}-quantity`}
+              name="defaultQuantity"
+              type="number"
+              inputMode="decimal"
+              value={defaultQuantity}
+              onChange={(event) => setDefaultQuantity(event.target.value)}
+              min="0.000001"
+              max="10000"
+              step="any"
+              required
+              aria-describedby={`${id}-quantity-help`}
+              className={inputClass}
+            />
+            <p
+              id={`${id}-quantity-help`}
+              className="text-[10px] leading-relaxed text-muted-foreground"
+            >
+              Prefills new entries.
+            </p>
+          </div>
+          <div className="min-w-0 space-y-2">
+            <Label htmlFor={`${id}-strength`}>Strength (mg)</Label>
+            <Input
+              id={`${id}-strength`}
+              name="strengthMg"
+              type="number"
+              inputMode="decimal"
+              value={strength}
+              onChange={(event) => setStrength(event.target.value)}
+              placeholder="e.g. 1"
+              min="0.0001"
+              max="100000"
+              step="0.0001"
+              required
+              aria-describedby={`${id}-strength-help`}
+              className={inputClass}
+            />
+            <p
+              id={`${id}-strength-help`}
+              className="text-[10px] leading-relaxed text-muted-foreground"
+            >
+              Per {unitLabels[form].singular}, as packaged.
+            </p>
+          </div>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <Label htmlFor={`${id}-form`}>Medication type</Label>
           <Select
             name="form"
@@ -154,7 +208,7 @@ export function MedicationForm({
           >
             <SelectTrigger
               id={`${id}-form`}
-              className="h-11 w-full rounded-xl px-3 text-sm data-[size=default]:h-11 [&>span:last-child>svg]:size-3.5"
+              className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10 [&>span:last-child>svg]:size-3.5"
             >
               <SelectValue>
                 <MedicationTypeIcon type={form} className="size-4" />
@@ -297,7 +351,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
   }
 
   return (
-    <form onSubmit={save} className="flex flex-col gap-5">
+    <form onSubmit={save} className="flex flex-col gap-4">
       <div className="rounded-xl border border-primary/10 bg-primary/5 p-3.5 text-xs leading-relaxed text-muted-foreground">
         Set a daily maximum agreed with your clinician. This is a reference for
         your journal; the app never creates an automatic taper.
@@ -311,9 +365,9 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
 
       <fieldset
         disabled={busy || medications.length === 0}
-        className="flex min-w-0 flex-col gap-5"
+        className="flex min-w-0 flex-col gap-4"
       >
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <Label htmlFor={`${id}-medication`}>Medication</Label>
           <Select
             name="medicationId"
@@ -332,7 +386,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       icon={selectedMedication.icon}
                       color={selectedMedication.color}
                       small
-                      className="size-6 rounded-md"
+                      className="size-5 rounded-md"
                     />
                     <span className="min-w-0 truncate">
                       {selectedMedication.name} ·{" "}
@@ -347,14 +401,14 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                 <SelectItem
                   key={medication.id}
                   value={medication.id}
-                  className="min-h-11 pl-3 pr-9 text-base"
+                  className="min-h-9 pl-3 pr-9 text-sm"
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <MedicationIcon
                       icon={medication.icon}
                       color={medication.color}
                       small
-                      className="size-6 rounded-md"
+                      className="size-5 rounded-md"
                     />
                     <span className="min-w-0 break-words">
                       {medication.name} · {formatDose(medication.strengthMg)} mg
@@ -366,7 +420,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           </Select>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <Label htmlFor={`${id}-limit`}>Daily maximum (mg)</Label>
           <Input
             id={`${id}-limit`}
@@ -385,7 +439,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         </div>
 
         <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
-          <div className="min-w-0 space-y-2.5">
+          <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-start`}>Starts on</Label>
             <Input
               id={`${id}-start`}
@@ -397,7 +451,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
               className={inputClass}
             />
           </div>
-          <div className="min-w-0 space-y-2.5">
+          <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-end`}>
               Ends on{" "}
               <span className="font-normal text-muted-foreground">
@@ -421,7 +475,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           to keep this goal ongoing.
         </p>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <Label htmlFor={`${id}-note`}>
             A note to yourself{" "}
             <span className="font-normal text-muted-foreground">
@@ -435,8 +489,8 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
             onChange={(event) => setNote(event.target.value)}
             placeholder="A reminder, intention, or note from your clinician…"
             maxLength={1000}
-            rows={3}
-            className="min-h-24 rounded-xl px-3 py-3 text-base md:text-base"
+            rows={2}
+            className="min-h-16 rounded-xl px-3 py-2 text-base md:text-sm"
           />
         </div>
       </fieldset>

@@ -44,7 +44,13 @@ export function IntakeForm({
   const [medicationId, setMedicationId] = useState(
     intake?.medicationId ?? medications[0]?.id ?? "",
   );
-  const [quantity, setQuantity] = useState(String(intake?.quantity ?? 1));
+  const [quantity, setQuantity] = useState(() =>
+    String(
+      intake?.quantity ??
+        medications.find((item) => item.id === medicationId)?.defaultQuantity ??
+        1,
+    ),
+  );
   const [initialTimestamp] = useState(
     () =>
       intake?.takenAt ??
@@ -125,16 +131,27 @@ export function IntakeForm({
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5">
+    <form onSubmit={submit} className="flex flex-col gap-4">
       <div className="form-field">
         <Label htmlFor="intake-medication">Medication</Label>
         <Select
           value={medicationId}
-          onValueChange={(v) => v && setMedicationId(v)}
+          onValueChange={(value) => {
+            if (!value) return;
+            setMedicationId(value);
+            if (!intake && value !== medicationId) {
+              setQuantity(
+                String(
+                  medications.find((item) => item.id === value)
+                    ?.defaultQuantity ?? 1,
+                ),
+              );
+            }
+          }}
         >
           <SelectTrigger
             id="intake-medication"
-            className="h-12 w-full rounded-xl px-3.5 text-base data-[size=default]:h-12"
+            className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10"
           >
             <SelectValue>
               {medication ? (
@@ -159,7 +176,7 @@ export function IntakeForm({
               <SelectItem
                 key={m.id}
                 value={m.id}
-                className="min-h-11 pl-3 pr-9"
+                className="min-h-9 pl-3 pr-9 text-xs"
               >
                 <span className="flex min-w-0 items-center gap-2">
                   <MedicationIcon
@@ -188,18 +205,18 @@ export function IntakeForm({
                 : `${medication?.form}s`}
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button
             type="button"
             variant="outline"
             aria-label="Decrease amount"
-            className="size-12 rounded-xl"
+            className="size-10 rounded-xl"
             disabled={Number(quantity) <= 0.25}
             onClick={() =>
               setQuantity(String(Math.max(0.25, Number(quantity) - 0.25)))
             }
           >
-            <ActionIcon name="subtract" className="size-[22px]" />
+            <ActionIcon name="subtract" className="size-4.5" />
           </Button>
           <Input
             id="intake-quantity"
@@ -208,29 +225,29 @@ export function IntakeForm({
             type="number"
             inputMode="decimal"
             min="0.000001"
-            max="1000"
+            max="10000"
             step="any"
             required
-            className="h-14 flex-1 rounded-xl text-center text-2xl! font-medium"
+            className="h-10 flex-1 rounded-xl px-3 text-center text-lg! font-medium"
           />
           <Button
             type="button"
             variant="outline"
             aria-label="Increase amount"
-            className="size-12 rounded-xl"
+            className="size-10 rounded-xl"
             onClick={() => setQuantity(String(Number(quantity) + 0.25))}
           >
-            <ActionIcon name="add" className="size-[22px]" />
+            <ActionIcon name="add" className="size-4.5" />
           </Button>
         </div>
-        <div className="mt-1 grid grid-cols-4 gap-2">
+        <div className="mt-1 grid grid-cols-4 gap-1.5">
           {[0.25, 0.5, 1, 2].map((amount) => (
             <button
               type="button"
               key={amount}
               onClick={() => setQuantity(String(amount))}
               aria-pressed={Number(quantity) === amount}
-              className={`h-10 rounded-xl border text-xs transition-colors ${Number(quantity) === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+              className={`h-8 rounded-lg border text-xs transition-colors ${Number(quantity) === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
             >
               {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
             </button>
@@ -248,7 +265,7 @@ export function IntakeForm({
       </div>
       <div className="form-field">
         <Label htmlFor="intake-time">
-          <ActionIcon name="calendar" className="mr-1 size-4.5" />
+          <ActionIcon name="calendar" className="mr-1 size-4" />
           Date & time taken
         </Label>
         <Input
@@ -258,7 +275,7 @@ export function IntakeForm({
           max={toLocalInput(new Date(), timezone)}
           onChange={(e) => setTakenAt(e.target.value)}
           required
-          className="h-12 w-full rounded-xl px-3.5 text-base"
+          className="h-10 w-full rounded-xl px-3 text-base md:text-sm"
         />
         <p className="text-[10px] leading-relaxed text-muted-foreground">
           {timezone.replaceAll("_", " ")} ·{" "}
@@ -281,7 +298,7 @@ export function IntakeForm({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           maxLength={1000}
-          className="min-h-20 resize-none rounded-xl p-3.5 text-base"
+          className="min-h-16 resize-none rounded-xl p-3 text-base md:text-sm"
         />
       </div>
       {error && (
