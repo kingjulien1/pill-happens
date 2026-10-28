@@ -108,6 +108,12 @@ test("local SVG names are allowlisted separately from Lucide and never accept pa
     "<svg><script>alert(1)</script></svg>",
     "svg:constructor",
     "svg:__proto__",
+    "svg:color:unknown",
+    "svg:color:../valium",
+    "svg:color:valium.svg",
+    "svg:color:constructor",
+    "Bromazepam",
+    "Valium",
   ]) {
     assert.equal(isMedicationIcon(value), false, value);
   }

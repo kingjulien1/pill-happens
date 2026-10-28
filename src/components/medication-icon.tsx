@@ -34,6 +34,7 @@ import {
   type MedicationIconName,
 } from "@/lib/medication-appearance";
 import { getSvgIcon } from "@/lib/svg-icon-catalog";
+import { TABLET_OUTLINE_COMPONENTS } from "@/components/tablet-icons";
 import { cn } from "@/lib/utils";
 
 const glyphs = {
@@ -73,6 +74,37 @@ export function MedicationGlyph({
     typeof icon === "string" && isMedicationIcon(icon) ? icon : "pill";
   const svgIcon = getSvgIcon(value);
   if (svgIcon) {
+    if (svgIcon.variant === "outline" && svgIcon.shape) {
+      const Tablet = TABLET_OUTLINE_COMPONENTS[svgIcon.shape];
+      return (
+        <Tablet
+          aria-hidden="true"
+          focusable="false"
+          strokeWidth={2.75}
+          className={cn("size-6 shrink-0", className)}
+          data-medication-glyph={value}
+          data-medication-svg={value}
+          data-tablet-variant="outline"
+        />
+      );
+    }
+    if (svgIcon.variant === "color") {
+      return (
+        <span
+          aria-hidden="true"
+          data-medication-glyph={value}
+          data-medication-svg={value}
+          data-tablet-variant="color"
+          className={cn("inline-flex size-6 shrink-0", className)}
+          style={{
+            backgroundImage: `url("${svgIcon.src}")`,
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+      );
+    }
     return (
       <span
         aria-hidden="true"
