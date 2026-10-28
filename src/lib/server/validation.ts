@@ -17,6 +17,10 @@ export const medicationSchema = z.object({
     .min(1, "Enter a medication name.")
     .max(100, "Keep the name under 100 characters."),
   strengthMg: positiveAmount,
+  defaultQuantity: positiveAmount
+    .min(0.000001, "Use an intake amount of at least 0.000001.")
+    .max(10_000, "This quantity is too large.")
+    .optional(),
   form: z.enum(["tablet", "capsule", "drops", "other"]),
   color: z.enum(MEDICATION_COLORS.map((color) => color.value)),
   icon: z

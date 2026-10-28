@@ -68,6 +68,58 @@ test("medications require a name and preserve user-entered fractional strengths"
   );
 });
 
+test("medication intake defaults accept fractional quantities within the log input limits", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 2,
+    form: "tablet",
+    color: "rose",
+  };
+  for (const defaultQuantity of [0.000001, 0.25, 0.5, 1, 10_000]) {
+    const result = medicationSchema.parse({ ...medication, defaultQuantity });
+    assert.equal(result.defaultQuantity, defaultQuantity);
+    assert.equal(result.strengthMg, 2);
+  }
+  for (const defaultQuantity of [
+    0,
+    -1,
+    0.0000001,
+    10_000.1,
+    Infinity,
+    NaN,
+    null,
+    "0.5",
+  ]) {
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, defaultQuantity }).success,
+      false,
+    );
+    assert.equal(
+      medicationPatchSchema.safeParse({ defaultQuantity }).success,
+      false,
+    );
+  }
+});
+
+test("legacy medications and unrelated patches do not gain or reset an intake default", () => {
+  const legacy = medicationSchema.parse({
+    name: "Legacy",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  });
+  assert.equal(Object.hasOwn(legacy, "defaultQuantity"), false);
+  assert.deepEqual(medicationPatchSchema.parse({ archived: true }), {
+    archived: true,
+  });
+  assert.deepEqual(medicationPatchSchema.parse({ name: "Renamed" }), {
+    name: "Renamed",
+  });
+  assert.deepEqual(medicationPatchSchema.parse({ defaultQuantity: 0.5 }), {
+    defaultQuantity: 0.5,
+  });
+});
+
 test("medication validation accepts every registered color and rejects unknown colors", () => {
   const medication = { name: "Example", strengthMg: 1, form: "tablet" };
   for (const { value } of MEDICATION_COLORS) {

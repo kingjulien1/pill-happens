@@ -5,6 +5,8 @@ export type Medication = {
   id: string;
   name: string;
   strengthMg: number;
+  /** Prefills new intakes; older medications use one unit. */
+  defaultQuantity?: number;
   form: "tablet" | "capsule" | "drops" | "other";
   color: MedicationColor;
   /** Missing on older records; the interface renders the default pill icon. */
