@@ -38,7 +38,7 @@ type SearchPhase = "idle" | "loading" | "ready";
 type SymbolOption = {
   value: string;
   label: string;
-  source: "Icon" | "SVG" | "Emoji";
+  source: "Icon" | "SVG" | "Color" | "Emoji";
 };
 type Look = { color: MedicationColor; icon: string };
 const surpriseIcons = [
@@ -80,7 +80,11 @@ function searchSymbols(query: string): SymbolOption[] {
     index++
   ) {
     if (icons[index]) results.push({ ...icons[index], source: "Icon" });
-    if (svgs[index]) results.push({ ...svgs[index], source: "SVG" });
+    if (svgs[index])
+      results.push({
+        ...svgs[index],
+        source: svgs[index].variant === "color" ? "Color" : "SVG",
+      });
     if (emoji[index]) results.push({ ...emoji[index], source: "Emoji" });
     if (results.length >= RESULT_LIMIT) break;
   }
@@ -116,7 +120,7 @@ function checkColor(hex: string) {
 
 function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
   const messages = {
-    idle: ["Find your symbol", "Search a word or paste an emoji."],
+    idle: ["Find your symbol", "Try a name, “outline”, or “color”."],
     loading: ["Looking around…", "Results appear when you pause typing."],
     empty: ["No matches this time", "Try a different word or an emoji."],
   };
@@ -171,7 +175,14 @@ export function MedicationAppearanceFields({
   useEffect(() => () => clearTimeout(timer.current ?? undefined), []);
   const selectedColor = getMedicationColor(color);
   const svg = getSvgIcon(icon);
-  const source = svg ? "SVG" : isMedicationLucideIcon(icon) ? "Icon" : "Emoji";
+  const fixedColor = svg?.variant === "color" ? svg.color : undefined;
+  const source = svg
+    ? svg.variant === "color"
+      ? "Color"
+      : "SVG"
+    : isMedicationLucideIcon(icon)
+      ? "Icon"
+      : "Emoji";
   const symbolLabel =
     svg?.label ??
     (source === "Icon"
@@ -355,10 +366,10 @@ export function MedicationAppearanceFields({
           )}
         </div>
         <p id={`${id}-search-help`} className="sr-only">
-          Search Lucide icons, local SVGs, and emoji in English or German. Type
-          “svg” to browse the project’s SVG collection. Results appear 2.5
-          seconds after you stop typing. Searching does not change your selected
-          icon.
+          Search component names, display names, and keywords in English or
+          German. Type “svg” for local artwork, “outline” for tablet outlines,
+          or “color” for flat-color tablets. Results appear 2.5 seconds after
+          you stop typing. Searching does not change your selected icon.
         </p>
         <p role="status" aria-live="polite" className="sr-only">
           {phase === "loading"
@@ -462,11 +473,21 @@ export function MedicationAppearanceFields({
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full"
-                style={{ backgroundColor: selectedColor.hex }}
+                style={{
+                  backgroundColor: fixedColor?.hex ?? selectedColor.hex,
+                }}
               />
-              {selectedColor.label}
+              {fixedColor?.name ?? selectedColor.label}
             </span>
-            <span>{source === "SVG" ? "Project SVG" : source}</span>
+            <span>
+              {source === "Color"
+                ? "Color SVG"
+                : svg?.variant === "outline"
+                  ? "Outline SVG"
+                  : source === "SVG"
+                    ? "Project SVG"
+                    : source}
+            </span>
           </div>
           <div className="relative flex justify-center py-5">
             <MedicationIcon
@@ -481,6 +502,15 @@ export function MedicationAppearanceFields({
           >
             {symbolLabel}
           </p>
+          {fixedColor && (
+            <p className="relative mt-1 text-center text-[10px] text-muted-foreground">
+              Fixed tablet color
+              <span className="mx-1.5" aria-hidden="true">
+                /
+              </span>
+              {selectedColor.label} accent
+            </p>
+          )}
           <div
             className="relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl border border-foreground/10 bg-background/10 p-3"
             data-preview-journal-row
