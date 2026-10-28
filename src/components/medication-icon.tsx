@@ -1,6 +1,9 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { lazy, Suspense, type CSSProperties } from "react";
 import {
   CircleDot,
+  CircleDashed,
   Cloud,
   Coffee,
   Droplet,
@@ -27,6 +30,7 @@ import type { Medication } from "@/lib/domain";
 import {
   getMedicationColor,
   isMedicationIcon,
+  isMedicationLucideIcon,
   type MedicationIconName,
 } from "@/lib/medication-appearance";
 import { cn } from "@/lib/utils";
@@ -52,7 +56,9 @@ const glyphs = {
   zap: Zap,
   "circle-dot": CircleDot,
   gem: Gem,
-} satisfies Record<MedicationIconName, LucideIcon>;
+} satisfies Partial<Record<MedicationIconName, LucideIcon>>;
+
+const DynamicMedicationGlyph = lazy(() => import("./dynamic-medication-glyph"));
 
 /** Names and emoji are validated before rendering; emoji stay plain text. */
 export function MedicationGlyph({
@@ -64,7 +70,7 @@ export function MedicationGlyph({
 }) {
   const value =
     typeof icon === "string" && isMedicationIcon(icon) ? icon : "pill";
-  const Glyph = glyphs[value as MedicationIconName];
+  const Glyph = glyphs[value as keyof typeof glyphs];
 
   if (Glyph) {
     return (
@@ -75,6 +81,30 @@ export function MedicationGlyph({
         className={cn("size-6 shrink-0", className)}
         data-medication-glyph={value}
       />
+    );
+  }
+
+  if (isMedicationLucideIcon(value) && value !== "capsule") {
+    return (
+      <span
+        aria-hidden="true"
+        data-medication-glyph={value}
+        className={cn("inline-flex size-6 shrink-0", className)}
+      >
+        <Suspense
+          fallback={
+            <CircleDashed
+              aria-hidden="true"
+              focusable="false"
+              strokeWidth={2.75}
+              className="size-full opacity-40"
+              data-glyph-loading
+            />
+          }
+        >
+          <DynamicMedicationGlyph name={value} />
+        </Suspense>
+      </span>
     );
   }
 

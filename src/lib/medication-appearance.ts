@@ -1,3 +1,5 @@
+import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
+
 /** Appearance values are persisted in medication records; keep legacy keys stable. */
 export const MEDICATION_COLORS = [
   { value: "rose", label: "Ember", hex: "#f97316" },
@@ -29,26 +31,9 @@ export const MEDICATION_COLORS = [
 export type MedicationColor = (typeof MEDICATION_COLORS)[number]["value"];
 
 export const MEDICATION_ICON_NAMES = [
-  "pill",
-  "tablets",
+  ...LUCIDE_ICON_NAMES,
+  // Historical records use this name for the PillBottle drawing.
   "capsule",
-  "droplet",
-  "syringe",
-  "flask-conical",
-  "heart",
-  "sparkles",
-  "sun",
-  "moon",
-  "flower-2",
-  "leaf",
-  "star",
-  "cloud",
-  "coffee",
-  "smile",
-  "shield-check",
-  "zap",
-  "circle-dot",
-  "gem",
 ] as const;
 
 export type MedicationIconName = (typeof MEDICATION_ICON_NAMES)[number];
@@ -64,10 +49,16 @@ const flagEmoji = /^\p{Regional_Indicator}{2}$/u;
 const keycapEmoji = /^[#*0-9]\uFE0F?\u20E3$/u;
 const tagFlagEmoji = /^\u{1F3F4}[\u{E0061}-\u{E007A}]{2,7}\u{E007F}$/u;
 
+export function isMedicationLucideIcon(
+  value: string,
+): value is MedicationIconName {
+  return iconNames.has(value);
+}
+
 /** Accept one allowlisted Lucide name or one bounded emoji grapheme, never markup. */
 export function isMedicationIcon(value: string): boolean {
   if (!value || value.length > 64) return false;
-  if (iconNames.has(value)) return true;
+  if (isMedicationLucideIcon(value)) return true;
   if (Array.from(graphemes.segment(value)).length !== 1) return false;
   return (
     pictographicEmoji.test(value) ||

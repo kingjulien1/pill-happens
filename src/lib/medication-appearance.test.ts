@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getMedicationColor,
   isMedicationIcon,
+  isMedicationLucideIcon,
   MEDICATION_COLORS,
   MEDICATION_ICON_NAMES,
 } from "./medication-appearance";
@@ -38,13 +39,34 @@ test("appearance fallbacks safely render existing medication records", () => {
   assert.equal(getMedicationColor("unknown-color"), MEDICATION_COLORS[0]);
 });
 
-test("all supported Lucide names are accepted without opening arbitrary icon names", () => {
-  assert.equal(MEDICATION_ICON_NAMES.length, 20);
+test("the expanded Lucide allowlist retains legacy names and rejects arbitrary names", () => {
+  assert.ok(MEDICATION_ICON_NAMES.length > 1_500);
+  assert.equal(
+    new Set(MEDICATION_ICON_NAMES).size,
+    MEDICATION_ICON_NAMES.length,
+  );
   for (const name of MEDICATION_ICON_NAMES)
     assert.equal(isMedicationIcon(name), true, name);
-  for (const name of ["Pill", "pill-icon", "unknown-icon", "pill heart"]) {
+  for (const name of [
+    "capsule",
+    "flower-2",
+    "circle-dot",
+    "bird",
+    "guitar",
+    "squirrel",
+  ])
+    assert.equal(isMedicationLucideIcon(name), true, name);
+  for (const name of [
+    "Pill",
+    "pill-icon",
+    "unknown-icon",
+    "pill heart",
+    "../pill",
+    "constructor",
+    "__proto__",
+  ])
     assert.equal(isMedicationIcon(name), false, name);
-  }
+  assert.equal(isMedicationLucideIcon("💊"), false);
 });
 
 test("one emoji can include variation selectors, skin tone, ZWJ, flags, and keycaps", () => {
