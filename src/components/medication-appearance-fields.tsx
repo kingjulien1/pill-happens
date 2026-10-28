@@ -1,16 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import {
-  Check,
-  Eye,
-  Palette,
-  Search,
-  Shapes,
-  Shuffle,
-  Undo2,
-  X,
-} from "lucide-react";
+import { Check, Eye, Search, Shuffle, Undo2, X } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
 import { Input } from "@/components/ui/input";
@@ -34,6 +25,9 @@ import { cn } from "@/lib/utils";
 
 const SEARCH_DELAY = 2500;
 const RESULT_LIMIT = 96;
+const pickerPanelClass =
+  "relative h-[134px] w-full overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-foreground/[.025] [scrollbar-gutter:stable]";
+const pickerGridClass = "grid grid-cols-8 gap-1 p-2 max-[359px]:grid-cols-6";
 type SearchPhase = "idle" | "loading" | "ready";
 type SymbolOption = {
   value: string;
@@ -126,16 +120,16 @@ function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
   };
   return (
     <div
-      className="flex h-full flex-col items-center justify-center gap-2.5 px-4 text-center"
+      className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center"
       data-symbol-state={phase}
     >
       <span
         className={cn(
-          "flex size-14 items-center justify-center rounded-2xl bg-foreground/5 text-foreground/80",
+          "flex size-11 items-center justify-center rounded-xl bg-foreground/5 text-foreground/80",
           phase === "loading" && "motion-safe:animate-pulse",
         )}
       >
-        <ActionIcon name="discover" weight="duotone" className="size-10" />
+        <ActionIcon name="discover" weight="duotone" className="size-8" />
       </span>
       <div>
         <p className="text-xs font-medium">{messages[phase][0]}</p>
@@ -166,6 +160,7 @@ export function MedicationAppearanceFields({
 }) {
   const id = useId();
   const searchInput = useRef<HTMLInputElement>(null);
+  const colorPanel = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const composing = useRef(false);
   const [query, setQuery] = useState("");
@@ -173,6 +168,17 @@ export function MedicationAppearanceFields({
   const [results, setResults] = useState<SymbolOption[]>([]);
   const [undo, setUndo] = useState<Look | null>(null);
   useEffect(() => () => clearTimeout(timer.current ?? undefined), []);
+  useEffect(() => {
+    const panel = colorPanel.current;
+    const tile =
+      panel?.querySelector<HTMLInputElement>("input:checked")?.parentElement;
+    if (!panel || !tile) return;
+    const top = tile.offsetTop;
+    const bottom = top + tile.offsetHeight;
+    if (top < panel.scrollTop + 8) panel.scrollTop = Math.max(0, top - 8);
+    else if (bottom > panel.scrollTop + panel.clientHeight - 8)
+      panel.scrollTop = bottom - panel.clientHeight + 8;
+  }, [color]);
   const selectedColor = getMedicationColor(color);
   const svg = getSvgIcon(icon);
   const fixedColor = svg?.variant === "color" ? svg.color : undefined;
@@ -232,207 +238,241 @@ export function MedicationAppearanceFields({
       className="medication-appearance w-full min-w-0 space-y-5"
       data-medication-appearance
     >
-      <fieldset className="w-full min-w-0">
-        <legend className="mb-3 w-full">
-          <span className="flex w-full items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-2 text-[13px] font-[550]">
-              <Palette
-                aria-hidden="true"
-                className="size-5 shrink-0"
-                strokeWidth={2.75}
-                data-appearance-section-icon
-              />
-              Appearance
-            </span>
-            <span className="text-[10px] font-normal text-muted-foreground">
-              24 colors
-            </span>
-          </span>
-        </legend>
-        <div className="grid w-full grid-cols-8 gap-1" data-appearance-colors>
-          {MEDICATION_COLORS.map((item) => (
-            <div key={item.value} className="relative min-w-0">
-              <input
-                type="radio"
-                id={`${id}-color-${item.value}`}
-                name={`${id}-color`}
-                value={item.value}
-                checked={color === item.value}
-                onChange={() => chooseColor(item.value)}
-                aria-label={`${item.label} medication color`}
-                data-medication-color={item.value}
-                className="peer sr-only"
-              />
-              <label
-                htmlFor={`${id}-color-${item.value}`}
-                title={item.label}
-                className={cn(
-                  "flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-transparent transition-colors hover:bg-foreground/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background peer-disabled:pointer-events-none peer-disabled:opacity-40",
-                  color === item.value &&
-                    "border-foreground/40 bg-foreground/5",
-                )}
-              >
-                <span
-                  className="flex size-5 items-center justify-center rounded-full border border-black/10"
-                  style={{
-                    backgroundColor: item.hex,
-                    color: checkColor(item.hex),
-                  }}
-                >
-                  {color === item.value && (
-                    <Check
-                      className="size-3"
-                      strokeWidth={3}
-                      aria-hidden="true"
-                    />
-                  )}
-                </span>
-              </label>
-            </div>
-          ))}
-        </div>
-      </fieldset>
-
-      <div aria-hidden="true" className="mx-auto h-px w-4/5 bg-foreground/15" />
-
-      <section
-        aria-labelledby={`${id}-search-title`}
-        className="w-full min-w-0 space-y-3"
-      >
-        <h3
-          id={`${id}-search-title`}
-          className="flex items-center justify-between gap-3 text-[13px] font-[550]"
-        >
-          <span className="inline-flex items-center gap-2">
-            <Shapes
-              aria-hidden="true"
-              className="size-5 shrink-0"
-              strokeWidth={2.75}
-              data-appearance-section-icon
-            />
-            Find a symbol
-          </span>
-          <span className="text-[10px] font-normal text-muted-foreground">
-            Lucide · SVG · Emoji
-          </span>
+      <header className="space-y-1.5">
+        <h3 id={`${id}-appearance-title`} className="text-[13px] font-[550]">
+          Appearance
         </h3>
-        <div className="relative">
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-3.5 z-10 size-5 -translate-y-1/2 text-muted-foreground"
-            strokeWidth={2.75}
-          />
-          <Input
-            ref={searchInput}
-            id={`${id}-search`}
-            type="search"
-            value={query}
-            onChange={(event) => updateQuery(event.target.value)}
-            onCompositionStart={() => {
-              composing.current = true;
-              clearTimeout(timer.current ?? undefined);
-              timer.current = null;
-              setResults([]);
-              setPhase(query.trim() ? "loading" : "idle");
-            }}
-            onCompositionEnd={(event) => {
-              composing.current = false;
-              updateQuery(event.currentTarget.value);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") event.preventDefault();
-            }}
-            aria-label="Search icons, SVGs, and emoji"
-            aria-describedby={`${id}-search-help`}
-            aria-controls={`${id}-results`}
-            autoComplete="off"
-            spellCheck={false}
-            placeholder="Try heart, leaf, svg…"
-            enterKeyHint="search"
-            className="h-12 rounded-xl pr-11 pl-11 text-base md:text-base [&::-webkit-search-cancel-button]:appearance-none"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => {
-                updateQuery("");
-                searchInput.current?.focus();
-              }}
-              aria-label="Clear icon search"
-              className="absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
-            >
-              <X className="size-4" strokeWidth={2.75} aria-hidden="true" />
-            </button>
-          )}
-        </div>
-        <p id={`${id}-search-help`} className="sr-only">
-          Search component names, display names, and keywords in English or
-          German. Type “svg” for local artwork, “outline” for tablet outlines,
-          or “color” for flat-color tablets. Results appear 2.5 seconds after
-          you stop typing. Searching does not change your selected icon.
-        </p>
-        <p role="status" aria-live="polite" className="sr-only">
-          {phase === "loading"
-            ? "Searching icons, SVGs, and emoji."
-            : phase === "ready"
-              ? `${results.length}${results.length === RESULT_LIMIT ? " or more" : ""} symbols found.`
-              : "Search for an icon or emoji."}
-        </p>
-        <div
-          id={`${id}-results`}
-          className="h-44 w-full overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-foreground/[.025]"
-          aria-busy={phase === "loading"}
-          data-appearance-results
+        <p
+          id={`${id}-appearance-description`}
+          className="text-[11px] leading-relaxed text-muted-foreground"
         >
-          {phase !== "ready" || !results.length ? (
-            <SearchState phase={phase === "ready" ? "empty" : phase} />
-          ) : (
-            <div
-              role="radiogroup"
-              aria-label="Icon search results"
-              className="grid grid-cols-8 gap-1 p-2 max-[359px]:grid-cols-6"
+          Choose a symbol and a color that feel like yours. A familiar look
+          makes this medication easier to spot.
+        </p>
+      </header>
+
+      <div className="space-y-4">
+        <section
+          aria-label="Medication symbol"
+          className="w-full min-w-0 space-y-2"
+        >
+          <div className="relative">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-3.5 z-10 size-5 -translate-y-1/2 text-muted-foreground"
+              strokeWidth={2.75}
+            />
+            <Input
+              ref={searchInput}
+              id={`${id}-search`}
+              type="search"
+              value={query}
+              onChange={(event) => updateQuery(event.target.value)}
+              onCompositionStart={() => {
+                composing.current = true;
+                clearTimeout(timer.current ?? undefined);
+                timer.current = null;
+                setResults([]);
+                setPhase(query.trim() ? "loading" : "idle");
+              }}
+              onCompositionEnd={(event) => {
+                composing.current = false;
+                updateQuery(event.currentTarget.value);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.preventDefault();
+              }}
+              aria-label="Search icons, SVGs, and emoji"
+              aria-describedby={`${id}-appearance-description ${id}-search-help`}
+              aria-controls={`${id}-results`}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="Find its symbol…"
+              enterKeyHint="search"
+              className="h-12 rounded-xl pr-11 pl-11 text-base md:text-base [&::-webkit-search-cancel-button]:appearance-none"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => {
+                  updateQuery("");
+                  searchInput.current?.focus();
+                }}
+                aria-label="Clear icon search"
+                className="absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
+              >
+                <X className="size-4" strokeWidth={2.75} aria-hidden="true" />
+              </button>
+            )}
+          </div>
+          <p id={`${id}-search-help`} className="sr-only">
+            Search component names, display names, and keywords in English or
+            German. Type “svg” for local artwork, “outline” for tablet outlines,
+            or “color” for flat-color tablets. Results appear 2.5 seconds after
+            you stop typing. Searching does not change your selected icon.
+          </p>
+          <p role="status" aria-live="polite" className="sr-only">
+            {phase === "loading"
+              ? "Searching icons, SVGs, and emoji."
+              : phase === "ready"
+                ? `${results.length}${results.length === RESULT_LIMIT ? " or more" : ""} icons found for “${query.trim()}”.`
+                : "Search for an icon or emoji."}
+          </p>
+          <div
+            className="flex min-h-4 items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
+            data-appearance-symbol-header
+          >
+            <span className="shrink-0">Lucide · SVG · Emoji</span>
+            <span
+              className="flex min-w-0 items-center justify-end gap-1 text-right"
+              data-appearance-search-status
             >
-              {results.map((item) => (
-                <div
-                  key={`${item.source}-${item.value}`}
-                  className="relative min-w-0"
-                >
+              {phase === "idle" ? (
+                "Your move"
+              ) : phase === "loading" ? (
+                "On it…"
+              ) : (
+                <>
+                  <span className="shrink-0 font-[550] tabular-nums">
+                    {results.length}
+                    {results.length === RESULT_LIMIT ? "+" : ""}
+                  </span>
+                  <span className="shrink-0">
+                    {results.length === 1 ? "icon" : "icons"} for
+                  </span>
+                  <span className="truncate" title={query.trim()}>
+                    “{query.trim()}”
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
+          <div
+            id={`${id}-results`}
+            className={pickerPanelClass}
+            aria-busy={phase === "loading"}
+            data-appearance-results
+          >
+            {phase !== "ready" || !results.length ? (
+              <SearchState phase={phase === "ready" ? "empty" : phase} />
+            ) : (
+              <div
+                role="radiogroup"
+                aria-label="Icon search results"
+                className={pickerGridClass}
+              >
+                {results.map((item) => (
+                  <div
+                    key={`${item.source}-${item.value}`}
+                    className="relative min-w-0"
+                  >
+                    <input
+                      type="radio"
+                      id={`${id}-symbol-${item.source}-${item.value}`}
+                      name={`${id}-symbol`}
+                      value={item.value}
+                      checked={icon === item.value}
+                      onChange={() => chooseIcon(item.value)}
+                      aria-label={`${item.label} · ${item.source}`}
+                      data-medication-icon={item.value}
+                      data-symbol-source={item.source}
+                      className="peer sr-only"
+                    />
+                    <label
+                      htmlFor={`${id}-symbol-${item.source}-${item.value}`}
+                      title={`${item.label} · ${item.source}`}
+                      className={cn(
+                        "relative flex h-9 w-full cursor-pointer items-center justify-center rounded-lg border border-transparent text-foreground/80 transition-colors hover:bg-foreground/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background peer-disabled:pointer-events-none peer-disabled:opacity-40",
+                        icon === item.value &&
+                          "border-foreground/40 bg-foreground/10 text-foreground",
+                      )}
+                    >
+                      <MedicationGlyph icon={item.value} className="size-5" />
+                      {icon === item.value && (
+                        <Check
+                          aria-hidden="true"
+                          className="absolute top-0.5 right-0.5 size-2.5"
+                          strokeWidth={3}
+                        />
+                      )}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <fieldset className="w-full min-w-0 space-y-2">
+          <legend className="sr-only">Medication color</legend>
+          <div
+            className="flex min-h-4 items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
+            data-appearance-color-header
+          >
+            <span className="shrink-0">Color palette</span>
+            <span className="flex min-w-0 items-center justify-end gap-1 text-right">
+              <span className="shrink-0 font-[550] tabular-nums">
+                {MEDICATION_COLORS.length}
+              </span>
+              <span className="shrink-0">shades</span>
+              <span className="mx-0.5 shrink-0" aria-hidden="true">
+                ·
+              </span>
+              <span className="truncate" title={selectedColor.label}>
+                {selectedColor.label}
+              </span>
+            </span>
+          </div>
+          <div
+            ref={colorPanel}
+            className={pickerPanelClass}
+            data-appearance-color-results
+          >
+            <div className={pickerGridClass} data-appearance-colors>
+              {MEDICATION_COLORS.map((item) => (
+                <div key={item.value} className="relative min-w-0">
                   <input
                     type="radio"
-                    id={`${id}-symbol-${item.source}-${item.value}`}
-                    name={`${id}-symbol`}
+                    id={`${id}-color-${item.value}`}
+                    name={`${id}-color`}
                     value={item.value}
-                    checked={icon === item.value}
-                    onChange={() => chooseIcon(item.value)}
-                    aria-label={`${item.label} · ${item.source}`}
-                    data-medication-icon={item.value}
-                    data-symbol-source={item.source}
+                    checked={color === item.value}
+                    onChange={() => chooseColor(item.value)}
+                    aria-label={`${item.label} medication color`}
+                    data-medication-color={item.value}
                     className="peer sr-only"
                   />
                   <label
-                    htmlFor={`${id}-symbol-${item.source}-${item.value}`}
-                    title={`${item.label} · ${item.source}`}
+                    htmlFor={`${id}-color-${item.value}`}
+                    title={item.label}
                     className={cn(
-                      "relative flex h-9 w-full cursor-pointer items-center justify-center rounded-lg border border-transparent text-foreground/80 transition-colors hover:bg-foreground/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background peer-disabled:pointer-events-none peer-disabled:opacity-40",
-                      icon === item.value &&
-                        "border-foreground/40 bg-foreground/10 text-foreground",
+                      "flex h-9 w-full cursor-pointer items-center justify-center rounded-lg border border-transparent transition-colors hover:bg-foreground/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background peer-disabled:pointer-events-none peer-disabled:opacity-40",
+                      color === item.value &&
+                        "border-foreground/40 bg-foreground/5",
                     )}
                   >
-                    <MedicationGlyph icon={item.value} className="size-5" />
-                    {icon === item.value && (
-                      <Check
-                        aria-hidden="true"
-                        className="absolute top-0.5 right-0.5 size-2.5"
-                        strokeWidth={3}
-                      />
-                    )}
+                    <span
+                      className="flex size-5 items-center justify-center rounded-full border border-black/10 dark:border-foreground/20"
+                      style={{
+                        backgroundColor: item.hex,
+                        color: checkColor(item.hex),
+                      }}
+                    >
+                      {color === item.value && (
+                        <Check
+                          className="size-3"
+                          strokeWidth={3}
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
                   </label>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </fieldset>
+      </div>
 
       <div aria-hidden="true" className="mx-auto h-px w-4/5 bg-foreground/15" />
 
