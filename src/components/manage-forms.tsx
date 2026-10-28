@@ -174,6 +174,9 @@ export function MedicationForm({
         <MedicationAppearanceFields
           color={color}
           icon={icon}
+          name={name}
+          strength={strength}
+          medicationType={form}
           onColorChange={setColor}
           onIconChange={(value) => {
             setIcon(value);

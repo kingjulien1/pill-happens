@@ -40,6 +40,7 @@ import { SunHorizonIcon } from "@phosphor-icons/react/dist/ssr/SunHorizon";
 import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ClockCounterClockwise";
 import { FirstAidKitIcon } from "@phosphor-icons/react/dist/ssr/FirstAidKit";
 import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
+import { BinocularsIcon } from "@phosphor-icons/react/dist/ssr/Binoculars";
 import { cn } from "@/lib/utils";
 
 const icons = {
@@ -85,6 +86,7 @@ const icons = {
   navHistory: ClockCounterClockwiseIcon,
   navMedications: FirstAidKitIcon,
   navGoals: TargetIcon,
+  discover: BinocularsIcon,
 } as const;
 
 export type ActionIconName = keyof typeof icons;
