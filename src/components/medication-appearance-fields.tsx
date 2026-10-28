@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { Check, Eye, Search, Shuffle, Undo2, X } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
@@ -498,16 +498,17 @@ export function MedicationAppearanceFields({
           </span>
         </h3>
         <div
-          className="relative w-full overflow-hidden rounded-3xl border border-foreground/15 bg-foreground/[.025] p-4"
+          className="final-look-showcase relative w-full overflow-hidden rounded-3xl border border-foreground/15 bg-foreground/[.025] p-4"
+          style={
+            {
+              "--preview-accent": selectedColor.hex,
+              "--preview-pigment": fixedColor?.hex ?? selectedColor.hex,
+            } as CSSProperties
+          }
           data-appearance-preview
         >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-44"
-            style={{
-              background: `radial-gradient(ellipse at 50% 45%, ${selectedColor.hex}26, transparent 68%)`,
-            }}
-          />
+          <span aria-hidden="true" className="final-look-ambience" />
+          <span aria-hidden="true" className="final-look-rim" />
           <div className="relative flex items-center justify-between gap-3 text-[10px] text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <span
@@ -529,12 +530,16 @@ export function MedicationAppearanceFields({
                     : source}
             </span>
           </div>
-          <div className="relative flex justify-center py-5">
-            <MedicationIcon
-              color={color}
-              icon={icon}
-              className="size-24 rounded-[28px] ring-1 ring-foreground/10 [&_[data-medication-glyph]]:size-12"
-            />
+          <div className="final-look-icon-stage relative flex justify-center py-5">
+            <span aria-hidden="true" className="final-look-icon-halo" />
+            <span className="final-look-icon-frame relative inline-flex size-24 rounded-[28px]">
+              <MedicationIcon
+                color={color}
+                icon={icon}
+                className="size-24 rounded-[28px] ring-1 ring-foreground/10 [&_[data-medication-glyph]]:size-12"
+              />
+              <span aria-hidden="true" className="final-look-icon-rim" />
+            </span>
           </div>
           <p
             className="relative text-center text-xs font-medium"
@@ -552,7 +557,7 @@ export function MedicationAppearanceFields({
             </p>
           )}
           <div
-            className="relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl border border-foreground/10 bg-background/10 p-3"
+            className="final-look-journal relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl border border-foreground/10 bg-background/10 p-3"
             data-preview-journal-row
           >
             <MedicationIcon
