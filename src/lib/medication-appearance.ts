@@ -1,4 +1,5 @@
 import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
+import { TAILWIND_MEDICATION_COLORS } from "./medication-palette";
 import { isMedicationSvgIcon } from "./svg-icon-catalog";
 
 /** Appearance values are persisted in medication records; keep legacy keys stable. */
@@ -27,6 +28,7 @@ export const MEDICATION_COLORS = [
   { value: "plum", label: "Plum", hex: "#86198f" },
   { value: "slate", label: "Slate", hex: "#64748b" },
   { value: "ink", label: "Ink", hex: "#334155" },
+  ...TAILWIND_MEDICATION_COLORS,
 ] as const;
 
 export type MedicationColor = (typeof MEDICATION_COLORS)[number]["value"];
