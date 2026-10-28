@@ -7,9 +7,12 @@ import {
   isJournalId,
   isSameOriginRequest,
   journalFromSessionToken,
+  journalSessionFromToken,
   LEGACY_JOURNAL_ID,
   passwordMatchesValue,
+  renewJournalSessionToken,
   SESSION_MAX_AGE,
+  SESSION_RENEW_INTERVAL,
   verifySessionToken,
 } from "./security";
 
@@ -329,6 +332,148 @@ test("scoped sessions identify only their signed journal without including passw
     );
     assert.equal(payload.includes(credentials.password), false);
     assert.equal(payload.includes(credentials.secret), false);
+  }
+});
+
+test("persistent sessions last 400 days and expose expiry only for an authenticated scope", () => {
+  assert.equal(SESSION_MAX_AGE, 400 * 24 * 60 * 60);
+  assert.equal(SESSION_RENEW_INTERVAL, 24 * 60 * 60);
+  const expectedExpiry = Math.floor(now / 1000) + SESSION_MAX_AGE;
+  for (const journalId of ["personal", journalA, journalB]) {
+    const token = createJournalSessionToken(journalId, credentials, now);
+    assert.deepEqual(journalSessionFromToken(token, credentials, now), {
+      journalId,
+      expiresAt: expectedExpiry,
+    });
+    assert.equal(
+      journalSessionFromToken(token, credentials, now + SESSION_MAX_AGE * 1000),
+      null,
+    );
+    assert.equal(
+      journalSessionFromToken(
+        token,
+        { ...credentials, secret: "a-different-valid-secret-for-testing" },
+        now,
+      ),
+      null,
+    );
+  }
+});
+
+test("rolling renewal extends a valid session at the daily boundary and keeps its journal", () => {
+  for (const journalId of ["personal", journalA, journalB]) {
+    const token = createJournalSessionToken(journalId, credentials, now);
+    assert.equal(renewJournalSessionToken(token, credentials, now), null);
+    assert.equal(
+      renewJournalSessionToken(
+        token,
+        credentials,
+        now + SESSION_RENEW_INTERVAL * 1000 - 1,
+      ),
+      null,
+    );
+    const refreshedAt = now + SESSION_RENEW_INTERVAL * 1000;
+    const renewed = renewJournalSessionToken(token, credentials, refreshedAt);
+    assert.ok(renewed);
+    assert.notEqual(renewed, token);
+    assert.deepEqual(
+      journalSessionFromToken(renewed, credentials, refreshedAt),
+      {
+        journalId,
+        expiresAt: Math.floor(refreshedAt / 1000) + SESSION_MAX_AGE,
+      },
+    );
+    assert.equal(
+      renewJournalSessionToken(renewed, credentials, refreshedAt),
+      null,
+    );
+    assert.equal(
+      journalFromSessionToken(
+        renewed,
+        credentials,
+        now + SESSION_MAX_AGE * 1000,
+      ),
+      journalId,
+    );
+  }
+});
+
+test("existing short-lived legacy and scoped sessions upgrade without changing their journal", () => {
+  const thirtyDays = 30 * 24 * 60 * 60;
+  const earlierIssue = now - (SESSION_MAX_AGE - thirtyDays) * 1000;
+  const oldTokens = [
+    [createSessionToken(credentials, earlierIssue), "personal"],
+    ...["personal", journalA, journalB].map((journalId) => [
+      createJournalSessionToken(journalId, credentials, earlierIssue),
+      journalId,
+    ]),
+  ];
+  for (const [token, journalId] of oldTokens) {
+    assert.deepEqual(journalSessionFromToken(token, credentials, now), {
+      journalId,
+      expiresAt: Math.floor(now / 1000) + thirtyDays,
+    });
+    const renewed = renewJournalSessionToken(token, credentials, now);
+    assert.ok(renewed);
+    assert.deepEqual(journalSessionFromToken(renewed, credentials, now), {
+      journalId,
+      expiresAt: Math.floor(now / 1000) + SESSION_MAX_AGE,
+    });
+    assert.equal(verifySessionToken(renewed, credentials, now), false);
+  }
+});
+
+test("expired, tampered, malformed, and revoked sessions cannot be renewed", () => {
+  const issuedAt = now - SESSION_RENEW_INTERVAL * 1000;
+  for (const token of [
+    createSessionToken(credentials, issuedAt),
+    createJournalSessionToken("personal", credentials, issuedAt),
+    createJournalSessionToken(journalA, credentials, issuedAt),
+  ]) {
+    assert.equal(
+      renewJournalSessionToken(
+        token,
+        credentials,
+        issuedAt + SESSION_MAX_AGE * 1000,
+      ),
+      null,
+    );
+    const [payload, signature] = token.split(".");
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    const changed = Buffer.from(
+      JSON.stringify({ ...data, exp: data.exp + 1 }),
+    ).toString("base64url");
+    for (const invalid of [
+      "",
+      "x.x",
+      `${payload}.`,
+      `${payload}.${signature}.extra`,
+      `${changed}.${signature}`,
+      "a".repeat(1025),
+    ]) {
+      assert.equal(renewJournalSessionToken(invalid, credentials, now), null);
+    }
+    assert.equal(
+      renewJournalSessionToken(
+        token,
+        { ...credentials, secret: `${credentials.secret}-rotated` },
+        now,
+      ),
+      null,
+    );
+  }
+  for (const token of [
+    createSessionToken(credentials, issuedAt),
+    createJournalSessionToken("personal", credentials, issuedAt),
+  ]) {
+    assert.equal(
+      renewJournalSessionToken(
+        token,
+        { ...credentials, password: "a-new-owner-password" },
+        now,
+      ),
+      null,
+    );
   }
 });
 

@@ -6,7 +6,9 @@ import {
 } from "node:crypto";
 
 // Pure primitives: actual environment values are supplied only by server-only auth.ts.
-export const SESSION_MAX_AGE = 30 * 24 * 60 * 60;
+// Persistent cookies are capped at 400 days by modern browsers.
+export const SESSION_MAX_AGE = 400 * 24 * 60 * 60;
+export const SESSION_RENEW_INTERVAL = 24 * 60 * 60;
 export const MIN_PASSWORD_LENGTH = 4;
 export const LEGACY_JOURNAL_ID = "personal";
 
@@ -221,12 +223,17 @@ export function createJournalSessionToken(
   return `${payload}.${signature}`;
 }
 
-/** Untrusted cookies never choose a journal until their scope is authenticated. */
-export function journalFromSessionToken(
+export type VerifiedJournalSession = {
+  journalId: string;
+  expiresAt: number;
+};
+
+/** Return expiry metadata only after the signed scope has been authenticated. */
+export function journalSessionFromToken(
   token: string,
   credentials: Credentials,
   now = Date.now(),
-): string | null {
+): VerifiedJournalSession | null {
   if (token.length > 1024) return null;
   const [payload, signature, extra] = token.split(".");
   if (
@@ -243,9 +250,16 @@ export function journalFromSessionToken(
     );
     if (!data || typeof data !== "object" || !("v" in data)) return null;
     if (data.v === 1) {
-      return verifySessionToken(token, credentials, now)
-        ? LEGACY_JOURNAL_ID
-        : null;
+      if (
+        !verifySessionToken(token, credentials, now) ||
+        !("exp" in data) ||
+        typeof data.exp !== "number"
+      )
+        return null;
+      return {
+        journalId: LEGACY_JOURNAL_ID,
+        expiresAt: data.exp,
+      };
     }
     if (
       data.v !== 2 ||
@@ -274,8 +288,30 @@ export function journalFromSessionToken(
       !timingSafeEqual(expected, supplied)
     )
       return null;
-    return data.journalId;
+    return { journalId: data.journalId, expiresAt: data.exp };
   } catch {
     return null;
   }
+}
+
+/** Untrusted cookies never choose a journal until their scope is authenticated. */
+export function journalFromSessionToken(
+  token: string,
+  credentials: Credentials,
+  now = Date.now(),
+): string | null {
+  return journalSessionFromToken(token, credentials, now)?.journalId ?? null;
+}
+
+/** Extend valid sessions at most daily; existing 30-day sessions upgrade on use. */
+export function renewJournalSessionToken(
+  token: string,
+  credentials: Credentials,
+  now = Date.now(),
+): string | null {
+  const session = journalSessionFromToken(token, credentials, now);
+  if (!session) return null;
+  const remaining = session.expiresAt - Math.floor(now / 1000);
+  if (remaining > SESSION_MAX_AGE - SESSION_RENEW_INTERVAL) return null;
+  return createJournalSessionToken(session.journalId, credentials, now);
 }
