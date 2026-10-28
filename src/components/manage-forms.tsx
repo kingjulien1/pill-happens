@@ -17,7 +17,10 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -141,6 +144,7 @@ export function MedicationForm({
           <Select
             name="form"
             value={form}
+            highlightItemOnHover={false}
             onValueChange={(value) => {
               if (value && forms.some((item) => item.value === value)) {
                 setForm(value as Medication["form"]);
@@ -148,25 +152,55 @@ export function MedicationForm({
             }}
             disabled={busy}
           >
-            <SelectTrigger id={`${id}-form`} className={selectClass}>
+            <SelectTrigger
+              id={`${id}-form`}
+              className="h-11 w-full rounded-xl px-3 text-sm data-[size=default]:h-11 [&>span:last-child>svg]:size-3.5"
+            >
               <SelectValue>
-                <MedicationTypeIcon type={form} className="size-5" />
+                <MedicationTypeIcon type={form} className="size-4" />
                 <span>{forms.find((item) => item.value === form)?.label}</span>
               </SelectValue>
             </SelectTrigger>
-            <SelectContent>
-              {forms.map((item) => (
-                <SelectItem
-                  key={item.value}
-                  value={item.value}
-                  className="min-h-11 pl-3 pr-9 text-base"
-                >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <MedicationTypeIcon type={item.value} className="size-5" />
-                    <span>{item.label}</span>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              sideOffset={6}
+              className="brand-menu brand-navigation medication-type-menu p-1"
+            >
+              <SelectGroup className="p-0">
+                <SelectLabel className="flex h-7 items-center gap-1.5 px-2.5 py-0 text-[11px] font-semibold text-popover-foreground">
+                  <span>Medication type</span>
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
+                    <span aria-hidden="true">·</span>
+                    <span>{forms.length} options</span>
                   </span>
-                </SelectItem>
-              ))}
+                </SelectLabel>
+                <SelectSeparator className="brand-navigation-separator mx-2.5 my-1" />
+                {forms.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    label={item.label}
+                    data-active={form === item.value}
+                    className="brand-menu-link medication-type-option min-h-9 cursor-pointer gap-2 rounded-lg py-1.5 pr-9 pl-2.5 text-xs font-medium"
+                  >
+                    <MedicationTypeIcon
+                      type={item.value}
+                      className="medication-type-option-icon size-4"
+                    />
+                    <span>{item.label}</span>
+                    {form === item.value && (
+                      <span
+                        aria-hidden="true"
+                        className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground"
+                      >
+                        <span>·</span>
+                        <span>selected</span>
+                      </span>
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>

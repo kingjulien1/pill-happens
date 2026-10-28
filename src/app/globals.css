@@ -919,6 +919,18 @@
 .brand-menu-indicator {
   color: var(--foreground);
 }
+.medication-type-option-icon {
+  opacity: 0.8;
+}
+.medication-type-option[data-active="true"] .medication-type-option-icon {
+  opacity: 1;
+}
+.medication-type-option[data-highlighted] {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+.medication-type-option[data-active="true"][data-highlighted] {
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
+}
 @media (prefers-color-scheme: dark) {
   .brand-navigation {
     background: rgb(18 15 23 / 92%);
@@ -981,6 +993,12 @@
   }
   .brand-menu-link[data-highlighted] {
     background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  }
+  .medication-type-option:hover {
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  }
+  .medication-type-option[data-active="true"]:hover {
+    background: color-mix(in srgb, var(--foreground) 18%, transparent);
   }
   .brand-menu-link[data-active="true"][data-highlighted] {
     background: color-mix(in srgb, var(--foreground) 18%, transparent);
