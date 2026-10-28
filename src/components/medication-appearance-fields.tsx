@@ -16,6 +16,12 @@ import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
 import { Input } from "@/components/ui/input";
 import { EMOJI_CATALOG, searchEmoji } from "@/lib/emoji-catalog";
 import { getLucideIconLabel, searchLucideIcons } from "@/lib/lucide-catalog";
+import {
+  getSvgIcon,
+  isMedicationSvgIcon,
+  searchSvgIcons,
+  SVG_ICON_CATALOG,
+} from "@/lib/svg-icon-catalog";
 import { formatDose, type Medication } from "@/lib/domain";
 import {
   MEDICATION_COLORS,
@@ -29,7 +35,11 @@ import { cn } from "@/lib/utils";
 const SEARCH_DELAY = 2500;
 const RESULT_LIMIT = 96;
 type SearchPhase = "idle" | "loading" | "ready";
-type SymbolOption = { value: string; label: string; source: "Icon" | "Emoji" };
+type SymbolOption = {
+  value: string;
+  label: string;
+  source: "Icon" | "SVG" | "Emoji";
+};
 type Look = { color: MedicationColor; icon: string };
 const surpriseIcons = [
   "sun",
@@ -50,6 +60,7 @@ const surpriseIcons = [
   "🦋",
   "🚲",
   "💜",
+  ...SVG_ICON_CATALOG.map((item) => item.value),
 ];
 const typeLabels = {
   tablet: "Tablet",
@@ -60,15 +71,22 @@ const typeLabels = {
 
 function searchSymbols(query: string): SymbolOption[] {
   const icons = searchLucideIcons(query, RESULT_LIMIT);
+  const svgs = searchSvgIcons(query, RESULT_LIMIT);
   const emoji = searchEmoji(query, RESULT_LIMIT);
   const results: SymbolOption[] = [];
-  for (let index = 0; index < Math.max(icons.length, emoji.length); index++) {
+  for (
+    let index = 0;
+    index < Math.max(icons.length, svgs.length, emoji.length);
+    index++
+  ) {
     if (icons[index]) results.push({ ...icons[index], source: "Icon" });
+    if (svgs[index]) results.push({ ...svgs[index], source: "SVG" });
     if (emoji[index]) results.push({ ...emoji[index], source: "Emoji" });
     if (results.length >= RESULT_LIMIT) break;
   }
   if (
     !isMedicationLucideIcon(query) &&
+    !isMedicationSvgIcon(query) &&
     isMedicationIcon(query) &&
     !results.some(
       (item) =>
@@ -152,12 +170,14 @@ export function MedicationAppearanceFields({
   const [undo, setUndo] = useState<Look | null>(null);
   useEffect(() => () => clearTimeout(timer.current ?? undefined), []);
   const selectedColor = getMedicationColor(color);
-  const source = isMedicationLucideIcon(icon) ? "Icon" : "Emoji";
+  const svg = getSvgIcon(icon);
+  const source = svg ? "SVG" : isMedicationLucideIcon(icon) ? "Icon" : "Emoji";
   const symbolLabel =
-    source === "Icon"
+    svg?.label ??
+    (source === "Icon"
       ? (getLucideIconLabel(icon) ?? "Icon")
       : (EMOJI_CATALOG.find((item) => item.value === icon)?.label ??
-        "Your emoji");
+        "Your emoji"));
   const previewName = name.trim() || "Your medication";
   const amount = Number(strength);
   const strengthLabel =
@@ -282,7 +302,7 @@ export function MedicationAppearanceFields({
             Find a symbol
           </span>
           <span className="text-[10px] font-normal text-muted-foreground">
-            Icons + emoji
+            Lucide · SVG · Emoji
           </span>
         </h3>
         <div className="relative">
@@ -311,12 +331,12 @@ export function MedicationAppearanceFields({
             onKeyDown={(event) => {
               if (event.key === "Enter") event.preventDefault();
             }}
-            aria-label="Search icons and emoji"
+            aria-label="Search icons, SVGs, and emoji"
             aria-describedby={`${id}-search-help`}
             aria-controls={`${id}-results`}
             autoComplete="off"
             spellCheck={false}
-            placeholder="Try leaf, heart, coffee…"
+            placeholder="Try heart, leaf, svg…"
             enterKeyHint="search"
             className="h-12 rounded-xl pr-11 pl-11 text-base md:text-base [&::-webkit-search-cancel-button]:appearance-none"
           />
@@ -335,13 +355,14 @@ export function MedicationAppearanceFields({
           )}
         </div>
         <p id={`${id}-search-help`} className="sr-only">
-          Search Lucide icons and emoji in English or German. Results appear 2.5
+          Search Lucide icons, local SVGs, and emoji in English or German. Type
+          “svg” to browse the project’s SVG collection. Results appear 2.5
           seconds after you stop typing. Searching does not change your selected
           icon.
         </p>
         <p role="status" aria-live="polite" className="sr-only">
           {phase === "loading"
-            ? "Searching icons and emoji."
+            ? "Searching icons, SVGs, and emoji."
             : phase === "ready"
               ? `${results.length}${results.length === RESULT_LIMIT ? " or more" : ""} symbols found.`
               : "Search for an icon or emoji."}
@@ -445,7 +466,7 @@ export function MedicationAppearanceFields({
               />
               {selectedColor.label}
             </span>
-            <span>{source}</span>
+            <span>{source === "SVG" ? "Project SVG" : source}</span>
           </div>
           <div className="relative flex justify-center py-5">
             <MedicationIcon
