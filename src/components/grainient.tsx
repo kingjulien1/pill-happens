@@ -40,6 +40,7 @@ export interface GrainientProps extends Omit<
   clickSwirl?: boolean;
   intro?: boolean;
   lightMode?: boolean;
+  paletteMode?: "auto" | "literal";
   dpr?: number;
   style?: CSSProperties;
 }
@@ -65,6 +66,7 @@ type Settings = {
   clickSwirl: boolean;
   intro: boolean;
   lightMode: boolean;
+  paletteMode: "auto" | "literal";
   dpr?: number;
 };
 
@@ -371,6 +373,7 @@ const Grainient = ({
   clickSwirl = true,
   intro = true,
   lightMode = false,
+  paletteMode = "auto",
   dpr,
   className = "",
   style,
@@ -402,6 +405,7 @@ const Grainient = ({
     clickSwirl,
     intro,
     lightMode,
+    paletteMode,
     dpr,
   };
   const settingsRef = useRef(settings);
@@ -526,11 +530,11 @@ const Grainient = ({
 
     const syncPalette = () => {
       const s = settingsRef.current;
-      const key = `${s.colors.join(",")}|${s.lightMode}`;
+      const key = `${s.colors.join(",")}|${s.lightMode}|${s.paletteMode}`;
       if (key === paletteKey) return;
       paletteKey = key;
       const labs = s.colors.map((color) => toLab(parse(color)));
-      if (!s.lightMode) {
+      if (!s.lightMode || s.paletteMode === "literal") {
         labs.forEach((lab, i) => ramp.set(lab, i * 3));
       } else {
         const blank = labs.map(([L]) => Math.abs(L - labs[0][0]) < 0.1);
@@ -870,15 +874,16 @@ const Grainient = ({
 
   // A static palette is visible before the first frame and if WebGL cannot run.
   // It is intentionally separate from the unmodified WebGL shader rendering.
-  const fallbackColors = lightMode
-    ? [
-        "#fffdf6",
-        ...palette
-          .slice(1)
-          .reverse()
-          .map((color) => `color-mix(in srgb, ${color} 35%, #fffdf6)`),
-      ]
-    : palette;
+  const fallbackColors =
+    lightMode && paletteMode === "auto"
+      ? [
+          "#fffdf6",
+          ...palette
+            .slice(1)
+            .reverse()
+            .map((color) => `color-mix(in srgb, ${color} 35%, #fffdf6)`),
+        ]
+      : palette;
   const fallbackBackground =
     type === "radial"
       ? `radial-gradient(ellipse at center, ${[...fallbackColors].reverse().join(", ")})`
@@ -891,7 +896,8 @@ const Grainient = ({
         .filter(Boolean)
         .join(" ")}
       style={{
-        backgroundColor: lightMode ? "#fffdf6" : palette[0],
+        backgroundColor:
+          lightMode && paletteMode === "auto" ? "#fffdf6" : palette[0],
         backgroundImage: fallbackBackground,
         ...style,
       }}

@@ -12,29 +12,29 @@
 
 :root {
   color-scheme: light;
-  --background: #fff7ed;
-  --foreground: #2a1914;
-  --card: #fffaf2ed;
+  --background: #f6f2f4;
+  --foreground: #211b1b;
+  --card: #fffdfdf2;
   --card-foreground: var(--foreground);
-  --popover: #fffaf2;
+  --popover: #fffdfd;
   --popover-foreground: var(--foreground);
   --primary: #120f17;
   --ink: #120f17;
-  --primary-foreground: var(--ink);
-  --action-background: #fed7aa;
-  --secondary: #efe4d8;
+  --primary-foreground: #fed7aa;
+  --action-background: #211b1b;
+  --secondary: #ece6e9;
   --secondary-foreground: var(--foreground);
-  --muted: #f2e8dd;
-  --muted-foreground: #755447;
-  --empty-intake-wash: rgb(255 250 242 / 62%);
-  --empty-intake-hover: rgb(255 250 242 / 84%);
-  --empty-intake-copy: rgb(42 25 20 / 80%);
+  --muted: #f0ebee;
+  --muted-foreground: #51414a;
+  --empty-intake-wash: rgb(255 253 253 / 48%);
+  --empty-intake-hover: rgb(255 253 253 / 72%);
+  --empty-intake-copy: rgb(33 27 27 / 80%);
   --medication-symbol-mix: 35%;
   --accent: #120f1712;
   --accent-foreground: var(--foreground);
   --destructive: #9a3412;
-  --border: #d9cbbd;
-  --input: #a1846e;
+  --border: #d8cbd2;
+  --input: #9b838e;
   --ring: #9a3412;
   --radius: 1rem;
 }
@@ -47,6 +47,8 @@
     --card: #1b171aed;
     --popover: #211b1b;
     --primary: #fff1d6;
+    --primary-foreground: var(--ink);
+    --action-background: #fed7aa;
     --secondary: #302522;
     --muted: #2b2222;
     --muted-foreground: rgb(254 215 170 / 60%);
@@ -138,14 +140,14 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  filter: brightness(1.18);
+  filter: brightness(1);
   /* A static Ember wash remains visible before hydration or without WebGL. */
   background: radial-gradient(
     ellipse at 50% 45%,
-    #fffaf2,
-    #ffead1 38%,
-    #f4d5b8 65%,
-    #e8d8ce
+    #fffdfd,
+    #f6b49c 38%,
+    #e69b89 65%,
+    #f6f2f4
   );
 }
 .ambient::after {
@@ -153,10 +155,11 @@
   position: absolute;
   inset: 0;
   /* Keep text readable as the gradient's light and dark areas move. */
-  background: rgb(255 247 237 / 72%);
+  background: rgb(255 255 255 / 18%);
 }
 @media (prefers-color-scheme: dark) {
   .ambient {
+    filter: brightness(1.18);
     background: radial-gradient(
       ellipse at 50% 45%,
       #fed7aa,
@@ -203,7 +206,7 @@
   z-index: -1;
   inset: -12px;
   border-radius: 24px;
-  background: rgb(239 228 216 / 40%);
+  background: rgb(235 228 233 / 32%);
   pointer-events: none;
 }
 [data-medication-mark] > [data-medication-glyph] {
@@ -482,14 +485,14 @@
     box-shadow 300ms ease;
 }
 .brand-lockup {
-  --brand-fill-start: #32201a;
-  --brand-fill-middle: #43291f;
-  --brand-fill-end: #543021;
-  --brand-gloss: #fed7aa1f;
+  --brand-fill-start: #211b20;
+  --brand-fill-middle: #35262b;
+  --brand-fill-end: #241d21;
+  --brand-gloss: #ffe0d21c;
   --brand-ink: #fed7aa;
-  --brand-glow: #f973162b;
-  --brand-halo: #ffbd851a;
-  --brand-sheen-opacity: 0.22;
+  --brand-glow: #e57f6940;
+  --brand-halo: #ed9f8f26;
+  --brand-sheen-opacity: 0.18;
   position: relative;
   isolation: isolate;
   border-radius: 999px;
@@ -677,6 +680,32 @@
     --brand-glow: #f9731633;
     --brand-halo: #ffbd8526;
     --brand-sheen-opacity: 0.16;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .brand-lockup::after {
+    background:
+      radial-gradient(
+        ellipse at 24% 36%,
+        #ffd9cd,
+        #e98e77b3 40%,
+        #e98e7700 74%
+      ),
+      radial-gradient(ellipse at 78% 64%, #f6c1b7, #e57f6980 42%, #e57f6900 74%);
+  }
+  .brand-corona-track::before {
+    background: conic-gradient(
+      transparent 0deg 30deg,
+      #ffe3db 70deg,
+      #ed9f8fb3 108deg,
+      transparent 155deg 205deg,
+      #f6c1b7cc 248deg,
+      #e57f6980 278deg,
+      transparent 335deg 360deg
+    );
+  }
+  .brand-bar {
+    outline-color: #ffd9cd;
   }
 }
 .brand-mark {
@@ -1036,11 +1065,11 @@
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgb(255 247 237 / 0%) 0%,
-    rgb(255 247 237 / 20%) 25%,
-    rgb(255 247 237 / 55%) 55%,
-    rgb(255 247 237 / 90%) 80%,
-    rgb(255 247 237 / 94%) 100%
+    rgb(246 242 244 / 0%) 0%,
+    rgb(246 242 244 / 12%) 25%,
+    rgb(246 242 244 / 35%) 55%,
+    rgb(246 242 244 / 72%) 80%,
+    rgb(246 242 244 / 86%) 100%
   );
 }
 @media (prefers-color-scheme: dark) {
