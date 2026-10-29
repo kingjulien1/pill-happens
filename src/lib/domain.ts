@@ -23,11 +23,12 @@ export type Medication = {
 export type Intake = {
   id: string;
   medicationId: string;
-  /** A snapshot so historical entries survive medication changes. */
+  /** Follows the linked medication; retained as a fallback if it is missing. */
   medicationName: string;
-  /** New entries retain their counted unit if the medication type changes. */
+  /** Follows the linked medication's type; optional on legacy fallback records. */
   medicationForm?: MedicationType;
   strengthMg: number;
+  /** The actual amount taken, independent of a medication's default quantity. */
   quantity: number;
   takenAt: string;
   createdAt: string;

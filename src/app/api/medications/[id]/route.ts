@@ -18,7 +18,7 @@ export function PATCH(
         if (!medication)
           throw new ApiError(404, "This medication was not found.");
         Object.assign(medication, input);
-        // Intake snapshots deliberately retain their original names and strengths.
+        // The store updates every linked intake in this same atomic save.
       });
     },
     { mutation: true },

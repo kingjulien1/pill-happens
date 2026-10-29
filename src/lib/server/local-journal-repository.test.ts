@@ -12,6 +12,7 @@ import path from "node:path";
 import test from "node:test";
 import { emptyData } from "@/lib/domain";
 import { createJournalService, JournalCreationError } from "./journal-service";
+import { mutateJournalState, readJournalState } from "./journal-state";
 import { createLocalJournalRepository } from "./local-journal-repository";
 
 async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
@@ -129,7 +130,7 @@ test("concurrent same-password creation has one winner while different passwords
     assert.deepEqual(await repository.readState(id), emptyData());
 });
 
-test("metered-pump records and intake units survive reopening and later medication type edits", async (t) => {
+test("local journals apply medication edits to every saved intake after reopening", async (t) => {
   for (const form of ["pump", "pump-bottle", "gel-dispenser"] as const) {
     const { directory, repository } = await fixture(t);
     const medication = {
@@ -157,17 +158,18 @@ test("metered-pump records and intake units survive reopening and later medicati
       });
     });
     const reopened = createLocalJournalRepository(directory);
-    const before = await reopened.readState("personal");
+    const before = await readJournalState(reopened, "personal");
     assert.deepEqual(before.medications[0], medication);
     assert.equal(before.intakes[0].medicationForm, form);
-    await reopened.mutateState("personal", (data) => {
+    await mutateJournalState(reopened, "personal", (data) => {
       data.medications[0].form = "tablet";
       data.medications[0].strengthMg = 10;
+      data.medications[0].defaultQuantity = 9;
     });
     const after = await repository.readState("personal");
     assert.equal(after.medications[0].form, "tablet");
-    assert.equal(after.intakes[0].medicationForm, form);
-    assert.equal(after.intakes[0].strengthMg, 2.5);
+    assert.equal(after.intakes[0].medicationForm, "tablet");
+    assert.equal(after.intakes[0].strengthMg, 10);
     assert.equal(after.intakes[0].quantity, 3);
   }
 });

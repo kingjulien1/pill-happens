@@ -166,7 +166,7 @@ describe("intake history and per-medication totals", () => {
     );
   });
 
-  it("keeps medications separate and uses each entry’s historical strength", () => {
+  it("keeps missing-medication records separate using their saved fallback strengths", () => {
     const data = emptyData();
     data.intakes = [
       entry({ strengthMg: 0.5, quantity: 0.5 }),

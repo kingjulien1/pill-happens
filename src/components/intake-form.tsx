@@ -70,14 +70,10 @@ export function IntakeForm({
   const [note, setNote] = useState(intake?.note ?? "");
   const [error, setError] = useState("");
   const medication = medications.find((m) => m.id === medicationId);
-  const strength =
-    intake && intake.medicationId === medicationId
-      ? intake.strengthMg
-      : (medication?.strengthMg ?? 0);
-  const medicationForm =
-    intake && intake.medicationId === medicationId
-      ? (intake.medicationForm ?? medication?.form)
-      : medication?.form;
+  const fallbackIntake =
+    intake?.medicationId === medicationId ? intake : undefined;
+  const strength = medication?.strengthMg ?? fallbackIntake?.strengthMg ?? 0;
+  const medicationForm = medication?.form ?? fallbackIntake?.medicationForm;
   const type = getMedicationType(medicationForm);
   const { increment, presets } = medicationQuantityControls(medicationForm);
   let belongsTo = "";

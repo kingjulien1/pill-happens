@@ -3,6 +3,7 @@ import "server-only";
 import type { AppData } from "@/lib/domain";
 import { authenticatedJournal } from "./auth";
 import { journalRepository } from "./database";
+import { mutateJournalState, readJournalState } from "./journal-state";
 
 async function requireJournal(): Promise<string> {
   const journalId = await authenticatedJournal();
@@ -11,14 +12,18 @@ async function requireJournal(): Promise<string> {
 }
 
 export async function readState(): Promise<AppData> {
-  return journalRepository().readState(await requireJournal());
+  return readJournalState(journalRepository(), await requireJournal());
 }
 
 /** The mutation may run more than once on contention; keep side effects outside it. */
 export async function mutateState(
   mutate: (state: AppData) => void,
 ): Promise<AppData> {
-  return journalRepository().mutateState(await requireJournal(), mutate);
+  return mutateJournalState(
+    journalRepository(),
+    await requireJournal(),
+    mutate,
+  );
 }
 
 export async function consumeLoginAttempt(): Promise<boolean> {
