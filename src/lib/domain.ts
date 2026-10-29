@@ -1,4 +1,5 @@
 import type { MedicationColor } from "@/lib/medication-appearance";
+import type { MedicationType } from "@/lib/medication-types";
 
 /** Shared data and calendar rules. All stored timestamps are UTC ISO strings. */
 export type Medication = {
@@ -7,7 +8,7 @@ export type Medication = {
   strengthMg: number;
   /** Prefills new intakes; older medications use one unit. */
   defaultQuantity?: number;
-  form: "tablet" | "capsule" | "drops" | "other";
+  form: MedicationType;
   color: MedicationColor;
   /** Missing on older records; the interface renders the default pill icon. */
   icon?: string;
@@ -22,6 +23,8 @@ export type Intake = {
   medicationId: string;
   /** A snapshot so historical entries survive medication changes. */
   medicationName: string;
+  /** New entries retain their counted unit if the medication type changes. */
+  medicationForm?: MedicationType;
   strengthMg: number;
   quantity: number;
   takenAt: string;

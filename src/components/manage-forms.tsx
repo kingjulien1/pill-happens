@@ -8,6 +8,7 @@ import {
   MedicationTypeIcon,
 } from "@/components/medication-icon";
 import { isMedicationIcon } from "@/lib/medication-appearance";
+import { getMedicationType, MEDICATION_TYPES } from "@/lib/medication-types";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
@@ -31,18 +32,7 @@ import {
   type Medication,
 } from "@/lib/domain";
 
-const forms: { value: Medication["form"]; label: string }[] = [
-  { value: "tablet", label: "Tablet" },
-  { value: "capsule", label: "Capsule" },
-  { value: "drops", label: "Drops" },
-  { value: "other", label: "Other" },
-];
-const unitLabels = {
-  tablet: { singular: "tablet", plural: "Tablets" },
-  capsule: { singular: "capsule", plural: "Capsules" },
-  drops: { singular: "drop", plural: "Drops" },
-  other: { singular: "unit", plural: "Units" },
-};
+const forms = MEDICATION_TYPES;
 
 const inputClass = "h-10 rounded-xl px-3 text-base md:text-sm";
 const selectClass =
@@ -76,6 +66,7 @@ export function MedicationForm({
     medication?.iconRotation ?? 0,
   );
   const [error, setError] = useState<string | null>(null);
+  const type = getMedicationType(form);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -148,7 +139,8 @@ export function MedicationForm({
         >
           <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-quantity`}>
-              {unitLabels[form].plural} per intake
+              {type.units.charAt(0).toUpperCase() + type.units.slice(1)} per
+              intake
             </Label>
             <Input
               id={`${id}-quantity`}
@@ -172,7 +164,9 @@ export function MedicationForm({
             </p>
           </div>
           <div className="min-w-0 space-y-2">
-            <Label htmlFor={`${id}-strength`}>Strength (mg)</Label>
+            <Label htmlFor={`${id}-strength`}>
+              {form === "pump" ? "Strength (mg/pump)" : "Strength (mg)"}
+            </Label>
             <Input
               id={`${id}-strength`}
               name="strengthMg"
@@ -192,7 +186,7 @@ export function MedicationForm({
               id={`${id}-strength-help`}
               className="text-[10px] leading-relaxed text-muted-foreground"
             >
-              Per {unitLabels[form].singular}, as packaged.
+              Per {type.unit}, as packaged.
             </p>
           </div>
         </div>

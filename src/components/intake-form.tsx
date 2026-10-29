@@ -5,6 +5,10 @@ import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationIcon } from "@/components/medication-icon";
 import { toast } from "sonner";
+import {
+  getMedicationType,
+  medicationQuantityControls,
+} from "@/lib/medication-types";
 import { useJournal } from "@/components/journal-provider";
 import {
   dayKey,
@@ -68,6 +72,12 @@ export function IntakeForm({
     intake && intake.medicationId === medicationId
       ? intake.strengthMg
       : (medication?.strengthMg ?? 0);
+  const medicationForm =
+    intake && intake.medicationId === medicationId
+      ? (intake.medicationForm ?? medication?.form)
+      : medication?.form;
+  const type = getMedicationType(medicationForm);
+  const { increment, presets } = medicationQuantityControls(medicationForm);
   let belongsTo = "";
   try {
     belongsTo = dayKey(fromLocalInput(takenAt, timezone), timezone);
@@ -165,6 +175,7 @@ export function IntakeForm({
                   />
                   <span className="min-w-0 truncate">
                     {medication.name} · {formatDose(strength)} mg
+                    {medicationForm === "pump" ? " / pump" : ""}
                   </span>
                 </>
               ) : (
@@ -189,6 +200,7 @@ export function IntakeForm({
                   />
                   <span className="min-w-0 break-words">
                     {m.name} · {formatDose(m.strengthMg)} mg
+                    {m.form === "pump" ? " / pump" : ""}
                   </span>
                 </span>
               </SelectItem>
@@ -199,13 +211,7 @@ export function IntakeForm({
       <div className="form-field">
         <div className="flex items-center justify-between">
           <Label htmlFor="intake-quantity">Amount taken</Label>
-          <span className="text-xs text-muted-foreground">
-            {medication?.form === "other"
-              ? "units"
-              : medication?.form === "drops"
-                ? "drops"
-                : `${medication?.form}s`}
-          </span>
+          <span className="text-xs text-muted-foreground">{type.units}</span>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -213,9 +219,11 @@ export function IntakeForm({
             variant="outline"
             aria-label="Decrease amount"
             className="size-10 rounded-xl"
-            disabled={Number(quantity) <= 0.25}
+            disabled={Number(quantity) <= increment}
             onClick={() =>
-              setQuantity(String(Math.max(0.25, Number(quantity) - 0.25)))
+              setQuantity(
+                String(Math.max(increment, Number(quantity) - increment)),
+              )
             }
           >
             <ActionIcon name="subtract" className="size-4.5" />
@@ -237,13 +245,13 @@ export function IntakeForm({
             variant="outline"
             aria-label="Increase amount"
             className="size-10 rounded-xl"
-            onClick={() => setQuantity(String(Number(quantity) + 0.25))}
+            onClick={() => setQuantity(String(Number(quantity) + increment))}
           >
             <ActionIcon name="add" className="size-4.5" />
           </Button>
         </div>
         <div className="mt-1 grid grid-cols-4 gap-1.5">
-          {[0.25, 0.5, 1, 2].map((amount) => (
+          {presets.map((amount) => (
             <button
               type="button"
               key={amount}

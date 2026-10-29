@@ -11,6 +11,7 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
 import { TodayHeading } from "@/components/today-heading";
 import { loggingStreak } from "@/lib/logging-streak";
+import { getMedicationType } from "@/lib/medication-types";
 import { MedicationIcon } from "@/components/medication-icon";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
@@ -286,8 +287,11 @@ function IntakeTimeline({
                       {time}
                       {localDay !== day ? " · next morning" : ""}{" "}
                       <span className="mx-1">·</span>{" "}
-                      {formatDose(entry.quantity)} ×{" "}
-                      {formatDose(entry.strengthMg)} mg
+                      {formatDose(entry.quantity)}
+                      {(entry.medicationForm ?? medication?.form) === "pump"
+                        ? ` ${entry.quantity === 1 ? "pump" : "pumps"}`
+                        : ""}{" "}
+                      × {formatDose(entry.strengthMg)} mg
                     </span>
                     <span className="flex items-center gap-1">
                       {String(index + 1).padStart(2, "0")}
@@ -441,11 +445,7 @@ export function MedicationsPage() {
                 <h3 className="truncate text-sm font-medium">{m.name}</h3>
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   {formatDose(m.strengthMg)} mg /{" "}
-                  {m.form === "other"
-                    ? "unit"
-                    : m.form === "drops"
-                      ? "drop"
-                      : m.form}
+                  {getMedicationType(m.form).unit}
                 </p>
               </div>
               <Button

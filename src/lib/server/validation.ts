@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isValidDayKey } from "@/lib/domain";
+import { MEDICATION_TYPE_VALUES } from "@/lib/medication-types";
 import {
   isMedicationIcon,
   MEDICATION_COLORS,
@@ -21,7 +22,7 @@ export const medicationSchema = z.object({
     .min(0.000001, "Use an intake amount of at least 0.000001.")
     .max(10_000, "This quantity is too large.")
     .optional(),
-  form: z.enum(["tablet", "capsule", "drops", "other"]),
+  form: z.enum(MEDICATION_TYPE_VALUES),
   color: z.enum(MEDICATION_COLORS.map((color) => color.value)),
   icon: z
     .string()

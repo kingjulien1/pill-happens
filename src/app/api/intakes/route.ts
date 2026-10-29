@@ -29,6 +29,7 @@ export function POST(request: Request) {
           takenAt: new Date(input.takenAt).toISOString(),
           createdAt,
           medicationName: medication.name,
+          medicationForm: medication.form,
           strengthMg: medication.strengthMg,
         });
       });

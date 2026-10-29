@@ -27,6 +27,7 @@ import {
   SVG_ICON_CATALOG,
 } from "@/lib/svg-icon-catalog";
 import { formatDose, type Medication } from "@/lib/domain";
+import { getMedicationType } from "@/lib/medication-types";
 import {
   MEDICATION_COLORS,
   getMedicationColor,
@@ -75,12 +76,6 @@ const surpriseIcons = [
   "💜",
   ...SVG_ICON_CATALOG.map((item) => item.value),
 ];
-const typeLabels = {
-  tablet: "Tablet",
-  capsule: "Capsule",
-  drops: "Drops",
-  other: "Other",
-};
 
 function searchSymbols(query: string): SymbolOption[] {
   const icons = searchLucideIcons(query, RESULT_LIMIT);
@@ -334,9 +329,10 @@ export function MedicationAppearanceFields({
           </div>
           <p id={`${id}-search-help`} className="sr-only">
             Search component names, display names, and keywords in English or
-            German. Type “svg” for local artwork, “outline” for tablet outlines,
-            or “color” for flat-color tablets. Results appear 2.5 seconds after
-            you stop typing. Searching does not change your selected icon.
+            German. Type “svg” for local artwork, “outline” for medication
+            outlines, or “color” for flat-color artwork. Results appear 2.5
+            seconds after you stop typing. Searching does not change your
+            selected icon.
           </p>
           <p role="status" aria-live="polite" className="sr-only">
             {phase === "loading"
@@ -633,7 +629,7 @@ export function MedicationAppearanceFields({
           </div>
           {fixedColor && (
             <p className="relative mt-1 text-center text-[10px] text-muted-foreground">
-              Fixed tablet color
+              Fixed artwork color
               <span className="mx-1.5" aria-hidden="true">
                 /
               </span>
@@ -667,7 +663,7 @@ export function MedicationAppearanceFields({
                 <span className="mx-1.5" aria-hidden="true">
                   /
                 </span>
-                {typeLabels[medicationType]}
+                {getMedicationType(medicationType).label}
               </p>
             </div>
           </div>

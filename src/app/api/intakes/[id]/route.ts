@@ -22,6 +22,7 @@ export function PATCH(request: Request, context: Context) {
           if (!medication)
             throw new ApiError(400, "Choose an active medication.");
           intake.medicationName = medication.name;
+          intake.medicationForm = medication.form;
           intake.strengthMg = medication.strengthMg;
         }
         Object.assign(intake, input, {

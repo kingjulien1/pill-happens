@@ -129,6 +129,47 @@ test("concurrent same-password creation has one winner while different passwords
     assert.deepEqual(await repository.readState(id), emptyData());
 });
 
+test("metered-pump records and intake units survive reopening and later medication type edits", async (t) => {
+  const { directory, repository } = await fixture(t);
+  const medication = {
+    id: "6cfa88e7-8474-4b17-a148-545fb825785b",
+    name: "Synthetic pump",
+    strengthMg: 2.5,
+    defaultQuantity: 3,
+    form: "pump" as const,
+    color: "rose" as const,
+    archived: false,
+    createdAt: "2026-10-01T12:00:00Z",
+  };
+  await repository.mutateState("personal", (data) => {
+    data.medications.push(medication);
+    data.intakes.push({
+      id: "synthetic-pump-intake",
+      medicationId: medication.id,
+      medicationName: medication.name,
+      medicationForm: medication.form,
+      strengthMg: medication.strengthMg,
+      quantity: 3,
+      takenAt: "2026-10-01T12:00:00Z",
+      createdAt: "2026-10-01T12:01:00Z",
+      note: "",
+    });
+  });
+  const reopened = createLocalJournalRepository(directory);
+  const before = await reopened.readState("personal");
+  assert.deepEqual(before.medications[0], medication);
+  assert.equal(before.intakes[0].medicationForm, "pump");
+  await reopened.mutateState("personal", (data) => {
+    data.medications[0].form = "tablet";
+    data.medications[0].strengthMg = 10;
+  });
+  const after = await repository.readState("personal");
+  assert.equal(after.medications[0].form, "tablet");
+  assert.equal(after.intakes[0].medicationForm, "pump");
+  assert.equal(after.intakes[0].strengthMg, 2.5);
+  assert.equal(after.intakes[0].quantity, 3);
+});
+
 test("missing or malformed local journal scope cannot open or create personal state", async (t) => {
   const { directory, repository } = await fixture(t);
   for (const id of [

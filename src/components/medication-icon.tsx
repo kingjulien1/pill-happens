@@ -18,6 +18,7 @@ import {
   PillBottle,
   ShieldCheck,
   Smile,
+  SoapDispenserDroplet,
   Sparkles,
   Star,
   Sun,
@@ -182,6 +183,7 @@ const typeGlyphs = {
   tablet: Tablets,
   capsule: Pill,
   drops: Droplet,
+  pump: SoapDispenserDroplet,
   other: Package,
 } satisfies Record<Medication["form"], LucideIcon>;
 
