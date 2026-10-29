@@ -9,7 +9,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="theme-color"
-      content="#fff7ed"
+      content="#f6f2f4"
       media="(prefers-color-scheme: light)"
     />
     <meta
@@ -21,12 +21,12 @@
     <style>
       :root {
         color-scheme: light;
-        --background: #fff7ed;
-        --foreground: #2a1914;
-        --muted: #755447;
-        --surface: #fffaf2;
-        --edge: #d9cbbd;
-        --glow: #fed7aa;
+        --background: #f6f2f4;
+        --foreground: #211b1b;
+        --muted: #51414a;
+        --surface: #fffdfd;
+        --edge: #d8cbd2;
+        --glow: #e58f79;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -118,6 +118,12 @@
       a:focus-visible {
         outline: 2px solid var(--foreground);
         outline-offset: 4px;
+      }
+      @media (prefers-color-scheme: light) {
+        a {
+          background: #211b1b;
+          color: #fed7aa;
+        }
       }
       .note {
         margin-top: 18px;

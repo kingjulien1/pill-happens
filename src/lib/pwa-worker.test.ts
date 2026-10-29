@@ -208,7 +208,7 @@ test("activation cleans only old app public caches and updates require an explic
   await sw.lifecycle("activate");
   assert.deepEqual(sw.deleted, ["pill-happens-public-old"]);
   assert.equal(sw.stores.has("another-app-cache"), true);
-  assert.equal(sw.stores.has("pill-happens-public-v1"), true);
+  assert.equal(sw.stores.has("pill-happens-public-v2"), true);
   assert.equal(sw.claimed, 1);
   assert.equal(sw.skipped, 0);
   await sw.lifecycle("message", { type: "UNRELATED" });
