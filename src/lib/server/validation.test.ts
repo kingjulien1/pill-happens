@@ -68,6 +68,88 @@ test("medications require a name and preserve user-entered fractional strengths"
   );
 });
 
+test("active ingredients preserve Unicode and combination names while trimming surrounding whitespace", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+    activeIngredient: "  Amoxicillin / Clavulansäure  ",
+  };
+  assert.equal(
+    medicationSchema.parse(medication).activeIngredient,
+    "Amoxicillin / Clavulansäure",
+  );
+  assert.deepEqual(
+    medicationPatchSchema.parse({ activeIngredient: "  Acetylsalicylsäure  " }),
+    { activeIngredient: "Acetylsalicylsäure" },
+  );
+});
+
+test("active ingredients stay optional and only an explicit blank patch clears an existing value", () => {
+  const legacy = medicationSchema.parse({
+    name: "Legacy",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  });
+  assert.equal(Object.hasOwn(legacy, "activeIngredient"), false);
+  for (const patch of [{ name: "Renamed" }, { archived: true }]) {
+    const parsed = medicationPatchSchema.parse(patch);
+    assert.deepEqual(parsed, patch);
+    assert.equal(
+      Object.assign(
+        { ...legacy, activeIngredient: "Existing ingredient" },
+        parsed,
+      ).activeIngredient,
+      "Existing ingredient",
+    );
+  }
+  for (const activeIngredient of ["", "   "]) {
+    assert.equal(
+      medicationSchema.parse({ ...legacy, activeIngredient }).activeIngredient,
+      "",
+    );
+    const parsed = medicationPatchSchema.parse({ activeIngredient });
+    assert.deepEqual(parsed, { activeIngredient: "" });
+    assert.equal(
+      Object.assign(
+        { ...legacy, activeIngredient: "Existing ingredient" },
+        parsed,
+      ).activeIngredient,
+      "",
+    );
+  }
+});
+
+test("active ingredients accept at most 160 trimmed characters and reject non-text values", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  };
+  const limit = "ä".repeat(160);
+  assert.equal(
+    medicationSchema.parse({ ...medication, activeIngredient: `  ${limit}  ` })
+      .activeIngredient,
+    limit,
+  );
+  assert.deepEqual(medicationPatchSchema.parse({ activeIngredient: limit }), {
+    activeIngredient: limit,
+  });
+  for (const activeIngredient of ["a".repeat(161), null, 1, false, [], {}]) {
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, activeIngredient }).success,
+      false,
+    );
+    assert.equal(
+      medicationPatchSchema.safeParse({ activeIngredient }).success,
+      false,
+    );
+  }
+});
+
 test("medication intake defaults accept fractional quantities within the log input limits", () => {
   const medication = {
     name: "Example",

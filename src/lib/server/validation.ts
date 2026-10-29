@@ -17,6 +17,11 @@ export const medicationSchema = z.object({
     .trim()
     .min(1, "Enter a medication name.")
     .max(100, "Keep the name under 100 characters."),
+  activeIngredient: z
+    .string()
+    .trim()
+    .max(160, "Keep the active ingredient to 160 characters or fewer.")
+    .optional(),
   strengthMg: positiveAmount,
   defaultQuantity: positiveAmount
     .min(0.000001, "Use an intake amount of at least 0.000001.")

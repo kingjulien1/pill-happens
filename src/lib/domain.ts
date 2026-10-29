@@ -5,6 +5,8 @@ import type { MedicationType } from "@/lib/medication-types";
 export type Medication = {
   id: string;
   name: string;
+  /** Optional, user-entered active ingredient; blank means intentionally cleared. */
+  activeIngredient?: string;
   strengthMg: number;
   /** Prefills new intakes; older medications use one unit. */
   defaultQuantity?: number;

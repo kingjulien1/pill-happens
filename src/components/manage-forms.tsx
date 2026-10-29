@@ -49,6 +49,9 @@ export function MedicationForm({
   const { mutate, busy } = useJournal();
   const id = useId();
   const [name, setName] = useState(medication?.name ?? "");
+  const [activeIngredient, setActiveIngredient] = useState(
+    medication?.activeIngredient ?? "",
+  );
   const [strength, setStrength] = useState(
     medication ? String(medication.strengthMg) : "",
   );
@@ -99,6 +102,7 @@ export function MedicationForm({
         medication ? `medications/${medication.id}` : "medications",
         {
           name: name.trim(),
+          activeIngredient: activeIngredient.trim(),
           strengthMg,
           defaultQuantity: quantity,
           form,
@@ -129,6 +133,27 @@ export function MedicationForm({
             required
             maxLength={80}
             autoComplete="off"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={`${id}-ingredient`}>
+            Active ingredient
+            <span className="inline-flex items-center gap-1.5 font-normal text-muted-foreground">
+              <span aria-hidden="true">·</span>
+              optional
+            </span>
+          </Label>
+          <Input
+            id={`${id}-ingredient`}
+            name="activeIngredient"
+            value={activeIngredient}
+            onChange={(event) => setActiveIngredient(event.target.value)}
+            placeholder="e.g. Diazepam"
+            maxLength={160}
+            autoComplete="off"
+            spellCheck={false}
             className={inputClass}
           />
         </div>
