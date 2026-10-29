@@ -1,6 +1,24 @@
 import { ActionIcon } from "@/components/action-icon";
 import { formatDay } from "@/lib/domain";
 
+function HeadingMarker({ name }: { name: "date" | "sparkle" }) {
+  return (
+    <>
+      <ActionIcon
+        name={name}
+        weight="fill"
+        className="streak-counter-icon size-[22px]"
+      />
+      <span
+        aria-hidden="true"
+        className="text-base leading-none text-muted-foreground"
+      >
+        ·
+      </span>
+    </>
+  );
+}
+
 export function TodayHeading({
   day,
   current,
@@ -21,8 +39,9 @@ export function TodayHeading({
 
   return (
     <header className="mb-[37px]" data-today-heading>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 max-[359px]:-mx-2 max-[359px]:gap-1">
         <h1 className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]">
+          <HeadingMarker name="date" />
           <time
             dateTime={day}
             aria-label={formatDay(day, {
@@ -58,14 +77,7 @@ export function TodayHeading({
             {current} consecutive logging {current === 1 ? "day" : "days"}.
           </span>
           <span aria-hidden="true" className="flex items-center gap-1">
-            <ActionIcon
-              name="sparkle"
-              weight="fill"
-              className="streak-counter-icon size-[22px]"
-            />
-            <span className="text-base leading-none text-muted-foreground">
-              ·
-            </span>
+            <HeadingMarker name="sparkle" />
             <span>
               {current} {current === 1 ? "day" : "days"}
             </span>
