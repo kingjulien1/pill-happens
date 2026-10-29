@@ -20,6 +20,7 @@ import {
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { IntakeCard } from "@/components/intake-card";
+import { HistoryDayCard } from "@/components/history-day-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
@@ -766,55 +767,9 @@ export function HistoryPage() {
         </EmptyState>
       ) : (
         <div className="space-y-3">
-          {days.slice(0, limit).map((day) => {
-            const totals = totalsForDay(data, day);
-            const count = dayIntakes(data, day).length;
-            const goals = totals.map((t) =>
-              goalForDay(data, t.medicationId, day),
-            );
-            const hasGoals = goals.some(Boolean);
-            const over = totals.some(
-              (t, i) => goals[i] && t.totalMg > goals[i]!.dailyLimitMg,
-            );
-            return (
-              <Link
-                key={day}
-                href={`/history/${day}`}
-                className="surface block rounded-3xl p-5 transition-colors hover:border-primary/30"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-[13px] font-medium">
-                      {formatDay(day, { weekday: "short", month: "short" })}
-                    </h2>
-                    <p className="mt-1.5 text-[10px] text-muted-foreground">
-                      {count} {count === 1 ? "intake" : "intakes"}
-                      {hasGoals
-                        ? ` · ${over ? "Above a recorded maximum" : "Within recorded maximums"}`
-                        : " · No daily goal"}
-                    </p>
-                  </div>
-                  <ActionIcon
-                    name="open"
-                    className="mt-1 text-muted-foreground"
-                  />
-                </div>
-                <div className="mt-3.5 flex flex-wrap gap-2">
-                  {totals.map((t) => (
-                    <span
-                      key={t.medicationId}
-                      className="rounded-lg bg-muted/70 px-2.5 py-1.5 text-[10px] text-muted-foreground"
-                    >
-                      {t.medicationName}
-                      <span className="ml-2 font-medium text-foreground">
-                        {formatDose(t.totalMg)} mg
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </Link>
-            );
-          })}
+          {days.slice(0, limit).map((day) => (
+            <HistoryDayCard key={day} data={data} day={day} />
+          ))}
         </div>
       )}
       {days.length > limit && (

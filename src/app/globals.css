@@ -505,6 +505,378 @@
     opacity: 0.17;
   }
 }
+.history-day-card {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  overflow: visible;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--foreground);
+  text-align: left;
+  text-decoration: none;
+}
+.history-day-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.history-card-bleed,
+.history-card-glass,
+.history-card-mesh,
+.history-card-pattern,
+.history-card-curves,
+.history-card-ink,
+.history-card-orbit,
+.history-card-sticker--a,
+.history-card-sticker--b,
+.history-card-confetti--a,
+.history-card-confetti--b,
+.history-card-confetti--c {
+  pointer-events: none;
+}
+.history-card-bleed {
+  position: absolute;
+  z-index: -1;
+  inset: -4px;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      ellipse 78px 58px at 42px 42px,
+      var(--day-color-a),
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 100px 36px at 82% 85%,
+      var(--day-color-c),
+      transparent 80%
+    );
+  opacity: 0.12;
+  animation: history-card-edge-breathe 23s ease-in-out var(--day-phase, 0s)
+    infinite;
+}
+.history-card-glass {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: inherit;
+  background: rgb(255 253 253 / 62%);
+  -webkit-backdrop-filter: blur(64px) saturate(1.2);
+  backdrop-filter: blur(64px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 #ffffff40,
+    inset 0 -1px 0 #120f170a;
+}
+.history-card-mesh {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 148px 110px at 44px 44px,
+      var(--day-wash-a),
+      transparent 82%
+    ),
+    radial-gradient(ellipse at 84% 18%, var(--day-wash-b), transparent 65%),
+    radial-gradient(ellipse at 33% 100%, var(--day-wash-c), transparent 65%),
+    linear-gradient(128deg, var(--day-wash-a), var(--day-wash-d));
+  transform-origin: 44px 44px;
+  opacity: 0.64;
+  transform: rotate(-3deg) scale(1.08);
+  animation: history-card-mesh-drift 17s ease-in-out var(--day-phase, 0s)
+    infinite;
+}
+.history-card-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    var(--day-color-a) 0.6px,
+    transparent 1px
+  );
+  background-position: 44px 44px;
+  background-size: 17px 17px;
+  opacity: 0.075;
+}
+.history-card-curves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 360px;
+  max-width: none;
+  height: 150px;
+  overflow: visible;
+  fill: none;
+  transform-origin: 44px 44px;
+  opacity: 0.2;
+  animation: history-card-curve-drift 21s ease-in-out var(--day-phase, 0s)
+    infinite;
+}
+.history-card-curves path {
+  stroke: var(--day-color-b);
+  stroke-width: 18px;
+  stroke-linecap: round;
+}
+.history-card-curves path + path {
+  stroke: var(--day-color-d);
+  stroke-width: 10px;
+}
+.history-card-ink {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  background: #120f17;
+  opacity: 0.2;
+}
+.history-card-content {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+}
+.history-card-focus {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+.history-card-orbit {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 68px;
+  height: 48px;
+  border: 1px dashed var(--day-color-b);
+  border-radius: 50%;
+  opacity: 0.52;
+  transform: translate(-50%, -50%) rotate(var(--day-orbit-angle, 0deg));
+  animation: history-card-orbit 18s linear var(--day-phase, 0s) infinite;
+}
+.history-card-bead {
+  position: absolute;
+  top: -3px;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--popover);
+  border-radius: 50%;
+  background: var(--day-color-b);
+}
+.history-card-bead + .history-card-bead {
+  top: auto;
+  bottom: -3px;
+  background: var(--day-color-d);
+}
+.history-card-sticker--a,
+.history-card-sticker--b {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ffffff38;
+  border-radius: 13px;
+}
+.history-card-sticker--a {
+  background: var(--day-color-a);
+  opacity: 0.55;
+  transform: translate(-58%, -46%) rotate(-14deg);
+  animation: history-card-sticker-rock-a 13s ease-in-out var(--day-phase, 0s)
+    infinite;
+}
+.history-card-sticker--b {
+  background: linear-gradient(135deg, var(--day-color-c), var(--day-color-d));
+  opacity: 0.58;
+  transform: translate(-42%, -54%) rotate(13deg);
+  animation: history-card-sticker-rock-b 19s ease-in-out var(--day-phase, 0s)
+    infinite;
+}
+.history-card-mark {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--popover);
+  color: var(--foreground);
+  box-shadow: 0 3px 8px #120f1726;
+}
+.history-card-confetti--a,
+.history-card-confetti--b,
+.history-card-confetti--c {
+  position: absolute;
+  z-index: 1;
+  animation: history-card-confetti-drift 16s ease-in-out var(--day-phase, 0s)
+    infinite;
+}
+.history-card-confetti--a {
+  top: 1px;
+  left: -3px;
+  width: 7px;
+  height: 7px;
+  color: var(--day-color-c);
+  opacity: 0.6;
+}
+.history-card-confetti--a::before,
+.history-card-confetti--a::after {
+  content: "";
+  position: absolute;
+  border-radius: 1px;
+  background: currentColor;
+}
+.history-card-confetti--a::before {
+  top: 3px;
+  width: 7px;
+  height: 1.5px;
+}
+.history-card-confetti--a::after {
+  left: 3px;
+  width: 1.5px;
+  height: 7px;
+}
+.history-card-confetti--b {
+  top: -3px;
+  right: -3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--day-color-b);
+  opacity: 0.65;
+  animation-duration: 21s;
+}
+.history-card-confetti--c {
+  right: -4px;
+  bottom: -1px;
+  width: 8px;
+  height: 5px;
+  border: 1.5px solid var(--day-color-d);
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  opacity: 0.55;
+  animation-duration: 23s;
+}
+.history-card-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.history-card-total {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 26px;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--popover);
+  color: var(--foreground);
+  font-size: 10px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+@media (prefers-color-scheme: dark) {
+  .history-card-glass {
+    background: rgb(18 15 23 / 46%);
+    box-shadow:
+      inset 0 1px 0 #fed7aa16,
+      inset 0 -1px 0 #120f171a;
+  }
+  .history-card-glass::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 52px,
+      rgb(18 15 23 / 50%) 96px
+    );
+    pointer-events: none;
+  }
+}
+@keyframes history-card-mesh-drift {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: rotate(-3deg) scale(1.08);
+  }
+  50% {
+    opacity: 0.72;
+    transform: rotate(3deg) scale(1.14);
+  }
+}
+@keyframes history-card-curve-drift {
+  0%,
+  100% {
+    opacity: 0.17;
+    transform: rotate(-2deg) translateY(2px);
+  }
+  50% {
+    opacity: 0.26;
+    transform: rotate(2deg) translateY(-2px);
+  }
+}
+@keyframes history-card-orbit {
+  from {
+    transform: translate(-50%, -50%) rotate(var(--day-orbit-angle, 0deg));
+  }
+  to {
+    transform: translate(-50%, -50%)
+      rotate(calc(var(--day-orbit-angle, 0deg) + 360deg));
+  }
+}
+@keyframes history-card-sticker-rock-a {
+  0%,
+  100% {
+    transform: translate(-58%, -46%) rotate(-14deg);
+  }
+  50% {
+    transform: translate(-55%, -43%) rotate(-8deg);
+  }
+}
+@keyframes history-card-sticker-rock-b {
+  0%,
+  100% {
+    transform: translate(-42%, -54%) rotate(13deg);
+  }
+  50% {
+    transform: translate(-45%, -57%) rotate(8deg);
+  }
+}
+@keyframes history-card-confetti-drift {
+  0%,
+  100% {
+    transform: translateY(1px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(12deg);
+  }
+}
+@keyframes history-card-edge-breathe {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.18;
+  }
+}
 .medication-archive-toggle,
 .medication-archive-toggle:hover,
 .medication-archive-toggle[data-pressed] {

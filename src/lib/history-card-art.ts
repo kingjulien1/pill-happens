@@ -54,7 +54,11 @@ export function getHistoryCardArt(
   const ranked = [...pigments.values()].sort(
     (left, right) =>
       right.count - left.count ||
-      (left.firstMedicationId < right.firstMedicationId ? -1 : 1),
+      (left.firstMedicationId === right.firstMedicationId
+        ? 0
+        : left.firstMedicationId < right.firstMedicationId
+          ? -1
+          : 1),
   );
   const colors = ranked.slice(0, 4).map(({ hex }) => hex);
   const primary = colors[0] ?? getMedicationColor().hex;
