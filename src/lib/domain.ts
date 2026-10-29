@@ -11,6 +11,8 @@ export type Medication = {
   color: MedicationColor;
   /** Missing on older records; the interface renders the default pill icon. */
   icon?: string;
+  /** Clockwise degrees; missing on older records means an upright glyph. */
+  iconRotation?: number;
   archived: boolean;
   createdAt: string;
 };

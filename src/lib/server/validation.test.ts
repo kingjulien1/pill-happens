@@ -120,6 +120,53 @@ test("legacy medications and unrelated patches do not gain or reset an intake de
   });
 });
 
+test("medication icon rotation accepts whole clockwise degrees and explicit upright reset", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  };
+  for (const iconRotation of [0, 1, 45, 90, 315, 359]) {
+    assert.equal(
+      medicationSchema.parse({ ...medication, iconRotation }).iconRotation,
+      iconRotation,
+    );
+    assert.deepEqual(medicationPatchSchema.parse({ iconRotation }), {
+      iconRotation,
+    });
+  }
+  for (const iconRotation of [-1, 360, 45.5, Infinity, NaN, null, "45"]) {
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, iconRotation }).success,
+      false,
+    );
+    assert.equal(
+      medicationPatchSchema.safeParse({ iconRotation }).success,
+      false,
+    );
+  }
+});
+
+test("legacy medications and unrelated patches do not introduce or reset icon rotation", () => {
+  const legacy = medicationSchema.parse({
+    name: "Legacy",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  });
+  assert.equal(Object.hasOwn(legacy, "iconRotation"), false);
+  for (const patch of [
+    { name: "Renamed" },
+    { archived: true },
+    { icon: "🌙" },
+  ]) {
+    assert.deepEqual(medicationPatchSchema.parse(patch), patch);
+    const edited = Object.assign({ ...legacy, iconRotation: 135 }, patch);
+    assert.equal(edited.iconRotation, 135);
+  }
+});
+
 test("medication validation accepts every registered color and rejects unknown colors", () => {
   const medication = { name: "Example", strengthMg: 1, form: "tablet" };
   for (const { value } of MEDICATION_COLORS) {

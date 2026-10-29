@@ -1,12 +1,25 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
-import { Check, Eye, Search, Shuffle, Undo2, X } from "lucide-react";
+import {
+  Check,
+  Eye,
+  RotateCcw,
+  RotateCw,
+  Search,
+  Shuffle,
+  Undo2,
+  X,
+} from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
 import { Input } from "@/components/ui/input";
 import { EMOJI_CATALOG, searchEmoji } from "@/lib/emoji-catalog";
-import { getLucideIconLabel, searchLucideIcons } from "@/lib/lucide-catalog";
+import {
+  getLucideIconLabel,
+  LUCIDE_ICON_CATALOG,
+  searchLucideIcons,
+} from "@/lib/lucide-catalog";
 import {
   getSvgIcon,
   isMedicationSvgIcon,
@@ -25,6 +38,8 @@ import { cn } from "@/lib/utils";
 
 const SEARCH_DELAY = 2500;
 const RESULT_LIMIT = 96;
+const iconCount = LUCIDE_ICON_CATALOG.length + SVG_ICON_CATALOG.length;
+const emojiCount = EMOJI_CATALOG.length;
 const pickerPanelClass =
   "relative h-[134px] w-full overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-foreground/[.025] [scrollbar-gutter:stable]";
 const pickerGridClass = "grid grid-cols-8 gap-1 p-2 max-[359px]:grid-cols-6";
@@ -38,7 +53,7 @@ type SymbolOption = {
   label: string;
   source: "Icon" | "SVG" | "Color" | "Emoji";
 };
-type Look = { color: MedicationColor; icon: string };
+type Look = { color: MedicationColor; icon: string; rotation: number };
 const surpriseIcons = [
   "sun",
   "leaf",
@@ -148,19 +163,23 @@ function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
 export function MedicationAppearanceFields({
   color,
   icon,
+  iconRotation = 0,
   name = "",
   strength = "",
   medicationType = "tablet",
   onColorChange,
   onIconChange,
+  onRotationChange,
 }: {
   color: MedicationColor;
   icon: string;
+  iconRotation?: number;
   name?: string;
   strength?: string;
   medicationType?: Medication["form"];
   onColorChange: (value: MedicationColor) => void;
   onIconChange: (value: string) => void;
+  onRotationChange: (value: number) => void;
 }) {
   const id = useId();
   const searchInput = useRef<HTMLInputElement>(null);
@@ -229,11 +248,15 @@ export function MedicationAppearanceFields({
     onIconChange(value);
   }
   function shuffleLook() {
-    setUndo({ color, icon });
+    setUndo({ color, icon, rotation: iconRotation });
     const colors = MEDICATION_COLORS.filter((item) => item.value !== color);
     const icons = surpriseIcons.filter((value) => value !== icon);
     onColorChange(colors[Math.floor(Math.random() * colors.length)].value);
     onIconChange(icons[Math.floor(Math.random() * icons.length)]);
+  }
+  function rotateIcon(angle: number) {
+    setUndo(null);
+    onRotationChange((angle + 360) % 360);
   }
 
   return (
@@ -332,7 +355,16 @@ export function MedicationAppearanceFields({
               data-appearance-search-status
             >
               {phase === "idle" ? (
-                "Your move"
+                <span>
+                  <span className="font-[550] tabular-nums">
+                    {iconCount.toLocaleString("en")}
+                  </span>{" "}
+                  icons,{" "}
+                  <span className="font-[550] tabular-nums">
+                    {emojiCount.toLocaleString("en")}
+                  </span>{" "}
+                  emojis
+                </span>
               ) : phase === "loading" ? (
                 "On it…"
               ) : (
@@ -480,7 +512,8 @@ export function MedicationAppearanceFields({
 
       <section
         aria-labelledby={`${id}-preview-title`}
-        className="w-full min-w-0"
+        className="w-full min-w-0 pt-2"
+        data-appearance-preview-section
       >
         <div
           className="final-look-showcase relative w-full overflow-hidden rounded-3xl bg-foreground/[.025] p-[18px]"
@@ -488,6 +521,8 @@ export function MedicationAppearanceFields({
             {
               "--preview-accent": selectedColor.hex,
               "--preview-pigment": fixedColor?.hex ?? selectedColor.hex,
+              "--preview-outline": `${selectedColor.hex}38`,
+              "--preview-shadow": `${selectedColor.hex}1a`,
             } as CSSProperties
           }
           data-appearance-preview
@@ -503,19 +538,19 @@ export function MedicationAppearanceFields({
             className="relative flex items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
             data-preview-header
           >
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex min-w-0 items-center gap-3">
               <h3
                 id={`${id}-preview-title`}
-                className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium"
+                className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-4 font-[550] text-foreground"
               >
                 <Eye
                   aria-hidden="true"
-                  className="size-3 shrink-0"
+                  className="size-3.5 shrink-0"
                   strokeWidth={2.25}
                 />
                 Final look
               </h3>
-              <span className="inline-flex min-w-0 items-center gap-1.5">
+              <span className="inline-flex min-w-0 items-center gap-2">
                 <span
                   aria-hidden="true"
                   className="size-1.5 shrink-0 rounded-full"
@@ -542,6 +577,7 @@ export function MedicationAppearanceFields({
               <MedicationIcon
                 color={color}
                 icon={icon}
+                rotation={iconRotation}
                 className="size-24 rounded-[28px] ring-1 ring-foreground/10 [&_[data-medication-glyph]]:size-12"
               />
               <span aria-hidden="true" className="final-look-icon-rim" />
@@ -553,6 +589,48 @@ export function MedicationAppearanceFields({
           >
             {symbolLabel}
           </p>
+          <div
+            role="group"
+            aria-label="Icon rotation"
+            className="relative mt-2 flex items-center justify-center gap-1"
+            data-appearance-rotation-controls
+          >
+            <button
+              type="button"
+              aria-label="Rotate icon left by 45 degrees"
+              onClick={() => rotateIcon(iconRotation - 45)}
+              className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
+            >
+              <RotateCcw
+                aria-hidden="true"
+                className="size-3.5"
+                strokeWidth={2.25}
+              />
+            </button>
+            <button
+              type="button"
+              aria-label="Reset icon rotation"
+              title="Reset to 0°"
+              disabled={iconRotation === 0}
+              onClick={() => rotateIcon(0)}
+              className="inline-flex h-8 min-w-10 items-center justify-center rounded-lg px-1.5 text-[10px] font-medium text-muted-foreground tabular-nums hover:bg-foreground/5 disabled:opacity-60"
+              data-rotation-angle={iconRotation}
+            >
+              {iconRotation}°
+            </button>
+            <button
+              type="button"
+              aria-label="Rotate icon right by 45 degrees"
+              onClick={() => rotateIcon(iconRotation + 45)}
+              className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
+            >
+              <RotateCw
+                aria-hidden="true"
+                className="size-3.5"
+                strokeWidth={2.25}
+              />
+            </button>
+          </div>
           {fixedColor && (
             <p className="relative mt-1 text-center text-[10px] text-muted-foreground">
               Fixed tablet color
@@ -569,6 +647,7 @@ export function MedicationAppearanceFields({
             <MedicationIcon
               color={color}
               icon={icon}
+              rotation={iconRotation}
               small
               className="size-10 rounded-xl"
             />
@@ -600,6 +679,7 @@ export function MedicationAppearanceFields({
                 if (!undo) return;
                 onColorChange(undo.color);
                 onIconChange(undo.icon);
+                onRotationChange(undo.rotation);
                 setUndo(null);
               }}
               className={previewActionClass}
@@ -630,7 +710,8 @@ export function MedicationAppearanceFields({
             </button>
           </div>
           <p className="sr-only" role="status">
-            Selected {symbolLabel}, {selectedColor.label} color.
+            Selected {symbolLabel}, {selectedColor.label} color. Rotation{" "}
+            {iconRotation} degrees.
           </p>
         </div>
       </section>

@@ -266,6 +266,7 @@ function IntakeTimeline({
                 <MedicationIcon
                   color={medication?.color}
                   icon={medication?.icon}
+                  rotation={medication?.iconRotation}
                   small
                 />
                 <div className="min-w-0 flex-1 pt-.5">
@@ -431,7 +432,11 @@ export function MedicationsPage() {
               key={m.id}
               className="surface flex items-center gap-3.5 rounded-3xl p-4"
             >
-              <MedicationIcon color={m.color} icon={m.icon} />
+              <MedicationIcon
+                color={m.color}
+                icon={m.icon}
+                rotation={m.iconRotation}
+              />
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-sm font-medium">{m.name}</h3>
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -552,7 +557,12 @@ export function GoalsPage() {
             return (
               <article key={goal.id} className="surface rounded-3xl p-5">
                 <div className="mb-4 flex items-center gap-3">
-                  <MedicationIcon color={med?.color} icon={med?.icon} small />
+                  <MedicationIcon
+                    color={med?.color}
+                    icon={med?.icon}
+                    rotation={med?.iconRotation}
+                    small
+                  />
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm font-medium">
                       {med?.name ?? "Medication"}

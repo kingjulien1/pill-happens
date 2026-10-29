@@ -208,17 +208,20 @@ export function MedicationTypeIcon({
 export function MedicationIcon({
   color,
   icon,
+  rotation = 0,
   small = false,
   className,
 }: {
   color?: string;
   icon?: string;
+  rotation?: number;
   small?: boolean;
   className?: string;
 }) {
   const appearance = getMedicationColor(color);
   const style = {
     "--medication-color": appearance.hex,
+    "--medication-rotation": `${rotation}deg`,
     color:
       "color-mix(in srgb, var(--medication-color) var(--medication-symbol-mix), var(--foreground))",
     backgroundColor:

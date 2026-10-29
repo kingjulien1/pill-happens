@@ -159,6 +159,7 @@ export function IntakeForm({
                   <MedicationIcon
                     icon={medication.icon}
                     color={medication.color}
+                    rotation={medication.iconRotation}
                     small
                     className="size-6 rounded-md"
                   />
@@ -182,6 +183,7 @@ export function IntakeForm({
                   <MedicationIcon
                     icon={m.icon}
                     color={m.color}
+                    rotation={m.iconRotation}
                     small
                     className="size-6 rounded-md"
                   />

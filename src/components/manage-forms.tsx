@@ -72,6 +72,9 @@ export function MedicationForm({
     medication?.color ?? "rose",
   );
   const [icon, setIcon] = useState(medication?.icon ?? "pill");
+  const [iconRotation, setIconRotation] = useState(
+    medication?.iconRotation ?? 0,
+  );
   const [error, setError] = useState<string | null>(null);
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -110,6 +113,7 @@ export function MedicationForm({
           form,
           color,
           icon,
+          iconRotation,
         },
         medication ? "PATCH" : "POST",
       );
@@ -262,10 +266,12 @@ export function MedicationForm({
         <MedicationAppearanceFields
           color={color}
           icon={icon}
+          iconRotation={iconRotation}
           name={name}
           strength={strength}
           medicationType={form}
           onColorChange={setColor}
+          onRotationChange={setIconRotation}
           onIconChange={(value) => {
             setIcon(value);
             if (isMedicationIcon(value)) {
@@ -384,6 +390,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                   <>
                     <MedicationIcon
                       icon={selectedMedication.icon}
+                      rotation={selectedMedication.iconRotation}
                       color={selectedMedication.color}
                       small
                       className="size-5 rounded-md"
@@ -406,6 +413,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                   <span className="flex min-w-0 items-center gap-2">
                     <MedicationIcon
                       icon={medication.icon}
+                      rotation={medication.iconRotation}
                       color={medication.color}
                       small
                       className="size-5 rounded-md"

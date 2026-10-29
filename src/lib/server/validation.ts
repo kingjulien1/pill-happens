@@ -28,6 +28,7 @@ export const medicationSchema = z.object({
     .max(64, "Choose an icon or a single emoji.")
     .refine(isMedicationIcon, "Choose an icon or a single emoji.")
     .optional(),
+  iconRotation: z.number().int().min(0).max(359).optional(),
 });
 export const medicationPatchSchema = medicationSchema
   .partial()

@@ -206,6 +206,9 @@
   background: rgb(239 228 216 / 40%);
   pointer-events: none;
 }
+[data-medication-mark] > [data-medication-glyph] {
+  transform: rotate(var(--medication-rotation, 0deg));
+}
 .final-look-showcase {
   isolation: isolate;
   box-shadow:
@@ -407,6 +410,10 @@
 }
 .final-look-journal {
   isolation: isolate;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--foreground) 10%, transparent),
+    0 0 0 1px var(--preview-outline),
+    0 4px 14px var(--preview-shadow);
 }
 .final-look-journal::before {
   content: "";
