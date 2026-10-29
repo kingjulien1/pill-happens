@@ -26,19 +26,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <StreakMenu />
       </header>
       <main id="main" className="flex min-w-0 flex-1 flex-col">
-        {error ? (
-          <div role="alert" className="surface rounded-3xl p-8 text-center">
+        {error && (
+          <div
+            role="alert"
+            className={
+              data
+                ? "surface mb-4 flex items-center gap-3 rounded-2xl px-4 py-3"
+                : "surface rounded-3xl p-8 text-center"
+            }
+          >
             <p className="text-sm text-muted-foreground">{error}</p>
             <Button
               variant="outline"
-              className="mt-5 h-11 px-5"
+              className={data ? "h-10 shrink-0 px-3 text-xs" : "mt-5 h-11 px-5"}
               onClick={() => void refresh()}
             >
               <ActionIcon name="retry" className="mr-2" />
               Try again
             </Button>
           </div>
-        ) : !data ? (
+        )}
+        {!data && !error && (
           <div
             role="status"
             className="flex min-h-64 flex-1 items-center justify-center gap-2 text-sm text-muted-foreground"
@@ -46,7 +54,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <ActionIcon name="loading" className="animate-spin" />
             Opening your space…
           </div>
-        ) : (
+        )}
+        {data && (
           <div
             key={path}
             className={`page-enter min-w-0 flex-1 ${path === "/" ? "flex flex-col" : ""}`}
