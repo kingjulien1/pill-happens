@@ -55,6 +55,10 @@ export function IntakeCard({
   const style = {
     "--entry-color": color.hex,
     "--entry-light": scale.lighter,
+    // Explicit alpha avoids opaque CSS color-mix fallbacks in older browsers.
+    "--entry-rim-tint": `${scale.lighter}14`,
+    "--entry-rim-hover-tint": `${scale.lighter}1f`,
+    "--entry-hover-glow": `${color.hex}1f`,
     "--entry-deep": scale.darker,
     "--entry-pop": accents.pop,
     "--entry-spark": accents.spark,
@@ -96,7 +100,7 @@ export function IntakeCard({
           <span className="intake-card-ink" data-intake-ink />
         </span>
       </span>
-      <div className="intake-card-content relative flex items-start gap-3 p-4">
+      <div className="intake-card-content relative flex items-start gap-3">
         <span className="intake-card-icon-arrival">
           <span
             className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"

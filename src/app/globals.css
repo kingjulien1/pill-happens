@@ -350,18 +350,22 @@
   transform: rotate(180deg);
 }
 .intake-log-card {
+  --entry-rim-width: 4px;
+  --entry-card-padding: calc(16px - var(--entry-rim-width) - 1px);
+  --entry-focus: calc(var(--entry-card-padding) + 28px);
   position: relative;
   isolation: isolate;
   display: block;
   width: 100%;
   overflow: visible;
-  border: 1px solid var(--border);
+  border: var(--entry-rim-width) solid var(--entry-rim-tint);
   border-radius: 21px;
   background: transparent;
   color: var(--foreground);
   text-align: left;
   cursor: pointer;
-  transform-origin: 44px 44px;
+  transform-origin: calc(var(--entry-rim-width) + var(--entry-focus))
+    calc(var(--entry-rim-width) + var(--entry-focus));
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease;
@@ -380,7 +384,7 @@
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  transform-origin: 44px 44px;
+  transform-origin: var(--entry-focus) var(--entry-focus);
   animation: intake-card-scene-arrive 900ms cubic-bezier(0.22, 1, 0.36, 1)
     calc(var(--entry-delay, 0ms) + 35ms) backwards;
 }
@@ -439,7 +443,7 @@
 .intake-card-bleed {
   position: absolute;
   z-index: -1;
-  inset: -4px;
+  inset: calc(-4px - var(--entry-rim-width));
   overflow: hidden;
   border-radius: 25px;
   background: radial-gradient(
@@ -458,7 +462,7 @@
   inset: 0;
   isolation: isolate;
   overflow: hidden;
-  border-radius: inherit;
+  border-radius: calc(21px - var(--entry-rim-width));
   background:
     linear-gradient(145deg, #ffffff24, #ffffff00 45%, #ffffff0a),
     rgb(255 253 253 / 18%);
@@ -491,6 +495,40 @@
   padding: 4px;
 }
 @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .intake-log-card {
+    border-color: transparent;
+  }
+  .intake-log-card::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: calc(-1 * var(--entry-rim-width));
+    padding: var(--entry-rim-width);
+    border-radius: inherit;
+    background-color: var(--entry-rim-tint);
+    background-image: linear-gradient(
+      145deg,
+      #ffffff24,
+      #ffffff05 38%,
+      #ffffff17 60%,
+      #ffffff08
+    );
+    -webkit-backdrop-filter: blur(72px) saturate(1.05);
+    backdrop-filter: blur(72px) saturate(1.05);
+    box-shadow:
+      inset 0 1px 0 #ffffff38,
+      inset 0 -1px 0 #ffffff12;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    transition: background-color 180ms ease;
+  }
   .intake-card-bleed,
   .history-card-bleed {
     display: block;
@@ -509,7 +547,7 @@
   inset: 0;
   background:
     radial-gradient(
-      ellipse 140px 100px at 44px 44px,
+      ellipse 140px 100px at var(--entry-focus) var(--entry-focus),
       var(--entry-light),
       var(--entry-color) 55%,
       transparent
@@ -521,7 +559,7 @@
     ),
     radial-gradient(ellipse at 28% 90%, var(--entry-light), transparent 65%),
     linear-gradient(125deg, var(--entry-color), var(--entry-deep));
-  transform-origin: 44px 44px;
+  transform-origin: var(--entry-focus) var(--entry-focus);
   transform: rotate(-2.5deg) scale(1.07);
   animation: intake-card-mesh-drift 19s ease-in-out var(--entry-phase, 0s)
     infinite;
@@ -534,7 +572,7 @@
     var(--entry-color) 0.55px,
     transparent 0.9px
   );
-  background-position: 44px 44px;
+  background-position: var(--entry-focus) var(--entry-focus);
   background-size: 16px 16px;
   opacity: 0.065;
 }
@@ -547,7 +585,7 @@
   height: 150px;
   overflow: visible;
   fill: none;
-  transform-origin: 44px 44px;
+  transform-origin: var(--entry-focus) var(--entry-focus);
   opacity: 0.5;
   animation: intake-card-curve-drift 26s ease-in-out var(--entry-phase, 0s)
     infinite;
@@ -572,6 +610,7 @@
 .intake-card-content {
   position: relative;
   z-index: 1;
+  padding: var(--entry-card-padding);
 }
 .intake-card-focus {
   position: relative;
@@ -712,14 +751,14 @@
 }
 @keyframes intake-card-scene-arrive {
   0% {
-    clip-path: circle(0 at 44px 44px);
+    clip-path: circle(0 at var(--entry-focus) var(--entry-focus));
     transform: scale(0.96);
   }
   45% {
-    clip-path: circle(40% at 44px 44px);
+    clip-path: circle(40% at var(--entry-focus) var(--entry-focus));
   }
   100% {
-    clip-path: circle(160% at 44px 44px);
+    clip-path: circle(160% at var(--entry-focus) var(--entry-focus));
     transform: none;
   }
 }
@@ -2408,9 +2447,11 @@
     color: var(--foreground);
   }
   .intake-group[data-expanded="true"] .intake-log-card:not(:disabled):hover {
-    border-color: color-mix(in srgb, var(--entry-light) 60%, var(--border));
-    box-shadow: 0 4px 18px
-      color-mix(in srgb, var(--entry-color) 12%, transparent);
+    box-shadow: 0 4px 18px var(--entry-hover-glow);
+  }
+  .intake-group[data-expanded="true"]
+    .intake-log-card:not(:disabled):hover::before {
+    background-color: var(--entry-rim-hover-tint);
   }
   .brand-lockup:hover::before {
     outline-color: rgb(254 215 170 / 85%);
