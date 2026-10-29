@@ -6,11 +6,23 @@ import {
 } from "node:crypto";
 
 // Pure primitives: actual environment values are supplied only by server-only auth.ts.
-// Persistent cookies are capped at 400 days by modern browsers.
+// Chrome caps persistent cookies at 400 days; other browsers may clear earlier.
 export const SESSION_MAX_AGE = 400 * 24 * 60 * 60;
 export const SESSION_RENEW_INTERVAL = 24 * 60 * 60;
 export const MIN_PASSWORD_LENGTH = 4;
 export const LEGACY_JOURNAL_ID = "personal";
+
+/** Keep the session across app restarts and incoming top-level navigation. */
+export function sessionCookieOptions(production: boolean) {
+  return {
+    httpOnly: true,
+    secure: production,
+    sameSite: "lax" as const,
+    priority: "high" as const,
+    path: "/",
+    maxAge: SESSION_MAX_AGE,
+  };
+}
 
 /** Journal scopes are fixed legacy storage or canonical generated UUIDs. */
 export function isJournalId(value: unknown): value is string {
@@ -314,4 +326,14 @@ export function renewJournalSessionToken(
   const remaining = session.expiresAt - Math.floor(now / 1000);
   if (remaining > SESSION_MAX_AGE - SESSION_RENEW_INTERVAL) return null;
   return createJournalSessionToken(session.journalId, credentials, now);
+}
+
+/** Reissue current cookie policy immediately, rotating the token only when due. */
+export function journalSessionTokenForRefresh(
+  token: string,
+  credentials: Credentials,
+  now = Date.now(),
+): string | null {
+  if (!journalSessionFromToken(token, credentials, now)) return null;
+  return renewJournalSessionToken(token, credentials, now) ?? token;
 }

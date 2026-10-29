@@ -18,6 +18,8 @@ export function POST(request: Request) {
       });
       return response;
     },
-    { mutation: true },
+    // Clearing this browser's cookie is safe even after its session expires.
+    // The same-origin mutation check still applies.
+    { public: true, mutation: true },
   );
 }

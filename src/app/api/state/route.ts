@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { api } from "@/lib/server/api";
 import {
   cookieOptions,
-  renewSessionIfNeeded,
+  sessionCookieForRefresh,
   SESSION_COOKIE,
 } from "@/lib/server/auth";
 import { readState } from "@/lib/server/store";
@@ -14,10 +14,10 @@ export function GET(request: Request) {
   return api(request, async () => {
     const state = await readState();
     const response = NextResponse.json(state, {
-      headers: { "Cache-Control": "private, no-store" },
+      headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
     });
-    const renewed = await renewSessionIfNeeded();
-    if (renewed) response.cookies.set(SESSION_COOKIE, renewed, cookieOptions());
+    const token = await sessionCookieForRefresh();
+    if (token) response.cookies.set(SESSION_COOKIE, token, cookieOptions());
     return response;
   });
 }

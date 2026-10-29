@@ -8,11 +8,13 @@ import {
   isSameOriginRequest,
   journalFromSessionToken,
   journalSessionFromToken,
+  journalSessionTokenForRefresh,
   LEGACY_JOURNAL_ID,
   passwordMatchesValue,
   renewJournalSessionToken,
   SESSION_MAX_AGE,
   SESSION_RENEW_INTERVAL,
+  sessionCookieOptions,
   verifySessionToken,
 } from "./security";
 
@@ -353,6 +355,134 @@ test("persistent sessions last 400 days and expose expiry only for an authentica
       journalSessionFromToken(
         token,
         { ...credentials, secret: "a-different-valid-secret-for-testing" },
+        now,
+      ),
+      null,
+    );
+  }
+});
+
+test("persistent cookie policy permits app launches while protecting session credentials", () => {
+  const production = sessionCookieOptions(true);
+  assert.deepEqual(production, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    priority: "high",
+    path: "/",
+    maxAge: 400 * 24 * 60 * 60,
+  });
+  assert.deepEqual(sessionCookieOptions(false), {
+    ...production,
+    secure: false,
+  });
+});
+
+test("fresh valid cookies can receive new browser policy without token rotation", () => {
+  for (const token of [
+    createSessionToken(credentials, now),
+    ...["personal", journalA, journalB].map((journalId) =>
+      createJournalSessionToken(journalId, credentials, now),
+    ),
+  ]) {
+    assert.equal(journalSessionTokenForRefresh(token, credentials, now), token);
+    assert.equal(
+      journalSessionTokenForRefresh(
+        token,
+        credentials,
+        now + SESSION_RENEW_INTERVAL * 1000 - 1,
+      ),
+      token,
+    );
+    const refreshAt = now + SESSION_RENEW_INTERVAL * 1000;
+    const refreshed = journalSessionTokenForRefresh(
+      token,
+      credentials,
+      refreshAt,
+    );
+    assert.ok(refreshed);
+    assert.notEqual(refreshed, token);
+    assert.deepEqual(
+      journalSessionFromToken(refreshed, credentials, refreshAt),
+      {
+        journalId: journalFromSessionToken(token, credentials, now),
+        expiresAt: Math.floor(refreshAt / 1000) + SESSION_MAX_AGE,
+      },
+    );
+  }
+});
+
+test("cookie refresh upgrades short-lived legacy sessions while keeping journal scope", () => {
+  const earlierIssue = now - (SESSION_MAX_AGE - 30 * 24 * 60 * 60) * 1000;
+  for (const token of [
+    createSessionToken(credentials, earlierIssue),
+    ...["personal", journalA, journalB].map((journalId) =>
+      createJournalSessionToken(journalId, credentials, earlierIssue),
+    ),
+  ]) {
+    const refreshed = journalSessionTokenForRefresh(token, credentials, now);
+    assert.ok(refreshed);
+    assert.notEqual(refreshed, token);
+    assert.deepEqual(journalSessionFromToken(refreshed, credentials, now), {
+      journalId: journalFromSessionToken(token, credentials, now),
+      expiresAt: Math.floor(now / 1000) + SESSION_MAX_AGE,
+    });
+  }
+});
+
+test("cookie policy refresh never reissues invalid, expired, or revoked tokens", () => {
+  for (const token of [
+    createSessionToken(credentials, now),
+    ...["personal", journalA, journalB].map((journalId) =>
+      createJournalSessionToken(journalId, credentials, now),
+    ),
+  ]) {
+    const [payload, signature] = token.split(".");
+    const decoded = JSON.parse(
+      Buffer.from(payload, "base64url").toString("utf8"),
+    );
+    const changed = Buffer.from(
+      JSON.stringify({ ...decoded, exp: decoded.exp + 1 }),
+    ).toString("base64url");
+    for (const invalid of [
+      "",
+      "x.x",
+      `${payload}.`,
+      `${payload}.${signature}.extra`,
+      `${payload}.${signature}!`,
+      `${changed}.${signature}`,
+      "a".repeat(1025),
+    ]) {
+      assert.equal(
+        journalSessionTokenForRefresh(invalid, credentials, now),
+        null,
+      );
+    }
+    assert.equal(
+      journalSessionTokenForRefresh(
+        token,
+        credentials,
+        now + SESSION_MAX_AGE * 1000,
+      ),
+      null,
+    );
+    assert.equal(
+      journalSessionTokenForRefresh(
+        token,
+        { ...credentials, secret: `${credentials.secret}-rotated` },
+        now,
+      ),
+      null,
+    );
+  }
+  for (const token of [
+    createSessionToken(credentials, now),
+    createJournalSessionToken("personal", credentials, now),
+  ]) {
+    assert.equal(
+      journalSessionTokenForRefresh(
+        token,
+        { ...credentials, password: "a-new-owner-password" },
         now,
       ),
       null,

@@ -5,9 +5,9 @@ import {
   configurationIssueFor,
   createJournalSessionToken,
   journalFromSessionToken,
+  journalSessionTokenForRefresh,
   LEGACY_JOURNAL_ID,
-  renewJournalSessionToken,
-  SESSION_MAX_AGE,
+  sessionCookieOptions,
 } from "@/lib/server/security";
 import { journalRepository } from "./database";
 import { createJournalService } from "./journal-service";
@@ -78,19 +78,13 @@ export async function isAuthenticated(): Promise<boolean> {
   return (await authenticatedJournal()) !== null;
 }
 
-/** Route handlers may refresh a valid cookie after a successful journal load. */
-export async function renewSessionIfNeeded(): Promise<string | null> {
+/** Apply current browser policy on use; signed expiry still renews at most daily. */
+export async function sessionCookieForRefresh(): Promise<string | null> {
   if (!configurationReady() || developmentWithoutPassword()) return null;
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  return token ? renewJournalSessionToken(token, credentials()) : null;
+  return token ? journalSessionTokenForRefresh(token, credentials()) : null;
 }
 
 export function cookieOptions() {
-  return {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict" as const,
-    path: "/",
-    maxAge: SESSION_MAX_AGE,
-  };
+  return sessionCookieOptions(process.env.NODE_ENV === "production");
 }
