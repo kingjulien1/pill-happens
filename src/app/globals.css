@@ -1149,8 +1149,20 @@
   }
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .empty-intake-card .empty-intake-dashes {
+    animation: empty-intake-dash-flow 1.2s linear infinite paused;
+  }
+  .empty-intake-card:hover .empty-intake-dashes {
+    animation-play-state: running;
+  }
   .empty-intake-card:hover {
     transform: translateY(-3px);
+  }
+}
+@keyframes empty-intake-dash-flow {
+  to {
+    /* One complete 12px dash + 8px gap keeps the loop seamless. */
+    stroke-dashoffset: -20px;
   }
 }
 .intake-dock {

@@ -8,6 +8,7 @@ function DashedOutline({ className }: { className: string }) {
       className={`pointer-events-none absolute inset-0 size-full ${className}`}
     >
       <rect
+        className="empty-intake-dashes"
         x="1"
         y="1"
         width="calc(100% - 2px)"
