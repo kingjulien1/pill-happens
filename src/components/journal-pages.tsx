@@ -13,6 +13,10 @@ import { loggingStreak } from "@/lib/logging-streak";
 import { getMedicationType } from "@/lib/medication-types";
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationActionButton } from "@/components/medication-action-button";
+import {
+  MedicationListHeading,
+  MedicationsHeading,
+} from "@/components/medications-heading";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { IntakeSummary } from "@/components/intake-summary";
@@ -383,9 +387,7 @@ export function MedicationsPage() {
   }
   return (
     <>
-      <PageHeading title="Medications" context="Your List">
-        Manage medication names, strengths, and types.
-      </PageHeading>
+      <MedicationsHeading medications={data.medications} />
       <MedicationActionButton
         intent="add"
         className="mb-7"
@@ -394,86 +396,71 @@ export function MedicationsPage() {
           setOpen(true);
         }}
       />
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-medium">
-          <HeadingText
-            title={showArchived ? "Archived" : "Active"}
-            context={`${medications.length} ${medications.length === 1 ? "medication" : "medications"}`}
-          />
-        </h2>
-        <Button
-          variant="ghost"
-          className="h-11 px-2 text-[10px] text-muted-foreground"
-          onClick={() => setShowArchived(!showArchived)}
-        >
-          {showArchived ? (
-            <ActionIcon name="restore" className="size-4" />
-          ) : (
-            <ActionIcon name="archive" className="size-4" />
-          )}
-          <span className="ml-1">
-            {showArchived ? "Show active" : "Archived"}
-          </span>
-        </Button>
-      </div>
-      {!medications.length ? (
-        <EmptyState
-          icon="medications"
-          title={
-            showArchived ? "Nothing Archived." : "Start with Your Medication."
-          }
-        >
-          {showArchived
-            ? "Archived medications stay here, and their past entries stay in your journal."
-            : "Add the exact name and strength from the packaging. Your first log starts here."}
-        </EmptyState>
-      ) : (
-        <div className="space-y-3">
-          {medications.map((m) => (
-            <div
-              key={m.id}
-              className="surface flex items-center gap-3.5 rounded-3xl p-4"
-            >
-              <MedicationIcon
-                color={m.color}
-                icon={m.icon}
-                rotation={m.iconRotation}
-              />
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm font-medium">{m.name}</h3>
-                <p className="mt-1 text-[11px] text-muted-foreground">
-                  {formatDose(m.strengthMg)} mg /{" "}
-                  {getMedicationType(m.form).unit}
-                </p>
+      <MedicationListHeading
+        archived={showArchived}
+        count={medications.length}
+        onArchivedChange={setShowArchived}
+      />
+      <div id="medication-library-list">
+        {!medications.length ? (
+          <EmptyState
+            icon="medications"
+            title={
+              showArchived ? "Nothing Archived." : "Start with Your Medication."
+            }
+          >
+            {showArchived
+              ? "Archived medications stay here, and their past entries stay in your journal."
+              : "Add the exact name and strength from the packaging. Your first log starts here."}
+          </EmptyState>
+        ) : (
+          <div className="space-y-3">
+            {medications.map((m) => (
+              <div
+                key={m.id}
+                className="surface flex items-center gap-3.5 rounded-3xl p-4"
+              >
+                <MedicationIcon
+                  color={m.color}
+                  icon={m.icon}
+                  rotation={m.iconRotation}
+                />
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-medium">{m.name}</h3>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    {formatDose(m.strengthMg)} mg /{" "}
+                    {getMedicationType(m.form).unit}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="size-11 shrink-0 text-muted-foreground"
+                  aria-label={`Edit ${m.name}`}
+                  onClick={() => {
+                    setEditing(m);
+                    setOpen(true);
+                  }}
+                >
+                  <ActionIcon name="edit" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  disabled={busy}
+                  className="size-11 shrink-0 text-muted-foreground"
+                  aria-label={`${m.archived ? "Restore" : "Archive"} ${m.name}`}
+                  onClick={() => void archive(m)}
+                >
+                  {m.archived ? (
+                    <ActionIcon name="restore" />
+                  ) : (
+                    <ActionIcon name="archive" />
+                  )}
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                className="size-11 shrink-0 text-muted-foreground"
-                aria-label={`Edit ${m.name}`}
-                onClick={() => {
-                  setEditing(m);
-                  setOpen(true);
-                }}
-              >
-                <ActionIcon name="edit" />
-              </Button>
-              <Button
-                variant="ghost"
-                disabled={busy}
-                className="size-11 shrink-0 text-muted-foreground"
-                aria-label={`${m.archived ? "Restore" : "Archive"} ${m.name}`}
-                onClick={() => void archive(m)}
-              >
-                {m.archived ? (
-                  <ActionIcon name="restore" />
-                ) : (
-                  <ActionIcon name="archive" />
-                )}
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
       <div className="mt-7 flex gap-3 rounded-2xl border border-border/70 bg-card/40 p-4">
         <Leaf size={16} className="mt-.5 shrink-0 text-foreground/70" />
         <p className="text-[11px] leading-[1.8] text-muted-foreground">
