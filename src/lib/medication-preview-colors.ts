@@ -14,6 +14,11 @@ export type MedicationColorScale = {
   icon: string;
 };
 
+export type MedicationPreviewAccents = {
+  pop: string;
+  spark: string;
+};
+
 const rampColors: RampColor[] = TAILWIND_MEDICATION_COLORS.flatMap((color) => {
   const match = /^tw-([a-z]+)-(\d+)$/.exec(color.value);
   return match ? [{ ...color, family: match[1], shade: Number(match[2]) }] : [];
@@ -80,6 +85,35 @@ export function getMedicationColorScale(value?: string): MedicationColorScale {
     lighter: family[Math.max(0, index - 1)].hex,
     darker: family[Math.min(family.length - 1, index + 1)].hex,
     icon: family[Math.min(family.length - 1, index + 2)].hex,
+  };
+}
+
+/** Two coordinated decorative hues; the selected medication pigment stays intact. */
+export function getMedicationPreviewAccents(
+  value?: string,
+): MedicationPreviewAccents {
+  const selected = getMedicationColor(value);
+  const family =
+    selected.value === "tw-black" || selected.value === "tw-white"
+      ? "neutral"
+      : (colorsByValue.get(selected.value) ?? nearestRampColor(selected.hex))
+          .family;
+
+  let pair = ["tw-orange-400", "tw-violet-400"];
+  if (["red", "orange", "amber", "yellow"].includes(family))
+    pair = ["tw-fuchsia-400", "tw-sky-400"];
+  else if (
+    ["sky", "cyan", "blue", "indigo", "violet", "purple"].includes(family)
+  )
+    pair = ["tw-pink-400", "tw-cyan-300"];
+  else if (["lime", "olive", "green", "emerald", "teal"].includes(family))
+    pair = ["tw-amber-300", "tw-blue-400"];
+  else if (["fuchsia", "pink", "rose"].includes(family))
+    pair = ["tw-orange-300", "tw-violet-400"];
+
+  return {
+    pop: colorsByValue.get(pair[0])!.hex,
+    spark: colorsByValue.get(pair[1])!.hex,
   };
 }
 

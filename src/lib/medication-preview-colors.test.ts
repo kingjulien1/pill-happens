@@ -4,6 +4,7 @@ import { MEDICATION_COLORS } from "./medication-appearance";
 import { TAILWIND_MEDICATION_COLORS } from "./medication-palette";
 import {
   getMedicationColorScale,
+  getMedicationPreviewAccents,
   getMedicationPreviewSurface,
 } from "./medication-preview-colors";
 
@@ -84,6 +85,54 @@ test("every selectable palette entry produces valid opaque preview pigments", ()
     const scale = getMedicationColorScale(color.value);
     for (const pigment of Object.values(scale))
       assert.match(pigment, /^#[0-9a-f]{6}$/);
+  }
+});
+
+test("decorative accent pairs coordinate by hue family and stay stable across shade changes", () => {
+  const cases = [
+    ["tw-yellow-400", "tw-fuchsia-400", "tw-sky-400"],
+    ["tw-blue-500", "tw-pink-400", "tw-cyan-300"],
+    ["tw-emerald-600", "tw-amber-300", "tw-blue-400"],
+    ["tw-rose-300", "tw-orange-300", "tw-violet-400"],
+    ["tw-zinc-950", "tw-orange-400", "tw-violet-400"],
+  ];
+  for (const [selected, pop, spark] of cases)
+    assert.deepEqual(getMedicationPreviewAccents(selected), {
+      pop: hex(pop),
+      spark: hex(spark),
+    });
+  assert.deepEqual(
+    getMedicationPreviewAccents("tw-yellow-50"),
+    getMedicationPreviewAccents("tw-yellow-950"),
+  );
+  for (const value of ["tw-black", "tw-white"])
+    assert.deepEqual(
+      getMedicationPreviewAccents(value),
+      getMedicationPreviewAccents("tw-zinc-950"),
+    );
+});
+
+test("legacy and unknown choices get deterministic accents from their resolved pigment", () => {
+  assert.deepEqual(
+    getMedicationPreviewAccents("rose"),
+    getMedicationPreviewAccents("tw-orange-500"),
+  );
+  assert.deepEqual(
+    getMedicationPreviewAccents("slate"),
+    getMedicationPreviewAccents("tw-slate-500"),
+  );
+  assert.deepEqual(
+    getMedicationPreviewAccents("unknown"),
+    getMedicationPreviewAccents(),
+  );
+  const palette = new Set<string>(
+    TAILWIND_MEDICATION_COLORS.map(({ hex }) => hex),
+  );
+  for (const { value } of MEDICATION_COLORS) {
+    const { pop, spark } = getMedicationPreviewAccents(value);
+    assert.ok(palette.has(pop), value);
+    assert.ok(palette.has(spark), value);
+    assert.notEqual(pop, spark, value);
   }
 });
 
