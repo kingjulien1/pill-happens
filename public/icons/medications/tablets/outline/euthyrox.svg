@@ -10,13 +10,15 @@
   stroke-linejoin="round"
 >
   <circle cx="12" cy="12" r="9" />
-  <path d="M4 12h16" />
+  <path d="M12 4v16" />
   <path
     d="M10.1 5.8H7.5v3.7h2.6M7.5 7.6h2.2m2.7 1.9V5.8l1.9 2.1 1.9-2.1v3.7"
     stroke-width="1"
+    transform="translate(.15 .15) rotate(90 12 12)"
   />
   <path
     d="M10.5 14.6H8v1.7h1.2a1.2 1.2 0 0 1 0 2.4H8m6.5-4.1c-1 0-1.4.7-1.4 2.1s.4 2 1.4 2 1.4-.6 1.4-2-.4-2.1-1.4-2.1Z"
     stroke-width="1"
+    transform="translate(.15 .05) rotate(90 12 12)"
   />
 </svg>

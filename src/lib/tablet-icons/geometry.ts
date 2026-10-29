@@ -1,4 +1,5 @@
 import type { IconNode } from "lucide-react";
+import { DISPENSER_SHAPES } from "./dispenser-geometry";
 
 /** Pure Lucide-compatible geometry; the first node is the tablet silhouette. */
 export type TabletIconNode = IconNode;
@@ -18,6 +19,12 @@ function scored(radius: number): TabletIconNode {
     ["path", { d: `M12 ${13 - radius}v${2 * radius - 2}`, key: "score" }],
   ];
 }
+
+/** Both strengths share an upright silhouette and differ only in their imprint. */
+const tadalafilBody: TabletIconNode[number] = [
+  "ellipse",
+  { cx: "12", cy: "12", rx: "5", ry: "9", key: "body" },
+];
 
 /** Relative radii retain the size relationships in the supplied photo groups. */
 export const TABLET_SHAPES = {
@@ -100,6 +107,7 @@ export const TABLET_SHAPES = {
         {
           d: "m5.8 10.6.8 2.8.8-2.8M8.3 10.6h.8m-.4 0v2.8m-.4 0h.8m.8 0 .8-2.8.8 2.8m-1.4-.8h1.2m2.7-1.6a1 1 0 0 0-1.6.8v1a1 1 0 0 0 1.7.7v-1h-.7m1.6 1.7v-2.8h.8a.7.7 0 0 1 0 1.4h-.8m.8 0 .9 1.4m.8 0 .8-2.8.8 2.8m-1.4-.8h1.2",
           strokeWidth: "0.65",
+          transform: "translate(-.45 -.4)",
           key: "wordmark",
         },
       ],
@@ -110,12 +118,13 @@ export const TABLET_SHAPES = {
     aliases: ["euthyrox", "tablet-em-fifty"],
     nodes: [
       ...round(9),
-      ["path", { d: "M4 12h16", key: "score" }],
+      ["path", { d: "M12 4v16", key: "score" }],
       [
         "path",
         {
           d: "M10.1 5.8H7.5v3.7h2.6M7.5 7.6h2.2m2.7 1.9V5.8l1.9 2.1 1.9-2.1v3.7",
           strokeWidth: "1",
+          transform: "translate(.15 .15) rotate(90 12 12)",
           key: "letters-em",
         },
       ],
@@ -124,11 +133,46 @@ export const TABLET_SHAPES = {
         {
           d: "M10.5 14.6H8v1.7h1.2a1.2 1.2 0 0 1 0 2.4H8m6.5-4.1c-1 0-1.4.7-1.4 2.1s.4 2 1.4 2 1.4-.6 1.4-2-.4-2.1-1.4-2.1Z",
           strokeWidth: "1",
+          transform: "translate(.15 .05) rotate(90 12 12)",
           key: "imprint-fifty",
         },
       ],
     ],
   },
+  "tadalafil-5": {
+    componentName: "Tadalafil5",
+    aliases: ["tadalafil-5", "tadalafil-five"],
+    nodes: [
+      tadalafilBody,
+      [
+        "path",
+        {
+          d: "M13.5 9H10.5v2.5H12a1.75 1.75 0 0 1 0 3.5h-1.5",
+          strokeWidth: "1",
+          transform: "translate(-.125 0)",
+          key: "imprint-five",
+        },
+      ],
+    ],
+  },
+  "tadalafil-10": {
+    componentName: "Tadalafil10",
+    aliases: ["tadalafil-10", "tadalafil-ten"],
+    nodes: [
+      tadalafilBody,
+      [
+        "path",
+        {
+          d: "m8.7 10 1.2-1v6m-1.2 0h2.4M14 9c-1.2 0-1.7 1-1.7 3s.5 3 1.7 3 1.7-1 1.7-3-.5-3-1.7-3Z",
+          strokeWidth: "1",
+          transform:
+            "translate(12 12) scale(.85) translate(-12 -12) translate(-.2 0)",
+          key: "imprint-ten",
+        },
+      ],
+    ],
+  },
+  ...DISPENSER_SHAPES,
 } satisfies Record<string, TabletShape>;
 
 export type TabletShapeName = keyof typeof TABLET_SHAPES;

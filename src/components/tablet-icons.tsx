@@ -21,6 +21,10 @@ export const TabletWideplain = tabletIcon("tablet-wideplain");
 export const TabletWideplainPlus = tabletIcon("tablet-wideplain-plus");
 export const Viagra = tabletIcon("viagra");
 export const Euthyrox = tabletIcon("euthyrox");
+export const Tadalafil5 = tabletIcon("tadalafil-5");
+export const Tadalafil10 = tabletIcon("tadalafil-10");
+export const Tramal = tabletIcon("tramal");
+export const Testavan = tabletIcon("testavan");
 
 /** Searchable alternative names reuse the canonical drawing and component. */
 export const TabletBisect = TabletMeridian;
@@ -42,4 +46,8 @@ export const TABLET_OUTLINE_COMPONENTS = {
   "tablet-wideplain-plus": TabletWideplainPlus,
   viagra: Viagra,
   euthyrox: Euthyrox,
+  "tadalafil-5": Tadalafil5,
+  "tadalafil-10": Tadalafil10,
+  tramal: Tramal,
+  testavan: Testavan,
 } satisfies Record<keyof typeof TABLET_SHAPES, LucideIcon>;

@@ -23,6 +23,9 @@ export const TABLET_COLORS = {
   red: { name: "Red 300", hex: "#ffa2a2" },
   coral: { name: "Red 400", hex: "#ff6467" },
   viagra: { name: "Blue 400", hex: "#51a2ff" },
+  tadalafil5: { name: "Amber 400", hex: "#ffb900" },
+  tadalafil10: { name: "Blue 600", hex: "#155dfc" },
+  tramal: { name: "Amber 700", hex: "#bb4d00" },
 } as const satisfies Record<string, TabletArtworkColor>;
 
 const outlineDefinitions = [
@@ -90,6 +93,41 @@ const outlineDefinitions = [
   ],
   ["viagra", ["rounded diamond", "diamond", "tablet", "blue", "raute", "blau"]],
   ["euthyrox", ["round", "scored", "em", "50", "fifty", "rund", "geteilt"]],
+  [
+    "tadalafil-5",
+    ["oval", "upright", "five", "5mg", "yellow", "gelb", "tablette"],
+  ],
+  [
+    "tadalafil-10",
+    ["oval", "upright", "ten", "10mg", "blue", "blau", "tablette"],
+  ],
+  [
+    "tramal",
+    [
+      "bottle",
+      "metered pump",
+      "pump dispenser",
+      "pumps",
+      "flasche",
+      "dosierpumpe",
+      "dosierpumpenflasche",
+      "pumper",
+      "pumpstoss",
+    ],
+  ],
+  [
+    "testavan",
+    [
+      "gel",
+      "metered pump",
+      "pump dispenser",
+      "pumps",
+      "gelspender",
+      "spender",
+      "dosierpumpe",
+      "pumper",
+    ],
+  ],
 ] as const satisfies readonly (readonly [TabletShapeName, readonly string[]])[];
 
 const colorDefinitions = [
@@ -185,6 +223,58 @@ const colorDefinitions = [
     "euthyrox",
     "zinc",
     ["white", "weiss", "em", "50", "fifty"],
+  ],
+  [
+    "tadalafil-5",
+    "Tadalafil5",
+    "tadalafil-5",
+    "tadalafil5",
+    ["oval", "upright", "five", "5mg", "yellow", "gelb"],
+  ],
+  [
+    "tadalafil-10",
+    "Tadalafil10",
+    "tadalafil-10",
+    "tadalafil10",
+    ["oval", "upright", "ten", "10mg", "blue", "blau"],
+  ],
+  [
+    "tramal",
+    "Tramal",
+    "tramal",
+    "tramal",
+    [
+      "bottle",
+      "metered pump",
+      "pump dispenser",
+      "pumps",
+      "amber",
+      "brown",
+      "braun",
+      "flasche",
+      "dosierpumpe",
+      "dosierpumpenflasche",
+      "pumper",
+      "pumpstoss",
+    ],
+  ],
+  [
+    "testavan",
+    "Testavan",
+    "testavan",
+    "zinc",
+    [
+      "gel",
+      "metered pump",
+      "pump dispenser",
+      "pumps",
+      "white",
+      "weiss",
+      "gelspender",
+      "spender",
+      "dosierpumpe",
+      "pumper",
+    ],
   ],
 ] as const satisfies readonly (readonly [
   string,

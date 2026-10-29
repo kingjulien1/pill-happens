@@ -123,7 +123,7 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
   );
   const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
   assert.equal(outlines.length, Object.keys(TABLET_SHAPES).length);
-  assert.equal(colors.length, 12);
+  assert.equal(colors.length, 16);
   for (const [slug, label] of [
     ["bromazepam", "Bromazepam"],
     ["diazepam", "Diazepam"],
@@ -137,6 +137,10 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     ["venlafaxin", "Venlafaxin"],
     ["viagra", "Viagra"],
     ["euthyrox", "Euthyrox"],
+    ["tadalafil-5", "Tadalafil 5mg"],
+    ["tadalafil-10", "Tadalafil 10mg"],
+    ["tramal", "Tramal"],
+    ["testavan", "Testavan"],
   ])
     assert.equal(getSvgIcon(`svg:color:${slug}`)?.label, label);
   for (const slug of [
@@ -145,6 +149,7 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     "queatialan-200",
     "venlafaxin",
     "euthyrox",
+    "testavan",
   ])
     assert.equal(
       getSvgIcon(`svg:color:${slug}`)?.color?.hex.toLowerCase(),
@@ -183,12 +188,20 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
     ["EuthyroxColor", "svg:color:euthyrox"],
     ["svg:color:ritalin", "svg:color:ritalin"],
     ["Venlafaxin", "svg:color:venlafaxin"],
+    ["Tadalafil5", "svg:tadalafil-5"],
+    ["Tadalafil 5mg", "svg:color:tadalafil-5"],
+    ["Tadalafil10", "svg:tadalafil-10"],
+    ["Tadalafil10Color", "svg:color:tadalafil-10"],
+    ["Tramal", "svg:tramal"],
+    ["TramalColor", "svg:color:tramal"],
+    ["Testavan", "svg:testavan"],
+    ["TestavanColor", "svg:color:testavan"],
   ])
     assert.ok(
       searchSvgIcons(query).some((entry) => entry.value === value),
       query,
     );
-  assert.equal(searchSvgIcons("color").length, 12);
+  assert.equal(searchSvgIcons("color").length, 16);
   assert.ok(
     searchSvgIcons("colored").every(({ variant }) => variant === "color"),
   );
@@ -201,6 +214,16 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
   );
   assert.equal(searchSvgIcons("euthyrox").length, 2);
   assert.equal(searchSvgIcons("viagra").length, 2);
+  for (const slug of ["tadalafil-5", "tadalafil-10", "tramal", "testavan"]) {
+    assert.deepEqual(
+      new Set(searchSvgIcons(slug).map(({ value }) => value)),
+      new Set([`svg:${slug}`, `svg:color:${slug}`]),
+    );
+    assert.equal(
+      getSvgIcon(`svg:${slug}`)?.label,
+      getSvgIcon(`svg:color:${slug}`)?.label,
+    );
+  }
 });
 
 test("local SVG discovery supports English, German, direct IDs, and multiple words", () => {
@@ -235,4 +258,54 @@ test("empty and bounded SVG searches return predictable results", () => {
   assert.equal(searchSvgIcons("svg", 3).length, 3);
   assert.equal(searchSvgIcons("svg", 3.9).length, 3);
   assert.equal(searchSvgIcons("svg", Infinity).length, SVG_ICON_CATALOG.length);
+});
+
+test("metered dispensers are searchable by context without being classified as tablets", () => {
+  for (const [query, value] of [
+    ["dosierpumpe", "svg:tramal"],
+    ["metered pump", "svg:color:tramal"],
+    ["gel dispenser", "svg:testavan"],
+  ])
+    assert.ok(
+      searchSvgIcons(query).some((entry) => entry.value === value),
+      query,
+    );
+  const tablets = searchSvgIcons("tablets");
+  for (const slug of ["tramal", "testavan"])
+    assert.ok(!tablets.some(({ shape }) => shape === slug), slug);
+});
+
+test("the two Tadalafil strengths preserve a shared centered silhouette and separate vector imprints", () => {
+  const five = TABLET_SHAPES["tadalafil-5"].nodes;
+  const ten = TABLET_SHAPES["tadalafil-10"].nodes;
+  assert.deepEqual(five[0], ten[0]);
+  assert.equal(five[0][0], "ellipse");
+  assert.equal(five[0][1].cx, "12");
+  assert.equal(five[0][1].cy, "12");
+  assert.notDeepEqual(five.slice(1), ten.slice(1));
+  for (const slug of ["tadalafil-5", "tadalafil-10"]) {
+    assert.equal(getSvgIcon(`svg:${slug}`)?.shape, slug);
+    assert.equal(getSvgIcon(`svg:color:${slug}`)?.shape, slug);
+  }
+  assert.equal(getSvgIcon("svg:color:tadalafil-5")?.color?.name, "Amber 400");
+  assert.equal(getSvgIcon("svg:color:tadalafil-10")?.color?.name, "Blue 600");
+});
+
+test("all round silhouettes and their vertical scores share the viewport center", () => {
+  for (const [name, { nodes }] of Object.entries(TABLET_SHAPES)) {
+    const [tag, body] = nodes[0];
+    if (tag !== "circle" && tag !== "ellipse") continue;
+    assert.equal(body.cx, "12", name);
+    assert.equal(body.cy, "12", name);
+    const score = nodes.find(([, attrs]) => attrs.key === "score")?.[1];
+    if (!score) continue;
+    assert.ok("d" in score, `${name}: the score is a path`);
+    const line = String(score.d).match(/^M([\d.]+) ([\d.]+)v([\d.]+)$/);
+    assert.ok(line, `${name}: the score is straight and upright`);
+    assert.equal(Number(line[1]), 12, `${name}: horizontal position`);
+    assert.ok(
+      Math.abs(Number(line[2]) + Number(line[3]) / 2 - 12) < 1e-9,
+      `${name}: vertical position`,
+    );
+  }
 });

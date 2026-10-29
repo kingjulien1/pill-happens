@@ -299,9 +299,9 @@ export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = [
     ],
     keywords: [
       ...localKeywords,
-      "tablet",
-      "tablette",
-      "tablets",
+      ...(entry.shape === "tramal" || entry.shape === "testavan"
+        ? ["dispenser", "pump", "dosierpumpe", "spender"]
+        : ["tablet", "tablette", "tablets"]),
       "medication",
       "medikament",
       ...(entry.variant === "color"

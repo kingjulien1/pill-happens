@@ -1,0 +1,38 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <defs>
+    <mask
+      id="tadalafil-5-cutouts"
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+    >
+      <ellipse cx="12" cy="12" rx="5" ry="9" fill="white" stroke="white" />
+      <path
+        d="M13.5 9H10.5v2.5H12a1.75 1.75 0 0 1 0 3.5h-1.5"
+        stroke-width="1"
+        transform="translate(-.125 0)"
+        fill="none"
+        stroke="black"
+      />
+    </mask>
+  </defs>
+  <rect
+    width="24"
+    height="24"
+    fill="#ffb900"
+    stroke="none"
+    mask="url(#tadalafil-5-cutouts)"
+  />
+</svg>
