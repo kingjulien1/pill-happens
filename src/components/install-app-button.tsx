@@ -14,7 +14,7 @@ export function InstallAppButton() {
       data-install-app
     >
       <ActionIcon name="export" className="size-4" />
-      Install app
+      Install App
     </button>
   );
 }

@@ -11,7 +11,7 @@ export default function NotFound() {
       </div>
       <h1 className="text-2xl font-semibold tracking-tight">
         <HeadingText
-          title="Page not found"
+          title="Page Not Found"
           context="404"
           className="justify-center"
         />

@@ -42,7 +42,7 @@ export function StreakMenu() {
             data-streak-popover
           >
             <Popover.Title className="pr-7 text-xs font-semibold">
-              Logging streak
+              Logging Streak
             </Popover.Title>
             <Popover.Close
               aria-label="Close streak details"
@@ -60,7 +60,7 @@ export function StreakMenu() {
                 <dl className="mt-4">
                   <div className="flex items-baseline justify-between gap-3">
                     <dt className="text-[11px] text-muted-foreground">
-                      Current streak
+                      Current Streak
                     </dt>
                     <dd
                       className="text-lg leading-none font-semibold tabular-nums"
@@ -88,7 +88,7 @@ export function StreakMenu() {
                 <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-border/60 pt-3">
                   <div>
                     <dt className="text-[10px] text-muted-foreground">
-                      Best streak
+                      Best Streak
                     </dt>
                     <dd
                       className="mt-1 text-xs font-medium tabular-nums"
@@ -99,7 +99,7 @@ export function StreakMenu() {
                   </div>
                   <div>
                     <dt className="text-[10px] text-muted-foreground">
-                      Days with entries
+                      Days with Entries
                     </dt>
                     <dd
                       className="mt-1 text-xs font-medium tabular-nums"

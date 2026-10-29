@@ -238,7 +238,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
         ? [
             {
               icon: Share2,
-              title: "Open Safari’s Share menu",
+              title: "Open Safari’s Share Menu",
               text: "Use the Share button in the toolbar.",
             },
             {
@@ -248,24 +248,24 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
             },
             {
               icon: Monitor,
-              title: "Make yourself at home",
+              title: "Make Yourself at Home",
               text: "Open pill happens from its new Dock icon.",
             },
           ]
         : [
             {
               icon: Menu,
-              title: "Open your browser menu",
+              title: "Open Your Browser Menu",
               text: "Use the menu beside the address bar.",
             },
             {
               icon: Download,
-              title: "Install the app",
+              title: "Install the App",
               text: "Look for Install app or Add to Home screen.",
             },
             {
               icon: Smartphone,
-              title: "Launch from its icon",
+              title: "Launch from Its Icon",
               text: "If installation isn’t offered, try Safari, Chrome, or Edge.",
             },
           ];
@@ -276,8 +276,8 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
       <ResponsiveModal
         open={helpOpen && !installed}
         onOpenChange={setHelpOpen}
-        title="Keep it close"
-        context="Install app"
+        title="Keep It Close"
+        context="Install App"
         description="Your journal, one tap from your Home Screen or Dock."
       >
         <ol className="space-y-3">

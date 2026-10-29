@@ -19,8 +19,8 @@ export default function ErrorPage({
       </div>
       <h1 className="text-2xl font-semibold tracking-tight">
         <HeadingText
-          title="Something went wrong"
-          context="Please try again"
+          title="Something Went Wrong"
+          context="Please Try Again"
           className="justify-center"
         />
       </h1>

@@ -226,7 +226,7 @@ export function LoginForm() {
         aria-busy={pending === "login"}
       >
         <div className="form-field">
-          <Label htmlFor="password">Your password</Label>
+          <Label htmlFor="password">Your Password</Label>
           <Input
             id="password"
             name="password"
@@ -293,8 +293,8 @@ export function LoginForm() {
         onOpenChange={(open) => {
           if (!open) closeCreation();
         }}
-        title="Create a new journal?"
-        context="New space"
+        title="Create a New Journal?"
+        context="New Space"
         description="This password isn’t linked to a journal yet."
       >
         {candidatePassword !== null && (
@@ -317,7 +317,7 @@ export function LoginForm() {
                 </span>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold">A journal of its own</p>
+                <p className="text-sm font-semibold">A Journal of Its Own</p>
                 <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                   Separate entries, medications, and goals.
                 </p>
@@ -333,7 +333,7 @@ export function LoginForm() {
                   id="new-journal-password-label"
                   className="text-[10px] font-semibold tracking-[.12em] uppercase"
                 >
-                  Your journal password
+                  Your Journal Password
                 </p>
                 <ActionIcon name="secure" className="size-4" />
               </div>

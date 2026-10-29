@@ -7,7 +7,7 @@ import { Brand } from "@/components/brand";
 import { InstallAppButton } from "@/components/install-app-button";
 import { configurationIssue, isAuthenticated } from "@/lib/server/auth";
 
-export const metadata: Metadata = { title: "Your private space" };
+export const metadata: Metadata = { title: "Your Private Space" };
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage() {
@@ -22,8 +22,8 @@ export default async function LoginPage() {
       <header className="mb-6 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           <HeadingText
-            title="Sign in"
-            context="Private journal"
+            title="Sign In"
+            context="Private Journal"
             className="justify-center"
           />
         </h1>
@@ -45,7 +45,7 @@ export default async function LoginPage() {
               />
             </div>
             <h2 className="text-sm font-medium">
-              Your private space needs a little setup.
+              Your Private Space Needs a Little Setup.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Finish the environment configuration in the project README, then

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/", label: "Today", page: "today", icon: "navToday" },
-  { href: "/history", label: "Past days", page: "history", icon: "navHistory" },
+  { href: "/history", label: "Past Days", page: "history", icon: "navHistory" },
   {
     href: "/medications",
     label: "Medications",
@@ -104,7 +104,7 @@ export function HeaderNavigation({ className }: { className?: string }) {
                     name="export"
                     className="brand-menu-icon size-4"
                   />
-                  <span>Install app</span>
+                  <span>Install App</span>
                 </Menu.Item>
               </>
             )}
