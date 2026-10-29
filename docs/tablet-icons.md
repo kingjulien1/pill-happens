@@ -1,12 +1,13 @@
-# Tablet icon library
+# Tablet and dispenser icon library
 
-The library contains **11 tintable outline drawings** and **12 fixed-color tablet illustrations**, based on the supplied references. The existing 12 generic SVG icons retain their paths and saved identifiers.
+The library contains **15 tintable outline drawings** and **16 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 12 generic SVGs, the picker offers 43 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox artwork.
 
 ## Source and generated files
 
 ```text
 src/lib/tablet-icons/
   geometry.ts                 Shared silhouettes, score lines, and vector imprints
+  dispenser-geometry.ts       Separate pump-bottle and gel-dispenser silhouettes
   artwork.ts                  Names, aliases, relative sizes, and fixed palettes
 src/lib/icon-names.ts         Component-name search and display-label formatting
 src/lib/svg-icon-catalog.ts   Registered local artwork and searchable metadata
@@ -18,7 +19,7 @@ scripts/generate-tablet-icons.ts
                              Deterministic generation and drift checking
 public/icons/medications/
   *.svg                      Existing generic artwork
-  tablets/
+  tablets/                   Stable library path; includes dispenser artwork
     outline/*.svg            Generated currentColor outlines
     color/*.svg              Generated fixed-color tablet artwork
 ```
@@ -42,7 +43,7 @@ Each form has three usable component names. Alternate names export the same comp
 | `TabletPebble`      | `TabletPetite`, `TabletDotlet`  | Significantly smaller plain round tablet  |
 | `TabletHalo`        | `TabletPlenum`, `TabletRoundel` | Larger plain round tablet                 |
 
-The names are checked against the installed Lucide names and emoji display labels. The additional outline components are `TabletDualmark`, `TabletSplitlet`, `TabletScorecrest`, `TabletMinidot`, `TabletWideplain`, `TabletWideplainPlus`, `Viagra`, and `Euthyrox`.
+The names are checked against the installed Lucide names and emoji display labels. The additional outline components are `TabletDualmark`, `TabletSplitlet`, `TabletScorecrest`, `TabletMinidot`, `TabletWideplain`, `TabletWideplainPlus`, `Viagra`, `Euthyrox`, `Tadalafil5`, `Tadalafil10`, `Tramal`, and `Testavan`.
 
 ## Flat-color variants
 
@@ -60,14 +61,22 @@ The names are checked against the installed Lucide names and emoji display label
 | `venlafaxin` / `Venlafaxin`        | Venlafaxin       | Tablet Wideplain Plus                 | Zinc 300     |
 | `viagra` / `Viagra`                | Viagra           | Rounded diamond with vector lettering | Blue 400     |
 | `euthyrox` / `Euthyrox`            | Euthyrox         | Round tablet with EM/50 imprint       | Zinc 300     |
+| `tadalafil-5` / `Tadalafil5`       | Tadalafil 5mg    | Upright oval with centered 5 imprint  | Amber 400    |
+| `tadalafil-10` / `Tadalafil10`     | Tadalafil 10mg   | Same oval with centered 10 imprint    | Blue 600     |
+| `tramal` / `Tramal`                | Tramal           | Shoulder bottle with metering pump    | Amber 700    |
+| `testavan` / `Testavan`            | Testavan         | Slender gel dispenser with pump       | Zinc 300     |
 
 Colors use static sRGB equivalents of the installed Tailwind palette. All neutral tablets use the specifically requested `#D4D4D8`. Every filled SVG has one visible paint color; score lines and imprints are transparent cutouts. There are no shadows, highlights, gradients, textures, or photographic irregularities in the artwork.
+
+Tadalafil 5 uses Amber 400 (`#ffb900`); Tadalafil 10 uses a moderately dark Blue 600 (`#155dfc`). Their silhouette is shared, with separate vector numeral paths. Tramal uses Amber 700 (`#bb4d00`) for its simplified amber bottle, including its pump. Testavan uses the same neutral Zinc 300 as the white tablets. Both dispensers keep a single flat pigment with transparent collar and label details, rather than reproducing photographic packaging text or multiple materials.
 
 The medication names and relative appearances come from the supplied references. Selecting an icon changes appearance only: it does not fill medication names, strengths, quantities, or doses. Imprint text is artwork; the `50` on Euthyrox does not add a strength to its label or medication record.
 
 ## SVG and component behavior
 
 Outline assets use Lucide's standard `xmlns`, `width="24"`, `height="24"`, `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="2"`, and rounded caps/joins. All shapes are flattened and centered in that same viewport. Smaller silhouettes retain their relative size instead of being expanded to fill the frame. The extra Venlafaxin tablet is slightly larger than the Queatialan 200 shape.
+
+Every silhouette is centered at `(12, 12)`, and each straight tablet score runs vertically through `x=12` with its midpoint at `y=12`. Euthyrox's EM/50 blocks sit on either side of that centered split, straightened from the reference photo. The Tadalafil numerals and Viagra wordmark are centered independently of their bodies; the wider “10” has additional breathing room. Dispensers retain distinct proportions, with Testavan narrower and taller in appearance than the Tramal bottle. All artwork fits the viewport at the app's 2.75 stroke width.
 
 The React outline exports use `createLucideIcon` and accept the same size, stroke, color, and other SVG props:
 
@@ -92,6 +101,14 @@ Search recognizes component names, display labels, slugs, aliases, and English/G
 - Either `Quetialan` or `Queatialan` spelling for the numbered tablets
 - `ViagraColor` or `EuthyroxColor` to find the fixed-color versions
 - `HeartHandshake` for Lucide or `CherryBlossom` for emoji
-- `outline` for the 11 tintable tablet forms, `color` for the 12 fixed-color tablets, or `svg` for all registered local artwork
+- `Tadalafil5`, `Tadalafil 5mg`, `Tadalafil10Color`, `Tramal`, or `TestavanColor`
+- `metered pump`, `dosierpumpe`, or `gel dispenser` for the dispenser artwork
+- `outline` for the 15 tintable medication forms, `color` for the 16 fixed-color illustrations, or `svg` for all registered local artwork
 
 Display labels capitalize words, replace hyphens with spaces, and append `mg` to numeric parts of tablet artwork names. Numbers in ordinary Lucide icon names keep their existing meaning and labels. Search aliases do not create extra picker entries or change stored icon IDs.
+
+## Metered-pump medication type
+
+Choose **Metered pump** for a liquid pump bottle or gel dispenser. Enter the medication's strength in **mg per pump** and the default number of **pumps per intake**. Intake controls offer 1–4 pump presets and increase/decrease by one pump. Selecting a dispenser icon only changes appearance; medication type and strength remain explicit choices.
+
+New intake records store the counted medication type alongside the name and per-unit strength. Editing a medication later does not relabel an already recorded pump intake as tablets or change its dose. Correcting an intake while keeping its medication preserves that snapshot; switching its medication takes a fresh type/strength snapshot. Older records remain readable without a migration. The existing quantity × strength calculation stays the same; no bottle-volume or drop-to-pump conversion is inferred.
