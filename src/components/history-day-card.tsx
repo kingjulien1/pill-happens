@@ -38,10 +38,6 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
     "--day-color-b": art.secondary,
     "--day-color-c": art.tertiary,
     "--day-color-d": fourth,
-    "--day-wash-a": `${art.primary}70`,
-    "--day-wash-b": `${art.secondary}66`,
-    "--day-wash-c": `${art.tertiary}59`,
-    "--day-wash-d": `${fourth}66`,
     "--day-phase": `${art.phaseSeconds}s`,
     "--day-orbit-angle": `${art.orbitAngle}deg`,
   } as CSSProperties;
@@ -56,19 +52,21 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
     >
       <span aria-hidden="true" className="history-card-bleed" />
       <span aria-hidden="true" className="history-card-glass">
-        <span className="history-card-mesh" />
-        <span className="history-card-pattern" />
-        <svg
-          className="history-card-curves"
-          viewBox="0 0 360 150"
-          fill="none"
-          focusable="false"
-          data-history-curves
-        >
-          {art.curves.map((curve, index) => (
-            <path key={index} d={curve} />
-          ))}
-        </svg>
+        <span className="history-card-color-overlay" data-history-color-overlay>
+          <span className="history-card-mesh" />
+          <span className="history-card-pattern" />
+          <svg
+            className="history-card-curves"
+            viewBox="0 0 360 150"
+            fill="none"
+            focusable="false"
+            data-history-curves
+          >
+            {art.curves.map((curve, index) => (
+              <path key={index} d={curve} />
+            ))}
+          </svg>
+        </span>
         <span className="history-card-ink" data-history-ink />
       </span>
       <div className="history-card-content p-4">

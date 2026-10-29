@@ -57,11 +57,6 @@ export function IntakeCard({
     "--entry-deep": scale.darker,
     "--entry-pop": accents.pop,
     "--entry-spark": accents.spark,
-    "--entry-color-wash": `${color.hex}66`,
-    "--entry-light-wash": `${scale.lighter}80`,
-    "--entry-deep-wash": `${scale.darker}59`,
-    "--entry-pop-wash": `${accents.pop}70`,
-    "--entry-spark-wash": `${accents.spark}66`,
     "--entry-phase": `${art.phaseSeconds}s`,
     "--entry-orbit-angle": `${art.orbitAngle}deg`,
     "--entry-accent-x": `${art.accentX}%`,
@@ -79,18 +74,20 @@ export function IntakeCard({
     >
       <span aria-hidden="true" className="intake-card-bleed" />
       <span aria-hidden="true" className="intake-card-glass">
-        <span className="intake-card-mesh" />
-        <span className="intake-card-pattern" />
-        <svg
-          className="intake-card-curves"
-          viewBox="0 0 360 150"
-          fill="none"
-          focusable="false"
-          data-intake-curves
-        >
-          <path d={art.curveA} />
-          <path d={art.curveB} />
-        </svg>
+        <span className="intake-card-color-overlay" data-intake-color-overlay>
+          <span className="intake-card-mesh" />
+          <span className="intake-card-pattern" />
+          <svg
+            className="intake-card-curves"
+            viewBox="0 0 360 150"
+            fill="none"
+            focusable="false"
+            data-intake-curves
+          >
+            <path d={art.curveA} />
+            <path d={art.curveB} />
+          </svg>
+        </span>
         <span className="intake-card-ink" data-intake-ink />
       </span>
       <div className="intake-card-content relative flex items-start gap-3 p-4">

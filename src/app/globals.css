@@ -246,6 +246,7 @@
 }
 .intake-card-bleed,
 .intake-card-glass,
+.intake-card-color-overlay,
 .intake-card-mesh,
 .intake-card-pattern,
 .intake-card-curves,
@@ -264,8 +265,8 @@
   border-radius: 25px;
   background: radial-gradient(
     ellipse 72px 58px at 48px 48px,
-    var(--entry-pop),
-    var(--entry-spark) 48%,
+    var(--entry-color),
+    var(--entry-light) 48%,
     transparent 78%
   );
   opacity: 0.12;
@@ -279,12 +280,50 @@
   isolation: isolate;
   overflow: hidden;
   border-radius: inherit;
-  background: rgb(255 253 253 / 62%);
-  -webkit-backdrop-filter: blur(64px) saturate(1.15);
-  backdrop-filter: blur(64px) saturate(1.15);
+  background:
+    linear-gradient(145deg, #ffffff24, #ffffff00 45%, #ffffff0a),
+    rgb(255 253 253 / 18%);
+  -webkit-backdrop-filter: blur(72px) saturate(1.1);
+  backdrop-filter: blur(72px) saturate(1.1);
   box-shadow:
-    inset 0 1px 0 #ffffff38,
-    inset 0 -1px 0 #120f170a;
+    inset 0 1px 0 #ffffff75,
+    inset 1px 0 0 #ffffff26,
+    inset 0 -1px 0 #ffffff1a;
+}
+.intake-card-color-overlay,
+.history-card-color-overlay {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.intake-card-color-overlay {
+  background: linear-gradient(125deg, var(--entry-color), var(--entry-deep));
+}
+.history-card-color-overlay {
+  background: linear-gradient(128deg, var(--day-color-a), var(--day-color-d));
+}
+.intake-card-bleed,
+.history-card-bleed {
+  display: none;
+  padding: 4px;
+}
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .intake-card-bleed,
+  .history-card-bleed {
+    display: block;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
 }
 .intake-card-mesh {
   position: absolute;
@@ -292,23 +331,18 @@
   background:
     radial-gradient(
       ellipse 140px 100px at 44px 44px,
-      var(--entry-light-wash),
-      var(--entry-color-wash) 55%,
+      var(--entry-light),
+      var(--entry-color) 55%,
       transparent
     ),
     radial-gradient(
       ellipse at var(--entry-accent-x, 78%) var(--entry-accent-y, 34%),
-      var(--entry-pop-wash),
+      var(--entry-deep),
       transparent 58%
     ),
-    radial-gradient(
-      ellipse at 28% 90%,
-      var(--entry-spark-wash),
-      transparent 65%
-    ),
-    linear-gradient(125deg, var(--entry-color-wash), var(--entry-deep-wash));
+    radial-gradient(ellipse at 28% 90%, var(--entry-light), transparent 65%),
+    linear-gradient(125deg, var(--entry-color), var(--entry-deep));
   transform-origin: 44px 44px;
-  opacity: 0.58;
   transform: rotate(-2.5deg) scale(1.07);
   animation: intake-card-mesh-drift 19s ease-in-out var(--entry-phase, 0s)
     infinite;
@@ -335,17 +369,17 @@
   overflow: visible;
   fill: none;
   transform-origin: 44px 44px;
-  opacity: 0.17;
+  opacity: 0.5;
   animation: intake-card-curve-drift 26s ease-in-out var(--entry-phase, 0s)
     infinite;
 }
 .intake-card-curves path {
-  stroke: var(--entry-pop);
+  stroke: var(--entry-light);
   stroke-width: 17px;
   stroke-linecap: round;
 }
 .intake-card-curves path + path {
-  stroke: var(--entry-spark);
+  stroke: var(--entry-deep);
   stroke-width: 10px;
 }
 .intake-card-ink {
@@ -447,10 +481,13 @@
 }
 @media (prefers-color-scheme: dark) {
   .intake-card-glass {
-    background: rgb(18 15 23 / 46%);
+    background:
+      linear-gradient(145deg, #ffffff14, #ffffff00 45%, #ffffff05),
+      rgb(18 15 23 / 14%);
     box-shadow:
-      inset 0 1px 0 #fed7aa12,
-      inset 0 -1px 0 #120f171a;
+      inset 0 1px 0 #fff1d64d,
+      inset 1px 0 0 #ffffff14,
+      inset 0 -1px 0 #ffffff0d;
   }
   .intake-card-glass::after {
     content: "";
@@ -468,22 +505,20 @@
 @keyframes intake-card-mesh-drift {
   0%,
   100% {
-    opacity: 0.52;
     transform: rotate(-2.5deg) scale(1.07);
   }
   50% {
-    opacity: 0.66;
     transform: rotate(2.5deg) scale(1.12);
   }
 }
 @keyframes intake-card-curve-drift {
   0%,
   100% {
-    opacity: 0.14;
+    opacity: 0.4;
     transform: rotate(-2deg) translateY(1px);
   }
   50% {
-    opacity: 0.21;
+    opacity: 0.65;
     transform: rotate(2deg) translateY(-1px);
   }
 }
@@ -524,6 +559,7 @@
 }
 .history-card-bleed,
 .history-card-glass,
+.history-card-color-overlay,
 .history-card-mesh,
 .history-card-pattern,
 .history-card-curves,
@@ -564,12 +600,15 @@
   isolation: isolate;
   overflow: hidden;
   border-radius: inherit;
-  background: rgb(255 253 253 / 62%);
-  -webkit-backdrop-filter: blur(64px) saturate(1.2);
-  backdrop-filter: blur(64px) saturate(1.2);
+  background:
+    linear-gradient(145deg, #ffffff24, #ffffff00 45%, #ffffff0a),
+    rgb(255 253 253 / 18%);
+  -webkit-backdrop-filter: blur(72px) saturate(1.1);
+  backdrop-filter: blur(72px) saturate(1.1);
   box-shadow:
-    inset 0 1px 0 #ffffff40,
-    inset 0 -1px 0 #120f170a;
+    inset 0 1px 0 #ffffff75,
+    inset 1px 0 0 #ffffff26,
+    inset 0 -1px 0 #ffffff1a;
 }
 .history-card-mesh {
   position: absolute;
@@ -577,14 +616,13 @@
   background:
     radial-gradient(
       ellipse 148px 110px at 44px 44px,
-      var(--day-wash-a),
+      var(--day-color-a),
       transparent 82%
     ),
-    radial-gradient(ellipse at 84% 18%, var(--day-wash-b), transparent 65%),
-    radial-gradient(ellipse at 33% 100%, var(--day-wash-c), transparent 65%),
-    linear-gradient(128deg, var(--day-wash-a), var(--day-wash-d));
+    radial-gradient(ellipse at 84% 18%, var(--day-color-b), transparent 65%),
+    radial-gradient(ellipse at 33% 100%, var(--day-color-c), transparent 65%),
+    linear-gradient(128deg, var(--day-color-a), var(--day-color-d));
   transform-origin: 44px 44px;
-  opacity: 0.64;
   transform: rotate(-3deg) scale(1.08);
   animation: history-card-mesh-drift 17s ease-in-out var(--day-phase, 0s)
     infinite;
@@ -611,7 +649,7 @@
   overflow: visible;
   fill: none;
   transform-origin: 44px 44px;
-  opacity: 0.2;
+  opacity: 0.45;
   animation: history-card-curve-drift 21s ease-in-out var(--day-phase, 0s)
     infinite;
 }
@@ -792,10 +830,13 @@
 }
 @media (prefers-color-scheme: dark) {
   .history-card-glass {
-    background: rgb(18 15 23 / 46%);
+    background:
+      linear-gradient(145deg, #ffffff14, #ffffff00 45%, #ffffff05),
+      rgb(18 15 23 / 14%);
     box-shadow:
-      inset 0 1px 0 #fed7aa16,
-      inset 0 -1px 0 #120f171a;
+      inset 0 1px 0 #fff1d64d,
+      inset 1px 0 0 #ffffff14,
+      inset 0 -1px 0 #ffffff0d;
   }
   .history-card-glass::after {
     content: "";
@@ -813,22 +854,20 @@
 @keyframes history-card-mesh-drift {
   0%,
   100% {
-    opacity: 0.58;
     transform: rotate(-3deg) scale(1.08);
   }
   50% {
-    opacity: 0.72;
     transform: rotate(3deg) scale(1.14);
   }
 }
 @keyframes history-card-curve-drift {
   0%,
   100% {
-    opacity: 0.17;
+    opacity: 0.35;
     transform: rotate(-2deg) translateY(2px);
   }
   50% {
-    opacity: 0.26;
+    opacity: 0.55;
     transform: rotate(2deg) translateY(-2px);
   }
 }
@@ -875,6 +914,14 @@
   }
   50% {
     opacity: 0.18;
+  }
+}
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .intake-card-glass,
+  .history-card-glass {
+    background: var(--popover);
   }
 }
 .medication-archive-toggle,
