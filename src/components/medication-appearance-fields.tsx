@@ -27,7 +27,14 @@ import {
   SVG_ICON_CATALOG,
 } from "@/lib/svg-icon-catalog";
 import { formatDose, type Medication } from "@/lib/domain";
-import { getMedicationType } from "@/lib/medication-types";
+import {
+  getMedicationType,
+  isMeteredMedicationType,
+} from "@/lib/medication-types";
+import {
+  getMedicationColorScale,
+  getMedicationPreviewSurface,
+} from "@/lib/medication-preview-colors";
 import {
   MEDICATION_COLORS,
   getMedicationColor,
@@ -123,9 +130,9 @@ function choiceStyle(hex: string): CSSProperties {
 
 function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
   const messages = {
-    idle: ["Find your symbol", "Try a name, “outline”, or “color”."],
-    loading: ["A little symbol hunt…", "Icons and emojis, coming right up."],
-    empty: ["No matches this time", "Try a different word or an emoji."],
+    idle: ["Find Your Symbol", "Try a name, “outline”, or “color”."],
+    loading: ["A Little Symbol Hunt…", "Icons and emojis, coming right up."],
+    empty: ["No Matches This Time", "Try a different word or an emoji."],
   };
   return (
     <div
@@ -171,6 +178,7 @@ export function MedicationAppearanceFields({
   iconRotation = 0,
   name = "",
   strength = "",
+  defaultQuantity = "1",
   medicationType = "tablet",
   onColorChange,
   onIconChange,
@@ -181,6 +189,7 @@ export function MedicationAppearanceFields({
   iconRotation?: number;
   name?: string;
   strength?: string;
+  defaultQuantity?: string;
   medicationType?: Medication["form"];
   onColorChange: (value: MedicationColor) => void;
   onIconChange: (value: string) => void;
@@ -217,6 +226,7 @@ export function MedicationAppearanceFields({
       panel.scrollTop = bottom - panel.clientHeight + 8;
   }, [color]);
   const selectedColor = getMedicationColor(color);
+  const colorScale = getMedicationColorScale(color);
   const svg = getSvgIcon(icon);
   const fixedColor = svg?.variant === "color" ? svg.color : undefined;
   const source = svg
@@ -234,10 +244,19 @@ export function MedicationAppearanceFields({
         "Your emoji"));
   const previewName = name.trim() || "Your medication";
   const amount = Number(strength);
-  const strengthLabel =
-    strength.trim() && Number.isFinite(amount) && amount > 0
-      ? `${formatDose(amount)} mg`
-      : "Strength not set";
+  const quantity = Number(defaultQuantity);
+  const type = getMedicationType(medicationType);
+  const hasStrength = strength.trim() && Number.isFinite(amount) && amount > 0;
+  const hasQuantity =
+    defaultQuantity.trim() && Number.isFinite(quantity) && quantity > 0;
+  const strengthLabel = hasStrength
+    ? `${formatDose(amount)} ${isMeteredMedicationType(medicationType) ? "mg/pump" : "mg"}`
+    : "Strength not set";
+  const doseLabel =
+    hasStrength && hasQuantity ? `${formatDose(amount * quantity)} mg` : "— mg";
+  const quantityLabel = hasQuantity
+    ? `${formatDose(quantity)} ${quantity === 1 ? type.unit : type.units}`
+    : "Set amount";
 
   function updateQuery(value: string) {
     clearTimeout(timer.current ?? undefined);
@@ -476,7 +495,7 @@ export function MedicationAppearanceFields({
             className="flex min-h-4 items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
             data-appearance-color-header
           >
-            <span className="shrink-0">Color palette</span>
+            <span className="shrink-0">Color Palette</span>
             <span className="flex min-w-0 items-center justify-end gap-1 text-right">
               <span className="shrink-0 font-[550] tabular-nums">
                 {MEDICATION_COLORS.length}
@@ -536,11 +555,13 @@ export function MedicationAppearanceFields({
         data-appearance-preview-section
       >
         <div
-          className="final-look-showcase relative w-full overflow-hidden rounded-3xl bg-foreground/[.025] p-[18px]"
+          className="final-look-showcase relative w-full overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[.025] p-4"
           style={
             {
               "--preview-accent": selectedColor.hex,
-              "--preview-pigment": fixedColor?.hex ?? selectedColor.hex,
+              "--preview-light": colorScale.lighter,
+              "--preview-deep": colorScale.darker,
+              "--preview-icon": colorScale.icon,
               "--preview-outline": `${selectedColor.hex}38`,
               "--preview-shadow": `${selectedColor.hex}1a`,
             } as CSSProperties
@@ -548,12 +569,7 @@ export function MedicationAppearanceFields({
           data-appearance-preview
         >
           <span aria-hidden="true" className="final-look-pattern" />
-          <span aria-hidden="true" className="final-look-glass-blur-x" />
-          <span aria-hidden="true" className="final-look-glass-blur-y" />
-          <span aria-hidden="true" className="final-look-glass-band" />
           <span aria-hidden="true" className="final-look-ambience" />
-          <span aria-hidden="true" className="final-look-rim" />
-          <span aria-hidden="true" className="final-look-accent-edge" />
           <div
             className="relative flex items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
             data-preview-header
@@ -568,38 +584,50 @@ export function MedicationAppearanceFields({
                   className="size-3.5 shrink-0"
                   strokeWidth={2.25}
                 />
-                Final look
+                Final Look
               </h3>
-              <span className="inline-flex min-w-0 items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className="size-1.5 shrink-0 rounded-full"
-                  style={{
-                    backgroundColor: fixedColor?.hex ?? selectedColor.hex,
-                  }}
-                />
-                <span
-                  className="truncate"
-                  title={fixedColor?.name ?? selectedColor.label}
-                >
-                  {fixedColor?.name ?? selectedColor.label}
-                </span>
-              </span>
+              <span className="truncate">Live Preview</span>
             </div>
-            <span className="shrink-0">Live preview</span>
+            <span className="inline-flex min-w-0 items-center justify-end gap-2">
+              <span
+                aria-hidden="true"
+                className="size-1.5 shrink-0 rounded-full ring-1 ring-foreground/10"
+                style={{
+                  backgroundColor: selectedColor.hex,
+                }}
+              />
+              <span className="truncate" title={selectedColor.label}>
+                {selectedColor.label}
+              </span>
+            </span>
           </div>
           <div className="final-look-icon-stage relative flex justify-center py-5">
             <span aria-hidden="true" className="final-look-icon-halo" />
             <span
               className="final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover"
+              style={{
+                backgroundColor: getMedicationPreviewSurface(
+                  fixedColor?.hex ?? colorScale.icon,
+                ),
+              }}
               data-preview-icon-surface
             >
-              <MedicationIcon
-                color={color}
-                icon={icon}
-                rotation={iconRotation}
-                className="size-24 rounded-[28px] ring-1 ring-foreground/10 [&_[data-medication-glyph]]:size-12"
-              />
+              <span
+                aria-hidden="true"
+                data-medication-mark
+                data-medication-color={color}
+                className="flex size-24 items-center justify-center rounded-[28px] ring-1 ring-foreground/10"
+                style={
+                  {
+                    color: "var(--preview-icon)",
+                    backgroundColor:
+                      "color-mix(in srgb, var(--preview-accent) 12%, transparent)",
+                    "--medication-rotation": `${iconRotation}deg`,
+                  } as CSSProperties
+                }
+              >
+                <MedicationGlyph icon={icon} className="size-12" />
+              </span>
               <span aria-hidden="true" className="final-look-icon-rim" />
             </span>
           </div>
@@ -673,7 +701,7 @@ export function MedicationAppearanceFields({
             />
             <div className="min-w-0 flex-1">
               <p className="mb-1 text-[9px] text-muted-foreground">
-                In your journal
+                In Your Journal
               </p>
               <p
                 className="truncate text-xs font-medium"
@@ -687,7 +715,24 @@ export function MedicationAppearanceFields({
                 <span className="mx-1.5" aria-hidden="true">
                   /
                 </span>
-                {getMedicationType(medicationType).label}
+                {type.label}
+              </p>
+            </div>
+            <div
+              className="min-w-0 shrink-0 text-right"
+              data-preview-default-dose
+            >
+              <p
+                className="text-xs font-[550] tabular-nums"
+                aria-label="Default intake dose"
+              >
+                {doseLabel}
+              </p>
+              <p
+                className="mt-1 text-[10px] text-muted-foreground"
+                aria-label="Default intake quantity"
+              >
+                {quantityLabel}
               </p>
             </div>
           </div>
@@ -725,7 +770,7 @@ export function MedicationAppearanceFields({
                   strokeWidth={2.25}
                   aria-hidden="true"
                 />
-                Surprise me
+                Surprise Me
               </span>
             </button>
           </div>

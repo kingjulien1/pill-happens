@@ -134,6 +134,37 @@
   }
 }
 
+/* Keep dialogs and their portaled selects scrollable without scrollbar tracks. */
+:is(
+  [data-slot="dialog-content"],
+  [data-slot="drawer-popup"],
+  [data-slot="select-content"]
+),
+:is(
+    [data-slot="dialog-content"],
+    [data-slot="drawer-popup"],
+    [data-slot="select-content"]
+  )
+  * {
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+}
+:is(
+  [data-slot="dialog-content"],
+  [data-slot="drawer-popup"],
+  [data-slot="select-content"]
+)::-webkit-scrollbar,
+:is(
+    [data-slot="dialog-content"],
+    [data-slot="drawer-popup"],
+    [data-slot="select-content"]
+  )
+  *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 .ambient {
   position: fixed;
   inset: 0;
@@ -319,24 +350,16 @@
 }
 .final-look-showcase {
   isolation: isolate;
-  box-shadow:
-    inset 0 0 0 6px color-mix(in srgb, var(--foreground) 4%, transparent),
-    inset 0 0 0 1px color-mix(in srgb, var(--foreground) 8%, transparent);
   --preview-glow: color-mix(
     in srgb,
     var(--preview-accent) 82%,
     var(--foreground)
   );
-  --preview-light: color-mix(
-    in srgb,
-    var(--preview-pigment) 82%,
-    var(--foreground)
-  );
 }
 .final-look-pattern {
   position: absolute;
-  inset: 6px;
-  border-radius: 18px;
+  inset: 0;
+  border-radius: inherit;
   background-image: radial-gradient(
     circle,
     var(--preview-accent) 0.65px,
@@ -346,96 +369,36 @@
   background-size: 18px 18px;
   opacity: 0.08;
 }
-.final-look-glass-band {
-  display: none;
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 6px;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--foreground) 6%, transparent),
-      transparent 44%,
-      color-mix(in srgb, var(--preview-accent) 3%, transparent)
-    ),
-    color-mix(in srgb, var(--foreground) 4%, transparent);
-}
-.final-look-glass-blur-x,
-.final-look-glass-blur-y {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-/* Narrow filter surfaces keep the blur at the edge in browsers that let
-   backdrop filters bleed beyond a composite mask. */
-.final-look-glass-blur-x::before,
-.final-look-glass-blur-x::after,
-.final-look-glass-blur-y::before,
-.final-look-glass-blur-y::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  -webkit-backdrop-filter: blur(32px) saturate(1.1);
-  backdrop-filter: blur(32px) saturate(1.1);
-}
-.final-look-glass-blur-x::before,
-.final-look-glass-blur-x::after {
-  top: 0;
-  bottom: 0;
-  width: 6px;
-}
-.final-look-glass-blur-x::before {
-  left: 0;
-}
-.final-look-glass-blur-x::after {
-  right: 0;
-}
-.final-look-glass-blur-y::before,
-.final-look-glass-blur-y::after {
-  right: 0;
-  left: 0;
-  height: 6px;
-}
-.final-look-glass-blur-y::before {
-  top: 0;
-}
-.final-look-glass-blur-y::after {
-  bottom: 0;
-}
-.final-look-glass-band,
 .final-look-pattern,
-.final-look-accent-edge,
 .final-look-ambience,
-.final-look-rim,
 .final-look-icon-halo,
 .final-look-icon-rim,
 .final-look-journal::before {
   pointer-events: none;
 }
-.final-look-accent-edge {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--preview-accent);
-  border-radius: inherit;
-  opacity: 0.55;
-}
 .final-look-ambience {
   position: absolute;
-  inset: 0;
+  inset: -25%;
   background:
     radial-gradient(
-      ellipse at 50% 22%,
-      color-mix(in srgb, var(--preview-light) 16%, transparent),
+      ellipse at 22% 18%,
+      color-mix(in srgb, var(--preview-light) 44%, transparent),
       transparent 62%
     ),
     radial-gradient(
-      ellipse at 85% 80%,
-      color-mix(in srgb, var(--preview-glow) 7%, transparent),
-      transparent 58%
+      ellipse at 78% 82%,
+      color-mix(in srgb, var(--preview-deep) 32%, transparent),
+      transparent 65%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--preview-light) 15%, transparent),
+      color-mix(in srgb, var(--preview-accent) 20%, transparent),
+      color-mix(in srgb, var(--preview-deep) 18%, transparent)
     );
-  opacity: 0.55;
-  animation: final-look-breathe 24s ease-in-out infinite;
+  opacity: 0.85;
+  transform: translate(-3%, -2%) rotate(-6deg) scale(1);
+  animation: final-look-drift 18s ease-in-out infinite;
 }
 .final-look-icon-stage {
   isolation: isolate;
@@ -458,7 +421,6 @@
   transform: translate(-50%, -50%) scale(0.96);
   animation: final-look-halo 24s ease-in-out -8s infinite;
 }
-.final-look-rim,
 .final-look-icon-rim {
   display: none;
   position: absolute;
@@ -468,12 +430,6 @@
   padding: 1px;
 }
 @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
-  .final-look-showcase {
-    box-shadow: inset 0 0 0 1px
-      color-mix(in srgb, var(--foreground) 8%, transparent);
-  }
-  .final-look-glass-band,
-  .final-look-rim,
   .final-look-icon-rim {
     display: block;
     -webkit-mask:
@@ -486,11 +442,6 @@
     mask-composite: exclude;
   }
 }
-.final-look-rim {
-  inset: 6px;
-  border-radius: 18px;
-}
-.final-look-rim::before,
 .final-look-icon-rim::before {
   content: "";
   position: absolute;
@@ -531,20 +482,31 @@
   border-radius: inherit;
   background: linear-gradient(
     125deg,
-    color-mix(in srgb, var(--foreground) 3%, transparent),
+    var(--foreground),
     transparent 45%,
-    color-mix(in srgb, var(--preview-glow) 5%, transparent)
+    var(--preview-glow)
   );
-  opacity: 0.55;
-  animation: final-look-breathe 24s ease-in-out -16s infinite;
+  opacity: 0.025;
+  animation: final-look-journal-breathe 24s ease-in-out -16s infinite;
 }
-@keyframes final-look-breathe {
+@keyframes final-look-journal-breathe {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.02;
   }
   50% {
+    opacity: 0.035;
+  }
+}
+@keyframes final-look-drift {
+  0%,
+  100% {
     opacity: 0.85;
+    transform: translate(-3%, -2%) rotate(-6deg) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(4%, 3%) rotate(6deg) scale(1.08);
   }
 }
 @keyframes final-look-halo {

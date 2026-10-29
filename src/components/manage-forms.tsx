@@ -3,12 +3,17 @@
 import { useId, useState, type FormEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
+import { MedicationActionButton } from "@/components/medication-action-button";
 import {
   MedicationIcon,
   MedicationTypeIcon,
 } from "@/components/medication-icon";
 import { isMedicationIcon } from "@/lib/medication-appearance";
-import { getMedicationType, MEDICATION_TYPES } from "@/lib/medication-types";
+import {
+  getMedicationType,
+  isMeteredMedicationType,
+  MEDICATION_TYPES,
+} from "@/lib/medication-types";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
@@ -123,7 +128,7 @@ export function MedicationForm({
     <form onSubmit={save} className="flex flex-col gap-4">
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
         <div className="space-y-2">
-          <Label htmlFor={`${id}-name`}>Medication name</Label>
+          <Label htmlFor={`${id}-name`}>Medication Name</Label>
           <Input
             id={`${id}-name`}
             name="name"
@@ -139,7 +144,7 @@ export function MedicationForm({
 
         <div className="space-y-2">
           <Label htmlFor={`${id}-ingredient`}>
-            Active ingredient
+            Active Ingredient
             <span className="inline-flex items-center gap-1.5 font-normal text-muted-foreground">
               <span aria-hidden="true">·</span>
               optional
@@ -165,7 +170,7 @@ export function MedicationForm({
           <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-quantity`}>
               {type.units.charAt(0).toUpperCase() + type.units.slice(1)} per
-              intake
+              Intake
             </Label>
             <Input
               id={`${id}-quantity`}
@@ -190,7 +195,9 @@ export function MedicationForm({
           </div>
           <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-strength`}>
-              {form === "pump" ? "Strength (mg/pump)" : "Strength (mg)"}
+              {isMeteredMedicationType(form)
+                ? "Strength (mg/pump)"
+                : "Strength (mg)"}
             </Label>
             <Input
               id={`${id}-strength`}
@@ -217,7 +224,7 @@ export function MedicationForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor={`${id}-form`}>Medication type</Label>
+          <Label htmlFor={`${id}-form`}>Medication Type</Label>
           <Select
             name="form"
             value={form}
@@ -246,7 +253,7 @@ export function MedicationForm({
             >
               <SelectGroup className="p-0">
                 <SelectLabel className="flex h-7 items-center gap-1.5 px-2.5 py-0 text-[11px] font-semibold text-popover-foreground">
-                  <span>Medication type</span>
+                  <span>Medication Type</span>
                   <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
                     <span aria-hidden="true">·</span>
                     <span>{forms.length} options</span>
@@ -288,6 +295,7 @@ export function MedicationForm({
           iconRotation={iconRotation}
           name={name}
           strength={strength}
+          defaultQuantity={defaultQuantity}
           medicationType={form}
           onColorChange={setColor}
           onRotationChange={setIconRotation}
@@ -306,18 +314,12 @@ export function MedicationForm({
         </p>
       )}
 
-      <Button
-        type="submit"
-        disabled={busy}
-        className="h-12 w-full gap-2 rounded-xl text-base"
-      >
-        {busy ? (
-          <ActionIcon name="loading" className="animate-spin" />
-        ) : (
-          <ActionIcon name="save" />
-        )}
-        {busy ? "Saving…" : "Save medication"}
-      </Button>
+      <div className="w-full space-y-3 pt-4" data-medication-save-footer>
+        <MedicationActionButton intent="save" type="submit" pending={busy} />
+        <p className="px-2 text-center text-[10px] leading-relaxed text-muted-foreground">
+          These defaults prefill your next entry. You can edit them anytime.
+        </p>
+      </div>
     </form>
   );
 }
@@ -448,7 +450,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor={`${id}-limit`}>Daily maximum (mg)</Label>
+          <Label htmlFor={`${id}-limit`}>Daily Maximum (mg)</Label>
           <Input
             id={`${id}-limit`}
             name="dailyLimitMg"
@@ -467,7 +469,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
 
         <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
           <div className="min-w-0 space-y-2">
-            <Label htmlFor={`${id}-start`}>Starts on</Label>
+            <Label htmlFor={`${id}-start`}>Starts On</Label>
             <Input
               id={`${id}-start`}
               name="startsOn"
@@ -480,7 +482,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           </div>
           <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-end`}>
-              Ends on{" "}
+              Ends On{" "}
               <span className="font-normal text-muted-foreground">
                 (optional)
               </span>
@@ -504,7 +506,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
 
         <div className="space-y-2">
           <Label htmlFor={`${id}-note`}>
-            A note to yourself{" "}
+            A Note to Yourself{" "}
             <span className="font-normal text-muted-foreground">
               (optional)
             </span>
@@ -538,7 +540,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         ) : (
           <ActionIcon name="save" />
         )}
-        {busy ? "Saving…" : "Save goal"}
+        {busy ? "Saving…" : "Save Goal"}
       </Button>
     </form>
   );

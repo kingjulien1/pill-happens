@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationIcon } from "@/components/medication-icon";
+import { MedicationActionButton } from "@/components/medication-action-button";
 import { toast } from "sonner";
 import {
   getMedicationType,
+  isMeteredMedicationType,
   medicationQuantityControls,
 } from "@/lib/medication-types";
 import { useJournal } from "@/components/journal-provider";
@@ -92,14 +94,12 @@ export function IntakeForm({
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
         </p>
-        <Link
-          href="/medications"
+        <MedicationActionButton
+          intent="add"
+          nativeButton={false}
+          render={<Link href="/medications" />}
           onClick={onSaved}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-action-background text-sm font-medium text-primary-foreground"
-        >
-          Add a medication
-          <ActionIcon name="next" />
-        </Link>
+        />
       </div>
     );
 
@@ -175,7 +175,7 @@ export function IntakeForm({
                   />
                   <span className="min-w-0 truncate">
                     {medication.name} · {formatDose(strength)} mg
-                    {medicationForm === "pump" ? " / pump" : ""}
+                    {isMeteredMedicationType(medicationForm) ? " / pump" : ""}
                   </span>
                 </>
               ) : (
@@ -200,7 +200,7 @@ export function IntakeForm({
                   />
                   <span className="min-w-0 break-words">
                     {m.name} · {formatDose(m.strengthMg)} mg
-                    {m.form === "pump" ? " / pump" : ""}
+                    {isMeteredMedicationType(m.form) ? " / pump" : ""}
                   </span>
                 </span>
               </SelectItem>
@@ -210,7 +210,7 @@ export function IntakeForm({
       </div>
       <div className="form-field">
         <div className="flex items-center justify-between">
-          <Label htmlFor="intake-quantity">Amount taken</Label>
+          <Label htmlFor="intake-quantity">Amount Taken</Label>
           <span className="text-xs text-muted-foreground">{type.units}</span>
         </div>
         <div className="flex items-center gap-2">
@@ -276,7 +276,7 @@ export function IntakeForm({
       <div className="form-field">
         <Label htmlFor="intake-time">
           <ActionIcon name="calendar" className="mr-1 size-4" />
-          Date & time taken
+          Date & Time Taken
         </Label>
         <Input
           id="intake-time"
@@ -297,7 +297,7 @@ export function IntakeForm({
       </div>
       <div className="form-field">
         <Label htmlFor="intake-note">
-          A little context{" "}
+          A Little Context{" "}
           <span className="ml-1 font-normal text-muted-foreground">
             (optional)
           </span>
@@ -326,7 +326,7 @@ export function IntakeForm({
         ) : (
           <ActionIcon name="save" />
         )}
-        {busy ? "Saving…" : intake ? "Save changes" : "Save intake"}
+        {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
       </Button>
     </form>
   );

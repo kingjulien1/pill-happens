@@ -12,6 +12,7 @@ import { TodayHeading } from "@/components/today-heading";
 import { loggingStreak } from "@/lib/logging-streak";
 import { getMedicationType } from "@/lib/medication-types";
 import { MedicationIcon } from "@/components/medication-icon";
+import { MedicationActionButton } from "@/components/medication-action-button";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { IntakeSummary } from "@/components/intake-summary";
@@ -107,7 +108,7 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
         }
       >
         <h2 className="text-xs font-medium text-muted-foreground">
-          Daily totals
+          Daily Totals
         </h2>
         {!activeIds.length && (
           <span className="text-xs text-muted-foreground">No intakes</span>
@@ -172,8 +173,8 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
     <ResponsiveModal
       open
       onOpenChange={(v) => !v && close()}
-      title="Edit intake"
-      context="Update entry"
+      title="Edit Intake"
+      context="Update Entry"
       description="Update this entry. Changes are saved to the day the intake was taken."
     >
       <IntakeForm intake={intake} onSaved={close} />
@@ -345,8 +346,8 @@ export function TodayPage() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="Log intake"
-        context="New entry"
+        title="Log Intake"
+        context="New Entry"
         description="Record what you took, when you took it, and anything on your mind."
       >
         {open && <IntakeForm onSaved={() => setOpen(false)} />}
@@ -382,19 +383,17 @@ export function MedicationsPage() {
   }
   return (
     <>
-      <PageHeading title="Medications" context="Your list">
+      <PageHeading title="Medications" context="Your List">
         Manage medication names, strengths, and types.
       </PageHeading>
-      <Button
-        className="mb-7 h-13 w-full gap-2 rounded-2xl"
+      <MedicationActionButton
+        intent="add"
+        className="mb-7"
         onClick={() => {
           setEditing(undefined);
           setOpen(true);
         }}
-      >
-        <ActionIcon name="medications" />
-        Add a medication
-      </Button>
+      />
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-medium">
           <HeadingText
@@ -421,7 +420,7 @@ export function MedicationsPage() {
         <EmptyState
           icon="medications"
           title={
-            showArchived ? "Nothing archived." : "Start with your medication."
+            showArchived ? "Nothing Archived." : "Start with Your Medication."
           }
         >
           {showArchived
@@ -485,10 +484,10 @@ export function MedicationsPage() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title={editing ? "Edit medication" : "Add medication"}
+        title={editing ? "Edit Medication" : "Add Medication"}
         titleIcon="medications"
         headerVariant="medication"
-        context={editing ? "Update details" : "Name & strength"}
+        context={editing ? "Update Details" : "Name & Strength"}
         description="Medication details and appearance."
       >
         {open && (
@@ -527,7 +526,7 @@ export function GoalsPage() {
   }
   return (
     <>
-      <PageHeading title="Goals" context="Daily maximums">
+      <PageHeading title="Goals" context="Daily Maximums">
         Keep track of the targets agreed with your prescriber.
       </PageHeading>
       <Button
@@ -538,7 +537,7 @@ export function GoalsPage() {
         Set a daily goal
       </Button>
       {!goals.length ? (
-        <EmptyState icon="goals" title="A little direction, when you’re ready.">
+        <EmptyState icon="goals" title="A Little Direction, When You’re Ready.">
           Add a daily maximum for one medication. Your journal will help you
           keep sight of it.
         </EmptyState>
@@ -647,8 +646,8 @@ export function GoalsPage() {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="Set a goal"
-        context="Daily maximum"
+        title="Set a Goal"
+        context="Daily Maximum"
         description="Record a daily maximum you have chosen with your prescriber. This does not calculate a taper schedule."
       >
         {open && <GoalForm onSaved={() => setOpen(false)} />}
@@ -656,8 +655,8 @@ export function GoalsPage() {
       <ResponsiveModal
         open={Boolean(deleting)}
         onOpenChange={(v) => !v && setDeleting(null)}
-        title="Remove this goal?"
-        context="Confirm removal"
+        title="Remove This Goal?"
+        context="Confirm Removal"
         description="This also removes it from historical summaries. Your intake entries stay in your journal."
       >
         <div className="mt-2 grid grid-cols-2 gap-3">
@@ -722,7 +721,7 @@ function JournalPreferences() {
         open={open}
         onOpenChange={setOpen}
         title="Preferences"
-        context="Your journal"
+        context="Your Journal"
         description="Your day begins at 06:00 in this timezone. Changing it regroups all of your entries."
       >
         <form
@@ -739,7 +738,7 @@ function JournalPreferences() {
           }}
         >
           <div className="form-field">
-            <Label htmlFor="timezone">Journal timezone</Label>
+            <Label htmlFor="timezone">Journal Timezone</Label>
             <Input
               id="timezone"
               value={timezone}
@@ -813,17 +812,17 @@ export function HistoryPage() {
     .reverse();
   return (
     <>
-      <PageHeading title="History" context="Past days">
+      <PageHeading title="History" context="Past Days">
         Daily summaries and intake details.
       </PageHeading>
       <div className="mb-5 flex items-center justify-between border-b border-border/70 pb-4">
-        <span className="text-xs font-medium">Past days</span>
+        <span className="text-xs font-medium">Past Days</span>
         <span className="text-[10px] text-muted-foreground">
           {days.length} {days.length === 1 ? "day" : "days"} with entries
         </span>
       </div>
       {!days.length ? (
-        <EmptyState icon="history" title="Your story starts here.">
+        <EmptyState icon="history" title="Your Story Starts Here.">
           Past days will appear here as you keep logging. Each new day begins at
           06:00.
         </EmptyState>
@@ -914,7 +913,7 @@ export function DayPage({ day }: { day: string }) {
         Back to past days
       </Link>
       <PageHeading
-        title="Daily log"
+        title="Daily Log"
         context={formatDay(day, {
           weekday: "short",
           month: "short",
@@ -964,8 +963,8 @@ export function DayPage({ day }: { day: string }) {
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="Log intake"
-        context="Past entry"
+        title="Log Intake"
+        context="Past Entry"
         description="Add an intake you missed. Check the date and time before saving."
       >
         {open && <IntakeForm initialDay={day} onSaved={() => setOpen(false)} />}
