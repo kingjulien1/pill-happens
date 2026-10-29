@@ -353,6 +353,19 @@ export function MedicationsPage() {
         count={medications.length}
         onArchivedChange={setShowArchived}
       />
+      <div
+        className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/30 px-3 py-2.5"
+        data-medication-history-notice
+      >
+        <ActionIcon name="retry" className="mt-0.5 size-4 text-foreground/70" />
+        <p className="text-[11px] leading-[1.7] text-muted-foreground">
+          <span className="font-medium text-foreground">
+            Edits Update All Past Logs.
+          </span>{" "}
+          Strength changes recalculate past doses and totals. Logged quantities,
+          times and notes stay as entered.
+        </p>
+      </div>
       <div id="medication-library-list">
         {!medications.length ? (
           <EmptyState
@@ -412,13 +425,6 @@ export function MedicationsPage() {
             ))}
           </div>
         )}
-      </div>
-      <div className="mt-7 flex gap-3 rounded-2xl border border-border/70 bg-card/40 p-4">
-        <Leaf size={16} className="mt-.5 shrink-0 text-foreground/70" />
-        <p className="text-[11px] leading-[1.8] text-muted-foreground">
-          Changes apply to new entries. Past entries keep the name and strength
-          you originally recorded.
-        </p>
       </div>
       <ResponsiveModal
         open={open}

@@ -1,6 +1,6 @@
 "use client";
 
-import { SmileyStickerIcon } from "@phosphor-icons/react/dist/ssr/SmileySticker";
+import { FirstAidKitIcon } from "@phosphor-icons/react/dist/ssr/FirstAidKit";
 import { StackIcon } from "@phosphor-icons/react/dist/ssr/Stack";
 import { FolderOpenIcon } from "@phosphor-icons/react/dist/ssr/FolderOpen";
 import { FolderSimpleIcon } from "@phosphor-icons/react/dist/ssr/FolderSimple";
@@ -14,52 +14,62 @@ export function MedicationsHeading({
 }: {
   medications: Medication[];
 }) {
+  const activeCount = medications.filter(
+    (medication) => !medication.archived,
+  ).length;
+
   return (
     <header className="mb-6" data-medications-heading>
       <div
-        className="flex min-w-0 items-center justify-between gap-3"
+        className="flex min-w-0 items-center justify-between gap-2 sm:gap-3"
         data-medications-title-row
       >
         <div className="flex min-w-0 items-center gap-2">
-          <SmileyStickerIcon
+          <FirstAidKitIcon
             weight="bold"
             aria-hidden="true"
             focusable="false"
             className="size-[22px] shrink-0 text-foreground"
           />
-          <h1 className="text-2xl font-semibold tracking-tight">Medications</h1>
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-[10px] text-muted-foreground">
+          <h1 className="medications-page-title">Medications</h1>
+          <span className="medications-heading-context inline-flex shrink-0 items-center gap-1.5 text-[10px] text-muted-foreground">
             <span aria-hidden="true">·</span>
             Kit
           </span>
         </div>
         <span
-          className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/[.035] px-2 text-[11px] text-muted-foreground"
-          aria-label={`${medications.length} saved ${medications.length === 1 ? "medication" : "medications"}`}
+          className="medications-total"
+          aria-label={`${medications.length} saved ${medications.length === 1 ? "medication" : "medications"}, ${activeCount} active`}
           role="img"
           data-medications-total
         >
-          {medications.length ? (
-            <span aria-hidden="true" className="flex -space-x-1">
-              {medications.slice(0, 3).map((medication) => (
-                <span
-                  key={medication.id}
-                  className="size-2 rounded-full border border-popover ring-1 ring-foreground/10"
-                  style={{
-                    backgroundColor: getMedicationColor(medication.color).hex,
-                  }}
-                />
-              ))}
-            </span>
-          ) : (
+          <span aria-hidden="true" className="medications-total-art">
             <StackIcon
-              aria-hidden="true"
               focusable="false"
               weight="bold"
-              className="size-3"
+              className="size-4 shrink-0"
             />
-          )}
-          <span className="font-[550] tabular-nums">{medications.length}</span>
+            {medications.length > 0 && (
+              <span className="medications-total-palette">
+                {medications.slice(0, 3).map((medication) => (
+                  <span
+                    key={medication.id}
+                    style={{
+                      backgroundColor: getMedicationColor(medication.color).hex,
+                    }}
+                  />
+                ))}
+              </span>
+            )}
+          </span>
+          <span aria-hidden="true" className="medications-total-copy">
+            <span className="medications-total-saved">
+              <strong>{medications.length}</strong> Saved
+            </span>
+            <span className="medications-total-active">
+              <strong>{activeCount}</strong> Active
+            </span>
+          </span>
         </span>
       </div>
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
