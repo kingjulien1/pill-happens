@@ -19,6 +19,7 @@ import {
 } from "@/components/medications-heading";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
+import { IntakeCard } from "@/components/intake-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
@@ -28,7 +29,6 @@ import { Label } from "@/components/ui/label";
 import {
   dayIntakes,
   dayKey,
-  doseMg,
   formatDay,
   formatDose,
   goalForDay,
@@ -245,70 +245,21 @@ function IntakeTimeline({
       {!entries.length ? (
         <EmptyIntakeStack onLog={onLog} />
       ) : (
-        <div className="relative space-y-3 before:absolute before:top-6 before:bottom-6 before:left-[23px] before:w-px before:bg-border">
+        <div className="relative space-y-3 before:absolute before:top-11 before:bottom-11 before:left-[43px] before:w-px before:bg-border">
           {entries.map((entry, index) => {
             const medication = data.medications.find(
               (m) => m.id === entry.medicationId,
             );
-            const time = new Intl.DateTimeFormat("en-GB", {
-              timeZone: data.settings.timezone,
-              hour: "2-digit",
-              minute: "2-digit",
-            }).format(new Date(entry.takenAt));
-            const localDay = new Intl.DateTimeFormat("en-CA", {
-              timeZone: data.settings.timezone,
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date(entry.takenAt));
             return (
-              <button
+              <IntakeCard
                 key={entry.id}
-                onClick={() => setEditing(entry)}
-                aria-label={`Edit ${entry.medicationName}, ${formatDose(doseMg(entry))} milligrams, ${time}`}
-                className="surface relative flex w-full items-start gap-3.5 rounded-[21px] p-4 text-left transition-colors hover:border-primary/30"
-              >
-                <MedicationIcon
-                  color={medication?.color}
-                  icon={medication?.icon}
-                  rotation={medication?.iconRotation}
-                  small
-                />
-                <div className="min-w-0 flex-1 pt-.5">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="truncate text-[13px] font-medium">
-                      {entry.medicationName}
-                    </h3>
-                    <span className="shrink-0 text-[13px] font-medium tabular-nums">
-                      {formatDose(doseMg(entry))}
-                      <span className="ml-1 text-[10px] font-normal text-muted-foreground">
-                        mg
-                      </span>
-                    </span>
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-                    <span>
-                      {time}
-                      {localDay !== day ? " · next morning" : ""}{" "}
-                      <span className="mx-1">·</span>{" "}
-                      {formatDose(entry.quantity)}
-                      {(entry.medicationForm ?? medication?.form) === "pump"
-                        ? ` ${entry.quantity === 1 ? "pump" : "pumps"}`
-                        : ""}{" "}
-                      × {formatDose(entry.strengthMg)} mg
-                    </span>
-                    <span className="flex items-center gap-1">
-                      {String(index + 1).padStart(2, "0")}
-                      <ActionIcon name="edit" className="size-4" />
-                    </span>
-                  </div>
-                  {entry.note && (
-                    <p className="mt-2.5 border-t border-border/60 pt-2 text-[11px] leading-relaxed break-words text-muted-foreground">
-                      {entry.note}
-                    </p>
-                  )}
-                </div>
-              </button>
+                entry={entry}
+                medication={medication}
+                index={index}
+                day={day}
+                timeZone={data.settings.timezone}
+                onEdit={() => setEditing(entry)}
+              />
             );
           })}
         </div>

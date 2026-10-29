@@ -227,6 +227,284 @@
   flex-direction: column;
   gap: 0.4rem;
 }
+.intake-log-card {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  overflow: visible;
+  border: 1px solid var(--border);
+  border-radius: 21px;
+  background: transparent;
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+}
+.intake-log-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.intake-card-bleed,
+.intake-card-glass,
+.intake-card-mesh,
+.intake-card-pattern,
+.intake-card-curves,
+.intake-card-ink,
+.intake-card-orbit,
+.intake-card-sticker--a,
+.intake-card-sticker--b,
+.intake-card-icon-rim {
+  pointer-events: none;
+}
+.intake-card-bleed {
+  position: absolute;
+  z-index: -1;
+  inset: -4px;
+  overflow: hidden;
+  border-radius: 25px;
+  background: radial-gradient(
+    ellipse 72px 58px at 48px 48px,
+    var(--entry-pop),
+    var(--entry-spark) 48%,
+    transparent 78%
+  );
+  opacity: 0.12;
+  animation: intake-card-edge-breathe 23s ease-in-out var(--entry-phase, 0s)
+    infinite;
+}
+.intake-card-glass {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: inherit;
+  background: rgb(255 253 253 / 62%);
+  -webkit-backdrop-filter: blur(64px) saturate(1.15);
+  backdrop-filter: blur(64px) saturate(1.15);
+  box-shadow:
+    inset 0 1px 0 #ffffff38,
+    inset 0 -1px 0 #120f170a;
+}
+.intake-card-mesh {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 140px 100px at 44px 44px,
+      var(--entry-light-wash),
+      var(--entry-color-wash) 55%,
+      transparent
+    ),
+    radial-gradient(
+      ellipse at var(--entry-accent-x, 78%) var(--entry-accent-y, 34%),
+      var(--entry-pop-wash),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse at 28% 90%,
+      var(--entry-spark-wash),
+      transparent 65%
+    ),
+    linear-gradient(125deg, var(--entry-color-wash), var(--entry-deep-wash));
+  transform-origin: 44px 44px;
+  opacity: 0.58;
+  transform: rotate(-2.5deg) scale(1.07);
+  animation: intake-card-mesh-drift 19s ease-in-out var(--entry-phase, 0s)
+    infinite;
+}
+.intake-card-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    var(--entry-color) 0.55px,
+    transparent 0.9px
+  );
+  background-position: 44px 44px;
+  background-size: 16px 16px;
+  opacity: 0.065;
+}
+.intake-card-curves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 360px;
+  max-width: none;
+  height: 150px;
+  overflow: visible;
+  fill: none;
+  transform-origin: 44px 44px;
+  opacity: 0.17;
+  animation: intake-card-curve-drift 26s ease-in-out var(--entry-phase, 0s)
+    infinite;
+}
+.intake-card-curves path {
+  stroke: var(--entry-pop);
+  stroke-width: 17px;
+  stroke-linecap: round;
+}
+.intake-card-curves path + path {
+  stroke: var(--entry-spark);
+  stroke-width: 10px;
+}
+.intake-card-ink {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  background: #120f17;
+  opacity: 0.2;
+}
+.intake-card-content {
+  position: relative;
+  z-index: 1;
+}
+.intake-card-focus {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+.intake-card-orbit {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 74px;
+  height: 56px;
+  border: 1px dashed var(--entry-pop);
+  border-radius: 50%;
+  opacity: 0.46;
+  transform: translate(-50%, -50%) rotate(var(--entry-orbit-angle, 0deg));
+  animation: intake-card-orbit 21s linear var(--entry-phase, 0s) infinite;
+}
+.intake-card-bead {
+  position: absolute;
+  top: -3px;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--popover);
+  border-radius: 50%;
+  background: var(--entry-pop);
+}
+.intake-card-bead + .intake-card-bead {
+  top: auto;
+  bottom: -3px;
+  background: var(--entry-spark);
+}
+.intake-card-sticker--a,
+.intake-card-sticker--b {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #ffffff30;
+  border-radius: 16px;
+}
+.intake-card-sticker--a {
+  background: var(--entry-pop);
+  opacity: 0.46;
+  transform: translate(-57%, -47%) rotate(-13deg);
+}
+.intake-card-sticker--b {
+  background: linear-gradient(135deg, var(--entry-spark), var(--entry-light));
+  opacity: 0.52;
+  transform: translate(-43%, -53%) rotate(12deg);
+}
+.intake-card-mark {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--popover);
+  box-shadow: 0 4px 10px #120f1726;
+}
+.intake-card-icon-rim {
+  position: absolute;
+  z-index: 3;
+  inset: 3px;
+  border: 1px solid var(--entry-light);
+  border-radius: 17px;
+  opacity: 0.32;
+}
+.intake-card-details {
+  position: relative;
+  min-width: 0;
+}
+@media (prefers-color-scheme: dark) {
+  .intake-card-glass {
+    background: rgb(18 15 23 / 46%);
+    box-shadow:
+      inset 0 1px 0 #fed7aa12,
+      inset 0 -1px 0 #120f171a;
+  }
+  .intake-card-glass::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 64px,
+      rgb(18 15 23 / 50%) 100px
+    );
+    pointer-events: none;
+  }
+}
+@keyframes intake-card-mesh-drift {
+  0%,
+  100% {
+    opacity: 0.52;
+    transform: rotate(-2.5deg) scale(1.07);
+  }
+  50% {
+    opacity: 0.66;
+    transform: rotate(2.5deg) scale(1.12);
+  }
+}
+@keyframes intake-card-curve-drift {
+  0%,
+  100% {
+    opacity: 0.14;
+    transform: rotate(-2deg) translateY(1px);
+  }
+  50% {
+    opacity: 0.21;
+    transform: rotate(2deg) translateY(-1px);
+  }
+}
+@keyframes intake-card-orbit {
+  from {
+    transform: translate(-50%, -50%) rotate(var(--entry-orbit-angle, 0deg));
+  }
+  to {
+    transform: translate(-50%, -50%)
+      rotate(calc(var(--entry-orbit-angle, 0deg) + 360deg));
+  }
+}
+@keyframes intake-card-edge-breathe {
+  0%,
+  100% {
+    opacity: 0.09;
+  }
+  50% {
+    opacity: 0.17;
+  }
+}
 .medication-archive-toggle,
 .medication-archive-toggle:hover,
 .medication-archive-toggle[data-pressed] {
