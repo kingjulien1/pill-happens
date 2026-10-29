@@ -33,6 +33,7 @@ import {
 } from "@/lib/medication-types";
 import {
   getMedicationColorScale,
+  getMedicationPreviewAccents,
   getMedicationPreviewSurface,
 } from "@/lib/medication-preview-colors";
 import {
@@ -227,6 +228,7 @@ export function MedicationAppearanceFields({
   }, [color]);
   const selectedColor = getMedicationColor(color);
   const colorScale = getMedicationColorScale(color);
+  const accents = getMedicationPreviewAccents(color);
   const svg = getSvgIcon(icon);
   const fixedColor = svg?.variant === "color" ? svg.color : undefined;
   const source = svg
@@ -562,6 +564,15 @@ export function MedicationAppearanceFields({
               "--preview-light": colorScale.lighter,
               "--preview-deep": colorScale.darker,
               "--preview-icon": colorScale.icon,
+              "--preview-pop": accents.pop,
+              "--preview-spark": accents.spark,
+              "--preview-color-wash": `${selectedColor.hex}66`,
+              "--preview-light-wash": `${colorScale.lighter}80`,
+              "--preview-deep-wash": `${colorScale.darker}59`,
+              "--preview-pop-wash": `${accents.pop}70`,
+              "--preview-spark-wash": `${accents.spark}66`,
+              "--preview-action-pop": `${accents.pop}26`,
+              "--preview-action-spark": `${accents.spark}26`,
               "--preview-outline": `${selectedColor.hex}38`,
               "--preview-shadow": `${selectedColor.hex}1a`,
             } as CSSProperties
@@ -570,6 +581,17 @@ export function MedicationAppearanceFields({
         >
           <span aria-hidden="true" className="final-look-pattern" />
           <span aria-hidden="true" className="final-look-ambience" />
+          <span aria-hidden="true" className="final-look-color-ribbon" />
+          <svg
+            aria-hidden="true"
+            className="final-look-swoosh"
+            viewBox="0 0 320 400"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path d="M-45 160C30 40 112 238 225 131S337 48 370 88" />
+            <path d="M-42 252C66 338 176 119 257 253S343 357 365 300" />
+          </svg>
           <div
             className="relative flex items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
             data-preview-header
@@ -577,7 +599,7 @@ export function MedicationAppearanceFields({
             <div className="flex min-w-0 items-center gap-3">
               <h3
                 id={`${id}-preview-title`}
-                className="inline-flex shrink-0 items-center gap-1.5 text-xs leading-4 font-[550] text-foreground"
+                className="final-look-title inline-flex shrink-0 items-center gap-1.5 text-xs leading-4 font-[550] text-foreground"
               >
                 <Eye
                   aria-hidden="true"
@@ -601,8 +623,49 @@ export function MedicationAppearanceFields({
               </span>
             </span>
           </div>
-          <div className="final-look-icon-stage relative flex justify-center py-5">
+          <div className="final-look-icon-stage relative flex h-44 items-center justify-center">
             <span aria-hidden="true" className="final-look-icon-halo" />
+            <span
+              aria-hidden="true"
+              className="final-look-orbit-track final-look-orbit-track--back"
+            />
+            <span
+              aria-hidden="true"
+              className="final-look-orbit-track final-look-orbit-track--front"
+            >
+              <span className="final-look-orbit-bead" />
+              <span className="final-look-orbit-bead final-look-orbit-bead--second" />
+            </span>
+            <span
+              aria-hidden="true"
+              className="final-look-sticker final-look-sticker--back"
+            />
+            <span
+              aria-hidden="true"
+              className="final-look-sticker final-look-sticker--front"
+            />
+            <span
+              aria-hidden="true"
+              className="final-look-doodle final-look-doodle--star"
+            >
+              <ActionIcon name="sparkle" weight="fill" className="size-6" />
+            </span>
+            <span
+              aria-hidden="true"
+              className="final-look-doodle final-look-doodle--flower"
+            >
+              <ActionIcon name="flower" weight="fill" className="size-5" />
+            </span>
+            <span
+              aria-hidden="true"
+              className="final-look-doodle final-look-doodle--bolt"
+            >
+              <ActionIcon name="lightning" weight="fill" className="size-4" />
+            </span>
+            <span
+              aria-hidden="true"
+              className="final-look-doodle final-look-doodle--ring"
+            />
             <span
               className="final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover"
               style={{
@@ -631,16 +694,23 @@ export function MedicationAppearanceFields({
               <span aria-hidden="true" className="final-look-icon-rim" />
             </span>
           </div>
-          <p
-            className="relative text-center text-xs font-medium"
-            data-preview-symbol-label
-          >
-            {symbolLabel}
-          </p>
+          <div className="relative flex min-w-0 items-center justify-center gap-3">
+            <p
+              className="truncate text-xs font-medium"
+              data-preview-symbol-label
+            >
+              {symbolLabel}
+            </p>
+            <span aria-hidden="true" className="final-look-swatch-trail">
+              <span />
+              <span />
+              <span />
+            </span>
+          </div>
           <div
             role="group"
             aria-label="Icon rotation"
-            className="relative mt-2 flex items-center justify-center gap-1"
+            className="final-look-rotation relative mx-auto mt-3 flex w-fit items-center justify-center gap-1 rounded-full px-1"
             data-appearance-rotation-controls
           >
             <button
@@ -750,7 +820,10 @@ export function MedicationAppearanceFields({
               className={previewActionClass}
               aria-label="Undo shuffled look"
             >
-              <span className={previewActionFaceClass} data-preview-action-face>
+              <span
+                className={previewActionFaceClass}
+                data-preview-action-face="undo"
+              >
                 <Undo2
                   className="size-3"
                   strokeWidth={2.25}
@@ -764,7 +837,10 @@ export function MedicationAppearanceFields({
               onClick={shuffleLook}
               className={previewActionClass}
             >
-              <span className={previewActionFaceClass} data-preview-action-face>
+              <span
+                className={previewActionFaceClass}
+                data-preview-action-face="surprise"
+              >
                 <Shuffle
                   className="size-3"
                   strokeWidth={2.25}
