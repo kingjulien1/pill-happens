@@ -2,12 +2,12 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import {
-  Check,
   Eye,
   RotateCcw,
   RotateCw,
   Search,
   Shuffle,
+  Sparkles,
   Undo2,
   X,
 } from "lucide-react";
@@ -44,11 +44,14 @@ const emojiCount = EMOJI_CATALOG.length;
 const pickerPanelClass =
   "relative h-[134px] w-full overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-foreground/[.025] [scrollbar-gutter:stable]";
 const pickerGridClass = "grid grid-cols-8 gap-1 p-2 max-[359px]:grid-cols-6";
+const pickerChoiceClass =
+  "appearance-choice relative flex h-9 w-full cursor-pointer items-center justify-center rounded-[10px] border-2 border-transparent text-foreground/80 hover:bg-foreground/5 peer-disabled:pointer-events-none peer-disabled:opacity-40";
 const previewActionClass =
   "inline-flex h-11 items-center rounded-lg text-[10px] font-medium text-muted-foreground transition-colors hover:[&>span]:bg-foreground/[.06] disabled:opacity-35";
 const previewActionFaceClass =
   "inline-flex h-7 items-center gap-1.5 rounded-lg border border-foreground/10 bg-foreground/[.025] px-2 transition-colors";
 type SearchPhase = "idle" | "loading" | "ready";
+type SearchFeedback = { id: number; tone: "success" | "empty" };
 type SymbolOption = {
   value: string;
   label: string;
@@ -110,26 +113,18 @@ function searchSymbols(query: string): SymbolOption[] {
   return results.slice(0, RESULT_LIMIT);
 }
 
-function checkColor(hex: string) {
-  const channels = hex
-    .slice(1)
-    .match(/../g)!
-    .map((part) => {
-      const value = parseInt(part, 16) / 255;
-      return value <= 0.04045
-        ? value / 12.92
-        : ((value + 0.055) / 1.055) ** 2.4;
-    });
-  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722 >
-    0.18
-    ? "#120f17"
-    : "#fff1d6";
+function choiceStyle(hex: string): CSSProperties {
+  return {
+    "--choice-accent": hex,
+    "--choice-fill": `${hex}24`,
+    "--choice-glow": `${hex}38`,
+  } as CSSProperties;
 }
 
 function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
   const messages = {
     idle: ["Find your symbol", "Try a name, “outline”, or “color”."],
-    loading: ["Looking around…", "Results appear when you pause typing."],
+    loading: ["A little symbol hunt…", "Icons and emojis, coming right up."],
     empty: ["No matches this time", "Try a different word or an emoji."],
   };
   return (
@@ -139,11 +134,26 @@ function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
     >
       <span
         className={cn(
-          "flex size-11 items-center justify-center rounded-xl bg-foreground/5 text-foreground/80",
-          phase === "loading" && "motion-safe:animate-pulse",
+          "relative flex size-11 items-center justify-center rounded-xl bg-foreground/5 text-foreground/80",
+          phase === "loading" && "symbol-search-mark",
         )}
       >
-        <ActionIcon name="discover" weight="duotone" className="size-8" />
+        {phase === "loading" && (
+          <span aria-hidden="true" className="symbol-search-orbit">
+            <span className="symbol-search-orbit-dot" />
+            <Sparkles
+              className="symbol-search-orbit-spark size-3"
+              strokeWidth={2.5}
+            />
+          </span>
+        )}
+        <span
+          className={
+            phase === "loading" ? "symbol-search-scout" : "inline-flex"
+          }
+        >
+          <ActionIcon name="discover" weight="duotone" className="size-8" />
+        </span>
       </span>
       <div>
         <p className="text-xs font-medium">{messages[phase][0]}</p>
@@ -180,12 +190,21 @@ export function MedicationAppearanceFields({
   const searchInput = useRef<HTMLInputElement>(null);
   const colorPanel = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchSequence = useRef(0);
   const composing = useRef(false);
   const [query, setQuery] = useState("");
   const [phase, setPhase] = useState<SearchPhase>("idle");
   const [results, setResults] = useState<SymbolOption[]>([]);
+  const [feedback, setFeedback] = useState<SearchFeedback | null>(null);
   const [undo, setUndo] = useState<Look | null>(null);
-  useEffect(() => () => clearTimeout(timer.current ?? undefined), []);
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current ?? undefined);
+      clearTimeout(feedbackTimer.current ?? undefined);
+    },
+    [],
+  );
   useEffect(() => {
     const panel = colorPanel.current;
     const tile =
@@ -222,15 +241,26 @@ export function MedicationAppearanceFields({
 
   function updateQuery(value: string) {
     clearTimeout(timer.current ?? undefined);
+    clearTimeout(feedbackTimer.current ?? undefined);
     timer.current = null;
+    feedbackTimer.current = null;
+    setFeedback(null);
+    const sequence = ++searchSequence.current;
     setQuery(value);
     setResults([]);
     const search = value.trim();
     setPhase(search ? "loading" : "idle");
     if (!search || composing.current) return;
     timer.current = setTimeout(() => {
-      setResults(searchSymbols(search));
+      if (sequence !== searchSequence.current || composing.current) return;
+      const matches = searchSymbols(search);
+      setResults(matches);
       setPhase("ready");
+      setFeedback({ id: sequence, tone: matches.length ? "success" : "empty" });
+      feedbackTimer.current = setTimeout(() => {
+        if (sequence === searchSequence.current) setFeedback(null);
+        feedbackTimer.current = null;
+      }, 1400);
       timer.current = null;
     }, SEARCH_DELAY);
   }
@@ -293,7 +323,11 @@ export function MedicationAppearanceFields({
               onCompositionStart={() => {
                 composing.current = true;
                 clearTimeout(timer.current ?? undefined);
+                clearTimeout(feedbackTimer.current ?? undefined);
                 timer.current = null;
+                feedbackTimer.current = null;
+                searchSequence.current++;
+                setFeedback(null);
                 setResults([]);
                 setPhase(query.trim() ? "loading" : "idle");
               }}
@@ -379,58 +413,59 @@ export function MedicationAppearanceFields({
               )}
             </span>
           </div>
-          <div
-            id={`${id}-results`}
-            className={pickerPanelClass}
-            aria-busy={phase === "loading"}
-            data-appearance-results
-          >
-            {phase !== "ready" || !results.length ? (
-              <SearchState phase={phase === "ready" ? "empty" : phase} />
-            ) : (
-              <div
-                role="radiogroup"
-                aria-label="Icon search results"
-                className={pickerGridClass}
-              >
-                {results.map((item) => (
-                  <div
-                    key={`${item.source}-${item.value}`}
-                    className="relative min-w-0"
-                  >
-                    <input
-                      type="radio"
-                      id={`${id}-symbol-${item.source}-${item.value}`}
-                      name={`${id}-symbol`}
-                      value={item.value}
-                      checked={icon === item.value}
-                      onChange={() => chooseIcon(item.value)}
-                      aria-label={`${item.label} · ${item.source}`}
-                      data-medication-icon={item.value}
-                      data-symbol-source={item.source}
-                      className="peer sr-only"
-                    />
-                    <label
-                      htmlFor={`${id}-symbol-${item.source}-${item.value}`}
-                      title={`${item.label} · ${item.source}`}
-                      className={cn(
-                        "relative flex h-9 w-full cursor-pointer items-center justify-center rounded-lg border border-transparent text-foreground/80 transition-colors hover:bg-foreground/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background peer-disabled:pointer-events-none peer-disabled:opacity-40",
-                        icon === item.value &&
-                          "border-foreground/40 bg-foreground/10 text-foreground",
-                      )}
+          <div className="relative rounded-2xl" data-appearance-result-frame>
+            <div
+              id={`${id}-results`}
+              className={pickerPanelClass}
+              aria-busy={phase === "loading"}
+              data-appearance-results
+            >
+              {phase !== "ready" || !results.length ? (
+                <SearchState phase={phase === "ready" ? "empty" : phase} />
+              ) : (
+                <div
+                  role="radiogroup"
+                  aria-label="Icon search results"
+                  className={pickerGridClass}
+                >
+                  {results.map((item) => (
+                    <div
+                      key={`${item.source}-${item.value}`}
+                      className="relative min-w-0"
                     >
-                      <MedicationGlyph icon={item.value} className="size-5" />
-                      {icon === item.value && (
-                        <Check
-                          aria-hidden="true"
-                          className="absolute top-0.5 right-0.5 size-2.5"
-                          strokeWidth={3}
-                        />
-                      )}
-                    </label>
-                  </div>
-                ))}
-              </div>
+                      <input
+                        type="radio"
+                        id={`${id}-symbol-${item.source}-${item.value}`}
+                        name={`${id}-symbol`}
+                        value={item.value}
+                        checked={icon === item.value}
+                        onChange={() => chooseIcon(item.value)}
+                        aria-label={`${item.label} · ${item.source}`}
+                        data-medication-icon={item.value}
+                        data-symbol-source={item.source}
+                        className="peer sr-only"
+                      />
+                      <label
+                        htmlFor={`${id}-symbol-${item.source}-${item.value}`}
+                        title={`${item.label} · ${item.source}`}
+                        className={pickerChoiceClass}
+                        style={choiceStyle(selectedColor.hex)}
+                        data-selected={icon === item.value}
+                      >
+                        <MedicationGlyph icon={item.value} className="size-5" />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {feedback && (
+              <span
+                key={feedback.id}
+                aria-hidden="true"
+                className="symbol-results-feedback"
+                data-search-feedback={feedback.tone}
+              />
             )}
           </div>
         </section>
@@ -477,27 +512,16 @@ export function MedicationAppearanceFields({
                   <label
                     htmlFor={`${id}-color-${item.value}`}
                     title={item.label}
-                    className={cn(
-                      "flex h-9 w-full cursor-pointer items-center justify-center rounded-lg border border-transparent transition-colors hover:bg-foreground/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background peer-disabled:pointer-events-none peer-disabled:opacity-40",
-                      color === item.value &&
-                        "border-foreground/40 bg-foreground/5",
-                    )}
+                    className={pickerChoiceClass}
+                    style={choiceStyle(item.hex)}
+                    data-selected={color === item.value}
                   >
                     <span
                       className="flex size-5 items-center justify-center rounded-full border border-black/10 dark:border-foreground/20"
                       style={{
                         backgroundColor: item.hex,
-                        color: checkColor(item.hex),
                       }}
-                    >
-                      {color === item.value && (
-                        <Check
-                          className="size-3"
-                          strokeWidth={3}
-                          aria-hidden="true"
-                        />
-                      )}
-                    </span>
+                    />
                   </label>
                 </div>
               ))}

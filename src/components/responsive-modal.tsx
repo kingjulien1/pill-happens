@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { HeadingText } from "@/components/heading-text";
+import { cn } from "@/lib/utils";
 
 const subscribe = (fn: () => void) => {
   const query = window.matchMedia("(min-width: 768px)");
@@ -31,6 +32,7 @@ export function ResponsiveModal({
   onOpenChange,
   title,
   titleIcon,
+  headerVariant,
   context,
   description,
   children,
@@ -39,6 +41,7 @@ export function ResponsiveModal({
   onOpenChange: (open: boolean) => void;
   title: string;
   titleIcon?: ActionIconName;
+  headerVariant?: "medication";
   context?: string;
   description: string;
   children: React.ReactNode;
@@ -48,6 +51,7 @@ export function ResponsiveModal({
     () => window.matchMedia("(min-width: 768px)").matches,
     () => false,
   );
+  const medicationHeader = headerVariant === "medication";
   const heading = (
     <HeadingText
       className="items-center gap-y-0"
@@ -56,7 +60,13 @@ export function ResponsiveModal({
           data-slot="modal-title-line"
           className="inline-flex min-h-7 items-center gap-2 leading-7"
         >
-          {titleIcon && <ActionIcon name={titleIcon} className="size-4" />}
+          {titleIcon && (
+            <ActionIcon
+              name={titleIcon}
+              weight="bold"
+              className={medicationHeader ? "size-[22px]" : "size-4"}
+            />
+          )}
           <span>{title}</span>
         </span>
       }
@@ -67,7 +77,10 @@ export function ResponsiveModal({
     <Button
       variant="ghost"
       size="icon"
-      className="absolute -top-2 right-0 size-11 text-foreground"
+      className={cn(
+        "absolute -top-2 right-0 size-11 text-foreground",
+        medicationHeader && "-top-2.5 -right-2 size-8",
+      )}
       aria-label="Close"
     />
   );
@@ -78,16 +91,30 @@ export function ResponsiveModal({
           showCloseButton={false}
           className="max-h-[90dvh] overflow-y-auto rounded-3xl p-7 sm:max-w-[440px]"
         >
-          <DialogHeader className="mb-1 gap-1.5">
+          <DialogHeader
+            className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
+          >
             <div className="relative">
-              <DialogTitle className="pr-13 text-lg font-semibold tracking-tight text-foreground">
+              <DialogTitle
+                className={cn(
+                  "pr-13 text-lg font-semibold tracking-tight text-foreground",
+                  medicationHeader && "pr-8",
+                )}
+              >
                 {heading}
               </DialogTitle>
               <DialogClose render={closeButton}>
-                <ActionIcon name="close" className="size-4" />
+                <ActionIcon
+                  name="close"
+                  className={medicationHeader ? "size-3" : "size-4"}
+                />
               </DialogClose>
             </div>
-            <DialogDescription className="text-xs leading-relaxed">
+            <DialogDescription
+              className={
+                medicationHeader ? "sr-only" : "text-xs leading-relaxed"
+              }
+            >
               {description}
             </DialogDescription>
           </DialogHeader>
@@ -98,16 +125,35 @@ export function ResponsiveModal({
   return (
     <Drawer open={open} onOpenChange={onOpenChange} showSwipeHandle>
       <DrawerContent className="rounded-t-[28px]">
-        <DrawerHeader className="px-6 pt-5 pb-4 text-left!">
+        <DrawerHeader
+          className={cn(
+            "px-6 pt-5 pb-4 text-left!",
+            medicationHeader && "pb-3 min-[360px]:pb-5",
+          )}
+        >
           <div className="relative">
-            <DrawerTitle className="pr-13 text-lg font-semibold tracking-tight">
+            <DrawerTitle
+              className={cn(
+                "pr-13 text-lg font-semibold tracking-tight",
+                medicationHeader && "pr-8",
+              )}
+            >
               {heading}
             </DrawerTitle>
             <DrawerClose render={closeButton}>
-              <ActionIcon name="close" className="size-4" />
+              <ActionIcon
+                name="close"
+                className={medicationHeader ? "size-3" : "size-4"}
+              />
             </DrawerClose>
           </div>
-          <DrawerDescription className="mt-1.5 pr-6 text-left text-xs leading-relaxed">
+          <DrawerDescription
+            className={
+              medicationHeader
+                ? "sr-only"
+                : "mt-1.5 pr-6 text-left text-xs leading-relaxed"
+            }
+          >
             {description}
           </DrawerDescription>
         </DrawerHeader>
