@@ -191,7 +191,7 @@ const SETTINGS = {
   idleIntensity: 0.35,
   shineSize: 39,
   shineFade: 61,
-  thickness: 1.2,
+  thickness: 2.4,
   glow: 2,
   speed: 1.15,
 };

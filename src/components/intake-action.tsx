@@ -34,7 +34,7 @@ export function IntakeAction({
       <Button
         type="button"
         onClick={onClick}
-        className="intake-log-action pointer-events-auto h-16 w-full justify-start gap-3.5 rounded-[22px] px-4 text-[15px] shadow-lg shadow-primary/10 max-[359px]:gap-3 max-[359px]:px-3 sm:gap-4 sm:px-5"
+        className="intake-log-action pointer-events-auto h-16 w-full justify-start gap-3.5 rounded-[22px] px-4 text-[15px] shadow-lg max-[359px]:gap-3 max-[359px]:px-3 sm:gap-4 sm:px-5"
       >
         <SpecularRim radius={22} />
         <span aria-hidden="true" className="intake-specular-fallback" />
