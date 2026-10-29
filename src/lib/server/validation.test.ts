@@ -184,33 +184,35 @@ test("medication intake defaults accept fractional quantities within the log inp
 });
 
 test("metered-pump medications keep the manually entered mg per pump and intake default", () => {
-  const medication = {
-    name: "Synthetic metered dispenser",
-    strengthMg: 2.5,
-    defaultQuantity: 3,
-    form: "pump",
-    color: "rose",
-  };
-  const parsed = medicationSchema.parse(medication);
-  assert.equal(parsed.form, "pump");
-  assert.equal(parsed.strengthMg, 2.5);
-  assert.equal(parsed.defaultQuantity, 3);
-  assert.deepEqual(medicationPatchSchema.parse({ form: "pump" }), {
-    form: "pump",
-  });
-  assert.equal(
-    medicationSchema.safeParse({ ...medication, strengthMg: undefined })
-      .success,
-    false,
-  );
-  assert.equal(
-    medicationSchema.safeParse({ ...medication, form: "spray" }).success,
-    false,
-  );
-  const recorded = intakeSchema.parse({ ...intake, quantity: 3 });
-  assert.equal(recorded.quantity, 3);
-  // Icon names, bottle capacity, and pump counts never supply a missing strength.
-  assert.equal(Object.hasOwn(recorded, "strengthMg"), false);
+  for (const form of ["pump", "pump-bottle", "gel-dispenser"] as const) {
+    const medication = {
+      name: "Synthetic metered dispenser",
+      strengthMg: 2.5,
+      defaultQuantity: 3,
+      form,
+      color: "rose",
+    };
+    const parsed = medicationSchema.parse(medication);
+    assert.equal(parsed.form, form);
+    assert.equal(parsed.strengthMg, 2.5);
+    assert.equal(parsed.defaultQuantity, 3);
+    assert.deepEqual(medicationPatchSchema.parse({ form }), {
+      form,
+    });
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, strengthMg: undefined })
+        .success,
+      false,
+    );
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, form: "spray" }).success,
+      false,
+    );
+    const recorded = intakeSchema.parse({ ...intake, quantity: 3 });
+    assert.equal(recorded.quantity, 3);
+    // Icon names, bottle capacity, and pump counts never supply a missing strength.
+    assert.equal(Object.hasOwn(recorded, "strengthMg"), false);
+  }
 });
 
 test("legacy medications and unrelated patches do not gain or reset an intake default", () => {

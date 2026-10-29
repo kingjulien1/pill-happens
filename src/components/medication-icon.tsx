@@ -35,7 +35,11 @@ import {
   type MedicationIconName,
 } from "@/lib/medication-appearance";
 import { getSvgIcon } from "@/lib/svg-icon-catalog";
-import { TABLET_OUTLINE_COMPONENTS } from "@/components/tablet-icons";
+import {
+  TABLET_OUTLINE_COMPONENTS,
+  Tramal,
+  Testavan,
+} from "@/components/tablet-icons";
 import { cn } from "@/lib/utils";
 
 const glyphs = {
@@ -184,6 +188,8 @@ const typeGlyphs = {
   capsule: Pill,
   drops: Droplet,
   pump: SoapDispenserDroplet,
+  "pump-bottle": Tramal,
+  "gel-dispenser": Testavan,
   other: Package,
 } satisfies Record<Medication["form"], LucideIcon>;
 
