@@ -46,11 +46,13 @@ export function StreakMenu() {
             </Popover.Title>
             <Popover.Close
               aria-label="Close streak details"
-              className="header-icon-button absolute top-1 right-1"
+              className="absolute top-2 right-2 inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring hover:[&>span]:bg-foreground/10"
             >
-              <ActionIcon name="close" className="size-4" />
+              <span className="flex size-7 items-center justify-center rounded-lg border border-foreground/10 bg-foreground/5 transition-colors">
+                <ActionIcon name="close" className="size-3.5" />
+              </span>
             </Popover.Close>
-            <Popover.Description className="mt-1 pr-5 text-[11px] leading-relaxed text-muted-foreground">
+            <Popover.Description className="mt-1 pr-7 text-[11px] leading-relaxed text-muted-foreground">
               Each tracking day with an entry counts once.
             </Popover.Description>
             {streak && (
