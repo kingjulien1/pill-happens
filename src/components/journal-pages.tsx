@@ -19,13 +19,14 @@ import {
 } from "@/components/medications-heading";
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
-import { IntakeCard } from "@/components/intake-card";
+import { IntakeCardGroup } from "@/components/intake-card-group";
 import { HistoryDayCard } from "@/components/history-day-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { groupIntakes } from "@/lib/intake-groups";
 import { Label } from "@/components/ui/label";
 import {
   dayIntakes,
@@ -236,6 +237,10 @@ function IntakeTimeline({
 }) {
   const [editing, setEditing] = useState<Intake | null>(null);
   const entries = dayIntakes(data, day);
+  const groups = groupIntakes(entries);
+  const entryIndexes = new Map(
+    entries.map((entry, index) => [entry.id, index]),
+  );
   return (
     <>
       {showSummary && (
@@ -246,23 +251,18 @@ function IntakeTimeline({
       {!entries.length ? (
         <EmptyIntakeStack onLog={onLog} />
       ) : (
-        <div className="relative space-y-3 before:absolute before:top-11 before:bottom-11 before:left-[43px] before:w-px before:bg-border">
-          {entries.map((entry, index) => {
-            const medication = data.medications.find(
-              (m) => m.id === entry.medicationId,
-            );
-            return (
-              <IntakeCard
-                key={entry.id}
-                entry={entry}
-                medication={medication}
-                index={index}
-                day={day}
-                timeZone={data.settings.timezone}
-                onEdit={() => setEditing(entry)}
-              />
-            );
-          })}
+        <div className="intake-timeline">
+          {groups.map((group) => (
+            <IntakeCardGroup
+              key={group.id}
+              group={group}
+              medications={data.medications}
+              startIndex={entryIndexes.get(group.id) ?? 0}
+              day={day}
+              timeZone={data.settings.timezone}
+              onEdit={setEditing}
+            />
+          ))}
         </div>
       )}
       {editing && (

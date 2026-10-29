@@ -1,7 +1,6 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { ActionIcon } from "@/components/action-icon";
 import { MedicationGlyph } from "@/components/medication-icon";
 import {
   doseMg,
@@ -30,6 +29,7 @@ export function IntakeCard({
   day,
   timeZone,
   onEdit,
+  disabled = false,
 }: {
   entry: Intake;
   medication?: Medication;
@@ -37,6 +37,7 @@ export function IntakeCard({
   day: string;
   timeZone: string;
   onEdit: () => void;
+  disabled?: boolean;
 }) {
   const color = getMedicationColor(medication?.color);
   const scale = getMedicationColorScale(color.value);
@@ -61,12 +62,15 @@ export function IntakeCard({
     "--entry-orbit-angle": `${art.orbitAngle}deg`,
     "--entry-accent-x": `${art.accentX}%`,
     "--entry-accent-y": `${art.accentY}%`,
+    "--entry-delay": `${Math.min(index, 7) * 65}ms`,
+    "--entry-lean": `${index % 2 ? 1.2 : -1.2}deg`,
   } as CSSProperties;
 
   return (
     <button
       type="button"
       onClick={onEdit}
+      disabled={disabled}
       aria-label={`Edit ${entry.medicationName}, ${formatDose(doseMg(entry))} milligrams, ${time}`}
       className="intake-log-card"
       style={style}
@@ -74,52 +78,56 @@ export function IntakeCard({
     >
       <span aria-hidden="true" className="intake-card-bleed" />
       <span aria-hidden="true" className="intake-card-glass">
-        <span className="intake-card-color-overlay" data-intake-color-overlay>
-          <span className="intake-card-mesh" />
-          <span className="intake-card-pattern" />
-          <svg
-            className="intake-card-curves"
-            viewBox="0 0 360 150"
-            fill="none"
-            focusable="false"
-            data-intake-curves
-          >
-            <path d={art.curveA} />
-            <path d={art.curveB} />
-          </svg>
+        <span className="intake-card-scene-arrival">
+          <span className="intake-card-color-overlay" data-intake-color-overlay>
+            <span className="intake-card-mesh" />
+            <span className="intake-card-pattern" />
+            <svg
+              className="intake-card-curves"
+              viewBox="0 0 360 150"
+              fill="none"
+              focusable="false"
+              data-intake-curves
+            >
+              <path d={art.curveA} />
+              <path d={art.curveB} />
+            </svg>
+          </span>
+          <span className="intake-card-ink" data-intake-ink />
         </span>
-        <span className="intake-card-ink" data-intake-ink />
       </span>
       <div className="intake-card-content relative flex items-start gap-3 p-4">
-        <span
-          className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"
-          aria-hidden="true"
-        >
-          <span className="intake-card-orbit">
-            <span className="intake-card-bead" />
-            <span className="intake-card-bead intake-card-bead--second" />
-          </span>
-          <span className="intake-card-sticker intake-card-sticker--a" />
-          <span className="intake-card-sticker intake-card-sticker--b" />
+        <span className="intake-card-icon-arrival">
           <span
-            className="intake-card-mark"
-            data-medication-mark
-            data-medication-color={color.value}
-            style={
-              {
-                color: scale.icon,
-                backgroundColor:
-                  getMedicationPreviewSurface(pigment) ?? "var(--popover)",
-                "--medication-rotation": `${medication?.iconRotation ?? 0}deg`,
-              } as CSSProperties
-            }
+            className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"
+            aria-hidden="true"
           >
-            <MedicationGlyph icon={medication?.icon} className="size-7" />
-            <span className="intake-card-icon-rim" />
+            <span className="intake-card-orbit">
+              <span className="intake-card-bead" />
+              <span className="intake-card-bead intake-card-bead--second" />
+            </span>
+            <span className="intake-card-sticker intake-card-sticker--a" />
+            <span className="intake-card-sticker intake-card-sticker--b" />
+            <span
+              className="intake-card-mark"
+              data-medication-mark
+              data-medication-color={color.value}
+              style={
+                {
+                  color: scale.icon,
+                  backgroundColor:
+                    getMedicationPreviewSurface(pigment) ?? "var(--popover)",
+                  "--medication-rotation": `${medication?.iconRotation ?? 0}deg`,
+                } as CSSProperties
+              }
+            >
+              <MedicationGlyph icon={medication?.icon} className="size-7" />
+              <span className="intake-card-icon-rim" />
+            </span>
           </span>
         </span>
         <div className="intake-card-details min-w-0 flex-1 pt-0.5">
-          <div className="flex items-baseline justify-between gap-2">
+          <div className="intake-card-title-arrival flex items-baseline justify-between gap-2">
             <h3 className="truncate text-[13px] font-medium" data-intake-name>
               {entry.medicationName}
             </h3>
@@ -133,7 +141,7 @@ export function IntakeCard({
               </span>
             </span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+          <div className="intake-card-meta-arrival mt-1.5 text-[10px] text-muted-foreground">
             <span className="min-w-0">
               {time}
               {localDay !== day ? " · next morning" : ""}
@@ -144,14 +152,10 @@ export function IntakeCard({
                 : ""}{" "}
               × {formatDose(entry.strengthMg)} mg
             </span>
-            <span className="flex shrink-0 items-center gap-1">
-              {String(index + 1).padStart(2, "0")}
-              <ActionIcon name="edit" className="size-4" />
-            </span>
           </div>
           {entry.note && (
             <p
-              className="mt-2.5 border-t border-border/60 pt-2 text-[11px] leading-relaxed break-words text-muted-foreground"
+              className="intake-card-note-arrival mt-2.5 border-t border-border/60 pt-2 text-[11px] leading-relaxed break-words text-muted-foreground"
               data-intake-note
             >
               {entry.note}
