@@ -13,6 +13,10 @@ import {
   type CSSProperties,
   type HTMLAttributes,
 } from "react";
+import {
+  getBackgroundFrameElapsed,
+  getBackgroundResolution,
+} from "@/lib/background-rendering";
 
 export type GrainientType = "linear" | "radial";
 
@@ -42,6 +46,8 @@ export interface GrainientProps extends Omit<
   lightMode?: boolean;
   paletteMode?: "auto" | "literal";
   dpr?: number;
+  maxDpr?: number;
+  maxPixels?: number;
   style?: CSSProperties;
 }
 
@@ -68,6 +74,8 @@ type Settings = {
   lightMode: boolean;
   paletteMode: "auto" | "literal";
   dpr?: number;
+  maxDpr?: number;
+  maxPixels?: number;
 };
 
 type Sample = {
@@ -375,6 +383,8 @@ const Grainient = ({
   lightMode = false,
   paletteMode = "auto",
   dpr,
+  maxDpr,
+  maxPixels,
   className = "",
   style,
   ...rest
@@ -407,6 +417,8 @@ const Grainient = ({
     lightMode,
     paletteMode,
     dpr,
+    maxDpr,
+    maxPixels,
   };
   const settingsRef = useRef(settings);
 
@@ -431,7 +443,7 @@ const Grainient = ({
         stencil: false,
       });
     } catch {
-      // The static palette remains visible when the platform denies WebGL.
+      // The palette wash remains visible when the platform denies WebGL.
     }
     if (!context) {
       canvas.remove();
@@ -515,7 +527,7 @@ const Grainient = ({
     let frameSeed = 0;
     let grainClock = 0;
     let raf = 0;
-    let last = 0;
+    let last: number | null = null;
     let visible = true;
     let stopped = false;
 
@@ -600,9 +612,16 @@ const Grainient = ({
       const s = settingsRef.current;
       view.width = Math.max(1, container.clientWidth);
       view.height = Math.max(1, container.clientHeight);
-      view.ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
-      const canvasWidth = Math.max(1, Math.round(view.width * view.ratio));
-      const canvasHeight = Math.max(1, Math.round(view.height * view.ratio));
+      const resolution = getBackgroundResolution({
+        width: view.width,
+        height: view.height,
+        dpr: s.dpr || window.devicePixelRatio || 1,
+        maxDpr: s.maxDpr,
+        maxPixels: s.maxPixels,
+      });
+      view.ratio = resolution.ratio;
+      const canvasWidth = resolution.width;
+      const canvasHeight = resolution.height;
       if (canvas.width !== canvasWidth) canvas.width = canvasWidth;
       if (canvas.height !== canvasHeight) canvas.height = canvasHeight;
       const width = Math.max(1, Math.round(canvas.width / 2));
@@ -733,12 +752,15 @@ const Grainient = ({
       raf = 0;
       if (stopped || !visible || document.hidden) return;
       const s = settingsRef.current;
-      const dt = last ? clamp((now - last) / 1000, 0.001, 0.05) : 1 / 60;
+      const elapsed = getBackgroundFrameElapsed(now, last);
+      // Keep visual time at its intended pace on slower GPUs; pointer physics
+      // retain their smaller stability bound, and lifecycle resumes reset last.
+      const dt = clamp(elapsed, 0.001, 0.05);
       last = now;
-      if (!reduce) time += dt * s.speed * 0.16;
+      if (!reduce) time += elapsed * s.speed * 0.16;
       if (introClock < 1)
-        introClock = Math.min(1, introClock + dt / INTRO_SECONDS);
-      grainClock += dt;
+        introClock = Math.min(1, introClock + elapsed / INTRO_SECONDS);
+      grainClock += elapsed;
       if (s.grainAnimated && !reduce && grainClock > 1 / 24) {
         grainClock = 0;
         frameSeed = (frameSeed + 1) % 97;
@@ -751,7 +773,7 @@ const Grainient = ({
         trail.length > 0 ||
         spins.length > 0;
       if (busy && !stopped) raf = requestAnimationFrame(frame);
-      else last = 0;
+      else last = null;
     };
 
     function wake() {
@@ -797,7 +819,7 @@ const Grainient = ({
     };
 
     const onVisibility = () => {
-      last = 0;
+      last = null;
       if (document.hidden) {
         cancelAnimationFrame(raf);
         raf = 0;
@@ -808,7 +830,7 @@ const Grainient = ({
 
     const onMotionChange = () => {
       reduce = motionQuery.matches;
-      last = 0;
+      last = null;
       cancelAnimationFrame(raf);
       raf = 0;
       if (reduce) {
@@ -831,7 +853,7 @@ const Grainient = ({
     const intersection = new IntersectionObserver((entries) => {
       visible = entries.some((entry) => entry.isIntersecting);
       if (visible) {
-        last = 0;
+        last = null;
         wake();
       }
     });
@@ -872,8 +894,8 @@ const Grainient = ({
     wakeRef.current?.();
   });
 
-  // A static palette is visible before the first frame and if WebGL cannot run.
-  // It is intentionally separate from the unmodified WebGL shader rendering.
+  // The palette wash remains visible before the first frame or without WebGL.
+  // A caller can enable mobile CSS drift independently of the shader colors.
   const fallbackColors =
     lightMode && paletteMode === "auto"
       ? [

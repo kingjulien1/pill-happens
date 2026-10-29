@@ -188,6 +188,28 @@
   /* Keep text readable as the gradient's light and dark areas move. */
   background: rgb(255 255 255 / 18%);
 }
+@media (prefers-reduced-motion: no-preference) {
+  .grainient-mobile-motion[data-rendered="false"]::before {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    background: inherit;
+    pointer-events: none;
+    animation: mobile-background-drift 16s ease-in-out infinite;
+  }
+}
+@keyframes mobile-background-drift {
+  0%,
+  100% {
+    transform: translate3d(-7%, -5%, 0) rotate(-2deg);
+  }
+  33.333% {
+    transform: translate3d(8%, -3%, 0) rotate(2deg);
+  }
+  66.667% {
+    transform: translate3d(-2%, 7%, 0) rotate(-1deg);
+  }
+}
 @media (prefers-color-scheme: dark) {
   .ambient {
     filter: brightness(1.18);
