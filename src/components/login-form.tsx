@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { ActionIcon } from "@/components/action-icon";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { recoverSession } from "@/lib/session-recovery";
 
 type AuthResult = { ok?: boolean; needsCreation?: boolean; error?: string };
 
@@ -25,7 +25,6 @@ function errorMessage(result: AuthResult, fallback: string) {
 }
 
 export function LoginForm() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState<"login" | "create" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,16 +33,76 @@ export function LoginForm() {
   );
   const [creationError, setCreationError] = useState<string | null>(null);
   const request = useRef<AbortController | null>(null);
+  const recovery = useRef<AbortController | null>(null);
+  const interacted = useRef(false);
   const busy = pending !== null;
 
-  useEffect(() => () => request.current?.abort(), []);
+  useEffect(() => {
+    const restore = () => {
+      if (
+        interacted.current ||
+        request.current ||
+        recovery.current ||
+        document.visibilityState === "hidden"
+      )
+        return;
+      const controller = new AbortController();
+      recovery.current = controller;
+      void recoverSession({ signal: controller.signal })
+        .then((session) => {
+          if (
+            session === "authenticated" &&
+            !controller.signal.aborted &&
+            !interacted.current
+          )
+            window.location.replace("/");
+        })
+        .catch(() => {
+          // A cancelled or unavailable check leaves the sign-in form usable.
+        })
+        .finally(() => {
+          if (recovery.current === controller) recovery.current = null;
+        });
+    };
+    restore();
+    window.addEventListener("online", restore);
+    window.addEventListener("pageshow", restore);
+    window.addEventListener("focus", restore);
+    document.addEventListener("visibilitychange", restore);
+    return () => {
+      request.current?.abort();
+      recovery.current?.abort();
+      recovery.current = null;
+      window.removeEventListener("online", restore);
+      window.removeEventListener("pageshow", restore);
+      window.removeEventListener("focus", restore);
+      document.removeEventListener("visibilitychange", restore);
+    };
+  }, []);
+
+  function stopRecovery() {
+    interacted.current = true;
+    recovery.current?.abort();
+    recovery.current = null;
+  }
+
+  async function confirmSignIn(signal: AbortSignal) {
+    const session = await recoverSession({ signal });
+    if (session === "unauthenticated")
+      throw new Error(
+        "This browser didn’t keep your sign-in. Allow cookies, then open your journal with the same password.",
+      );
+    // A successful sign-in followed by a connection failure can still navigate;
+    // the server will verify the cookie again before showing the journal.
+    if (!signal.aborted) openJournal();
+  }
 
   function openJournal() {
     setCandidatePassword(null);
     setCreationError(null);
     setPassword("");
-    router.replace("/");
-    router.refresh();
+    // A full navigation avoids reusing a pre-sign-in App Router response.
+    window.location.replace("/");
   }
 
   function closeCreation() {
@@ -56,6 +115,7 @@ export function LoginForm() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (request.current || candidatePassword !== null) return;
+    stopRecovery();
     const submittedPassword = String(
       new FormData(event.currentTarget).get("password") ?? "",
     );
@@ -72,6 +132,7 @@ export function LoginForm() {
     try {
       const response = await fetch("/api/login", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: submittedPassword }),
         signal: controller.signal,
@@ -92,7 +153,7 @@ export function LoginForm() {
       }
       if (result.ok !== true)
         throw new Error("We couldn’t confirm sign-in. Please try again.");
-      openJournal();
+      await confirmSignIn(controller.signal);
     } catch (cause) {
       if (controller.signal.aborted) return;
       setError(
@@ -113,6 +174,7 @@ export function LoginForm() {
   async function createJournal(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (request.current || candidatePassword === null) return;
+    stopRecovery();
     const submittedPassword = candidatePassword;
     const controller = new AbortController();
     request.current = controller;
@@ -121,6 +183,7 @@ export function LoginForm() {
     try {
       const response = await fetch("/api/journals", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: submittedPassword }),
         signal: controller.signal,
@@ -135,7 +198,7 @@ export function LoginForm() {
             "Could not create your journal. Please try again.",
           ),
         );
-      openJournal();
+      await confirmSignIn(controller.signal);
     } catch (cause) {
       if (controller.signal.aborted) return;
       setCreationError(
@@ -156,6 +219,8 @@ export function LoginForm() {
   return (
     <>
       <form
+        method="post"
+        action="/api/login"
         onSubmit={submit}
         className="space-y-4"
         aria-busy={pending === "login"}
@@ -170,6 +235,7 @@ export function LoginForm() {
             placeholder="Enter your journal password"
             value={password}
             onChange={(event) => {
+              stopRecovery();
               setPassword(event.target.value);
               setError(null);
             }}
@@ -233,6 +299,8 @@ export function LoginForm() {
       >
         {candidatePassword !== null && (
           <form
+            method="post"
+            action="/api/journals"
             onSubmit={createJournal}
             className="flex flex-col gap-5"
             aria-busy={pending === "create"}

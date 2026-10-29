@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Leaf } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { toast } from "sonner";
@@ -685,21 +684,14 @@ export function GoalsPage() {
 }
 
 function JournalPreferences() {
-  const { data, mutate, busy } = useJournal();
-  const router = useRouter();
+  const { data, mutate, signOut, busy } = useJournal();
   const [open, setOpen] = useState(false);
   const [timezone, setTimezone] = useState(data!.settings.timezone);
   const [saving, setSaving] = useState(false);
   async function logout() {
     setSaving(true);
     try {
-      const res = await fetch("/api/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error();
-      router.replace("/login");
-      router.refresh();
+      await signOut();
     } catch {
       toast.error("Unable to sign out. Please try again.");
     } finally {
@@ -793,7 +785,7 @@ function JournalPreferences() {
         <div className="mt-5 border-t pt-4">
           <Button
             variant="ghost"
-            disabled={saving}
+            disabled={saving || busy}
             className="h-11 w-full gap-2 text-xs text-muted-foreground"
             onClick={() => void logout()}
           >
