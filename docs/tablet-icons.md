@@ -1,6 +1,6 @@
 # Tablet and dispenser icon library
 
-The library contains **15 tintable outline drawings** and **16 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 12 generic SVGs, the picker offers 43 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox artwork.
+The library contains **16 tintable outline drawings** and **17 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 12 generic SVGs, the picker offers 45 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox artwork.
 
 ## Source and generated files
 
@@ -43,28 +43,29 @@ Each form has three usable component names. Alternate names export the same comp
 | `TabletPebble`      | `TabletPetite`, `TabletDotlet`  | Significantly smaller plain round tablet  |
 | `TabletHalo`        | `TabletPlenum`, `TabletRoundel` | Larger plain round tablet                 |
 
-The names are checked against the installed Lucide names and emoji display labels. The additional outline components are `TabletDualmark`, `TabletSplitlet`, `TabletScorecrest`, `TabletMinidot`, `TabletWideplain`, `TabletWideplainPlus`, `Viagra`, `Euthyrox`, `Tadalafil5`, `Tadalafil10`, `Tramal`, and `Testavan`.
+The names are checked against the installed Lucide names and emoji display labels. The additional outline components are `TabletDualmark`, `TabletSplitlet`, `TabletScorecrest`, `TabletMinidot`, `TabletWideplain`, `TabletWideplainPlus`, `Viagra`, `Euthyrox`, `Tadalafil5`, `Tadalafil10`, `Tramal`, `Testavan`, and `Levomethasan`.
 
 ## Flat-color variants
 
-| File/component name                | Display label    | Outline geometry                      | Flat palette |
-| ---------------------------------- | ---------------- | ------------------------------------- | ------------ |
-| `bromazepam` / `Bromazepam`        | Bromazepam       | Tablet Meridian                       | Lime 300     |
-| `diazepam` / `Diazepam`            | Diazepam         | Tablet Meridian                       | Sky 300      |
-| `alprazolam` / `Alprazolam`        | Alprazolam       | Tablet Pebble                         | Blue 300     |
-| `valium` / `Valium`                | Valium           | Tablet Halo                           | Zinc 300     |
-| `ritalin` / `Ritalin`              | Ritalin          | Tablet Dualmark, A/B imprint          | Zinc 300     |
-| `quetialan-100` / `Quetialan100`   | Quetialan 100mg  | Tablet Splitlet                       | Yellow 200   |
-| `dominal-forte` / `DominalForte`   | Dominal Forte    | Tablet Scorecrest                     | Red 300      |
-| `queatialan-25` / `Queatialan25`   | Queatialan 25mg  | Tablet Minidot                        | Red 400      |
-| `queatialan-200` / `Queatialan200` | Queatialan 200mg | Tablet Wideplain                      | Zinc 300     |
-| `venlafaxin` / `Venlafaxin`        | Venlafaxin       | Tablet Wideplain Plus                 | Zinc 300     |
-| `viagra` / `Viagra`                | Viagra           | Rounded diamond with vector lettering | Blue 400     |
-| `euthyrox` / `Euthyrox`            | Euthyrox         | Round tablet with EM/50 imprint       | Zinc 300     |
-| `tadalafil-5` / `Tadalafil5`       | Tadalafil 5mg    | Upright oval with centered 5 imprint  | Amber 400    |
-| `tadalafil-10` / `Tadalafil10`     | Tadalafil 10mg   | Same oval with centered 10 imprint    | Blue 600     |
-| `tramal` / `Tramal`                | Tramal           | Shoulder bottle with metering pump    | Amber 700    |
-| `testavan` / `Testavan`            | Testavan         | Slender gel dispenser with pump       | Zinc 300     |
+| File/component name                | Display label    | Outline geometry                          | Flat palette |
+| ---------------------------------- | ---------------- | ----------------------------------------- | ------------ |
+| `bromazepam` / `Bromazepam`        | Bromazepam       | Tablet Meridian                           | Lime 300     |
+| `diazepam` / `Diazepam`            | Diazepam         | Tablet Meridian                           | Sky 300      |
+| `alprazolam` / `Alprazolam`        | Alprazolam       | Tablet Pebble                             | Blue 300     |
+| `valium` / `Valium`                | Valium           | Tablet Halo                               | Zinc 300     |
+| `ritalin` / `Ritalin`              | Ritalin          | Tablet Dualmark, A/B imprint              | Zinc 300     |
+| `quetialan-100` / `Quetialan100`   | Quetialan 100mg  | Tablet Splitlet                           | Yellow 200   |
+| `dominal-forte` / `DominalForte`   | Dominal Forte    | Tablet Scorecrest                         | Red 300      |
+| `queatialan-25` / `Queatialan25`   | Queatialan 25mg  | Tablet Minidot                            | Red 400      |
+| `queatialan-200` / `Queatialan200` | Queatialan 200mg | Tablet Wideplain                          | Zinc 300     |
+| `venlafaxin` / `Venlafaxin`        | Venlafaxin       | Tablet Wideplain Plus                     | Zinc 300     |
+| `viagra` / `Viagra`                | Viagra           | Rounded diamond with vector lettering     | Blue 400     |
+| `euthyrox` / `Euthyrox`            | Euthyrox         | Round tablet with EM/50 imprint           | Zinc 300     |
+| `tadalafil-5` / `Tadalafil5`       | Tadalafil 5mg    | Upright oval with centered 5 imprint      | Amber 400    |
+| `tadalafil-10` / `Tadalafil10`     | Tadalafil 10mg   | Same oval with centered 10 imprint        | Blue 600     |
+| `tramal` / `Tramal`                | Tramal           | Shoulder bottle with metering pump        | Amber 700    |
+| `testavan` / `Testavan`            | Testavan         | Slender gel dispenser with pump           | Zinc 300     |
+| `levomethasan` / `Levomethasan`    | Levomethasan     | Round tablet with centered four-way score | Zinc 300     |
 
 Colors use static sRGB equivalents of the installed Tailwind palette. All neutral tablets use the specifically requested `#D4D4D8`. Every filled SVG has one visible paint color; score lines and imprints are transparent cutouts. There are no shadows, highlights, gradients, textures, or photographic irregularities in the artwork.
 
@@ -76,7 +77,7 @@ The medication names and relative appearances come from the supplied references.
 
 Outline assets use Lucide's standard `xmlns`, `width="24"`, `height="24"`, `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="2"`, and rounded caps/joins. All shapes are flattened and centered in that same viewport. Smaller silhouettes retain their relative size instead of being expanded to fill the frame. The extra Venlafaxin tablet is slightly larger than the Queatialan 200 shape.
 
-Every silhouette is centered at `(12, 12)`, and each straight tablet score runs vertically through `x=12` with its midpoint at `y=12`. Euthyrox's EM/50 blocks sit on either side of that centered split, straightened from the reference photo. The Tadalafil numerals and Viagra wordmark are centered independently of their bodies; the wider “10” has additional breathing room. Dispensers retain distinct proportions, with Testavan narrower and taller in appearance than the Tramal bottle. All artwork fits the viewport at the app's 2.75 stroke width.
+Every silhouette is centered at `(12, 12)`, and each vertical tablet score runs through `x=12` with its midpoint at `y=12`. Levomethasan adds a perpendicular score through `y=12`, making a centered four-way cross. Its quartering marks are simplified artwork and do not set intake quantities. Euthyrox's EM/50 blocks sit on either side of that centered split, straightened from the reference photo. The Tadalafil numerals and Viagra wordmark are centered independently of their bodies; the wider “10” has additional breathing room. Dispensers retain distinct proportions, with Testavan narrower and taller in appearance than the Tramal bottle. All artwork fits the viewport at the app's 2.75 stroke width.
 
 The React outline exports use `createLucideIcon` and accept the same size, stroke, color, and other SVG props:
 
@@ -103,7 +104,8 @@ Search recognizes component names, display labels, slugs, aliases, and English/G
 - `HeartHandshake` for Lucide or `CherryBlossom` for emoji
 - `Tadalafil5`, `Tadalafil 5mg`, `Tadalafil10Color`, `Tramal`, or `TestavanColor`
 - `metered pump`, `dosierpumpe`, or `gel dispenser` for the dispenser artwork
-- `outline` for the 15 tintable medication forms, `color` for the 16 fixed-color illustrations, or `svg` for all registered local artwork
+- `Levomethasan`, `LevomethasanColor`, `quarter`, or `kreuzbruchrille` for the four-way scored tablet
+- `outline` for the 16 tintable medication forms, `color` for the 17 fixed-color illustrations, or `svg` for all registered local artwork
 
 Display labels capitalize words, replace hyphens with spaces, and append `mg` to numeric parts of tablet artwork names. Numbers in ordinary Lucide icon names keep their existing meaning and labels. Search aliases do not create extra picker entries or change stored icon IDs.
 
