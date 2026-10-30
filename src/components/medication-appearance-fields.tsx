@@ -1,18 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
-import {
-  RotateCcw,
-  RotateCw,
-  Search,
-  Shuffle,
-  Sparkles,
-  Star,
-  Undo2,
-  X,
-} from "lucide-react";
-import { ActionIcon } from "@/components/action-icon";
+import { RotateCcw, RotateCw, Search, Shuffle, Undo2, X } from "lucide-react";
 import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import { FinalLookStar } from "@/components/final-look-star";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
 import { SymbolSearchState } from "@/components/symbol-search-state";
 import { Input } from "@/components/ui/input";
@@ -554,6 +545,10 @@ export function MedicationAppearanceFields({
               "--preview-spark-wash": `${accents.spark}66`,
               "--preview-action-pop": `${accents.pop}26`,
               "--preview-action-spark": `${accents.spark}26`,
+              "--preview-icon-action-pop": `${accents.pop}38`,
+              "--preview-icon-action-spark": `${accents.spark}38`,
+              "--preview-header-pop": `${accents.pop}14`,
+              "--preview-header-spark": `${accents.spark}14`,
               "--preview-outline": `${selectedColor.hex}38`,
               "--preview-shadow": `${selectedColor.hex}1a`,
             } as CSSProperties
@@ -574,15 +569,15 @@ export function MedicationAppearanceFields({
             <path d="M-42 252C66 338 176 119 257 253S343 357 365 300" />
           </svg>
           <div
-            className="relative flex items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
+            className="final-look-header relative flex items-center justify-between gap-2"
             data-preview-header
           >
-            <div className="flex min-w-0 items-center gap-3">
+            <div className="flex min-w-0 items-center gap-2">
               <h3
                 id={`${id}-preview-title`}
-                className="final-look-title inline-flex shrink-0 items-center gap-1.5 text-xs leading-4 font-[550] text-foreground"
+                className="final-look-title inline-flex shrink-0 items-center gap-1.5 font-[550] text-foreground"
               >
-                <ActionIcon name="sparkle" className="size-3.5 shrink-0" />
+                <FinalLookStar variant="title" />
                 Final Look
               </h3>
               <span className="truncate">Live Preview</span>
@@ -621,38 +616,10 @@ export function MedicationAppearanceFields({
               aria-hidden="true"
               className="final-look-sticker final-look-sticker--front"
             />
-            <span
-              aria-hidden="true"
-              className="final-look-doodle final-look-doodle--star"
-            >
-              <ActionIcon name="sparkle" weight="fill" className="size-6" />
-            </span>
-            <span
-              aria-hidden="true"
-              className="final-look-doodle final-look-doodle--cluster"
-            >
-              <Sparkles
-                className="size-5"
-                strokeWidth={2}
-                fill="currentColor"
-              />
-            </span>
-            <span
-              aria-hidden="true"
-              className="final-look-doodle final-look-doodle--shooting"
-            >
-              <ActionIcon
-                name="shootingStar"
-                weight="fill"
-                className="size-4"
-              />
-            </span>
-            <span
-              aria-hidden="true"
-              className="final-look-doodle final-look-doodle--twinkle"
-            >
-              <Star className="size-3.5" strokeWidth={2} fill="currentColor" />
-            </span>
+            <FinalLookStar variant="star" />
+            <FinalLookStar variant="cluster" />
+            <FinalLookStar variant="shooting" />
+            <FinalLookStar variant="twinkle" />
             <span
               className={cn(
                 "final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover",
