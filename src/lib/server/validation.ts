@@ -2,6 +2,11 @@ import { z } from "zod";
 import { isValidDayKey } from "@/lib/domain";
 import { MEDICATION_TYPE_VALUES } from "@/lib/medication-types";
 import {
+  MEDICATION_CATEGORY_VALUES,
+  normalizeMedicationCategories,
+} from "@/lib/medication-categories";
+import { resolveMedicationCategoryPatch } from "./medication-category-patch";
+import {
   DAILY_MOOD_VALUES,
   DAILY_REFLECTION_MAX_LENGTH,
 } from "@/lib/daily-check-in";
@@ -15,7 +20,7 @@ export const positiveAmount = z
   .finite()
   .positive("Enter an amount greater than zero.")
   .max(100_000, "This amount is too large.");
-export const medicationSchema = z.object({
+const medicationFieldsSchema = z.object({
   name: z
     .string()
     .trim()
@@ -28,6 +33,18 @@ export const medicationSchema = z.object({
     .optional(),
   isBenzodiazepine: z.boolean().optional(),
   isOpioid: z.boolean().optional(),
+  categories: z
+    .array(z.enum(MEDICATION_CATEGORY_VALUES))
+    .max(
+      MEDICATION_CATEGORY_VALUES.length,
+      "Choose only registered medication categories.",
+    )
+    .refine(
+      (values) => new Set(values).size === values.length,
+      "Choose each medication category only once.",
+    )
+    .transform(normalizeMedicationCategories)
+    .optional(),
   strengthMg: positiveAmount,
   defaultQuantity: positiveAmount
     .min(0.000001, "Use an intake amount of at least 0.000001.")
@@ -42,9 +59,17 @@ export const medicationSchema = z.object({
     .optional(),
   iconRotation: z.number().int().min(0).max(359).optional(),
 });
-export const medicationPatchSchema = medicationSchema
+export const medicationSchema = medicationFieldsSchema.transform((input) => ({
+  ...input,
+  ...resolveMedicationCategoryPatch(undefined, input),
+}));
+export const medicationPatchSchema = medicationFieldsSchema
   .partial()
-  .extend({ archived: z.boolean().optional() });
+  .extend({ archived: z.boolean().optional() })
+  .transform((input) => ({
+    ...input,
+    ...resolveMedicationCategoryPatch(undefined, input),
+  }));
 
 export const intakeSchema = z.object({
   medicationId: z.string().uuid("Choose a medication."),

@@ -1,12 +1,14 @@
+import {
+  getMedicationCategories,
+  type MedicationCategoryMetadata,
+} from "./medication-categories";
+
 export type MedicationClassification =
   "unmarked" | "benzodiazepine" | "opioid" | "both";
 
 export type MedicationClass = "benzodiazepine" | "opioid";
 
-type ClassificationFlags = {
-  isBenzodiazepine?: boolean;
-  isOpioid?: boolean;
-};
+type ClassificationFlags = MedicationCategoryMetadata;
 
 export const MEDICATION_CLASSIFICATIONS = [
   {
@@ -39,8 +41,9 @@ export const MEDICATION_CLASSIFICATIONS = [
 export function getMedicationClassification(
   medication?: ClassificationFlags | null,
 ): MedicationClassification {
-  const benzo = medication?.isBenzodiazepine === true;
-  const opioid = medication?.isOpioid === true;
+  const categories = getMedicationCategories(medication);
+  const benzo = categories.includes("benzodiazepine");
+  const opioid = categories.includes("opioid");
   return benzo
     ? opioid
       ? "both"
@@ -68,7 +71,8 @@ export function getMedicationClasses(
   medication?: ClassificationFlags | null,
 ): MedicationClass[] {
   const classes: MedicationClass[] = [];
-  if (medication?.isBenzodiazepine === true) classes.push("benzodiazepine");
-  if (medication?.isOpioid === true) classes.push("opioid");
+  const categories = getMedicationCategories(medication);
+  if (categories.includes("benzodiazepine")) classes.push("benzodiazepine");
+  if (categories.includes("opioid")) classes.push("opioid");
   return classes;
 }

@@ -1,6 +1,7 @@
 import type { MedicationColor } from "@/lib/medication-appearance";
 import type { MedicationType } from "@/lib/medication-types";
 import type { DailyCheckIn } from "@/lib/daily-check-in";
+import type { MedicationCategory } from "@/lib/medication-categories";
 
 /** Shared data and calendar rules. All stored timestamps are UTC ISO strings. */
 export type Medication = {
@@ -12,6 +13,8 @@ export type Medication = {
   isBenzodiazepine?: boolean;
   /** Manually marked independently; missing on older medications is unmarked. */
   isOpioid?: boolean;
+  /** Manual labels; an explicit array is authoritative over the legacy flags. */
+  categories?: MedicationCategory[];
   strengthMg: number;
   /** Prefills new intakes; older medications use one unit. */
   defaultQuantity?: number;
