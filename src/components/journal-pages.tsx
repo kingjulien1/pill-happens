@@ -21,6 +21,7 @@ import {
 import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { IntakeCardGroup } from "@/components/intake-card-group";
+import { IntakeTimelineEntrance } from "@/components/intake-timeline-entrance";
 import { HistoryDayCard } from "@/components/history-day-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
@@ -264,7 +265,7 @@ function IntakeTimeline({
       {!entries.length ? (
         <EmptyIntakeStack onLog={onLog} />
       ) : (
-        <div className="intake-timeline">
+        <IntakeTimelineEntrance key={day}>
           {groups.map((group) => (
             <IntakeCardGroup
               key={group.id}
@@ -275,7 +276,7 @@ function IntakeTimeline({
               onEdit={setEditing}
             />
           ))}
-        </div>
+        </IntakeTimelineEntrance>
       )}
       {editing && (
         <EntryEditor intake={editing} close={() => setEditing(null)} />

@@ -51,7 +51,12 @@ function StackSlot({
       data-stack-rear={depth > 0}
       data-stack-collapsed={collapsed && depth > 0}
     >
-      <div ref={measure} className="intake-stack-measure">
+      <div
+        ref={measure}
+        className="intake-stack-measure"
+        data-intake-entrance={entry.id}
+        data-entrance-exposed={!collapsed || depth === 0}
+      >
         <IntakeCard
           entry={entry}
           medication={medication}

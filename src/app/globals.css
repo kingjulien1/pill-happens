@@ -308,6 +308,98 @@
   position: relative;
   bottom: auto;
 }
+/* One entrance per exposed intake. Finished cards release their compositor layers. */
+@media (prefers-reduced-motion: no-preference) {
+  .intake-stack-measure[data-entrance-state="pending"] {
+    opacity: 0;
+  }
+  .intake-stack-measure[data-entrance-state="running"] {
+    transform-origin: 18% 50%;
+    animation: intake-card-arrive 680ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--intake-enter-delay, 0ms) backwards;
+    will-change: transform, opacity;
+  }
+  .intake-stack-measure[data-entrance-state="running"] .intake-card-focus {
+    animation: intake-icon-arrive 620ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 55ms) backwards;
+  }
+  .intake-stack-measure[data-entrance-state="running"] .intake-card-heading {
+    animation: intake-copy-arrive 380ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 95ms) backwards;
+  }
+  .intake-stack-measure[data-entrance-state="running"] .intake-card-bottom,
+  .intake-stack-measure[data-entrance-state="running"] .intake-card-note {
+    animation: intake-copy-arrive 420ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 145ms) backwards;
+  }
+  .intake-group:has(
+      .intake-stack-slot:first-child
+        > .intake-stack-measure[data-entrance-state="pending"]
+    )
+    :is(.intake-stack-slot[data-stack-collapsed="true"], .intake-group-label) {
+    opacity: 0;
+  }
+  .intake-group:has(
+      .intake-stack-slot:first-child
+        > .intake-stack-measure[data-entrance-state="running"]
+    )
+    :is(.intake-stack-slot[data-stack-collapsed="true"], .intake-group-label) {
+    animation: intake-stack-arrive 520ms ease-out var(--intake-enter-delay, 0ms)
+      backwards;
+  }
+}
+@keyframes intake-stack-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes intake-card-arrive {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.975);
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(0, -1.5px, 0) scale(1.003);
+  }
+  78% {
+    transform: translate3d(0, 0.5px, 0) scale(0.999);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes intake-icon-arrive {
+  0% {
+    opacity: 0;
+    transform: translate3d(-5px, 3px, 0) rotate(-12deg) scale(0.72);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(0, -1px, 0) rotate(3deg) scale(1.065);
+  }
+  80% {
+    transform: translate3d(0, 0, 0) rotate(-1deg) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+@keyframes intake-copy-arrive {
+  from {
+    opacity: 0;
+    transform: translate3d(5px, 2px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
 .intake-group[data-expanded="false"] .intake-group-cards {
   pointer-events: none;
 }
