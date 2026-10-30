@@ -696,7 +696,7 @@ function JournalPreferences() {
   }
   return (
     <>
-      <div className="mt-8 flex items-center justify-center gap-4">
+      <div className="canvas-copy mt-8 flex items-center justify-center gap-4">
         <a
           href="/api/export"
           download
@@ -809,7 +809,7 @@ export function HistoryPage() {
       <PageHeading title="History" context="Past Days">
         Intake details and evening check-ins, day by day.
       </PageHeading>
-      <div className="mb-5 flex items-center justify-between border-b border-border/70 pb-4">
+      <div className="canvas-copy mb-5 flex items-center justify-between border-b border-border/70 pb-4">
         <span className="text-xs font-medium">Past Days</span>
         <span className="text-[10px] text-muted-foreground">
           {days.length} {days.length === 1 ? "day" : "days"} with entries
