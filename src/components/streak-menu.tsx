@@ -1,23 +1,37 @@
 "use client";
 
+import { useState, type CSSProperties } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Popover } from "@base-ui/react/popover";
 import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
+import { StreakArtwork } from "@/components/streak-artwork";
 import { dayKey } from "@/lib/domain";
 import { loggingStreak } from "@/lib/logging-streak";
+import { getMilestoneLook } from "@/lib/streak-milestones";
+import styles from "./streak-menu.module.css";
 
 export function StreakMenu() {
   const pathname = usePathname();
+  return <StreakPopover key={pathname} />;
+}
+
+function StreakPopover() {
+  const [open, setOpen] = useState(false);
   const { data, now } = useJournal();
   const streak =
     data && now
       ? loggingStreak(data, dayKey(now, data.settings.timezone), now)
       : null;
+  const active = Boolean(streak && streak.current > 0);
   const remaining = streak ? streak.nextMilestone - streak.current : 0;
+  const look = getMilestoneLook(
+    streak?.milestone ?? streak?.nextMilestone ?? 2,
+  );
 
   return (
-    <Popover.Root key={pathname} modal={false}>
+    <Popover.Root open={open} onOpenChange={setOpen} modal={false}>
       <Popover.Trigger
         aria-label="View logging streak"
         className="header-icon-button header-icon-button--compact justify-self-center"
@@ -38,79 +52,132 @@ export function StreakMenu() {
           className="z-50"
         >
           <Popover.Popup
-            className="brand-menu max-h-(--available-height) w-60 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl p-4 outline-none"
+            className={styles.popup}
             data-streak-popover
+            data-streak-active={active}
+            style={
+              {
+                "--party-accent": look.palette.accent,
+                "--party-pop": look.palette.pop,
+                "--party-spark": look.palette.spark,
+              } as CSSProperties
+            }
           >
-            <Popover.Title className="pr-7 text-xs font-semibold">
-              Logging Streak
-            </Popover.Title>
-            <Popover.Close
-              aria-label="Close streak details"
-              className="absolute top-2 right-2 inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring hover:[&>span]:bg-foreground/10"
-            >
-              <span className="flex size-7 items-center justify-center rounded-lg border border-foreground/10 bg-foreground/5 transition-colors">
-                <ActionIcon name="close" className="size-3.5" />
-              </span>
-            </Popover.Close>
-            <Popover.Description className="mt-1 pr-7 text-[11px] leading-relaxed text-muted-foreground">
-              Each tracking day with an entry counts once.
-            </Popover.Description>
-            {streak && (
-              <>
-                <dl className="mt-4">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <dt className="text-[11px] text-muted-foreground">
-                      Current Streak
-                    </dt>
-                    <dd
-                      className="text-lg leading-none font-semibold tabular-nums"
+            {active && (
+              <StreakArtwork
+                seed={streak!.current}
+                palette={look.palette}
+                party
+              />
+            )}
+            <div className={styles.content}>
+              <Popover.Title className={styles.title}>
+                <ActionIcon
+                  name={active ? "confetti" : "sparkle"}
+                  weight="fill"
+                  className="size-4"
+                />
+                {active ? "Streak Spotlight" : "Your Next Chapter"}
+              </Popover.Title>
+              <Popover.Close
+                aria-label="Close streak details"
+                className={styles.close}
+              >
+                <span>
+                  <ActionIcon name="close" className="size-3.5" />
+                </span>
+              </Popover.Close>
+              <Popover.Description className={styles.description}>
+                Each tracking day with an intake entry counts once.
+              </Popover.Description>
+              {streak && (
+                <>
+                  <div className={styles.hero}>
+                    <span className={styles.medal} aria-hidden="true">
+                      <span>{active ? look.emoji : "✧"}</span>
+                    </span>
+                    <p
+                      className={styles.current}
                       data-streak-current={streak.current}
                     >
-                      {streak.current}{" "}
-                      <span className="text-xs font-normal">
-                        {streak.current === 1 ? "day" : "days"}
+                      <strong>{streak.current}</strong>
+                      <span>
+                        {streak.current === 1 ? "day" : "days"} in a row
                       </span>
-                    </dd>
+                    </p>
+                    <p className={styles.cheer}>
+                      {active
+                        ? streak.current === 1
+                          ? "One day, one little spark."
+                          : "A little momentum worth celebrating."
+                        : "Your milestones will be waiting here."}
+                    </p>
                   </div>
-                </dl>
-                <p
-                  className="mt-2 text-[11px] text-muted-foreground"
-                  data-streak-remaining={remaining}
-                >
-                  {remaining} {remaining === 1 ? "day" : "days"} to the next
-                  milestone.
-                  <span className="sr-only">
-                    {" "}
-                    The next milestone is {streak.nextMilestone} consecutive
-                    logging days.
-                  </span>
-                </p>
-                <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-border/60 pt-3">
-                  <div>
-                    <dt className="text-[10px] text-muted-foreground">
-                      Best Streak
-                    </dt>
-                    <dd
-                      className="mt-1 text-xs font-medium tabular-nums"
-                      data-streak-best={streak.best}
-                    >
-                      {streak.best} {streak.best === 1 ? "day" : "days"}
-                    </dd>
+                  <div className={styles.nextRow}>
+                    <span>Next In This Run</span>
+                    <strong>{streak.nextMilestone} days</strong>
                   </div>
-                  <div>
-                    <dt className="text-[10px] text-muted-foreground">
-                      Days with Entries
-                    </dt>
-                    <dd
-                      className="mt-1 text-xs font-medium tabular-nums"
-                      data-streak-total={streak.totalDays}
-                    >
-                      {streak.totalDays}
-                    </dd>
+                  <div
+                    role="progressbar"
+                    aria-label="Progress to the next milestone in this run"
+                    aria-valuemin={0}
+                    aria-valuemax={streak.nextMilestone}
+                    aria-valuenow={streak.current}
+                    className={styles.progress}
+                  >
+                    <span
+                      style={{
+                        width: `${Math.min(100, (streak.current / streak.nextMilestone) * 100)}%`,
+                      }}
+                    />
                   </div>
-                </dl>
-              </>
-            )}
+                  <p
+                    className={styles.remaining}
+                    data-streak-remaining={remaining}
+                  >
+                    {remaining} {remaining === 1 ? "day" : "days"} to the next
+                    milestone.
+                  </p>
+                  <dl className={styles.stats}>
+                    <div>
+                      <dt>
+                        <ActionIcon name="shootingStar" className="size-3.5" />
+                        Best Streak
+                      </dt>
+                      <dd data-streak-best={streak.best}>
+                        {streak.best}{" "}
+                        <span>{streak.best === 1 ? "day" : "days"}</span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>
+                        <ActionIcon name="calendar" className="size-3.5" />
+                        Days With Entries
+                      </dt>
+                      <dd data-streak-total={streak.totalDays}>
+                        {streak.totalDays}
+                      </dd>
+                    </div>
+                  </dl>
+                  <Link
+                    href="/streaks"
+                    className={styles.link}
+                    onClick={() => setOpen(false)}
+                  >
+                    <ActionIcon
+                      name="sparkle"
+                      weight="fill"
+                      className="size-4"
+                    />
+                    Explore Milestones
+                    <ActionIcon name="next" className="size-4" />
+                  </Link>
+                  <p className={styles.footnote}>
+                    Your earned milestones stay with you after a gap.
+                  </p>
+                </>
+              )}
+            </div>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>

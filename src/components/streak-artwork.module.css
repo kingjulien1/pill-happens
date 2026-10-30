@@ -1,0 +1,172 @@
+.artwork {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.88;
+}
+.artwork[data-party="true"] {
+  opacity: 1;
+}
+.artwork > * {
+  position: absolute;
+  pointer-events: none;
+}
+.glow {
+  inset: -20%;
+  background:
+    radial-gradient(
+      ellipse at 20% 20%,
+      color-mix(in srgb, var(--streak-art-a) 58%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse at 84% 75%,
+      color-mix(in srgb, var(--streak-art-b) 52%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 65% 5%,
+      color-mix(in srgb, var(--streak-art-c) 42%, transparent),
+      transparent 55%
+    );
+  filter: blur(24px);
+  opacity: 0.72;
+  animation: streak-glow-drift 16s ease-in-out var(--streak-art-phase) infinite;
+}
+.pattern {
+  inset: 0;
+  background-image: radial-gradient(
+    var(--streak-art-c) 0.7px,
+    transparent 0.8px
+  );
+  background-size: 14px 14px;
+  opacity: 0.09;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000, transparent 78%);
+}
+.orbit,
+.orbitSecond {
+  inset: 9% 19%;
+  border: 1px dashed color-mix(in srgb, var(--streak-art-c) 45%, transparent);
+  border-radius: 48% 52% 66% 34%;
+  opacity: 0.3;
+  transform: rotate(-25deg);
+  animation: streak-orbit-turn 24s linear var(--streak-art-phase) infinite;
+}
+.orbitSecond {
+  inset: 20% 10%;
+  border-color: var(--streak-art-b);
+  border-style: solid;
+  border-radius: 58% 42% 34% 66%;
+  opacity: 0.14;
+  animation-direction: reverse;
+  animation-duration: 30s;
+}
+.waves {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0.32;
+  animation: streak-wave-sway 13s ease-in-out var(--streak-art-phase) infinite;
+}
+.waves path {
+  stroke: var(--streak-art-b);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.waves path + path {
+  stroke: var(--streak-art-c);
+}
+.star {
+  left: var(--star-x);
+  top: var(--star-y);
+  width: var(--star-size);
+  height: var(--star-size);
+  color: #ffdf20;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 8px #ffdf2040);
+  animation: streak-star-spark 6s ease-in-out var(--star-phase) infinite;
+}
+.confetti {
+  left: var(--piece-x);
+  top: var(--piece-y);
+  width: 4px;
+  height: 8px;
+  border-radius: 1.5px;
+  background: var(--piece-color);
+  opacity: 0;
+  transform: rotate(var(--piece-angle));
+  animation: streak-confetti-rise 10s ease-in-out var(--piece-phase) infinite;
+}
+.artwork > * {
+  animation-play-state: paused;
+}
+.artwork[data-active="true"] > * {
+  animation-play-state: running;
+}
+@keyframes streak-glow-drift {
+  0%,
+  100% {
+    transform: translate3d(-3%, 1%, 0) rotate(-4deg) scale(0.97);
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) rotate(5deg) scale(1.08);
+  }
+}
+@keyframes streak-orbit-turn {
+  to {
+    transform: rotate(335deg);
+  }
+}
+@keyframes streak-wave-sway {
+  0%,
+  100% {
+    transform: translate3d(-3px, 2px, 0) scaleY(0.98);
+  }
+  50% {
+    transform: translate3d(4px, -4px, 0) scaleY(1.04);
+  }
+}
+@keyframes streak-star-spark {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: rotate(-9deg) scale(0.84);
+  }
+  42% {
+    opacity: 0.85;
+    transform: rotate(11deg) scale(1.1);
+  }
+  60% {
+    opacity: 0.5;
+    transform: rotate(3deg) scale(0.95);
+  }
+}
+@keyframes streak-confetti-rise {
+  0%,
+  55%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) rotate(var(--piece-angle));
+  }
+  62% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0;
+    transform: translate3d(var(--piece-drift), -34px, 0)
+      rotate(calc(var(--piece-angle) + 100deg));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .artwork > * {
+    animation: none;
+  }
+  .confetti {
+    display: none;
+  }
+}
