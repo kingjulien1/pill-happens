@@ -5,6 +5,7 @@ import {
 } from "@/lib/server/daily-check-ins";
 import { mutateState } from "@/lib/server/store";
 import { dailyCheckInSchema } from "@/lib/server/validation";
+import { JSON_BODY_LIMITS } from "@/lib/server/json-body";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,9 @@ export function POST(request: Request) {
   return api(
     request,
     async () => {
-      const input = dailyCheckInSchema.parse(await jsonBody(request));
+      const input = dailyCheckInSchema.parse(
+        await jsonBody(request, { maxBytes: JSON_BODY_LIMITS.dailyCheckIn }),
+      );
       const now = new Date();
       try {
         return await mutateState((state) =>

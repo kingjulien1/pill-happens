@@ -4,7 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import test, { type TestContext } from "node:test";
 import { PGlite } from "@electric-sql/pglite";
-import { DAILY_MOOD_VALUES, type DailyCheckIn } from "@/lib/daily-check-in";
+import {
+  DAILY_MOOD_VALUES,
+  DAILY_REFLECTION_MAX_LENGTH,
+  type DailyCheckIn,
+} from "@/lib/daily-check-in";
 import { emptyData, shiftDayKey, type AppData } from "@/lib/domain";
 import {
   DAILY_CHECK_IN_LIMIT,
@@ -71,10 +75,8 @@ test("moods are allowlisted, unique, and limited to four selections", () => {
 });
 
 test("check-in text has bounded lengths after trimming and uses real calendar dates", () => {
-  assert.equal(input({ note: "x".repeat(800) }).note.length, 800);
   assert.equal(input({ helped: "x".repeat(160) }).helped.length, 160);
   for (const fields of [
-    { note: "x".repeat(801) },
     { helped: "x".repeat(161) },
     { day: "2026-02-29" },
     { day: "2026-13-01" },
@@ -87,6 +89,26 @@ test("check-in text has bounded lengths after trimming and uses real calendar da
       false,
     );
   assert.equal(input({ day: "2028-02-29" }).day, "2028-02-29");
+});
+
+test("reflections accept longer journal writing up to 8,000 characters after trimming", () => {
+  assert.equal(input({ note: "x".repeat(801) }).note.length, 801);
+  const atLimit =
+    "First paragraph.\n\nA second thought.\n  An indented line.".padEnd(
+      DAILY_REFLECTION_MAX_LENGTH,
+      "x",
+    );
+  assert.equal(atLimit.length, 8_000);
+  assert.equal(input({ note: ` \n${atLimit}\n ` }).note, atLimit);
+  const aboveLimit = dailyCheckInSchema.safeParse({
+    day: "2026-10-30",
+    note: `${atLimit}x`,
+  });
+  assert.equal(aboveLimit.success, false);
+  if (!aboveLimit.success) {
+    assert.deepEqual(aboveLimit.error.issues[0].path, ["note"]);
+    assert.match(aboveLimit.error.issues[0].message, /8,000/);
+  }
 });
 
 test("energy and stress are optional whole 1–5 scores while sleep permits zero and fractions", () => {
@@ -283,7 +305,14 @@ for (const fixture of repositories) {
       delete state.dailyCheckIns;
     });
     const untouched = await repository.readState(otherJournal);
+    const longReflection = Array.from(
+      { length: 40 },
+      (_, index) =>
+        `Paragraph ${index + 1}: A synthetic account of the day, with room to describe what happened and how the evening felt.\n  A separate indented thought.`,
+    ).join("\n\n");
+    assert.ok(longReflection.length > 800);
     const fields = input({
+      note: longReflection,
       moods: ["calm", "tired"],
       energy: 2,
       stress: 3,
@@ -313,10 +342,16 @@ for (const fixture of repositories) {
       }),
     ]);
     const correctedAt = new Date("2026-10-31T01:00:00.000Z");
+    const correctedReflection =
+      `${longReflection}\n\nEdited after midnight.`.padEnd(
+        DAILY_REFLECTION_MAX_LENGTH,
+        "x",
+      );
+    assert.equal(correctedReflection.length, DAILY_REFLECTION_MAX_LENGTH);
     await mutateJournalState(reopen(), "personal", (state) => {
       upsertDailyCheckIn(
         state,
-        input({ note: "Edited after midnight." }),
+        input({ note: correctedReflection }),
         correctedAt,
       );
     });
@@ -325,12 +360,22 @@ for (const fixture of repositories) {
     const entry = corrected.dailyCheckIns!.find(
       (item) => item.day === fields.day,
     )!;
-    assert.equal(entry.note, "Edited after midnight.");
+    assert.equal(entry.note, correctedReflection);
     assert.equal(entry.createdAt, now.toISOString());
     assert.equal(entry.updatedAt, correctedAt.toISOString());
     assert.deepEqual(corrected.intakes, original.intakes);
     assert.deepEqual(corrected.medications, original.medications);
     assert.deepEqual(corrected.goals, original.goals);
+    const exported = JSON.parse(
+      JSON.stringify({ schemaVersion: 1, data: corrected }),
+    );
+    assert.equal(
+      exported.data.dailyCheckIns.find(
+        (item: DailyCheckIn) => item.day === fields.day,
+      ).note,
+      correctedReflection,
+      "multiline journal text survives reopening, editing and exporting without truncation",
+    );
     assert.deepEqual(await readJournalState(reopen(), otherJournal), untouched);
 
     const beforeRejection = structuredClone(corrected);

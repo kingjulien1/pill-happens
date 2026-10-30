@@ -4,15 +4,10 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { configurationReady, isAuthenticated } from "@/lib/server/auth";
 import { isSameOriginRequest } from "@/lib/server/security";
+import { ApiError } from "./api-error";
 
-export class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+export { ApiError } from "./api-error";
+export { jsonBody } from "./json-body";
 
 export function checkOrigin(request: Request) {
   if (
@@ -25,23 +20,6 @@ export function checkOrigin(request: Request) {
     })
   )
     throw new ApiError(403, "This request must come from your journal.");
-}
-
-export async function jsonBody(request: Request): Promise<unknown> {
-  if (!request.headers.get("content-type")?.includes("application/json")) {
-    throw new ApiError(415, "Send this request as JSON.");
-  }
-  const declaredLength = Number(request.headers.get("content-length") || 0);
-  if (declaredLength > 16_384)
-    throw new ApiError(413, "This entry is too large.");
-  const text = await request.text();
-  if (Buffer.byteLength(text, "utf8") > 16_384)
-    throw new ApiError(413, "This entry is too large.");
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new ApiError(400, "The submitted data could not be read.");
-  }
 }
 
 export async function api(

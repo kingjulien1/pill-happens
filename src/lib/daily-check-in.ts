@@ -1,5 +1,8 @@
 import { dayKey, isValidDayKey, toLocalInput } from "@/lib/domain";
 
+/** Shared by the reflection editor and API; other check-in fields stay concise. */
+export const DAILY_REFLECTION_MAX_LENGTH = 8_000;
+
 export const DAILY_MOODS = [
   { value: "calm", label: "Calm", emoji: "🌿" },
   { value: "okay", label: "Okay", emoji: "🙂" },

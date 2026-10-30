@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { isValidDayKey } from "@/lib/domain";
 import { MEDICATION_TYPE_VALUES } from "@/lib/medication-types";
-import { DAILY_MOOD_VALUES } from "@/lib/daily-check-in";
+import {
+  DAILY_MOOD_VALUES,
+  DAILY_REFLECTION_MAX_LENGTH,
+} from "@/lib/daily-check-in";
 import {
   isMedicationIcon,
   MEDICATION_COLORS,
@@ -72,7 +75,10 @@ export const dailyCheckInSchema = z
     note: z
       .string()
       .trim()
-      .max(800, "Keep your reflection to 800 characters or fewer.")
+      .max(
+        DAILY_REFLECTION_MAX_LENGTH,
+        "Keep your reflection to 8,000 characters or fewer.",
+      )
       .default(""),
     moods: z
       .array(z.enum(DAILY_MOOD_VALUES))
