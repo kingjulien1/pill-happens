@@ -275,7 +275,8 @@ export function GuidePage() {
             <p>
               Tap a collapsed stack once to reveal its cards. Tap an individual
               revealed card again to edit it. Use <strong>Collapse</strong> to
-              fold the group back up.
+              fold the group back up. The folded preview shows up to six cards
+              behind the first; opening reveals every entry at full size.
             </p>
           </GuideDetail>
         </div>
