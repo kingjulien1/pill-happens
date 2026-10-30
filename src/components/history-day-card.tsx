@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { ActionIcon } from "@/components/action-icon";
 import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import {
@@ -15,10 +16,12 @@ import {
 import { getHistoryCardArt } from "@/lib/history-card-art";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationPreviewSurface } from "@/lib/medication-preview-colors";
+import { checkInForDay, DAILY_MOODS } from "@/lib/daily-check-in";
 
 export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
   const totals = totalsForDay(data, day);
   const count = dayIntakes(data, day).length;
+  const checkIn = checkInForDay(data.dailyCheckIns, day);
   const goals = totals.map((total) =>
     goalForDay(data, total.medicationId, day),
   );
@@ -31,7 +34,9 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
     ? over
       ? "Above a recorded maximum"
       : "Within recorded maximums"
-    : "No daily goal";
+    : checkIn
+      ? "Check-in saved"
+      : "No daily goal";
   const art = getHistoryCardArt(day, totals, data.medications);
   const fourth = art.colors[3] ?? art.secondary;
   const style = {
@@ -113,7 +118,9 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
             className="mt-1 size-[18px] text-muted-foreground"
           />
         </div>
-        <div className="history-card-totals mt-3.5 flex flex-wrap gap-2">
+        <div
+          className={`history-card-totals flex flex-wrap gap-2${totals.length ? " mt-3.5" : ""}`}
+        >
           {totals.map((total) => {
             const medication = data.medications.find(
               (item) => item.id === total.medicationId,
@@ -144,6 +151,30 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
             );
           })}
         </div>
+        {checkIn && (
+          <div
+            className="mt-3 flex min-w-0 items-center gap-1.5 text-[10px] text-foreground/80"
+            data-history-check-in
+          >
+            <MoonStarsIcon
+              className="size-3.5 shrink-0"
+              weight="bold"
+              aria-hidden="true"
+            />
+            <span className="min-w-0 truncate">
+              {checkIn.note ||
+                checkIn.moods
+                  .map(
+                    (value) =>
+                      DAILY_MOODS.find((mood) => mood.value === value)?.label,
+                  )
+                  .filter(Boolean)
+                  .join(" · ") ||
+                checkIn.helped ||
+                "Evening Check-In Saved"}
+            </span>
+          </div>
+        )}
       </div>
     </Link>
   );

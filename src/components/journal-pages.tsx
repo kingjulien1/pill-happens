@@ -24,10 +24,12 @@ import { IntakeCardGroup } from "@/components/intake-card-group";
 import { HistoryDayCard } from "@/components/history-day-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
+import { DailyCheckInSection } from "@/components/daily-check-in";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { groupIntakes } from "@/lib/intake-groups";
+import { canCheckIn, checkInForDay, journalDays } from "@/lib/daily-check-in";
 import { Label } from "@/components/ui/label";
 import {
   dayIntakes,
@@ -288,6 +290,7 @@ export function TodayPage() {
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const streak = loggingStreak(data, today, now);
+  const checkIn = checkInForDay(data.dailyCheckIns, today);
   const openLog = () => setOpen(true);
   return (
     <div className="flex flex-1 flex-col pt-6" data-today-layout>
@@ -297,6 +300,9 @@ export function TodayPage() {
         now={now}
         timeZone={data.settings.timezone}
       />
+      <div className="mb-4" hidden={!checkIn}>
+        <DailyCheckInSection day={today} checkIn={checkIn} variant="saved" />
+      </div>
       <section aria-label="Today's entries" className="flex-1">
         <IntakeTimeline
           data={data}
@@ -304,6 +310,14 @@ export function TodayPage() {
           showSummary={false}
           onLog={openLog}
         />
+        <div
+          className="mt-5"
+          hidden={
+            Boolean(checkIn) || !canCheckIn(today, now, data.settings.timezone)
+          }
+        >
+          <DailyCheckInSection day={today} variant="prompt" />
+        </div>
       </section>
       <IntakeAction
         onClick={openLog}
@@ -774,18 +788,15 @@ export function HistoryPage() {
   const [limit, setLimit] = useState(20);
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
-  const days = [
-    ...new Set(
-      data.intakes.map((i) => dayKey(i.takenAt, data.settings.timezone)),
-    ),
-  ]
-    .filter((d) => d !== today)
-    .sort()
-    .reverse();
+  const days = journalDays(
+    data.intakes,
+    data.dailyCheckIns,
+    data.settings.timezone,
+  ).filter((day) => day < today);
   return (
     <>
       <PageHeading title="History" context="Past Days">
-        Daily summaries and intake details.
+        Intake details and evening check-ins, day by day.
       </PageHeading>
       <div className="mb-5 flex items-center justify-between border-b border-border/70 pb-4">
         <span className="text-xs font-medium">Past Days</span>
@@ -829,6 +840,7 @@ export function DayPage({ day }: { day: string }) {
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const isFuture = day > today;
+  const checkIn = checkInForDay(data.dailyCheckIns, day);
   return (
     <>
       <Link
@@ -850,6 +862,9 @@ export function DayPage({ day }: { day: string }) {
         06:00 to 06:00 the next day ·{" "}
         {data.settings.timezone.replaceAll("_", " ")}
       </PageHeading>
+      <div className="mb-5" hidden={!checkIn}>
+        <DailyCheckInSection day={day} checkIn={checkIn} variant="saved" />
+      </div>
       <DailyOverview data={data} day={day} />
       <div className="my-6">
         <IntakeTimeline
@@ -857,6 +872,14 @@ export function DayPage({ day }: { day: string }) {
           day={day}
           onLog={isFuture ? undefined : () => setOpen(true)}
         />
+        <div
+          className="mt-5"
+          hidden={
+            Boolean(checkIn) || !canCheckIn(day, now, data.settings.timezone)
+          }
+        >
+          <DailyCheckInSection day={day} variant="prompt" />
+        </div>
       </div>
       <div className="flex items-center justify-between gap-3 border-t pt-4">
         <Link
