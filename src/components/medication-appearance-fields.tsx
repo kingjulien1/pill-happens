@@ -7,13 +7,13 @@ import {
   RotateCw,
   Search,
   Shuffle,
-  Sparkles,
   Undo2,
   X,
 } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
 import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
+import { SymbolSearchState } from "@/components/symbol-search-state";
 import { Input } from "@/components/ui/input";
 import { EMOJI_CATALOG, searchEmoji } from "@/lib/emoji-catalog";
 import {
@@ -49,6 +49,12 @@ import { cn } from "@/lib/utils";
 const SEARCH_DELAY = 2500;
 const RESULT_LIMIT = 96;
 const iconCount = LUCIDE_ICON_CATALOG.length + SVG_ICON_CATALOG.length;
+const customIconCount = SVG_ICON_CATALOG.length;
+const coloredIconCount = SVG_ICON_CATALOG.filter(
+  (item) => item.variant === "color",
+).length;
+const tintableIconCount = customIconCount - coloredIconCount;
+const customIconDescription = `${tintableIconCount} tintable SVGs and ${coloredIconCount} colored SVGs, each counted separately in the icon total.`;
 const emojiCount = EMOJI_CATALOG.length;
 const pickerPanelClass =
   "relative h-[134px] w-full overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-foreground/[.025] [scrollbar-gutter:stable]";
@@ -128,50 +134,6 @@ function choiceStyle(hex: string): CSSProperties {
     "--choice-fill": `${hex}24`,
     "--choice-glow": `${hex}38`,
   } as CSSProperties;
-}
-
-function SearchState({ phase }: { phase: "idle" | "loading" | "empty" }) {
-  const messages = {
-    idle: ["Find Your Symbol", "Try a name, “outline”, or “color”."],
-    loading: ["A Little Symbol Hunt…", "Icons and emojis, coming right up."],
-    empty: ["No Matches This Time", "Try a different word or an emoji."],
-  };
-  return (
-    <div
-      className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center"
-      data-symbol-state={phase}
-    >
-      <span
-        className={cn(
-          "relative flex size-11 items-center justify-center rounded-xl bg-foreground/5 text-foreground/80",
-          phase === "loading" && "symbol-search-mark",
-        )}
-      >
-        {phase === "loading" && (
-          <span aria-hidden="true" className="symbol-search-orbit">
-            <span className="symbol-search-orbit-dot" />
-            <Sparkles
-              className="symbol-search-orbit-spark size-3"
-              strokeWidth={2.5}
-            />
-          </span>
-        )}
-        <span
-          className={
-            phase === "loading" ? "symbol-search-scout" : "inline-flex"
-          }
-        >
-          <ActionIcon name="discover" weight="duotone" className="size-8" />
-        </span>
-      </span>
-      <div>
-        <p className="text-xs font-medium">{messages[phase][0]}</p>
-        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-          {messages[phase][1]}
-        </p>
-      </div>
-    </div>
-  );
 }
 
 export function MedicationAppearanceFields({
@@ -409,15 +371,28 @@ export function MedicationAppearanceFields({
               data-appearance-search-status
             >
               {phase === "idle" ? (
-                <span>
-                  <span className="font-[550] tabular-nums">
-                    {iconCount.toLocaleString("en")}
+                <span className="inline-flex flex-col items-end gap-0.5">
+                  <span data-appearance-symbol-total>
+                    <span className="font-[550] tabular-nums">
+                      {iconCount.toLocaleString("en")}
+                    </span>{" "}
+                    icons,{" "}
+                    <span className="font-[550] tabular-nums">
+                      {emojiCount.toLocaleString("en")}
+                    </span>{" "}
+                    emojis
                   </span>{" "}
-                  icons,{" "}
-                  <span className="font-[550] tabular-nums">
-                    {emojiCount.toLocaleString("en")}
-                  </span>{" "}
-                  emojis
+                  <span
+                    data-appearance-custom-count
+                    title={customIconDescription}
+                  >
+                    incl.{" "}
+                    <span className="font-[550] tabular-nums">
+                      {customIconCount.toLocaleString("en")}
+                    </span>{" "}
+                    custom SVGs
+                    <span className="sr-only">. {customIconDescription}</span>
+                  </span>
                 </span>
               ) : phase === "loading" ? (
                 "On it…"
@@ -445,7 +420,9 @@ export function MedicationAppearanceFields({
               data-appearance-results
             >
               {phase !== "ready" || !results.length ? (
-                <SearchState phase={phase === "ready" ? "empty" : phase} />
+                <SymbolSearchState
+                  phase={phase === "ready" ? "empty" : phase}
+                />
               ) : (
                 <div
                   role="radiogroup"
