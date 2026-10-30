@@ -9,7 +9,7 @@ export function IntakeSummary({
 }) {
   return (
     <div
-      className="flex items-center justify-between gap-2"
+      className="canvas-copy flex items-center justify-between gap-2"
       data-intake-summary
     >
       <h2 className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]">

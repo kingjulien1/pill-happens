@@ -516,7 +516,7 @@ export function MedicationAppearanceFields({
                     data-selected={color === item.value}
                   >
                     <span
-                      className="flex size-5 items-center justify-center rounded-full border border-black/10 dark:border-foreground/20"
+                      className="flex size-5 items-center justify-center rounded-full border border-ink/10 dark:border-foreground/20"
                       style={{
                         backgroundColor: item.hex,
                       }}

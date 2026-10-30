@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import Grainient from "@/components/grainient";
+import { APP_BACKGROUND_COLORS } from "@/lib/app-theme";
 
 const colorQuery = "(prefers-color-scheme: dark)";
 const subscribe = (onChange: () => void) => {
@@ -19,8 +20,6 @@ const subscribeMobile = (onChange: () => void) => {
 };
 const getMobileSnapshot = () => window.matchMedia(mobileQuery).matches;
 const getServerMobileSnapshot = () => false;
-const colors = ["#120f17", "#2a0f0a", "#9a3412", "#f97316", "#fed7aa"];
-const lightColors = ["#f6f2f4", "#edc0b8", "#e69b89", "#f6b49c", "#fffdfd"];
 
 export function JournalBackground() {
   const dark = useSyncExternalStore<boolean | null>(
@@ -43,8 +42,7 @@ export function JournalBackground() {
     >
       {dark !== null && (
         <Grainient
-          colors={dark ? colors : lightColors}
-          paletteMode={dark ? "auto" : "literal"}
+          colors={APP_BACKGROUND_COLORS}
           type="radial"
           flow={mobile ? 1.3 : 0.85}
           variation={16}
@@ -52,10 +50,10 @@ export function JournalBackground() {
           interactive={false}
           saturation={1.01}
           scale={mobile ? 0.42 : 0.3}
-          contrast={dark ? 0.84 : 1}
+          contrast={dark ? 0.92 : 1}
           silk={0.58}
           softness={0.96}
-          grainAmount={dark ? 0.07 : 0.045}
+          grainAmount={dark ? 0.07 : 0.055}
           grainSize={1.2}
           grainAnimated
           clickSwirl={false}

@@ -1,8 +1,8 @@
 .page {
   min-width: 0;
-  --upcoming-ink: #625b65;
-  --upcoming-wash: #ffffff54;
-  --upcoming-edge: #80758338;
+  --upcoming-ink: var(--muted-foreground);
+  --upcoming-wash: color-mix(in srgb, var(--surface-sunken) 60%, transparent);
+  --upcoming-edge: var(--border);
 }
 .pageHeader h1 {
   font-size: 24px;
@@ -110,7 +110,7 @@
     color-mix(in srgb, var(--milestone-accent) 70%, var(--foreground));
   background: color-mix(in srgb, var(--card) 84%, transparent);
   box-shadow:
-    inset 0 1px 0 #ffffff20,
+    inset 0 1px 0 color-mix(in srgb, var(--palette-peach) 12.549%, transparent),
     0 5px 22px color-mix(in srgb, var(--milestone-accent) 12%, transparent);
 }
 .cardForeground {
@@ -140,7 +140,7 @@
     color-mix(in srgb, var(--milestone-pop) 12%, var(--card))
   );
   box-shadow:
-    inset 0 1px 0 #ffffff45,
+    inset 0 1px 0 color-mix(in srgb, var(--palette-peach) 27.059%, transparent),
     0 0 0 4px color-mix(in srgb, var(--milestone-accent) 9%, transparent),
     0 5px 15px color-mix(in srgb, var(--milestone-pop) 14%, transparent);
   transform: rotate(-5deg);
@@ -150,7 +150,9 @@
   top: -13px;
   right: -7px;
   font-size: 23px;
-  filter: drop-shadow(0 3px 5px #120f1730);
+  filter: drop-shadow(
+    0 3px 5px color-mix(in srgb, var(--palette-ink) 18.824%, transparent)
+  );
   transform: rotate(12deg);
 }
 .medallionCount {
@@ -233,7 +235,8 @@
   border: 1px solid var(--upcoming-edge);
   background: var(--upcoming-wash);
   color: var(--upcoming-ink);
-  box-shadow: inset 0 1px 0 #ffffff0a;
+  box-shadow: inset 0 1px 0
+    color-mix(in srgb, var(--palette-peach) 3.922%, transparent);
 }
 .upcomingCard .cardForeground {
   gap: 12px;
@@ -384,8 +387,8 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    var(--milestone-accent, #b3a8b7),
-    var(--milestone-pop, #8f8795)
+    var(--milestone-accent, var(--muted-foreground)),
+    var(--milestone-pop, var(--surface-inverse))
   );
 }
 .scopeNote {
@@ -917,9 +920,9 @@
 }
 @media (prefers-color-scheme: dark) {
   .page {
-    --upcoming-ink: #bfb8c5;
-    --upcoming-wash: #302c341f;
-    --upcoming-edge: #bfb8c530;
+    --upcoming-ink: var(--muted-foreground);
+    --upcoming-wash: color-mix(in srgb, var(--surface-sunken) 45%, transparent);
+    --upcoming-edge: var(--border);
   }
   .ratingComparison[data-trend="improved"] .trendPill {
     color: #6ee7b7;
@@ -1005,7 +1008,8 @@
   .earnedCard:hover {
     border-color: var(--milestone-spark);
     box-shadow:
-      inset 0 1px 0 #ffffff30,
+      inset 0 1px 0
+        color-mix(in srgb, var(--palette-peach) 18.824%, transparent),
       0 7px 27px color-mix(in srgb, var(--milestone-accent) 22%, transparent);
   }
   .upcomingCard:hover,
@@ -1018,4 +1022,22 @@
   .milestoneCard {
     transition: none;
   }
+}
+
+.pageHeader,
+.sectionTitle {
+  color: var(--canvas-foreground);
+  text-shadow: 0 1px 3px var(--palette-ink);
+}
+.pageHeader > p,
+.sectionDescription {
+  color: var(--canvas-muted-foreground);
+  text-shadow: 0 1px 3px var(--palette-ink);
+}
+
+.backLink,
+.scopeNote,
+.sectionTitle > span {
+  color: var(--canvas-muted-foreground);
+  text-shadow: 0 1px 3px var(--palette-ink);
 }

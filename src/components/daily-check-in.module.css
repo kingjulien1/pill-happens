@@ -409,3 +409,19 @@
     transition: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .card {
+    background: color-mix(in srgb, var(--surface-reading) 90%, transparent);
+    color: var(--surface-reading-foreground);
+  }
+  .card[data-filled="true"] {
+    background:
+      linear-gradient(
+        115deg,
+        color-mix(in srgb, var(--palette-flame) 14%, transparent),
+        transparent 75%
+      ),
+      color-mix(in srgb, var(--surface-reading) 94%, transparent);
+  }
+}

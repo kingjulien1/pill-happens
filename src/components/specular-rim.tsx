@@ -4,6 +4,7 @@
 // MIT + Commons Clause; see /licenses/react-bits.txt.
 // https://github.com/DavidHDev/react-bits/tree/main/src/ts-default/Components/SpecularButton
 import { useEffect, useRef } from "react";
+import { APP_COLORS } from "@/lib/app-theme";
 
 const PAD = 24;
 const TAU = Math.PI * 2;
@@ -293,7 +294,7 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const readPalette = () => {
       const styles = getComputedStyle(button);
       return {
-        line: readColor(styles, "--intake-rim-line", "#fff1d6"),
+        line: readColor(styles, "--intake-rim-line", APP_COLORS.peach),
         base: readColor(styles, "--intake-rim-base", "#f97316"),
         edge: readColor(styles, "--intake-rim-guard", "#9a3412"),
         glow: readColor(styles, "--intake-rim-glow", "#f97316"),

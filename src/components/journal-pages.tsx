@@ -59,7 +59,7 @@ function PageHeading({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6">
+    <div className="canvas-copy mb-6">
       <h1 className="text-2xl font-semibold tracking-tight">
         <HeadingText title={title} context={context} />
       </h1>
@@ -383,7 +383,7 @@ export function MedicationsPage() {
         onArchivedChange={setShowArchived}
       />
       <div
-        className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/30 px-3 py-2.5"
+        className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/90 px-3 py-2.5"
         data-medication-history-notice
       >
         <ActionIcon name="retry" className="mt-0.5 size-4 text-foreground/70" />

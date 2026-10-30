@@ -2,7 +2,7 @@
 
 /**
  * Grainient by David Haz / React Bits, adapted for this Next.js application.
- * Original shaders and default settings are preserved.
+ * Palette colors remain literal in both system modes; no white tint is added.
  * Source: https://github.com/DavidHDev/react-bits/tree/main/src/ts-tailwind/Backgrounds/Grainient
  * Copyright (c) 2026 David Haz. MIT + Commons Clause; see /licenses/react-bits.txt.
  */
@@ -17,6 +17,7 @@ import {
   getBackgroundFrameElapsed,
   getBackgroundResolution,
 } from "@/lib/background-rendering";
+import { APP_BACKGROUND_COLORS } from "@/lib/app-theme";
 
 export type GrainientType = "linear" | "radial";
 
@@ -44,7 +45,6 @@ export interface GrainientProps extends Omit<
   clickSwirl?: boolean;
   intro?: boolean;
   lightMode?: boolean;
-  paletteMode?: "auto" | "literal";
   dpr?: number;
   maxDpr?: number;
   maxPixels?: number;
@@ -72,7 +72,6 @@ type Settings = {
   clickSwirl: boolean;
   intro: boolean;
   lightMode: boolean;
-  paletteMode: "auto" | "literal";
   dpr?: number;
   maxDpr?: number;
   maxPixels?: number;
@@ -102,9 +101,8 @@ const STIR_LIFE = 1.3;
 const STIR_STEP = 0.06;
 const TWIRL_LIFE = 2.6;
 const INTRO_SECONDS = 1.6;
-const DEFAULT_COLORS = ["#120f17", "#2a0f0a", "#9a3412", "#f97316", "#fed7aa"];
+const DEFAULT_COLORS = APP_BACKGROUND_COLORS;
 const TYPES: Record<string, number> = { linear: 0, radial: 1 };
-const LIFT = 0.2;
 
 const VERTEX = `#version 300 es
 out vec2 vUv;
@@ -252,7 +250,8 @@ void main() {
     float diffuse = dot(normal, light) - light.z;
     lab = uRamp[0] + (lab - uRamp[0]) * (1.0 + (diffuse * 0.35 + max(diffuse, 0.0) * diffuse * 0.6) * uSilk);
   }
-  lab = mix(uRamp[0], lab, smoothstep(0.0, 1.0, uReveal * 1.5 - length(vUv - 0.5) * 0.6));
+  vec3 introBase = uType == 1 ? uRamp[uCount - 1] : uRamp[0];
+  lab = mix(introBase, lab, smoothstep(0.0, 1.0, uReveal * 1.5 - length(vUv - 0.5) * 0.6));
   lab.x = (lab.x - 0.55) * uContrast + 0.55;
   lab.yz *= uSaturation;
   outColor = vec4(encode(labToRgb(lab)), 1.0);
@@ -381,7 +380,6 @@ const Grainient = ({
   clickSwirl = true,
   intro = true,
   lightMode = false,
-  paletteMode = "auto",
   dpr,
   maxDpr,
   maxPixels,
@@ -415,7 +413,6 @@ const Grainient = ({
     clickSwirl,
     intro,
     lightMode,
-    paletteMode,
     dpr,
     maxDpr,
     maxPixels,
@@ -542,20 +539,11 @@ const Grainient = ({
 
     const syncPalette = () => {
       const s = settingsRef.current;
-      const key = `${s.colors.join(",")}|${s.lightMode}|${s.paletteMode}`;
+      const key = s.colors.join(",");
       if (key === paletteKey) return;
       paletteKey = key;
       const labs = s.colors.map((color) => toLab(parse(color)));
-      if (!s.lightMode || s.paletteMode === "literal") {
-        labs.forEach((lab, i) => ramp.set(lab, i * 3));
-      } else {
-        const blank = labs.map(([L]) => Math.abs(L - labs[0][0]) < 0.1);
-        const tints = labs.filter((_, i) => !blank[i]).reverse();
-        labs.forEach((_, i) => {
-          const [L, a, b] = blank[i] ? [1, 0, 0] : (tints.shift() as number[]);
-          ramp.set([L + (1 - L) * LIFT, a * (1 - LIFT), b * (1 - LIFT)], i * 3);
-        });
-      }
+      labs.forEach((lab, i) => ramp.set(lab, i * 3));
     };
 
     const draw = () => {
@@ -896,20 +884,10 @@ const Grainient = ({
 
   // The palette wash remains visible before the first frame or without WebGL.
   // A caller can enable mobile CSS drift independently of the shader colors.
-  const fallbackColors =
-    lightMode && paletteMode === "auto"
-      ? [
-          "#fffdf6",
-          ...palette
-            .slice(1)
-            .reverse()
-            .map((color) => `color-mix(in srgb, ${color} 35%, #fffdf6)`),
-        ]
-      : palette;
   const fallbackBackground =
     type === "radial"
-      ? `radial-gradient(ellipse at center, ${[...fallbackColors].reverse().join(", ")})`
-      : `linear-gradient(${angle}deg, ${fallbackColors.join(", ")})`;
+      ? `radial-gradient(ellipse at center, ${[...palette].reverse().join(", ")})`
+      : `linear-gradient(${angle}deg, ${palette.join(", ")})`;
 
   return (
     <div
@@ -919,7 +897,7 @@ const Grainient = ({
         .join(" ")}
       style={{
         backgroundColor:
-          lightMode && paletteMode === "auto" ? "#fffdf6" : palette[0],
+          type === "radial" ? palette[palette.length - 1] : palette[0],
         backgroundImage: fallbackBackground,
         ...style,
       }}

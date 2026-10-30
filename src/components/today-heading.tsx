@@ -38,7 +38,7 @@ export function TodayHeading({
   }).format(now);
 
   return (
-    <header className="mb-[37px]" data-today-heading>
+    <header className="canvas-copy mb-[37px]" data-today-heading>
       <div className="flex items-center justify-between gap-2 max-[359px]:-mx-2 max-[359px]:gap-1">
         <h1 className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]">
           <HeadingMarker name="date" />

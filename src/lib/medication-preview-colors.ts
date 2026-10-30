@@ -1,3 +1,4 @@
+import { APP_COLORS } from "./app-theme";
 import { getMedicationColor } from "./medication-appearance";
 import { TAILWIND_MEDICATION_COLORS } from "./medication-palette";
 
@@ -158,7 +159,7 @@ export function getMedicationPreviewSurface(hex: string): string | undefined {
   const luminance = red * 0.2126 + green * 0.7152 + blue * 0.0722;
   // Opaque neutral backplates work in either system theme. Middle pigments
   // retain the usual popover surface rather than adding an unnecessary fill.
-  if (luminance < 0.16) return "#f4f4f5";
-  if (luminance > 0.28) return "#18181b";
+  if (luminance < 0.16) return APP_COLORS.peach;
+  if (luminance > 0.28) return APP_COLORS.ink;
   return undefined;
 }

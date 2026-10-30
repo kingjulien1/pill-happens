@@ -19,7 +19,7 @@ export function MedicationsHeading({
   ).length;
 
   return (
-    <header className="mb-6" data-medications-heading>
+    <header className="canvas-copy mb-6" data-medications-heading>
       <div
         className="flex min-w-0 items-center justify-between gap-2 sm:gap-3"
         data-medications-title-row
@@ -91,7 +91,7 @@ export function MedicationListHeading({
 }) {
   return (
     <div
-      className="mb-4 flex min-w-0 items-center justify-between gap-3"
+      className="canvas-copy mb-4 flex min-w-0 items-center justify-between gap-3"
       data-medications-list-heading
     >
       <div className="flex min-w-0 items-center gap-2 text-foreground">

@@ -13,8 +13,12 @@
     "test": "node --import tsx --test src/lib/*.test.ts src/lib/server/*.test.ts",
     "icons:tablets": "node --import tsx scripts/generate-tablet-icons.ts",
     "icons:tablets:check": "node --import tsx scripts/generate-tablet-icons.ts --check",
+    "icons:app": "node --import tsx scripts/generate-app-icons.ts",
+    "icons:app:check": "node --import tsx scripts/generate-app-icons.ts --check",
     "palette:generate": "node --import tsx scripts/generate-medication-palette.ts",
     "palette:check": "node --import tsx scripts/generate-medication-palette.ts --check",
+    "theme:generate": "node --import tsx scripts/generate-app-theme.ts",
+    "theme:check": "node --import tsx scripts/generate-app-theme.ts --check",
     "secrets": "node scripts/generate-secrets.mjs"
   },
   "dependencies": {

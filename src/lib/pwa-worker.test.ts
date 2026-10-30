@@ -203,12 +203,19 @@ test("evicted public storage still returns an honest unavailable response", asyn
 test("activation cleans only old app public caches and updates require an explicit message", async () => {
   const sw = worker();
   await sw.lifecycle("install");
+  const currentCache = [...sw.stores.keys()][0];
+  assert.match(currentCache, /^pill-happens-public-/);
+  assert.notEqual(currentCache, "pill-happens-public-v3");
+  sw.stores.set("pill-happens-public-v3", new Map());
   sw.stores.set("pill-happens-public-old", new Map());
   sw.stores.set("another-app-cache", new Map());
   await sw.lifecycle("activate");
-  assert.deepEqual(sw.deleted, ["pill-happens-public-old"]);
+  assert.deepEqual(
+    new Set(sw.deleted),
+    new Set(["pill-happens-public-v3", "pill-happens-public-old"]),
+  );
   assert.equal(sw.stores.has("another-app-cache"), true);
-  assert.equal(sw.stores.has("pill-happens-public-v3"), true);
+  assert.equal(sw.stores.has(currentCache), true);
   assert.equal(sw.claimed, 1);
   assert.equal(sw.skipped, 0);
   await sw.lifecycle("message", { type: "UNRELATED" });

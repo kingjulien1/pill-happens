@@ -9,19 +9,19 @@ export default function NotFound() {
       <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-foreground">
         <BrandMark className="size-6" />
       </div>
-      <h1 className="text-2xl font-semibold tracking-tight">
+      <h1 className="canvas-copy text-2xl font-semibold tracking-tight">
         <HeadingText
           title="Page Not Found"
           context="404"
           className="justify-center"
         />
       </h1>
-      <p className="mt-2 max-w-64 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-2 max-w-64 text-sm leading-relaxed text-canvas-muted-foreground">
         Let’s head back to your daily journal.
       </p>
       <Link
         href="/"
-        className="mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-action-background px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-action-background/90"
+        className="mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-action-background px-6 text-sm font-medium text-action-foreground transition-colors hover:bg-action-background/90"
       >
         <ActionIcon name="back" />
         Back to today

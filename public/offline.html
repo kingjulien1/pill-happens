@@ -9,36 +9,46 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="theme-color"
-      content="#f6f2f4"
+      content="#f3cda2"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#120f17"
+      content="#2a0f0a"
       media="(prefers-color-scheme: dark)"
     />
     <title>Offline · Pill happens</title>
     <style>
+      /* BEGIN GENERATED APP THEME */
       :root {
         color-scheme: light;
-        --background: #f6f2f4;
-        --foreground: #211b1b;
-        --muted: #51414a;
-        --surface: #fffdfd;
-        --edge: #d8cbd2;
-        --glow: #e58f79;
+        --background: #f3cda2;
+        --foreground: #2a0f0a;
+        --card: #fad3a7;
+        --muted-foreground: #503327;
+        --primary: #2a0f0a;
+        --primary-foreground: #fed7aa;
+        --border: #2a0f0a3d;
+        --ring: #623cea;
+        --shadow: #2a0f0a38;
+        --glow: #f9731661;
       }
       @media (prefers-color-scheme: dark) {
         :root {
           color-scheme: dark;
-          --background: #120f17;
+          --background: #2a0f0a;
           --foreground: #fed7aa;
-          --muted: #bda084;
-          --surface: #211b1b;
-          --edge: #50423a;
-          --glow: #9a3412;
+          --card: #31110a;
+          --muted-foreground: #c39f7d;
+          --primary: #fed7aa;
+          --primary-foreground: #2a0f0a;
+          --border: #fed7aa3b;
+          --ring: #fed7aa;
+          --shadow: #2a0f0a80;
+          --glow: #f9731680;
         }
       }
+      /* END GENERATED APP THEME */
       * {
         box-sizing: border-box;
       }
@@ -75,11 +85,11 @@
       }
       section {
         padding: 28px;
-        border: 1px solid var(--edge);
+        border: 1px solid var(--border);
         border-radius: 24px;
-        background: var(--surface);
+        background: var(--card);
         text-align: center;
-        box-shadow: 0 12px 40px #120f1705;
+        box-shadow: 0 12px 40px var(--shadow);
       }
       .symbol {
         display: grid;
@@ -98,7 +108,7 @@
       }
       p {
         margin: 10px 0 0;
-        color: var(--muted);
+        color: var(--muted-foreground);
         font-size: 13px;
       }
       a {
@@ -110,20 +120,14 @@
         margin-top: 24px;
         padding: 12px 20px;
         border-radius: 14px;
-        background: #fed7aa;
-        color: #120f17;
+        background: var(--primary);
+        color: var(--primary-foreground);
         text-decoration: none;
         font-weight: 550;
       }
       a:focus-visible {
-        outline: 2px solid var(--foreground);
+        outline: 2px solid var(--ring);
         outline-offset: 4px;
-      }
-      @media (prefers-color-scheme: light) {
-        a {
-          background: #211b1b;
-          color: #fed7aa;
-        }
       }
       .note {
         margin-top: 18px;

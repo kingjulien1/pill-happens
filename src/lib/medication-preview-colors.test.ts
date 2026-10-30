@@ -240,10 +240,10 @@ test("wave color results are independent and all selectable choices use register
 
 test("extreme preview pigments receive opaque contrasting neutral surfaces", () => {
   for (const pigment of ["#000000", hex("tw-zinc-950"), hex("tw-blue-900")]) {
-    assert.equal(getMedicationPreviewSurface(pigment), "#f4f4f5");
+    assert.equal(getMedicationPreviewSurface(pigment), "#fed7aa");
   }
   for (const pigment of ["#ffffff", hex("tw-zinc-50"), hex("tw-yellow-100")]) {
-    assert.equal(getMedicationPreviewSurface(pigment), "#18181b");
+    assert.equal(getMedicationPreviewSurface(pigment), "#2a0f0a");
   }
 });
 

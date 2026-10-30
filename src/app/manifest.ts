@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { APP_THEME_VALUES } from "@/lib/app-theme";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Pill happens",
@@ -9,8 +10,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     prefer_related_applications: false,
-    background_color: "#f6f2f4",
-    theme_color: "#120f17",
+    background_color: APP_THEME_VALUES.light.background,
+    theme_color: APP_THEME_VALUES.dark.background,
     icons: [
       {
         src: "/icons/app/icon-192.png",

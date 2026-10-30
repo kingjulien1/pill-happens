@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
 import { JournalBackground } from "@/components/journal-background";
 import { PwaProvider } from "@/components/pwa-provider";
+import { APP_THEME_VALUES } from "@/lib/app-theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,8 +33,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f2f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#120f17" },
+    {
+      media: "(prefers-color-scheme: light)",
+      color: APP_THEME_VALUES.light.background,
+    },
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: APP_THEME_VALUES.dark.background,
+    },
   ],
 };
 
@@ -53,6 +60,13 @@ export default function RootLayout({
             position="top-center"
             richColors
             closeButton
+            toastOptions={{
+              style: {
+                background: "var(--popover)",
+                color: "var(--popover-foreground)",
+                borderColor: "var(--border)",
+              },
+            }}
           />
         </PwaProvider>
       </body>

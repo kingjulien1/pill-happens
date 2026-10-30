@@ -17,14 +17,14 @@ export default function ErrorPage({
       <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-foreground">
         <BrandMark className="size-6" />
       </div>
-      <h1 className="text-2xl font-semibold tracking-tight">
+      <h1 className="canvas-copy text-2xl font-semibold tracking-tight">
         <HeadingText
           title="Something Went Wrong"
           context="Please Try Again"
           className="justify-center"
         />
       </h1>
-      <p className="mt-2 max-w-64 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-2 max-w-64 text-sm leading-relaxed text-canvas-muted-foreground">
         Something interrupted this page. Try loading it again.
       </p>
       <Button onClick={reset} className="mt-6 h-12 gap-2.5 rounded-xl px-6">
@@ -33,7 +33,7 @@ export default function ErrorPage({
       </Button>
       <Link
         href="/"
-        className="mt-3 inline-flex min-h-11 items-center px-4 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        className="mt-3 inline-flex min-h-11 items-center px-4 text-sm text-canvas-muted-foreground underline-offset-4 hover:text-canvas-foreground hover:underline"
       >
         Back to today
       </Link>

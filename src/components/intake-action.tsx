@@ -71,7 +71,7 @@ export function IntakeAction({
         <div className="flex justify-center pt-1">
           <Link
             href="/guide"
-            className="inline-flex min-h-6 items-center justify-center rounded-md px-4 text-[9px] leading-none text-muted-foreground/70 focus-visible:text-foreground"
+            className="inline-flex min-h-6 items-center justify-center rounded-md px-4 text-[9px] leading-none text-canvas-muted-foreground/70 focus-visible:text-canvas-foreground"
             aria-label="Open Getting Started and Guide"
           >
             Guide

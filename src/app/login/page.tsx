@@ -19,7 +19,7 @@ export default async function LoginPage() {
       <div className="mb-28 flex justify-center sm:mb-32">
         <Brand />
       </div>
-      <header className="mb-6 text-center">
+      <header className="canvas-copy mb-6 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           <HeadingText
             title="Sign In"
@@ -56,10 +56,10 @@ export default async function LoginPage() {
           <LoginForm />
         )}
       </section>
-      <p className="mt-6 text-center text-xs text-muted-foreground">
+      <p className="mt-6 text-center text-xs text-canvas-muted-foreground">
         One day at a time.
       </p>
-      <div className="mt-2 flex justify-center">
+      <div className="mx-auto mt-2 flex w-fit justify-center rounded-xl bg-surface-reading">
         <InstallAppButton />
       </div>
     </main>

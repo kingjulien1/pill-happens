@@ -12,7 +12,8 @@
   background: color-mix(in srgb, var(--popover) 96%, transparent);
   -webkit-backdrop-filter: blur(48px);
   backdrop-filter: blur(48px);
-  box-shadow: 0 14px 45px #120f1733;
+  box-shadow: 0 14px 45px
+    color-mix(in srgb, var(--palette-ink) 20%, transparent);
   transform-origin: var(--transform-origin);
   transition:
     opacity 180ms ease,
@@ -29,7 +30,7 @@
     ),
     color-mix(in srgb, var(--popover) 95%, transparent);
   box-shadow:
-    0 14px 45px #120f1733,
+    0 14px 45px color-mix(in srgb, var(--palette-ink) 20%, transparent),
     0 0 30px color-mix(in srgb, var(--party-accent) 22%, transparent),
     inset 0 0 0 4px color-mix(in srgb, var(--foreground) 4%, transparent);
 }
@@ -107,8 +108,9 @@
   background: linear-gradient(135deg, var(--party-accent), var(--party-pop));
   box-shadow:
     0 0 24px color-mix(in srgb, var(--party-pop) 35%, transparent),
-    inset 0 0 0 4px #ffffff24;
-  color: #fff1d6;
+    inset 0 0 0 4px
+      color-mix(in srgb, var(--palette-peach) 14.118%, transparent);
+  color: var(--palette-peach);
 }
 .current {
   display: flex;

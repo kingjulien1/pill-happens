@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {!data && !error && (
           <div
             role="status"
-            className="flex min-h-64 flex-1 items-center justify-center gap-2 text-sm text-muted-foreground"
+            className="canvas-copy flex min-h-64 flex-1 items-center justify-center gap-2 text-sm"
           >
             <ActionIcon name="loading" className="animate-spin" />
             Opening your space…

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { APP_COLORS } from "@/lib/app-theme";
 import {
   MEDICATION_CLASS_MARKERS,
   MedicationClassIcon,
@@ -97,7 +98,7 @@ export function IntakeCard({
       data-opioid={isOpioid || undefined}
       data-medication-classification={getMedicationClassification(medication)}
       data-light-accent={
-        getMedicationPreviewSurface(color.hex) === "#18181b" || undefined
+        getMedicationPreviewSurface(color.hex) === APP_COLORS.ink || undefined
       }
     >
       <span aria-hidden="true" className="intake-card-glass">
