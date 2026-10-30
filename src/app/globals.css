@@ -299,7 +299,12 @@
 .intake-group[data-stack-moving="true"]
   .intake-stack-measure
   > .intake-log-card {
-  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1)
+  transition:
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--stack-delay, 0ms),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--stack-delay, 0ms);
+}
+.intake-group[data-stack-moving="true"] .intake-card-benzo-rim {
+  transition: border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1)
     var(--stack-delay, 0ms);
 }
 .intake-group[data-stack-moving="true"] .intake-card-content {
@@ -500,6 +505,7 @@
   transform: rotate(180deg);
 }
 .intake-log-card {
+  --entry-card-radius: 21px;
   --entry-rim-width: 4px;
   --entry-card-padding: 15px;
   position: relative;
@@ -508,7 +514,7 @@
   width: 100%;
   overflow: hidden;
   border: 0;
-  border-radius: 21px;
+  border-radius: var(--entry-card-radius);
   background: transparent;
   color: var(--palette-peach);
   text-align: left;
@@ -582,8 +588,9 @@
     border-radius: inherit;
     background-color: var(--entry-rim-color);
     background-image: none;
-    -webkit-backdrop-filter: blur(72px);
-    backdrop-filter: blur(72px);
+    /* Frost belongs on the base; rim blur can obscure its own foreground. */
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     box-shadow: none;
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -606,6 +613,24 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
+}
+/* Keep a full side turn within each 12px reveal, then restore normal corners. */
+.intake-stack-slot[data-stack-collapsed="true"] .intake-log-card {
+  --entry-card-radius: 12px;
+}
+/* Folded previews use a simple inside rim, free of masked blur edge cutoffs. */
+.intake-stack-slot[data-stack-collapsed="true"] .intake-log-card::before {
+  border: var(--entry-rim-width) solid var(--entry-folded-rim-color);
+  padding: 0;
+  background: none;
+  -webkit-mask: none;
+  mask: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+.intake-stack-slot[data-stack-collapsed="true"] .intake-card-benzo-rim {
+  border-color: var(--entry-folded-rim-color);
 }
 .intake-card-ink {
   position: absolute;
@@ -755,7 +780,7 @@
   z-index: 3;
   inset: calc(var(--entry-rim-width) + 1px);
   border: 1px solid var(--entry-benzo-border);
-  border-radius: calc(21px - var(--entry-rim-width) - 1px);
+  border-radius: calc(var(--entry-card-radius) - var(--entry-rim-width) - 1px);
   pointer-events: none;
 }
 .intake-card-bottom {
@@ -913,7 +938,7 @@
   z-index: 1;
   inset: var(--entry-rim-width);
   overflow: hidden;
-  border-radius: calc(21px - var(--entry-rim-width));
+  border-radius: calc(var(--entry-card-radius) - var(--entry-rim-width));
   pointer-events: none;
 }
 .intake-card-shine-beam {

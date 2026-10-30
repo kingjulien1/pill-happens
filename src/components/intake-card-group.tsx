@@ -36,11 +36,13 @@ function stackLayout(
     expandedHeight += naturalHeight + (depth < count - 1 ? 8 : 0);
     const previewDepth = Math.min(depth, 6);
     const scale = collapsed ? 1 - previewDepth * 0.008 : 1;
-    // Whole rear faces sit below the front's top and reveal their own rounded
-    // bottom edges. Long notes are contained by the card, not a clipped slot.
+    // Extend full rear faces upward, keeping every existing 12px peek bottom.
+    // Their extra height is decorative; intrinsic content still measures the
+    // expanded card, so long notes and disclosure geometry stay independent.
     const y = collapsed
-      ? frontHeight * (1 - scale) + previewDepth * 12
+      ? frontHeight * (1 - scale) + previewDepth * 4
       : expandedY;
+    const foldedHeight = frontHeight + (previewDepth * 8) / scale;
     const delay =
       depth === 0
         ? 0
@@ -50,7 +52,7 @@ function stackLayout(
     layouts.push({
       "--stack-y": `${y}px`,
       "--stack-scale": scale,
-      "--stack-face-height": `${collapsed && depth > 0 ? frontHeight : naturalHeight}px`,
+      "--stack-face-height": `${collapsed && depth > 0 ? foldedHeight : naturalHeight}px`,
       "--stack-delay": `${delay}ms`,
       "--stack-layer": count - depth,
     } as CSSProperties);
