@@ -1,0 +1,1021 @@
+.page {
+  min-width: 0;
+  --upcoming-ink: #625b65;
+  --upcoming-wash: #ffffff54;
+  --upcoming-edge: #80758338;
+}
+.pageHeader h1 {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+.headingTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.pageHeader > p,
+.sectionDescription,
+.scopeNote {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.85;
+}
+.pageHeader > p {
+  margin-top: 10px;
+}
+.runStats,
+.earnedStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 22px 0 28px;
+  padding: 14px 12px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 14%, transparent);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--card) 50%, transparent);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+}
+.runStats > div + div,
+.earnedStats > div + div {
+  padding-left: 10px;
+  border-left: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+.runStats dt,
+.earnedStats dt {
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+.runStats dd,
+.earnedStats dd {
+  margin-top: 5px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.runStats dd span {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.sectionTitle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.sectionTitle h2 {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+.sectionTitle > span {
+  flex-shrink: 0;
+  max-width: 42%;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+  text-align: right;
+}
+.cardList {
+  display: grid;
+  gap: 12px;
+}
+.milestoneCard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: block;
+  min-width: 0;
+  border-radius: 22px;
+  color: var(--foreground);
+  -webkit-backdrop-filter: blur(48px);
+  backdrop-filter: blur(48px);
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+.earnedCard,
+.earnedHero {
+  border: 1px solid
+    color-mix(in srgb, var(--milestone-accent) 70%, var(--foreground));
+  background: color-mix(in srgb, var(--card) 84%, transparent);
+  box-shadow:
+    inset 0 1px 0 #ffffff20,
+    0 5px 22px color-mix(in srgb, var(--milestone-accent) 12%, transparent);
+}
+.cardForeground {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 13px;
+  padding: 18px 14px;
+}
+.medallion {
+  position: relative;
+  display: flex;
+  width: 68px;
+  min-height: 78px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid color-mix(in srgb, var(--milestone-spark) 70%, transparent);
+  border-radius: 21px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--milestone-accent) 24%, var(--card)),
+    color-mix(in srgb, var(--milestone-pop) 12%, var(--card))
+  );
+  box-shadow:
+    inset 0 1px 0 #ffffff45,
+    0 0 0 4px color-mix(in srgb, var(--milestone-accent) 9%, transparent),
+    0 5px 15px color-mix(in srgb, var(--milestone-pop) 14%, transparent);
+  transform: rotate(-5deg);
+}
+.medallionEmoji {
+  position: absolute;
+  top: -13px;
+  right: -7px;
+  font-size: 23px;
+  filter: drop-shadow(0 3px 5px #120f1730);
+  transform: rotate(12deg);
+}
+.medallionCount {
+  max-width: 100%;
+  padding-inline: 4px;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.06em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.medallionUnit {
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+  font-size: 9px;
+  line-height: 1.3;
+}
+.cardCopy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+}
+.cardEyebrow {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: color-mix(in srgb, var(--foreground) 73%, transparent);
+  font-size: 9px;
+  font-weight: 450;
+  line-height: 1.4;
+}
+.cardEyebrow > svg {
+  color: var(--milestone-spark);
+}
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.cardContext {
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.cardArrow {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--milestone-spark) 26%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--card) 30%, transparent);
+}
+.cardRibbon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 13px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--milestone-spark) 30%, transparent);
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--milestone-accent) 14%, var(--card)),
+    color-mix(in srgb, var(--milestone-pop) 10%, var(--card))
+  );
+  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+  font-size: 9px;
+  line-height: 1.4;
+}
+.upcomingCard,
+.upcomingHero {
+  border: 1px solid var(--upcoming-edge);
+  background: var(--upcoming-wash);
+  color: var(--upcoming-ink);
+  box-shadow: inset 0 1px 0 #ffffff0a;
+}
+.upcomingCard .cardForeground {
+  gap: 12px;
+  padding: 14px 12px;
+}
+.upcomingCard .medallion {
+  width: 48px;
+  min-height: 54px;
+  gap: 1px;
+  border: 1px solid var(--upcoming-edge);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--upcoming-ink) 4%, transparent);
+  box-shadow: none;
+  transform: none;
+}
+.upcomingCard .medallionEmoji {
+  display: none;
+}
+.upcomingCard .medallionCount {
+  font-size: 21px;
+  font-weight: 500;
+}
+.upcomingCard .medallionUnit,
+.upcomingCard .cardEyebrow,
+.upcomingCard .cardContext {
+  color: color-mix(in srgb, var(--upcoming-ink) 76%, transparent);
+}
+.upcomingCard .cardEyebrow > svg {
+  color: inherit;
+}
+.upcomingCard .cardTitle {
+  font-size: 12px;
+  font-weight: 450;
+}
+.upcomingCard .cardCopy {
+  gap: 4px;
+}
+.upcomingCard .cardArrow {
+  border-color: var(--upcoming-edge);
+  background: transparent;
+}
+.firstMilestone {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px 16px;
+  border: 1px dashed color-mix(in srgb, var(--foreground) 25%, transparent);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--card) 35%, transparent);
+}
+.firstMilestone > span {
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+}
+.firstMilestone h3 {
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.6;
+}
+.firstMilestone p {
+  margin-top: 5px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.8;
+}
+.encouragement {
+  position: relative;
+  margin: 32px 0;
+  padding: 24px 18px 20px;
+  border-block: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
+  text-align: center;
+}
+.encouragement::before,
+.encouragement::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  height: 20px;
+  background: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--milestone-accent) 65%, transparent)
+  );
+}
+.encouragement::before {
+  top: -21px;
+}
+.encouragement::after {
+  bottom: -21px;
+  transform: rotate(180deg);
+}
+.encouragementStar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 10px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--milestone-spark) 30%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--milestone-accent) 9%, var(--card));
+  color: var(--milestone-spark);
+  transform: rotate(-6deg);
+}
+.encouragement h2 {
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+.encouragement > p {
+  margin: 7px auto 15px;
+  max-width: 270px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.8;
+}
+.separatorContext {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.7;
+}
+.runProgress {
+  min-width: 0;
+}
+.progressLabels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+.progressLabels strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.progressTrack {
+  height: 5px;
+  overflow: hidden;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+.progressTrack > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--milestone-accent, #b3a8b7),
+    var(--milestone-pop, #8f8795)
+  );
+}
+.scopeNote {
+  margin: 24px 2px 9px;
+  font-size: 10px;
+}
+.backLink {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.detailHero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 26px;
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+}
+.heroForeground {
+  position: relative;
+  z-index: 1;
+  padding: 18px 20px 23px;
+  text-align: center;
+}
+.heroTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+  font-size: 9px;
+  line-height: 1.5;
+}
+.heroTopline > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.heroEmoji {
+  position: relative;
+  display: grid;
+  width: 66px;
+  height: 66px;
+  margin: 29px auto 13px;
+  place-items: center;
+  border: 1px solid
+    color-mix(in srgb, var(--milestone-spark) 64%, var(--foreground));
+  border-radius: 23px;
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--milestone-accent) 28%, var(--card)),
+    color-mix(in srgb, var(--milestone-pop) 14%, var(--card))
+  );
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--milestone-spark) 7%, transparent),
+    0 10px 30px color-mix(in srgb, var(--milestone-pop) 18%, transparent);
+  font-size: 35px;
+  transform: rotate(-7deg);
+}
+.detailHero h1 > span {
+  display: block;
+  font-size: 64px;
+  font-weight: 650;
+  letter-spacing: -0.07em;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+.detailHero h1 > small {
+  display: block;
+  margin-top: 3px;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.detailHero h2 {
+  margin-top: 17px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.5;
+}
+.heroEncouragement {
+  max-width: 270px;
+  margin: 8px auto 20px;
+  color: color-mix(in srgb, var(--foreground) 76%, transparent);
+  font-size: 11px;
+  line-height: 1.85;
+}
+.earnedDate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--milestone-spark) 30%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card) 38%, transparent);
+  color: color-mix(in srgb, var(--foreground) 82%, transparent);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.upcomingHero .heroTopline,
+.upcomingHero h1 > small,
+.upcomingHero .heroEncouragement,
+.upcomingHero .progressLabels,
+.upcomingHero .progressLabels strong {
+  color: var(--upcoming-ink);
+}
+.upcomingHero .heroForeground {
+  padding: 17px 19px 24px;
+}
+.upcomingHero .heroEmoji {
+  width: 53px;
+  height: 53px;
+  margin-top: 23px;
+  border-color: var(--upcoming-edge);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--upcoming-ink) 5%, transparent);
+  color: var(--upcoming-ink);
+  box-shadow: none;
+  font-size: 29px;
+  transform: none;
+}
+.upcomingHero h1 > span {
+  font-size: 50px;
+  font-weight: 500;
+}
+.upcomingHero h2 {
+  font-size: 15px;
+  font-weight: 500;
+}
+.upcomingHero .heroEncouragement {
+  font-size: 10px;
+}
+.upcomingSummary {
+  padding: 21px 3px 7px;
+  color: var(--upcoming-ink);
+}
+.upcomingSummary > h2 {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+.upcomingSummary > p,
+.futureContent p {
+  margin-top: 7px;
+  font-size: 10px;
+  line-height: 1.85;
+}
+.futureContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 17px 13px;
+  border: 1px dashed var(--upcoming-edge);
+  border-radius: 16px;
+  background: var(--upcoming-wash);
+}
+.futureContent > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.futureContent h3 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+.todayAction {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+  border: 1px solid var(--upcoming-edge);
+  border-radius: 13px;
+  background: var(--upcoming-wash);
+  color: var(--upcoming-ink);
+  font-size: 11px;
+}
+.earnedStats {
+  margin: 18px 0;
+  padding: 14px 10px;
+}
+.earnedStats dd {
+  font-size: 23px;
+}
+.coverageCard,
+.ratingComparison,
+.medicationComparison {
+  padding: 15px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--card) 80%, transparent);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+}
+.coverageTitle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+.coverageTitle h3 {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 550;
+}
+.coverageTitle > span {
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.coverageColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin-top: 16px;
+}
+.coverageColumns > div + div {
+  border-left: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  padding-left: 15px;
+}
+.coverageColumns h4 {
+  font-size: 10px;
+  font-weight: 550;
+}
+.coverageColumns p {
+  margin-top: 5px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+.coverageColumns dl {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.coverageColumns dl > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 3px 6px;
+}
+.coverageColumns dt,
+.coverageColumns dd {
+  font-size: 9px;
+  line-height: 1.6;
+}
+.coverageColumns dt {
+  color: var(--muted-foreground);
+}
+.coverageColumns dd {
+  font-weight: 550;
+}
+.coverageHint {
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.8;
+}
+.detailSection {
+  margin-top: 27px;
+}
+.sectionDescription {
+  margin: -3px 1px 14px;
+  font-size: 10px;
+}
+.ratingList,
+.medicationList,
+.memoryList {
+  display: grid;
+  gap: 10px;
+}
+.metricHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+.metricHeading h3 {
+  font-size: 12px;
+  font-weight: 550;
+}
+.trendPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 65%;
+  padding: 5px 6px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+  border-radius: 7px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.5;
+}
+.ratingComparison[data-trend="improved"] .trendPill {
+  border-color: #34d3995c;
+  background: #34d39912;
+  color: #047857;
+}
+.ratingComparison[data-trend="worse"] .trendPill {
+  border-color: #fb71855c;
+  background: #fb718512;
+  color: #be123c;
+}
+.ratingComparison[data-trend="unchanged"] .trendPill {
+  border-color: #fbbf245c;
+  background: #fbbf2412;
+  color: #92400e;
+}
+.metricValues {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 13px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.metricValues > div {
+  min-width: 0;
+}
+.metricValues > div > span {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+.metricValues strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: 550;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.metricValues small {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.metricCoverage,
+.metricExplanation {
+  margin-top: 10px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.85;
+}
+.metricExplanation {
+  margin-top: 6px;
+}
+.medicationHeading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.medicationDot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+.medicationHeading h3 {
+  min-width: 0;
+  max-width: 72%;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.medicationHeading > span:last-child {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.medicationAmounts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.medicationAmounts > div {
+  min-width: 0;
+}
+.medicationAmounts > div > span {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+.medicationAmounts strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.medicationAmounts small {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 8px;
+  font-weight: 400;
+}
+.medicationAmounts p {
+  margin-top: 6px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.7;
+}
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: 13px;
+}
+.dayGrid a {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 4px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  font-size: 9px;
+}
+.dayGrid a > span:first-child {
+  color: var(--muted-foreground);
+  font-size: 8px;
+}
+.dayGrid strong {
+  font-size: 10px;
+  font-weight: 550;
+}
+.dayNumber {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--muted-foreground);
+  font-size: 8px;
+}
+.moodSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 13px;
+}
+.moodSummary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 7px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--card) 54%, transparent);
+  font-size: 9px;
+}
+.moodSummary strong {
+  padding-left: 3px;
+  color: var(--muted-foreground);
+  font-size: 8px;
+  font-weight: 550;
+}
+.memoryList a {
+  display: block;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--card) 75%, transparent);
+}
+.memoryDate {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.memoryDate > svg:last-child {
+  margin-left: auto;
+}
+.memoryList p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  margin-top: 9px;
+  font-size: 11px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.helped {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.helped strong {
+  color: var(--foreground);
+  font-weight: 500;
+}
+.plainEmpty {
+  padding: 17px 15px;
+  border: 1px dashed color-mix(in srgb, var(--foreground) 22%, transparent);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--card) 40%, transparent);
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.9;
+}
+@media (prefers-color-scheme: dark) {
+  .page {
+    --upcoming-ink: #bfb8c5;
+    --upcoming-wash: #302c341f;
+    --upcoming-edge: #bfb8c530;
+  }
+  .ratingComparison[data-trend="improved"] .trendPill {
+    color: #6ee7b7;
+  }
+  .ratingComparison[data-trend="worse"] .trendPill {
+    color: #fda4af;
+  }
+  .ratingComparison[data-trend="unchanged"] .trendPill {
+    color: #fde68a;
+  }
+}
+@media (max-width: 359px) {
+  .runStats,
+  .earnedStats {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+  .runStats > div + div,
+  .earnedStats > div + div {
+    padding-left: 7px;
+  }
+  .runStats dd {
+    font-size: 18px;
+  }
+  .cardForeground {
+    gap: 11px;
+    padding-inline: 12px;
+  }
+  .medallion {
+    width: 58px;
+    min-height: 72px;
+  }
+  .cardTitle {
+    font-size: 13px;
+  }
+  .cardArrow {
+    width: 21px;
+    height: 25px;
+    border: 0;
+    background: transparent;
+  }
+  .cardRibbon {
+    font-size: 8px;
+  }
+  .sectionTitle {
+    gap: 8px;
+  }
+  .sectionTitle > span {
+    max-width: 36%;
+    font-size: 8px;
+  }
+  .heroForeground {
+    padding-inline: 15px;
+  }
+  .heroTopline {
+    font-size: 8px;
+  }
+  .coverageCard,
+  .ratingComparison,
+  .medicationComparison {
+    padding: 12px;
+  }
+  .coverageColumns {
+    gap: 10px;
+  }
+  .coverageColumns > div + div {
+    padding-left: 10px;
+  }
+  .metricValues {
+    gap: 7px;
+  }
+  .metricValues strong {
+    font-size: 22px;
+  }
+  .medicationAmounts {
+    gap: 10px;
+  }
+  .dayGrid {
+    gap: 5px;
+  }
+}
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .earnedCard:hover {
+    border-color: var(--milestone-spark);
+    box-shadow:
+      inset 0 1px 0 #ffffff30,
+      0 7px 27px color-mix(in srgb, var(--milestone-accent) 22%, transparent);
+  }
+  .upcomingCard:hover,
+  .dayGrid a:hover,
+  .memoryList a:hover {
+    border-color: color-mix(in srgb, var(--foreground) 40%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .milestoneCard {
+    transition: none;
+  }
+}

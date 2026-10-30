@@ -18,6 +18,7 @@ const links = [
     icon: "navMedications",
   },
   { href: "/goals", label: "Goals", page: "goals", icon: "navGoals" },
+  { href: "/streaks", label: "Streaks", page: "streaks", icon: "sparkle" },
 ] as const;
 
 export function HeaderNavigation({ className }: { className?: string }) {
