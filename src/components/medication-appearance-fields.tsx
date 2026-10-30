@@ -54,9 +54,9 @@ const pickerGridClass = "grid grid-cols-8 gap-1 p-2 max-[359px]:grid-cols-6";
 const pickerChoiceClass =
   "appearance-choice relative flex h-9 w-full cursor-pointer items-center justify-center rounded-[10px] border-2 border-transparent text-foreground/80 hover:bg-foreground/5 peer-disabled:pointer-events-none peer-disabled:opacity-40";
 const previewActionClass =
-  "inline-flex h-11 items-center rounded-lg text-[10px] font-medium text-muted-foreground transition-colors hover:[&>span]:bg-foreground/[.06] disabled:opacity-35";
+  "inline-flex h-11 items-center justify-center rounded-lg text-center text-[10px] font-medium text-muted-foreground transition-colors hover:[&>span]:bg-foreground/[.06] disabled:opacity-35";
 const previewActionFaceClass =
-  "inline-flex h-7 items-center gap-1.5 rounded-lg border border-foreground/10 bg-foreground/[.025] px-2 transition-colors";
+  "inline-flex h-7 items-center justify-center gap-1.5 rounded-lg border border-foreground/10 bg-foreground/[.025] px-2 transition-colors";
 type SearchPhase = "idle" | "loading" | "ready";
 type SearchFeedback = { id: number; tone: "success" | "empty" };
 type SymbolOption = {

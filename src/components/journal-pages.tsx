@@ -226,10 +226,10 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
         ) : (
           <Button
             variant="ghost"
-            className="h-11 w-full text-xs text-muted-foreground"
+            className="h-11 w-full gap-2 text-xs text-muted-foreground"
             onClick={() => setConfirm(true)}
           >
-            <ActionIcon name="delete" className="mr-2" />
+            <ActionIcon name="delete" />
             Delete this entry
           </Button>
         )}

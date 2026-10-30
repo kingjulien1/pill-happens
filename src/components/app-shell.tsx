@@ -39,10 +39,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <p className="text-sm text-muted-foreground">{error}</p>
             <Button
               variant="outline"
-              className={data ? "h-10 shrink-0 px-3 text-xs" : "mt-5 h-11 px-5"}
+              className={
+                data
+                  ? "h-10 shrink-0 gap-2 px-3 text-xs"
+                  : "mt-5 h-11 gap-2 px-5"
+              }
               onClick={() => void refresh()}
             >
-              <ActionIcon name="retry" className="mr-2" />
+              <ActionIcon name="retry" />
               Try again
             </Button>
           </div>
