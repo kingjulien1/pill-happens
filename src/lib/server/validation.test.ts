@@ -150,6 +150,79 @@ test("active ingredients accept at most 160 trimmed characters and reject non-te
   }
 });
 
+test("benzodiazepine classification is optional and never inferred from medication names or symbols", () => {
+  for (const name of ["Diazepam", "Alprazolam", "Bromazepam", "Example"]) {
+    const medication = medicationSchema.parse({
+      name,
+      activeIngredient: "Diazepam",
+      strengthMg: 1,
+      form: "tablet",
+      color: "rose",
+      icon: "svg:color:diazepam",
+    });
+    assert.equal(Object.hasOwn(medication, "isBenzodiazepine"), false);
+  }
+});
+
+test("benzodiazepine classification accepts explicit booleans and rejects coercible or malformed values", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  };
+  for (const isBenzodiazepine of [true, false]) {
+    assert.equal(
+      medicationSchema.parse({ ...medication, isBenzodiazepine })
+        .isBenzodiazepine,
+      isBenzodiazepine,
+    );
+    assert.deepEqual(medicationPatchSchema.parse({ isBenzodiazepine }), {
+      isBenzodiazepine,
+    });
+  }
+  for (const isBenzodiazepine of [null, 0, 1, "true", "false", "", [], {}]) {
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, isBenzodiazepine }).success,
+      false,
+    );
+    assert.equal(
+      medicationPatchSchema.safeParse({ isBenzodiazepine }).success,
+      false,
+    );
+  }
+});
+
+test("unrelated medication patches preserve a benzodiazepine flag and explicit false clears it", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+    isBenzodiazepine: true,
+  };
+  for (const patch of [
+    { name: "Renamed" },
+    { archived: true },
+    { activeIngredient: "" },
+    { icon: "🌙" },
+  ]) {
+    const parsed = medicationPatchSchema.parse(patch);
+    assert.equal(Object.hasOwn(parsed, "isBenzodiazepine"), false);
+    assert.equal(
+      Object.assign({ ...medication }, parsed).isBenzodiazepine,
+      true,
+    );
+  }
+  assert.equal(
+    Object.assign(
+      { ...medication },
+      medicationPatchSchema.parse({ isBenzodiazepine: false }),
+    ).isBenzodiazepine,
+    false,
+  );
+});
+
 test("medication intake defaults accept fractional quantities within the log input limits", () => {
   const medication = {
     name: "Example",

@@ -22,6 +22,7 @@ export const medicationSchema = z.object({
     .trim()
     .max(160, "Keep the active ingredient to 160 characters or fewer.")
     .optional(),
+  isBenzodiazepine: z.boolean().optional(),
   strengthMg: positiveAmount,
   defaultQuantity: positiveAmount
     .min(0.000001, "Use an intake amount of at least 0.000001.")
