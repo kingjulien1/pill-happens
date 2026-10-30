@@ -1,221 +1,109 @@
 import { MEDICATION_COLORS } from "@/lib/medication-appearance";
+import {
+  APP_PALETTE,
+  APP_THEME_GROUPS,
+  APP_THEME_TOKENS,
+  APP_THEME_VALUES,
+  renderAppThemeCss,
+} from "@/lib/app-theme";
 
-export type GuideColor = {
-  label: string;
-  hex: string;
-  usage: string;
-};
+export type GuideThemeMode = "light" | "dark";
+export type GuideThemeRole = (typeof APP_THEME_TOKENS)[number];
 
-/** Reference values from globals.css and JournalBackground; not theme controls. */
-export const GUIDE_THEME_GROUPS = [
-  {
-    id: "ember",
-    title: "The Ember Palette",
-    description:
-      "The five original colors behind the dark background and branding.",
-    colors: [
-      {
-        label: "Ink",
-        hex: "#120f17",
-        usage: "Deep background and dark overlays",
-      },
-      { label: "Cocoa", hex: "#2a0f0a", usage: "Warm depth in the gradient" },
-      { label: "Clay", hex: "#9a3412", usage: "Deep orange accents" },
-      {
-        label: "Ember",
-        hex: "#f97316",
-        usage: "Brand glow and warm highlights",
-      },
-      {
-        label: "Sand",
-        hex: "#fed7aa",
-        usage: "Dark-mode text and main button",
-      },
-    ],
-  },
-  {
-    id: "light-background",
-    title: "The Light Background",
-    description:
-      "Porcelain, coral and terracotta keep the same warm direction in daylight.",
-    colors: [
-      { label: "Porcelain", hex: "#f6f2f4", usage: "Page background" },
-      { label: "Blush", hex: "#edc0b8", usage: "Soft gradient fold" },
-      { label: "Terracotta", hex: "#e69b89", usage: "Deeper gradient fold" },
-      { label: "Apricot", hex: "#f6b49c", usage: "Warm gradient highlight" },
-      {
-        label: "Chalk",
-        hex: "#fffdfd",
-        usage: "Bright background and popovers",
-      },
-    ],
-  },
-  {
-    id: "light-interface",
-    title: "Light Interface Colors",
-    description: "Text, surfaces, controls and edges from the light theme.",
-    colors: [
-      {
-        label: "Primary Ink",
-        hex: "#120f17",
-        usage: "Primary and accent base",
-      },
-      {
-        label: "Text & Button",
-        hex: "#211b1b",
-        usage: "Foreground and action fill",
-      },
-      { label: "Card", hex: "#fffdfdf2", usage: "Chalk at about 95% opacity" },
-      {
-        label: "Secondary Surface",
-        hex: "#ece6e9",
-        usage: "Secondary controls",
-      },
-      {
-        label: "Muted Surface",
-        hex: "#f0ebee",
-        usage: "Quiet supporting areas",
-      },
-      {
-        label: "Secondary Text",
-        hex: "#51414a",
-        usage: "Hints and descriptions",
-      },
-      { label: "Border", hex: "#d8cbd2", usage: "Panel edges" },
-      { label: "Input", hex: "#9b838e", usage: "Input edges" },
-      {
-        label: "Accent Wash",
-        hex: "#120f1712",
-        usage: "Ink at about 7% opacity",
-      },
-      {
-        label: "Focus & Destructive",
-        hex: "#9a3412",
-        usage: "Focus rings and destructive controls",
-      },
-    ],
-  },
-  {
-    id: "dark-interface",
-    title: "Dark Interface Colors",
-    description:
-      "Peach foregrounds and dark neutral surfaces for the evening theme.",
-    colors: [
-      {
-        label: "Text & Button",
-        hex: "#fed7aa",
-        usage: "Foreground and action fill",
-      },
-      {
-        label: "Primary & Focus",
-        hex: "#fff1d6",
-        usage: "Bright primary and focus rings",
-      },
-      {
-        label: "Card",
-        hex: "#1b171aed",
-        usage: "Warm charcoal at about 93% opacity",
-      },
-      { label: "Popover", hex: "#211b1b", usage: "Menus and popovers" },
-      {
-        label: "Secondary Surface",
-        hex: "#302522",
-        usage: "Secondary controls",
-      },
-      {
-        label: "Muted Surface",
-        hex: "#2b2222",
-        usage: "Quiet supporting areas",
-      },
-      {
-        label: "Secondary Text",
-        hex: "#fed7aa99",
-        usage: "Sand at exactly 60% opacity",
-      },
-      { label: "Border", hex: "#50423a", usage: "Panel edges" },
-      { label: "Input", hex: "#776255", usage: "Input edges" },
-      {
-        label: "Accent Wash",
-        hex: "#fff1d61a",
-        usage: "Bright peach at about 10% opacity",
-      },
-      {
-        label: "Destructive",
-        hex: "#ffbd8a",
-        usage: "Destructive control text",
-      },
-    ],
-  },
-  {
-    id: "brand-effects",
-    title: "Brand & Button Details",
-    description:
-      "The extra warm tones used by the branding face and specular button edge.",
-    colors: [
-      {
-        label: "Dark Brand Edge",
-        hex: "#fff0db",
-        usage: "Fine bright branding outline in dark mode",
-      },
-      {
-        label: "Light Brand Edge",
-        hex: "#ffd9cd",
-        usage: "Coral branding outline in light mode",
-      },
-      {
-        label: "Light Brand Face",
-        hex: "#211b20eb",
-        usage: "Smoky face at about 92% opacity",
-      },
-      {
-        label: "Dark Brand Face",
-        hex: "#120f17eb",
-        usage: "Ink face at about 92% opacity",
-      },
-      {
-        label: "Light Brand Fold",
-        hex: "#7d352c",
-        usage: "Middle of the light brand gradient",
-      },
-      {
-        label: "Dark Brand Fold",
-        hex: "#6b2b17",
-        usage: "Middle of the dark brand gradient",
-      },
-      {
-        label: "Copper Rim",
-        hex: "#c2410c",
-        usage: "Moving dark-mode button highlight",
-      },
-      {
-        label: "Light Halo",
-        hex: "#e57f6940",
-        usage: "Coral branding glow at about 25%",
-      },
-      {
-        label: "Light Outer Glow",
-        hex: "#ed9f8f26",
-        usage: "Soft coral halo at about 15%",
-      },
-      {
-        label: "Dark Halo",
-        hex: "#f9731633",
-        usage: "Ember branding glow at 20%",
-      },
-      {
-        label: "Dark Outer Glow",
-        hex: "#ffbd8526",
-        usage: "Soft apricot halo at about 15%",
-      },
-    ],
-  },
-] as const satisfies readonly {
-  id: string;
-  title: string;
-  description: string;
-  colors: readonly GuideColor[];
-}[];
+/** The live application tokens, not a second hand-maintained palette. */
+export const GUIDE_BRAND_COLORS = APP_PALETTE;
+export const GUIDE_THEME_ROLES = APP_THEME_TOKENS;
+export const GUIDE_THEME_GROUPS = APP_THEME_GROUPS.map((group) => ({
+  ...group,
+  roles: APP_THEME_TOKENS.filter((role) => role.group === group.id),
+}));
 
+export const GUIDE_FEATURED_ROLES = [
+  "--action-background",
+  "--secondary",
+  "--accent",
+  "--background",
+  "--card",
+  "--foreground",
+].flatMap((token) => {
+  const role = APP_THEME_TOKENS.find((item) => item.token === token);
+  return role ? [role] : [];
+});
+
+export const GUIDE_THEME_CSS = renderAppThemeCss();
+export const GUIDE_THEME_JSON = JSON.stringify(
+  { palette: APP_PALETTE, tokens: APP_THEME_TOKENS, modes: APP_THEME_VALUES },
+  null,
+  2,
+);
+
+export function guideRole(id: string) {
+  return APP_THEME_TOKENS.find((role) => role.id === id);
+}
+
+/** HEX stays exact; alpha is documented rather than silently discarded. */
+export function guideColorDetails(hex: string) {
+  const value = hex.replace(/^#/, "");
+  const red = Number.parseInt(value.slice(0, 2), 16);
+  const green = Number.parseInt(value.slice(2, 4), 16);
+  const blue = Number.parseInt(value.slice(4, 6), 16);
+  const alpha =
+    value.length === 8 ? Number.parseInt(value.slice(6, 8), 16) / 255 : 1;
+  const percent = Math.round(alpha * 1000) / 10;
+  return {
+    red,
+    green,
+    blue,
+    alpha,
+    opacity: `${percent}%`,
+    rgb:
+      alpha === 1
+        ? `rgb(${red} ${green} ${blue})`
+        : `rgb(${red} ${green} ${blue} / ${percent}%)`,
+  };
+}
+
+function luminance(channels: number[]) {
+  return channels
+    .map((channel) => {
+      const value = channel / 255;
+      return value <= 0.04045
+        ? value / 12.92
+        : ((value + 0.055) / 1.055) ** 2.4;
+    })
+    .reduce(
+      (total, channel, index) =>
+        total + channel * [0.2126, 0.7152, 0.0722][index],
+      0,
+    );
+}
+
+/** Preview labels use the more readable of the actual Peach and Ink pigments. */
+export function guidePreviewInk(hex: string, mode: GuideThemeMode) {
+  const color = guideColorDetails(hex);
+  const canvas = APP_THEME_TOKENS.find((role) => role.token === "--background");
+  const base = guideColorDetails(canvas?.[mode] ?? APP_PALETTE[0].hex);
+  const background = [color.red, color.green, color.blue].map(
+    (channel, index) =>
+      channel * color.alpha +
+      [base.red, base.green, base.blue][index] * (1 - color.alpha),
+  );
+  const candidates = ["ink", "peach"].flatMap((id) => {
+    const item = APP_PALETTE.find((color) => color.id === id);
+    return item ? [item.hex] : [];
+  });
+  return candidates.reduce((best, candidate) => {
+    const ratio = (value: string) => {
+      const rgb = guideColorDetails(value);
+      const a = luminance([rgb.red, rgb.green, rgb.blue]);
+      const b = luminance(background);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    };
+    return ratio(candidate) > ratio(best) ? candidate : best;
+  }, candidates[0]);
+}
+
+/** Saved medication pigments remain a separate, literal catalog. */
 export const GUIDE_MEDICATION_COLORS = MEDICATION_COLORS.map((color) => ({
   ...color,
   family: !color.value.startsWith("tw-")
@@ -224,12 +112,6 @@ export const GUIDE_MEDICATION_COLORS = MEDICATION_COLORS.map((color) => ({
       ? "Black & White"
       : color.label.replace(/ \d+$/, ""),
 }));
-
 export const GUIDE_COLOR_FAMILIES = [
   ...new Set(GUIDE_MEDICATION_COLORS.map((color) => color.family)),
 ];
-
-export const GUIDE_THEME_COPY = GUIDE_THEME_GROUPS.map(
-  (group) =>
-    `${group.title}\n${group.colors.map((color) => `${color.label}: ${color.hex}`).join("\n")}`,
-).join("\n\n");

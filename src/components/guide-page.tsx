@@ -491,12 +491,13 @@ export function GuidePage() {
         <SectionHeading
           icon={<PaletteIcon size={18} weight="bold" />}
           title="Colors &amp; Appearance"
-          context="Tap A Shade To Copy"
+          context="Palette, Roles & Copy"
         />
         <p className={styles.sectionIntro}>
-          The warm Ember palette anchors the branding and actions. Light mode
-          adds softer coral and porcelain tones. Copy the exact colors below, or
-          browse every medication accent.
+          Peach, Flame, Rust, Ink and Violet shape the whole interface. Explore
+          their roles in light and dark mode, inspect exact values, or copy the
+          complete theme. Your saved medication colors have their own palette
+          below.
         </p>
         <GuideColors />
         <div className={styles.panel}>

@@ -531,3 +531,28 @@
     transition: none;
   }
 }
+
+/* Reading surfaces stay Peach; headings over the moving field use canvas copy. */
+.intro,
+.atAGlance,
+.steps {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-reading);
+  color: var(--surface-reading-foreground);
+}
+.backLink,
+.sectionHeading {
+  color: var(--canvas-foreground);
+  text-shadow: 0 1px 3px var(--palette-ink);
+}
+.sectionHeading > span,
+.sectionIntro {
+  color: var(--canvas-muted-foreground);
+  text-shadow: 0 1px 3px var(--palette-ink);
+}
+.contents a {
+  background: var(--surface-reading);
+  color: var(--surface-reading-foreground);
+}
