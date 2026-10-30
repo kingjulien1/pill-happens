@@ -147,9 +147,9 @@ export function GuidePage() {
                 Open Medications and choose <strong>Add a Medication</strong>.
                 Enter its name, strength in mg per unit, medication type, and
                 default quantity for new entries. Active Ingredient means the
-                Wirkstoff; leave it blank if you don’t know it. Mark
-                benzodiazepines with the Benzo switch, then choose a color and
-                symbol you can recognize quickly.
+                Wirkstoff; leave it blank if you don’t know it. Mark benzos,
+                opioids, or both with Class, then choose a color and symbol you
+                can recognize quickly.
               </p>
               <PageLink href="/medications">Open Medications</PageLink>
             </div>
@@ -325,20 +325,21 @@ export function GuidePage() {
             </dl>
           </GuideDetail>
           <GuideDetail
-            title="The Benzo Switch"
-            context="Your Own Label"
+            title="Medication Classes"
+            context="Your Own Labels"
             icon="sparkle"
           >
             <p>
-              Turn on Benzo beside Active Ingredient to mark a medication as a
-              benzodiazepine in your journal. Its badge and warm highlight then
-              follow it through medication lists, intake cards, history totals,
-              goals, and medication choices.
+              Class sits beside Active Ingredient. Choose Benzo, Opioid /
+              Opiate, or Both; None leaves the medication unmarked. Rose and
+              amber markers follow these labels through medication lists, intake
+              cards, history totals, goals, and medication choices.
             </p>
             <p>
-              The switch is manual. Entering a medication or ingredient name
-              does not turn it on automatically. You can change the mark later;
-              it also updates the medication’s past appearances.
+              The labels are manual. Entering a medication or ingredient name
+              never selects a class automatically. Choose Both to keep both
+              labels. Changing the selection also updates past appearances;
+              quantities, times, notes, and dose calculations stay the same.
             </p>
           </GuideDetail>
           <GuideDetail title="Edits Apply To Past Logs" icon="retry">
