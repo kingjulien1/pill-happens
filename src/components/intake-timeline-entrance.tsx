@@ -18,8 +18,10 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     const active = new Set<HTMLElement>();
     let observer: IntersectionObserver | null = null;
     let frame = 0;
+    let disposed = false;
 
-    const finish = (node: HTMLElement) => {
+    const finish = (node: HTMLElement): void => {
+      const wasDone = node.dataset.entranceState === "done";
       const id = node.dataset.intakeEntrance;
       if (id) seen.current.add(id);
       node.dataset.entranceState = "done";
@@ -27,6 +29,10 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       watched.delete(node);
       active.delete(node);
       queued.delete(node);
+      if (!wasDone && node.parentElement?.dataset.stackDepth === "0")
+        queueMicrotask(() => {
+          if (!disposed) sync();
+        });
     };
 
     const flush = () => {
@@ -37,23 +43,29 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
         timeline.querySelectorAll<HTMLElement>(ENTRY),
       ).filter((node) => queued.has(node));
       queued.clear();
-      const step = Math.min(85, 510 / Math.max(1, batch.length - 1));
+      const mainCount = batch.filter(
+        (node) => node.dataset.entrancePreview !== "true",
+      ).length;
+      const step = Math.min(85, 510 / Math.max(1, mainCount - 1));
       let index = 0;
       for (const node of batch) {
-        if (node.dataset.entranceExposed !== "true") continue;
+        const preview = node.dataset.entrancePreview === "true";
+        if (node.dataset.entranceExposed !== "true" && !preview) continue;
         const id = node.dataset.intakeEntrance;
         if (!id || seen.current.has(id) || reduced.matches || document.hidden) {
           finish(node);
           continue;
         }
         seen.current.add(id);
-        const delay = `${index++ * step}ms`;
+        const depth = Number(node.parentElement?.dataset.stackDepth ?? 0);
+        const delay = `${preview ? Math.max(0, depth - 1) * 55 : index++ * step}ms`;
         node.style.setProperty("--intake-enter-delay", delay);
         if (node.parentElement?.dataset.stackRear === "false")
           node
             .closest<HTMLElement>("[data-intake-group]")
             ?.style.setProperty("--intake-enter-delay", delay);
         node.dataset.entranceState = "running";
+        node.dataset.entranceKind = preview ? "preview" : "card";
         active.add(node);
       }
     };
@@ -93,7 +105,7 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     };
     observer = createObserver();
 
-    const sync = () => {
+    const sync = (): void => {
       for (const node of [...watched, ...active]) {
         if (!timeline.contains(node)) {
           observer?.unobserve(node);
@@ -104,7 +116,8 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       }
       for (const node of timeline.querySelectorAll<HTMLElement>(ENTRY)) {
         const id = node.dataset.intakeEntrance;
-        if (node.dataset.entranceExposed !== "true") {
+        const preview = node.dataset.entrancePreview === "true";
+        if (node.dataset.entranceExposed !== "true" && !preview) {
           observer?.unobserve(node);
           watched.delete(node);
           queued.delete(node);
@@ -118,6 +131,23 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
           watched.delete(node);
           continue;
         }
+        if (preview) {
+          observer.unobserve(node);
+          watched.delete(node);
+          const front = node
+            .closest("[data-intake-group]")
+            ?.querySelector<HTMLElement>(
+              '[data-stack-depth="0"] > [data-intake-entrance]',
+            );
+          if (front?.dataset.entranceState === "done") {
+            if (document.hidden) finish(node);
+            else {
+              queued.add(node);
+              if (!frame) frame = requestAnimationFrame(flush);
+            }
+          } else node.dataset.entranceState = "waiting";
+          continue;
+        }
         if (!watched.has(node) && !queued.has(node)) {
           node.dataset.entranceState = "pending";
           watched.add(node);
@@ -128,7 +158,8 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
 
     const onEnd = (event: AnimationEvent) => {
       if (
-        event.animationName === "intake-card-arrive" &&
+        (event.animationName === "intake-card-arrive" ||
+          event.animationName === "intake-preview-arrive") &&
         event.target instanceof HTMLElement &&
         event.target.matches(ENTRY)
       )
@@ -162,7 +193,7 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-entrance-exposed"],
+      attributeFilter: ["data-entrance-exposed", "data-entrance-preview"],
     });
     timeline.addEventListener("animationend", onEnd);
     timeline.addEventListener("focusin", onInteraction);
@@ -172,6 +203,7 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     reduced.addEventListener("change", sync);
     sync();
     return () => {
+      disposed = true;
       cancelAnimationFrame(frame);
       mutations.disconnect();
       observer?.disconnect();
