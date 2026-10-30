@@ -12,7 +12,7 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import {
   DAILY_MOODS,
   type DailyCheckIn,
@@ -122,7 +122,7 @@ export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
             </>
           ) : (
             <span className={styles.cardDescription}>
-              How did today feel? Leave a quick note.
+              Your day, your words. Make a little space to reflect.
             </span>
           )}
         </span>
@@ -141,7 +141,7 @@ export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
           weekday: "short",
           month: "short",
         })}
-        description="How did today feel? Add what you want to remember; every field is optional."
+        description="Your evening journal: room for your thoughts, moods and the details you want to keep. Every field is optional."
       >
         {open && editing && (
           <CheckInForm
@@ -258,26 +258,12 @@ function CheckInForm({
 
   return (
     <form className={styles.form} onSubmit={save} aria-busy={busy}>
-      <div className={styles.field}>
-        <div className={styles.labelRow}>
-          <Label htmlFor={`${id}-note`}>
-            <ActionIcon name="record" className="size-4" />
-            Your Day In A Few Words
-          </Label>
-          <span className={styles.optional}>Optional</span>
-        </div>
-        <Textarea
-          id={`${id}-note`}
-          value={note}
-          onChange={(event) => setNote(event.target.value)}
-          maxLength={800}
-          rows={2}
-          placeholder="What stood out today?"
-          className="min-h-20 resize-y rounded-xl px-3 py-2.5 text-base md:text-sm"
-          disabled={busy}
-        />
-        <span className={styles.characterCount}>{note.length} / 800</span>
-      </div>
+      <DailyReflectionEditor
+        id={`${id}-note`}
+        value={note}
+        onChange={setNote}
+        disabled={busy}
+      />
 
       <fieldset className={styles.moodField} disabled={busy}>
         <legend className={styles.moodLegend}>
