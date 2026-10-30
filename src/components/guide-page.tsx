@@ -256,18 +256,20 @@ export function GuidePage() {
           </GuideDetail>
           <GuideDetail
             title="How The Stacks Work"
-            context="5-Minute Windows"
+            context="Rolling 13-Minute Windows"
             icon="history"
           >
             <p>
               Entries appear from earliest to latest by Date &amp; Time Taken.
-              Intakes within five minutes of the earliest entry in a group form
-              a compact stack, even when you entered them later.
+              Intakes form a compact stack when each is no more than 13 minutes
+              after the previous one. Each intake extends the window by another
+              13 minutes, even when you entered it later.
             </p>
             <div className={styles.example}>
               <span>A Quick Example</span>
               <p>
-                08:00 and 08:04 share a stack. An 08:08 intake starts a new one.
+                08:00, 08:12, and 08:25 share a stack. An 08:39 intake starts a
+                new one.
               </p>
             </div>
             <p>

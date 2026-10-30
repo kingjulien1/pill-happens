@@ -136,7 +136,7 @@ export function IntakeCardGroup({
           aria-controls={cardsId}
           aria-label={`${
             collapsed
-              ? `Show ${count} intakes taken within five minutes, starting with ${group.entries[0].medicationName}`
+              ? `Show ${count} intakes grouped by consecutive gaps of 13 minutes or less, starting with ${group.entries[0].medicationName}`
               : `Collapse ${count} intakes taken together`
           }${classificationContext}`}
           onClick={(event) => {
