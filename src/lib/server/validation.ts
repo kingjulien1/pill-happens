@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isValidDayKey } from "@/lib/domain";
 import { MEDICATION_TYPE_VALUES } from "@/lib/medication-types";
+import { DAILY_MOOD_VALUES } from "@/lib/daily-check-in";
 import {
   isMedicationIcon,
   MEDICATION_COLORS,
@@ -62,6 +63,44 @@ export const intakeSchema = z.object({
 const calendarDate = z
   .string()
   .refine(isValidDayKey, "Choose a valid calendar date.");
+
+const checkInScale = z.number().finite().int().min(1).max(5).nullable();
+export const dailyCheckInSchema = z
+  .object({
+    day: calendarDate,
+    note: z
+      .string()
+      .trim()
+      .max(800, "Keep your reflection to 800 characters or fewer.")
+      .default(""),
+    moods: z
+      .array(z.enum(DAILY_MOOD_VALUES))
+      .max(4, "Choose up to four moods.")
+      .refine(
+        (moods) => new Set(moods).size === moods.length,
+        "Choose each mood only once.",
+      )
+      .default([]),
+    energy: checkInScale.default(null),
+    stress: checkInScale.default(null),
+    sleepHours: z.number().finite().min(0).max(24).nullable().default(null),
+    helped: z
+      .string()
+      .trim()
+      .max(160, "Keep what helped to 160 characters or fewer.")
+      .default(""),
+  })
+  .refine(
+    (entry) =>
+      Boolean(entry.note || entry.helped || entry.moods.length) ||
+      entry.energy !== null ||
+      entry.stress !== null ||
+      entry.sleepHours !== null,
+    "Add a few words, a mood, or one of the optional details before saving.",
+  );
+
+export type DailyCheckInInput = z.infer<typeof dailyCheckInSchema>;
+
 export const goalSchema = z
   .object({
     medicationId: z.string().uuid("Choose a medication."),

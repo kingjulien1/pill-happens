@@ -1,5 +1,6 @@
 import type { MedicationColor } from "@/lib/medication-appearance";
 import type { MedicationType } from "@/lib/medication-types";
+import type { DailyCheckIn } from "@/lib/daily-check-in";
 
 /** Shared data and calendar rules. All stored timestamps are UTC ISO strings. */
 export type Medication = {
@@ -53,6 +54,8 @@ export type AppData = {
   medications: Medication[];
   intakes: Intake[];
   goals: Goal[];
+  /** Missing in older journals; one personal reflection per tracking day. */
+  dailyCheckIns?: DailyCheckIn[];
   settings: Settings;
 };
 
@@ -68,6 +71,7 @@ export function emptyData(): AppData {
     medications: [],
     intakes: [],
     goals: [],
+    dailyCheckIns: [],
     settings: { timezone: "Europe/Vienna" },
   };
 }
