@@ -218,12 +218,14 @@ export function MedicationIcon({
   icon,
   rotation = 0,
   small = false,
+  isBenzodiazepine = false,
   className,
 }: {
   color?: string;
   icon?: string;
   rotation?: number;
   small?: boolean;
+  isBenzodiazepine?: boolean;
   className?: string;
 }) {
   const appearance = getMedicationColor(color);
@@ -241,9 +243,11 @@ export function MedicationIcon({
       aria-hidden="true"
       data-medication-mark
       data-medication-color={appearance.value}
+      data-benzodiazepine={isBenzodiazepine || undefined}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-2xl",
         small ? "size-10" : "size-12",
+        isBenzodiazepine && "benzodiazepine-highlight",
         className,
       )}
       style={style}

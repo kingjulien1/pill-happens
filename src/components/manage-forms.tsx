@@ -4,6 +4,8 @@ import { useId, useState, type FormEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import { MedicationActionButton } from "@/components/medication-action-button";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import { CrosshairSimpleIcon } from "@phosphor-icons/react/dist/ssr/CrosshairSimple";
 import {
   MedicationIcon,
   MedicationTypeIcon,
@@ -19,6 +21,7 @@ import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -56,6 +59,9 @@ export function MedicationForm({
   const [name, setName] = useState(medication?.name ?? "");
   const [activeIngredient, setActiveIngredient] = useState(
     medication?.activeIngredient ?? "",
+  );
+  const [isBenzodiazepine, setIsBenzodiazepine] = useState(
+    medication?.isBenzodiazepine === true,
   );
   const [strength, setStrength] = useState(
     medication ? String(medication.strengthMg) : "",
@@ -108,6 +114,7 @@ export function MedicationForm({
         {
           name: name.trim(),
           activeIngredient: activeIngredient.trim(),
+          isBenzodiazepine,
           strengthMg,
           defaultQuantity: quantity,
           form,
@@ -142,25 +149,57 @@ export function MedicationForm({
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor={`${id}-ingredient`}>
-            Active Ingredient
-            <span className="inline-flex items-center gap-1.5 font-normal text-muted-foreground">
-              <span aria-hidden="true">·</span>
-              optional
-            </span>
-          </Label>
-          <Input
-            id={`${id}-ingredient`}
-            name="activeIngredient"
-            value={activeIngredient}
-            onChange={(event) => setActiveIngredient(event.target.value)}
-            placeholder="e.g. Diazepam"
-            maxLength={160}
-            autoComplete="off"
-            spellCheck={false}
-            className={inputClass}
-          />
+        <div
+          className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(80px,.4fr)] gap-3"
+          data-medication-classification-fields
+        >
+          <div className="min-w-0 space-y-2">
+            <Label htmlFor={`${id}-ingredient`}>
+              Active Ingredient
+              <span className="inline-flex items-center gap-1.5 font-normal text-muted-foreground">
+                <span aria-hidden="true">·</span>
+                optional
+              </span>
+            </Label>
+            <Input
+              id={`${id}-ingredient`}
+              name="activeIngredient"
+              value={activeIngredient}
+              onChange={(event) => setActiveIngredient(event.target.value)}
+              placeholder="e.g. Diazepam"
+              maxLength={160}
+              autoComplete="off"
+              spellCheck={false}
+              className={inputClass}
+            />
+          </div>
+          <div className="flex h-10 items-center self-end">
+            <Switch
+              id={`${id}-benzodiazepine`}
+              name="isBenzodiazepine"
+              checked={isBenzodiazepine}
+              onCheckedChange={setIsBenzodiazepine}
+              disabled={busy}
+              aria-label="Benzodiazepine"
+              aria-description="Mark this medication to highlight it as a benzodiazepine throughout your journal."
+              title="Benzodiazepine"
+              className="benzodiazepine-switch"
+              data-medication-benzodiazepine-switch
+            >
+              <CrosshairSimpleIcon
+                weight="bold"
+                aria-hidden="true"
+                className="benzodiazepine-switch-icon"
+              />
+              <span>Benzo</span>
+              <span
+                aria-hidden="true"
+                className="benzodiazepine-switch-indicator"
+              >
+                <ActionIcon name="selected" />
+              </span>
+            </Switch>
+          </div>
         </div>
 
         <div
@@ -297,6 +336,7 @@ export function MedicationForm({
           strength={strength}
           defaultQuantity={defaultQuantity}
           medicationType={form}
+          isBenzodiazepine={isBenzodiazepine}
           onColorChange={setColor}
           onRotationChange={setIconRotation}
           onIconChange={(value) => {
@@ -413,12 +453,25 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       icon={selectedMedication.icon}
                       rotation={selectedMedication.iconRotation}
                       color={selectedMedication.color}
+                      isBenzodiazepine={
+                        selectedMedication.isBenzodiazepine === true
+                      }
                       small
                       className="size-5 rounded-md"
                     />
-                    <span className="min-w-0 truncate">
-                      {selectedMedication.name} ·{" "}
-                      {formatDose(selectedMedication.strengthMg)} mg
+                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                      <span
+                        className="min-w-0 truncate"
+                        title={selectedMedication.name}
+                      >
+                        {selectedMedication.name}
+                      </span>
+                      <span className="shrink-0 text-xs">
+                        · {formatDose(selectedMedication.strengthMg)} mg
+                      </span>
+                      {selectedMedication.isBenzodiazepine === true && (
+                        <BenzodiazepineBadge />
+                      )}
                     </span>
                   </>
                 ) : null}
@@ -429,18 +482,28 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                 <SelectItem
                   key={medication.id}
                   value={medication.id}
-                  className="min-h-9 pl-3 pr-9 text-sm"
+                  className={`min-h-9 pl-3 pr-9 text-sm ${medication.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                  data-benzodiazepine={
+                    medication.isBenzodiazepine === true || undefined
+                  }
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <MedicationIcon
                       icon={medication.icon}
                       rotation={medication.iconRotation}
                       color={medication.color}
+                      isBenzodiazepine={medication.isBenzodiazepine === true}
                       small
                       className="size-5 rounded-md"
                     />
-                    <span className="min-w-0 break-words">
-                      {medication.name} · {formatDose(medication.strengthMg)} mg
+                    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                      <span className="min-w-0 break-words">
+                        {medication.name} · {formatDose(medication.strengthMg)}{" "}
+                        mg
+                      </span>
+                      {medication.isBenzodiazepine === true && (
+                        <BenzodiazepineBadge />
+                      )}
                     </span>
                   </span>
                 </SelectItem>

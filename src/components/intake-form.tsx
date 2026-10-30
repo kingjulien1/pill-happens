@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationActionButton } from "@/components/medication-action-button";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import { toast } from "sonner";
 import {
   getMedicationType,
@@ -166,12 +167,21 @@ export function IntakeForm({
                     icon={medication.icon}
                     color={medication.color}
                     rotation={medication.iconRotation}
+                    isBenzodiazepine={medication.isBenzodiazepine === true}
                     small
                     className="size-6 rounded-md"
                   />
-                  <span className="min-w-0 truncate">
-                    {medication.name} · {formatDose(strength)} mg
-                    {isMeteredMedicationType(medicationForm) ? " / pump" : ""}
+                  <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                    <span className="min-w-0 truncate" title={medication.name}>
+                      {medication.name}
+                    </span>
+                    <span className="shrink-0 text-xs">
+                      · {formatDose(strength)} mg
+                      {isMeteredMedicationType(medicationForm) ? " / pump" : ""}
+                    </span>
+                    {medication.isBenzodiazepine === true && (
+                      <BenzodiazepineBadge />
+                    )}
                   </span>
                 </>
               ) : (
@@ -184,19 +194,24 @@ export function IntakeForm({
               <SelectItem
                 key={m.id}
                 value={m.id}
-                className="min-h-9 pl-3 pr-9 text-xs"
+                className={`min-h-9 pl-3 pr-9 text-xs ${m.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                data-benzodiazepine={m.isBenzodiazepine === true || undefined}
               >
                 <span className="flex min-w-0 items-center gap-2">
                   <MedicationIcon
                     icon={m.icon}
                     color={m.color}
                     rotation={m.iconRotation}
+                    isBenzodiazepine={m.isBenzodiazepine === true}
                     small
                     className="size-6 rounded-md"
                   />
-                  <span className="min-w-0 break-words">
-                    {m.name} · {formatDose(m.strengthMg)} mg
-                    {isMeteredMedicationType(m.form) ? " / pump" : ""}
+                  <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                    <span className="min-w-0 break-words">
+                      {m.name} · {formatDose(m.strengthMg)} mg
+                      {isMeteredMedicationType(m.form) ? " / pump" : ""}
+                    </span>
+                    {m.isBenzodiazepine === true && <BenzodiazepineBadge />}
                   </span>
                 </span>
               </SelectItem>

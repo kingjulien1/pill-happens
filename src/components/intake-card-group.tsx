@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import { ActionIcon } from "@/components/action-icon";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import { IntakeCard } from "@/components/intake-card";
 import type { Intake, Medication } from "@/lib/domain";
 import type { IntakeGroup } from "@/lib/intake-groups";
@@ -101,6 +102,16 @@ export function IntakeCardGroup({
   const grouped = group.entries.length > 1;
   const collapsed = grouped && !expanded;
   const count = group.entries.length;
+  const containsBenzodiazepine = group.entries.some((entry) =>
+    medications.some(
+      (medication) =>
+        medication.id === entry.medicationId &&
+        medication.isBenzodiazepine === true,
+    ),
+  );
+  const classificationContext = containsBenzodiazepine
+    ? ", includes a medication marked as a benzodiazepine"
+    : "";
 
   return (
     <div
@@ -108,6 +119,7 @@ export function IntakeCardGroup({
       data-intake-group={group.id}
       data-group-size={count}
       data-expanded={!collapsed}
+      data-contains-benzodiazepine={containsBenzodiazepine || undefined}
     >
       <div
         id={cardsId}
@@ -140,11 +152,11 @@ export function IntakeCardGroup({
           className="intake-group-toggle"
           aria-expanded={!collapsed}
           aria-controls={cardsId}
-          aria-label={
+          aria-label={`${
             collapsed
               ? `Show ${count} entries recorded together, starting with ${group.entries[0].medicationName}`
               : `Collapse ${count} entries recorded together`
-          }
+          }${classificationContext}`}
           onClick={(event) => {
             setExpanded(collapsed);
             // Keyboard users can enter the newly disclosed list immediately.
@@ -166,6 +178,7 @@ export function IntakeCardGroup({
                 {collapsed ? "Saved Together" : "Collapse"}
               </span>
             </span>
+            {containsBenzodiazepine && <BenzodiazepineBadge />}
             <ActionIcon name="expand" className="intake-group-chevron" />
           </span>
         </button>

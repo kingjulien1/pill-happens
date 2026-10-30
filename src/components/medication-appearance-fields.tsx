@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
 import { Input } from "@/components/ui/input";
 import { EMOJI_CATALOG, searchEmoji } from "@/lib/emoji-catalog";
@@ -181,6 +182,7 @@ export function MedicationAppearanceFields({
   strength = "",
   defaultQuantity = "1",
   medicationType = "tablet",
+  isBenzodiazepine = false,
   onColorChange,
   onIconChange,
   onRotationChange,
@@ -192,6 +194,7 @@ export function MedicationAppearanceFields({
   strength?: string;
   defaultQuantity?: string;
   medicationType?: Medication["form"];
+  isBenzodiazepine?: boolean;
   onColorChange: (value: MedicationColor) => void;
   onIconChange: (value: string) => void;
   onRotationChange: (value: number) => void;
@@ -667,7 +670,11 @@ export function MedicationAppearanceFields({
               className="final-look-doodle final-look-doodle--ring"
             />
             <span
-              className="final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover"
+              className={cn(
+                "final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover",
+                isBenzodiazepine && "benzodiazepine-highlight",
+              )}
+              data-benzodiazepine={isBenzodiazepine || undefined}
               style={{
                 backgroundColor: getMedicationPreviewSurface(
                   fixedColor?.hex ?? colorScale.icon,
@@ -695,6 +702,7 @@ export function MedicationAppearanceFields({
             </span>
           </div>
           <div className="relative flex min-w-0 items-center justify-center gap-3">
+            {isBenzodiazepine && <BenzodiazepineBadge />}
             <p
               className="truncate text-xs font-medium"
               data-preview-symbol-label
@@ -759,13 +767,18 @@ export function MedicationAppearanceFields({
             </p>
           )}
           <div
-            className="final-look-journal relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl bg-popover p-3"
+            className={cn(
+              "final-look-journal relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl bg-popover p-3",
+              isBenzodiazepine && "benzodiazepine-highlight",
+            )}
             data-preview-journal-row
+            data-benzodiazepine={isBenzodiazepine || undefined}
           >
             <MedicationIcon
               color={color}
               icon={icon}
               rotation={iconRotation}
+              isBenzodiazepine={isBenzodiazepine}
               small
               className="size-10 rounded-xl"
             />
@@ -773,13 +786,16 @@ export function MedicationAppearanceFields({
               <p className="mb-1 text-[9px] text-muted-foreground">
                 In Your Journal
               </p>
-              <p
-                className="truncate text-xs font-medium"
-                title={previewName}
-                data-preview-medication-name
-              >
-                {previewName}
-              </p>
+              <div className="flex min-w-0 items-center gap-1.5">
+                <p
+                  className="min-w-0 truncate text-xs font-medium"
+                  title={previewName}
+                  data-preview-medication-name
+                >
+                  {previewName}
+                </p>
+                {isBenzodiazepine && <BenzodiazepineBadge />}
+              </div>
               <p className="mt-1 text-[10px] text-muted-foreground">
                 {strengthLabel}
                 <span className="mx-1.5" aria-hidden="true">

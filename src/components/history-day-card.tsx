@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import {
   dayIntakes,
   formatDay,
@@ -117,11 +118,13 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
             const medication = data.medications.find(
               (item) => item.id === total.medicationId,
             );
+            const isBenzodiazepine = medication?.isBenzodiazepine === true;
             return (
               <span
                 key={total.medicationId}
-                className="history-card-total min-w-0 max-w-full"
+                className={`history-card-total min-w-0 max-w-full${isBenzodiazepine ? " benzodiazepine-highlight" : ""}`}
                 data-history-total={total.medicationId}
+                data-benzodiazepine={isBenzodiazepine || undefined}
               >
                 <span
                   aria-hidden="true"
@@ -133,6 +136,7 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
                 <span className="min-w-0 truncate" title={total.medicationName}>
                   {total.medicationName}
                 </span>
+                {isBenzodiazepine && <BenzodiazepineBadge />}
                 <span className="shrink-0 font-medium text-foreground">
                   {formatDose(total.totalMg)} mg
                 </span>

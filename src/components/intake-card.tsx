@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import { MedicationGlyph } from "@/components/medication-icon";
 import {
   doseMg,
@@ -51,6 +52,7 @@ export function IntakeCard({
   const localTime = toLocalInput(entry.takenAt, timeZone);
   const time = localTime.slice(11);
   const localDay = localTime.slice(0, 10);
+  const isBenzodiazepine = medication?.isBenzodiazepine === true;
 
   const style = {
     "--entry-color": color.hex,
@@ -75,10 +77,11 @@ export function IntakeCard({
       type="button"
       onClick={onEdit}
       disabled={disabled}
-      aria-label={`Edit ${entry.medicationName}, ${formatDose(doseMg(entry))} milligrams, ${time}`}
-      className="intake-log-card"
+      aria-label={`Edit ${entry.medicationName}${isBenzodiazepine ? ", benzodiazepine" : ""}, ${formatDose(doseMg(entry))} milligrams, ${time}`}
+      className={`intake-log-card${isBenzodiazepine ? " benzodiazepine-highlight" : ""}`}
       style={style}
       data-intake-card={entry.id}
+      data-benzodiazepine={isBenzodiazepine || undefined}
     >
       <span aria-hidden="true" className="intake-card-bleed" />
       <span aria-hidden="true" className="intake-card-glass">
@@ -131,10 +134,17 @@ export function IntakeCard({
           </span>
         </span>
         <div className="intake-card-details min-w-0 flex-1 pt-0.5">
-          <div className="intake-card-title-arrival flex items-baseline justify-between gap-2">
-            <h3 className="truncate text-[13px] font-medium" data-intake-name>
-              {entry.medicationName}
-            </h3>
+          <div className="intake-card-title-arrival flex items-center justify-between gap-2">
+            <div className="flex min-w-0 flex-1 items-center gap-1.5">
+              <h3
+                className="min-w-0 truncate text-[13px] font-medium"
+                title={entry.medicationName}
+                data-intake-name
+              >
+                {entry.medicationName}
+              </h3>
+              {isBenzodiazepine && <BenzodiazepineBadge />}
+            </div>
             <span
               className="shrink-0 text-[13px] font-medium tabular-nums"
               data-intake-dose

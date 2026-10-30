@@ -13,6 +13,7 @@ import { loggingStreak } from "@/lib/logging-streak";
 import { getMedicationType } from "@/lib/medication-types";
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationActionButton } from "@/components/medication-action-button";
+import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import {
   MedicationListHeading,
   MedicationsHeading,
@@ -123,6 +124,8 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
       {activeIds.length > 0 && (
         <ul className="space-y-2.5">
           {activeIds.map((id) => {
+            const medication = data.medications.find((item) => item.id === id);
+            const benzodiazepine = medication?.isBenzodiazepine === true;
             const total = totals.find((item) => item.medicationId === id);
             const goal = goalForDay(data, id, day);
             const amount = total?.totalMg ?? 0;
@@ -132,13 +135,24 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
                 ?.name ??
               "Medication";
             return (
-              <li key={id}>
+              <li
+                key={id}
+                className={
+                  benzodiazepine
+                    ? "benzodiazepine-highlight rounded-lg px-2 py-1"
+                    : undefined
+                }
+                data-benzodiazepine={benzodiazepine || undefined}
+              >
                 <div className="flex items-baseline justify-between gap-3">
-                  <span
-                    className="min-w-0 truncate text-xs font-medium"
-                    title={name}
-                  >
-                    {name}
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span
+                      className="min-w-0 truncate text-xs font-medium"
+                      title={name}
+                    >
+                      {name}
+                    </span>
+                    {benzodiazepine && <BenzodiazepineBadge />}
                   </span>
                   <span className="shrink-0 text-right text-sm font-medium tabular-nums">
                     {formatDose(amount)} mg
@@ -383,19 +397,24 @@ export function MedicationsPage() {
             {medications.map((m) => (
               <div
                 key={m.id}
-                className="surface flex items-center gap-3.5 rounded-3xl p-4"
+                className={`surface flex items-center gap-3.5 rounded-3xl p-4 ${m.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                data-benzodiazepine={m.isBenzodiazepine === true || undefined}
               >
                 <MedicationIcon
                   color={m.color}
                   icon={m.icon}
                   rotation={m.iconRotation}
+                  isBenzodiazepine={m.isBenzodiazepine === true}
                 />
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm font-medium">{m.name}</h3>
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    {formatDose(m.strengthMg)} mg /{" "}
-                    {getMedicationType(m.form).unit}
-                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                    <span className="text-[11px] text-muted-foreground">
+                      {formatDose(m.strengthMg)} mg /{" "}
+                      {getMedicationType(m.form).unit}
+                    </span>
+                    {m.isBenzodiazepine === true && <BenzodiazepineBadge />}
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -499,18 +518,30 @@ export function GoalsPage() {
                 ?.totalMg ?? 0;
             const future = goal.startsOn > today;
             return (
-              <article key={goal.id} className="surface rounded-3xl p-5">
+              <article
+                key={goal.id}
+                className={`surface rounded-3xl p-5 ${med?.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                data-benzodiazepine={
+                  med?.isBenzodiazepine === true || undefined
+                }
+              >
                 <div className="mb-4 flex items-center gap-3">
                   <MedicationIcon
                     color={med?.color}
                     icon={med?.icon}
                     rotation={med?.iconRotation}
+                    isBenzodiazepine={med?.isBenzodiazepine === true}
                     small
                   />
                   <div className="min-w-0 flex-1">
-                    <h2 className="truncate text-sm font-medium">
-                      {med?.name ?? "Medication"}
-                    </h2>
+                    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                      <h2 className="min-w-0 truncate text-sm font-medium">
+                        {med?.name ?? "Medication"}
+                      </h2>
+                      {med?.isBenzodiazepine === true && (
+                        <BenzodiazepineBadge />
+                      )}
+                    </div>
                     <p className="mt-1 text-[10px] text-muted-foreground">
                       {current
                         ? "Current daily maximum"

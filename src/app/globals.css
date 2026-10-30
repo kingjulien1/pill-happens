@@ -1265,6 +1265,146 @@
     background: var(--popover);
   }
 }
+.benzodiazepine-badge,
+.benzodiazepine-highlight,
+.benzodiazepine-switch {
+  --benzo-keyline: #9a34123d;
+  --benzo-halo: #f973161a;
+  --benzo-badge-background: #ffedd5c7;
+  --benzo-badge-edge: #9a341229;
+  --benzo-mark: #9a3412;
+  --benzo-check-ink: #fff1d6;
+  --benzo-checked-background: #fed7aa80;
+}
+.benzodiazepine-badge {
+  display: inline-flex;
+  min-height: 18px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px;
+  border: 1px solid var(--benzo-badge-edge);
+  border-radius: 6px;
+  background: var(--benzo-badge-background);
+  color: var(--foreground);
+  box-shadow: inset 0 1px 0 #ffffff24;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.benzodiazepine-badge > svg,
+.benzodiazepine-switch-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--benzo-mark);
+}
+.benzodiazepine-highlight {
+  outline: 1px solid var(--benzo-keyline);
+  outline-offset: 1px;
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000),
+    var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000),
+    var(--benzodiazepine-base-shadow, 0 0 #0000),
+    0 0 13px var(--benzo-halo);
+}
+.benzodiazepine-switch {
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 7px;
+  border: 1px solid var(--benzo-badge-edge);
+  border-radius: 10px;
+  background: var(--empty-intake-wash);
+  color: var(--foreground);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: inset 0 1px 0 #ffffff24;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.benzodiazepine-switch:is(
+  [data-checked],
+  [data-pressed],
+  [aria-checked="true"]
+) {
+  border-color: var(--benzo-keyline);
+  background: var(--benzo-checked-background);
+  box-shadow:
+    inset 0 1px 0 #ffffff24,
+    0 0 12px var(--benzo-halo);
+}
+.benzodiazepine-switch:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.benzodiazepine-switch-indicator {
+  display: inline-flex;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--benzo-keyline);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--benzo-check-ink);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+.benzodiazepine-switch-indicator > svg {
+  width: 9px;
+  height: 9px;
+  opacity: 0;
+  transform: rotate(-20deg) scale(0.4);
+  transition:
+    opacity 160ms ease,
+    transform 240ms cubic-bezier(0.2, 0.85, 0.25, 1.15);
+}
+.benzodiazepine-switch:is([data-checked], [data-pressed], [aria-checked="true"])
+  .benzodiazepine-switch-indicator {
+  border-color: var(--benzo-mark);
+  background: var(--benzo-mark);
+}
+.benzodiazepine-switch:is([data-checked], [data-pressed], [aria-checked="true"])
+  .benzodiazepine-switch-indicator
+  > svg {
+  opacity: 1;
+  transform: none;
+}
+.benzodiazepine-switch:is(:disabled, [data-disabled]) {
+  opacity: 0.5;
+  pointer-events: none;
+}
+@media (prefers-color-scheme: dark) {
+  .benzodiazepine-badge,
+  .benzodiazepine-highlight,
+  .benzodiazepine-switch {
+    --benzo-keyline: #fed7aa59;
+    --benzo-halo: #f9731621;
+    --benzo-badge-background: #9a34123d;
+    --benzo-badge-edge: #fed7aa38;
+    --benzo-mark: #fed7aa;
+    --benzo-check-ink: #120f17;
+    --benzo-checked-background: #9a341238;
+  }
+}
 .medications-page-title {
   font-size: 24px;
   font-weight: 600;
@@ -2592,6 +2732,16 @@
   }
   .intake-group[data-expanded="true"] .intake-log-card:not(:disabled):hover {
     box-shadow: 0 4px 18px var(--entry-hover-glow);
+  }
+  .intake-group[data-expanded="true"]
+    .intake-log-card.benzodiazepine-highlight:not(:disabled):hover {
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      0 4px 18px var(--entry-hover-glow),
+      0 0 13px var(--benzo-halo);
   }
   .intake-group[data-expanded="true"]
     .intake-log-card:not(:disabled):hover::before {
