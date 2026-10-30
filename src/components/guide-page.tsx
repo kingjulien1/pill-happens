@@ -405,6 +405,15 @@ export function GuidePage() {
               every intake was recorded or a daily goal was met. Evening
               check-ins do not add intake days to the counter.
             </p>
+            <p>
+              Open Streaks from navigation to see the latest three unlocked
+              milestones and the next three targets. Achievements stay unlocked
+              after a gap. Each card opens its own page with the recorded days,
+              check-in changes, and separate medication figures available for
+              that milestone. Missing records stay unknown; dose changes are not
+              labeled as better or worse.
+            </p>
+            <PageLink href="/streaks">Explore Streak Milestones</PageLink>
           </GuideDetail>
         </div>
       </section>
