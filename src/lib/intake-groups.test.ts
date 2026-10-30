@@ -36,29 +36,57 @@ test("empty and single-entry timelines retain their natural shape", () => {
   assert.deepEqual(groupIntakes([entry]), [{ id: "one", entries: [entry] }]);
 });
 
-test("equal intake times and exactly five minutes share a window, but one millisecond later does not", () => {
+test("equal times and consecutive gaps of exactly 13 minutes extend the window", () => {
   assert.deepEqual(
     memberIds([
       intake("first"),
       intake("same-time"),
-      intake("five-minutes", 300_000),
-      intake("one-ms-late", 300_001),
+      intake("thirteen-minutes", 780_000),
+      intake("twenty-six-minutes", 1_560_000),
+      intake("one-ms-late", 2_340_001),
     ]),
-    [["first", "same-time", "five-minutes"], ["one-ms-late"]],
+    [
+      ["first", "same-time", "thirteen-minutes", "twenty-six-minutes"],
+      ["one-ms-late"],
+    ],
   );
 });
 
-test("the five-minute window is anchored to its earliest intake rather than chained", () => {
+test("each new intake resets the rolling window rather than anchoring it to the first", () => {
   assert.deepEqual(
     memberIds([
       intake("zero"),
-      intake("four", 240_000),
-      intake("eight", 480_000),
-      intake("twelve", 720_000),
-      intake("sixteen", 960_000),
+      intake("twelve", 12 * 60_000),
+      intake("twenty-four", 24 * 60_000),
+      intake("thirty-six", 36 * 60_000),
+      intake("fifty", 50 * 60_000),
+      intake("sixty-three", 63 * 60_000),
     ]),
-    [["zero", "four"], ["eight", "twelve"], ["sixteen"]],
+    [
+      ["zero", "twelve", "twenty-four", "thirty-six"],
+      ["fifty", "sixty-three"],
+    ],
   );
+});
+
+test("a gap longer than 13 minutes starts a new group even at the first boundary", () => {
+  assert.deepEqual(memberIds([intake("first"), intake("outside", 780_001)]), [
+    ["first"],
+    ["outside"],
+  ]);
+});
+
+test("backfilling a bridge merges groups and removing it restores the gap", () => {
+  const first = intake("first");
+  const later = intake("later", 24 * 60_000);
+  const bridge = intake("bridge", 12 * 60_000, {
+    createdAt: "2026-10-30T12:00:00.000Z",
+  });
+  assert.deepEqual(memberIds([later, first]), [["first"], ["later"]]);
+  assert.deepEqual(memberIds([later, bridge, first]), [
+    ["first", "bridge", "later"],
+  ]);
+  assert.deepEqual(memberIds([later, first]), [["first"], ["later"]]);
 });
 
 test("backfilled intakes taken together group even when created on different days", () => {
@@ -95,7 +123,7 @@ test("unsorted nonadjacent records become chronological taken-time groups", () =
       intake("zero"),
       intake("eight", 480_000),
     ]),
-    [["zero", "four"], ["eight"], ["after-an-hour"], ["after-a-day"]],
+    [["zero", "four", "eight"], ["after-an-hour"], ["after-a-day"]],
   );
 });
 
@@ -112,10 +140,10 @@ test("equal taken instants preserve source order regardless of IDs and creation 
 
 test("appending a later intake within a window preserves its earliest member's group identity", () => {
   const first = intake("first");
-  const nextWindow = intake("next-window", 600_000);
+  const nextWindow = intake("next-window", 1_800_000);
   const before = groupIntakes([first, nextWindow]);
   const after = groupIntakes([
-    intake("within-next-window", 720_000),
+    intake("within-next-window", 1_920_000),
     first,
     intake("within-first-window", 120_000),
     nextWindow,
@@ -166,7 +194,7 @@ test("invalid taken times remain stable singletons after valid groups without fa
       intake("before"),
       intake("also-unknown", 0, { takenAt: "" }),
       intake("after", 60_000),
-      intake("next-window", 600_000),
+      intake("next-window", 900_000),
     ]),
     [["before", "after"], ["next-window"], ["unknown"], ["also-unknown"]],
   );
@@ -177,7 +205,7 @@ test("malformed creation timestamps do not affect valid taken-time grouping", ()
     memberIds([
       intake("second", 60_000, { createdAt: "not-a-date" }),
       intake("first", 0, { createdAt: "" }),
-      intake("outside", 600_000, { createdAt: "invalid" }),
+      intake("outside", 900_000, { createdAt: "invalid" }),
     ]),
     [["first", "second"], ["outside"]],
   );
@@ -200,11 +228,11 @@ test("elapsed time taken groups correctly over midnight and daylight-saving offs
   assert.deepEqual(
     memberIds([
       intake("first", 0, { takenAt: "2026-10-25T02:58:00.000+02:00" }),
-      intake("six-minutes-later", 0, {
-        takenAt: "2026-10-25T02:04:00.000+01:00",
+      intake("fourteen-minutes-later", 0, {
+        takenAt: "2026-10-25T02:12:00.000+01:00",
       }),
     ]),
-    [["first"], ["six-minutes-later"]],
+    [["first"], ["fourteen-minutes-later"]],
   );
 });
 

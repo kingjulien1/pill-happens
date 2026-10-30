@@ -6,12 +6,13 @@ export type IntakeGroup = {
   entries: Intake[];
 };
 
-const TAKEN_WINDOW_MS = 5 * 60 * 1_000;
+const TAKEN_WINDOW_MS = 13 * 60 * 1_000;
 
 /**
  * Order a copy by time taken, keeping source order for equal instants. Each
- * five-minute window starts at its earliest intake rather than extending with
- * later members. Creation times never determine grouping or display order.
+ * 13-minute window extends from the most recent member, so a group continues
+ * while consecutive intakes are at most 13 minutes apart. Creation times never
+ * determine grouping or display order.
  * Invalid taken times remain separate singletons after the valid timeline.
  */
 export function groupIntakes(entries: readonly Intake[]): IntakeGroup[] {
@@ -25,7 +26,7 @@ export function groupIntakes(entries: readonly Intake[]): IntakeGroup[] {
     });
   const groups: IntakeGroup[] = [];
   let current: IntakeGroup | undefined;
-  let windowStart = Number.NaN;
+  let lastTakenAt = Number.NaN;
 
   for (const { entry, takenAt } of ordered) {
     if (!Number.isFinite(takenAt)) {
@@ -34,13 +35,13 @@ export function groupIntakes(entries: readonly Intake[]): IntakeGroup[] {
       continue;
     }
 
-    if (current && takenAt - windowStart <= TAKEN_WINDOW_MS) {
+    if (current && takenAt - lastTakenAt <= TAKEN_WINDOW_MS) {
       current.entries.push(entry);
     } else {
       current = { id: entry.id, entries: [entry] };
       groups.push(current);
-      windowStart = takenAt;
     }
+    lastTakenAt = takenAt;
   }
 
   return groups;
