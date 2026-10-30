@@ -526,7 +526,7 @@
 .intake-card-content {
   position: relative;
   z-index: 1;
-  padding: var(--entry-card-padding);
+  padding: 8px var(--entry-card-padding);
 }
 .intake-card-focus {
   position: relative;
