@@ -392,9 +392,7 @@
 }
 .intake-card-glass,
 .intake-card-curves,
-.intake-card-ink,
-.intake-card-sticker--a,
-.intake-card-sticker--b {
+.intake-card-ink {
   pointer-events: none;
 }
 .intake-card-glass {
@@ -516,27 +514,6 @@
   align-items: center;
   justify-content: center;
 }
-.intake-card-sticker--a,
-.intake-card-sticker--b {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  width: 48px;
-  height: 48px;
-  border: 1px solid #ffffff30;
-  border-radius: 16px;
-}
-.intake-card-sticker--a {
-  background: var(--entry-pop);
-  opacity: 0.46;
-  transform: translate(-57%, -47%) rotate(-13deg);
-}
-.intake-card-sticker--b {
-  background: linear-gradient(135deg, var(--entry-spark), var(--entry-light));
-  opacity: 0.52;
-  transform: translate(-43%, -53%) rotate(12deg);
-}
 .intake-card-mark {
   position: relative;
   z-index: 2;
@@ -549,6 +526,10 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--popover);
+  background-image: linear-gradient(
+    var(--entry-icon-tint),
+    var(--entry-icon-tint)
+  );
 }
 .intake-card-details {
   position: relative;

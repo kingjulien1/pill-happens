@@ -10,11 +10,10 @@ import {
   type Intake,
   type Medication,
 } from "@/lib/domain";
-import { getIntakeCardArt } from "@/lib/intake-card-art";
+import { getIntakeCardWaves } from "@/lib/intake-card-waves";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import {
   getMedicationColorScale,
-  getMedicationPreviewAccents,
   getMedicationPreviewSurface,
 } from "@/lib/medication-preview-colors";
 import {
@@ -40,8 +39,7 @@ export function IntakeCard({
 }) {
   const color = getMedicationColor(medication?.color);
   const scale = getMedicationColorScale(color.value);
-  const accents = getMedicationPreviewAccents(color.value);
-  const art = getIntakeCardArt(entry.id);
+  const waves = getIntakeCardWaves(entry.id);
   const svg = getSvgIcon(medication?.icon ?? "pill");
   const pigment =
     svg?.variant === "color" ? (svg.color?.hex ?? scale.icon) : scale.icon;
@@ -57,8 +55,7 @@ export function IntakeCard({
     // Explicit alpha avoids opaque CSS color-mix fallbacks in older browsers.
     "--entry-rim-tint": `${scale.lighter}14`,
     "--entry-deep": scale.darker,
-    "--entry-pop": accents.pop,
-    "--entry-spark": accents.spark,
+    "--entry-icon-tint": `${color.hex}66`,
   } as CSSProperties;
 
   return (
@@ -81,8 +78,8 @@ export function IntakeCard({
           focusable="false"
           data-intake-curves
         >
-          <path d={art.curveA} vectorEffect="non-scaling-stroke" />
-          <path d={art.curveB} vectorEffect="non-scaling-stroke" />
+          <path d={waves.curveA} vectorEffect="non-scaling-stroke" />
+          <path d={waves.curveB} vectorEffect="non-scaling-stroke" />
         </svg>
         <span className="intake-card-ink" data-intake-ink />
       </span>
@@ -91,8 +88,6 @@ export function IntakeCard({
           className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"
           aria-hidden="true"
         >
-          <span className="intake-card-sticker intake-card-sticker--a" />
-          <span className="intake-card-sticker intake-card-sticker--b" />
           <span
             className="intake-card-mark"
             data-medication-mark
