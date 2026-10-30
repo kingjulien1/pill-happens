@@ -2,11 +2,12 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import {
-  Eye,
   RotateCcw,
   RotateCw,
   Search,
   Shuffle,
+  Sparkles,
+  Star,
   Undo2,
   X,
 } from "lucide-react";
@@ -561,7 +562,7 @@ export function MedicationAppearanceFields({
         >
           <span aria-hidden="true" className="final-look-pattern" />
           <span aria-hidden="true" className="final-look-ambience" />
-          <span aria-hidden="true" className="final-look-color-ribbon" />
+          <span aria-hidden="true" className="final-look-color-outline" />
           <svg
             aria-hidden="true"
             className="final-look-swoosh"
@@ -581,11 +582,7 @@ export function MedicationAppearanceFields({
                 id={`${id}-preview-title`}
                 className="final-look-title inline-flex shrink-0 items-center gap-1.5 text-xs leading-4 font-[550] text-foreground"
               >
-                <Eye
-                  aria-hidden="true"
-                  className="size-3.5 shrink-0"
-                  strokeWidth={2.25}
-                />
+                <ActionIcon name="sparkle" className="size-3.5 shrink-0" />
                 Final Look
               </h3>
               <span className="truncate">Live Preview</span>
@@ -632,20 +629,30 @@ export function MedicationAppearanceFields({
             </span>
             <span
               aria-hidden="true"
-              className="final-look-doodle final-look-doodle--flower"
+              className="final-look-doodle final-look-doodle--cluster"
             >
-              <ActionIcon name="flower" weight="fill" className="size-5" />
+              <Sparkles
+                className="size-5"
+                strokeWidth={2}
+                fill="currentColor"
+              />
             </span>
             <span
               aria-hidden="true"
-              className="final-look-doodle final-look-doodle--bolt"
+              className="final-look-doodle final-look-doodle--shooting"
             >
-              <ActionIcon name="lightning" weight="fill" className="size-4" />
+              <ActionIcon
+                name="shootingStar"
+                weight="fill"
+                className="size-4"
+              />
             </span>
             <span
               aria-hidden="true"
-              className="final-look-doodle final-look-doodle--ring"
-            />
+              className="final-look-doodle final-look-doodle--twinkle"
+            >
+              <Star className="size-3.5" strokeWidth={2} fill="currentColor" />
+            </span>
             <span
               className={cn(
                 "final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover",

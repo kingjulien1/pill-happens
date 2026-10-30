@@ -1961,27 +1961,40 @@
     var(--foreground)
   );
 }
-.final-look-color-ribbon {
+.final-look-color-outline {
   position: absolute;
-  top: 1px;
-  right: 18px;
-  left: 18px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--preview-spark),
-    var(--preview-light),
-    var(--preview-accent),
-    var(--preview-pop),
-    var(--preview-spark)
-  );
-  background-size: 200% 100%;
+  z-index: 3;
+  inset: 0;
+  border: 3px solid var(--preview-accent);
+  border-radius: inherit;
   opacity: 0.9;
-  animation: final-look-ribbon 12s ease-in-out infinite;
+}
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .final-look-color-outline {
+    border: 0;
+    padding: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--preview-spark),
+      var(--preview-light),
+      var(--preview-accent),
+      var(--preview-pop),
+      var(--preview-spark)
+    );
+    background-size: 200% 100%;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: final-look-outline-flow 12s ease-in-out infinite;
+  }
 }
 .final-look-title > svg {
-  color: var(--preview-pop);
+  color: var(--preview-accent);
 }
 .final-look-showcase [data-preview-header] {
   isolation: isolate;
@@ -2011,7 +2024,7 @@
 }
 .final-look-pattern,
 .final-look-ambience,
-.final-look-color-ribbon,
+.final-look-color-outline,
 .final-look-swoosh,
 .final-look-orbit-track,
 .final-look-sticker,
@@ -2144,7 +2157,7 @@
 .final-look-doodle {
   position: absolute;
   display: inline-flex;
-  color: var(--preview-pop);
+  color: var(--preview-accent);
   animation: final-look-doodle 8s ease-in-out infinite;
 }
 .final-look-doodle--star {
@@ -2152,25 +2165,19 @@
   left: 7%;
   transform: rotate(-15deg);
 }
-.final-look-doodle--flower {
+.final-look-doodle--cluster {
   right: 6%;
   bottom: 17%;
-  color: var(--preview-spark);
   animation-delay: -4s;
 }
-.final-look-doodle--bolt {
+.final-look-doodle--shooting {
   top: 11%;
   right: 16%;
-  color: var(--preview-icon);
   animation-delay: -2s;
 }
-.final-look-doodle--ring {
+.final-look-doodle--twinkle {
   bottom: 14%;
   left: 17%;
-  width: 10px;
-  height: 10px;
-  border: 2px solid var(--preview-spark);
-  border-radius: 50%;
   animation-delay: -6s;
 }
 .final-look-swatch-trail {
@@ -2201,7 +2208,8 @@
   border-color: var(--preview-outline);
   background: var(--popover);
 }
-.final-look-showcase [data-preview-action-face="surprise"] {
+.final-look-showcase [data-preview-action-face="surprise"],
+.final-look-journal {
   color: var(--foreground);
   background:
     linear-gradient(
@@ -2345,7 +2353,7 @@
     rotate: 8deg;
   }
 }
-@keyframes final-look-ribbon {
+@keyframes final-look-outline-flow {
   0%,
   100% {
     background-position: 0% 50%;
