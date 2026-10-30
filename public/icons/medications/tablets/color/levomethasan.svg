@@ -19,8 +19,39 @@
       height="24"
     >
       <circle cx="12" cy="12" r="9" fill="white" stroke="white" />
-      <path d="M12 4v16" fill="none" stroke="black" />
-      <path d="M4 12h16" fill="none" stroke="black" />
+      <path
+        d="m6.35 6.35 11.3 11.3m0-11.3-11.3 11.3"
+        fill="none"
+        stroke="black"
+      />
+      <path
+        d="M12 9.5V6.2q0-1-.8-1.6"
+        stroke-width="1.1"
+        transform="rotate(0 12 12)"
+        fill="none"
+        stroke="black"
+      />
+      <path
+        d="M12 9.5V6.2q0-1-.8-1.6"
+        stroke-width="1.1"
+        transform="rotate(90 12 12)"
+        fill="none"
+        stroke="black"
+      />
+      <path
+        d="M12 9.5V6.2q0-1-.8-1.6"
+        stroke-width="1.1"
+        transform="rotate(180 12 12)"
+        fill="none"
+        stroke="black"
+      />
+      <path
+        d="M12 9.5V6.2q0-1-.8-1.6"
+        stroke-width="1.1"
+        transform="rotate(270 12 12)"
+        fill="none"
+        stroke="black"
+      />
     </mask>
   </defs>
   <rect

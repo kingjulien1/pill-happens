@@ -7,6 +7,7 @@ import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
 import { TABLET_SHAPES } from "./tablet-icons/geometry";
 import {
   getSvgIcon,
+  getSvgIconAssetUrl,
   isMedicationSvgIcon,
   searchSvgIcons,
   SVG_ICON_CATALOG,
@@ -46,6 +47,14 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
       entry.variant === "mask"
         ? `/icons/medications/${slug}.svg`
         : `/icons/medications/tablets/${entry.variant}/${slug}.svg`,
+    );
+    const revisedLevomethasan =
+      entry.value === "svg:levomethasan" ||
+      entry.value === "svg:color:levomethasan";
+    assert.equal(
+      getSvgIconAssetUrl(entry),
+      revisedLevomethasan ? `${entry.src}?v=facets-2` : entry.src,
+      `${entry.value}: runtime URL revisions must preserve canonical paths and IDs`,
     );
     assert.ok(entry.label.length > 0);
     assert.ok(entry.componentName.length > 0);

@@ -175,7 +175,27 @@ export const TABLET_SHAPES = {
   levomethasan: {
     componentName: "Levomethasan",
     aliases: ["levomethasan", "quarter-scored-tablet"],
-    nodes: [...scored(9), ["path", { d: "M4 12h16", key: "cross-score" }]],
+    nodes: [
+      ...round(9),
+      // Deep diagonal valleys separate four raised quarters, as in the reference.
+      [
+        "path",
+        {
+          d: "m6.35 6.35 11.3 11.3m0-11.3-11.3 11.3",
+          key: "quarter-valleys",
+        },
+      ],
+      // Each finer radial crest divides two sloping faces and softens at the rim.
+      ...[0, 90, 180, 270].map((angle): TabletIconNode[number] => [
+        "path",
+        {
+          d: "M12 9.5V6.2q0-1-.8-1.6",
+          strokeWidth: "1.1",
+          transform: `rotate(${angle} 12 12)`,
+          key: `rounded-crest-${angle}`,
+        },
+      ]),
+    ],
   },
   ...DISPENSER_SHAPES,
 } satisfies Record<string, TabletShape>;

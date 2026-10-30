@@ -248,6 +248,8 @@ export type SvgIconCatalogEntry = {
   componentName: string;
   aliases: readonly string[];
   src: string;
+  /** Public asset refresh key; saved icon IDs and generated filenames stay stable. */
+  assetRevision?: string;
   keywords: readonly string[];
   variant: "mask" | "outline" | "color";
   shape?: TabletShapeName;
@@ -289,6 +291,7 @@ export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = [
   })),
   ...TABLET_ARTWORK.map((entry): SvgIconCatalogEntry => ({
     ...entry,
+    assetRevision: entry.shape === "levomethasan" ? "facets-2" : undefined,
     label: tabletIconLabel(entry.slug),
     aliases: [
       ...entry.aliases,
@@ -328,6 +331,13 @@ const iconsByValue = new Map<string, SvgIconCatalogEntry>(
 
 export function getSvgIcon(value: string): SvgIconCatalogEntry | undefined {
   return iconsByValue.get(value);
+}
+
+/** Revalidate revised artwork without changing the identifier stored in journals. */
+export function getSvgIconAssetUrl(entry: SvgIconCatalogEntry): string {
+  return entry.assetRevision
+    ? `${entry.src}?v=${encodeURIComponent(entry.assetRevision)}`
+    : entry.src;
 }
 
 export function isMedicationSvgIcon(

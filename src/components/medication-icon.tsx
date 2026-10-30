@@ -34,7 +34,7 @@ import {
   isMedicationLucideIcon,
   type MedicationIconName,
 } from "@/lib/medication-appearance";
-import { getSvgIcon } from "@/lib/svg-icon-catalog";
+import { getSvgIcon, getSvgIconAssetUrl } from "@/lib/svg-icon-catalog";
 import {
   TABLET_OUTLINE_COMPONENTS,
   Tramal,
@@ -79,6 +79,7 @@ export function MedicationGlyph({
     typeof icon === "string" && isMedicationIcon(icon) ? icon : "pill";
   const svgIcon = getSvgIcon(value);
   if (svgIcon) {
+    const assetUrl = getSvgIconAssetUrl(svgIcon);
     if (svgIcon.variant === "outline" && svgIcon.shape) {
       const Tablet = TABLET_OUTLINE_COMPONENTS[svgIcon.shape];
       return (
@@ -102,7 +103,7 @@ export function MedicationGlyph({
           data-tablet-variant="color"
           className={cn("inline-flex size-6 shrink-0", className)}
           style={{
-            backgroundImage: `url("${svgIcon.src}")`,
+            backgroundImage: `url("${assetUrl}")`,
             backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -118,11 +119,11 @@ export function MedicationGlyph({
         className={cn("inline-flex size-6 shrink-0", className)}
         style={{
           backgroundColor: "currentColor",
-          maskImage: `url("${svgIcon.src}")`,
+          maskImage: `url("${assetUrl}")`,
           maskSize: "contain",
           maskPosition: "center",
           maskRepeat: "no-repeat",
-          WebkitMaskImage: `url("${svgIcon.src}")`,
+          WebkitMaskImage: `url("${assetUrl}")`,
           WebkitMaskSize: "contain",
           WebkitMaskPosition: "center",
           WebkitMaskRepeat: "no-repeat",
