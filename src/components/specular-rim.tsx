@@ -24,6 +24,8 @@ uniform float uSpot;
 uniform vec2 uEntry;
 uniform vec3 uLineColor;
 uniform vec3 uBaseColor;
+uniform vec3 uEdgeColor;
+uniform vec3 uGlowColor;
 uniform float uIntensity;
 uniform vec2 uWindow;
 uniform float uThickness;
@@ -54,6 +56,15 @@ float lobe(float position, float center) {
   return 1.0 - smoothstep(uWindow.x, uWindow.x + uWindow.y, gap);
 }
 
+vec4 paint(vec3 color, float alpha) {
+  float opacity = clamp(alpha, 0.0, 1.0);
+  return vec4(color * opacity, opacity);
+}
+
+vec4 over(vec4 front, vec4 back) {
+  return front + back * (1.0 - front.a);
+}
+
 void main() {
   vec2 p = gl_FragCoord.xy - uCenter;
   float d = roundedBox(p, uHalf, uRadius);
@@ -61,15 +72,21 @@ void main() {
   float key = lobe(position, uSpot);
   float back = lobe(position, uSpot + 0.5);
   float streak = key + back * 0.45;
-  float width = max(uThickness * uPx * mix(1.0, max(key, back), 0.6), 0.35);
+  float width = max(uThickness * uPx * mix(0.7, 1.0, max(key, back)), 0.35);
   float band = smoothstep(-width - 0.6, -width + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
-  float hair = smoothstep(-uPx - 0.6, -uPx + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
+  float baseWidth = uThickness * uPx * 0.55;
+  float baseBand = smoothstep(-baseWidth - 0.6, -baseWidth + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
+  float outside = smoothstep(-0.25 * uPx, 0.25 * uPx, d);
+  float edge = outside * (1.0 - smoothstep(0.8 * uPx, 1.6 * uPx, d));
   float inside = 1.0 - smoothstep(-0.6, 0.6, d);
   vec2 pool = (p - uEntry) / (uHalf.y * vec2(1.6, 1.1));
-  float glow = streak * 0.2 * exp(-abs(d + width * 0.5) / (5.0 * uPx)) + inside * 0.08 * exp(-dot(pool, pool));
-  float light = clamp((band * streak + glow * uGlow) * uIntensity, 0.0, 1.0);
-  vec4 base = vec4(uBaseColor, 1.0) * hair * 0.6;
-  outColor = vec4(uLineColor, 1.0) * light + base * (1.0 - light);
+  float glow = streak * 0.16 * exp(-abs(d) / (5.0 * uPx)) * outside
+    + inside * 0.025 * exp(-dot(pool, pool));
+  vec4 result = paint(uGlowColor, glow * uGlow);
+  result = over(paint(uEdgeColor, edge * 0.85), result);
+  result = over(paint(uBaseColor, baseBand * 0.9), result);
+  result = over(paint(uLineColor, band * (0.18 + streak * 0.82) * uIntensity), result);
+  outColor = result;
 }`;
 
 const UNIFORMS = [
@@ -81,6 +98,8 @@ const UNIFORMS = [
   "uEntry",
   "uLineColor",
   "uBaseColor",
+  "uEdgeColor",
+  "uGlowColor",
   "uIntensity",
   "uWindow",
   "uThickness",
@@ -185,20 +204,54 @@ const link = (gl: WebGL2RenderingContext) => {
 };
 
 const SETTINGS = {
-  lineColor: new Float32Array([1, 216 / 255, 189 / 255]),
-  baseColor: new Float32Array([249 / 255, 115 / 255, 22 / 255]),
-  intensity: 1.35,
+  intensity: 1.5,
   idleIntensity: 0.35,
   shineSize: 39,
   shineFade: 61,
-  thickness: 2.4,
-  glow: 2,
+  thickness: 4,
+  glow: 2.4,
   speed: 1.15,
 };
 
 /** Pointer-independent React Bits rim, leaving the host button's styles intact. */
 export function SpecularRim({ radius = 22 }: { radius?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const button = canvas?.closest("button");
+    if (!canvas || !button) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let intersecting = true;
+    const sync = () => {
+      canvas.dataset.fallbackActive = String(
+        intersecting && !document.hidden && !motion.matches && !button.disabled,
+      );
+    };
+    const intersection =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver((entries) => {
+            intersecting = entries.some((entry) => entry.isIntersecting);
+            sync();
+          });
+    intersection?.observe(button);
+    const disabled = new MutationObserver(sync);
+    disabled.observe(button, {
+      attributes: true,
+      attributeFilter: ["disabled"],
+    });
+    motion.addEventListener("change", sync);
+    document.addEventListener("visibilitychange", sync);
+    sync();
+    return () => {
+      intersection?.disconnect();
+      disabled.disconnect();
+      motion.removeEventListener("change", sync);
+      document.removeEventListener("visibilitychange", sync);
+      canvas.dataset.fallbackActive = "false";
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -223,6 +276,30 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const gl = context;
     const safeRadius = Number.isFinite(radius) ? Math.max(0, radius) : 22;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const theme = window.matchMedia("(prefers-color-scheme: dark)");
+    const readColor = (
+      styles: CSSStyleDeclaration,
+      property: string,
+      fallback: string,
+    ) => {
+      const value = styles.getPropertyValue(property).trim();
+      const hex = /^#[\da-f]{6}$/i.test(value) ? value : fallback;
+      return new Float32Array(
+        [1, 3, 5].map(
+          (offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255,
+        ),
+      );
+    };
+    const readPalette = () => {
+      const styles = getComputedStyle(button);
+      return {
+        line: readColor(styles, "--intake-rim-line", "#fff1d6"),
+        base: readColor(styles, "--intake-rim-base", "#f97316"),
+        edge: readColor(styles, "--intake-rim-guard", "#9a3412"),
+        glow: readColor(styles, "--intake-rim-glow", "#f97316"),
+      };
+    };
+    let palette = readPalette();
     const view = { width: 1, height: 1, ratio: 1 };
     const uniforms: Record<string, WebGLUniformLocation | null> = {};
     let program: WebGLProgram | null = null;
@@ -349,8 +426,10 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
           rimX * pull * scaleX,
           rimY * pull * scaleY,
         );
-        gl.uniform3fv(uniforms.uLineColor, SETTINGS.lineColor);
-        gl.uniform3fv(uniforms.uBaseColor, SETTINGS.baseColor);
+        gl.uniform3fv(uniforms.uLineColor, palette.line);
+        gl.uniform3fv(uniforms.uBaseColor, palette.base);
+        gl.uniform3fv(uniforms.uEdgeColor, palette.edge);
+        gl.uniform3fv(uniforms.uGlowColor, palette.glow);
         gl.uniform1f(
           uniforms.uIntensity,
           SETTINGS.intensity * (button.disabled ? SETTINGS.idleIntensity : 1),
@@ -419,6 +498,10 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
       sync();
     };
     const onResize = () => measure();
+    const onThemeChange = () => {
+      palette = readPalette();
+      sync();
+    };
     const onContextLost = (event: Event) => {
       event.preventDefault();
       lost = true;
@@ -455,6 +538,7 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     canvas.addEventListener("webglcontextlost", onContextLost);
     canvas.addEventListener("webglcontextrestored", onContextRestored);
     motion.addEventListener("change", sync);
+    theme.addEventListener("change", onThemeChange);
     document.addEventListener("visibilitychange", sync);
     window.addEventListener("resize", onResize);
     measure();
@@ -468,6 +552,7 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
       canvas.removeEventListener("webglcontextlost", onContextLost);
       canvas.removeEventListener("webglcontextrestored", onContextRestored);
       motion.removeEventListener("change", sync);
+      theme.removeEventListener("change", onThemeChange);
       document.removeEventListener("visibilitychange", sync);
       window.removeEventListener("resize", onResize);
       release();
@@ -482,6 +567,7 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
       aria-hidden="true"
       data-rendered="false"
       data-animated="false"
+      data-fallback-active="false"
     />
   );
 }

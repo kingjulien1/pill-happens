@@ -2743,8 +2743,16 @@
   }
 }
 .intake-log-action {
+  --intake-rim-line: #fff1d6;
+  --intake-rim-base: #f97316;
+  --intake-rim-guard: #9a3412;
+  --intake-rim-glow: #f97316;
+  --intake-rim-outline: #9a3412b3;
+  --intake-rim-halo: #f973164d;
   /* Keep Tailwind's shadow composition so keyboard focus rings stay visible. */
-  --tw-shadow: 0 7px 20px rgb(18 15 23 / 16%), 0 0 18px rgb(249 115 22 / 12%);
+  --tw-shadow:
+    0 7px 20px rgb(18 15 23 / 16%), 0 0 0 1px var(--intake-rim-outline),
+    0 0 18px var(--intake-rim-halo);
   --tw-ring-color: #9a341280;
   position: relative;
   isolation: isolate;
@@ -2757,6 +2765,12 @@
 }
 @media (prefers-color-scheme: dark) {
   .intake-log-action {
+    --intake-rim-line: #c2410c;
+    --intake-rim-base: #9a3412;
+    --intake-rim-guard: #fff1d6;
+    --intake-rim-glow: #fed7aa;
+    --intake-rim-outline: #fff1d694;
+    --intake-rim-halo: #fed7aa4d;
     --tw-ring-color: #fff1d680;
   }
 }
@@ -2778,10 +2792,52 @@
   position: absolute;
   z-index: 0;
   inset: -1px;
-  border: 2.4px solid rgb(249 115 22 / 60%);
+  border: 4px solid var(--intake-rim-base);
   border-radius: inherit;
-  box-shadow: 0 0 8px rgb(255 216 189 / 20%);
+  box-shadow: inset 0 0 0 1px var(--intake-rim-line);
   pointer-events: none;
+}
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .intake-log-action > .intake-specular-fallback {
+    overflow: hidden;
+    border: 0;
+    padding: 4px;
+    background: var(--intake-rim-base);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .intake-specular-fallback::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    aspect-ratio: 1;
+    background: conic-gradient(
+      var(--intake-rim-base) 0deg 35deg,
+      var(--intake-rim-line) 70deg 105deg,
+      var(--intake-rim-base) 145deg 215deg,
+      var(--intake-rim-line) 250deg 285deg,
+      var(--intake-rim-base) 325deg 360deg
+    );
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: intake-specular-fallback-turn 6.8s linear infinite paused;
+  }
+  .intake-specular-light[data-rendered="false"][data-fallback-active="true"]
+    + .intake-specular-fallback::before {
+    animation-play-state: running;
+  }
+}
+@keyframes intake-specular-fallback-turn {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 .intake-specular-light[data-rendered="true"] + .intake-specular-fallback {
   opacity: 0;
