@@ -3071,8 +3071,8 @@
 }
 @media (max-width: 767px) {
   .with-intake-dock {
-    /* Clear the summary row and action when scrolling to the final entry. */
-    padding-bottom: calc(136px + max(20px, env(safe-area-inset-bottom)));
+    /* Clear the summary, action, and quiet guide link at the end of the list. */
+    padding-bottom: calc(164px + max(20px, env(safe-area-inset-bottom)));
   }
 }
 input[type="datetime-local"],

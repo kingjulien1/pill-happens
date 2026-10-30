@@ -1,0 +1,533 @@
+.page {
+  min-width: 0;
+  color: var(--foreground);
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 13px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+
+.intro h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.intro > p,
+.sectionIntro {
+  margin-top: 12px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.85;
+}
+
+.atAGlance {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  gap: 6px;
+  margin-top: 22px;
+  padding: 13px 0;
+  border-block: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
+}
+
+.atAGlance > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.atAGlance > div + div {
+  padding-left: 10px;
+  border-left: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+.atAGlance span {
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+
+.atAGlance small {
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.contents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 21px 0 32px;
+}
+
+.contents a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 17%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--card) 42%, transparent);
+  color: color-mix(in srgb, var(--foreground) 85%, transparent);
+  font-size: 10px;
+  line-height: 1.4;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.section {
+  min-width: 0;
+  margin-top: 34px;
+  scroll-margin-top: 24px;
+}
+
+.sectionHeading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.sectionHeading h2 {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.5;
+}
+
+.headingIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.sectionHeading > span {
+  max-width: 40%;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps > li {
+  display: flex;
+  gap: 12px;
+  padding: 17px 0;
+}
+
+.steps > li + li {
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+}
+
+.stepNumber {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, #f97316 36%, var(--foreground));
+  border-radius: 10px;
+  background: color-mix(in srgb, #f97316 10%, var(--card));
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.steps > li > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.steps h3 {
+  margin: 1px 0 7px;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.6;
+}
+
+.steps p,
+.detailBody,
+.readingCard > p,
+.callout p,
+.privacyNote p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.page strong {
+  color: var(--foreground);
+  font-weight: 550;
+}
+
+.pageLink {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--foreground);
+  font-size: 10px;
+  font-weight: 500;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--foreground) 25%, transparent);
+  text-underline-offset: 4px;
+}
+
+.panel,
+.readingCard {
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--foreground) 17%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  -webkit-backdrop-filter: blur(32px);
+  backdrop-filter: blur(32px);
+  box-shadow: inset 0 1px 0
+    color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.readingCard {
+  padding: 17px;
+}
+
+.readingCard > p + p,
+.readingCard > p + .reference,
+.readingCard .reference + p {
+  margin-top: 14px;
+}
+
+.sectionIntro {
+  margin-top: -2px;
+  margin-bottom: 17px;
+  font-size: 11px;
+}
+
+.sectionIntro + div {
+  min-width: 0;
+}
+
+.section > .panel:last-child:not(:first-child) {
+  margin-top: 14px;
+}
+
+.detail + .detail {
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+.detail summary {
+  display: flex;
+  min-height: 49px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 13px;
+  border-radius: inherit;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease;
+}
+
+.detail summary::-webkit-details-marker {
+  display: none;
+}
+
+.detail summary > svg:first-child:not(:last-child) {
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+}
+
+.detailTitle {
+  min-width: 0;
+  flex: 1;
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.7;
+}
+
+.detailContext {
+  max-width: 30%;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.detailCaret {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: transform 180ms ease;
+}
+
+.detail[open] .detailCaret {
+  transform: rotate(180deg);
+}
+
+.detailBody {
+  padding: 0 15px 16px;
+}
+
+.detailBody > p {
+  margin: 0;
+}
+
+.detailBody > p + p,
+.detailBody > p + .example,
+.detailBody .example + p {
+  margin-top: 12px;
+}
+
+.detailBody a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+  text-underline-offset: 3px;
+}
+
+.detailBody code {
+  color: var(--foreground);
+  font-size: 10px;
+}
+
+.example {
+  padding: 10px 12px;
+  border-left: 2px solid #f97316;
+  border-radius: 0 9px 9px 0;
+  background: color-mix(in srgb, #f97316 6%, var(--background));
+}
+
+.example > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+
+.example code {
+  display: block;
+  font-size: 10px;
+  white-space: normal;
+}
+
+.example p {
+  margin: 0;
+}
+
+.reference {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.reference > div {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.7fr);
+  gap: 13px;
+}
+
+.reference dt {
+  color: var(--foreground);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.reference dd {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.moodList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 15px 0 19px;
+}
+
+.moodList > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 7px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  color: var(--foreground);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, #f97316 7%, var(--background));
+}
+
+.callout > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.callout p {
+  font-size: 10px;
+}
+
+.installAction {
+  display: flex;
+  justify-content: flex-start;
+  margin: 9px -10px -6px;
+}
+
+.privacyNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 14px 4px 0;
+}
+
+.privacyNote > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--muted-foreground);
+}
+
+.privacyNote p {
+  font-size: 10px;
+}
+
+.footer {
+  margin-top: 32px;
+  padding-top: 23px;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 17%, transparent);
+  text-align: center;
+}
+
+.returnAction {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card) 75%, transparent);
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 550;
+  transition: background 160ms ease;
+}
+
+.topLink {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  margin-top: 7px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+
+@media (max-width: 359px) {
+  .atAGlance {
+    grid-template-columns: 1fr 1fr 1.15fr;
+  }
+  .atAGlance > div + div {
+    padding-left: 7px;
+  }
+  .atAGlance span {
+    font-size: 11px;
+  }
+  .atAGlance small {
+    font-size: 8px;
+  }
+  .sectionHeading {
+    gap: 8px;
+  }
+  .sectionHeading h2 {
+    font-size: 13px;
+  }
+  .sectionHeading > span {
+    max-width: 33%;
+    font-size: 8px;
+  }
+  .readingCard {
+    padding: 14px;
+  }
+  .detail summary {
+    gap: 6px;
+    padding-inline: 11px;
+  }
+  .detailContext {
+    max-width: 26%;
+    font-size: 8px;
+  }
+  .reference > div {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
+    gap: 10px;
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .contents a:hover,
+  .returnAction:hover {
+    border-color: color-mix(in srgb, var(--foreground) 32%, transparent);
+    background: color-mix(in srgb, var(--card) 95%, transparent);
+  }
+  .detail summary:hover {
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  }
+  .pageLink:hover {
+    text-decoration-color: var(--foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contents a,
+  .detail summary,
+  .detailCaret,
+  .returnAction {
+    transition: none;
+  }
+}
