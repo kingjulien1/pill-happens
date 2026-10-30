@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export function BrandMark({ className }: { className?: string }) {
@@ -41,7 +41,10 @@ function TabletIcon({ className }: { className: string }) {
   );
 }
 
-export function Brand({ className }: { className?: string }) {
+export function Brand({
+  className,
+  ...props
+}: Omit<ComponentProps<typeof Link>, "href" | "children">) {
   return (
     <Link
       href="/"
@@ -50,6 +53,7 @@ export function Brand({ className }: { className?: string }) {
         "brand-lockup inline-flex h-11 items-center justify-center",
         className,
       )}
+      {...props}
     >
       <span aria-hidden="true" className="brand-corona">
         <span className="brand-corona-track" />

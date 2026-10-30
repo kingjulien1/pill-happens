@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "@base-ui/react/menu";
 import { ActionIcon } from "@/components/action-icon";
 import { usePwa } from "@/components/pwa-provider";
+import { usePageRefresh } from "@/components/page-refresh";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -22,6 +23,7 @@ const links = [
 export function HeaderNavigation({ className }: { className?: string }) {
   const pathname = usePathname();
   const { installed, install } = usePwa();
+  const { refreshPage, unavailable } = usePageRefresh();
 
   return (
     <Menu.Root key={pathname} modal={false}>
@@ -91,9 +93,18 @@ export function HeaderNavigation({ className }: { className?: string }) {
                 );
               })}
             </Menu.Group>
+            <Menu.Separator className="brand-navigation-separator mx-2 my-1 h-px" />
+            <Menu.Item
+              closeOnClick
+              disabled={unavailable}
+              onClick={refreshPage}
+              className="brand-menu-link flex min-h-8 w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs font-medium outline-none data-disabled:opacity-40"
+            >
+              <ActionIcon name="retry" className="brand-menu-icon size-4" />
+              <span>Refresh Page</span>
+            </Menu.Item>
             {!installed && (
               <>
-                <Menu.Separator className="brand-navigation-separator mx-2 my-1 h-px" />
                 <Menu.Item
                   closeOnClick
                   onClick={() => void install()}

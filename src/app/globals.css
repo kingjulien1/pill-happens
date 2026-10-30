@@ -2221,6 +2221,130 @@
     transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 300ms ease;
 }
+.brand-refresh {
+  z-index: 2;
+  transform: translate3d(0, var(--brand-pull, 0px), 0);
+  transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.brand-refresh[data-dragging="true"] {
+  transition: none;
+}
+.brand-refresh-handle {
+  /* Only a gesture starting on the brand belongs to the refresh control. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.brand-refresh-hint {
+  position: absolute;
+  inset-block-start: calc(100% + 12px);
+  inset-inline-start: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: max-content;
+  max-width: calc(100vw - 48px);
+  padding: 5px 10px 5px 6px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  color: var(--foreground);
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition:
+    opacity 160ms ease,
+    border-color 160ms ease;
+}
+.brand-refresh-hint[data-visible="true"] {
+  opacity: 1;
+}
+.brand-refresh[data-ready="true"] .brand-refresh-hint {
+  border-color: color-mix(in srgb, #f97316 70%, var(--foreground));
+}
+.brand-refresh-progress {
+  position: relative;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  place-items: center;
+}
+.brand-refresh-progress > svg:first-child {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.brand-refresh-progress-track {
+  opacity: 0.16;
+}
+.page-refresh-screen {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--background) 60%, transparent);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+}
+.page-refresh-card {
+  width: min(100%, 290px);
+  padding: 28px 20px 24px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 20%, transparent);
+  border-radius: 26px;
+  background:
+    radial-gradient(ellipse at 50% 0, #f9731614, transparent 68%),
+    color-mix(in srgb, var(--card) 86%, transparent);
+  box-shadow:
+    0 16px 60px #120f171a,
+    0 0 40px #f9731612;
+  text-align: center;
+  animation: enter 220ms ease-out;
+}
+.page-refresh-loader {
+  position: relative;
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  place-items: center;
+}
+.page-refresh-loader > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+.page-refresh-track {
+  opacity: 0.12;
+}
+.page-refresh-arc {
+  stroke: #f97316;
+  stroke-dasharray: 54 122;
+  stroke-linecap: round;
+  transform-origin: center;
+  animation: page-refresh-turn 1.4s linear infinite;
+}
+@keyframes page-refresh-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .brand-lockup {
   --brand-base: #211b20eb;
   --brand-fill-start: #2a0f0a;

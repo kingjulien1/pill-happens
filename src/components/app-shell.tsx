@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
-import { Brand } from "@/components/brand";
+import { PullToRefreshBrand } from "@/components/page-refresh";
 import { HeaderNavigation } from "@/components/header-navigation";
 import { StreakMenu } from "@/components/streak-menu";
 
@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <HeaderNavigation />
         </nav>
-        <Brand className="justify-self-center" />
+        <PullToRefreshBrand />
         <StreakMenu />
       </header>
       <main id="main" className="flex min-w-0 flex-1 flex-col">
