@@ -13,7 +13,11 @@ import { loggingStreak } from "@/lib/logging-streak";
 import { getMedicationType } from "@/lib/medication-types";
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationActionButton } from "@/components/medication-action-button";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import {
+  MedicationClassBadges,
+  medicationClassHighlights,
+} from "@/components/medication-class-badge";
+import { getMedicationClassification } from "@/lib/medication-classification";
 import {
   MedicationListHeading,
   MedicationsHeading,
@@ -140,12 +144,12 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
             return (
               <li
                 key={id}
-                className={
-                  benzodiazepine
-                    ? "benzodiazepine-highlight rounded-lg px-2 py-1"
-                    : undefined
-                }
+                className={`${medicationClassHighlights(medication)}${benzodiazepine || medication?.isOpioid === true ? " rounded-lg px-2 py-1" : ""}`}
                 data-benzodiazepine={benzodiazepine || undefined}
+                data-opioid={medication?.isOpioid === true || undefined}
+                data-medication-classification={getMedicationClassification(
+                  medication,
+                )}
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="flex min-w-0 items-center gap-1.5">
@@ -155,7 +159,7 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
                     >
                       {name}
                     </span>
-                    {benzodiazepine && <BenzodiazepineBadge />}
+                    <MedicationClassBadges medication={medication} />
                   </span>
                   <span className="shrink-0 text-right text-sm font-medium tabular-nums">
                     {formatDose(amount)} mg
@@ -408,14 +412,17 @@ export function MedicationsPage() {
             {medications.map((m) => (
               <div
                 key={m.id}
-                className={`surface flex items-center gap-3.5 rounded-3xl p-4 ${m.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                className={`surface flex items-center gap-3.5 rounded-3xl p-4 ${medicationClassHighlights(m)}`}
                 data-benzodiazepine={m.isBenzodiazepine === true || undefined}
+                data-opioid={m.isOpioid === true || undefined}
+                data-medication-classification={getMedicationClassification(m)}
               >
                 <MedicationIcon
                   color={m.color}
                   icon={m.icon}
                   rotation={m.iconRotation}
                   isBenzodiazepine={m.isBenzodiazepine === true}
+                  isOpioid={m.isOpioid === true}
                 />
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm font-medium">{m.name}</h3>
@@ -424,7 +431,7 @@ export function MedicationsPage() {
                       {formatDose(m.strengthMg)} mg /{" "}
                       {getMedicationType(m.form).unit}
                     </span>
-                    {m.isBenzodiazepine === true && <BenzodiazepineBadge />}
+                    <MedicationClassBadges medication={m} />
                   </div>
                 </div>
                 <Button
@@ -531,10 +538,14 @@ export function GoalsPage() {
             return (
               <article
                 key={goal.id}
-                className={`surface rounded-3xl p-5 ${med?.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                className={`surface rounded-3xl p-5 ${medicationClassHighlights(med)}`}
                 data-benzodiazepine={
                   med?.isBenzodiazepine === true || undefined
                 }
+                data-opioid={med?.isOpioid === true || undefined}
+                data-medication-classification={getMedicationClassification(
+                  med,
+                )}
               >
                 <div className="mb-4 flex items-center gap-3">
                   <MedicationIcon
@@ -542,6 +553,7 @@ export function GoalsPage() {
                     icon={med?.icon}
                     rotation={med?.iconRotation}
                     isBenzodiazepine={med?.isBenzodiazepine === true}
+                    isOpioid={med?.isOpioid === true}
                     small
                   />
                   <div className="min-w-0 flex-1">
@@ -549,9 +561,7 @@ export function GoalsPage() {
                       <h2 className="min-w-0 truncate text-sm font-medium">
                         {med?.name ?? "Medication"}
                       </h2>
-                      {med?.isBenzodiazepine === true && (
-                        <BenzodiazepineBadge />
-                      )}
+                      <MedicationClassBadges medication={med} />
                     </div>
                     <p className="mt-1 text-[10px] text-muted-foreground">
                       {current

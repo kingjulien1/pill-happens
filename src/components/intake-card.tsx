@@ -1,7 +1,10 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { PillIcon } from "@phosphor-icons/react/dist/ssr/Pill";
+import {
+  MEDICATION_CLASS_MARKERS,
+  MedicationClassIcon,
+} from "@/components/medication-class-badge";
 import { IntakeCardShine } from "@/components/intake-card-shine";
 import { MedicationGlyph } from "@/components/medication-icon";
 import {
@@ -22,6 +25,10 @@ import {
   MEDICATION_TYPE_VALUES,
 } from "@/lib/medication-types";
 import { getSvgIcon } from "@/lib/svg-icon-catalog";
+import {
+  getMedicationClasses,
+  getMedicationClassification,
+} from "@/lib/medication-classification";
 
 export function IntakeCard({
   entry,
@@ -45,6 +52,9 @@ export function IntakeCard({
   const rose = getMedicationColor("tw-rose-500").hex;
   const roseSoft = getMedicationColor("tw-rose-300").hex;
   const roseInk = getMedicationColor("tw-rose-600").hex;
+  const amber = getMedicationColor("tw-amber-500").hex;
+  const amberSoft = getMedicationColor("tw-amber-300").hex;
+  const amberInk = getMedicationColor("tw-amber-700").hex;
   const svg = getSvgIcon(medication?.icon ?? "pill");
   const pigment =
     svg?.variant === "color" ? (svg.color?.hex ?? scale.icon) : scale.icon;
@@ -56,6 +66,8 @@ export function IntakeCard({
   const time = localTime.slice(11);
   const nextMorning = localTime.slice(0, 10) !== day;
   const isBenzodiazepine = medication?.isBenzodiazepine === true;
+  const isOpioid = medication?.isOpioid === true;
+  const classes = getMedicationClasses(medication);
   const ingredient = medication?.activeIngredient?.trim();
 
   const style = {
@@ -66,6 +78,9 @@ export function IntakeCard({
     "--entry-benzo-soft": roseSoft,
     "--entry-benzo-ink": roseInk,
     "--entry-benzo-border": `${color.hex}59`,
+    "--entry-opioid": amber,
+    "--entry-opioid-soft": amberSoft,
+    "--entry-opioid-ink": amberInk,
   } as CSSProperties;
 
   return (
@@ -73,12 +88,14 @@ export function IntakeCard({
       type="button"
       onClick={onEdit}
       disabled={disabled}
-      aria-label={`Edit ${entry.medicationName}${isBenzodiazepine ? ", benzodiazepine" : ""}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${formatDose(doseMg(entry))} milligrams, ${time}${nextMorning ? ", next morning" : ""}`}
+      aria-label={`Edit ${entry.medicationName}${classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${formatDose(doseMg(entry))} milligrams, ${time}${nextMorning ? ", next morning" : ""}`}
       className="intake-log-card"
       style={style}
       data-intake-card={entry.id}
       data-shine-eligible={shineEligible}
       data-benzodiazepine={isBenzodiazepine || undefined}
+      data-opioid={isOpioid || undefined}
+      data-medication-classification={getMedicationClassification(medication)}
       data-light-accent={
         getMedicationPreviewSurface(color.hex) === "#18181b" || undefined
       }
@@ -90,11 +107,12 @@ export function IntakeCard({
         <span className="intake-card-color-wash" data-intake-color-overlay />
       </span>
       <IntakeCardShine seed={entry.id} eligible={shineEligible} />
-      {isBenzodiazepine && (
+      {classes.length > 0 && (
         <span
           className="intake-card-benzo-rim"
           aria-hidden="true"
-          data-intake-benzo-rim
+          data-intake-benzo-rim={isBenzodiazepine || undefined}
+          data-intake-class-rim
         />
       )}
       <div className="intake-card-content">
@@ -113,9 +131,19 @@ export function IntakeCard({
             }
           >
             <MedicationGlyph icon={medication?.icon} className="size-7" />
-            {isBenzodiazepine && (
-              <span className="intake-card-benzo-dot" data-intake-benzo-dot />
-            )}
+            {classes.map((kind) => (
+              <span
+                key={kind}
+                className={
+                  kind === "benzodiazepine"
+                    ? "intake-card-benzo-dot"
+                    : "intake-card-opioid-dot"
+                }
+                data-medication-class={kind}
+                data-intake-benzo-dot={kind === "benzodiazepine" || undefined}
+                data-intake-opioid-dot={kind === "opioid" || undefined}
+              />
+            ))}
           </span>
         </span>
         <div className="intake-card-details">
@@ -144,22 +172,17 @@ export function IntakeCard({
               >
                 {typeLabel}
               </span>
-              {isBenzodiazepine && (
-                <span
-                  className="intake-card-benzo-icon"
-                  role="img"
-                  aria-label="Benzodiazepine"
-                  title="Benzodiazepine"
-                  data-intake-benzo-icon
-                >
-                  <PillIcon
-                    weight="duotone"
-                    size={12}
-                    aria-hidden="true"
-                    focusable="false"
-                  />
-                </span>
-              )}
+              {classes.map((kind) => (
+                <MedicationClassIcon
+                  key={kind}
+                  kind={kind}
+                  className={`intake-card-class-icon${kind === "benzodiazepine" ? " intake-card-benzo-icon" : " intake-card-opioid-icon"}`}
+                  data-intake-benzo-icon={
+                    kind === "benzodiazepine" || undefined
+                  }
+                  data-intake-opioid-icon={kind === "opioid" || undefined}
+                />
+              ))}
             </span>
           </div>
           <div className="intake-card-bottom" data-intake-bottom>

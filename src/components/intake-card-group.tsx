@@ -13,6 +13,7 @@ import { ActionIcon } from "@/components/action-icon";
 import { IntakeCard } from "@/components/intake-card";
 import type { Intake, Medication } from "@/lib/domain";
 import type { IntakeGroup } from "@/lib/intake-groups";
+import { getMedicationClasses } from "@/lib/medication-classification";
 
 function stackLayout(
   entries: readonly Intake[],
@@ -179,8 +180,18 @@ export function IntakeCardGroup({
         medication.isBenzodiazepine === true,
     ),
   );
-  const classificationContext = containsBenzodiazepine
-    ? ", includes a medication marked as a benzodiazepine"
+  const containsOpioid = group.entries.some((entry) =>
+    medications.some(
+      (medication) =>
+        medication.id === entry.medicationId && medication.isOpioid === true,
+    ),
+  );
+  const classes = getMedicationClasses({
+    isBenzodiazepine: containsBenzodiazepine,
+    isOpioid: containsOpioid,
+  });
+  const classificationContext = classes.length
+    ? `, includes medications marked as ${classes.join(" and ")}`
     : "";
 
   return (
@@ -191,6 +202,7 @@ export function IntakeCardGroup({
       data-expanded={!collapsed}
       data-stack-moving={moving}
       data-contains-benzodiazepine={containsBenzodiazepine || undefined}
+      data-contains-opioid={containsOpioid || undefined}
     >
       <div
         id={cardsId}

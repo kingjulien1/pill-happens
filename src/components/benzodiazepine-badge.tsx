@@ -1,16 +1,5 @@
-import { CrosshairSimpleIcon } from "@phosphor-icons/react/dist/ssr/CrosshairSimple";
-import { cn } from "@/lib/utils";
+import { MedicationClassBadge } from "@/components/medication-class-badge";
 
 export function BenzodiazepineBadge({ className }: { className?: string }) {
-  return (
-    <span
-      className={cn("benzodiazepine-badge", className)}
-      role="img"
-      aria-label="Benzodiazepine"
-      title="Benzodiazepine"
-    >
-      <CrosshairSimpleIcon weight="bold" aria-hidden="true" focusable="false" />
-      <span aria-hidden="true">Benzo</span>
-    </span>
-  );
+  return <MedicationClassBadge kind="benzodiazepine" className={className} />;
 }

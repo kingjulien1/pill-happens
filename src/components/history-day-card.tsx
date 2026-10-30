@@ -4,7 +4,11 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { ActionIcon } from "@/components/action-icon";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import {
+  MedicationClassBadges,
+  medicationClassHighlights,
+} from "@/components/medication-class-badge";
+import { getMedicationClassification } from "@/lib/medication-classification";
 import {
   dayIntakes,
   formatDay,
@@ -129,9 +133,13 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
             return (
               <span
                 key={total.medicationId}
-                className={`history-card-total min-w-0 max-w-full${isBenzodiazepine ? " benzodiazepine-highlight" : ""}`}
+                className={`history-card-total min-w-0 max-w-full ${medicationClassHighlights(medication)}`}
                 data-history-total={total.medicationId}
                 data-benzodiazepine={isBenzodiazepine || undefined}
+                data-opioid={medication?.isOpioid === true || undefined}
+                data-medication-classification={getMedicationClassification(
+                  medication,
+                )}
               >
                 <span
                   aria-hidden="true"
@@ -143,7 +151,7 @@ export function HistoryDayCard({ data, day }: { data: AppData; day: string }) {
                 <span className="min-w-0 truncate" title={total.medicationName}>
                   {total.medicationName}
                 </span>
-                {isBenzodiazepine && <BenzodiazepineBadge />}
+                <MedicationClassBadges medication={medication} />
                 <span className="shrink-0 font-medium text-foreground">
                   {formatDose(total.totalMg)} mg
                 </span>

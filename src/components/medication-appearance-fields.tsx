@@ -2,7 +2,11 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { RotateCcw, RotateCw, Search, Shuffle, Undo2, X } from "lucide-react";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import {
+  MedicationClassBadges,
+  medicationClassHighlights,
+} from "@/components/medication-class-badge";
+import { getMedicationClassification } from "@/lib/medication-classification";
 import { FinalLookStar } from "@/components/final-look-star";
 import { MedicationGlyph, MedicationIcon } from "@/components/medication-icon";
 import { SymbolSearchState } from "@/components/symbol-search-state";
@@ -137,6 +141,7 @@ export function MedicationAppearanceFields({
   defaultQuantity = "1",
   medicationType = "tablet",
   isBenzodiazepine = false,
+  isOpioid = false,
   onColorChange,
   onIconChange,
   onRotationChange,
@@ -149,6 +154,7 @@ export function MedicationAppearanceFields({
   defaultQuantity?: string;
   medicationType?: Medication["form"];
   isBenzodiazepine?: boolean;
+  isOpioid?: boolean;
   onColorChange: (value: MedicationColor) => void;
   onIconChange: (value: string) => void;
   onRotationChange: (value: number) => void;
@@ -623,9 +629,14 @@ export function MedicationAppearanceFields({
             <span
               className={cn(
                 "final-look-icon-frame relative inline-flex size-24 rounded-[28px] bg-popover",
-                isBenzodiazepine && "benzodiazepine-highlight",
+                medicationClassHighlights({ isBenzodiazepine, isOpioid }),
               )}
               data-benzodiazepine={isBenzodiazepine || undefined}
+              data-opioid={isOpioid || undefined}
+              data-medication-classification={getMedicationClassification({
+                isBenzodiazepine,
+                isOpioid,
+              })}
               style={{
                 backgroundColor: getMedicationPreviewSurface(
                   fixedColor?.hex ?? colorScale.icon,
@@ -653,7 +664,9 @@ export function MedicationAppearanceFields({
             </span>
           </div>
           <div className="relative flex min-w-0 items-center justify-center gap-3">
-            {isBenzodiazepine && <BenzodiazepineBadge />}
+            <MedicationClassBadges
+              medication={{ isBenzodiazepine, isOpioid }}
+            />
             <p
               className="truncate text-xs font-medium"
               data-preview-symbol-label
@@ -720,16 +733,22 @@ export function MedicationAppearanceFields({
           <div
             className={cn(
               "final-look-journal relative mt-4 flex w-full min-w-0 items-center gap-3 rounded-2xl bg-popover p-3",
-              isBenzodiazepine && "benzodiazepine-highlight",
+              medicationClassHighlights({ isBenzodiazepine, isOpioid }),
             )}
             data-preview-journal-row
             data-benzodiazepine={isBenzodiazepine || undefined}
+            data-opioid={isOpioid || undefined}
+            data-medication-classification={getMedicationClassification({
+              isBenzodiazepine,
+              isOpioid,
+            })}
           >
             <MedicationIcon
               color={color}
               icon={icon}
               rotation={iconRotation}
               isBenzodiazepine={isBenzodiazepine}
+              isOpioid={isOpioid}
               small
               className="size-10 rounded-xl"
             />
@@ -745,7 +764,9 @@ export function MedicationAppearanceFields({
                 >
                   {previewName}
                 </p>
-                {isBenzodiazepine && <BenzodiazepineBadge />}
+                <MedicationClassBadges
+                  medication={{ isBenzodiazepine, isOpioid }}
+                />
               </div>
               <p className="mt-1 text-[10px] text-muted-foreground">
                 {strengthLabel}

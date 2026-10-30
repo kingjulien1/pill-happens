@@ -4,13 +4,20 @@ import { useId, useState, type FormEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import { MedicationActionButton } from "@/components/medication-action-button";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
-import { CrosshairSimpleIcon } from "@phosphor-icons/react/dist/ssr/CrosshairSimple";
+import {
+  MedicationClassBadges,
+  medicationClassHighlights,
+} from "@/components/medication-class-badge";
+import { MedicationClassificationField } from "@/components/medication-classification-field";
 import {
   MedicationIcon,
   MedicationTypeIcon,
 } from "@/components/medication-icon";
 import { isMedicationIcon } from "@/lib/medication-appearance";
+import {
+  getMedicationClassification,
+  medicationClassificationFlags,
+} from "@/lib/medication-classification";
 import {
   getMedicationType,
   isMeteredMedicationType,
@@ -21,7 +28,6 @@ import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -60,9 +66,11 @@ export function MedicationForm({
   const [activeIngredient, setActiveIngredient] = useState(
     medication?.activeIngredient ?? "",
   );
-  const [isBenzodiazepine, setIsBenzodiazepine] = useState(
-    medication?.isBenzodiazepine === true,
+  const [classification, setClassification] = useState(
+    getMedicationClassification(medication),
   );
+  const { isBenzodiazepine, isOpioid } =
+    medicationClassificationFlags(classification);
   const [strength, setStrength] = useState(
     medication ? String(medication.strengthMg) : "",
   );
@@ -115,6 +123,7 @@ export function MedicationForm({
           name: name.trim(),
           activeIngredient: activeIngredient.trim(),
           isBenzodiazepine,
+          isOpioid,
           strengthMg,
           defaultQuantity: quantity,
           form,
@@ -134,26 +143,101 @@ export function MedicationForm({
   return (
     <form onSubmit={save} className="flex flex-col gap-4">
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`${id}-name`}>Medication Name</Label>
-          <Input
-            id={`${id}-name`}
-            name="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="As written on the packaging"
-            required
-            maxLength={80}
-            autoComplete="off"
-            className={inputClass}
-          />
+        <div
+          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-end gap-3"
+          data-medication-identity-fields
+        >
+          <div className="flex min-w-0 flex-col gap-2">
+            <Label htmlFor={`${id}-name`}>Medication Name</Label>
+            <Input
+              id={`${id}-name`}
+              name="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="As written on the packaging"
+              required
+              maxLength={80}
+              autoComplete="off"
+              className={inputClass}
+            />
+          </div>
+          <div className="flex min-w-0 flex-col gap-2">
+            <Label htmlFor={`${id}-form`}>Type</Label>
+            <Select
+              name="form"
+              value={form}
+              highlightItemOnHover={false}
+              onValueChange={(value) => {
+                if (value && forms.some((item) => item.value === value)) {
+                  setForm(value as Medication["form"]);
+                }
+              }}
+              disabled={busy}
+            >
+              <SelectTrigger
+                id={`${id}-form`}
+                aria-label="Medication Type"
+                title={type.label}
+                data-medication-type-select
+                className="medication-compact-select h-10 w-full rounded-xl px-2 text-xs data-[size=default]:h-10"
+              >
+                <SelectValue className="gap-1">
+                  <MedicationTypeIcon type={form} className="size-3" />
+                  <span>
+                    {forms.find((item) => item.value === form)?.label}
+                  </span>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent
+                align="end"
+                alignItemWithTrigger={false}
+                sideOffset={6}
+                className="brand-menu brand-navigation medication-type-menu min-w-[240px] max-w-[calc(100vw-32px)] p-1"
+              >
+                <SelectGroup className="p-0">
+                  <SelectLabel className="flex h-7 items-center gap-1.5 px-2.5 py-0 text-[11px] font-semibold text-popover-foreground">
+                    <span>Medication Type</span>
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
+                      <span aria-hidden="true">·</span>
+                      <span>{forms.length} options</span>
+                    </span>
+                  </SelectLabel>
+                  <SelectSeparator className="brand-navigation-separator mx-2.5 my-1" />
+                  {forms.map((item) => (
+                    <SelectItem
+                      key={item.value}
+                      value={item.value}
+                      label={item.label}
+                      data-active={form === item.value}
+                      className="brand-menu-link medication-type-option min-h-9 cursor-pointer gap-2 rounded-lg py-1.5 pr-9 pl-2.5 text-xs font-medium"
+                    >
+                      <MedicationTypeIcon
+                        type={item.value}
+                        className="medication-type-option-icon size-4"
+                      />
+                      <span>{item.label}</span>
+                      {form === item.value && (
+                        <span
+                          aria-hidden="true"
+                          className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground"
+                        >
+                          <span>·</span>
+                          <span>selected</span>
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div
-          className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(80px,.4fr)] gap-3"
+          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-end gap-3"
           data-medication-classification-fields
         >
-          <div className="min-w-0 space-y-2">
+          <div className="flex min-w-0 flex-col gap-2">
             <Label htmlFor={`${id}-ingredient`}>
               Active Ingredient
               <span className="inline-flex items-center gap-1.5 font-normal text-muted-foreground">
@@ -173,34 +257,17 @@ export function MedicationForm({
               className={inputClass}
             />
           </div>
-          <div className="flex h-10 items-center self-end">
-            <Switch
-              id={`${id}-benzodiazepine`}
-              name="isBenzodiazepine"
-              checked={isBenzodiazepine}
-              onCheckedChange={setIsBenzodiazepine}
-              disabled={busy}
-              aria-label="Benzodiazepine"
-              aria-description="Mark this medication to highlight it as a benzodiazepine throughout your journal."
-              title="Benzodiazepine"
-              className="benzodiazepine-switch"
-              data-medication-benzodiazepine-switch
-            >
-              <CrosshairSimpleIcon
-                weight="bold"
-                aria-hidden="true"
-                className="benzodiazepine-switch-icon"
-              />
-              <span>Benzo</span>
-              <span
-                aria-hidden="true"
-                className="benzodiazepine-switch-indicator"
-              >
-                <ActionIcon name="selected" />
-              </span>
-            </Switch>
-          </div>
+          <MedicationClassificationField
+            id={`${id}-classification`}
+            value={classification}
+            onChange={setClassification}
+            disabled={busy}
+          />
         </div>
+
+        <p className="-mt-2 text-[10px] leading-relaxed text-muted-foreground">
+          Manual labels · shared across your journal.
+        </p>
 
         <div
           className="grid min-w-0 grid-cols-2 gap-3"
@@ -262,72 +329,6 @@ export function MedicationForm({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor={`${id}-form`}>Medication Type</Label>
-          <Select
-            name="form"
-            value={form}
-            highlightItemOnHover={false}
-            onValueChange={(value) => {
-              if (value && forms.some((item) => item.value === value)) {
-                setForm(value as Medication["form"]);
-              }
-            }}
-            disabled={busy}
-          >
-            <SelectTrigger
-              id={`${id}-form`}
-              className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10 [&>span:last-child>svg]:size-3.5"
-            >
-              <SelectValue>
-                <MedicationTypeIcon type={form} className="size-4" />
-                <span>{forms.find((item) => item.value === form)?.label}</span>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent
-              align="start"
-              alignItemWithTrigger={false}
-              sideOffset={6}
-              className="brand-menu brand-navigation medication-type-menu p-1"
-            >
-              <SelectGroup className="p-0">
-                <SelectLabel className="flex h-7 items-center gap-1.5 px-2.5 py-0 text-[11px] font-semibold text-popover-foreground">
-                  <span>Medication Type</span>
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
-                    <span aria-hidden="true">·</span>
-                    <span>{forms.length} options</span>
-                  </span>
-                </SelectLabel>
-                <SelectSeparator className="brand-navigation-separator mx-2.5 my-1" />
-                {forms.map((item) => (
-                  <SelectItem
-                    key={item.value}
-                    value={item.value}
-                    label={item.label}
-                    data-active={form === item.value}
-                    className="brand-menu-link medication-type-option min-h-9 cursor-pointer gap-2 rounded-lg py-1.5 pr-9 pl-2.5 text-xs font-medium"
-                  >
-                    <MedicationTypeIcon
-                      type={item.value}
-                      className="medication-type-option-icon size-4"
-                    />
-                    <span>{item.label}</span>
-                    {form === item.value && (
-                      <span
-                        aria-hidden="true"
-                        className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground"
-                      >
-                        <span>·</span>
-                        <span>selected</span>
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-
         <MedicationAppearanceFields
           color={color}
           icon={icon}
@@ -337,6 +338,7 @@ export function MedicationForm({
           defaultQuantity={defaultQuantity}
           medicationType={form}
           isBenzodiazepine={isBenzodiazepine}
+          isOpioid={isOpioid}
           onColorChange={setColor}
           onRotationChange={setIconRotation}
           onIconChange={(value) => {
@@ -456,6 +458,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       isBenzodiazepine={
                         selectedMedication.isBenzodiazepine === true
                       }
+                      isOpioid={selectedMedication.isOpioid === true}
                       small
                       className="size-5 rounded-md"
                     />
@@ -469,9 +472,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       <span className="shrink-0 text-xs">
                         · {formatDose(selectedMedication.strengthMg)} mg
                       </span>
-                      {selectedMedication.isBenzodiazepine === true && (
-                        <BenzodiazepineBadge />
-                      )}
+                      <MedicationClassBadges medication={selectedMedication} />
                     </span>
                   </>
                 ) : null}
@@ -482,10 +483,11 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                 <SelectItem
                   key={medication.id}
                   value={medication.id}
-                  className={`min-h-9 pl-3 pr-9 text-sm ${medication.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                  className={`min-h-9 pl-3 pr-9 text-sm ${medicationClassHighlights(medication)}`}
                   data-benzodiazepine={
                     medication.isBenzodiazepine === true || undefined
                   }
+                  data-opioid={medication.isOpioid === true || undefined}
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <MedicationIcon
@@ -493,6 +495,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       rotation={medication.iconRotation}
                       color={medication.color}
                       isBenzodiazepine={medication.isBenzodiazepine === true}
+                      isOpioid={medication.isOpioid === true}
                       small
                       className="size-5 rounded-md"
                     />
@@ -501,9 +504,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                         {medication.name} · {formatDose(medication.strengthMg)}{" "}
                         mg
                       </span>
-                      {medication.isBenzodiazepine === true && (
-                        <BenzodiazepineBadge />
-                      )}
+                      <MedicationClassBadges medication={medication} />
                     </span>
                   </span>
                 </SelectItem>

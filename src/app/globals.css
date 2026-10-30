@@ -907,7 +907,8 @@
     gap: 6px;
   }
 }
-.intake-card-benzo-dot {
+.intake-card-benzo-dot,
+.intake-card-opioid-dot {
   position: absolute;
   z-index: 3;
   top: -2px;
@@ -917,6 +918,13 @@
   border-radius: 50%;
   background: var(--entry-benzo);
   box-shadow: 0 0 0 2px #1b171a;
+}
+.intake-card-opioid-dot {
+  background: var(--entry-opioid);
+}
+.intake-log-card[data-medication-classification="both"]
+  .intake-card-opioid-dot {
+  left: 8px;
 }
 .intake-card-shine {
   position: absolute;
@@ -1368,15 +1376,12 @@
   }
 }
 .benzodiazepine-badge,
-.benzodiazepine-highlight,
-.benzodiazepine-switch {
+.benzodiazepine-highlight {
   --benzo-keyline: #9a34123d;
   --benzo-halo: #f973161a;
   --benzo-badge-background: #ffedd5c7;
   --benzo-badge-edge: #9a341229;
   --benzo-mark: #9a3412;
-  --benzo-check-ink: #fff1d6;
-  --benzo-checked-background: #fed7aa80;
 }
 .benzodiazepine-badge {
   display: inline-flex;
@@ -1395,8 +1400,7 @@
   line-height: 14px;
   white-space: nowrap;
 }
-.benzodiazepine-badge > svg,
-.benzodiazepine-switch-icon {
+.benzodiazepine-badge > svg {
   width: 12px;
   height: 12px;
   flex-shrink: 0;
@@ -1413,98 +1417,95 @@
     var(--benzodiazepine-base-shadow, 0 0 #0000),
     0 0 13px var(--benzo-halo);
 }
-.benzodiazepine-switch {
-  display: inline-flex;
-  width: 100%;
-  min-width: 0;
-  height: 36px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 0 7px;
-  border: 1px solid var(--benzo-badge-edge);
-  border-radius: 10px;
-  background: var(--empty-intake-wash);
-  color: var(--foreground);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
-  box-shadow: inset 0 1px 0 #ffffff24;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1;
-  white-space: nowrap;
-  transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease;
-}
-.benzodiazepine-switch:is(
-  [data-checked],
-  [data-pressed],
-  [aria-checked="true"]
-) {
-  border-color: var(--benzo-keyline);
-  background: var(--benzo-checked-background);
-  box-shadow:
-    inset 0 1px 0 #ffffff24,
-    0 0 12px var(--benzo-halo);
-}
-.benzodiazepine-switch:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.benzodiazepine-switch-indicator {
-  display: inline-flex;
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--benzo-keyline);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--benzo-check-ink);
-  transition:
-    background-color 180ms ease,
-    border-color 180ms ease;
-}
-.benzodiazepine-switch-indicator > svg {
-  width: 9px;
-  height: 9px;
-  opacity: 0;
-  transform: rotate(-20deg) scale(0.4);
-  transition:
-    opacity 160ms ease,
-    transform 240ms cubic-bezier(0.2, 0.85, 0.25, 1.15);
-}
-.benzodiazepine-switch:is([data-checked], [data-pressed], [aria-checked="true"])
-  .benzodiazepine-switch-indicator {
-  border-color: var(--benzo-mark);
-  background: var(--benzo-mark);
-}
-.benzodiazepine-switch:is([data-checked], [data-pressed], [aria-checked="true"])
-  .benzodiazepine-switch-indicator
-  > svg {
-  opacity: 1;
-  transform: none;
-}
-.benzodiazepine-switch:is(:disabled, [data-disabled]) {
-  opacity: 0.5;
-  pointer-events: none;
-}
 @media (prefers-color-scheme: dark) {
   .benzodiazepine-badge,
-  .benzodiazepine-highlight,
-  .benzodiazepine-switch {
+  .benzodiazepine-highlight {
     --benzo-keyline: #fed7aa59;
     --benzo-halo: #f9731621;
     --benzo-badge-background: #9a34123d;
     --benzo-badge-edge: #fed7aa38;
     --benzo-mark: #fed7aa;
-    --benzo-check-ink: #120f17;
-    --benzo-checked-background: #9a341238;
+  }
+}
+.medication-class-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--entry-benzo-soft, #ffa1ad);
+  color: var(--entry-benzo-ink, #ec003f);
+}
+.medication-class-icon[data-medication-class="opioid"] {
+  background: var(--entry-opioid-soft, #ffd230);
+  color: var(--entry-opioid-ink, #bb4d00);
+}
+.medication-class-badge[data-medication-class="opioid"] {
+  --benzo-badge-background: #fef3c7d9;
+  --benzo-badge-edge: #bb4d0038;
+  --benzo-mark: #92400e;
+}
+.opioid-highlight {
+  outline: 1px solid #bb4d004d;
+  outline-offset: 1px;
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000),
+    var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000),
+    var(--benzodiazepine-base-shadow, 0 0 #0000),
+    0 0 13px #fe9a001a;
+}
+.medication-compact-select > [data-slot="select-value"] {
+  gap: 4px;
+}
+.medication-compact-select > span:last-child > svg {
+  width: 12px;
+  height: 12px;
+}
+.medication-class-selection-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--foreground) 30%, transparent);
+}
+.medication-class-selection-dot[data-class-selection="benzodiazepine"] {
+  background: #ff2056;
+}
+.medication-class-selection-dot[data-class-selection="opioid"] {
+  background: #fe9a00;
+}
+.medication-class-selection-dot[data-class-selection="both"] {
+  background: linear-gradient(90deg, #ff2056 50%, #fe9a00 50%);
+}
+@media (max-width: 359px) {
+  .medication-compact-select {
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+  [data-medication-classification-fields] label > span {
+    gap: 4px;
+    font-size: 10px;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .medication-class-badge[data-medication-class="opioid"] {
+    --benzo-badge-background: #92400e4d;
+    --benzo-badge-edge: #ffd23059;
+    --benzo-mark: #ffd230;
+  }
+  .opioid-highlight {
+    outline-color: #ffd23059;
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--benzodiazepine-base-shadow, 0 0 #0000),
+      0 0 13px #fe9a0021;
   }
 }
 .medications-page-title {

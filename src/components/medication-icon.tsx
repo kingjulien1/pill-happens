@@ -41,6 +41,8 @@ import {
   Testavan,
 } from "@/components/tablet-icons";
 import { cn } from "@/lib/utils";
+import { medicationClassHighlights } from "@/components/medication-class-badge";
+import { getMedicationClassification } from "@/lib/medication-classification";
 
 const glyphs = {
   pill: Pill,
@@ -220,6 +222,7 @@ export function MedicationIcon({
   rotation = 0,
   small = false,
   isBenzodiazepine = false,
+  isOpioid = false,
   className,
 }: {
   color?: string;
@@ -227,6 +230,7 @@ export function MedicationIcon({
   rotation?: number;
   small?: boolean;
   isBenzodiazepine?: boolean;
+  isOpioid?: boolean;
   className?: string;
 }) {
   const appearance = getMedicationColor(color);
@@ -245,10 +249,15 @@ export function MedicationIcon({
       data-medication-mark
       data-medication-color={appearance.value}
       data-benzodiazepine={isBenzodiazepine || undefined}
+      data-opioid={isOpioid || undefined}
+      data-medication-classification={getMedicationClassification({
+        isBenzodiazepine,
+        isOpioid,
+      })}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-2xl",
         small ? "size-10" : "size-12",
-        isBenzodiazepine && "benzodiazepine-highlight",
+        medicationClassHighlights({ isBenzodiazepine, isOpioid }),
         className,
       )}
       style={style}

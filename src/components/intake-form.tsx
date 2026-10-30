@@ -5,7 +5,11 @@ import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationActionButton } from "@/components/medication-action-button";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import {
+  MedicationClassBadges,
+  medicationClassHighlights,
+} from "@/components/medication-class-badge";
+import { getMedicationClassification } from "@/lib/medication-classification";
 import { toast } from "sonner";
 import {
   getMedicationType,
@@ -168,6 +172,7 @@ export function IntakeForm({
                     color={medication.color}
                     rotation={medication.iconRotation}
                     isBenzodiazepine={medication.isBenzodiazepine === true}
+                    isOpioid={medication.isOpioid === true}
                     small
                     className="size-6 rounded-md"
                   />
@@ -179,9 +184,7 @@ export function IntakeForm({
                       · {formatDose(strength)} mg
                       {isMeteredMedicationType(medicationForm) ? " / pump" : ""}
                     </span>
-                    {medication.isBenzodiazepine === true && (
-                      <BenzodiazepineBadge />
-                    )}
+                    <MedicationClassBadges medication={medication} />
                   </span>
                 </>
               ) : (
@@ -194,8 +197,10 @@ export function IntakeForm({
               <SelectItem
                 key={m.id}
                 value={m.id}
-                className={`min-h-9 pl-3 pr-9 text-xs ${m.isBenzodiazepine === true ? "benzodiazepine-highlight" : ""}`}
+                className={`min-h-9 pl-3 pr-9 text-xs ${medicationClassHighlights(m)}`}
                 data-benzodiazepine={m.isBenzodiazepine === true || undefined}
+                data-opioid={m.isOpioid === true || undefined}
+                data-medication-classification={getMedicationClassification(m)}
               >
                 <span className="flex min-w-0 items-center gap-2">
                   <MedicationIcon
@@ -203,6 +208,7 @@ export function IntakeForm({
                     color={m.color}
                     rotation={m.iconRotation}
                     isBenzodiazepine={m.isBenzodiazepine === true}
+                    isOpioid={m.isOpioid === true}
                     small
                     className="size-6 rounded-md"
                   />
@@ -211,7 +217,7 @@ export function IntakeForm({
                       {m.name} · {formatDose(m.strengthMg)} mg
                       {isMeteredMedicationType(m.form) ? " / pump" : ""}
                     </span>
-                    {m.isBenzodiazepine === true && <BenzodiazepineBadge />}
+                    <MedicationClassBadges medication={m} />
                   </span>
                 </span>
               </SelectItem>

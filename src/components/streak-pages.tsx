@@ -8,7 +8,7 @@ import { TrendDownIcon } from "@phosphor-icons/react/dist/ssr/TrendDown";
 import { EqualsIcon } from "@phosphor-icons/react/dist/ssr/Equals";
 import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { ActionIcon } from "@/components/action-icon";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import { MedicationClassBadges } from "@/components/medication-class-badge";
 import { HeadingText } from "@/components/heading-text";
 import { useJournal } from "@/components/journal-provider";
 import { StreakArtwork } from "@/components/streak-artwork";
@@ -430,7 +430,7 @@ function MedicationComparisons({
                   aria-hidden="true"
                 />
                 <h3 title={medication.name}>{medication.name}</h3>
-                {medication.isBenzodiazepine && <BenzodiazepineBadge />}
+                <MedicationClassBadges medication={medication} />
                 <span>
                   {medication.direction === "insufficient"
                     ? "No Comparison"

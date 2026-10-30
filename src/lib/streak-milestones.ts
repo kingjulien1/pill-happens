@@ -50,6 +50,7 @@ export type StreakMedicationChange = {
   name: string;
   color: MedicationColor;
   isBenzodiazepine: boolean;
+  isOpioid: boolean;
   currentTotalMg: number | null;
   previousTotalMg: number | null;
   currentLoggedDays: number;
@@ -412,6 +413,7 @@ function medicationChanges(
         name: record.name,
         color: medication?.color ?? "rose",
         isBenzodiazepine: medication?.isBenzodiazepine === true,
+        isOpioid: medication?.isOpioid === true,
         currentTotalMg: record.current?.total ?? null,
         previousTotalMg: record.previous?.total ?? null,
         currentLoggedDays: record.current?.days.size ?? 0,
