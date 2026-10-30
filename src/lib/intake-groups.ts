@@ -1,48 +1,46 @@
 import type { Intake } from "./domain";
 
 export type IntakeGroup = {
-  /** The first recorded entry keeps this group's identity stable on append. */
+  /** Earliest-taken member; backdating or time edits can legitimately regroup. */
   id: string;
   entries: Intake[];
 };
 
-const RECORDING_WINDOW_MS = 5 * 60 * 1_000;
+const TAKEN_WINDOW_MS = 5 * 60 * 1_000;
 
 /**
- * Group an already creation-ordered timeline without changing any intake.
- * Each window starts at its first saved entry, rather than extending whenever
- * another entry arrives. takenAt, doses, and calendar boundaries play no part.
- * Invalid or backward timestamps start a separate group without reordering.
+ * Order a copy by time taken, keeping source order for equal instants. Each
+ * five-minute window starts at its earliest intake rather than extending with
+ * later members. Creation times never determine grouping or display order.
+ * Invalid taken times remain separate singletons after the valid timeline.
  */
 export function groupIntakes(entries: readonly Intake[]): IntakeGroup[] {
+  const ordered = entries
+    .map((entry) => ({ entry, takenAt: Date.parse(entry.takenAt) }))
+    .sort((left, right) => {
+      if (!Number.isFinite(left.takenAt))
+        return Number.isFinite(right.takenAt) ? 1 : 0;
+      if (!Number.isFinite(right.takenAt)) return -1;
+      return left.takenAt - right.takenAt;
+    });
   const groups: IntakeGroup[] = [];
   let current: IntakeGroup | undefined;
   let windowStart = Number.NaN;
-  let previousTime = Number.NaN;
 
-  for (const entry of entries) {
-    const recordedAt = Date.parse(entry.createdAt);
-
-    if (!Number.isFinite(recordedAt)) {
+  for (const { entry, takenAt } of ordered) {
+    if (!Number.isFinite(takenAt)) {
       groups.push({ id: entry.id, entries: [entry] });
-      // An unknown save time cannot connect the groups on either side of it.
       current = undefined;
       continue;
     }
 
-    if (
-      current &&
-      recordedAt >= previousTime &&
-      recordedAt - windowStart <= RECORDING_WINDOW_MS
-    ) {
+    if (current && takenAt - windowStart <= TAKEN_WINDOW_MS) {
       current.entries.push(entry);
     } else {
       current = { id: entry.id, entries: [entry] };
       groups.push(current);
-      windowStart = recordedAt;
+      windowStart = takenAt;
     }
-
-    previousTime = recordedAt;
   }
 
   return groups;

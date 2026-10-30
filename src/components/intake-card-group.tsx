@@ -147,8 +147,8 @@ export function IntakeCardGroup({
           aria-controls={cardsId}
           aria-label={`${
             collapsed
-              ? `Show ${count} entries recorded together, starting with ${group.entries[0].medicationName}`
-              : `Collapse ${count} entries recorded together`
+              ? `Show ${count} intakes taken within five minutes, starting with ${group.entries[0].medicationName}`
+              : `Collapse ${count} intakes taken together`
           }${classificationContext}`}
           onClick={(event) => {
             setExpanded(collapsed);
@@ -168,7 +168,7 @@ export function IntakeCardGroup({
               <strong>{count}</strong> Entries
               <span className="intake-group-context">
                 {" / "}
-                {collapsed ? "Saved Together" : "Collapse"}
+                {collapsed ? "Taken Together" : "Collapse"}
               </span>
             </span>
             {containsBenzodiazepine && <BenzodiazepineBadge />}
