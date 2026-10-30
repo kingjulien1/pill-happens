@@ -172,6 +172,11 @@ export const TABLET_SHAPES = {
       ],
     ],
   },
+  levomethasan: {
+    componentName: "Levomethasan",
+    aliases: ["levomethasan", "quarter-scored-tablet"],
+    nodes: [...scored(9), ["path", { d: "M4 12h16", key: "cross-score" }]],
+  },
   ...DISPENSER_SHAPES,
 } satisfies Record<string, TabletShape>;
 

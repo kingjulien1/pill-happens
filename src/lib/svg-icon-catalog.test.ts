@@ -13,7 +13,7 @@ import {
 } from "./svg-icon-catalog";
 
 test("the local SVG catalog has unique stable IDs and corresponding checked-in assets", () => {
-  assert.ok(SVG_ICON_CATALOG.length > 0);
+  assert.equal(SVG_ICON_CATALOG.length, 45);
   assert.equal(
     new Set(SVG_ICON_CATALOG.map(({ value }) => value)).size,
     SVG_ICON_CATALOG.length,
@@ -123,7 +123,8 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
   );
   const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
   assert.equal(outlines.length, Object.keys(TABLET_SHAPES).length);
-  assert.equal(colors.length, 16);
+  assert.equal(outlines.length, 16);
+  assert.equal(colors.length, 17);
   for (const [slug, label] of [
     ["bromazepam", "Bromazepam"],
     ["diazepam", "Diazepam"],
@@ -141,6 +142,7 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     ["tadalafil-10", "Tadalafil 10mg"],
     ["tramal", "Tramal"],
     ["testavan", "Testavan"],
+    ["levomethasan", "Levomethasan"],
   ])
     assert.equal(getSvgIcon(`svg:color:${slug}`)?.label, label);
   for (const slug of [
@@ -150,6 +152,7 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     "venlafaxin",
     "euthyrox",
     "testavan",
+    "levomethasan",
   ])
     assert.equal(
       getSvgIcon(`svg:color:${slug}`)?.color?.hex.toLowerCase(),
@@ -196,12 +199,14 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
     ["TramalColor", "svg:color:tramal"],
     ["Testavan", "svg:testavan"],
     ["TestavanColor", "svg:color:testavan"],
+    ["Levomethasan", "svg:levomethasan"],
+    ["LevomethasanColor", "svg:color:levomethasan"],
   ])
     assert.ok(
       searchSvgIcons(query).some((entry) => entry.value === value),
       query,
     );
-  assert.equal(searchSvgIcons("color").length, 16);
+  assert.equal(searchSvgIcons("color").length, 17);
   assert.ok(
     searchSvgIcons("colored").every(({ variant }) => variant === "color"),
   );
@@ -214,7 +219,13 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
   );
   assert.equal(searchSvgIcons("euthyrox").length, 2);
   assert.equal(searchSvgIcons("viagra").length, 2);
-  for (const slug of ["tadalafil-5", "tadalafil-10", "tramal", "testavan"]) {
+  for (const slug of [
+    "tadalafil-5",
+    "tadalafil-10",
+    "tramal",
+    "testavan",
+    "levomethasan",
+  ]) {
     assert.deepEqual(
       new Set(searchSvgIcons(slug).map(({ value }) => value)),
       new Set([`svg:${slug}`, `svg:color:${slug}`]),

@@ -25,6 +25,7 @@ export const Tadalafil5 = tabletIcon("tadalafil-5");
 export const Tadalafil10 = tabletIcon("tadalafil-10");
 export const Tramal = tabletIcon("tramal");
 export const Testavan = tabletIcon("testavan");
+export const Levomethasan = tabletIcon("levomethasan");
 
 /** Searchable alternative names reuse the canonical drawing and component. */
 export const TabletBisect = TabletMeridian;
@@ -50,4 +51,5 @@ export const TABLET_OUTLINE_COMPONENTS = {
   "tadalafil-10": Tadalafil10,
   tramal: Tramal,
   testavan: Testavan,
+  levomethasan: Levomethasan,
 } satisfies Record<keyof typeof TABLET_SHAPES, LucideIcon>;
