@@ -285,13 +285,13 @@
   margin-top: 8px;
 }
 .intake-stack-slot[data-stack-rear="true"] {
+  margin-inline: 2%;
   overflow: clip;
   overflow-clip-margin: 6px;
 }
 .intake-stack-slot[data-stack-collapsed="true"] {
   height: min(26px, calc(var(--stack-card-height, 104px) * 0.25));
   margin-top: -1px;
-  margin-inline: var(--stack-inset, 1%);
   overflow: clip;
   overflow-clip-margin: 0;
 }
@@ -366,22 +366,19 @@
 }
 .intake-log-card {
   --entry-rim-width: 4px;
-  --entry-card-padding: calc(16px - var(--entry-rim-width) - 1px);
+  --entry-card-padding: 15px;
   position: relative;
   isolation: isolate;
   display: block;
   width: 100%;
-  overflow: visible;
-  border: var(--entry-rim-width) solid var(--entry-rim-tint);
+  overflow: hidden;
+  border: 0;
   border-radius: 21px;
   background: transparent;
   color: #fed7aa;
   text-align: left;
   cursor: pointer;
-}
-.intake-log-card.benzodiazepine-highlight {
-  outline-color: #fed7aa59;
-  box-shadow: none;
+  box-shadow: inset 0 0 0 var(--entry-rim-width) #ffffff08;
 }
 .intake-log-card:disabled {
   cursor: inherit;
@@ -390,8 +387,16 @@
   outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
+.intake-log-card::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border: var(--entry-rim-width) solid #ffffff08;
+  border-radius: inherit;
+  pointer-events: none;
+}
 .intake-card-glass,
-.intake-card-curves,
 .intake-card-ink {
   pointer-events: none;
 }
@@ -401,16 +406,16 @@
   inset: 0;
   isolation: isolate;
   overflow: hidden;
-  border-radius: calc(21px - var(--entry-rim-width));
+  border-radius: inherit;
   background:
     linear-gradient(145deg, #ffffff24, #ffffff00 45%, #ffffff0a),
     rgb(255 253 253 / 18%);
   -webkit-backdrop-filter: blur(72px) saturate(1.1);
   backdrop-filter: blur(72px) saturate(1.1);
   box-shadow:
-    inset 0 1px 0 #ffffff75,
-    inset 1px 0 0 #ffffff26,
-    inset 0 -1px 0 #ffffff1a;
+    inset 0 1px 0 #ffffff1a,
+    inset 1px 0 0 #ffffff08,
+    inset 0 -1px 0 #ffffff06;
 }
 .history-card-color-overlay {
   position: absolute;
@@ -427,29 +432,27 @@
   padding: 4px;
 }
 @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
-  .intake-log-card {
-    border-color: transparent;
-  }
   .intake-log-card::before {
     content: "";
     position: absolute;
-    z-index: 2;
-    inset: calc(-1 * var(--entry-rim-width));
+    z-index: 3;
+    inset: 0;
+    border: 0;
     padding: var(--entry-rim-width);
     border-radius: inherit;
-    background-color: var(--entry-rim-tint);
+    background-color: #ffffff03;
     background-image: linear-gradient(
       145deg,
-      #ffffff24,
-      #ffffff05 38%,
-      #ffffff17 60%,
-      #ffffff08
+      #ffffff0d,
+      #ffffff02 38%,
+      #ffffff08 60%,
+      #ffffff03
     );
-    -webkit-backdrop-filter: blur(72px) saturate(1.05);
-    backdrop-filter: blur(72px) saturate(1.05);
+    -webkit-backdrop-filter: blur(72px);
+    backdrop-filter: blur(72px);
     box-shadow:
-      inset 0 1px 0 #ffffff38,
-      inset 0 -1px 0 #ffffff12;
+      inset 0 1px 0 #ffffff0d,
+      inset 0 -1px 0 #ffffff05;
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
       linear-gradient(#000 0 0);
@@ -472,49 +475,6 @@
     mask-composite: exclude;
   }
 }
-.intake-card-curves {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  max-width: none;
-  height: 100%;
-  overflow: visible;
-  fill: none;
-}
-.intake-card-curves path {
-  stroke: var(--entry-wave-above);
-  stroke-width: 17px;
-  stroke-linecap: round;
-  transform-box: view-box;
-  transform-origin: 50% 50%;
-  animation: intake-wave-flow 16s ease-in-out var(--entry-wave-phase, 0s)
-    infinite;
-}
-.intake-card-curves path + path {
-  stroke: var(--entry-wave-below);
-  stroke-width: 10px;
-  animation-duration: 20s;
-  animation-delay: calc(var(--entry-wave-phase, 0s) - 5s);
-  animation-direction: reverse;
-}
-.intake-stack-slot[data-stack-collapsed="true"] .intake-card-curves path {
-  animation-play-state: paused;
-}
-@keyframes intake-wave-flow {
-  0%,
-  100% {
-    transform: translate(-6px, 0) scaleY(0.98);
-  }
-  25% {
-    transform: translate(0, -2px) scaleY(1.035);
-  }
-  50% {
-    transform: translate(6px, 0) scaleY(1.02);
-  }
-  75% {
-    transform: translate(0, 2px) scaleY(0.965);
-  }
-}
 .intake-card-ink {
   position: absolute;
   z-index: 3;
@@ -525,8 +485,14 @@
 }
 .intake-card-content {
   position: relative;
-  z-index: 1;
-  padding: 8px var(--entry-card-padding);
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px var(--entry-card-padding);
+}
+.intake-stack-slot[data-stack-rear="true"] .intake-card-content {
+  padding-block: 10px;
 }
 .intake-card-focus {
   position: relative;
@@ -558,11 +524,215 @@
 .intake-card-details {
   position: relative;
   min-width: 0;
+  flex: 1;
+  padding-block: 5px;
 }
-.intake-card-meta,
-.intake-card-note,
-.intake-card-dose-unit {
+.intake-card-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  line-height: 20px;
+}
+.intake-card-time,
+.intake-card-name {
+  font-size: 13.5px;
+  font-weight: 550;
+  line-height: 20px;
+}
+.intake-card-time {
+  flex-shrink: 0;
+  color: #fed7aaeb;
+  font-variant-numeric: tabular-nums;
+}
+.intake-card-heading-dot {
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #fed7aa99;
+}
+.intake-card-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intake-card-bottom {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 5px;
+}
+.intake-card-meta {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  line-height: 16px;
+}
+.intake-card-ingredient {
+  min-width: min(48px, 100%);
+  max-width: 100%;
+  flex: 0 1 auto;
+  overflow: hidden;
+  color: #fed7aae6;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intake-card-ingredient[data-unset="true"] {
   color: #fed7aabf;
+  font-weight: 400;
+}
+.intake-card-meta-slash {
+  flex-shrink: 0;
+  color: #fed7aa99;
+  font-size: 10px;
+}
+.intake-card-dose-group {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+.intake-card-amount {
+  min-width: 0;
+  flex: 0 1 auto;
+  color: #fed7aabf;
+  font-size: 10px;
+  font-weight: 450;
+  line-height: 16px;
+  overflow-wrap: anywhere;
+}
+.intake-card-note {
+  margin-top: 8px;
+  color: #fed7aabf;
+  font-size: 11px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 359px) {
+  .intake-log-card {
+    --entry-card-padding: 10px;
+  }
+  .intake-card-content {
+    gap: 8px;
+  }
+  .intake-card-heading {
+    gap: 8px;
+  }
+  .intake-card-bottom {
+    gap: 6px;
+  }
+  .intake-card-meta {
+    column-gap: 6px;
+  }
+  .intake-card-dose-group {
+    gap: 6px;
+  }
+  .intake-stack-slot[data-stack-rear="true"] .intake-log-card {
+    --entry-card-padding: 8px;
+  }
+  .intake-stack-slot[data-stack-rear="true"] .intake-card-bottom {
+    gap: 4px;
+  }
+  .intake-stack-slot[data-stack-rear="true"] .intake-card-meta {
+    column-gap: 4px;
+  }
+  .intake-stack-slot[data-stack-rear="true"] .intake-card-dose-group {
+    gap: 4px;
+  }
+  .intake-stack-slot[data-stack-rear="true"] .intake-card-benzo {
+    padding-inline: 3px;
+  }
+}
+.intake-log-card .intake-card-benzo {
+  min-height: 16px;
+  gap: 0;
+  padding: 0 4px;
+  border-color: var(--entry-benzo-edge);
+  border-radius: 5px;
+  background: var(--entry-benzo-wash);
+  color: var(--entry-benzo-copy);
+  box-shadow: none;
+  font-size: 8px;
+  font-weight: 550;
+  line-height: 14px;
+}
+.intake-log-card .intake-card-benzo > svg {
+  display: none;
+}
+.intake-card-benzo-dot {
+  position: absolute;
+  z-index: 3;
+  top: -2px;
+  left: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--entry-benzo);
+  box-shadow: 0 0 0 2px #1b171a;
+}
+.intake-card-shine {
+  position: absolute;
+  z-index: 1;
+  inset: var(--entry-rim-width);
+  overflow: hidden;
+  border-radius: calc(21px - var(--entry-rim-width));
+  pointer-events: none;
+}
+.intake-card-shine-beam {
+  position: absolute;
+  inset-block: -70%;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #fed7aa12 24%,
+    #fffaf2eb 50%,
+    #fed7aa12 76%,
+    transparent
+  );
+  filter: blur(4px);
+  opacity: 0;
+  transform: translate3d(-160%, 0, 0) skewX(-18deg);
+  animation: intake-card-rare-shine var(--intake-shine-cycle) linear
+    var(--intake-shine-wait) infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+}
+.intake-card-shine[data-shine-active="true"] .intake-card-shine-beam {
+  animation-play-state: running;
+}
+@keyframes intake-card-rare-shine {
+  0%,
+  0.6% {
+    opacity: 0;
+    transform: translate3d(-160%, 0, 0) skewX(-18deg);
+  }
+  1% {
+    opacity: 0.28;
+    transform: translate3d(-160%, 0, 0) skewX(-18deg);
+  }
+  3.8% {
+    opacity: 0.28;
+    transform: translate3d(380%, 0, 0) skewX(-18deg);
+  }
+  4.5%,
+  100% {
+    opacity: 0;
+    transform: translate3d(380%, 0, 0) skewX(-18deg);
+  }
 }
 @media (prefers-color-scheme: dark) {
   .intake-card-glass {
@@ -570,9 +740,9 @@
       linear-gradient(145deg, #ffffff14, #ffffff00 45%, #ffffff05),
       rgb(18 15 23 / 14%);
     box-shadow:
-      inset 0 1px 0 #fff1d64d,
-      inset 1px 0 0 #ffffff14,
-      inset 0 -1px 0 #ffffff0d;
+      inset 0 1px 0 #fff1d61a,
+      inset 1px 0 0 #ffffff08,
+      inset 0 -1px 0 #ffffff05;
   }
 }
 .history-day-card {

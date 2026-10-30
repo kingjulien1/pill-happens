@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
+import { IntakeCardShine } from "@/components/intake-card-shine";
 import { MedicationGlyph } from "@/components/medication-icon";
 import {
   doseMg,
@@ -10,12 +11,10 @@ import {
   type Intake,
   type Medication,
 } from "@/lib/domain";
-import { getIntakeCardWaves } from "@/lib/intake-card-waves";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import {
   getMedicationColorScale,
   getMedicationPreviewSurface,
-  getMedicationWaveColors,
 } from "@/lib/medication-preview-colors";
 import {
   getMedicationType,
@@ -30,6 +29,7 @@ export function IntakeCard({
   timeZone,
   onEdit,
   disabled = false,
+  shineEligible = true,
 }: {
   entry: Intake;
   medication?: Medication;
@@ -37,11 +37,12 @@ export function IntakeCard({
   timeZone: string;
   onEdit: () => void;
   disabled?: boolean;
+  shineEligible?: boolean;
 }) {
   const color = getMedicationColor(medication?.color);
   const scale = getMedicationColorScale(color.value);
-  const waveColors = getMedicationWaveColors(color.value);
-  const waves = getIntakeCardWaves(entry.id);
+  const rose = getMedicationColor("tw-rose-500").hex;
+  const roseCopy = getMedicationColor("tw-rose-200").hex;
   const svg = getSvgIcon(medication?.icon ?? "pill");
   const pigment =
     svg?.variant === "color" ? (svg.color?.hex ?? scale.icon) : scale.icon;
@@ -49,16 +50,16 @@ export function IntakeCard({
   const units = getMedicationType(type);
   const localTime = toLocalInput(entry.takenAt, timeZone);
   const time = localTime.slice(11);
-  const localDay = localTime.slice(0, 10);
+  const nextMorning = localTime.slice(0, 10) !== day;
   const isBenzodiazepine = medication?.isBenzodiazepine === true;
+  const ingredient = medication?.activeIngredient?.trim();
 
   const style = {
-    // Explicit alpha avoids opaque CSS color-mix fallbacks in older browsers.
-    "--entry-rim-tint": `${scale.lighter}14`,
-    "--entry-wave-above": waveColors.above,
-    "--entry-wave-below": waveColors.below,
-    "--entry-wave-phase": `${waves.phaseSeconds}s`,
     "--entry-icon-tint": `${color.hex}66`,
+    "--entry-benzo": rose,
+    "--entry-benzo-copy": roseCopy,
+    "--entry-benzo-wash": `${rose}29`,
+    "--entry-benzo-edge": `${rose}40`,
   } as CSSProperties;
 
   return (
@@ -66,39 +67,19 @@ export function IntakeCard({
       type="button"
       onClick={onEdit}
       disabled={disabled}
-      aria-label={`Edit ${entry.medicationName}${isBenzodiazepine ? ", benzodiazepine" : ""}, ${formatDose(doseMg(entry))} milligrams, ${time}`}
-      className={`intake-log-card${isBenzodiazepine ? " benzodiazepine-highlight" : ""}`}
+      aria-label={`Edit ${entry.medicationName}${isBenzodiazepine ? ", benzodiazepine" : ""}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${formatDose(doseMg(entry))} milligrams, ${time}${nextMorning ? ", next morning" : ""}`}
+      className="intake-log-card"
       style={style}
       data-intake-card={entry.id}
+      data-shine-eligible={shineEligible}
       data-benzodiazepine={isBenzodiazepine || undefined}
     >
       <span aria-hidden="true" className="intake-card-glass">
-        <svg
-          className="intake-card-curves"
-          viewBox="0 0 360 150"
-          preserveAspectRatio="none"
-          fill="none"
-          focusable="false"
-          data-intake-curves
-        >
-          <path
-            d={waves.curveA}
-            vectorEffect="non-scaling-stroke"
-            data-intake-wave-color={waveColors.aboveValue}
-          />
-          <path
-            d={waves.curveB}
-            vectorEffect="non-scaling-stroke"
-            data-intake-wave-color={waveColors.belowValue}
-          />
-        </svg>
         <span className="intake-card-ink" data-intake-ink />
       </span>
-      <div className="intake-card-content relative flex items-start gap-3">
-        <span
-          className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"
-          aria-hidden="true"
-        >
+      <IntakeCardShine seed={entry.id} eligible={shineEligible} />
+      <div className="intake-card-content">
+        <span className="intake-card-focus" aria-hidden="true">
           <span
             className="intake-card-mark"
             data-medication-mark
@@ -113,47 +94,61 @@ export function IntakeCard({
             }
           >
             <MedicationGlyph icon={medication?.icon} className="size-7" />
+            {isBenzodiazepine && (
+              <span className="intake-card-benzo-dot" data-intake-benzo-dot />
+            )}
           </span>
         </span>
-        <div className="intake-card-details min-w-0 flex-1 pt-0.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex min-w-0 flex-1 items-center gap-1.5">
-              <h3
-                className="min-w-0 truncate text-[13px] font-medium"
-                title={entry.medicationName}
-                data-intake-name
-              >
-                {entry.medicationName}
-              </h3>
-              {isBenzodiazepine && <BenzodiazepineBadge />}
-            </div>
-            <span
-              className="shrink-0 text-[13px] font-medium tabular-nums"
-              data-intake-dose
+        <div className="intake-card-details">
+          <div className="intake-card-heading" data-intake-heading>
+            <time
+              className="intake-card-time"
+              dateTime={entry.takenAt}
+              title={`${time}${nextMorning ? " · next morning" : ""}`}
+              data-intake-time
             >
-              {formatDose(doseMg(entry))}
-              <span className="intake-card-dose-unit ml-1 text-[10px] font-normal">
-                mg
-              </span>
-            </span>
-          </div>
-          <div className="intake-card-meta mt-1.5 text-[10px]">
-            <span className="min-w-0">
               {time}
-              {localDay !== day ? " · next morning" : ""}
-              <span className="mx-1">·</span>
-              {formatDose(entry.quantity)}
-              {isMeteredMedicationType(type)
-                ? ` ${entry.quantity === 1 ? units.unit : units.units}`
-                : ""}{" "}
-              × {formatDose(entry.strengthMg)} mg
-            </span>
+              {nextMorning && <span className="sr-only">, next morning</span>}
+            </time>
+            <span className="intake-card-heading-dot" aria-hidden="true" />
+            <h3
+              className="intake-card-name"
+              title={entry.medicationName}
+              data-intake-name
+            >
+              {entry.medicationName}
+            </h3>
+          </div>
+          <div className="intake-card-bottom" data-intake-bottom>
+            <div className="intake-card-meta">
+              <span
+                className="intake-card-ingredient"
+                data-intake-ingredient
+                data-unset={!ingredient || undefined}
+                title={ingredient || "Active ingredient not set"}
+              >
+                {ingredient || "Not Set"}
+              </span>
+              <span className="intake-card-dose-group">
+                <span className="intake-card-meta-slash" aria-hidden="true">
+                  /
+                </span>
+                <span className="intake-card-amount" data-intake-dose>
+                  {formatDose(entry.quantity)}
+                  {isMeteredMedicationType(type)
+                    ? ` ${entry.quantity === 1 ? units.unit : units.units}`
+                    : ""}{" "}
+                  × {formatDose(entry.strengthMg)}
+                  {"\u00a0"}mg
+                </span>
+              </span>
+            </div>
+            {isBenzodiazepine && (
+              <BenzodiazepineBadge className="intake-card-benzo" />
+            )}
           </div>
           {entry.note && (
-            <p
-              className="intake-card-note mt-2.5 text-[11px] leading-relaxed break-words"
-              data-intake-note
-            >
+            <p className="intake-card-note" data-intake-note>
               {entry.note}
             </p>
           )}
