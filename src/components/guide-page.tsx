@@ -12,6 +12,7 @@ import { GuideColors } from "@/components/guide-colors";
 import { HeadingText } from "@/components/heading-text";
 import { InstallAppButton } from "@/components/install-app-button";
 import { DAILY_MOODS, DAILY_REFLECTION_MAX_LENGTH } from "@/lib/daily-check-in";
+import { MEDICATION_CATEGORIES } from "@/lib/medication-categories";
 import styles from "./guide-page.module.css";
 
 const sections = [
@@ -147,9 +148,9 @@ export function GuidePage() {
                 Open Medications and choose <strong>Add a Medication</strong>.
                 Enter its name, strength in mg per unit, medication type, and
                 default quantity for new entries. Active Ingredient means the
-                Wirkstoff; leave it blank if you don’t know it. Mark benzos,
-                opioids, or both with Class, then choose a color and symbol you
-                can recognize quickly.
+                Wirkstoff; leave it blank if you don’t know it. Add optional
+                labels with Categories, then choose a color and symbol you can
+                recognize quickly.
               </p>
               <PageLink href="/medications">Open Medications</PageLink>
             </div>
@@ -318,28 +319,38 @@ export function GuidePage() {
               <div>
                 <dt>Medication Type</dt>
                 <dd>
-                  The presentation and counting unit, including Pump Bottle and
-                  Gel Dispenser.
+                  The presentation and counting unit: tablet, capsule, drops,
+                  pump, or another form. This is separate from Categories.
                 </dd>
               </div>
             </dl>
           </GuideDetail>
           <GuideDetail
-            title="Medication Classes"
+            title="Medication Categories"
             context="Your Own Labels"
             icon="sparkle"
           >
             <p>
-              Class sits beside Active Ingredient. Choose Benzo, Opioid /
-              Opiate, or Both; None leaves the medication unmarked. Rose and
-              amber markers follow these labels through medication lists, intake
-              cards, history totals, goals, and medication choices.
+              The Categories menu sits beside Active Ingredient. Search the{" "}
+              {MEDICATION_CATEGORIES.length} labels in English or German—for
+              example, Sleep Aid or Schlafmittel—and select as many as you want.
+              Each choice stays selected while you search for another. Remove
+              individual labels or clear the selection to leave it empty.
             </p>
             <p>
-              The labels are manual. Entering a medication or ingredient name
-              never selects a class automatically. Choose Both to keep both
-              labels. Changing the selection also updates past appearances;
-              quantities, times, notes, and dose calculations stay the same.
+              These optional labels help organize your own medication list. More
+              than one can be selected for the same item; you choose which ones
+              are useful. Medication Type still describes its form and counting
+              unit. Names and active ingredients never select categories
+              automatically. Categories can be left empty.
+            </p>
+            <p>
+              Earlier Benzo and Opioid markings carry over. They keep their rose
+              and amber priority markers across intakes, history, goals, and
+              medication choices; both can remain selected together. Other
+              labels appear as compact badges in the medication library, with an
+              extra count when space is limited. Changing labels does not change
+              quantities, times, notes, or dose calculations.
             </p>
           </GuideDetail>
           <GuideDetail title="Edits Apply To Past Logs" icon="retry">
