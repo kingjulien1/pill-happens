@@ -10,6 +10,8 @@ export type Medication = {
   activeIngredient?: string;
   /** Manually marked; missing on older medications means unmarked. */
   isBenzodiazepine?: boolean;
+  /** Manually marked independently; missing on older medications is unmarked. */
+  isOpioid?: boolean;
   strengthMg: number;
   /** Prefills new intakes; older medications use one unit. */
   defaultQuantity?: number;

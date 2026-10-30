@@ -6,6 +6,10 @@ import test, { type TestContext } from "node:test";
 import { PGlite } from "@electric-sql/pglite";
 import { emptyData, totalsForDay, type AppData } from "@/lib/domain";
 import {
+  getMedicationClasses,
+  getMedicationClassification,
+} from "@/lib/medication-classification";
+import {
   createPostgresJournalRepository,
   type JournalRepository,
 } from "./journal-repository";
@@ -54,6 +58,7 @@ function classificationState(): AppData {
       name: "Synthetic medication",
       activeIngredient: "Optional ingredient",
       isBenzodiazepine: true,
+      isOpioid: true,
       strengthMg: 2,
       defaultQuantity: 3,
       form: "tablet",
@@ -67,12 +72,30 @@ function classificationState(): AppData {
   };
   const legacy = { ...medication };
   delete legacy.isBenzodiazepine;
+  delete legacy.isOpioid;
   return {
     ...emptyData(),
     medications: [
       medication,
-      { ...medication, id: "explicit-false", isBenzodiazepine: false },
+      {
+        ...medication,
+        id: "explicit-false",
+        isBenzodiazepine: false,
+        isOpioid: false,
+      },
       { ...legacy, id: "legacy", name: "Diazepam" },
+      {
+        ...medication,
+        id: "opioid-only",
+        name: "Another marked medication",
+        isBenzodiazepine: false,
+      },
+      {
+        ...legacy,
+        id: "legacy-benzo",
+        name: "Already marked medication",
+        isBenzodiazepine: true,
+      },
     ],
     intakes: [
       {
@@ -127,6 +150,7 @@ for (const fixture of repositories) {
         ...original.medications[0],
         name: "Unrelated journal medication with the same ID",
         isBenzodiazepine: false,
+        isOpioid: false,
       });
     });
     const otherBefore = await readJournalState(repository, otherJournal);
@@ -134,11 +158,27 @@ for (const fixture of repositories) {
     const restored = await readJournalState(reopen(), "personal");
     assert.deepEqual(restored, original);
     assert.equal(restored.medications[0].isBenzodiazepine, true);
+    assert.equal(restored.medications[0].isOpioid, true);
     assert.equal(restored.medications[1].isBenzodiazepine, false);
+    assert.equal(restored.medications[1].isOpioid, false);
     assert.equal(
       Object.hasOwn(restored.medications[2], "isBenzodiazepine"),
       false,
       "legacy medication names must not cause classification",
+    );
+    assert.equal(Object.hasOwn(restored.medications[2], "isOpioid"), false);
+    assert.equal(
+      getMedicationClassification(restored.medications[3]),
+      "opioid",
+    );
+    assert.equal(
+      Object.hasOwn(restored.medications[4], "isOpioid"),
+      false,
+      "a pre-existing benzo label must not acquire an opioid flag",
+    );
+    assert.equal(
+      getMedicationClassification(restored.medications[4]),
+      "benzodiazepine",
     );
     const exported = JSON.parse(
       JSON.stringify({ schemaVersion: 1, data: restored }),
@@ -153,6 +193,16 @@ for (const fixture of repositories) {
     });
     const archived = await readJournalState(reopen(), "personal");
     assert.equal(archived.medications[0].isBenzodiazepine, true);
+    assert.equal(archived.medications[0].isOpioid, true);
+    assert.deepEqual(
+      getMedicationClasses(
+        archived.medications.find(
+          (item) => item.id === archived.intakes[0].medicationId,
+        ),
+      ),
+      ["benzodiazepine", "opioid"],
+      "past-log labels follow the current linked medication",
+    );
     assert.equal(archived.medications[0].archived, true);
     assert.equal(archived.intakes[0].medicationName, "Renamed");
     assert.deepEqual(intakeFacts(archived), intakeFacts(original));
@@ -165,6 +215,26 @@ for (const fixture of repositories) {
         medicationPatchSchema.parse({ isBenzodiazepine: false }),
       );
     });
+    const opioidOnly = await readJournalState(reopen(), "personal");
+    assert.equal(
+      getMedicationClassification(opioidOnly.medications[0]),
+      "opioid",
+    );
+    assert.deepEqual(
+      getMedicationClasses(
+        opioidOnly.medications.find(
+          (item) => item.id === opioidOnly.intakes[0].medicationId,
+        ),
+      ),
+      ["opioid"],
+    );
+    assert.deepEqual(intakeFacts(opioidOnly), intakeFacts(original));
+    await mutateJournalState(reopen(), "personal", (state) => {
+      Object.assign(
+        state.medications[0],
+        medicationPatchSchema.parse({ isOpioid: false }),
+      );
+    });
     await mutateJournalState(reopen(), "personal", (state) => {
       Object.assign(
         state.medications[0],
@@ -173,6 +243,19 @@ for (const fixture of repositories) {
     });
     const unmarked = await readJournalState(reopen(), "personal");
     assert.equal(unmarked.medications[0].isBenzodiazepine, false);
+    assert.equal(unmarked.medications[0].isOpioid, false);
+    assert.equal(
+      getMedicationClassification(unmarked.medications[0]),
+      "unmarked",
+    );
+    assert.deepEqual(
+      getMedicationClasses(
+        unmarked.medications.find(
+          (item) => item.id === unmarked.intakes[0].medicationId,
+        ),
+      ),
+      [],
+    );
     assert.equal(unmarked.medications[0].activeIngredient, "Corrected");
     assert.deepEqual(intakeFacts(unmarked), intakeFacts(original));
     assert.deepEqual(unmarked.goals, original.goals);
@@ -186,6 +269,8 @@ for (const fixture of repositories) {
     // Current medication metadata is the source for old and new log highlights;
     // intake snapshots never acquire a second flag that can fall out of sync.
     assert.equal(Object.hasOwn(unmarked.intakes[0], "isBenzodiazepine"), false);
+    assert.equal(Object.hasOwn(unmarked.intakes[0], "isOpioid"), false);
+    assert.equal(Object.hasOwn(unmarked.goals[0], "isOpioid"), false);
     assert.deepEqual(
       JSON.parse(JSON.stringify({ schemaVersion: 1, data: unmarked })).data,
       unmarked,

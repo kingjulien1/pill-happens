@@ -223,6 +223,76 @@ test("unrelated medication patches preserve a benzodiazepine flag and explicit f
   );
 });
 
+test("opioid labels remain optional and are never inferred from medication names or ingredients", () => {
+  for (const name of ["Tramadol", "Morphine", "Oxycodone", "Example"]) {
+    const medication = medicationSchema.parse({
+      name,
+      activeIngredient: "Opioid",
+      strengthMg: 1,
+      form: "tablet",
+      color: "rose",
+      icon: "pill",
+    });
+    assert.equal(Object.hasOwn(medication, "isOpioid"), false);
+    assert.equal(Object.hasOwn(medication, "isBenzodiazepine"), false);
+  }
+  assert.deepEqual(medicationPatchSchema.parse({}), {});
+});
+
+test("opioid labels accept only boolean create and patch values independently of benzo labels", () => {
+  const medication = {
+    name: "Example",
+    strengthMg: 1,
+    form: "tablet",
+    color: "rose",
+  };
+  for (const isOpioid of [true, false]) {
+    for (const isBenzodiazepine of [undefined, true, false]) {
+      const flags = {
+        isOpioid,
+        ...(isBenzodiazepine === undefined ? {} : { isBenzodiazepine }),
+      };
+      const created = medicationSchema.parse({ ...medication, ...flags });
+      assert.equal(created.isOpioid, isOpioid);
+      assert.equal(created.isBenzodiazepine, isBenzodiazepine);
+      assert.deepEqual(medicationPatchSchema.parse(flags), flags);
+    }
+  }
+  for (const isOpioid of [null, 0, 1, "true", "false", "", [], {}]) {
+    assert.equal(
+      medicationSchema.safeParse({ ...medication, isOpioid }).success,
+      false,
+    );
+    assert.equal(medicationPatchSchema.safeParse({ isOpioid }).success, false);
+  }
+});
+
+test("omitted opioid patches preserve their previous value and explicit false clears only that label", () => {
+  const medication = { isOpioid: true, isBenzodiazepine: true };
+  for (const patch of [
+    { name: "Renamed" },
+    { archived: true },
+    { activeIngredient: "" },
+    { icon: "🌙" },
+    { isBenzodiazepine: false },
+  ]) {
+    const parsed = medicationPatchSchema.parse(patch);
+    assert.equal(Object.hasOwn(parsed, "isOpioid"), false);
+    assert.equal(Object.assign({ ...medication }, parsed).isOpioid, true);
+  }
+  const cleared = Object.assign(
+    { ...medication },
+    medicationPatchSchema.parse({ isOpioid: false }),
+  );
+  assert.equal(cleared.isOpioid, false);
+  assert.equal(cleared.isBenzodiazepine, true);
+  const legacy = Object.assign(
+    {},
+    medicationPatchSchema.parse({ name: "Old" }),
+  );
+  assert.equal(Object.hasOwn(legacy, "isOpioid"), false);
+});
+
 test("medication intake defaults accept fractional quantities within the log input limits", () => {
   const medication = {
     name: "Example",
