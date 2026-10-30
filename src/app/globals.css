@@ -276,9 +276,6 @@
   min-width: 0;
   margin-inline: 0;
   border-radius: 21px;
-  transition:
-    height 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .intake-stack-slot:first-child {
   z-index: 2;
@@ -297,8 +294,6 @@
   margin-inline: var(--stack-inset, 1%);
   overflow: clip;
   overflow-clip-margin: 0;
-  animation: intake-stack-peek-arrive 620ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(min(var(--stack-order, 0), 7) * 65ms) backwards;
 }
 .intake-stack-slot[data-stack-collapsed="true"] .intake-card-content {
   visibility: hidden;
@@ -352,7 +347,6 @@
   gap: 5px;
   font-size: 10px;
   line-height: 1;
-  transition: color 160ms ease;
 }
 .intake-group-label strong {
   font-weight: 600;
@@ -366,7 +360,6 @@
   height: 16px;
   flex-shrink: 0;
   transform: rotate(0deg);
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .intake-group[data-expanded="true"] .intake-group-chevron {
   transform: rotate(180deg);
@@ -374,7 +367,6 @@
 .intake-log-card {
   --entry-rim-width: 4px;
   --entry-card-padding: calc(16px - var(--entry-rim-width) - 1px);
-  --entry-focus: calc(var(--entry-card-padding) + 28px);
   position: relative;
   isolation: isolate;
   display: block;
@@ -383,16 +375,13 @@
   border: var(--entry-rim-width) solid var(--entry-rim-tint);
   border-radius: 21px;
   background: transparent;
-  color: var(--foreground);
+  color: #fed7aa;
   text-align: left;
   cursor: pointer;
-  transform-origin: calc(var(--entry-rim-width) + var(--entry-focus))
-    calc(var(--entry-rim-width) + var(--entry-focus));
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease;
-  animation: intake-card-arrive 760ms cubic-bezier(0.16, 1, 0.3, 1)
-    var(--entry-delay, 0ms) backwards;
+}
+.intake-log-card.benzodiazepine-highlight {
+  outline-color: #fed7aa59;
+  box-shadow: none;
 }
 .intake-log-card:disabled {
   cursor: inherit;
@@ -401,82 +390,12 @@
   outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
-.intake-card-scene-arrival {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  transform-origin: var(--entry-focus) var(--entry-focus);
-  animation: intake-card-scene-arrive 900ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--entry-delay, 0ms) + 35ms) backwards;
-}
-.intake-card-icon-arrival {
-  position: relative;
-  display: inline-flex;
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  transform-origin: center;
-  animation: intake-card-icon-arrive 820ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--entry-delay, 0ms) + 70ms) backwards;
-}
-.intake-card-title-arrival,
-.intake-card-meta-arrival,
-.intake-card-note-arrival {
-  animation: intake-card-copy-arrive 580ms cubic-bezier(0.16, 1, 0.3, 1)
-    calc(var(--entry-delay, 0ms) + 130ms) backwards;
-}
-.intake-card-title-arrival [data-intake-dose] {
-  display: inline-block;
-  transform-origin: right center;
-  animation: intake-card-dose-arrive 640ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--entry-delay, 0ms) + 180ms) backwards;
-}
-.intake-card-meta-arrival {
-  animation-delay: calc(var(--entry-delay, 0ms) + 190ms);
-}
-.intake-card-note-arrival {
-  animation-delay: calc(var(--entry-delay, 0ms) + 245ms);
-}
-.intake-stack-slot[data-stack-rear="true"] .intake-log-card {
-  animation: none;
-}
-.intake-group[data-expanded="true"]
-  .intake-stack-slot[data-stack-rear="true"]
-  .intake-log-card {
-  animation: intake-card-unfold 560ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(min(var(--stack-order, 0), 7) * 35ms) backwards;
-}
-.intake-card-bleed,
 .intake-card-glass,
-.intake-card-color-overlay,
-.intake-card-mesh,
-.intake-card-pattern,
 .intake-card-curves,
 .intake-card-ink,
-.intake-card-orbit,
 .intake-card-sticker--a,
-.intake-card-sticker--b,
-.intake-card-icon-rim {
+.intake-card-sticker--b {
   pointer-events: none;
-}
-.intake-card-bleed {
-  position: absolute;
-  z-index: -1;
-  inset: calc(-4px - var(--entry-rim-width));
-  overflow: hidden;
-  border-radius: 25px;
-  background: radial-gradient(
-    ellipse 72px 58px at 48px 48px,
-    var(--entry-color),
-    var(--entry-light) 48%,
-    transparent 78%
-  );
-  opacity: 0.12;
-  animation: intake-card-edge-breathe 23s ease-in-out var(--entry-phase, 0s)
-    infinite;
 }
 .intake-card-glass {
   position: absolute;
@@ -495,7 +414,6 @@
     inset 1px 0 0 #ffffff26,
     inset 0 -1px 0 #ffffff1a;
 }
-.intake-card-color-overlay,
 .history-card-color-overlay {
   position: absolute;
   z-index: 0;
@@ -504,14 +422,8 @@
   border-radius: inherit;
   opacity: 0.3;
   pointer-events: none;
-}
-.intake-card-color-overlay {
-  background: linear-gradient(125deg, var(--entry-color), var(--entry-deep));
-}
-.history-card-color-overlay {
   background: linear-gradient(128deg, var(--day-color-a), var(--day-color-d));
 }
-.intake-card-bleed,
 .history-card-bleed {
   display: none;
   padding: 4px;
@@ -549,9 +461,7 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    transition: background-color 180ms ease;
   }
-  .intake-card-bleed,
   .history-card-bleed {
     display: block;
     -webkit-mask:
@@ -564,53 +474,15 @@
     mask-composite: exclude;
   }
 }
-.intake-card-mesh {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      ellipse 140px 100px at var(--entry-focus) var(--entry-focus),
-      var(--entry-light),
-      var(--entry-color) 55%,
-      transparent
-    ),
-    radial-gradient(
-      ellipse at var(--entry-accent-x, 78%) var(--entry-accent-y, 34%),
-      var(--entry-deep),
-      transparent 58%
-    ),
-    radial-gradient(ellipse at 28% 90%, var(--entry-light), transparent 65%),
-    linear-gradient(125deg, var(--entry-color), var(--entry-deep));
-  transform-origin: var(--entry-focus) var(--entry-focus);
-  transform: rotate(-2.5deg) scale(1.07);
-  animation: intake-card-mesh-drift 19s ease-in-out var(--entry-phase, 0s)
-    infinite;
-}
-.intake-card-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(
-    circle,
-    var(--entry-color) 0.55px,
-    transparent 0.9px
-  );
-  background-position: var(--entry-focus) var(--entry-focus);
-  background-size: 16px 16px;
-  opacity: 0.065;
-}
 .intake-card-curves {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 360px;
+  inset: 0;
+  width: 100%;
   max-width: none;
-  height: 150px;
+  height: 100%;
   overflow: visible;
   fill: none;
-  transform-origin: var(--entry-focus) var(--entry-focus);
   opacity: 0.5;
-  animation: intake-card-curve-drift 26s ease-in-out var(--entry-phase, 0s)
-    infinite;
 }
 .intake-card-curves path {
   stroke: var(--entry-light);
@@ -627,7 +499,7 @@
   inset: 0;
   border-radius: inherit;
   background: #120f17;
-  opacity: 0.2;
+  opacity: 0.8;
 }
 .intake-card-content {
   position: relative;
@@ -643,34 +515,6 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-}
-.intake-card-orbit {
-  position: absolute;
-  z-index: 0;
-  top: 50%;
-  left: 50%;
-  width: 74px;
-  height: 56px;
-  border: 1px dashed var(--entry-pop);
-  border-radius: 50%;
-  opacity: 0.46;
-  transform: translate(-50%, -50%) rotate(var(--entry-orbit-angle, 0deg));
-  animation: intake-card-orbit 21s linear var(--entry-phase, 0s) infinite;
-}
-.intake-card-bead {
-  position: absolute;
-  top: -3px;
-  left: calc(50% - 3px);
-  width: 6px;
-  height: 6px;
-  border: 1px solid var(--popover);
-  border-radius: 50%;
-  background: var(--entry-pop);
-}
-.intake-card-bead + .intake-card-bead {
-  top: auto;
-  bottom: -3px;
-  background: var(--entry-spark);
 }
 .intake-card-sticker--a,
 .intake-card-sticker--b {
@@ -705,19 +549,15 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--popover);
-  box-shadow: 0 4px 10px #120f1726;
-}
-.intake-card-icon-rim {
-  position: absolute;
-  z-index: 3;
-  inset: 3px;
-  border: 1px solid var(--entry-light);
-  border-radius: 17px;
-  opacity: 0.32;
 }
 .intake-card-details {
   position: relative;
   min-width: 0;
+}
+.intake-card-meta,
+.intake-card-note,
+.intake-card-dose-unit {
+  color: #fed7aabf;
 }
 @media (prefers-color-scheme: dark) {
   .intake-card-glass {
@@ -728,157 +568,6 @@
       inset 0 1px 0 #fff1d64d,
       inset 1px 0 0 #ffffff14,
       inset 0 -1px 0 #ffffff0d;
-  }
-  .intake-card-glass::after {
-    content: "";
-    position: absolute;
-    z-index: 2;
-    inset: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 64px,
-      rgb(18 15 23 / 50%) 100px
-    );
-    pointer-events: none;
-  }
-}
-@keyframes intake-stack-peek-arrive {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 8px, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes intake-card-arrive {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 24px, 0) rotate(var(--entry-lean, 1.2deg))
-      scale(0.97);
-  }
-  56% {
-    opacity: 1;
-    transform: translate3d(0, -3px, 0)
-      rotate(calc(var(--entry-lean, 1.2deg) * -0.18)) scale(1.006);
-  }
-  78% {
-    transform: translate3d(0, 1px, 0) rotate(0deg) scale(0.999);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes intake-card-scene-arrive {
-  0% {
-    clip-path: circle(0 at var(--entry-focus) var(--entry-focus));
-    transform: scale(0.96);
-  }
-  45% {
-    clip-path: circle(40% at var(--entry-focus) var(--entry-focus));
-  }
-  100% {
-    clip-path: circle(160% at var(--entry-focus) var(--entry-focus));
-    transform: none;
-  }
-}
-@keyframes intake-card-icon-arrive {
-  0% {
-    opacity: 0;
-    transform: translate3d(-5px, 6px, 0) rotate(-18deg) scale(0.52);
-  }
-  42% {
-    opacity: 1;
-    transform: translate3d(1px, -4px, 0) rotate(8deg) scale(1.11);
-  }
-  70% {
-    transform: translate3d(0, 1px, 0) rotate(-3deg) scale(0.98);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes intake-card-copy-arrive {
-  0% {
-    opacity: 0;
-    transform: translate3d(9px, 4px, 0);
-  }
-  65% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes intake-card-dose-arrive {
-  0% {
-    opacity: 0;
-    transform: translate3d(4px, 0, 0) scale(0.92);
-  }
-  54% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1.035);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes intake-card-unfold {
-  0% {
-    opacity: 0.65;
-    transform: translate3d(0, -7px, 0) rotate(var(--entry-lean, 1.2deg))
-      scale(0.985);
-  }
-  66% {
-    opacity: 1;
-    transform: translate3d(0, 1px, 0) rotate(0deg) scale(1.002);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes intake-card-mesh-drift {
-  0%,
-  100% {
-    transform: rotate(-2.5deg) scale(1.07);
-  }
-  50% {
-    transform: rotate(2.5deg) scale(1.12);
-  }
-}
-@keyframes intake-card-curve-drift {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: rotate(-2deg) translateY(1px);
-  }
-  50% {
-    opacity: 0.65;
-    transform: rotate(2deg) translateY(-1px);
-  }
-}
-@keyframes intake-card-orbit {
-  from {
-    transform: translate(-50%, -50%) rotate(var(--entry-orbit-angle, 0deg));
-  }
-  to {
-    transform: translate(-50%, -50%)
-      rotate(calc(var(--entry-orbit-angle, 0deg) + 360deg));
-  }
-}
-@keyframes intake-card-edge-breathe {
-  0%,
-  100% {
-    opacity: 0.09;
-  }
-  50% {
-    opacity: 0.17;
   }
 }
 .history-day-card {
@@ -1260,7 +949,9 @@
 @supports not (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
-  .intake-card-glass,
+  .intake-card-glass {
+    background: #120f17;
+  }
   .history-card-glass {
     background: var(--popover);
   }
@@ -3091,26 +2782,6 @@
   opacity: 0;
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .intake-group-toggle:hover .intake-group-label {
-    color: var(--foreground);
-  }
-  .intake-group[data-expanded="true"] .intake-log-card:not(:disabled):hover {
-    box-shadow: 0 4px 18px var(--entry-hover-glow);
-  }
-  .intake-group[data-expanded="true"]
-    .intake-log-card.benzodiazepine-highlight:not(:disabled):hover {
-    box-shadow:
-      var(--tw-inset-shadow, 0 0 #0000),
-      var(--tw-inset-ring-shadow, 0 0 #0000),
-      var(--tw-ring-offset-shadow, 0 0 #0000),
-      var(--tw-ring-shadow, 0 0 #0000),
-      0 4px 18px var(--entry-hover-glow),
-      0 0 13px var(--benzo-halo);
-  }
-  .intake-group[data-expanded="true"]
-    .intake-log-card:not(:disabled):hover::before {
-    background-color: var(--entry-rim-hover-tint);
-  }
   .brand-lockup:hover::before {
     outline-color: rgb(254 215 170 / 85%);
     box-shadow:

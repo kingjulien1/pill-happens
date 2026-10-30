@@ -26,7 +26,6 @@ import { getSvgIcon } from "@/lib/svg-icon-catalog";
 export function IntakeCard({
   entry,
   medication,
-  index,
   day,
   timeZone,
   onEdit,
@@ -34,7 +33,6 @@ export function IntakeCard({
 }: {
   entry: Intake;
   medication?: Medication;
-  index: number;
   day: string;
   timeZone: string;
   onEdit: () => void;
@@ -55,21 +53,12 @@ export function IntakeCard({
   const isBenzodiazepine = medication?.isBenzodiazepine === true;
 
   const style = {
-    "--entry-color": color.hex,
     "--entry-light": scale.lighter,
     // Explicit alpha avoids opaque CSS color-mix fallbacks in older browsers.
     "--entry-rim-tint": `${scale.lighter}14`,
-    "--entry-rim-hover-tint": `${scale.lighter}1f`,
-    "--entry-hover-glow": `${color.hex}1f`,
     "--entry-deep": scale.darker,
     "--entry-pop": accents.pop,
     "--entry-spark": accents.spark,
-    "--entry-phase": `${art.phaseSeconds}s`,
-    "--entry-orbit-angle": `${art.orbitAngle}deg`,
-    "--entry-accent-x": `${art.accentX}%`,
-    "--entry-accent-y": `${art.accentY}%`,
-    "--entry-delay": `${Math.min(index, 7) * 65}ms`,
-    "--entry-lean": `${index % 2 ? 1.2 : -1.2}deg`,
   } as CSSProperties;
 
   return (
@@ -83,58 +72,45 @@ export function IntakeCard({
       data-intake-card={entry.id}
       data-benzodiazepine={isBenzodiazepine || undefined}
     >
-      <span aria-hidden="true" className="intake-card-bleed" />
       <span aria-hidden="true" className="intake-card-glass">
-        <span className="intake-card-scene-arrival">
-          <span className="intake-card-color-overlay" data-intake-color-overlay>
-            <span className="intake-card-mesh" />
-            <span className="intake-card-pattern" />
-            <svg
-              className="intake-card-curves"
-              viewBox="0 0 360 150"
-              fill="none"
-              focusable="false"
-              data-intake-curves
-            >
-              <path d={art.curveA} />
-              <path d={art.curveB} />
-            </svg>
-          </span>
-          <span className="intake-card-ink" data-intake-ink />
-        </span>
+        <svg
+          className="intake-card-curves"
+          viewBox="0 0 360 150"
+          preserveAspectRatio="none"
+          fill="none"
+          focusable="false"
+          data-intake-curves
+        >
+          <path d={art.curveA} vectorEffect="non-scaling-stroke" />
+          <path d={art.curveB} vectorEffect="non-scaling-stroke" />
+        </svg>
+        <span className="intake-card-ink" data-intake-ink />
       </span>
       <div className="intake-card-content relative flex items-start gap-3">
-        <span className="intake-card-icon-arrival">
+        <span
+          className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"
+          aria-hidden="true"
+        >
+          <span className="intake-card-sticker intake-card-sticker--a" />
+          <span className="intake-card-sticker intake-card-sticker--b" />
           <span
-            className="intake-card-focus relative flex size-14 shrink-0 items-center justify-center"
-            aria-hidden="true"
+            className="intake-card-mark"
+            data-medication-mark
+            data-medication-color={color.value}
+            style={
+              {
+                color: scale.icon,
+                backgroundColor:
+                  getMedicationPreviewSurface(pigment) ?? "var(--popover)",
+                "--medication-rotation": `${medication?.iconRotation ?? 0}deg`,
+              } as CSSProperties
+            }
           >
-            <span className="intake-card-orbit">
-              <span className="intake-card-bead" />
-              <span className="intake-card-bead intake-card-bead--second" />
-            </span>
-            <span className="intake-card-sticker intake-card-sticker--a" />
-            <span className="intake-card-sticker intake-card-sticker--b" />
-            <span
-              className="intake-card-mark"
-              data-medication-mark
-              data-medication-color={color.value}
-              style={
-                {
-                  color: scale.icon,
-                  backgroundColor:
-                    getMedicationPreviewSurface(pigment) ?? "var(--popover)",
-                  "--medication-rotation": `${medication?.iconRotation ?? 0}deg`,
-                } as CSSProperties
-              }
-            >
-              <MedicationGlyph icon={medication?.icon} className="size-7" />
-              <span className="intake-card-icon-rim" />
-            </span>
+            <MedicationGlyph icon={medication?.icon} className="size-7" />
           </span>
         </span>
         <div className="intake-card-details min-w-0 flex-1 pt-0.5">
-          <div className="intake-card-title-arrival flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 flex-1 items-center gap-1.5">
               <h3
                 className="min-w-0 truncate text-[13px] font-medium"
@@ -150,12 +126,12 @@ export function IntakeCard({
               data-intake-dose
             >
               {formatDose(doseMg(entry))}
-              <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+              <span className="intake-card-dose-unit ml-1 text-[10px] font-normal">
                 mg
               </span>
             </span>
           </div>
-          <div className="intake-card-meta-arrival mt-1.5 text-[10px] text-muted-foreground">
+          <div className="intake-card-meta mt-1.5 text-[10px]">
             <span className="min-w-0">
               {time}
               {localDay !== day ? " · next morning" : ""}
@@ -169,7 +145,7 @@ export function IntakeCard({
           </div>
           {entry.note && (
             <p
-              className="intake-card-note-arrival mt-2.5 border-t border-border/60 pt-2 text-[11px] leading-relaxed break-words text-muted-foreground"
+              className="intake-card-note mt-2.5 text-[11px] leading-relaxed break-words"
               data-intake-note
             >
               {entry.note}

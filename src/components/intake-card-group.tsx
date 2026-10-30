@@ -16,7 +16,6 @@ import type { IntakeGroup } from "@/lib/intake-groups";
 function StackSlot({
   entry,
   medication,
-  index,
   depth,
   collapsed,
   day,
@@ -25,7 +24,6 @@ function StackSlot({
 }: {
   entry: Intake;
   medication?: Medication;
-  index: number;
   depth: number;
   collapsed: boolean;
   day: string;
@@ -38,8 +36,8 @@ function StackSlot({
   useLayoutEffect(() => {
     const content = measure.current;
     if (!content) return;
-    // Measure layout height, not the animated transform. Notes and wrapping
-    // metadata may make each card a different height, even within one stack.
+    // Notes and wrapping metadata can make cards different heights, even
+    // within one stack. Measure each one for instant, unclipped disclosure.
     const updateHeight = () => {
       slot.current?.style.setProperty(
         "--stack-card-height",
@@ -62,7 +60,6 @@ function StackSlot({
       style={
         {
           "--stack-inset": `${Math.min(depth, 4)}%`,
-          "--stack-order": index,
         } as CSSProperties
       }
     >
@@ -70,7 +67,6 @@ function StackSlot({
         <IntakeCard
           entry={entry}
           medication={medication}
-          index={index}
           day={day}
           timeZone={timeZone}
           disabled={collapsed}
@@ -84,14 +80,12 @@ function StackSlot({
 export function IntakeCardGroup({
   group,
   medications,
-  startIndex,
   day,
   timeZone,
   onEdit,
 }: {
   group: IntakeGroup;
   medications: Medication[];
-  startIndex: number;
   day: string;
   timeZone: string;
   onEdit: (entry: Intake) => void;
@@ -137,7 +131,6 @@ export function IntakeCardGroup({
             medication={medications.find(
               (item) => item.id === entry.medicationId,
             )}
-            index={startIndex + depth}
             depth={depth}
             collapsed={collapsed}
             day={day}

@@ -252,9 +252,6 @@ function IntakeTimeline({
   const [editing, setEditing] = useState<Intake | null>(null);
   const entries = dayIntakes(data, day);
   const groups = groupIntakes(entries);
-  const entryIndexes = new Map(
-    entries.map((entry, index) => [entry.id, index]),
-  );
   return (
     <>
       {showSummary && (
@@ -271,7 +268,6 @@ function IntakeTimeline({
               key={group.id}
               group={group}
               medications={data.medications}
-              startIndex={entryIndexes.get(group.id) ?? 0}
               day={day}
               timeZone={data.settings.timezone}
               onEdit={setEditing}

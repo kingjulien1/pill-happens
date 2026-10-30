@@ -10,6 +10,7 @@ import { StreakMenu } from "@/components/streak-menu";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
+  const intakePage = path === "/" || path.startsWith("/history/");
   const { data, error, refresh } = useJournal();
   return (
     <div
@@ -58,7 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {data && (
           <div
             key={path}
-            className={`page-enter min-w-0 flex-1 ${path === "/" ? "flex flex-col" : ""}`}
+            className={`min-w-0 flex-1 ${intakePage ? "" : "page-enter"} ${path === "/" ? "flex flex-col" : ""}`}
           >
             {children}
           </div>
