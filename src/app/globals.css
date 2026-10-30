@@ -265,52 +265,90 @@
 .intake-group-cards {
   position: relative;
   isolation: isolate;
-  display: flex;
+  display: block;
   min-width: 0;
-  flex-direction: column;
+  overflow: visible;
 }
 .intake-stack-slot {
-  position: relative;
-  z-index: 1;
-  height: var(--stack-card-height, 104px);
+  position: absolute;
+  z-index: var(--stack-layer, 1);
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: var(--stack-face-height, 80px);
   min-width: 0;
-  margin-inline: 0;
+  margin: 0;
+  overflow: visible;
   border-radius: 21px;
+  opacity: 1;
+  visibility: visible;
+  transform: translate3d(0, var(--stack-y, 0px), 0) scale(var(--stack-scale, 1));
+  transform-origin: 50% 0;
 }
-.intake-stack-slot:first-child {
-  z-index: 2;
-  height: auto;
-}
-.intake-stack-slot + .intake-stack-slot {
-  margin-top: 8px;
-}
-.intake-stack-slot[data-stack-rear="true"] {
-  margin-inline: 2%;
-  overflow: clip;
-  overflow-clip-margin: 6px;
-}
-.intake-stack-slot[data-stack-collapsed="true"] {
-  height: min(26px, calc(var(--stack-card-height, 104px) * 0.25));
-  margin-top: -1px;
-  overflow: clip;
-  overflow-clip-margin: 0;
-}
-.intake-stack-slot[data-stack-collapsed="true"] .intake-card-content {
+.intake-stack-slot[data-stack-hidden="true"] {
+  opacity: 0;
   visibility: hidden;
+  pointer-events: none;
 }
 .intake-stack-measure {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
+  position: relative;
   width: 100%;
 }
-.intake-stack-slot:first-child .intake-stack-measure {
-  position: relative;
-  bottom: auto;
+.intake-stack-measure > .intake-log-card {
+  height: var(--stack-face-height, 80px);
+}
+.intake-stack-slot[data-stack-collapsed="true"] .intake-card-content {
+  opacity: 0;
+}
+/* Whole faces move in their own slots; inner wrappers own entrance animation. */
+.intake-group[data-stack-moving="true"] .intake-group-cards {
+  transition: height var(--stack-layout-duration, 420ms)
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+.intake-group[data-stack-moving="true"] .intake-stack-slot {
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease,
+    visibility 0s;
+  transition-delay:
+    var(--stack-delay, 0ms), var(--stack-delay, 0ms), var(--stack-delay, 0ms),
+    0ms;
+}
+.intake-group[data-stack-moving="true"]
+  .intake-stack-slot[data-stack-hidden="true"] {
+  transition-delay:
+    var(--stack-delay, 0ms), var(--stack-delay, 0ms), var(--stack-delay, 0ms),
+    calc(var(--stack-delay, 0ms) + 420ms);
+}
+.intake-group[data-stack-moving="true"]
+  .intake-stack-measure
+  > .intake-log-card {
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1)
+    var(--stack-delay, 0ms);
+}
+.intake-group[data-stack-moving="true"] .intake-card-content {
+  transition: opacity 180ms ease calc(var(--stack-delay, 0ms) + 90ms);
+}
+.intake-group[data-stack-moving="true"]
+  .intake-stack-slot[data-stack-collapsed="true"]
+  .intake-card-content {
+  transition-duration: 120ms;
+  transition-delay: var(--stack-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .intake-group[data-stack-moving="true"] .intake-group-cards,
+  .intake-group[data-stack-moving="true"] .intake-stack-slot,
+  .intake-group[data-stack-moving="true"]
+    .intake-stack-measure
+    > .intake-log-card,
+  .intake-group[data-stack-moving="true"] .intake-card-content {
+    transition: none;
+  }
 }
 /* One entrance per exposed intake. Finished cards release their compositor layers. */
 @media (prefers-reduced-motion: no-preference) {
-  .intake-stack-measure[data-entrance-state="pending"] {
+  .intake-stack-measure[data-entrance-state="pending"],
+  .intake-stack-measure[data-entrance-state="waiting"] {
     opacity: 0;
   }
   .intake-stack-measure[data-entrance-state="running"] {
@@ -332,20 +370,48 @@
     animation: intake-copy-arrive 420ms cubic-bezier(0.22, 1, 0.36, 1)
       calc(var(--intake-enter-delay, 0ms) + 145ms) backwards;
   }
+  .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="preview"] {
+    transform-origin: center;
+    animation: intake-preview-arrive 480ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--intake-enter-delay, 0ms) backwards;
+  }
+  .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="preview"]
+    :is(
+      .intake-card-focus,
+      .intake-card-heading,
+      .intake-card-bottom,
+      .intake-card-note
+    ) {
+    animation: none;
+  }
   .intake-group:has(
       .intake-stack-slot:first-child
         > .intake-stack-measure[data-entrance-state="pending"]
     )
-    :is(.intake-stack-slot[data-stack-collapsed="true"], .intake-group-label) {
+    .intake-group-label {
     opacity: 0;
   }
   .intake-group:has(
       .intake-stack-slot:first-child
         > .intake-stack-measure[data-entrance-state="running"]
     )
-    :is(.intake-stack-slot[data-stack-collapsed="true"], .intake-group-label) {
+    .intake-group-label {
     animation: intake-stack-arrive 520ms ease-out var(--intake-enter-delay, 0ms)
       backwards;
+  }
+}
+@keyframes intake-preview-arrive {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -12px, 0) scale(0.995);
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(0, 0.75px, 0) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 @keyframes intake-stack-arrive {
@@ -583,9 +649,6 @@
   gap: 12px;
   padding: 12px var(--entry-card-padding);
 }
-.intake-stack-slot[data-stack-rear="true"] .intake-card-content {
-  padding-block: 10px;
-}
 .intake-card-focus {
   position: relative;
   isolation: isolate;
@@ -730,21 +793,6 @@
   }
   .intake-card-dose-group {
     gap: 6px;
-  }
-  .intake-stack-slot[data-stack-rear="true"] .intake-log-card {
-    --entry-card-padding: 8px;
-  }
-  .intake-stack-slot[data-stack-rear="true"] .intake-card-bottom {
-    gap: 4px;
-  }
-  .intake-stack-slot[data-stack-rear="true"] .intake-card-meta {
-    column-gap: 4px;
-  }
-  .intake-stack-slot[data-stack-rear="true"] .intake-card-dose-group {
-    gap: 4px;
-  }
-  .intake-stack-slot[data-stack-rear="true"] .intake-card-benzo {
-    padding-inline: 3px;
   }
 }
 .intake-log-card .intake-card-benzo {
