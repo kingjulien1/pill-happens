@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-} from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { ActionIcon } from "@/components/action-icon";
-import { BenzodiazepineBadge } from "@/components/benzodiazepine-badge";
 import { IntakeCard } from "@/components/intake-card";
 import type { Intake, Medication } from "@/lib/domain";
 import type { IntakeGroup } from "@/lib/intake-groups";
@@ -57,11 +50,6 @@ function StackSlot({
       role="listitem"
       data-stack-rear={depth > 0}
       data-stack-collapsed={collapsed && depth > 0}
-      style={
-        {
-          "--stack-inset": `${Math.min(depth, 4)}%`,
-        } as CSSProperties
-      }
     >
       <div ref={measure} className="intake-stack-measure">
         <IntakeCard
@@ -70,6 +58,7 @@ function StackSlot({
           day={day}
           timeZone={timeZone}
           disabled={collapsed}
+          shineEligible={!collapsed || depth === 0}
           onEdit={onEdit}
         />
       </div>
@@ -171,7 +160,6 @@ export function IntakeCardGroup({
                 {collapsed ? "Taken Together" : "Collapse"}
               </span>
             </span>
-            {containsBenzodiazepine && <BenzodiazepineBadge />}
             <ActionIcon name="expand" className="intake-group-chevron" />
           </span>
         </button>
