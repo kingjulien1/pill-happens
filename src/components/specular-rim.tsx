@@ -72,21 +72,24 @@ void main() {
   float position = loopPosition(p, uHalf, uRadius);
   float key = lobe(position, uSpot);
   float back = lobe(position, uSpot + 0.5);
-  float streak = key + back * 0.45;
+  // Opposing colors travel together instead of tinting the whole rim violet.
+  float streak = key + back * 0.72;
+  float leading = key / max(streak, 0.0001);
+  vec3 lineColor = mix(uBaseColor, uLineColor, leading);
+  vec3 glowColor = mix(uBaseColor, uGlowColor, leading);
   float width = max(uThickness * uPx * mix(0.7, 1.0, max(key, back)), 0.35);
   float band = smoothstep(-width - 0.6, -width + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
   float baseWidth = uThickness * uPx * 0.55;
   float baseBand = smoothstep(-baseWidth - 0.6, -baseWidth + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
   float outside = smoothstep(-0.25 * uPx, 0.25 * uPx, d);
   float edge = outside * (1.0 - smoothstep(0.8 * uPx, 1.6 * uPx, d));
-  float inside = 1.0 - smoothstep(-0.6, 0.6, d);
   vec2 pool = (p - uEntry) / (uHalf.y * vec2(1.6, 1.1));
   float glow = streak * 0.16 * exp(-abs(d) / (5.0 * uPx)) * outside
-    + inside * 0.025 * exp(-dot(pool, pool));
-  vec4 result = paint(uGlowColor, glow * uGlow);
+    * (0.8 + 0.2 * exp(-dot(pool, pool)));
+  vec4 result = paint(glowColor, glow * uGlow);
   result = over(paint(uEdgeColor, edge * 0.85), result);
   result = over(paint(uBaseColor, baseBand * 0.9), result);
-  result = over(paint(uLineColor, band * (0.18 + streak * 0.82) * uIntensity), result);
+  result = over(paint(lineColor, band * (0.18 + streak * 0.82) * uIntensity), result);
   outColor = result;
 }`;
 
@@ -209,7 +212,7 @@ const SETTINGS = {
   idleIntensity: 0.35,
   shineSize: 39,
   shineFade: 61,
-  thickness: 4,
+  thickness: 3,
   glow: 2.4,
   speed: 1.15,
 };
@@ -294,10 +297,10 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const readPalette = () => {
       const styles = getComputedStyle(button);
       return {
-        line: readColor(styles, "--intake-rim-line", APP_COLORS.peach),
-        base: readColor(styles, "--intake-rim-base", "#f97316"),
-        edge: readColor(styles, "--intake-rim-guard", "#9a3412"),
-        glow: readColor(styles, "--intake-rim-glow", "#f97316"),
+        line: readColor(styles, "--intake-rim-line", APP_COLORS.violet),
+        base: readColor(styles, "--intake-rim-base", APP_COLORS.rust),
+        edge: readColor(styles, "--intake-rim-guard", APP_COLORS.ink),
+        glow: readColor(styles, "--intake-rim-glow", APP_COLORS.violet),
       };
     };
     let palette = readPalette();

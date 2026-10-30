@@ -3374,57 +3374,83 @@
     background: color-mix(in srgb, var(--palette-ink) 92%, transparent);
   }
 }
-.intake-log-action {
-  --intake-rim-line: var(--palette-peach);
-  --intake-rim-base: var(--palette-flame);
-  --intake-rim-guard: var(--palette-rust);
-  --intake-rim-glow: var(--palette-flame);
-  --intake-rim-outline: color-mix(
-    in srgb,
-    var(--palette-rust) 70.196%,
-    transparent
-  );
-  --intake-rim-halo: color-mix(
-    in srgb,
-    var(--palette-flame) 30.196%,
-    transparent
-  );
-  /* Keep Tailwind's shadow composition so keyboard focus rings stay visible. */
-  --tw-shadow:
-    0 7px 20px color-mix(in srgb, var(--palette-ink) 16%, transparent),
-    0 0 0 1px var(--intake-rim-outline), 0 0 18px var(--intake-rim-halo);
-  --tw-ring-color: color-mix(in srgb, var(--palette-rust) 50.196%, transparent);
+.intake-action-shell {
+  display: grid;
   position: relative;
+  isolation: isolate;
+}
+.intake-orbit-shadow {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: 22px;
+  pointer-events: none;
+  filter: blur(9px);
+}
+.intake-orbit-shadow svg {
+  display: block;
+  overflow: visible;
+}
+.intake-shadow-trail {
+  stroke-linecap: round;
+  stroke-dasharray: 18 82;
+  animation: intake-shadow-orbit 9.6s linear infinite paused;
+}
+.intake-shadow-trail--violet {
+  stroke: var(--palette-violet);
+  stroke-width: 12px;
+  opacity: 0.65;
+}
+.intake-shadow-trail--rust {
+  stroke: var(--palette-rust);
+  stroke-width: 14px;
+  stroke-dasharray: 15 85;
+  stroke-dashoffset: -50;
+  opacity: 0.6;
+  animation-delay: -4.8s;
+}
+.intake-shadow-trail--ink {
+  stroke: var(--palette-ink);
+  stroke-width: 10px;
+  stroke-dasharray: 24 76;
+  stroke-dashoffset: -25;
+  opacity: 0.55;
+  animation-duration: 14.4s;
+  animation-delay: -3.2s;
+  animation-direction: reverse;
+}
+/* Reuse the rim's visibility, disabled and reduced-motion lifecycle. */
+.intake-action-shell:has(.intake-specular-light[data-fallback-active="true"])
+  .intake-shadow-trail {
+  animation-play-state: running;
+}
+.intake-action-shell:has(.intake-log-action:disabled) .intake-orbit-shadow {
+  opacity: 0.3;
+}
+@keyframes intake-shadow-orbit {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+.intake-log-action {
+  --intake-rim-line: var(--palette-violet);
+  --intake-rim-base: var(--palette-rust);
+  --intake-rim-guard: var(--palette-ink);
+  --intake-rim-glow: var(--palette-violet);
+  /* Retain Tailwind's focus-ring composition above the moving shadow layer. */
+  --tw-shadow: 0 7px 20px var(--shadow);
+  --tw-ring-color: var(--ring);
+  position: relative;
+  z-index: 1;
   isolation: isolate;
   -webkit-backdrop-filter: blur(13px);
   backdrop-filter: blur(13px);
 }
 .intake-log-action:focus-visible {
-  /* Avoid an empty optional inset invalidating the ring in older browsers. */
   --tw-ring-shadow: 0 0 0 3px var(--tw-ring-color);
-}
-@media (prefers-color-scheme: dark) {
-  .intake-log-action {
-    --intake-rim-line: var(--palette-rust);
-    --intake-rim-base: var(--palette-rust);
-    --intake-rim-guard: var(--palette-peach);
-    --intake-rim-glow: var(--palette-peach);
-    --intake-rim-outline: color-mix(
-      in srgb,
-      var(--palette-peach) 58.039%,
-      transparent
-    );
-    --intake-rim-halo: color-mix(
-      in srgb,
-      var(--palette-peach) 30.196%,
-      transparent
-    );
-    --tw-ring-color: color-mix(
-      in srgb,
-      var(--palette-peach) 50.196%,
-      transparent
-    );
-  }
 }
 .intake-log-action > * {
   position: relative;
@@ -3444,17 +3470,19 @@
   position: absolute;
   z-index: 0;
   inset: -1px;
-  border: 4px solid var(--intake-rim-base);
+  border: 3px solid var(--intake-rim-base);
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px var(--intake-rim-line);
+  box-shadow:
+    inset 0 0 0 1px var(--intake-rim-line),
+    0 0 0 1px var(--intake-rim-guard);
   pointer-events: none;
 }
 @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
   .intake-log-action > .intake-specular-fallback {
     overflow: hidden;
     border: 0;
-    padding: 4px;
-    background: var(--intake-rim-base);
+    padding: 3px;
+    background: var(--intake-rim-guard);
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
       linear-gradient(#000 0 0);
@@ -3472,11 +3500,11 @@
     width: 200%;
     aspect-ratio: 1;
     background: conic-gradient(
-      var(--intake-rim-base) 0deg 35deg,
+      var(--intake-rim-guard) 0deg 35deg,
       var(--intake-rim-line) 70deg 105deg,
-      var(--intake-rim-base) 145deg 215deg,
-      var(--intake-rim-line) 250deg 285deg,
-      var(--intake-rim-base) 325deg 360deg
+      var(--intake-rim-guard) 145deg 215deg,
+      var(--intake-rim-base) 250deg 285deg,
+      var(--intake-rim-guard) 325deg 360deg
     );
     transform: translate(-50%, -50%) rotate(0deg);
     animation: intake-specular-fallback-turn 6.8s linear infinite paused;
