@@ -1,6 +1,6 @@
 # Tablet and dispenser icon library
 
-The library contains **16 tintable outline drawings** and **17 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 12 generic SVGs, the picker offers 45 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox artwork.
+The library contains **16 tintable outline drawings** and **17 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 12 generic SVGs, the picker offers 45 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox and Levomethasan artwork.
 
 ## Source and generated files
 
@@ -65,7 +65,7 @@ The names are checked against the installed Lucide names and emoji display label
 | `tadalafil-10` / `Tadalafil10`     | Tadalafil 10mg   | Same oval with centered 10 imprint        | Blue 600     |
 | `tramal` / `Tramal`                | Tramal           | Shoulder bottle with metering pump        | Amber 700    |
 | `testavan` / `Testavan`            | Testavan         | Slender gel dispenser with pump           | Zinc 300     |
-| `levomethasan` / `Levomethasan`    | Levomethasan     | Round tablet with centered four-way score | Zinc 300     |
+| `levomethasan` / `Levomethasan`    | Levomethasan     | Round tablet with raised, ridged quarters | Zinc 300     |
 
 Colors use static sRGB equivalents of the installed Tailwind palette. All neutral tablets use the specifically requested `#D4D4D8`. Every filled SVG has one visible paint color; score lines and imprints are transparent cutouts. There are no shadows, highlights, gradients, textures, or photographic irregularities in the artwork.
 
@@ -77,7 +77,9 @@ The medication names and relative appearances come from the supplied references.
 
 Outline assets use Lucide's standard `xmlns`, `width="24"`, `height="24"`, `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="2"`, and rounded caps/joins. All shapes are flattened and centered in that same viewport. Smaller silhouettes retain their relative size instead of being expanded to fill the frame. The extra Venlafaxin tablet is slightly larger than the Queatialan 200 shape.
 
-Every silhouette is centered at `(12, 12)`, and each vertical tablet score runs through `x=12` with its midpoint at `y=12`. Levomethasan adds a perpendicular score through `y=12`, making a centered four-way cross. Its quartering marks are simplified artwork and do not set intake quantities. Euthyrox's EM/50 blocks sit on either side of that centered split, straightened from the reference photo. The Tadalafil numerals and Viagra wordmark are centered independently of their bodies; the wider “10” has additional breathing room. Dispensers retain distinct proportions, with Testavan narrower and taller in appearance than the Tramal bottle. All artwork fits the viewport at the app's 2.75 stroke width.
+Every silhouette is centered at `(12, 12)`, and each vertical tablet score runs through `x=12` with its midpoint at `y=12`. Euthyrox's EM/50 blocks sit on either side of that centered split, straightened from the reference photo. The Tadalafil numerals and Viagra wordmark are centered independently of their bodies; the wider “10” has additional breathing room. Dispensers retain distinct proportions, with Testavan narrower and taller in appearance than the Tramal bottle. All artwork fits the viewport at the app's 2.75 stroke width.
+
+Levomethasan represents four raised wedge-shaped quarters rather than a plain circle with a plus sign. Deep diagonal valleys separate the quarters. Each quarter has a finer cardinal crest that divides two sloping faces and curves gently at the outer edge to suggest the rounded falloff. These details use vector lines and transparent cutouts only; the filled version keeps a single flat Zinc 300 pigment without shadows or highlights. Quartering marks are appearance only and do not set intake quantities.
 
 The React outline exports use `createLucideIcon` and accept the same size, stroke, color, and other SVG props:
 
@@ -92,6 +94,8 @@ import { TabletMeridian, TabletBisect, Euthyrox } from "@/components/tablet-icon
 Inside the application, these outlines receive the same 2.75 stroke width and selected medication accent as the other Lucide icons. Filled variants render their generated SVG file without a tint, mask, or filter in the shared glyph renderer. The color picker still controls their surrounding medication accent; the tablet pigment stays fixed. The preview identifies the fixed palette and the selected accent separately.
 
 Outline and filled files can share a basename, as with `viagra.svg` and `euthyrox.svg`, because they live in separate folders. Their stored IDs are distinct: `svg:viagra` and `svg:color:viagra`, for example. Only registered identifiers are accepted by client/server validation.
+
+Levomethasan retains its persisted IDs, `svg:levomethasan` and `svg:color:levomethasan`, and its canonical outline/color file paths. Existing selections therefore show the refined artwork throughout the shared medication renderer, including the appearance preview, medication library, intake rows, medication selectors, and goals. `getSvgIconAssetUrl` adds a public revision query to the two Levomethasan asset URLs: `/icons/medications/tablets/outline/levomethasan.svg?v=facets-2` and `/icons/medications/tablets/color/levomethasan.svg?v=facets-2`. The revision refreshes browser-cached artwork without changing catalog paths or values stored in journals; other SVG URLs remain unchanged.
 
 ## Finding icons
 
