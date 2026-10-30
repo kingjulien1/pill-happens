@@ -11,7 +11,7 @@ import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { GuideColors } from "@/components/guide-colors";
 import { HeadingText } from "@/components/heading-text";
 import { InstallAppButton } from "@/components/install-app-button";
-import { DAILY_MOODS } from "@/lib/daily-check-in";
+import { DAILY_MOODS, DAILY_REFLECTION_MAX_LENGTH } from "@/lib/daily-check-in";
 import styles from "./guide-page.module.css";
 
 const sections = [
@@ -448,8 +448,14 @@ export function GuidePage() {
           </div>
           <dl className={styles.reference}>
             <div>
-              <dt>Your Day</dt>
-              <dd>A short reflection, up to 800 characters.</dd>
+              <dt>Your Day, Your Words</dt>
+              <dd>
+                A roomy journal entry, up to{" "}
+                {DAILY_REFLECTION_MAX_LENGTH.toLocaleString("en-GB")}{" "}
+                characters. Keep paragraphs and follow the live word and
+                character counts. Optional prompts offer a starting point
+                without changing your writing.
+              </dd>
             </div>
             <div>
               <dt>Moods</dt>
