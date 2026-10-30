@@ -7,11 +7,9 @@ import {
   type MedicationClass,
 } from "@/lib/medication-classification";
 import { cn } from "@/lib/utils";
+import type { MedicationCategoryMetadata } from "@/lib/medication-categories";
 
-type ClassificationFlags = {
-  isBenzodiazepine?: boolean;
-  isOpioid?: boolean;
-};
+type ClassificationFlags = MedicationCategoryMetadata;
 
 export type { MedicationClass } from "@/lib/medication-classification";
 
@@ -22,9 +20,10 @@ export const MEDICATION_CLASS_MARKERS = {
 
 /** Keep the established rose marker and add an independent amber opioid marker. */
 export function medicationClassHighlights(medication?: ClassificationFlags) {
+  const classes = getMedicationClasses(medication);
   return cn(
-    medication?.isBenzodiazepine === true && "benzodiazepine-highlight",
-    medication?.isOpioid === true && "opioid-highlight",
+    classes.includes("benzodiazepine") && "benzodiazepine-highlight",
+    classes.includes("opioid") && "opioid-highlight",
   );
 }
 

@@ -1,0 +1,244 @@
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+.label {
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+.trigger {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px solid var(--input);
+  border-radius: calc(var(--radius) + 4px);
+  background: transparent;
+  color: var(--foreground);
+  text-align: left;
+  font-size: 12px;
+}
+.trigger:disabled {
+  opacity: 0.5;
+}
+.triggerIcon {
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+}
+.triggerText {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.positioner {
+  z-index: 60;
+  outline: none;
+}
+.popup {
+  display: flex;
+  width: min(330px, calc(100vw - 24px));
+  max-height: min(438px, var(--available-height));
+  min-height: 0;
+  flex-direction: column;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: 0 8px 30px var(--shadow);
+  outline: none;
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+}
+.popup,
+.popup * {
+  scrollbar-width: none;
+}
+.popup::-webkit-scrollbar,
+.popup *::-webkit-scrollbar {
+  display: none;
+}
+.heading {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 8px 9px;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+.heading > span:last-child {
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 400;
+}
+.search {
+  display: flex;
+  min-height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  margin: 0 4px 6px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+.search:focus-within {
+  border-color: var(--ring);
+}
+.searchInput {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.searchInput::placeholder {
+  color: var(--muted-foreground);
+}
+.searchInput:focus-visible {
+  outline: none;
+}
+.list {
+  min-height: 0;
+  max-height: 286px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 1px;
+}
+.option {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1.4;
+  cursor: pointer;
+  outline: none;
+}
+.option[data-selected] {
+  background: var(--accent);
+  color: var(--foreground);
+}
+.option[data-highlighted] {
+  border-color: var(--ring);
+  color: var(--foreground);
+}
+.optionIcon {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  place-items: center;
+}
+.optionIcon[data-category-kind="benzodiazepine"] {
+  border-radius: 7px;
+  background: #fda4af;
+  color: #e11d48;
+}
+.optionIcon[data-category-kind="opioid"] {
+  border-radius: 7px;
+  background: #fcd34d;
+  color: #92400e;
+}
+.optionText {
+  min-width: 0;
+  flex: 1;
+}
+.indicator {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--foreground);
+}
+.empty {
+  display: flex;
+  min-height: 98px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  text-align: center;
+}
+.footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 5px 1px;
+  border-top: 1px solid var(--glass-border);
+}
+.footer > span {
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.clear,
+.done {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 10px;
+}
+.clear {
+  color: var(--muted-foreground);
+}
+.clear:disabled {
+  opacity: 0.4;
+}
+.done {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+@media (min-width: 768px) {
+  .searchInput {
+    font-size: 12px;
+  }
+}
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .option:hover {
+    background: var(--accent);
+    color: var(--foreground);
+  }
+  .clear:not(:disabled):hover,
+  .done:hover {
+    border-color: var(--ring);
+  }
+}
+
+@media (max-width: 359px) {
+  .countSuffix {
+    display: none;
+  }
+}

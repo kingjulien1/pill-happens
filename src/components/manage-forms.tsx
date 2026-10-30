@@ -8,6 +8,7 @@ import {
   MedicationClassBadges,
   medicationClassHighlights,
 } from "@/components/medication-class-badge";
+import { MedicationCategoryBadges } from "@/components/medication-category-badges";
 import { MedicationClassificationField } from "@/components/medication-classification-field";
 import {
   MedicationIcon,
@@ -15,9 +16,9 @@ import {
 } from "@/components/medication-icon";
 import { isMedicationIcon } from "@/lib/medication-appearance";
 import {
-  getMedicationClassification,
-  medicationClassificationFlags,
-} from "@/lib/medication-classification";
+  getMedicationCategories,
+  medicationCategoryFlags,
+} from "@/lib/medication-categories";
 import {
   getMedicationType,
   isMeteredMedicationType,
@@ -66,11 +67,10 @@ export function MedicationForm({
   const [activeIngredient, setActiveIngredient] = useState(
     medication?.activeIngredient ?? "",
   );
-  const [classification, setClassification] = useState(
-    getMedicationClassification(medication),
+  const [categories, setCategories] = useState(
+    getMedicationCategories(medication),
   );
-  const { isBenzodiazepine, isOpioid } =
-    medicationClassificationFlags(classification);
+  const { isBenzodiazepine, isOpioid } = medicationCategoryFlags(categories);
   const [strength, setStrength] = useState(
     medication ? String(medication.strengthMg) : "",
   );
@@ -122,6 +122,7 @@ export function MedicationForm({
         {
           name: name.trim(),
           activeIngredient: activeIngredient.trim(),
+          categories,
           isBenzodiazepine,
           isOpioid,
           strengthMg,
@@ -259,15 +260,21 @@ export function MedicationForm({
           </div>
           <MedicationClassificationField
             id={`${id}-classification`}
-            value={classification}
-            onChange={setClassification}
+            value={categories}
+            onChange={setCategories}
             disabled={busy}
           />
         </div>
 
-        <p className="-mt-2 text-[10px] leading-relaxed text-muted-foreground">
-          Manual labels · shared across your journal.
-        </p>
+        <div className="-mt-2 space-y-1.5" data-medication-category-summary>
+          <MedicationCategoryBadges
+            medication={{ categories }}
+            maxGeneral={3}
+          />
+          <p className="text-[10px] leading-relaxed text-muted-foreground">
+            Choose one or more categories · shared across your journal.
+          </p>
+        </div>
 
         <div
           className="grid min-w-0 grid-cols-2 gap-3"

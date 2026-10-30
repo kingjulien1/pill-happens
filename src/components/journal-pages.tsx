@@ -29,6 +29,7 @@ import { IntakeTimelineEntrance } from "@/components/intake-timeline-entrance";
 import { HistoryDayCard } from "@/components/history-day-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
+import { MedicationCategoryBadges } from "@/components/medication-category-badges";
 import { DailyCheckInSection } from "@/components/daily-check-in";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
@@ -431,7 +432,7 @@ export function MedicationsPage() {
                       {formatDose(m.strengthMg)} mg /{" "}
                       {getMedicationType(m.form).unit}
                     </span>
-                    <MedicationClassBadges medication={m} />
+                    <MedicationCategoryBadges medication={m} />
                   </div>
                 </div>
                 <Button
