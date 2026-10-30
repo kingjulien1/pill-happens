@@ -19,6 +19,13 @@ export type MedicationPreviewAccents = {
   spark: string;
 };
 
+export type MedicationWaveColors = {
+  above: string;
+  below: string;
+  aboveValue: string;
+  belowValue: string;
+};
+
 const rampColors: RampColor[] = TAILWIND_MEDICATION_COLORS.flatMap((color) => {
   const match = /^tw-([a-z]+)-(\d+)$/.exec(color.value);
   return match ? [{ ...color, family: match[1], shade: Number(match[2]) }] : [];
@@ -32,6 +39,7 @@ for (const color of rampColors) {
 }
 for (const colors of families.values())
   colors.sort((a, b) => a.shade - b.shade);
+const familyMidpoints = rampColors.filter((color) => color.shade === 500);
 
 function rgb(hex: string) {
   return [1, 3, 5].map((offset) =>
@@ -85,6 +93,29 @@ export function getMedicationColorScale(value?: string): MedicationColorScale {
     lighter: family[Math.max(0, index - 1)].hex,
     darker: family[Math.min(family.length - 1, index + 1)].hex,
     icon: family[Math.min(family.length - 1, index + 2)].hex,
+  };
+}
+
+/** Neighboring palette families at shade 500; the family order wraps at its ends. */
+export function getMedicationWaveColors(value?: string): MedicationWaveColors {
+  const selected = getMedicationColor(value);
+  const family =
+    selected.value === "tw-black" || selected.value === "tw-white"
+      ? "neutral"
+      : (colorsByValue.get(selected.value) ?? nearestRampColor(selected.hex))
+          .family;
+  const index = familyMidpoints.findIndex((color) => color.family === family);
+  const above =
+    familyMidpoints[
+      (index - 1 + familyMidpoints.length) % familyMidpoints.length
+    ];
+  const below = familyMidpoints[(index + 1) % familyMidpoints.length];
+
+  return {
+    above: above.hex,
+    below: below.hex,
+    aboveValue: above.value,
+    belowValue: below.value,
   };
 }
 

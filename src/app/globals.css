@@ -480,16 +480,40 @@
   height: 100%;
   overflow: visible;
   fill: none;
-  opacity: 0.5;
 }
 .intake-card-curves path {
-  stroke: var(--entry-light);
+  stroke: var(--entry-wave-above);
   stroke-width: 17px;
   stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: intake-wave-flow 16s ease-in-out var(--entry-wave-phase, 0s)
+    infinite;
 }
 .intake-card-curves path + path {
-  stroke: var(--entry-deep);
+  stroke: var(--entry-wave-below);
   stroke-width: 10px;
+  animation-duration: 20s;
+  animation-delay: calc(var(--entry-wave-phase, 0s) - 5s);
+  animation-direction: reverse;
+}
+.intake-stack-slot[data-stack-collapsed="true"] .intake-card-curves path {
+  animation-play-state: paused;
+}
+@keyframes intake-wave-flow {
+  0%,
+  100% {
+    transform: translate(-6px, 0) scaleY(0.98);
+  }
+  25% {
+    transform: translate(0, -2px) scaleY(1.035);
+  }
+  50% {
+    transform: translate(6px, 0) scaleY(1.02);
+  }
+  75% {
+    transform: translate(0, 2px) scaleY(0.965);
+  }
 }
 .intake-card-ink {
   position: absolute;

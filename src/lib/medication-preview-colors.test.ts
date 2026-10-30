@@ -6,6 +6,7 @@ import {
   getMedicationColorScale,
   getMedicationPreviewAccents,
   getMedicationPreviewSurface,
+  getMedicationWaveColors,
 } from "./medication-preview-colors";
 
 function hex(value: string) {
@@ -133,6 +134,107 @@ test("legacy and unknown choices get deterministic accents from their resolved p
     assert.ok(palette.has(pop), value);
     assert.ok(palette.has(spark), value);
     assert.notEqual(pop, spark, value);
+  }
+});
+
+test("intake wave strokes use adjacent color families at shade 500", () => {
+  for (const [selected, above, below] of [
+    ["tw-orange-400", "tw-red-500", "tw-amber-500"],
+    ["tw-purple-800", "tw-violet-500", "tw-fuchsia-500"],
+    ["tw-emerald-50", "tw-green-500", "tw-teal-500"],
+    ["tw-neutral-950", "tw-zinc-500", "tw-stone-500"],
+  ]) {
+    assert.deepEqual(getMedicationWaveColors(selected), {
+      above: hex(above),
+      below: hex(below),
+      aboveValue: above,
+      belowValue: below,
+    });
+  }
+});
+
+test("every shade in a family shares registered 500 wave colors in palette order", () => {
+  const midpoints = TAILWIND_MEDICATION_COLORS.filter(({ value }) =>
+    /^tw-[a-z]+-500$/.test(value),
+  );
+  for (const { value } of TAILWIND_MEDICATION_COLORS) {
+    const match = /^tw-([a-z]+)-\d+$/.exec(value);
+    if (!match) continue;
+    const index = midpoints.findIndex(
+      (color) => color.value === `tw-${match[1]}-500`,
+    );
+    const above = midpoints[(index + midpoints.length - 1) % midpoints.length];
+    const below = midpoints[(index + 1) % midpoints.length];
+    const result = getMedicationWaveColors(value);
+    assert.deepEqual(result, {
+      above: above.hex,
+      below: below.hex,
+      aboveValue: above.value,
+      belowValue: below.value,
+    });
+    assert.match(result.above, /^#[0-9a-f]{6}$/);
+    assert.match(result.below, /^#[0-9a-f]{6}$/);
+    assert.notEqual(result.aboveValue, result.belowValue);
+    assert.notEqual(result.aboveValue, `tw-${match[1]}-500`);
+    assert.notEqual(result.belowValue, `tw-${match[1]}-500`);
+  }
+});
+
+test("wave family neighbors wrap at both ends of the installed palette", () => {
+  assert.deepEqual(getMedicationWaveColors("tw-red-500"), {
+    above: hex("tw-taupe-500"),
+    below: hex("tw-orange-500"),
+    aboveValue: "tw-taupe-500",
+    belowValue: "tw-orange-500",
+  });
+  assert.deepEqual(getMedicationWaveColors("tw-taupe-500"), {
+    above: hex("tw-mist-500"),
+    below: hex("tw-red-500"),
+    aboveValue: "tw-mist-500",
+    belowValue: "tw-red-500",
+  });
+});
+
+test("black, white, legacy and unknown wave choices resolve without changing stored pigments", () => {
+  const before = structuredClone(MEDICATION_COLORS);
+  for (const value of ["tw-black", "tw-white"])
+    assert.deepEqual(
+      getMedicationWaveColors(value),
+      getMedicationWaveColors("tw-neutral-500"),
+    );
+  for (const [legacy, family] of [
+    ["rose", "tw-orange-500"],
+    ["violet", "tw-orange-500"],
+    ["slate", "tw-slate-500"],
+  ])
+    assert.deepEqual(
+      getMedicationWaveColors(legacy),
+      getMedicationWaveColors(family),
+    );
+  assert.deepEqual(
+    getMedicationWaveColors("unknown"),
+    getMedicationWaveColors(),
+  );
+  assert.deepEqual(getMedicationWaveColors(), getMedicationWaveColors("rose"));
+  assert.deepEqual(MEDICATION_COLORS, before);
+});
+
+test("wave color results are independent and all selectable choices use registered midpoints", () => {
+  const first = getMedicationWaveColors("tw-blue-500");
+  const original = { ...first };
+  first.above = "#000000";
+  first.aboveValue = "unregistered";
+  assert.deepEqual(getMedicationWaveColors("tw-blue-500"), original);
+
+  const midpoints = new Map<string, string>(
+    TAILWIND_MEDICATION_COLORS.filter(({ value }) =>
+      value.endsWith("-500"),
+    ).map(({ value, hex }) => [value, hex]),
+  );
+  for (const { value } of MEDICATION_COLORS) {
+    const result = getMedicationWaveColors(value);
+    assert.equal(result.above, midpoints.get(result.aboveValue), value);
+    assert.equal(result.below, midpoints.get(result.belowValue), value);
   }
 });
 

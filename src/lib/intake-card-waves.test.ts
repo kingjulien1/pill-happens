@@ -66,6 +66,7 @@ test("intake waves stay deterministic and return independent containers", () => 
   getIntakeCardWaves("unrelated-call");
   const again = getIntakeCardWaves("synthetic-one");
   assert.deepEqual(again, snapshot);
+  assert.ok(again.phaseSeconds >= -20 && again.phaseSeconds <= 0);
   assert.notEqual(again, first);
   first.curveA = "changed only in the returned container";
   assert.deepEqual(getIntakeCardWaves("synthetic-one"), snapshot);

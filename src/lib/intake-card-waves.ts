@@ -1,9 +1,10 @@
 export type IntakeCardWaves = {
   curveA: string;
   curveB: string;
+  phaseSeconds: number;
 };
 
-/** Static, gently spaced waves in a 360 × 150 viewBox. */
+/** Stable, gently spaced wave geometry in a 360 × 150 viewBox. */
 export function getIntakeCardWaves(id: string): IntakeCardWaves {
   let state = 0x811c9dc5;
   for (let index = 0; index < id.length; index += 1) {
@@ -40,5 +41,9 @@ export function getIntakeCardWaves(id: string): IntakeCardWaves {
     return commands.join(" ");
   }
 
-  return { curveA: wave(upper), curveB: wave(lower) };
+  return {
+    curveA: wave(upper),
+    curveB: wave(lower),
+    phaseSeconds: -between(0, 200) / 10,
+  };
 }

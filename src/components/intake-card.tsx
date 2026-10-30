@@ -15,6 +15,7 @@ import { getMedicationColor } from "@/lib/medication-appearance";
 import {
   getMedicationColorScale,
   getMedicationPreviewSurface,
+  getMedicationWaveColors,
 } from "@/lib/medication-preview-colors";
 import {
   getMedicationType,
@@ -39,6 +40,7 @@ export function IntakeCard({
 }) {
   const color = getMedicationColor(medication?.color);
   const scale = getMedicationColorScale(color.value);
+  const waveColors = getMedicationWaveColors(color.value);
   const waves = getIntakeCardWaves(entry.id);
   const svg = getSvgIcon(medication?.icon ?? "pill");
   const pigment =
@@ -51,10 +53,11 @@ export function IntakeCard({
   const isBenzodiazepine = medication?.isBenzodiazepine === true;
 
   const style = {
-    "--entry-light": scale.lighter,
     // Explicit alpha avoids opaque CSS color-mix fallbacks in older browsers.
     "--entry-rim-tint": `${scale.lighter}14`,
-    "--entry-deep": scale.darker,
+    "--entry-wave-above": waveColors.above,
+    "--entry-wave-below": waveColors.below,
+    "--entry-wave-phase": `${waves.phaseSeconds}s`,
     "--entry-icon-tint": `${color.hex}66`,
   } as CSSProperties;
 
@@ -78,8 +81,16 @@ export function IntakeCard({
           focusable="false"
           data-intake-curves
         >
-          <path d={waves.curveA} vectorEffect="non-scaling-stroke" />
-          <path d={waves.curveB} vectorEffect="non-scaling-stroke" />
+          <path
+            d={waves.curveA}
+            vectorEffect="non-scaling-stroke"
+            data-intake-wave-color={waveColors.aboveValue}
+          />
+          <path
+            d={waves.curveB}
+            vectorEffect="non-scaling-stroke"
+            data-intake-wave-color={waveColors.belowValue}
+          />
         </svg>
         <span className="intake-card-ink" data-intake-ink />
       </span>
