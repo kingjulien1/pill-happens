@@ -771,10 +771,10 @@ export function DeveloperGuidePage() {
             <p>
               The intake card keeps a blurred glass base, a subtle static
               pattern, an Ink readability treatment and a selected-color wash. A
-              final 40% Ink overlay brings the different card pigments closer
-              together while leaving the foreground readable. Its inside rim
-              does not increase the outer card dimensions. Related background
-              layers stay behind the real icon and content.
+              final Ink overlay (40% light, 34% dark) brings card pigments
+              closer together while leaving the foreground readable. Its inside
+              rim does not increase the outer card dimensions. Related
+              background layers stay behind the real icon and content.
             </p>
             <p>
               MedicationCardBase is the shared button frame for intakes and the
@@ -797,11 +797,29 @@ export function DeveloperGuidePage() {
               changing the stored dose.
             </p>
             <p>
-              Collapsed groups overlap complete ordinary cards with their
-              natural content heights and corners. The visible rear cards shrink
-              slightly by depth; opening restores full-size cards. Preserve
-              whole faces when changing the stack, and avoid adding separate
-              decorative borders to the rear layers.
+              A card can become the head of its own substack without cloning or
+              replacing its DOM. Stable entry IDs define presentation heads, and
+              each head resets the six-card folded preview. Show exposes child
+              rows; Fold closes those children first, then gathers inner heads
+              before outer ones in bounded waves. Delayed height shrink keeps
+              the footer below returning faces. Preserve full natural card
+              heights and corners, with no added rear borders.
+            </p>
+            <p>
+              Stack presentation is saved per journal and day in the existing
+              local workspace, separately from form drafts. Persist user intent
+              rather than timer queues: a fold saves its final gathered view
+              immediately, and a new Show or promotion replaces that intent.
+              Hydrate before layout and reconcile saved IDs with live records.
+              The bounded store retains up to 60 recently used day views.
+            </p>
+            <p>
+              Dark subsection surfaces use 15% less opacity, with blur behind
+              their content. Shared backplates use 85% fill, and direct intake
+              and history Ink layers receive a proportional reduction. The
+              registry keeps their exact values and slightly brighter secondary
+              copy for readable text over the more visible background. Light
+              surface values, palette pigments, and the page canvas stay intact.
             </p>
           </Detail>
         </div>

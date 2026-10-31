@@ -308,10 +308,23 @@ export function GuidePage() {
               </p>
             </div>
             <p>
-              Tap a collapsed stack once to reveal its cards. Tap an individual
-              revealed card again to edit it. Use <strong>Collapse</strong> to
-              fold the group back up. The folded preview shows up to six cards
-              behind the first; opening reveals every entry at full size.
+              Tap a card underneath to make it the head of its own stack, with
+              the following cards folded beneath it. Repeat with another card to
+              open more substacks. Tap that fully visible head again to edit the
+              intake. Each stack can preview up to six cards underneath.
+            </p>
+            <p>
+              <strong>Show Intakes</strong> reveals the rows. Selecting a row
+              makes it a stack head; its next tap opens the editor.
+              <strong> Fold Intakes</strong> closes shown children first, then
+              gathers inner stacks back into the original one. These views never
+              change recorded times, quantities, or which entries belong to the
+              13-minute group.
+            </p>
+            <p>
+              Opened stacks and shown rows are remembered for each day on this
+              device. Refresh, close the tab, or reopen the app to return to the
+              same view. Other journals and recent days keep their own state.
             </p>
           </GuideDetail>
         </div>
@@ -707,11 +720,13 @@ export function GuidePage() {
               quantities; it does not rewrite those quantities or taken times.
             </p>
           </GuideDetail>
-          <GuideDetail title="Why Can’t I Edit A Collapsed Card Yet?">
+          <GuideDetail title="Why Does A Card Open Another Stack?">
             <p>
-              The first tap opens the stack. The next tap on a revealed entry
-              opens its editor. Entries group by when they were taken, rather
-              than when you entered them.
+              A card underneath first becomes a fully visible stack head. Tap
+              that same head again to edit it. Show Intakes reveals all rows,
+              and Fold Intakes gathers them again. The recorded grouping still
+              follows when entries were taken, rather than when you entered
+              them.
             </p>
           </GuideDetail>
           <GuideDetail title="Can I Check In Without Logging An Intake?">
