@@ -319,7 +319,7 @@ export const APP_THEME_TOKENS = [
     "actions",
     "action-background",
     "Filled Action",
-    "Intake, medication and other main buttons keep a warm Peach fill in both modes.",
+    "Shared primary controls keep a warm Peach fill. The intake button uses its own layered gradient.",
     peach,
     peach,
     ["action-foreground"],

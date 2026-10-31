@@ -2,13 +2,12 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BookOpenTextIcon } from "@phosphor-icons/react/dist/ssr/BookOpenText";
 import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
-import { PaletteIcon } from "@phosphor-icons/react/dist/ssr/Palette";
 import { QuestionIcon } from "@phosphor-icons/react/dist/ssr/Question";
 import { RocketLaunchIcon } from "@phosphor-icons/react/dist/ssr/RocketLaunch";
 import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 import { DeviceMobileIcon } from "@phosphor-icons/react/dist/ssr/DeviceMobile";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
-import { GuideColors } from "@/components/guide-colors";
+import { GuideStartLink } from "@/components/guide-onboarding";
 import { HeadingText } from "@/components/heading-text";
 import { InstallAppButton } from "@/components/install-app-button";
 import { DAILY_MOODS, DAILY_REFLECTION_MAX_LENGTH } from "@/lib/daily-check-in";
@@ -21,7 +20,6 @@ const sections = [
   { id: "medications", label: "Medications" },
   { id: "goals", label: "Goals & Streaks" },
   { id: "check-in", label: "Check-Ins" },
-  { id: "colors", label: "Colors" },
   { id: "history", label: "History & Backups" },
   { id: "app", label: "The App" },
   { id: "questions", label: "Quick Answers" },
@@ -76,10 +74,17 @@ function GuideDetail({
 }
 
 function PageLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <Link href={href} className={styles.pageLink}>
+  const content = (
+    <>
       {children}
       <ActionIcon name="external" className="size-3.5" />
+    </>
+  );
+  return href === "/" ? (
+    <GuideStartLink className={styles.pageLink}>{content}</GuideStartLink>
+  ) : (
+    <Link href={href} className={styles.pageLink}>
+      {content}
     </Link>
   );
 }
@@ -87,10 +92,10 @@ function PageLink({ href, children }: { href: string; children: ReactNode }) {
 export function GuidePage() {
   return (
     <article className={styles.page}>
-      <Link href="/" className={styles.backLink}>
+      <GuideStartLink className={styles.backLink}>
         <ActionIcon name="back" className="size-3.5" />
         Back To Today
-      </Link>
+      </GuideStartLink>
 
       <header className={styles.intro}>
         <h1>
@@ -197,6 +202,18 @@ export function GuidePage() {
           </li>
         </ol>
       </section>
+
+      <aside className={styles.startAction} aria-label="Start Your Daily Log">
+        <GuideStartLink className={styles.quickStart}>
+          <ActionIcon name="shootingStar" className="size-[18px]" />
+          Open My Daily Log
+          <ActionIcon name="next" className="size-[18px]" />
+        </GuideStartLink>
+        <p>
+          Reading on first can help you get familiar with the journal. You can
+          also start now and come back anytime.
+        </p>
+      </aside>
 
       <section id="daily-log" className={styles.section}>
         <SectionHeading
@@ -365,6 +382,24 @@ export function GuidePage() {
               changes the starting value for new intakes.
             </p>
           </GuideDetail>
+          <GuideDetail title="A Familiar Color &amp; Symbol" icon="flower">
+            <p>
+              Search Appearance for a Lucide icon, a project SVG, or an emoji by
+              name or keyword. English and German terms are supported. Results
+              arrive after you stop typing for 2.5 seconds.
+            </p>
+            <p>
+              Try <code>svg</code> for custom artwork, <code>outline</code> for
+              tintable tablets, or <code>color</code> for flat-color tablet
+              illustrations. Preview the result in Final Look, rotate the symbol
+              in 45° steps, or try Surprise Me and Undo.
+            </p>
+            <p>
+              Tintable icons follow your chosen accent; colored artwork keeps
+              its own colors. The app itself follows your device’s light or dark
+              appearance and reduced-motion settings.
+            </p>
+          </GuideDetail>
           <GuideDetail title="Archive &amp; Restore" icon="archive">
             <p>
               Archive a medication when you no longer want it offered for new
@@ -511,55 +546,6 @@ export function GuidePage() {
             keeps the day it was opened for, even if the clock passes the reset.
             Past logs also let you add a missed check-in at any hour.
           </p>
-        </div>
-      </section>
-
-      <section id="colors" className={styles.section}>
-        <SectionHeading
-          icon={<PaletteIcon size={18} weight="bold" />}
-          title="Colors &amp; Appearance"
-          context="Palette, Roles & Copy"
-        />
-        <p className={styles.sectionIntro}>
-          Peach, Flame, Rust, Ink and Violet shape the whole interface. Explore
-          their roles in light and dark mode, inspect exact values, or copy the
-          complete theme. Your saved medication colors have their own palette
-          below.
-        </p>
-        <GuideColors />
-        <div className={styles.panel}>
-          <GuideDetail title="Make Each Medication Recognizable" icon="log">
-            <p>
-              In Appearance, search for a symbol by name or keyword, or paste an
-              emoji. Results mix Lucide icons, the project’s SVG artwork, and
-              emoji. English and German search terms are supported. Search
-              results arrive after you stop typing for 2.5 seconds.
-            </p>
-            <p>
-              Try <code>svg</code> for custom artwork, <code>outline</code> for
-              tintable tablets, or <code>color</code> for the flat-color tablet
-              illustrations. Tintable icons follow your selected accent; colored
-              illustrations keep their own artwork colors.
-            </p>
-            <p>
-              The Final Look card previews your choices before saving. Rotate
-              the glyph in 45° steps, try Surprise Me for a new color and
-              symbol, or Undo the last surprise. Rotation changes the glyph
-              while its background stays upright.
-            </p>
-          </GuideDetail>
-          <GuideDetail title="Light, Dark &amp; Motion" icon="flower">
-            <p>
-              The app follows your device’s light or dark appearance. There is
-              no separate theme switch. Both modes keep the same medication
-              accents, while page surfaces, contrast, and the background adapt.
-            </p>
-            <p>
-              Reduced-motion settings quiet decorative movement. Hover effects
-              are limited to larger screens with a precise pointer; mobile
-              controls do not depend on hovering.
-            </p>
-          </GuideDetail>
         </div>
       </section>
 
@@ -748,14 +734,21 @@ export function GuidePage() {
       </section>
 
       <footer className={styles.footer}>
-        <Link href="/" className={styles.returnAction}>
+        <GuideStartLink className={styles.returnAction}>
           <ActionIcon name="today" className="size-4" />
           Back To Today
           <ActionIcon name="next" className="size-4" />
-        </Link>
-        <a href="#start" className={styles.topLink}>
-          Back To The Steps
-        </a>
+        </GuideStartLink>
+        <div className={styles.footerLinks}>
+          <a href="#start" className={styles.topLink}>
+            Back To The Steps
+          </a>
+          <span aria-hidden="true">·</span>
+          <Link href="/developer-guide" className={styles.topLink}>
+            Developer Guide
+            <ActionIcon name="external" className="size-3" />
+          </Link>
+        </div>
       </footer>
     </article>
   );

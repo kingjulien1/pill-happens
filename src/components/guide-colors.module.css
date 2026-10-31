@@ -84,11 +84,12 @@
   font-size: 9px;
   font-weight: 600;
 }
-.brandColor code {
+.brandPalette .brandColor code {
   max-width: 100%;
-  padding: 0 2px 3px;
+  padding: 0 0 3px;
   color: var(--muted-foreground);
   font-size: 8px;
+  white-space: nowrap;
 }
 .sectionHeading {
   margin: 23px 0 12px;
