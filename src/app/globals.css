@@ -978,18 +978,18 @@
 }
 .intake-card-total-value {
   min-width: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 650;
   line-height: 20px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .intake-card-total[data-total-long="true"] .intake-card-total-value {
-  font-size: 14px;
+  font-size: 13.5px;
 }
 .intake-card-total-unit {
   flex-shrink: 0;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 550;
   line-height: 12px;
 }
