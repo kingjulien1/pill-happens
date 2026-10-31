@@ -81,10 +81,7 @@ export function IntakeCard({
       decoration={
         <>
           <IntakeCardShine seed={entry.id} eligible={shineEligible} />
-          <MedicationCardPriorityRim
-            marked={classes.length > 0}
-            benzo={isBenzodiazepine}
-          />
+          <MedicationCardPriorityRim marked={isOpioid} benzo={false} />
         </>
       }
       iconDecoration={<MedicationCardOpioidDot present={isOpioid} />}
@@ -100,14 +97,15 @@ export function IntakeCard({
             {time}
             {nextMorning && <span className="sr-only">, next morning</span>}
           </time>
-          <h3
-            className="intake-card-name"
-            title={entry.medicationName}
-            data-intake-name
-          >
-            {entry.medicationName}
-          </h3>
-          <span className="intake-card-tags">
+          <div className="intake-card-title-group" data-intake-title-group>
+            <h3
+              className="intake-card-name"
+              title={entry.medicationName}
+              data-intake-name
+            >
+              {entry.medicationName}
+            </h3>
+            <span className="intake-card-title-dot" aria-hidden="true" />
             <span
               className="intake-card-type-text"
               title={hasType ? typeLabel : "Medication Type Not Set"}
@@ -115,16 +113,22 @@ export function IntakeCard({
             >
               {typeLabel}
             </span>
-            {classes.map((kind) => (
-              <MedicationClassIcon
-                key={kind}
-                kind={kind}
-                className={`intake-card-class-icon${kind === "benzodiazepine" ? " intake-card-benzo-icon" : " intake-card-opioid-icon"}`}
-                data-intake-benzo-icon={kind === "benzodiazepine" || undefined}
-                data-intake-opioid-icon={kind === "opioid" || undefined}
-              />
-            ))}
-          </span>
+          </div>
+          {classes.length > 0 && (
+            <span className="intake-card-tags">
+              {[...classes].reverse().map((kind) => (
+                <MedicationClassIcon
+                  key={kind}
+                  kind={kind}
+                  className={`intake-card-class-icon${kind === "benzodiazepine" ? " intake-card-benzo-icon" : " intake-card-opioid-icon"}`}
+                  data-intake-benzo-icon={
+                    kind === "benzodiazepine" || undefined
+                  }
+                  data-intake-opioid-icon={kind === "opioid" || undefined}
+                />
+              ))}
+            </span>
+          )}
         </div>
         <div className="intake-card-bottom" data-intake-bottom>
           <div className="intake-card-ingredient-group">
