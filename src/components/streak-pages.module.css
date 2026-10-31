@@ -4,7 +4,18 @@
   --upcoming-wash: color-mix(in srgb, var(--surface-sunken) 60%, transparent);
   --upcoming-edge: var(--border);
 }
+.pageHeader {
+  margin-bottom: 26px;
+}
+.headerRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
 .pageHeader h1 {
+  --muted-foreground: var(--canvas-muted-foreground);
+  min-width: 0;
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -24,7 +35,29 @@
 .pageHeader > p {
   margin-top: 10px;
 }
-.runStats,
+.headerStats {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.headerStats dd {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+.headerStats strong {
+  color: var(--canvas-foreground);
+  font-size: 13px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
 .earnedStats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -37,29 +70,21 @@
   -webkit-backdrop-filter: blur(30px);
   backdrop-filter: blur(30px);
 }
-.runStats > div + div,
 .earnedStats > div + div {
   padding-left: 10px;
   border-left: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
 }
-.runStats dt,
 .earnedStats dt {
   color: var(--muted-foreground);
   font-size: 9px;
   line-height: 1.6;
 }
-.runStats dd,
 .earnedStats dd {
   margin-top: 5px;
   font-size: 20px;
   font-weight: 600;
   line-height: 1.25;
   font-variant-numeric: tabular-nums;
-}
-.runStats dd span {
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--muted-foreground);
 }
 .sectionTitle {
   display: flex;

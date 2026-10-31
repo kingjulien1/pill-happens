@@ -178,42 +178,49 @@ export function StreaksPage({
   return (
     <div className={styles.page} data-streak-list>
       <header className={styles.pageHeader}>
-        <h1>
-          <HeadingText
-            title={
-              <span className={styles.headingTitle}>
-                <TrophyIcon size={23} weight="bold" aria-hidden="true" />
-                Streaks
-              </span>
-            }
-            context="Little Milestones"
-            className="items-center"
-          />
-        </h1>
+        <div className={styles.headerRow}>
+          <h1>
+            <HeadingText
+              title={
+                <span className={styles.headingTitle}>
+                  <TrophyIcon size={23} weight="bold" aria-hidden="true" />
+                  Streaks
+                </span>
+              }
+              context="Little Milestones"
+              className="items-center"
+            />
+          </h1>
+          <dl className={styles.headerStats} aria-label="Logging Streaks">
+            <div>
+              <dt className="sr-only">Current Run</dt>
+              <dd data-streak-header-current>
+                <strong>
+                  {count(view.streak.current)}{" "}
+                  {view.streak.current === 1 ? "day" : "days"}
+                </strong>
+                <span aria-hidden="true">/</span>
+                <span>in a row</span>
+              </dd>
+            </div>
+            <div>
+              <dt className="sr-only">Best Run</dt>
+              <dd data-streak-header-best>
+                <strong>
+                  {count(view.streak.best)}{" "}
+                  {view.streak.best === 1 ? "day" : "days"}
+                </strong>
+                <span aria-hidden="true">/</span>
+                <span>best run</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
         <p>
           A few days of showing up, a little more of your story. Your unlocked
           milestones stay here, even after a pause.
         </p>
       </header>
-
-      <dl className={styles.runStats}>
-        <div>
-          <dt>Current Run</dt>
-          <dd>
-            {count(view.streak.current)} <span>days</span>
-          </dd>
-        </div>
-        <div>
-          <dt>Best Run</dt>
-          <dd>
-            {count(view.streak.best)} <span>days</span>
-          </dd>
-        </div>
-        <div>
-          <dt>Days Logged</dt>
-          <dd>{count(view.streak.totalDays)}</dd>
-        </div>
-      </dl>
 
       {extraSpotlight && (
         <section
