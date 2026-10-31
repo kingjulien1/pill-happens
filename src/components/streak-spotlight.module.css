@@ -1,0 +1,178 @@
+.spotlight {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  border-radius: 22px;
+  scroll-margin-block: 24px;
+}
+.spotlight::before,
+.spotlight::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.spotlight::before {
+  z-index: -1;
+  inset: -6px;
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      ellipse at 25% 35%,
+      var(--spotlight-soft-a),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse at 78% 60%,
+      var(--spotlight-soft-b),
+      transparent 75%
+    );
+  filter: blur(14px);
+}
+.spotlight::after {
+  z-index: 3;
+  inset: -4px;
+  border: 2px solid var(--spotlight-edge);
+  border-radius: 26px;
+}
+.spotlight[data-spotlight-state="running"] {
+  z-index: 3;
+  transform-origin: center;
+  animation: spotlight-card-arrive 1700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  will-change: transform;
+}
+.spotlight[data-spotlight-state="running"]::before {
+  animation: spotlight-glow-bloom 2400ms ease-out both;
+}
+.spotlight[data-spotlight-state="running"]::after {
+  animation: spotlight-ring-expand 2200ms ease-out both;
+}
+.spotlight[data-spotlight-state="quiet"]::after {
+  opacity: 0.8;
+}
+.burst {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 10px;
+  border-radius: 1.5px;
+  background: var(--particle-color);
+  opacity: 0;
+  animation: spotlight-particle-fly var(--particle-time)
+    cubic-bezier(0.12, 0.65, 0.2, 1) var(--particle-wait) both;
+  pointer-events: none;
+}
+.particle[data-kind="dot"] {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.particle[data-kind="star"] {
+  width: 10px;
+  height: 10px;
+  clip-path: polygon(
+    50% 0,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 94%,
+    50% 72%,
+    21% 94%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+@keyframes spotlight-card-arrive {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0) scale(1);
+  }
+  10% {
+    transform: translate3d(0, 3px, 0) rotate(-0.6deg) scale(0.965);
+  }
+  28% {
+    transform: translate3d(0, -7px, 0) rotate(0.8deg) scale(1.045);
+  }
+  47% {
+    transform: translate3d(0, 2px, 0) rotate(-0.35deg) scale(0.995);
+  }
+  70% {
+    transform: translate3d(0, -1px, 0) rotate(0.1deg) scale(1.012);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0) scale(1);
+  }
+}
+@keyframes spotlight-glow-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  24% {
+    opacity: 0.95;
+    transform: scale(1.025);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+}
+@keyframes spotlight-ring-expand {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  18% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+@keyframes spotlight-particle-fly {
+  0% {
+    opacity: 0;
+    transform: translate3d(
+        calc(-50% + var(--particle-start-x)),
+        calc(-50% + var(--particle-start-y)),
+        0
+      )
+      rotate(var(--particle-turn)) scale(0.35);
+  }
+  9% {
+    opacity: 0.95;
+  }
+  65% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(
+        calc(-50% + var(--particle-x)),
+        calc(-50% + var(--particle-y) + 24px),
+        0
+      )
+      rotate(calc(var(--particle-turn) + var(--particle-spin))) scale(0.4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight,
+  .spotlight::before,
+  .spotlight::after,
+  .particle {
+    animation: none !important;
+  }
+  .burst {
+    display: none;
+  }
+}

@@ -12,6 +12,7 @@ import { MedicationClassBadges } from "@/components/medication-class-badge";
 import { HeadingText } from "@/components/heading-text";
 import { useJournal } from "@/components/journal-provider";
 import { StreakArtwork } from "@/components/streak-artwork";
+import { StreakSpotlight } from "@/components/streak-spotlight";
 import { formatDay, formatDose, shiftDayKey } from "@/lib/domain";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import {
@@ -64,6 +65,7 @@ function MilestoneCard({ milestone }: { milestone: StreakMilestone }) {
   const earned = milestone.achieved;
   return (
     <Link
+      id={`milestone-${milestone.target}`}
       href={`/streaks/${milestone.target}`}
       className={`${styles.milestoneCard} ${earned ? styles.earnedCard : styles.upcomingCard}`}
       style={earned ? paletteStyle(milestone.palette) : undefined}
@@ -142,13 +144,36 @@ function RunProgress({ milestone }: { milestone: StreakMilestone }) {
   );
 }
 
-export function StreaksPage() {
+export function StreaksPage({
+  spotlightTarget = null,
+}: {
+  spotlightTarget?: number | null;
+}) {
   const { data, now } = useJournal();
   const view = useMemo(
     () => (data && now ? getStreakMilestones(data, now) : null),
     [data, now],
   );
+  const extraSpotlight = useMemo(() => {
+    if (!view || !data || !now || spotlightTarget === null) return null;
+    const visible = [...view.achieved, ...view.upcoming].some(
+      (item) => item.target === spotlightTarget,
+    );
+    return visible ? null : getStreakMilestone(data, now, spotlightTarget);
+  }, [view, data, now, spotlightTarget]);
   if (!view) return null;
+  const renderMilestone = (milestone: StreakMilestone) =>
+    milestone.target === spotlightTarget ? (
+      <StreakSpotlight
+        key={milestone.target}
+        target={milestone.target}
+        palette={milestone.palette}
+      >
+        <MilestoneCard milestone={milestone} />
+      </StreakSpotlight>
+    ) : (
+      <MilestoneCard key={milestone.target} milestone={milestone} />
+    );
   const next = view.upcoming[0];
   return (
     <div className={styles.page} data-streak-list>
@@ -190,6 +215,25 @@ export function StreaksPage() {
         </div>
       </dl>
 
+      {extraSpotlight && (
+        <section
+          aria-label="Selected spotlight milestone"
+          className={styles.listSection}
+        >
+          <SectionTitle
+            context={
+              extraSpotlight.achieved
+                ? "From Your Recorded History"
+                : "A Milestone To Look Toward"
+            }
+          >
+            <ActionIcon name="sparkle" weight="fill" className="size-4" />
+            In The Spotlight
+          </SectionTitle>
+          {renderMilestone(extraSpotlight)}
+        </section>
+      )}
+
       <section aria-label="Achieved milestones" className={styles.listSection}>
         <SectionTitle
           context={
@@ -203,9 +247,7 @@ export function StreaksPage() {
         </SectionTitle>
         {view.achieved.length ? (
           <div className={styles.cardList}>
-            {view.achieved.map((milestone) => (
-              <MilestoneCard key={milestone.target} milestone={milestone} />
-            ))}
+            {view.achieved.map(renderMilestone)}
           </div>
         ) : (
           <div className={styles.firstMilestone}>
@@ -251,9 +293,7 @@ export function StreaksPage() {
           Up Ahead
         </SectionTitle>
         <div className={styles.cardList}>
-          {view.upcoming.map((milestone) => (
-            <MilestoneCard key={milestone.target} milestone={milestone} />
-          ))}
+          {view.upcoming.map(renderMilestone)}
         </div>
       </section>
 
