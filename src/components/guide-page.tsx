@@ -308,23 +308,21 @@ export function GuidePage() {
               </p>
             </div>
             <p>
-              Tap a card underneath to make it the head of its own stack, with
-              the following cards folded beneath it. Repeat with another card to
-              open more substacks. Tap that fully visible head again to edit the
-              intake. Each stack can preview up to six cards underneath.
+              Tap any visible card in a folded stack to show all of its intakes.
+              Once the stack is open, tap any card to edit that intake. A folded
+              stack previews up to six complete cards underneath the first one.
             </p>
             <p>
-              <strong>Show Intakes</strong> reveals the rows. Selecting a row
-              makes it a stack head; its next tap opens the editor.
-              <strong> Fold Intakes</strong> closes shown children first, then
-              gathers inner stacks back into the original one. These views never
-              change recorded times, quantities, or which entries belong to the
-              13-minute group.
+              <strong>Show Intakes</strong> reveals the whole group.
+              <strong> Fold Intakes</strong> brings its cards back into one
+              compact stack. These views never change recorded times,
+              quantities, or which entries belong to the 13-minute group.
             </p>
             <p>
-              Opened stacks and shown rows are remembered for each day on this
-              device. Refresh, close the tab, or reopen the app to return to the
-              same view. Other journals and recent days keep their own state.
+              Each stack’s open or folded state is remembered for each day on
+              this device. Refresh, close the tab, or reopen the app to return
+              to the same view. Other journals and recent days keep their own
+              state.
             </p>
           </GuideDetail>
         </div>
@@ -720,13 +718,12 @@ export function GuidePage() {
               quantities; it does not rewrite those quantities or taken times.
             </p>
           </GuideDetail>
-          <GuideDetail title="Why Does A Card Open Another Stack?">
+          <GuideDetail title="How Do I Edit A Stacked Intake?">
             <p>
-              A card underneath first becomes a fully visible stack head. Tap
-              that same head again to edit it. Show Intakes reveals all rows,
-              and Fold Intakes gathers them again. The recorded grouping still
-              follows when entries were taken, rather than when you entered
-              them.
+              Tap any visible card in a folded stack to open the whole group,
+              then tap the intake you want to edit. Show Intakes and Fold
+              Intakes open or close the same group. Its membership follows when
+              entries were taken, rather than when you entered them.
             </p>
           </GuideDetail>
           <GuideDetail title="Can I Check In Without Logging An Intake?">

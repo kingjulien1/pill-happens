@@ -786,32 +786,35 @@ export function DeveloperGuidePage() {
               dialog.
             </p>
             <p>
-              Benzo cards use a Rose 400 inside outline and a bold circled B.
-              The medication tile itself stays free of a Benzo rim or red dot.
-              Intake types use plain text with a very slight selected-color
-              tint, aligned with the 22px classification marker. The active
-              substance starts at the left of the second text row and always
-              includes its quieter label; Unspecified represents an unrecorded
-              value without implying that a medicine has no active substance.
-              The calculation and total adapt to the available width without
-              changing the stored dose.
+              Intake cards marked as Benzo use a standalone bold 24px Fuchsia
+              500 circled B. The medication tile stays free of a Benzo rim or
+              red dot, and the card has no extra Rose outline. Intake types use
+              an 11px plain-text label after the medication name and a centered
+              dot, with a very slight selected-color tint. The active substance
+              starts at the left of the second text row and always includes its
+              quieter label; Unspecified represents an unrecorded value without
+              implying that a medicine has no active substance. The calculation
+              and total adapt to the available width without changing the stored
+              dose.
             </p>
             <p>
-              A card can become the head of its own substack without cloning or
-              replacing its DOM. Stable entry IDs define presentation heads, and
-              each head resets the six-card folded preview. Show exposes child
-              rows; Fold closes those children first, then gathers inner heads
-              before outer ones in bounded waves. Delayed height shrink keeps
-              the footer below returning faces. Preserve full natural card
-              heights and corners, with no added rear borders.
+              Each intake group has one head: its original first entry. Tapping
+              any visible card in a folded group shows all of its rows; tapping
+              a shown card opens its editor directly. Show and Fold transition
+              the whole group in one staggered wave. The folded preview keeps up
+              to six full rear cards, with delayed height shrink keeping the
+              footer below returning cards. Preserve natural heights and
+              corners, with no added rear borders.
             </p>
             <p>
               Stack presentation is saved per journal and day in the existing
               local workspace, separately from form drafts. Persist user intent
-              rather than timer queues: a fold saves its final gathered view
-              immediately, and a new Show or promotion replaces that intent.
-              Hydrate before layout and reconcile saved IDs with live records.
-              The bounded store retains up to 60 recently used day views.
+              rather than animation progress: Fold saves its closed target
+              immediately, and a new Show replaces that intent. Hydrate before
+              layout and reconcile saved IDs with live records. Older additional
+              head IDs are ignored; only expansion of the original first entry
+              is retained. The bounded store keeps up to 60 recently used day
+              views.
             </p>
             <p>
               Dark subsection surfaces use 15% less opacity, with blur behind
