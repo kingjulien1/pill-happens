@@ -190,9 +190,9 @@ export function GuidePage() {
             <div>
               <h3>Leave An Evening Check-In</h3>
               <p>
-                From 20:30, a small button below the intake list opens your
+                From 20:30, the check-in card above your first intake opens your
                 reflection. A few words or a single mood is enough. Once saved,
-                its editable summary appears above that day’s intakes.
+                its editable summary stays in the same place.
               </p>
               <a className={styles.pageLink} href="#check-in">
                 See The Check-In Fields
@@ -517,7 +517,7 @@ export function GuidePage() {
         />
         <div className={styles.readingCard}>
           <p>
-            The check-in button appears below Today’s intake list from 20:30 in
+            The check-in card appears above Today’s first intake from 20:30 in
             the journal timezone. Every field is optional; add at least one
             detail to save. A single mood is enough, and you can check in on a
             day with no recorded intakes.
@@ -568,7 +568,7 @@ export function GuidePage() {
             </div>
           </dl>
           <p>
-            After saving, the filled summary moves above that day’s intakes. Tap
+            After saving, the filled summary stays above that day’s intakes. Tap
             it to edit. There is one check-in per tracking day, and edits update
             that record rather than adding another.
           </p>

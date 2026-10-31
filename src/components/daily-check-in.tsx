@@ -57,6 +57,10 @@ export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
       data-daily-check-in={saved ? "saved" : "prompt"}
       data-check-in-day={day}
     >
+      <div className={styles.sectionContext}>
+        <span>Mood · Sleep · Notes</span>
+        <span>{saved ? "Yours to Edit" : "Optional"}</span>
+      </div>
       <button
         type="button"
         className={styles.card}
@@ -140,6 +144,11 @@ export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
           <ActionIcon name={saved ? "edit" : "external"} className="size-4" />
         </span>
       </button>
+      <p className={styles.sectionHint}>
+        {saved
+          ? "Saved with this day. Tap to make changes."
+          : "Anything you add stays with this daily log."}
+      </p>
       <ResponsiveModal
         open={open}
         onOpenChange={(next) => {

@@ -357,8 +357,15 @@ export function TodayPage() {
         now={now}
         timeZone={data.settings.timezone}
       />
-      <div className="mb-4" hidden={!checkIn}>
+      <div hidden={!checkIn}>
         <DailyCheckInSection day={today} checkIn={checkIn} variant="saved" />
+      </div>
+      <div
+        hidden={
+          Boolean(checkIn) || !canCheckIn(today, now, data.settings.timezone)
+        }
+      >
+        <DailyCheckInSection day={today} variant="prompt" />
       </div>
       <section aria-label="Today's entries" className="flex-1">
         <IntakeTimeline
@@ -367,14 +374,6 @@ export function TodayPage() {
           showSummary={false}
           onLog={openLog}
         />
-        <div
-          className="mt-5"
-          hidden={
-            Boolean(checkIn) || !canCheckIn(today, now, data.settings.timezone)
-          }
-        >
-          <DailyCheckInSection day={today} variant="prompt" />
-        </div>
       </section>
       <IntakeAction
         onClick={openLog}
@@ -961,11 +960,18 @@ export function DayPage({ day }: { day: string }) {
         06:00 to 06:00 the next day ·{" "}
         {data.settings.timezone.replaceAll("_", " ")}
       </PageHeading>
-      <div className="mb-5" hidden={!checkIn}>
-        <DailyCheckInSection day={day} checkIn={checkIn} variant="saved" />
-      </div>
       <DailyOverview data={data} day={day} />
       <div className="my-6">
+        <div hidden={!checkIn}>
+          <DailyCheckInSection day={day} checkIn={checkIn} variant="saved" />
+        </div>
+        <div
+          hidden={
+            Boolean(checkIn) || !canCheckIn(day, now, data.settings.timezone)
+          }
+        >
+          <DailyCheckInSection day={day} variant="prompt" />
+        </div>
         <IntakeTimeline
           data={data}
           day={day}
@@ -973,14 +979,6 @@ export function DayPage({ day }: { day: string }) {
             isFuture ? undefined : () => openDialog({ kind: "intake-new", day })
           }
         />
-        <div
-          className="mt-5"
-          hidden={
-            Boolean(checkIn) || !canCheckIn(day, now, data.settings.timezone)
-          }
-        >
-          <DailyCheckInSection day={day} variant="prompt" />
-        </div>
       </div>
       <div className="flex items-center justify-between gap-3 border-t pt-4">
         <Link
