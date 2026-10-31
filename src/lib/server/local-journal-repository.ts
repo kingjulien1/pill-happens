@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { emptyData, type AppData } from "@/lib/domain";
+import { newJournalData } from "@/lib/guide-onboarding";
 import {
   JOURNAL_LIMIT,
   LEGACY_JOURNAL_ID,
@@ -131,7 +132,7 @@ export function createLocalJournalRepository(
         if (data.credentials.some((existing) => existing.id === credential.id))
           throw new Error("The journal already exists.");
         data.credentials.push(credential);
-        data.states[credential.id] = emptyData();
+        data.states[credential.id] = newJournalData();
         data.version++;
         // Credential and empty state are one atomic file replacement.
         await atomicWrite(registryFile, data);

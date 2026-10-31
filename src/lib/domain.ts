@@ -61,6 +61,8 @@ export type AppData = {
   goals: Goal[];
   /** Missing in older journals; one personal reflection per tracking day. */
   dailyCheckIns?: DailyCheckIn[];
+  /** Only new journals opt in; missing on existing journals means introduced. */
+  onboarding?: { guidePending: boolean };
   settings: Settings;
 };
 

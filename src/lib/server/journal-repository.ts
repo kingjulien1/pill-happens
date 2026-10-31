@@ -1,4 +1,5 @@
 import { emptyData, type AppData } from "@/lib/domain";
+import { newJournalData } from "@/lib/guide-onboarding";
 import type { PasswordVerifier } from "./passwords";
 
 export const JOURNAL_LIMIT = 50;
@@ -111,7 +112,7 @@ export function createPostgresJournalRepository(
           credential.scheme,
           credential.salt,
           credential.hash,
-          JSON.stringify(emptyData()),
+          JSON.stringify(newJournalData()),
           JOURNAL_LIMIT,
         ],
       );

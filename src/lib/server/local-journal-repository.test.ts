@@ -11,6 +11,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { emptyData } from "@/lib/domain";
+import { newJournalData } from "@/lib/guide-onboarding";
 import { createJournalService, JournalCreationError } from "./journal-service";
 import { mutateJournalState, readJournalState } from "./journal-state";
 import { createLocalJournalRepository } from "./local-journal-repository";
@@ -55,7 +56,7 @@ test("new local journals persist isolated state and salted credentials across re
   const first = await service.create(password);
   const second = await service.create("different-fixture-password");
   assert.notEqual(first, second);
-  assert.deepEqual(await repository.readState(first), emptyData());
+  assert.deepEqual(await repository.readState(first), newJournalData());
   await repository.mutateState(first, (data) => {
     data.settings.timezone = "Pacific/Auckland";
   });
@@ -127,7 +128,7 @@ test("concurrent same-password creation has one winner while different passwords
   assert.notEqual(different[0], different[1]);
   assert.equal((await repository.credentialSnapshot()).credentials.length, 3);
   for (const id of different)
-    assert.deepEqual(await repository.readState(id), emptyData());
+    assert.deepEqual(await repository.readState(id), newJournalData());
 });
 
 test("local journals apply medication edits to every saved intake after reopening", async (t) => {
