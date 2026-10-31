@@ -14,9 +14,14 @@ import {
   MedicationIcon,
   MedicationTypeIcon,
 } from "@/components/medication-icon";
-import { isMedicationIcon } from "@/lib/medication-appearance";
+import {
+  isMedicationIcon,
+  MEDICATION_COLORS,
+} from "@/lib/medication-appearance";
 import {
   getMedicationCategories,
+  MEDICATION_CATEGORY_VALUES,
+  type MedicationCategory,
   medicationCategoryFlags,
 } from "@/lib/medication-categories";
 import {
@@ -26,6 +31,7 @@ import {
 } from "@/lib/medication-types";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
+import { DraftStatus, usePersistentDraft } from "@/components/journal-drafts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,6 +60,85 @@ const selectClass =
   "h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10";
 const iconError = "Choose an icon or enter one emoji.";
 
+type MedicationDraft = {
+  name: string;
+  activeIngredient: string;
+  categories: MedicationCategory[];
+  strength: string;
+  defaultQuantity: string;
+  form: Medication["form"];
+  color: Medication["color"];
+  icon: string;
+  iconRotation: number;
+  searchQuery: string;
+  classificationQuery: string;
+};
+
+function medicationDefaults(medication?: Medication): MedicationDraft {
+  return {
+    name: medication?.name ?? "",
+    activeIngredient: medication?.activeIngredient ?? "",
+    categories: getMedicationCategories(medication),
+    strength: medication ? String(medication.strengthMg) : "",
+    defaultQuantity: String(medication?.defaultQuantity ?? 1),
+    form: medication?.form ?? "tablet",
+    color: medication?.color ?? "rose",
+    icon: medication?.icon ?? "pill",
+    iconRotation: medication?.iconRotation ?? 0,
+    searchQuery: "",
+    classificationQuery: "",
+  };
+}
+
+function isMedicationDraft(value: unknown): value is MedicationDraft {
+  if (!value || typeof value !== "object") return false;
+  const draft = value as Record<string, unknown>;
+  return (
+    typeof draft.name === "string" &&
+    draft.name.length <= 80 &&
+    typeof draft.activeIngredient === "string" &&
+    draft.activeIngredient.length <= 160 &&
+    Array.isArray(draft.categories) &&
+    draft.categories.every((category) =>
+      MEDICATION_CATEGORY_VALUES.includes(category),
+    ) &&
+    typeof draft.strength === "string" &&
+    draft.strength.length <= 256 &&
+    typeof draft.defaultQuantity === "string" &&
+    draft.defaultQuantity.length <= 256 &&
+    forms.some((item) => item.value === draft.form) &&
+    MEDICATION_COLORS.some((item) => item.value === draft.color) &&
+    typeof draft.icon === "string" &&
+    draft.icon.length <= 256 &&
+    typeof draft.iconRotation === "number" &&
+    Number.isFinite(draft.iconRotation) &&
+    typeof draft.searchQuery === "string" &&
+    draft.searchQuery.length <= 1000 &&
+    typeof draft.classificationQuery === "string" &&
+    draft.classificationQuery.length <= 80
+  );
+}
+
+type GoalDraft = {
+  medicationId: string;
+  limit: string;
+  startsOn: string;
+  endsOn: string;
+  note: string;
+};
+
+function isGoalDraft(value: unknown): value is GoalDraft {
+  if (!value || typeof value !== "object") return false;
+  const draft = value as Record<string, unknown>;
+  return (
+    ["medicationId", "limit", "startsOn", "endsOn"].every(
+      (key) => typeof draft[key] === "string" && draft[key].length <= 256,
+    ) &&
+    typeof draft.note === "string" &&
+    draft.note.length <= 1000
+  );
+}
+
 export function MedicationForm({
   medication,
   onSaved,
@@ -63,32 +148,47 @@ export function MedicationForm({
 }) {
   const { mutate, busy } = useJournal();
   const id = useId();
-  const [name, setName] = useState(medication?.name ?? "");
-  const [activeIngredient, setActiveIngredient] = useState(
-    medication?.activeIngredient ?? "",
+  const draft = usePersistentDraft(
+    medication ? `med:edit:${medication.id}` : "med:new",
+    () => medicationDefaults(medication),
+    isMedicationDraft,
   );
-  const [categories, setCategories] = useState(
-    getMedicationCategories(medication),
-  );
+  const {
+    name,
+    activeIngredient,
+    categories,
+    strength,
+    defaultQuantity,
+    form,
+    color,
+    icon,
+    iconRotation,
+    searchQuery,
+    classificationQuery,
+  } = draft.value;
+  const setField = <K extends keyof MedicationDraft>(
+    key: K,
+    value: MedicationDraft[K],
+  ) => draft.setValue((current) => ({ ...current, [key]: value }));
+  const setName = (value: string) => setField("name", value);
+  const setActiveIngredient = (value: string) =>
+    setField("activeIngredient", value);
+  const setCategories = (value: MedicationCategory[]) =>
+    setField("categories", value);
+  const setStrength = (value: string) => setField("strength", value);
+  const setDefaultQuantity = (value: string) =>
+    setField("defaultQuantity", value);
+  const setForm = (value: Medication["form"]) => setField("form", value);
+  const setColor = (value: Medication["color"]) => setField("color", value);
+  const setIcon = (value: string) => setField("icon", value);
+  const setIconRotation = (value: number) => setField("iconRotation", value);
   const { isBenzodiazepine, isOpioid } = medicationCategoryFlags(categories);
-  const [strength, setStrength] = useState(
-    medication ? String(medication.strengthMg) : "",
-  );
-  const [defaultQuantity, setDefaultQuantity] = useState(
-    String(medication?.defaultQuantity ?? 1),
-  );
-  const [form, setForm] = useState<Medication["form"]>(
-    medication?.form ?? "tablet",
-  );
-  const [color, setColor] = useState<Medication["color"]>(
-    medication?.color ?? "rose",
-  );
-  const [icon, setIcon] = useState(medication?.icon ?? "pill");
-  const [iconRotation, setIconRotation] = useState(
-    medication?.iconRotation ?? 0,
-  );
   const [error, setError] = useState<string | null>(null);
   const type = getMedicationType(form);
+  const reset = () => {
+    draft.resetDraft(medicationDefaults(medication));
+    setError(null);
+  };
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -134,6 +234,7 @@ export function MedicationForm({
         },
         medication ? "PATCH" : "POST",
       );
+      draft.clearDraft();
       toast.success(medication ? "Medication updated." : "Medication added.");
       onSaved();
     } catch {
@@ -262,6 +363,10 @@ export function MedicationForm({
             id={`${id}-classification`}
             value={categories}
             onChange={setCategories}
+            searchQuery={classificationQuery}
+            onSearchQueryChange={(value) =>
+              setField("classificationQuery", value)
+            }
             disabled={busy}
           />
         </div>
@@ -337,6 +442,8 @@ export function MedicationForm({
         </div>
 
         <MedicationAppearanceFields
+          searchQuery={searchQuery}
+          onSearchQueryChange={(value) => setField("searchQuery", value)}
           color={color}
           icon={icon}
           iconRotation={iconRotation}
@@ -357,6 +464,7 @@ export function MedicationForm({
         />
       </fieldset>
 
+      <DraftStatus {...draft} onReset={busy ? undefined : reset} />
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -374,21 +482,35 @@ export function MedicationForm({
 }
 
 export function GoalForm({ onSaved }: { onSaved: () => void }) {
-  const { data, now, mutate, busy } = useJournal();
+  const { data, mutate, busy } = useJournal();
   const id = useId();
   const medications =
     data?.medications.filter((medication) => !medication.archived) ?? [];
-  const [medicationId, setMedicationId] = useState(medications[0]?.id ?? "");
-  const [limit, setLimit] = useState("");
-  const [startsOn, setStartsOn] = useState(() =>
-    dayKey(now ?? new Date(), data?.settings.timezone ?? "Europe/Vienna"),
-  );
-  const [endsOn, setEndsOn] = useState("");
-  const [note, setNote] = useState("");
+  const freshGoal = (): GoalDraft => ({
+    medicationId: medications[0]?.id ?? "",
+    limit: "",
+    startsOn: dayKey(new Date(), data?.settings.timezone ?? "Europe/Vienna"),
+    endsOn: "",
+    note: "",
+  });
+  const draft = usePersistentDraft("goal:new", freshGoal, isGoalDraft);
+  const { medicationId, limit, startsOn, endsOn, note } = draft.value;
+  const setField = (key: keyof GoalDraft, value: string) =>
+    draft.setValue((current) => ({ ...current, [key]: value }));
+  const setMedicationId = (value: string) => setField("medicationId", value);
+  const setLimit = (value: string) => setField("limit", value);
+  const setStartsOn = (value: string) => setField("startsOn", value);
+  const setEndsOn = (value: string) => setField("endsOn", value);
+  const setNote = (value: string) => setField("note", value);
   const [error, setError] = useState<string | null>(null);
   const selectedMedication = medications.find(
     (medication) => medication.id === medicationId,
   );
+
+  const reset = () => {
+    draft.resetDraft(freshGoal());
+    setError(null);
+  };
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -419,6 +541,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         endsOn: endsOn || null,
         note: note.trim(),
       });
+      draft.clearDraft();
       toast.success("Your goal has been saved.");
       onSaved();
     } catch {
@@ -595,6 +718,12 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         </div>
       </fieldset>
 
+      {medicationId && !selectedMedication && medications.length > 0 && (
+        <p role="status" className="text-xs text-muted-foreground">
+          Your draft medication is no longer active. Choose another to continue.
+        </p>
+      )}
+      <DraftStatus {...draft} onReset={busy ? undefined : reset} />
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}

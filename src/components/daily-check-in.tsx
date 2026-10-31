@@ -8,6 +8,11 @@ import { PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneTil
 import { toast } from "sonner";
 import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
+import {
+  DraftStatus,
+  useJournalWorkspace,
+  usePersistentDraft,
+} from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +20,8 @@ import { Label } from "@/components/ui/label";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import {
   DAILY_MOODS,
+  DAILY_REFLECTION_MAX_LENGTH,
+  checkInForDay,
   type DailyCheckIn,
   type DailyMood,
 } from "@/lib/daily-check-in";
@@ -28,12 +35,16 @@ type CheckInProps = {
 };
 
 export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<{
-    day: string;
-    checkIn?: DailyCheckIn;
-  } | null>(null);
-  const { busy } = useJournal();
+  const { data, busy } = useJournal();
+  const workspace = useJournalWorkspace();
+  const currentCheckIn = checkInForDay(data?.dailyCheckIns, day);
+  // Both variants exist inside hidden wrappers. Exactly one owns the portal.
+  const ownsDialog = variant === (currentCheckIn ? "saved" : "prompt");
+  const remembered =
+    workspace.dialog?.kind === "check-in" ? workspace.dialog : null;
+  const targetDay = remembered?.day ?? day;
+  const editing = checkInForDay(data?.dailyCheckIns, targetDay);
+  const open = ownsDialog && Boolean(remembered);
   const saved = variant === "saved" && Boolean(checkIn);
   const moods = DAILY_MOODS.filter((mood) =>
     checkIn?.moods.includes(mood.value),
@@ -51,8 +62,7 @@ export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
         className={styles.card}
         data-filled={saved}
         onClick={() => {
-          setEditing({ day, checkIn });
-          setOpen(true);
+          workspace.openDialog({ kind: "check-in", day });
         }}
         aria-label={saved ? "Edit Evening Check-In" : "Write Evening Check-In"}
         aria-haspopup="dialog"
@@ -133,21 +143,28 @@ export function DailyCheckInSection({ day, checkIn, variant }: CheckInProps) {
       <ResponsiveModal
         open={open}
         onOpenChange={(next) => {
-          if (!busy) setOpen(next);
+          if (!busy) {
+            if (next)
+              workspace.openDialog({ kind: "check-in", day: targetDay });
+            else workspace.closeDialog({ kind: "check-in", day: targetDay });
+          }
         }}
         title="Evening Check-In"
         titleIcon="shootingStar"
-        context={formatDay(editing?.day ?? day, {
+        context={formatDay(targetDay, {
           weekday: "short",
           month: "short",
         })}
         description="Your evening journal: room for your thoughts, moods and the details you want to keep. Every field is optional."
       >
-        {open && editing && (
+        {open && (
           <CheckInForm
-            day={editing.day}
-            checkIn={editing.checkIn}
-            onSaved={() => setOpen(false)}
+            key={targetDay}
+            day={targetDay}
+            checkIn={editing}
+            onSaved={() =>
+              workspace.closeDialog({ kind: "check-in", day: targetDay })
+            }
           />
         )}
       </ResponsiveModal>
@@ -201,6 +218,59 @@ function RatingField({
   );
 }
 
+type CheckInDraft = {
+  note: string;
+  moods: DailyMood[];
+  energy: number | null;
+  stress: number | null;
+  sleepHours: string;
+  helped: string;
+  prompt: string | null;
+};
+
+function checkInDefaults(checkIn?: DailyCheckIn): CheckInDraft {
+  return {
+    note: checkIn?.note ?? "",
+    moods: checkIn?.moods ?? [],
+    energy: checkIn?.energy ?? null,
+    stress: checkIn?.stress ?? null,
+    sleepHours:
+      checkIn?.sleepHours === null || checkIn?.sleepHours === undefined
+        ? ""
+        : String(checkIn.sleepHours),
+    helped: checkIn?.helped ?? "",
+    prompt: null,
+  };
+}
+
+function isCheckInDraft(value: unknown): value is CheckInDraft {
+  if (!value || typeof value !== "object") return false;
+  const draft = value as Record<string, unknown>;
+  const rating = (value: unknown) =>
+    value === null ||
+    (typeof value === "number" &&
+      Number.isInteger(value) &&
+      value >= 1 &&
+      value <= 5);
+  return (
+    typeof draft.note === "string" &&
+    draft.note.length <= DAILY_REFLECTION_MAX_LENGTH &&
+    Array.isArray(draft.moods) &&
+    draft.moods.length <= 4 &&
+    draft.moods.every((value) =>
+      DAILY_MOODS.some((mood) => mood.value === value),
+    ) &&
+    rating(draft.energy) &&
+    rating(draft.stress) &&
+    typeof draft.sleepHours === "string" &&
+    draft.sleepHours.length <= 256 &&
+    typeof draft.helped === "string" &&
+    draft.helped.length <= 160 &&
+    (draft.prompt === null ||
+      ["moment", "feeling", "win"].includes(draft.prompt as string))
+  );
+}
+
 function CheckInForm({
   day,
   checkIn,
@@ -212,17 +282,34 @@ function CheckInForm({
 }) {
   const { mutate, busy } = useJournal();
   const id = useId();
-  const [note, setNote] = useState(checkIn?.note ?? "");
-  const [moods, setMoods] = useState<DailyMood[]>(checkIn?.moods ?? []);
-  const [energy, setEnergy] = useState<number | null>(checkIn?.energy ?? null);
-  const [stress, setStress] = useState<number | null>(checkIn?.stress ?? null);
-  const [sleepHours, setSleepHours] = useState(
-    checkIn?.sleepHours === null || checkIn?.sleepHours === undefined
-      ? ""
-      : String(checkIn.sleepHours),
+  const draft = usePersistentDraft(
+    `checkin:${day}`,
+    () => checkInDefaults(checkIn),
+    isCheckInDraft,
   );
-  const [helped, setHelped] = useState(checkIn?.helped ?? "");
+  const { note, moods, energy, stress, sleepHours, helped, prompt } =
+    draft.value;
+  const setField = <K extends keyof CheckInDraft>(
+    key: K,
+    value: CheckInDraft[K],
+  ) => draft.setValue((current) => ({ ...current, [key]: value }));
+  const setNote = (value: string) => setField("note", value);
+  const setMoods = (
+    next: DailyMood[] | ((current: DailyMood[]) => DailyMood[]),
+  ) =>
+    draft.setValue((current) => ({
+      ...current,
+      moods: typeof next === "function" ? next(current.moods) : next,
+    }));
+  const setEnergy = (value: number | null) => setField("energy", value);
+  const setStress = (value: number | null) => setField("stress", value);
+  const setSleepHours = (value: string) => setField("sleepHours", value);
+  const setHelped = (value: string) => setField("helped", value);
   const [error, setError] = useState("");
+  const reset = () => {
+    draft.resetDraft(checkInDefaults(checkIn));
+    setError("");
+  };
   const hasContent =
     note.trim() ||
     moods.length ||
@@ -249,6 +336,7 @@ function CheckInForm({
         sleepHours: sleepHours === "" ? null : Number(sleepHours),
         helped,
       });
+      draft.clearDraft();
       toast.success(checkIn ? "Check-in updated." : "Your day, saved.");
       onSaved();
     } catch {
@@ -262,6 +350,8 @@ function CheckInForm({
         id={`${id}-note`}
         value={note}
         onChange={setNote}
+        selectedPrompt={prompt}
+        onPromptChange={(value) => setField("prompt", value)}
         disabled={busy}
       />
 
@@ -367,6 +457,7 @@ function CheckInForm({
         </div>
       </div>
 
+      <DraftStatus {...draft} onReset={busy ? undefined : reset} />
       {error && (
         <p className={styles.error} role="alert">
           {error}

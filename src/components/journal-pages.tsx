@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Leaf } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
+import {
+  DraftStatus,
+  useJournalWorkspace,
+  usePersistentDraft,
+} from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HeadingText } from "@/components/heading-text";
 import { TodayHeading } from "@/components/today-heading";
 import { loggingStreak } from "@/lib/logging-streak";
-import { getMedicationType } from "@/lib/medication-types";
 import { MedicationIcon } from "@/components/medication-icon";
+import { MedicationLibraryCard } from "@/components/medication-library-card";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import {
   MedicationClassBadges,
@@ -29,7 +34,6 @@ import { IntakeTimelineEntrance } from "@/components/intake-timeline-entrance";
 import { HistoryDayCard } from "@/components/history-day-card";
 import { IntakeSummary } from "@/components/intake-summary";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
-import { MedicationCategoryBadges } from "@/components/medication-category-badges";
 import { DailyCheckInSection } from "@/components/daily-check-in";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
@@ -49,6 +53,36 @@ import {
   type Intake,
   type Medication,
 } from "@/lib/domain";
+
+function medicationView(value: unknown): value is { archived: boolean } {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    "archived" in value &&
+    typeof value.archived === "boolean",
+  );
+}
+
+function historyView(value: unknown): value is { limit: number } {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    "limit" in value &&
+    typeof value.limit === "number" &&
+    Number.isSafeInteger(value.limit) &&
+    value.limit >= 20,
+  );
+}
+
+function timezoneDraft(value: unknown): value is { timezone: string } {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    "timezone" in value &&
+    typeof value.timezone === "string" &&
+    value.timezone.length <= 128,
+  );
+}
 
 function PageHeading({
   title,
@@ -187,10 +221,12 @@ function DailyOverview({ data, day }: { data: AppData; day: string }) {
 
 function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
   const { mutate, busy } = useJournal();
+  const { store } = useJournalWorkspace();
   const [confirm, setConfirm] = useState(false);
   async function remove() {
     try {
       await mutate(`intakes/${intake.id}`, undefined, "DELETE");
+      store.clearDraft(`intake:edit:${intake.id}`);
       toast.success("Entry deleted.");
       close();
     } catch {
@@ -257,7 +293,14 @@ function IntakeTimeline({
   showSummary?: boolean;
   onLog?: () => void;
 }) {
-  const [editing, setEditing] = useState<Intake | null>(null);
+  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const editing =
+    dialog?.kind === "intake-edit"
+      ? data.intakes.find((entry) => entry.id === dialog.id)
+      : undefined;
+  useEffect(() => {
+    if (dialog?.kind === "intake-edit" && !editing) closeDialog(dialog);
+  }, [dialog, editing, closeDialog]);
   const entries = dayIntakes(data, day);
   const groups = groupIntakes(entries);
   return (
@@ -278,13 +321,18 @@ function IntakeTimeline({
               medications={data.medications}
               day={day}
               timeZone={data.settings.timezone}
-              onEdit={setEditing}
+              onEdit={(entry) =>
+                openDialog({ kind: "intake-edit", id: entry.id })
+              }
             />
           ))}
         </IntakeTimelineEntrance>
       )}
       {editing && (
-        <EntryEditor intake={editing} close={() => setEditing(null)} />
+        <EntryEditor
+          intake={editing}
+          close={() => closeDialog(dialog ?? undefined)}
+        />
       )}
     </>
   );
@@ -292,12 +340,13 @@ function IntakeTimeline({
 
 export function TodayPage() {
   const { data, now } = useJournal();
-  const [open, setOpen] = useState(false);
+  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const open = dialog?.kind === "intake-new";
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const streak = loggingStreak(data, today, now);
   const checkIn = checkInForDay(data.dailyCheckIns, today);
-  const openLog = () => setOpen(true);
+  const openLog = () => openDialog({ kind: "intake-new" });
   return (
     <div className="flex flex-1 flex-col pt-6" data-today-layout>
       <TodayHeading
@@ -331,12 +380,14 @@ export function TodayPage() {
       />
       <ResponsiveModal
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(next) => {
+          if (!next && dialog?.kind === "intake-new") closeDialog(dialog);
+        }}
         title="Log Intake"
         context="New Entry"
         description="Record what you took, when you took it, and anything on your mind."
       >
-        {open && <IntakeForm onSaved={() => setOpen(false)} />}
+        {open && <IntakeForm onSaved={() => closeDialog(dialog)} />}
       </ResponsiveModal>
     </div>
   );
@@ -344,12 +395,31 @@ export function TodayPage() {
 
 export function MedicationsPage() {
   const { data, mutate, busy } = useJournal();
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Medication | undefined>();
-  const [showArchived, setShowArchived] = useState(false);
+  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const view = usePersistentDraft(
+    "view:medications",
+    () => ({ archived: false }),
+    medicationView,
+  );
+  const showArchived = view.value.archived;
+  const medicationDialog =
+    dialog?.kind === "medication-new" || dialog?.kind === "medication-edit"
+      ? dialog
+      : null;
+  const editing =
+    medicationDialog?.kind === "medication-edit"
+      ? data?.medications.find((item) => item.id === medicationDialog.id)
+      : undefined;
+  const open = Boolean(
+    medicationDialog && (medicationDialog.kind === "medication-new" || editing),
+  );
+  useEffect(() => {
+    if (data && medicationDialog?.kind === "medication-edit" && !editing)
+      closeDialog(medicationDialog);
+  }, [data, medicationDialog, editing, closeDialog]);
   if (!data) return null;
   const medications = data.medications.filter(
-    (m) => m.archived === showArchived,
+    (item) => item.archived === showArchived,
   );
   async function archive(medication: Medication) {
     try {
@@ -363,8 +433,9 @@ export function MedicationsPage() {
           ? "Medication restored."
           : "Medication archived. Past entries are saved.",
       );
+      closeDialog(medicationDialog ?? undefined);
     } catch {
-      /* provider displays error */
+      /* Provider displays the error; keep the editor and draft available. */
     }
   }
   return (
@@ -373,15 +444,12 @@ export function MedicationsPage() {
       <MedicationActionButton
         intent="add"
         className="mb-7"
-        onClick={() => {
-          setEditing(undefined);
-          setOpen(true);
-        }}
+        onClick={() => openDialog({ kind: "medication-new" })}
       />
       <MedicationListHeading
         archived={showArchived}
         count={medications.length}
-        onArchivedChange={setShowArchived}
+        onArchivedChange={(archived) => view.setValue({ archived })}
       />
       <div
         className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/90 px-3 py-2.5"
@@ -410,63 +478,24 @@ export function MedicationsPage() {
           </EmptyState>
         ) : (
           <div className="space-y-3">
-            {medications.map((m) => (
-              <div
-                key={m.id}
-                className={`surface flex items-center gap-3.5 rounded-3xl p-4 ${medicationClassHighlights(m)}`}
-                data-benzodiazepine={m.isBenzodiazepine === true || undefined}
-                data-opioid={m.isOpioid === true || undefined}
-                data-medication-classification={getMedicationClassification(m)}
-              >
-                <MedicationIcon
-                  color={m.color}
-                  icon={m.icon}
-                  rotation={m.iconRotation}
-                  isBenzodiazepine={m.isBenzodiazepine === true}
-                  isOpioid={m.isOpioid === true}
-                />
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm font-medium">{m.name}</h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
-                    <span className="text-[11px] text-muted-foreground">
-                      {formatDose(m.strengthMg)} mg /{" "}
-                      {getMedicationType(m.form).unit}
-                    </span>
-                    <MedicationCategoryBadges medication={m} />
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  className="size-11 shrink-0 text-muted-foreground"
-                  aria-label={`Edit ${m.name}`}
-                  onClick={() => {
-                    setEditing(m);
-                    setOpen(true);
-                  }}
-                >
-                  <ActionIcon name="edit" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  disabled={busy}
-                  className="size-11 shrink-0 text-muted-foreground"
-                  aria-label={`${m.archived ? "Restore" : "Archive"} ${m.name}`}
-                  onClick={() => void archive(m)}
-                >
-                  {m.archived ? (
-                    <ActionIcon name="restore" />
-                  ) : (
-                    <ActionIcon name="archive" />
-                  )}
-                </Button>
-              </div>
+            {medications.map((medication) => (
+              <MedicationLibraryCard
+                key={medication.id}
+                medication={medication}
+                disabled={busy}
+                onEdit={() =>
+                  openDialog({ kind: "medication-edit", id: medication.id })
+                }
+              />
             ))}
           </div>
         )}
       </div>
       <ResponsiveModal
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(next) => {
+          if (!next && medicationDialog) closeDialog(medicationDialog);
+        }}
         title={editing ? "Edit Medication" : "Add Medication"}
         titleIcon="medications"
         headerVariant="medication"
@@ -474,11 +503,33 @@ export function MedicationsPage() {
         description="Medication details and appearance."
       >
         {open && (
-          <MedicationForm
-            key={editing?.id ?? "new"}
-            medication={editing}
-            onSaved={() => setOpen(false)}
-          />
+          <>
+            <MedicationForm
+              key={editing?.id ?? "new"}
+              medication={editing}
+              onSaved={() => closeDialog(medicationDialog ?? undefined)}
+            />
+            {editing && (
+              <div className="mt-4 rounded-xl border border-border/60 bg-muted/20 p-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={busy}
+                  onClick={() => void archive(editing)}
+                  className="h-11 w-full gap-2 text-xs text-muted-foreground"
+                  data-medication-archive-action
+                >
+                  <ActionIcon
+                    name={editing.archived ? "restore" : "archive"}
+                    className="size-4"
+                  />
+                  {editing.archived
+                    ? "Restore Medication"
+                    : "Archive Medication"}
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </ResponsiveModal>
     </>
@@ -487,7 +538,8 @@ export function MedicationsPage() {
 
 export function GoalsPage() {
   const { data, now, mutate, busy } = useJournal();
-  const [open, setOpen] = useState(false);
+  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const open = dialog?.kind === "goal-new";
   const [deleting, setDeleting] = useState<string | null>(null);
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
@@ -514,7 +566,7 @@ export function GoalsPage() {
       </PageHeading>
       <Button
         className="mb-7 h-13 w-full gap-2 rounded-2xl"
-        onClick={() => setOpen(true)}
+        onClick={() => openDialog({ kind: "goal-new" })}
       >
         <ActionIcon name="goals" />
         Set a daily goal
@@ -643,12 +695,14 @@ export function GoalsPage() {
       </div>
       <ResponsiveModal
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(next) => {
+          if (!next && dialog?.kind === "goal-new") closeDialog(dialog);
+        }}
         title="Set a Goal"
         context="Daily Maximum"
         description="Record a daily maximum you have chosen with your prescriber. This does not calculate a taper schedule."
       >
-        {open && <GoalForm onSaved={() => setOpen(false)} />}
+        {open && <GoalForm onSaved={() => closeDialog(dialog ?? undefined)} />}
       </ResponsiveModal>
       <ResponsiveModal
         open={Boolean(deleting)}
@@ -680,10 +734,87 @@ export function GoalsPage() {
   );
 }
 
+function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
+  const { data, mutate, busy } = useJournal();
+  const draft = usePersistentDraft(
+    "preferences",
+    () => ({ timezone: data!.settings.timezone }),
+    timezoneDraft,
+  );
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        try {
+          await mutate("settings", { timezone: draft.value.timezone }, "PATCH");
+          draft.clearDraft();
+          toast.success("Timezone updated.");
+          onSaved();
+        } catch {
+          /* The provider displays the error; the draft stays available. */
+        }
+      }}
+    >
+      <div className="form-field">
+        <Label htmlFor="timezone">Journal Timezone</Label>
+        <Input
+          id="timezone"
+          value={draft.value.timezone}
+          onChange={(event) => draft.setValue({ timezone: event.target.value })}
+          disabled={busy}
+          maxLength={128}
+          list="timezones"
+          required
+          className="h-10 rounded-xl px-3 text-base md:text-sm"
+        />
+        <datalist id="timezones">
+          {[
+            "Europe/Vienna",
+            "Europe/London",
+            "Europe/Berlin",
+            "America/New_York",
+            "America/Los_Angeles",
+            "Asia/Tokyo",
+            "Australia/Sydney",
+            "UTC",
+          ].map((zone) => (
+            <option key={zone} value={zone} />
+          ))}
+        </datalist>
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
+          Use an IANA timezone such as Europe/Vienna. Daylight-saving changes
+          are handled automatically.
+        </p>
+      </div>
+      <DraftStatus
+        hasDraft={draft.hasDraft}
+        status={draft.status}
+        restored={draft.restored}
+        onReset={
+          busy
+            ? undefined
+            : () => draft.resetDraft({ timezone: data!.settings.timezone })
+        }
+      />
+      <Button className="h-12 w-full rounded-xl" type="submit" disabled={busy}>
+        {busy ? (
+          <ActionIcon name="loading" className="animate-spin" />
+        ) : (
+          <>
+            <ActionIcon name="save" />
+            Save preferences
+          </>
+        )}
+      </Button>
+    </form>
+  );
+}
+
 function JournalPreferences() {
-  const { data, mutate, signOut, busy } = useJournal();
-  const [open, setOpen] = useState(false);
-  const [timezone, setTimezone] = useState(data!.settings.timezone);
+  const { signOut, busy } = useJournal();
+  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const open = dialog?.kind === "preferences";
   const [saving, setSaving] = useState(false);
   async function logout() {
     setSaving(true);
@@ -709,7 +840,7 @@ function JournalPreferences() {
         <span className="h-3 w-px bg-border" />
         <button
           className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground"
-          onClick={() => setOpen(true)}
+          onClick={() => openDialog({ kind: "preferences" })}
         >
           <ActionIcon name="settings" className="size-4" />
           Preferences
@@ -717,68 +848,14 @@ function JournalPreferences() {
       </div>
       <ResponsiveModal
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(next) => {
+          if (!next && dialog?.kind === "preferences") closeDialog(dialog);
+        }}
         title="Preferences"
         context="Your Journal"
         description="Your day begins at 06:00 in this timezone. Changing it regroups all of your entries."
       >
-        <form
-          className="space-y-4"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            try {
-              await mutate("settings", { timezone }, "PATCH");
-              toast.success("Timezone updated.");
-              setOpen(false);
-            } catch {
-              /* provider displays error */
-            }
-          }}
-        >
-          <div className="form-field">
-            <Label htmlFor="timezone">Journal Timezone</Label>
-            <Input
-              id="timezone"
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              list="timezones"
-              required
-              className="h-10 rounded-xl px-3 text-base md:text-sm"
-            />
-            <datalist id="timezones">
-              {[
-                "Europe/Vienna",
-                "Europe/London",
-                "Europe/Berlin",
-                "America/New_York",
-                "America/Los_Angeles",
-                "Asia/Tokyo",
-                "Australia/Sydney",
-                "UTC",
-              ].map((zone) => (
-                <option key={zone} value={zone} />
-              ))}
-            </datalist>
-            <p className="text-[10px] leading-relaxed text-muted-foreground">
-              Use an IANA timezone such as Europe/Vienna. Daylight-saving
-              changes are handled automatically.
-            </p>
-          </div>
-          <Button
-            className="h-12 w-full rounded-xl"
-            type="submit"
-            disabled={busy}
-          >
-            {busy ? (
-              <ActionIcon name="loading" className="animate-spin" />
-            ) : (
-              <>
-                <ActionIcon name="save" />
-                Save preferences
-              </>
-            )}
-          </Button>
-        </form>
+        {open && <JournalPreferencesForm onSaved={() => closeDialog(dialog)} />}
         <div className="mt-5 border-t pt-4">
           <Button
             variant="ghost"
@@ -797,7 +874,12 @@ function JournalPreferences() {
 
 export function HistoryPage() {
   const { data, now } = useJournal();
-  const [limit, setLimit] = useState(20);
+  const history = usePersistentDraft(
+    "view:history",
+    () => ({ limit: 20 }),
+    historyView,
+  );
+  const limit = history.value.limit;
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const days = journalDays(
@@ -831,7 +913,9 @@ export function HistoryPage() {
       {days.length > limit && (
         <Button
           variant="outline"
-          onClick={() => setLimit((l) => l + 20)}
+          onClick={() =>
+            history.setValue((previous) => ({ limit: previous.limit + 20 }))
+          }
           className="mt-5 h-12 w-full gap-2 rounded-2xl text-xs"
         >
           <ActionIcon name="loadMore" />
@@ -848,7 +932,8 @@ export function HistoryPage() {
 
 export function DayPage({ day }: { day: string }) {
   const { data, now } = useJournal();
-  const [open, setOpen] = useState(false);
+  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const open = dialog?.kind === "intake-new" && dialog.day === day;
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const isFuture = day > today;
@@ -882,7 +967,9 @@ export function DayPage({ day }: { day: string }) {
         <IntakeTimeline
           data={data}
           day={day}
-          onLog={isFuture ? undefined : () => setOpen(true)}
+          onLog={
+            isFuture ? undefined : () => openDialog({ kind: "intake-new", day })
+          }
         />
         <div
           className="mt-5"
@@ -905,7 +992,7 @@ export function DayPage({ day }: { day: string }) {
           <Button
             variant="ghost"
             className="h-11 gap-1 text-[10px] text-foreground"
-            onClick={() => setOpen(true)}
+            onClick={() => openDialog({ kind: "intake-new", day })}
           >
             <ActionIcon name="create" className="size-4.5" />
             Add missed intake
@@ -923,12 +1010,19 @@ export function DayPage({ day }: { day: string }) {
       </div>
       <ResponsiveModal
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(next) => {
+          if (!next && open) closeDialog(dialog ?? undefined);
+        }}
         title="Log Intake"
         context="Past Entry"
         description="Add an intake you missed. Check the date and time before saving."
       >
-        {open && <IntakeForm initialDay={day} onSaved={() => setOpen(false)} />}
+        {open && (
+          <IntakeForm
+            initialDay={day}
+            onSaved={() => closeDialog(dialog ?? undefined)}
+          />
+        )}
       </ResponsiveModal>
     </>
   );

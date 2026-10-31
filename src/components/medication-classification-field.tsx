@@ -19,14 +19,20 @@ export function MedicationClassificationField({
   value,
   onChange,
   disabled,
+  searchQuery,
+  onSearchQueryChange,
 }: {
   id: string;
   value: MedicationCategory[];
   onChange: (value: MedicationCategory[]) => void;
   disabled: boolean;
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [internalQuery, setInternalQuery] = useState("");
+  const query = searchQuery ?? internalQuery;
+  const setQuery = onSearchQueryChange ?? setInternalQuery;
   const items = filterMedicationCategories(query);
   const selected = value.map(getMedicationCategory);
   const summary = selected.map((item) => item.label).join(", ");
@@ -47,11 +53,13 @@ export function MedicationClassificationField({
             return;
           }
           setOpen(next);
-          if (!next) setQuery("");
         }}
         inputValue={query}
         onInputValueChange={(next, details) => {
-          if (details.isItemPress) details.cancel();
+          // Keep the user's search when the popup/dialog closes. Base UI otherwise
+          // clears multiple-selection filters after its exit transition.
+          if (details.isItemPress || details.reason !== "input-change")
+            details.cancel();
           else setQuery(next);
         }}
         highlightItemOnHover={false}
@@ -178,7 +186,6 @@ export function MedicationClassificationField({
                   disabled={disabled}
                   onClick={() => {
                     setOpen(false);
-                    setQuery("");
                   }}
                 >
                   Done <ActionIcon name="selected" className="size-3" />

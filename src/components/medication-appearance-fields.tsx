@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { RotateCcw, RotateCw, Search, Shuffle, Undo2, X } from "lucide-react";
 import {
   MedicationClassBadges,
@@ -145,9 +152,13 @@ export function MedicationAppearanceFields({
   onColorChange,
   onIconChange,
   onRotationChange,
+  searchQuery,
+  onSearchQueryChange,
 }: {
   color: MedicationColor;
   icon: string;
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
   iconRotation?: number;
   name?: string;
   strength?: string;
@@ -166,7 +177,9 @@ export function MedicationAppearanceFields({
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchSequence = useRef(0);
   const composing = useRef(false);
-  const [query, setQuery] = useState("");
+  const [internalQuery, setInternalQuery] = useState("");
+  const query = searchQuery ?? internalQuery;
+  const lastQuery = useRef("");
   const [phase, setPhase] = useState<SearchPhase>("idle");
   const [results, setResults] = useState<SymbolOption[]>([]);
   const [feedback, setFeedback] = useState<SearchFeedback | null>(null);
@@ -223,14 +236,13 @@ export function MedicationAppearanceFields({
     ? `${formatDose(quantity)} ${quantity === 1 ? type.unit : type.units}`
     : "Set amount";
 
-  function updateQuery(value: string) {
+  const runSearch = useCallback((value: string) => {
     clearTimeout(timer.current ?? undefined);
     clearTimeout(feedbackTimer.current ?? undefined);
     timer.current = null;
     feedbackTimer.current = null;
     setFeedback(null);
     const sequence = ++searchSequence.current;
-    setQuery(value);
     setResults([]);
     const search = value.trim();
     setPhase(search ? "loading" : "idle");
@@ -247,6 +259,23 @@ export function MedicationAppearanceFields({
       }, 1400);
       timer.current = null;
     }, SEARCH_DELAY);
+  }, []);
+
+  // Re-run restored or explicitly reset searches without persisting transient results.
+  useEffect(() => {
+    if (lastQuery.current === query) return;
+    const restoredSearch = setTimeout(() => {
+      lastQuery.current = query;
+      runSearch(query);
+    }, 0);
+    return () => clearTimeout(restoredSearch);
+  }, [query, runSearch]);
+
+  function updateQuery(value: string) {
+    lastQuery.current = value;
+    if (onSearchQueryChange) onSearchQueryChange(value);
+    else setInternalQuery(value);
+    runSearch(value);
   }
   function chooseColor(value: MedicationColor) {
     setUndo(null);
@@ -302,6 +331,7 @@ export function MedicationAppearanceFields({
               ref={searchInput}
               id={`${id}-search`}
               type="search"
+              maxLength={1000}
               value={query}
               onChange={(event) => updateQuery(event.target.value)}
               onCompositionStart={() => {

@@ -38,14 +38,21 @@ export function DailyReflectionEditor({
   value,
   onChange,
   disabled,
+  selectedPrompt: controlledPrompt,
+  onPromptChange,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
+  selectedPrompt?: string | null;
+  onPromptChange?: (value: string | null) => void;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
-  const [prompt, setPrompt] = useState<string | null>(null);
+  const [internalPrompt, setInternalPrompt] = useState<string | null>(null);
+  const prompt =
+    controlledPrompt === undefined ? internalPrompt : controlledPrompt;
+  const setPrompt = onPromptChange ?? setInternalPrompt;
   const selectedPrompt = prompts.find((item) => item.id === prompt);
   const wordCount = value.trim() ? value.trim().split(/\s+/u).length : 0;
   const remaining = DAILY_REFLECTION_MAX_LENGTH - value.length;
