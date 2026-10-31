@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { CrosshairSimpleIcon } from "@phosphor-icons/react/dist/ssr/CrosshairSimple";
-import { PillIcon } from "@phosphor-icons/react/dist/ssr/Pill";
 import { TagIcon } from "@phosphor-icons/react/dist/ssr/Tag";
+import { CircleLetterB } from "@/components/circle-letter-b";
 import {
   getMedicationClasses,
   type MedicationClass,
@@ -83,7 +83,6 @@ export function MedicationClassIcon({
   className?: string;
 } & Omit<ComponentProps<"span">, "children">) {
   const marker = MEDICATION_CLASS_MARKERS[kind];
-  const Icon = kind === "benzodiazepine" ? PillIcon : TagIcon;
   return (
     <span
       {...props}
@@ -93,7 +92,16 @@ export function MedicationClassIcon({
       aria-label={marker.accessibleLabel}
       title={marker.accessibleLabel}
     >
-      <Icon weight="duotone" size={12} aria-hidden="true" focusable="false" />
+      {kind === "benzodiazepine" ? (
+        <CircleLetterB />
+      ) : (
+        <TagIcon
+          weight="duotone"
+          size={12}
+          aria-hidden="true"
+          focusable="false"
+        />
+      )}
     </span>
   );
 }
