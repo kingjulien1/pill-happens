@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { Button } from "@/components/ui/button";
+import { rememberJournalDestination } from "@/components/journal-drafts";
 
 type GuideStatus = "ready" | "saving" | "error";
 type GuideContext = {
@@ -163,6 +164,7 @@ export function GuideStartLink({ children, ...props }: GuideStartLinkProps) {
             if (!mounted.current) return;
             // Bypass any root response prefetched while the first visit was
             // still pending. The server now directs this journal to Today.
+            rememberJournalDestination("/");
             window.location.assign(new URL("/", window.location.href).href);
           })
           .catch(() => {

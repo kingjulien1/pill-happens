@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { PullToRefreshBrand } from "@/components/page-refresh";
 import { HeaderNavigation } from "@/components/header-navigation";
 import { StreakMenu } from "@/components/streak-menu";
+import { useJournalWorkspace } from "@/components/journal-drafts";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const intakePage = path === "/" || path.startsWith("/history/");
   const { data, error, refresh } = useJournal();
+  const { ready } = useJournalWorkspace();
   return (
     <div
       className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10 ${path === "/" ? "with-intake-dock" : ""}`}
@@ -60,7 +62,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Opening your space…
           </div>
         )}
-        {data && (
+        {data && !ready && (
+          <div
+            role="status"
+            className="canvas-copy flex min-h-64 flex-1 items-center justify-center gap-2 text-sm"
+          >
+            <ActionIcon name="loading" className="animate-spin" />
+            Restoring your last screen…
+          </div>
+        )}
+        {data && ready && (
           <div
             key={path}
             className={`min-w-0 flex-1 ${intakePage ? "" : "page-enter"} ${path === "/" ? "flex flex-col" : ""}`}
