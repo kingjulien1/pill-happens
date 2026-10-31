@@ -814,6 +814,18 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.intake-card-type-text {
+  min-width: 0;
+  max-width: 76px;
+  flex: 0 1 auto;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--palette-peach) 94%, var(--entry-color));
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .intake-log-card .intake-card-class-icon {
   display: inline-flex;
   width: 22px;
@@ -860,10 +872,9 @@
 }
 .intake-card-ingredient-group {
   display: flex;
-  min-width: min(80px, 100%);
-  flex: 1 1 80px;
-  margin-inline-start: calc(var(--entry-time-width) + var(--entry-text-gap));
-  flex-wrap: wrap;
+  min-width: min(140px, 100%);
+  flex: 1 1 140px;
+  flex-wrap: nowrap;
   align-items: baseline;
   gap: 1px 6px;
   line-height: 16px;
@@ -880,12 +891,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.intake-card-ingredient[data-unset="true"] {
-  color: color-mix(in srgb, var(--palette-peach) 60%, transparent);
-}
 .intake-card-ingredient-context {
   display: inline-flex;
   max-width: 100%;
+  flex: 0 0 auto;
   align-items: baseline;
   gap: 5px;
   color: rgb(254 215 170 / 60%);

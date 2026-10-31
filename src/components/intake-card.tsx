@@ -11,7 +11,6 @@ import {
   MedicationCardOpioidDot,
   MedicationCardPriorityRim,
 } from "@/components/medication-card-priority";
-import { MedicationTypeIcon } from "@/components/medication-icon";
 import {
   doseMg,
   formatDose,
@@ -99,12 +98,11 @@ export function IntakeCard({
           </h3>
           <span className="intake-card-tags">
             <span
-              className="intake-card-type"
+              className="intake-card-type-text"
               title={hasType ? typeLabel : "Medication Type Not Set"}
               data-intake-type
             >
-              <MedicationTypeIcon type={type ?? "other"} className="size-3" />
-              <span className="intake-card-type-label">{typeLabel}</span>
+              {typeLabel}
             </span>
             {classes.map((kind) => (
               <MedicationClassIcon
@@ -123,16 +121,14 @@ export function IntakeCard({
               className="intake-card-ingredient"
               data-intake-ingredient
               data-unset={!ingredient || undefined}
-              title={ingredient || "Active ingredient not set"}
+              title={ingredient || "Active substance not specified"}
             >
-              {ingredient || "Not Set"}
+              {ingredient || "Unspecified"}
             </span>
-            {ingredient && (
-              <span className="intake-card-ingredient-context">
-                <span aria-hidden="true">/</span>
-                <span>Active Substance</span>
-              </span>
-            )}
+            <span className="intake-card-ingredient-context">
+              <span aria-hidden="true">/</span>
+              <span>Active Substance</span>
+            </span>
           </div>
           <div className="intake-card-dose-group">
             <span className="intake-card-amount" data-intake-dose>
