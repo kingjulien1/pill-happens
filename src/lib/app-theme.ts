@@ -133,6 +133,9 @@ function role<const Id extends string>(
 const { peach, flame, rust, ink, violet } = APP_COLORS;
 const blend = mixAppColors;
 const alpha = withAppAlpha;
+// Only dark subsection backplates soften; canvas, text and pigments stay solid.
+const darkSurface = (color: AppThemeHex, opacity = 1) =>
+  alpha(color, opacity * 0.85);
 
 export const APP_THEME_TOKENS = [
   role(
@@ -157,9 +160,9 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "card",
     "Card",
-    "A solid, readable base beneath translucent component effects.",
+    "A readable base beneath component effects, with an 85% backplate in dark mode.",
     blend(peach, ink, 0.98),
-    blend(ink, rust, 0.94),
+    darkSurface(blend(ink, rust, 0.94)),
     ["card-foreground"],
   ),
   role(
@@ -175,9 +178,9 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "popover",
     "Popover",
-    "An opaque base for menus and dialogs above the moving background.",
+    "An opaque light base and 85% dark backplate for menus and dialogs above the moving background.",
     peach,
-    blend(ink, peach, 0.94),
+    darkSurface(blend(ink, peach, 0.94)),
     ["popover-foreground"],
   ),
   role(
@@ -195,16 +198,16 @@ export const APP_THEME_TOKENS = [
     "Quiet Surface",
     "A softened layer for secondary blocks and controls.",
     blend(peach, ink, 0.88),
-    blend(ink, peach, 0.92),
+    darkSurface(blend(ink, peach, 0.92)),
     ["muted-foreground"],
   ),
   role(
     "surfaces",
     "muted-foreground",
     "Secondary Copy",
-    "Opaque palette-derived secondary copy; readable on quiet surfaces.",
+    "Opaque palette-derived secondary copy; dark copy is lifted slightly to stay readable through softened backplates.",
     blend(ink, peach, 0.82),
-    blend(peach, ink, 0.72),
+    blend(peach, ink, 0.76),
     ["muted", "background", "card"],
   ),
   role(
@@ -213,7 +216,7 @@ export const APP_THEME_TOKENS = [
     "Raised Surface",
     "The brightest light surface and a softly lifted dark layer.",
     peach,
-    blend(ink, peach, 0.89),
+    darkSurface(blend(ink, peach, 0.89)),
     ["surface-raised-foreground"],
   ),
   role(
@@ -231,7 +234,7 @@ export const APP_THEME_TOKENS = [
     "Inset Surface",
     "A deeper resting place for inputs and nested content.",
     blend(peach, ink, 0.84),
-    ink,
+    darkSurface(ink),
     ["surface-sunken-foreground"],
   ),
   role(
@@ -265,9 +268,9 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "surface-reading",
     "Reading Surface",
-    "A dependable solid backplate for longer copy over the animated field.",
+    "A dependable reading backplate, softened to 85% in dark mode over the animated field.",
     blend(peach, ink, 0.97),
-    blend(ink, peach, 0.97),
+    darkSurface(blend(ink, peach, 0.97)),
     ["surface-reading-foreground"],
   ),
   role(
@@ -339,7 +342,7 @@ export const APP_THEME_TOKENS = [
     "Secondary Action",
     "A quiet filled control below the primary action.",
     blend(peach, ink, 0.86),
-    blend(ink, peach, 0.88),
+    darkSurface(blend(ink, peach, 0.88)),
     ["secondary-foreground"],
   ),
   role(
@@ -357,7 +360,7 @@ export const APP_THEME_TOKENS = [
     "Selected Surface",
     "A subtle palette-derived highlight for active menu items.",
     blend(peach, rust, 0.8),
-    blend(ink, flame, 0.84),
+    darkSurface(blend(ink, flame, 0.84)),
     ["accent-foreground"],
   ),
   role(
@@ -415,7 +418,7 @@ export const APP_THEME_TOKENS = [
     "Glass Wash",
     "A Peach light wash or Ink dark wash over blurred backdrops.",
     alpha(peach, 0.6),
-    alpha(ink, 0.62),
+    darkSurface(ink, 0.62),
   ),
   role(
     "glass",
@@ -545,7 +548,7 @@ export const APP_THEME_TOKENS = [
     "Success Surface",
     "A warm restrained confirmation surface; its label also conveys success.",
     blend(peach, rust, 0.91),
-    blend(ink, peach, 0.88),
+    darkSurface(blend(ink, peach, 0.88)),
     ["success-foreground"],
   ),
   role(
@@ -563,7 +566,7 @@ export const APP_THEME_TOKENS = [
     "Attention Surface",
     "Flame mixed with the current surface draws gentle attention.",
     blend(peach, flame, 0.68),
-    blend(ink, flame, 0.82),
+    darkSurface(blend(ink, flame, 0.82)),
     ["warning-foreground"],
   ),
   role(
@@ -581,7 +584,7 @@ export const APP_THEME_TOKENS = [
     "Information Surface",
     "A modest Violet tint for neutral contextual information.",
     blend(peach, violet, 0.88),
-    blend(ink, violet, 0.82),
+    darkSurface(blend(ink, violet, 0.82)),
     ["info-foreground"],
   ),
   role(

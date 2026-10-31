@@ -2,6 +2,22 @@
   min-width: 0;
   color: var(--canvas-foreground);
 }
+@media (prefers-color-scheme: dark) {
+  .intro,
+  .contentsBox,
+  .readingCard,
+  .shapeCard,
+  .colorReference,
+  .githubCard,
+  .detail,
+  .flow,
+  .contributionSteps,
+  .resourceLink,
+  .codeBlock {
+    -webkit-backdrop-filter: blur(32px);
+    backdrop-filter: blur(32px);
+  }
+}
 
 .page code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

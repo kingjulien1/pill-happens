@@ -603,3 +603,21 @@
   background: var(--surface-reading);
   color: var(--surface-reading-foreground);
 }
+@media (prefers-color-scheme: dark) {
+  .intro,
+  .atAGlance,
+  .steps,
+  .contents a,
+  .startAction,
+  .example,
+  .callout {
+    -webkit-backdrop-filter: blur(32px);
+    backdrop-filter: blur(32px);
+  }
+  .example {
+    background: color-mix(in srgb, #f97316 6%, var(--surface-sunken));
+  }
+  .callout {
+    background: color-mix(in srgb, #f97316 7%, var(--surface-sunken));
+  }
+}

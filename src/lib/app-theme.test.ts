@@ -114,6 +114,56 @@ test("small copy clears 4.5:1 contrast on its intended solid surfaces in each mo
   }
 });
 
+test("dark subsection washes soften without fading copy, and stay readable over the background ramp", () => {
+  const surfaces = [
+    ["card", "card-foreground"],
+    ["popover", "popover-foreground"],
+    ["muted", "muted-foreground"],
+    ["surface-raised", "surface-raised-foreground"],
+    ["surface-sunken", "surface-sunken-foreground"],
+    ["surface-reading", "surface-reading-foreground"],
+    ["secondary", "secondary-foreground"],
+    ["accent", "accent-foreground"],
+    ["success", "success-foreground"],
+    ["warning", "warning-foreground"],
+    ["info", "info-foreground"],
+  ] as const;
+  for (const [surface, copy] of surfaces) {
+    const wash = APP_THEME_VALUES.dark[surface];
+    assert.equal(wash.slice(7), "d9", `${surface} keeps an 85% backplate`);
+    assert.equal(APP_THEME_VALUES.dark[copy].length, 7, `${copy} stays opaque`);
+    for (const behind of APP_BACKGROUND_COLORS) {
+      const resolved = mixAppColors(
+        wash,
+        behind,
+        parseInt(wash.slice(7), 16) / 255,
+      );
+      assert.ok(
+        contrast(resolved, APP_THEME_VALUES.dark[copy]) >= 4.5,
+        `${copy} on ${surface} over ${behind} remains readable`,
+      );
+    }
+  }
+  const muted = APP_THEME_VALUES.dark.muted;
+  const brightest = mixAppColors(
+    muted,
+    APP_COLORS.peach,
+    parseInt(muted.slice(7), 16) / 255,
+  );
+  assert.ok(
+    contrast(brightest, APP_THEME_VALUES.dark["muted-foreground"]) >= 4.5,
+  );
+  assert.equal(
+    APP_THEME_VALUES.dark["glass-background"],
+    withAppAlpha(APP_COLORS.ink, 0.62 * 0.85),
+  );
+  assert.equal(APP_THEME_VALUES.dark.foreground, APP_COLORS.peach);
+  assert.equal(APP_THEME_VALUES.dark["action-background"], APP_COLORS.peach);
+  assert.equal(APP_THEME_VALUES.light.card, "#fad3a7");
+  assert.equal(APP_THEME_VALUES.light.popover, APP_COLORS.peach);
+  assert.equal(APP_THEME_VALUES.light.muted, "#e5bf97");
+});
+
 test("generated application and offline CSS match the documented registry", async () => {
   const css = await readFile(
     new URL("../app/theme.css", import.meta.url),

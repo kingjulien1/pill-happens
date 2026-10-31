@@ -1075,11 +1075,20 @@
         transparent 45%,
         color-mix(in srgb, var(--palette-peach) 1.961%, transparent)
       ),
-      color-mix(in srgb, var(--palette-ink) 10%, transparent);
+      color-mix(in srgb, var(--palette-ink) 8.5%, transparent);
     box-shadow: none;
   }
   .intake-card-readability {
-    opacity: 0.12;
+    opacity: 0.102;
+  }
+  .intake-card-ink {
+    opacity: 0.51;
+  }
+  .intake-card-tone {
+    opacity: 0.34;
+  }
+  .intake-log-card[data-light-accent="true"] .intake-card-readability {
+    opacity: 0.425;
   }
 }
 .history-day-card {
@@ -1395,7 +1404,7 @@
         transparent 45%,
         color-mix(in srgb, var(--palette-peach) 1.961%, transparent)
       ),
-      color-mix(in srgb, var(--palette-ink) 14%, transparent);
+      color-mix(in srgb, var(--palette-ink) 11.9%, transparent);
     box-shadow:
       inset 0 1px 0
         color-mix(in srgb, var(--palette-peach) 30.196%, transparent),
@@ -1415,6 +1424,18 @@
     color-mix(in srgb, var(--palette-ink) 50%, transparent) 96px
   );
   pointer-events: none;
+}
+@media (prefers-color-scheme: dark) {
+  .history-card-ink {
+    opacity: 0.17;
+  }
+  .history-card-glass::after {
+    background: linear-gradient(
+      90deg,
+      transparent 52px,
+      color-mix(in srgb, var(--palette-ink) 42.5%, transparent) 96px
+    );
+  }
 }
 @keyframes history-card-mesh-drift {
   0%,
@@ -2778,7 +2799,7 @@
 }
 @media (prefers-color-scheme: dark) {
   .medication-appearance::before {
-    background: color-mix(in srgb, var(--palette-ink) 20%, transparent);
+    background: color-mix(in srgb, var(--palette-ink) 17%, transparent);
   }
 }
 .empty-intake-tint {
@@ -3477,7 +3498,7 @@
 }
 @media (prefers-color-scheme: dark) {
   .brand-navigation {
-    background: color-mix(in srgb, var(--palette-ink) 92%, transparent);
+    background: color-mix(in srgb, var(--palette-ink) 78.2%, transparent);
   }
 }
 .journal-navigation {
@@ -3498,6 +3519,21 @@
   justify-content: space-between;
   gap: 8px;
   padding: 0 4px 3px 8px;
+}
+@media (prefers-color-scheme: dark) {
+  .journal-navigation {
+    --muted-foreground: rgb(254 215 170 / 72%);
+    --popover: rgb(42 15 10 / 85%);
+    background:
+      linear-gradient(rgb(249 115 22 / 7%) 0 0),
+      linear-gradient(rgb(154 52 18 / 30%) 0 0), rgb(42 15 10 / 85%);
+  }
+  [data-slot="dialog-content"],
+  [data-slot="drawer-popup"],
+  [data-slot="select-content"] {
+    -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(40px);
+  }
 }
 .journal-navigation-actions {
   display: inline-flex;

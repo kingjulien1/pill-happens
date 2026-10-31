@@ -43,6 +43,15 @@
   opacity: 0;
   transform: translateY(-4px) scale(0.97);
 }
+@media (prefers-color-scheme: dark) {
+  .popup {
+    --popover: #2a0f0ad9;
+    --muted-foreground: #fed7aab8;
+    background:
+      linear-gradient(rgb(249 115 22 / 7%) 0 0),
+      linear-gradient(rgb(154 52 18 / 30%) 0 0), var(--popover);
+  }
+}
 .cardLink {
   position: relative;
   z-index: 1;
