@@ -74,7 +74,6 @@ export function IntakeCard({
   const style = {
     "--entry-color": color.hex,
     "--entry-rim-color": `${color.hex}1f`,
-    "--entry-folded-rim-color": `${color.hex}33`,
     "--entry-icon-tint": `${color.hex}66`,
     "--entry-benzo": rose,
     "--entry-benzo-soft": roseSoft,

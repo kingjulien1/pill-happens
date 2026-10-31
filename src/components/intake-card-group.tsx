@@ -29,6 +29,7 @@ function stackLayout(
     : (count - 1) * openStep;
   const layoutDuration = 420 + maxDelay;
   let expandedHeight = 0;
+  let foldedBottom = frontHeight;
   const layouts: CSSProperties[] = [];
   for (const [depth, entry] of entries.entries()) {
     const naturalHeight = heights[entry.id] ?? 80;
@@ -36,13 +37,13 @@ function stackLayout(
     expandedHeight += naturalHeight + (depth < count - 1 ? 8 : 0);
     const previewDepth = Math.min(depth, 6);
     const scale = collapsed ? 1 - previewDepth * 0.008 : 1;
-    // Extend full rear faces upward, keeping every existing 12px peek bottom.
-    // Their extra height is decorative; intrinsic content still measures the
-    // expanded card, so long notes and disclosure geometry stay independent.
+    // Overlap complete, naturally sized cards. Reserve each real lower edge,
+    // with enough reveal for the ordinary rounded corners to turn fully.
+    if (depth > 0 && depth <= 6)
+      foldedBottom = Math.max(foldedBottom + 24, naturalHeight * scale);
     const y = collapsed
-      ? frontHeight * (1 - scale) + previewDepth * 4
+      ? Math.max(0, foldedBottom - naturalHeight * scale)
       : expandedY;
-    const foldedHeight = frontHeight + (previewDepth * 8) / scale;
     const delay =
       depth === 0
         ? 0
@@ -52,14 +53,12 @@ function stackLayout(
     layouts.push({
       "--stack-y": `${y}px`,
       "--stack-scale": scale,
-      "--stack-face-height": `${collapsed && depth > 0 ? foldedHeight : naturalHeight}px`,
+      "--stack-face-height": `${naturalHeight}px`,
       "--stack-delay": `${delay}ms`,
       "--stack-layer": count - depth,
     } as CSSProperties);
   }
-  const cardsHeight = collapsed
-    ? frontHeight + Math.min(count - 1, 6) * 12
-    : expandedHeight;
+  const cardsHeight = collapsed ? foldedBottom : expandedHeight;
   return { layouts, cardsHeight, layoutDuration };
 }
 
@@ -91,8 +90,8 @@ function StackSlot({
       ".intake-card-content",
     );
     if (!content) return;
-    // Read the intrinsic content, never the temporarily folded button height.
-    // This stays correct as notes wrap or medication details change.
+    // Measure unscaled content so every face keeps its natural dimensions as
+    // notes wrap, medication details change, or the stack opens and closes.
     const updateHeight = () => {
       onNaturalHeight(entry.id, content.offsetHeight);
     };

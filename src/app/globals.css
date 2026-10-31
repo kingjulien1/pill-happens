@@ -265,15 +265,18 @@
   visibility: hidden;
   pointer-events: none;
 }
+/* Park capped entries without adding invisible scroll space after disclosure. */
+.intake-group:not([data-stack-moving="true"])
+  .intake-stack-slot[data-stack-hidden="true"] {
+  height: 0;
+  overflow: clip;
+}
 .intake-stack-measure {
   position: relative;
   width: 100%;
 }
 .intake-stack-measure > .intake-log-card {
   height: var(--stack-face-height, 80px);
-}
-.intake-stack-slot[data-stack-collapsed="true"] .intake-card-content {
-  opacity: 0;
 }
 /* Whole faces move in their own slots; inner wrappers own entrance animation. */
 .intake-group[data-stack-moving="true"] .intake-group-cards {
@@ -283,46 +286,19 @@
 .intake-group[data-stack-moving="true"] .intake-stack-slot {
   transition:
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 260ms ease,
     visibility 0s;
-  transition-delay:
-    var(--stack-delay, 0ms), var(--stack-delay, 0ms), var(--stack-delay, 0ms),
-    0ms;
+  transition-delay: var(--stack-delay, 0ms), var(--stack-delay, 0ms), 0ms;
 }
 .intake-group[data-stack-moving="true"]
   .intake-stack-slot[data-stack-hidden="true"] {
   transition-delay:
-    var(--stack-delay, 0ms), var(--stack-delay, 0ms), var(--stack-delay, 0ms),
+    var(--stack-delay, 0ms), var(--stack-delay, 0ms),
     calc(var(--stack-delay, 0ms) + 420ms);
-}
-.intake-group[data-stack-moving="true"]
-  .intake-stack-measure
-  > .intake-log-card {
-  transition:
-    height 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--stack-delay, 0ms),
-    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--stack-delay, 0ms);
-}
-.intake-group[data-stack-moving="true"] .intake-card-benzo-rim {
-  transition: border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1)
-    var(--stack-delay, 0ms);
-}
-.intake-group[data-stack-moving="true"] .intake-card-content {
-  transition: opacity 180ms ease calc(var(--stack-delay, 0ms) + 90ms);
-}
-.intake-group[data-stack-moving="true"]
-  .intake-stack-slot[data-stack-collapsed="true"]
-  .intake-card-content {
-  transition-duration: 120ms;
-  transition-delay: var(--stack-delay, 0ms);
 }
 @media (prefers-reduced-motion: reduce) {
   .intake-group[data-stack-moving="true"] .intake-group-cards,
-  .intake-group[data-stack-moving="true"] .intake-stack-slot,
-  .intake-group[data-stack-moving="true"]
-    .intake-stack-measure
-    > .intake-log-card,
-  .intake-group[data-stack-moving="true"] .intake-card-content {
+  .intake-group[data-stack-moving="true"] .intake-stack-slot {
     transition: none;
   }
 }
@@ -613,24 +589,6 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
-}
-/* Keep a full side turn within each 12px reveal, then restore normal corners. */
-.intake-stack-slot[data-stack-collapsed="true"] .intake-log-card {
-  --entry-card-radius: 12px;
-}
-/* Folded previews use a simple inside rim, free of masked blur edge cutoffs. */
-.intake-stack-slot[data-stack-collapsed="true"] .intake-log-card::before {
-  border: var(--entry-rim-width) solid var(--entry-folded-rim-color);
-  padding: 0;
-  background: none;
-  -webkit-mask: none;
-  mask: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: none;
-}
-.intake-stack-slot[data-stack-collapsed="true"] .intake-card-benzo-rim {
-  border-color: var(--entry-folded-rim-color);
 }
 .intake-card-ink {
   position: absolute;
