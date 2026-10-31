@@ -770,9 +770,19 @@ export function DeveloperGuidePage() {
           >
             <p>
               The intake card keeps a blurred glass base, a subtle static
-              pattern, an Ink readability treatment and a selected-color wash.
-              Its inside rim does not increase the outer card dimensions.
-              Related background layers stay behind the real icon and content.
+              pattern, an Ink readability treatment and a selected-color wash. A
+              final 40% Ink overlay brings the different card pigments closer
+              together while leaving the foreground readable. Its inside rim
+              does not increase the outer card dimensions. Related background
+              layers stay behind the real icon and content.
+            </p>
+            <p>
+              Benzo cards use a Rose 400 inside outline and a bold circled B.
+              The medication tile itself stays free of a Benzo rim or red dot.
+              Type badges share the classification marker’s 22px height and
+              carry a matching medication-type symbol. The ingredient label and
+              quieter calculation adapt to the available width without changing
+              the stored dose.
             </p>
             <p>
               Collapsed groups overlap complete ordinary cards with their
