@@ -272,6 +272,23 @@ export function GuidePage() {
               intake times cannot be saved.
             </p>
           </GuideDetail>
+          <GuideDetail title="Pick Up Where You Left Off" icon="save">
+            <p>
+              Unfinished intake, medication, goal, evening check-in, and
+              preference forms keep a draft on this device. Close a dialog,
+              reload, or reopen the app: your last screen and open form return
+              with the values you entered. Each medication and past day keeps
+              its own draft.
+            </p>
+            <p>
+              Look for Draft Saved or Restored Draft below the fields. Save
+              records the change in your journal and clears that draft; Reset
+              Draft starts the form over. Closing a form keeps your work without
+              recording an intake. Drafts stay on this browser or installed app
+              and do not sync to another device. Clearing its site data removes
+              them.
+            </p>
+          </GuideDetail>
           <GuideDetail
             title="How The Stacks Work"
             context="Rolling 13-Minute Windows"
@@ -402,10 +419,11 @@ export function GuidePage() {
           </GuideDetail>
           <GuideDetail title="Archive &amp; Restore" icon="archive">
             <p>
-              Archive a medication when you no longer want it offered for new
-              intakes. Its earlier records stay in the journal. Use the
-              Active/Archive toggle on Medications to find archived items and
-              restore them whenever you need them again.
+              Tap anywhere on a medication card to open its editor. Archive
+              Medication is below the form when you no longer want it offered
+              for new intakes; its earlier records stay in the journal. Use the
+              Active/Archive toggle to find archived items, open their card, and
+              choose Restore Medication whenever you need them again.
             </p>
           </GuideDetail>
         </div>
@@ -625,6 +643,8 @@ export function GuidePage() {
               Loading and saving journal records needs a connection. The
               installed app can show a neutral offline page, but it does not
               queue offline intakes or save them for later submission.
+              Unfinished form drafts are separate: they stay on the device and
+              still need your explicit Save when connected.
             </p>
             <p>
               When a new app version is waiting, App Update Ready offers Reload
@@ -703,9 +723,10 @@ export function GuidePage() {
           </GuideDetail>
           <GuideDetail title="What If A Save Fails?">
             <p>
-              Leave the form open, check the connection, and retry when you are
-              ready. Failed saves retain the current draft. The app does not
-              automatically replay a save after restoring a sign-in.
+              Check the connection and retry when you are ready. Failed saves
+              retain the current draft, including if you close the form and
+              return later. The app does not automatically replay a save after
+              restoring a sign-in.
             </p>
           </GuideDetail>
           <GuideDetail title="Why Am I Being Asked For A Password Again?">

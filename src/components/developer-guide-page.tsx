@@ -777,6 +777,15 @@ export function DeveloperGuidePage() {
               layers stay behind the real icon and content.
             </p>
             <p>
+              MedicationCardBase is the shared button frame for intakes and the
+              medication library. Its default output contains only the selected
+              color treatment and glyph. Specialized cards supply their own
+              content and optional decorations; the base has no medication name,
+              dose, time, or classification rules. A library card opens the
+              editor as one native button, with Archive and Restore inside that
+              dialog.
+            </p>
+            <p>
               Benzo cards use a Rose 400 inside outline and a bold circled B.
               The medication tile itself stays free of a Benzo rim or red dot.
               Type badges share the classification marker’s 22px height and
@@ -1052,9 +1061,11 @@ export function DeveloperGuidePage() {
             </p>
             <p>
               This records opening the guide, not completing it. Returning
-              visits go to the daily screen, and Guide remains available from
-              navigation. The flag belongs to journal state rather than the
-              browser’s local storage or the authentication cookie.
+              visits can resume their last screen, and Guide remains available
+              from navigation. The flag belongs to journal state rather than the
+              browser’s local storage or the authentication cookie. The first
+              guide’s Daily Log action declares its destination before
+              navigating, so screen restoration cannot send it back here.
             </p>
           </Detail>
           <Detail
@@ -1109,6 +1120,35 @@ export function DeveloperGuidePage() {
               worker caches public installation assets and the offline page. It
               does not turn medication writes into a background queue; mutations
               need a connection and explicit result handling.
+            </p>
+          </Detail>
+          <Detail title="Durable Form Drafts" context="Local To Each Journal">
+            <p>
+              JournalDraftProvider hydrates a versioned localStorage workspace
+              before forms mount. The server derives its namespace from the
+              authenticated journal ID, without exposing credentials. Inputs
+              persist synchronously as raw values, including blank or unfinished
+              fields. Drafts are separate for new forms, individual edit IDs,
+              and past tracking days; successful saves clear only their own
+              draft. Failed requests and closing a dialog retain it.
+            </p>
+            <p>
+              The workspace also remembers the last route, scroll position,
+              anchor, open non-destructive dialog, medication filter, and
+              history page length. First-visit onboarding and explicit deep
+              links take precedence. Dialog generations prevent a late save from
+              closing a newer editor. Intake drafts preserve their original
+              timestamp and timezone, including seconds and repeated
+              daylight-saving hours.
+            </p>
+            <p>
+              Drafts have no age expiry and remain on that browser or installed
+              app; they are not synchronized or automatically submitted. The
+              workspace validates its version, routes, dialog descriptors, and
+              bounded payloads. Unavailable storage falls back to memory with an
+              honest status. Passwords, authentication tokens, and destructive
+              confirmations never enter the workspace. The service worker still
+              caches only public assets, not private journal responses.
             </p>
           </Detail>
         </div>
