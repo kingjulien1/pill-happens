@@ -412,8 +412,11 @@ export function GuidePage() {
             </p>
             <p>
               Tap the top-right stars button for your current streak, best
-              streak, total days logged, and next milestone. Early milestones
-              arrive in small steps, then every five days after 30.
+              streak, total days logged, and next milestone. Tap anywhere on
+              that card to open Streaks at the milestone reached in your current
+              run, or its next step if you have not reached one yet. The close
+              button only dismisses the card. Early milestones arrive in small
+              steps, then every five days after 30.
             </p>
             <p>
               A streak measures logging activity. It does not indicate whether
@@ -427,6 +430,13 @@ export function GuidePage() {
               check-in changes, and separate medication figures available for
               that milestone. Missing records stay unknown; dose changes are not
               labeled as better or worse.
+            </p>
+            <p>
+              When you arrive from the stars card, the selected milestone moves
+              into view and briefly lights up. If it falls outside the usual
+              list, an extra card appears under In The Spotlight. Its earned or
+              upcoming status still comes from your saved records. Reduced
+              motion uses a brief outline instead of the animated burst.
             </p>
             <PageLink href="/streaks">Explore Streak Milestones</PageLink>
           </GuideDetail>
