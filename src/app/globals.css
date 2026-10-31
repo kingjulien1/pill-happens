@@ -671,6 +671,77 @@
     var(--entry-icon-tint)
   );
 }
+.medication-card-base[data-card-empty="true"] .medication-card-content {
+  justify-content: center;
+}
+.medication-library-card {
+  --foreground: var(--palette-peach);
+  --muted-foreground: rgb(254 215 170 / 72%);
+  --border: rgb(254 215 170 / 20%);
+  --muted: rgb(254 215 170 / 8%);
+  --popover: var(--palette-ink);
+  --popover-foreground: var(--palette-peach);
+}
+.medication-library-card
+  .medication-class-badge[data-medication-class="benzodiazepine"] {
+  --benzo-mark: var(--entry-benzo-soft);
+  border-color: var(--entry-benzo-border);
+  background: rgb(255 99 126 / 15%);
+  color: var(--palette-peach);
+}
+.medication-library-card
+  .medication-class-badge[data-medication-class="opioid"] {
+  --benzo-mark: var(--entry-opioid-soft);
+  border-color: rgb(255 210 48 / 40%);
+  background: rgb(187 77 0 / 15%);
+  color: var(--palette-peach);
+}
+.medication-library-card-details {
+  min-width: 0;
+  flex: 1;
+  padding-block: 5px;
+}
+.medication-library-card-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+.medication-library-card-heading h3 {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 550;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.medication-library-card-heading .intake-card-type {
+  flex-shrink: 0;
+}
+.medication-library-card-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  margin-top: 5px;
+  color: rgb(254 215 170 / 72%);
+  font-size: 11px;
+  line-height: 16px;
+}
+.medication-library-card-meta > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.medication-library-card-meta > span + span {
+  color: rgb(254 215 170 / 86%);
+}
+.medication-library-card-details > [data-medication-category-badges] {
+  margin-top: 6px;
+}
 .intake-log-card[data-benzodiazepine="true"] .intake-card-mark {
   border: 0;
 }
