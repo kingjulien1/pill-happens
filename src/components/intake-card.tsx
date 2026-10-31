@@ -7,7 +7,10 @@ import {
   MedicationClassIcon,
 } from "@/components/medication-class-badge";
 import { IntakeCardShine } from "@/components/intake-card-shine";
-import { MedicationGlyph } from "@/components/medication-icon";
+import {
+  MedicationGlyph,
+  MedicationTypeIcon,
+} from "@/components/medication-icon";
 import {
   doseMg,
   formatDose,
@@ -31,6 +34,14 @@ import {
   getMedicationClassification,
 } from "@/lib/medication-classification";
 
+const benzoColors = {
+  outline: getMedicationColor("tw-rose-400").hex,
+  background: getMedicationColor("tw-rose-200").hex,
+  overlay: getMedicationColor("tw-pink-700").hex,
+  foreground: getMedicationColor("tw-fuchsia-800").hex,
+  border: getMedicationColor("tw-rose-800").hex,
+};
+
 export function IntakeCard({
   entry,
   medication,
@@ -50,9 +61,6 @@ export function IntakeCard({
 }) {
   const color = getMedicationColor(medication?.color);
   const scale = getMedicationColorScale(color.value);
-  const rose = getMedicationColor("tw-rose-500").hex;
-  const roseSoft = getMedicationColor("tw-rose-300").hex;
-  const roseInk = getMedicationColor("tw-rose-600").hex;
   const amber = getMedicationColor("tw-amber-500").hex;
   const amberSoft = getMedicationColor("tw-amber-300").hex;
   const amberInk = getMedicationColor("tw-amber-700").hex;
@@ -66,19 +74,23 @@ export function IntakeCard({
   const localTime = toLocalInput(entry.takenAt, timeZone);
   const time = localTime.slice(11);
   const nextMorning = localTime.slice(0, 10) !== day;
-  const isBenzodiazepine = medication?.isBenzodiazepine === true;
-  const isOpioid = medication?.isOpioid === true;
   const classes = getMedicationClasses(medication);
+  const isBenzodiazepine = classes.includes("benzodiazepine");
+  const isOpioid = classes.includes("opioid");
   const ingredient = medication?.activeIngredient?.trim();
+  const totalMg = formatDose(doseMg(entry));
 
   const style = {
     "--entry-color": color.hex,
     "--entry-rim-color": `${color.hex}1f`,
     "--entry-icon-tint": `${color.hex}66`,
-    "--entry-benzo": rose,
-    "--entry-benzo-soft": roseSoft,
-    "--entry-benzo-ink": roseInk,
-    "--entry-benzo-border": `${color.hex}59`,
+    "--entry-benzo-soft": `${benzoColors.background}99`,
+    "--entry-benzo-overlay": `${benzoColors.overlay}4d`,
+    "--entry-benzo-ink": benzoColors.foreground,
+    "--entry-benzo-edge": `${benzoColors.foreground}59`,
+    "--entry-benzo-edge-overlay": `${benzoColors.border}66`,
+    "--entry-class-border": `${color.hex}59`,
+    "--entry-benzo-border": `${benzoColors.outline}99`,
     "--entry-opioid": amber,
     "--entry-opioid-soft": amberSoft,
     "--entry-opioid-ink": amberInk,
@@ -89,7 +101,7 @@ export function IntakeCard({
       type="button"
       onClick={onEdit}
       disabled={disabled}
-      aria-label={`Edit ${entry.medicationName}${classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${formatDose(doseMg(entry))} milligrams, ${time}${nextMorning ? ", next morning" : ""}`}
+      aria-label={`Edit ${entry.medicationName}${classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${totalMg} milligrams, ${time}${nextMorning ? ", next morning" : ""}`}
       className="intake-log-card"
       style={style}
       data-intake-card={entry.id}
@@ -106,11 +118,12 @@ export function IntakeCard({
         <span className="intake-card-ink" data-intake-ink />
         <span className="intake-card-readability" data-intake-readability />
         <span className="intake-card-color-wash" data-intake-color-overlay />
+        <span className="intake-card-tone" data-intake-tone />
       </span>
       <IntakeCardShine seed={entry.id} eligible={shineEligible} />
       {classes.length > 0 && (
         <span
-          className="intake-card-benzo-rim"
+          className="intake-card-class-rim"
           aria-hidden="true"
           data-intake-benzo-rim={isBenzodiazepine || undefined}
           data-intake-class-rim
@@ -132,19 +145,13 @@ export function IntakeCard({
             }
           >
             <MedicationGlyph icon={medication?.icon} className="size-7" />
-            {classes.map((kind) => (
+            {isOpioid && (
               <span
-                key={kind}
-                className={
-                  kind === "benzodiazepine"
-                    ? "intake-card-benzo-dot"
-                    : "intake-card-opioid-dot"
-                }
-                data-medication-class={kind}
-                data-intake-benzo-dot={kind === "benzodiazepine" || undefined}
-                data-intake-opioid-dot={kind === "opioid" || undefined}
+                className="intake-card-opioid-dot"
+                data-medication-class="opioid"
+                data-intake-opioid-dot
               />
-            ))}
+            )}
           </span>
         </span>
         <div className="intake-card-details">
@@ -171,7 +178,8 @@ export function IntakeCard({
                 title={hasType ? typeLabel : "Medication Type Not Set"}
                 data-intake-type
               >
-                {typeLabel}
+                <MedicationTypeIcon type={type ?? "other"} className="size-3" />
+                <span className="intake-card-type-label">{typeLabel}</span>
               </span>
               {classes.map((kind) => (
                 <MedicationClassIcon
@@ -187,7 +195,7 @@ export function IntakeCard({
             </span>
           </div>
           <div className="intake-card-bottom" data-intake-bottom>
-            <div className="intake-card-meta">
+            <div className="intake-card-ingredient-group">
               <span
                 className="intake-card-ingredient"
                 data-intake-ingredient
@@ -196,26 +204,36 @@ export function IntakeCard({
               >
                 {ingredient || "Not Set"}
               </span>
-              <span className="intake-card-dose-group">
-                <span className="intake-card-meta-slash" aria-hidden="true">
-                  /
+              {ingredient && (
+                <span className="intake-card-ingredient-context">
+                  <span aria-hidden="true">/</span>
+                  <span>Active Substance</span>
                 </span>
-                <span className="intake-card-amount" data-intake-dose>
-                  {formatDose(entry.quantity)}
-                  {isMeteredMedicationType(type)
-                    ? ` ${entry.quantity === 1 ? units.unit : units.units}`
-                    : ""}{" "}
-                  × {formatDose(entry.strengthMg)}
-                  <span className="intake-card-mg">{"\u00a0"}mg</span>
+              )}
+            </div>
+            <div className="intake-card-dose-group">
+              <span className="intake-card-amount" data-intake-dose>
+                {formatDose(entry.quantity)}
+                {isMeteredMedicationType(type)
+                  ? ` ${entry.quantity === 1 ? units.unit : units.units}`
+                  : ""}{" "}
+                × {formatDose(entry.strengthMg)}
+                <span className="intake-card-mg">{"\u00a0"}mg</span>
+              </span>
+              <span
+                className="intake-card-total"
+                data-intake-total
+                data-total-long={totalMg.length > 15 || undefined}
+              >
+                <span
+                  className="intake-card-total-value"
+                  data-intake-total-value
+                >
+                  {totalMg}
                 </span>
+                <span className="intake-card-total-unit">mg</span>
               </span>
             </div>
-            <span className="intake-card-total" data-intake-total>
-              <span className="intake-card-total-value" data-intake-total-value>
-                {formatDose(doseMg(entry))}
-              </span>
-              <span className="intake-card-total-unit">mg</span>
-            </span>
           </div>
           {entry.note && (
             <p className="intake-card-note" data-intake-note>
