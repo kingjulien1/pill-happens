@@ -1,14 +1,25 @@
+import { BookOpenText } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
 import { formatDay } from "@/lib/domain";
 
 function HeadingMarker({ name }: { name: "date" | "sparkle" }) {
   return (
     <>
-      <ActionIcon
-        name={name}
-        weight="fill"
-        className="streak-counter-icon size-[22px]"
-      />
+      {name === "date" ? (
+        <BookOpenText
+          strokeWidth={2.5}
+          aria-hidden="true"
+          focusable="false"
+          data-action-icon="date"
+          className="streak-counter-icon size-[22px] shrink-0"
+        />
+      ) : (
+        <ActionIcon
+          name={name}
+          weight="fill"
+          className="streak-counter-icon size-[22px]"
+        />
+      )}
       <span
         aria-hidden="true"
         className="text-base leading-none text-muted-foreground"
