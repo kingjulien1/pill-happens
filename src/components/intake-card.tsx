@@ -32,6 +32,9 @@ export function IntakeCard({
   onEdit,
   disabled = false,
   shineEligible = true,
+  actionLabel,
+  controls,
+  expanded,
 }: {
   entry: Intake;
   medication?: Medication;
@@ -40,6 +43,9 @@ export function IntakeCard({
   onEdit: () => void;
   disabled?: boolean;
   shineEligible?: boolean;
+  actionLabel?: string;
+  controls?: string;
+  expanded?: boolean;
 }) {
   const type = entry.medicationForm ?? medication?.form;
   const hasType = type !== undefined && MEDICATION_TYPE_VALUES.includes(type);
@@ -60,7 +66,12 @@ export function IntakeCard({
       iconRotation={medication?.iconRotation}
       onClick={onEdit}
       disabled={disabled}
-      aria-label={`Edit ${entry.medicationName}${classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${totalMg} milligrams, ${time}${nextMorning ? ", next morning" : ""}`}
+      aria-label={
+        actionLabel ??
+        `Edit ${entry.medicationName}${classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${totalMg} milligrams, ${time}${nextMorning ? ", next morning" : ""}`
+      }
+      aria-controls={controls}
+      aria-expanded={expanded}
       style={priority.style}
       data-intake-card={entry.id}
       data-shine-eligible={shineEligible}

@@ -17,6 +17,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { useJournal } from "@/components/journal-provider";
 import { ActionIcon } from "@/components/action-icon";
 import {
+  EMPTY_INTAKE_STACK_VIEW,
+  normalizeIntakeStackView,
+  type IntakeStackView,
+} from "@/lib/intake-stack-layout";
+import {
   createDraftWorkspace,
   safeRememberedDialog,
   safeWorkspaceHash,
@@ -234,6 +239,79 @@ export function useJournalWorkspace() {
   const value = useContext(Context);
   if (!value) throw new Error("Journal draft provider is missing.");
   return value;
+}
+
+/** Parent hydration completes before a day mounts, so its first layout is final. */
+export function usePersistentIntakeStackView(
+  day: string,
+  entries: readonly { id: string }[],
+) {
+  const { store } = useJournalWorkspace();
+  const [fallback, setFallback] = useState<{
+    store: DraftWorkspace;
+    day: string;
+    members: readonly string[];
+    view: IntakeStackView;
+  } | null>(null);
+  const snapshot = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getServerSnapshot,
+  );
+  const memory =
+    fallback?.store === store && fallback.day === day ? fallback : null;
+  const saved = snapshot.stackViews[day] ?? EMPTY_INTAKE_STACK_VIEW;
+  const members = memory && new Set(memory.members);
+  const retained = memory
+    ? {
+        // A regroup can bring in another stack's remembered heads. Override
+        // only the failed writer's own IDs instead of discarding that context.
+        heads: [
+          ...saved.heads.filter((id) => !members!.has(id)),
+          ...memory.view.heads,
+        ],
+        expanded: [
+          ...saved.expanded.filter((id) => !members!.has(id)),
+          ...memory.view.expanded,
+        ],
+      }
+    : saved;
+  return {
+    view: normalizeIntakeStackView(entries, retained),
+    // Called from user event handlers, never a React state updater or an effect.
+    saveView: (view: IntakeStackView) => {
+      const members = entries.map((entry) => entry.id);
+      const normalized = normalizeIntakeStackView(entries, view);
+      const accepted = store.setStackView(day, members, normalized);
+      // Validation/size rejection deliberately leaves the durable record alone.
+      // Keep that user's target locally too, rather than reverting after motion.
+      setFallback(accepted ? null : { store, day, members, view: normalized });
+      return accepted;
+    },
+    status: memory ? ("memory" as const) : snapshot.status,
+  };
+}
+
+/** One quiet notice per day, only when device persistence is unavailable. */
+export function StackViewStorageStatus() {
+  const { store } = useJournalWorkspace();
+  const snapshot = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getServerSnapshot,
+  );
+  if (snapshot.status === "saved") return null;
+  return (
+    <p
+      role="status"
+      className="canvas-copy mt-3 text-center text-[10px] leading-relaxed text-muted-foreground"
+      data-stack-view-storage-status={snapshot.status}
+    >
+      {snapshot.status === "memory"
+        ? "Stack views are kept for this visit; device storage is unavailable."
+        : "Stack views are kept for this visit; saved views may not survive reopening."}
+    </p>
+  );
 }
 
 export function usePersistentDraft<T>(

@@ -311,3 +311,283 @@ test("resume only replaces a fresh bare root, preserving explicit links, onboard
     true,
   );
 });
+
+test("daily stack views reopen independently for every group, day and journal", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("journal_a");
+  first.hydrate(storage);
+  const groupA = [{ id: "a0" }, { id: "a1" }, { id: "a2" }];
+  const groupB = [{ id: "b0" }, { id: "b1" }, { id: "b2" }];
+  first.setStackView(
+    "2026-10-31",
+    groupA.map((entry) => entry.id),
+    {
+      heads: ["a0", "a2"],
+      expanded: ["a0"],
+    },
+  );
+  first.setStackView(
+    "2026-10-31",
+    groupB.map((entry) => entry.id),
+    {
+      heads: ["b0", "b1"],
+      expanded: ["b1"],
+    },
+  );
+  first.setStackView("2026-10-30", ["past0", "past1"], {
+    heads: ["past0"],
+    expanded: ["past0"],
+  });
+  const reopened = createDraftWorkspace("journal_a");
+  reopened.hydrate(storage);
+  const today = reopened.getSnapshot().stackViews["2026-10-31"];
+  assert.deepEqual(today.heads, ["a0", "a2", "b0", "b1"]);
+  assert.deepEqual(today.expanded, ["a0", "b1"]);
+  assert.deepEqual(reopened.getSnapshot().stackViews["2026-10-30"].expanded, [
+    "past0",
+  ]);
+  assert.equal(reopened.getSnapshot().status, "saved");
+  assert.deepEqual(reopened.getSnapshot().drafts, {});
+  const other = createDraftWorkspace("journal_b");
+  other.hydrate(storage);
+  assert.deepEqual(other.getSnapshot().stackViews, {});
+});
+
+test("stack persistence commits final Fold intent before animation and reversal can replace it", async () => {
+  const {
+    EMPTY_INTAKE_STACK_VIEW,
+    foldIntakeStackSteps,
+    normalizeIntakeStackView,
+    promoteIntakeStack,
+    showIntakeStackChildren,
+  } = await import("./intake-stack-layout");
+  const storage = memoryStorage();
+  const workspace = createDraftWorkspace("journal_a");
+  workspace.hydrate(storage);
+  const entries = Array.from({ length: 8 }, (_, index) => ({
+    id: `i${index}`,
+  }));
+  const ids = entries.map((entry) => entry.id);
+  let nested = promoteIntakeStack(entries, EMPTY_INTAKE_STACK_VIEW, "i3");
+  nested = promoteIntakeStack(entries, nested, "i6");
+  nested = showIntakeStackChildren(entries, nested);
+  workspace.setStackView("2026-10-31", ids, nested);
+  const steps = foldIntakeStackSteps(entries, nested);
+  assert.ok(steps.length > 1);
+  workspace.setStackView("2026-10-31", ids, steps.at(-1)!.view);
+  const halfway = createDraftWorkspace("journal_a");
+  halfway.hydrate(storage);
+  assert.deepEqual(
+    normalizeIntakeStackView(
+      entries,
+      halfway.getSnapshot().stackViews["2026-10-31"],
+    ),
+    {
+      heads: ["i0"],
+      expanded: [],
+    },
+  );
+  assert.equal(
+    JSON.stringify([...storage.entries]).includes("fold-children"),
+    false,
+  );
+  assert.equal(JSON.stringify([...storage.entries]).includes("pending"), false);
+  const reversed = showIntakeStackChildren(entries, steps[0].view);
+  workspace.setStackView("2026-10-31", ids, reversed);
+  const afterReverse = createDraftWorkspace("journal_a");
+  afterReverse.hydrate(storage);
+  assert.deepEqual(
+    normalizeIntakeStackView(
+      entries,
+      afterReverse.getSnapshot().stackViews["2026-10-31"],
+    ),
+    reversed,
+  );
+  // Opening a still-visible head during a fold retains that exact current view.
+  workspace.setStackView("2026-10-31", ids, steps[0].view);
+  const afterEdit = createDraftWorkspace("journal_a");
+  afterEdit.hydrate(storage);
+  assert.deepEqual(
+    normalizeIntakeStackView(
+      entries,
+      afterEdit.getSnapshot().stackViews["2026-10-31"],
+    ),
+    steps[0].view,
+  );
+});
+
+test("saved stack IDs follow live grouping and never invent or reorder intake records", async () => {
+  const { normalizeIntakeStackView } = await import("./intake-stack-layout");
+  const storage = memoryStorage();
+  const workspace = createDraftWorkspace("journal_a");
+  workspace.hydrate(storage);
+  workspace.setStackView("2026-10-31", ["a", "b", "c"], {
+    heads: ["a", "c"],
+    expanded: ["a"],
+  });
+  workspace.setStackView("2026-10-31", ["d", "e"], {
+    heads: ["d"],
+    expanded: ["d"],
+  });
+  const saved = workspace.getSnapshot().stackViews["2026-10-31"];
+  const merged = [
+    { id: "new" },
+    { id: "a" },
+    { id: "c" },
+    { id: "d" },
+    { id: "e" },
+  ];
+  assert.deepEqual(normalizeIntakeStackView(merged, saved), {
+    heads: ["new", "a", "c", "d"],
+    expanded: ["d"],
+  });
+  assert.deepEqual(
+    merged.map((entry) => entry.id),
+    ["new", "a", "c", "d", "e"],
+  );
+});
+
+test("version1 workspaces gain optional stack views while corrupted view records are isolated", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("journal_a");
+  first.hydrate(storage);
+  first.setDraft("med:new", { name: "Keep this form" });
+  first.setLocation("/medications", "", 50);
+  first.setStackView("2026-10-31", ["a", "b"], {
+    heads: ["a"],
+    expanded: ["a"],
+  });
+  const [key, raw] = [...storage.entries][0];
+  const envelope = JSON.parse(raw);
+  envelope.stackViews["2026-10-30"] = {
+    heads: ["a"],
+    expanded: ["not-a-head"],
+    updatedAt: 1,
+  };
+  envelope.stackViews["2026-02-30"] = {
+    heads: ["valid"],
+    expanded: [],
+    updatedAt: 1,
+  };
+  envelope.stackViews["2026-10-29"] = {
+    heads: ["https://bad.test"],
+    expanded: [],
+    updatedAt: 1,
+  };
+  storage.setItem(key, JSON.stringify(envelope));
+  const reopened = createDraftWorkspace("journal_a");
+  reopened.hydrate(storage);
+  assert.deepEqual(Object.keys(reopened.getSnapshot().stackViews), [
+    "2026-10-31",
+  ]);
+  assert.deepEqual(reopened.getSnapshot().drafts["med:new"].value, {
+    name: "Keep this form",
+  });
+  assert.equal(reopened.getSnapshot().lastPath, "/medications");
+  assert.equal(reopened.getSnapshot().status, "error");
+  reopened.setStackView("2026-10-31", ["a", "b"], {
+    heads: ["a", "b"],
+    expanded: [],
+  });
+  assert.equal(reopened.getSnapshot().status, "error");
+  delete envelope.stackViews;
+  storage.setItem(key, JSON.stringify(envelope));
+  const legacy = createDraftWorkspace("journal_a");
+  legacy.hydrate(storage);
+  assert.deepEqual(legacy.getSnapshot().stackViews, {});
+  assert.ok(legacy.getSnapshot().drafts["med:new"]);
+  assert.equal(legacy.getSnapshot().status, "saved");
+});
+
+test("stack metadata is bounded separately from 128 form drafts and keeps the latest 60 days", () => {
+  const workspace = createDraftWorkspace("journal_a");
+  workspace.hydrate(memoryStorage());
+  for (let index = 0; index < 128; index++)
+    workspace.setDraft(`med:edit:form-${index}`, { name: `Draft${index}` });
+  for (let index = 0; index < 70; index++) {
+    const day = new Date(Date.UTC(2026, 0, index + 1))
+      .toISOString()
+      .slice(0, 10);
+    workspace.setStackView(day, [`head-${index}`], {
+      heads: [`head-${index}`],
+      expanded: [],
+    });
+  }
+  assert.equal(Object.keys(workspace.getSnapshot().drafts).length, 128);
+  assert.equal(Object.keys(workspace.getSnapshot().stackViews).length, 60);
+  assert.ok(workspace.getSnapshot().stackViews["2026-03-11"]);
+  assert.equal(workspace.getSnapshot().stackViews["2026-01-01"], undefined);
+  assert.equal(workspace.getSnapshot().status, "saved");
+  workspace.setStackView("2025-01-01", ["historical"], {
+    heads: ["historical"],
+    expanded: [],
+  });
+  assert.ok(workspace.getSnapshot().stackViews["2025-01-01"]);
+  assert.equal(Object.keys(workspace.getSnapshot().stackViews).length, 60);
+  assert.equal(
+    workspace.setStackView("2026-02-30", ["a"], { heads: ["a"], expanded: [] }),
+    false,
+  );
+  assert.equal(
+    workspace.setStackView("2026-10-31", ["a"], {
+      heads: ["not-in-this-group"],
+      expanded: [],
+    }),
+    false,
+  );
+  assert.equal(
+    workspace.setStackView("2026-10-31", ["a"], {
+      heads: ["a"],
+      expanded: ["other"],
+    }),
+    false,
+  );
+});
+
+test("unavailable stack storage keeps in-visit views without claiming a durable save", () => {
+  const workspace = createDraftWorkspace("journal_a");
+  workspace.hydrate(null);
+  assert.equal(
+    workspace.setStackView("2026-10-31", ["a", "b"], {
+      heads: ["a", "b"],
+      expanded: [],
+    }),
+    false,
+  );
+  assert.deepEqual(workspace.getSnapshot().stackViews["2026-10-31"].heads, [
+    "a",
+    "b",
+  ]);
+  assert.equal(workspace.getSnapshot().status, "memory");
+});
+
+test("day-view byte budgets prune old presentation metadata and reject oversized individual days", () => {
+  const workspace = createDraftWorkspace("journal_a");
+  workspace.hydrate(memoryStorage());
+  for (let index = 1; index <= 10; index++) {
+    const ids = Array.from(
+      { length: 200 },
+      (_, item) => `view-${index}-${item}-${"x".repeat(99)}`,
+    );
+    workspace.setStackView(`2026-10-${String(index).padStart(2, "0")}`, ids, {
+      heads: ids,
+      expanded: ids,
+    });
+  }
+  assert.ok(
+    JSON.stringify(workspace.getSnapshot().stackViews).length <= 262_144,
+  );
+  assert.ok(Object.keys(workspace.getSnapshot().stackViews).length < 10);
+  assert.ok(workspace.getSnapshot().stackViews["2026-10-10"]);
+  const previous = workspace.getSnapshot().stackViews;
+  const huge = Array.from(
+    { length: 500 },
+    (_, index) => `large-${index}-${"z".repeat(100)}`,
+  );
+  assert.equal(
+    workspace.setStackView("2026-10-31", huge, { heads: huge, expanded: huge }),
+    false,
+  );
+  assert.equal(workspace.getSnapshot().status, "error");
+  assert.equal(workspace.getSnapshot().stackViews, previous);
+});

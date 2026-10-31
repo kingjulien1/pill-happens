@@ -1,5 +1,6 @@
 import { isValidDayKey } from "@/lib/domain";
 import { isStreakMilestoneTarget } from "@/lib/streak-milestones";
+import type { IntakeStackView } from "@/lib/intake-stack-layout";
 
 export type RememberedDialog = {
   kind:
@@ -23,11 +24,17 @@ type ScreenRecord = {
   scrollY: number;
   updatedAt: number;
 };
+export type RememberedStackDay = {
+  heads: string[];
+  expanded: string[];
+  updatedAt: number;
+};
 type SavedWorkspace = {
   version: 1;
   scope: string;
   drafts: Record<string, DraftRecord>;
   screens: Record<string, ScreenRecord>;
+  stackViews: Record<string, RememberedStackDay>;
   lastPath: string;
 };
 export type WorkspaceSnapshot = SavedWorkspace & {
@@ -41,6 +48,10 @@ const MAX_WORKSPACE = 1_048_576;
 const MAX_DRAFT = 65_536;
 const MAX_DRAFTS = 128;
 const MAX_SCREENS = 64;
+const MAX_STACK_DAYS = 60;
+const MAX_STACK_DAY = 65_536;
+const MAX_STACK_VIEWS = 262_144;
+const MAX_STACK_IDS = 2_048;
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 const ordinaryPaths = new Set([
   "/",
@@ -201,7 +212,64 @@ function validJson(value: unknown, depth = 0): boolean {
   );
 }
 function fresh(scope: string): SavedWorkspace {
-  return { version: 1, scope, drafts: {}, screens: {}, lastPath: "/" };
+  return {
+    version: 1,
+    scope,
+    drafts: {},
+    screens: {},
+    stackViews: {},
+    lastPath: "/",
+  };
+}
+
+function safeStackIds(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length <= MAX_STACK_IDS &&
+    value.every((id) => typeof id === "string" && idPattern.test(id))
+  );
+}
+
+function stackViewRecord(value: unknown): RememberedStackDay | null {
+  if (
+    !plain(value) ||
+    !safeStackIds(value.heads) ||
+    !safeStackIds(value.expanded) ||
+    typeof value.updatedAt !== "number" ||
+    !Number.isFinite(value.updatedAt)
+  )
+    return null;
+  const heads = [...new Set(value.heads)];
+  const headSet = new Set(heads);
+  if (!value.expanded.every((id) => headSet.has(id))) return null;
+  const record = {
+    heads,
+    expanded: [...new Set(value.expanded)],
+    updatedAt: value.updatedAt,
+  };
+  return JSON.stringify(record).length <= MAX_STACK_DAY ? record : null;
+}
+
+/** Recently used day views have a separate budget; form drafts are never evicted. */
+function boundedStackViews(
+  views: Record<string, RememberedStackDay>,
+  keep?: string,
+): Record<string, RememberedStackDay> {
+  const days = Object.keys(views).sort((a, b) =>
+    a === keep
+      ? -1
+      : b === keep
+        ? 1
+        : views[b].updatedAt - views[a].updatedAt || b.localeCompare(a),
+  );
+  const result: Record<string, RememberedStackDay> = {};
+  for (const day of days.slice(0, MAX_STACK_DAYS)) result[day] = views[day];
+  while (JSON.stringify(result).length > MAX_STACK_VIEWS) {
+    const oldest = Object.keys(result).at(-1);
+    if (!oldest || oldest === keep) break;
+    delete result[oldest];
+  }
+  return result;
 }
 function parseWorkspace(
   raw: string,
@@ -270,6 +338,26 @@ function parseWorkspace(
             : 0,
       };
     }
+    // Optional in version1: previously saved forms/routes remain compatible.
+    if (value.stackViews !== undefined) {
+      if (!plain(value.stackViews)) damaged = true;
+      else {
+        for (const [day, rawView] of Object.entries(value.stackViews)) {
+          const view = stackViewRecord(rawView);
+          if (!isValidDayKey(day) || !view) {
+            damaged = true;
+            continue;
+          }
+          result.stackViews[day] = view;
+        }
+        const bounded = boundedStackViews(result.stackViews);
+        if (
+          Object.keys(bounded).length !== Object.keys(result.stackViews).length
+        )
+          damaged = true;
+        result.stackViews = bounded;
+      }
+    }
     result.lastPath = safeWorkspacePath(value.lastPath) ?? "/";
     return { workspace: result, damaged };
   } catch {
@@ -297,6 +385,7 @@ export function createDraftWorkspace(scope: string) {
       scope,
       drafts: state.drafts,
       screens: state.screens,
+      stackViews: state.stackViews,
       lastPath: state.lastPath,
     });
   const persist = (preserveError = false) => {
@@ -390,6 +479,58 @@ export function createDraftWorkspace(scope: string) {
       delete drafts[draftKey];
       state = { ...state, drafts };
       persist();
+    },
+    setStackView(
+      day: string,
+      memberIds: readonly string[],
+      view: IntakeStackView,
+    ) {
+      if (
+        !isValidDayKey(day) ||
+        !safeStackIds(memberIds) ||
+        !safeStackIds(view.heads) ||
+        !safeStackIds(view.expanded)
+      ) {
+        state = { ...state, status: "error" };
+        emit();
+        return false;
+      }
+      const members = new Set(memberIds);
+      if (
+        view.heads.some((id) => !members.has(id)) ||
+        view.expanded.some((id) => !view.heads.includes(id))
+      ) {
+        state = { ...state, status: "error" };
+        emit();
+        return false;
+      }
+      const previous = state.stackViews[day];
+      const next = stackViewRecord({
+        heads: [
+          ...(previous?.heads ?? []).filter((id) => !members.has(id)),
+          ...view.heads,
+        ],
+        expanded: [
+          ...(previous?.expanded ?? []).filter((id) => !members.has(id)),
+          ...view.expanded,
+        ],
+        updatedAt: Date.now(),
+      });
+      if (!next) {
+        state = { ...state, status: "error" };
+        emit();
+        return false;
+      }
+      state = {
+        ...state,
+        stackViews: boundedStackViews(
+          { ...state.stackViews, [day]: next },
+          day,
+        ),
+      };
+      // Presentation changes must not dismiss an unrelated damaged-form warning.
+      persist(true);
+      return state.status === "saved";
     },
     setLocation(path: string, hash: string, scrollY: number) {
       if (!safeWorkspacePath(path)) return;

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useJournal } from "@/components/journal-provider";
 import {
   DraftStatus,
+  StackViewStorageStatus,
   useJournalWorkspace,
   usePersistentDraft,
 } from "@/components/journal-drafts";
@@ -328,6 +329,7 @@ function IntakeTimeline({
           ))}
         </IntakeTimelineEntrance>
       )}
+      {entries.length > 1 && <StackViewStorageStatus />}
       {editing && (
         <EntryEditor
           intake={editing}

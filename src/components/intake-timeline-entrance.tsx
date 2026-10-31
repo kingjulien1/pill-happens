@@ -25,6 +25,18 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     let disposed = false;
     let revealInsets = { top: 0, bottom: 0 };
 
+    const parentHead = (node: HTMLElement) => {
+      const group = node.closest("[data-intake-group]");
+      const id = node.dataset.entranceParent;
+      return id
+        ? group?.querySelector<HTMLElement>(
+            `[data-intake-entrance="${CSS.escape(id)}"]`,
+          )
+        : group?.querySelector<HTMLElement>(
+            '[data-stack-depth="0"] > [data-intake-entrance]',
+          );
+    };
+
     const finish = (node: HTMLElement): void => {
       const wasDone = node.dataset.entranceState === "done";
       const id = node.dataset.intakeEntrance;
@@ -81,11 +93,11 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
           seen.current.has(node.dataset.intakeEntrance ?? "")
         )
           continue;
-        const group = node.closest("[data-intake-group]");
-        if (!group) continue;
-        const rear = rearBatches.get(group) ?? { count: 0, index: 0 };
+        const owner = parentHead(node) ?? node.closest("[data-intake-group]");
+        if (!owner) continue;
+        const rear = rearBatches.get(owner) ?? { count: 0, index: 0 };
         rear.count += 1;
-        rearBatches.set(group, rear);
+        rearBatches.set(owner, rear);
       }
       let index = 0;
       for (const node of batch) {
@@ -98,8 +110,8 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
         }
         seen.current.add(id);
         const rear = Number(node.parentElement?.dataset.stackDepth ?? 0) > 0;
-        const group = node.closest<HTMLElement>("[data-intake-group]");
-        const rearBatch = group ? rearBatches.get(group) : undefined;
+        const owner = parentHead(node) ?? node.closest("[data-intake-group]");
+        const rearBatch = owner ? rearBatches.get(owner) : undefined;
         const delay = `${
           rear && rearBatch
             ? rearBatch.index++ *
@@ -211,11 +223,7 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
         }
         const rear = Number(node.parentElement?.dataset.stackDepth ?? 0) > 0;
         if (rear) {
-          const front = node
-            .closest("[data-intake-group]")
-            ?.querySelector<HTMLElement>(
-              '[data-stack-depth="0"] > [data-intake-entrance]',
-            );
+          const front = parentHead(node);
           const fronts = front && frontBatches.get(front);
           const mainPhaseDone =
             !fronts ||
@@ -267,10 +275,6 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       if (!(event.target instanceof Element)) return;
       const node = event.target.closest<HTMLElement>(ENTRY);
       const group = event.target.closest("[data-intake-group]");
-      const front = group?.querySelector<HTMLElement>(
-        '[data-stack-depth="0"] > [data-intake-entrance]',
-      );
-      if (front) frontBatches.delete(front);
       // Disclosure and keyboard focus release visible faces immediately. Capped,
       // unseen children retain their first entrance when disclosure reveals them.
       if (!node) {
@@ -278,10 +282,15 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
           if (
             member.dataset.entranceExposed === "true" ||
             member.dataset.entrancePreview === "true"
-          )
+          ) {
+            if (member.parentElement?.dataset.stackDepth === "0")
+              frontBatches.delete(member);
             finish(member);
+          }
         return;
       }
+      const front = parentHead(node);
+      if (front) frontBatches.delete(front);
       if (node && node.dataset.entranceState !== "done") finish(node);
     };
     const onVisibility = () => {
@@ -301,7 +310,11 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-entrance-exposed", "data-entrance-preview"],
+      attributeFilter: [
+        "data-entrance-exposed",
+        "data-entrance-preview",
+        "data-entrance-parent",
+      ],
     });
     timeline.addEventListener("animationend", onEnd);
     timeline.addEventListener("animationcancel", onEnd);
