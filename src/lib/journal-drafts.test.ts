@@ -322,7 +322,7 @@ test("daily stack views reopen independently for every group, day and journal", 
     "2026-10-31",
     groupA.map((entry) => entry.id),
     {
-      heads: ["a0", "a2"],
+      heads: ["a0"],
       expanded: ["a0"],
     },
   );
@@ -330,8 +330,8 @@ test("daily stack views reopen independently for every group, day and journal", 
     "2026-10-31",
     groupB.map((entry) => entry.id),
     {
-      heads: ["b0", "b1"],
-      expanded: ["b1"],
+      heads: ["b0"],
+      expanded: [],
     },
   );
   first.setStackView("2026-10-30", ["past0", "past1"], {
@@ -341,8 +341,8 @@ test("daily stack views reopen independently for every group, day and journal", 
   const reopened = createDraftWorkspace("journal_a");
   reopened.hydrate(storage);
   const today = reopened.getSnapshot().stackViews["2026-10-31"];
-  assert.deepEqual(today.heads, ["a0", "a2", "b0", "b1"]);
-  assert.deepEqual(today.expanded, ["a0", "b1"]);
+  assert.deepEqual(today.heads, ["a0", "b0"]);
+  assert.deepEqual(today.expanded, ["a0"]);
   assert.deepEqual(reopened.getSnapshot().stackViews["2026-10-30"].expanded, [
     "past0",
   ]);
@@ -356,9 +356,8 @@ test("daily stack views reopen independently for every group, day and journal", 
 test("stack persistence commits final Fold intent before animation and reversal can replace it", async () => {
   const {
     EMPTY_INTAKE_STACK_VIEW,
-    foldIntakeStackSteps,
+    foldIntakeStack,
     normalizeIntakeStackView,
-    promoteIntakeStack,
     showIntakeStackChildren,
   } = await import("./intake-stack-layout");
   const storage = memoryStorage();
@@ -368,13 +367,10 @@ test("stack persistence commits final Fold intent before animation and reversal 
     id: `i${index}`,
   }));
   const ids = entries.map((entry) => entry.id);
-  let nested = promoteIntakeStack(entries, EMPTY_INTAKE_STACK_VIEW, "i3");
-  nested = promoteIntakeStack(entries, nested, "i6");
-  nested = showIntakeStackChildren(entries, nested);
-  workspace.setStackView("2026-10-31", ids, nested);
-  const steps = foldIntakeStackSteps(entries, nested);
-  assert.ok(steps.length > 1);
-  workspace.setStackView("2026-10-31", ids, steps.at(-1)!.view);
+  const shown = showIntakeStackChildren(entries, EMPTY_INTAKE_STACK_VIEW);
+  workspace.setStackView("2026-10-31", ids, shown);
+  const folded = foldIntakeStack(entries, shown);
+  workspace.setStackView("2026-10-31", ids, folded);
   const halfway = createDraftWorkspace("journal_a");
   halfway.hydrate(storage);
   assert.deepEqual(
@@ -387,12 +383,9 @@ test("stack persistence commits final Fold intent before animation and reversal 
       expanded: [],
     },
   );
-  assert.equal(
-    JSON.stringify([...storage.entries]).includes("fold-children"),
-    false,
-  );
+  assert.equal(JSON.stringify([...storage.entries]).includes("stage"), false);
   assert.equal(JSON.stringify([...storage.entries]).includes("pending"), false);
-  const reversed = showIntakeStackChildren(entries, steps[0].view);
+  const reversed = showIntakeStackChildren(entries, folded);
   workspace.setStackView("2026-10-31", ids, reversed);
   const afterReverse = createDraftWorkspace("journal_a");
   afterReverse.hydrate(storage);
@@ -403,17 +396,6 @@ test("stack persistence commits final Fold intent before animation and reversal 
     ),
     reversed,
   );
-  // Opening a still-visible head during a fold retains that exact current view.
-  workspace.setStackView("2026-10-31", ids, steps[0].view);
-  const afterEdit = createDraftWorkspace("journal_a");
-  afterEdit.hydrate(storage);
-  assert.deepEqual(
-    normalizeIntakeStackView(
-      entries,
-      afterEdit.getSnapshot().stackViews["2026-10-31"],
-    ),
-    steps[0].view,
-  );
 });
 
 test("saved stack IDs follow live grouping and never invent or reorder intake records", async () => {
@@ -422,7 +404,7 @@ test("saved stack IDs follow live grouping and never invent or reorder intake re
   const workspace = createDraftWorkspace("journal_a");
   workspace.hydrate(storage);
   workspace.setStackView("2026-10-31", ["a", "b", "c"], {
-    heads: ["a", "c"],
+    heads: ["a"],
     expanded: ["a"],
   });
   workspace.setStackView("2026-10-31", ["d", "e"], {
@@ -438,13 +420,61 @@ test("saved stack IDs follow live grouping and never invent or reorder intake re
     { id: "e" },
   ];
   assert.deepEqual(normalizeIntakeStackView(merged, saved), {
-    heads: ["new", "a", "c", "d"],
-    expanded: ["d"],
+    heads: ["new"],
+    expanded: [],
   });
   assert.deepEqual(
     merged.map((entry) => entry.id),
     ["new", "a", "c", "d", "e"],
   );
+});
+
+test("legacy substack metadata becomes one stack without disturbing other groups or forms", async () => {
+  const { normalizeIntakeStackView } = await import("./intake-stack-layout");
+  const storage = memoryStorage();
+  const workspace = createDraftWorkspace("journal_a");
+  workspace.hydrate(storage);
+  workspace.setDraft("med:new", { name: "Keep this form" });
+  workspace.setStackView("2026-10-31", ["other0", "other1"], {
+    heads: ["other0"],
+    expanded: ["other0"],
+  });
+  const [key, raw] = [...storage.entries][0];
+  const envelope = JSON.parse(raw);
+  // Old clients saved extra heads, including expanded promoted children.
+  envelope.stackViews["2026-10-31"].heads.push("a0", "a2");
+  envelope.stackViews["2026-10-31"].expanded.push("a0", "a2");
+  storage.setItem(key, JSON.stringify(envelope));
+  const reopened = createDraftWorkspace("journal_a");
+  reopened.hydrate(storage);
+  const entries = [{ id: "a0" }, { id: "a1" }, { id: "a2" }, { id: "a3" }];
+  const saved = reopened.getSnapshot().stackViews["2026-10-31"];
+  const single = normalizeIntakeStackView(entries, saved);
+  assert.deepEqual(single, { heads: ["a0"], expanded: ["a0"] });
+  assert.deepEqual(
+    normalizeIntakeStackView(entries, { ...saved, expanded: ["a2"] }),
+    { heads: ["a0"], expanded: [] },
+  );
+  assert.equal(reopened.getSnapshot().status, "saved");
+  reopened.setStackView(
+    "2026-10-31",
+    entries.map((entry) => entry.id),
+    single,
+  );
+  const cleaned = createDraftWorkspace("journal_a");
+  cleaned.hydrate(storage);
+  assert.deepEqual(cleaned.getSnapshot().stackViews["2026-10-31"].heads, [
+    "other0",
+    "a0",
+  ]);
+  assert.deepEqual(cleaned.getSnapshot().stackViews["2026-10-31"].expanded, [
+    "other0",
+    "a0",
+  ]);
+  assert.deepEqual(cleaned.getSnapshot().drafts["med:new"].value, {
+    name: "Keep this form",
+  });
+  assert.equal(cleaned.getSnapshot().status, "saved");
 });
 
 test("version1 workspaces gain optional stack views while corrupted view records are isolated", () => {
@@ -486,7 +516,7 @@ test("version1 workspaces gain optional stack views while corrupted view records
   assert.equal(reopened.getSnapshot().lastPath, "/medications");
   assert.equal(reopened.getSnapshot().status, "error");
   reopened.setStackView("2026-10-31", ["a", "b"], {
-    heads: ["a", "b"],
+    heads: ["a"],
     expanded: [],
   });
   assert.equal(reopened.getSnapshot().status, "error");
@@ -549,14 +579,16 @@ test("unavailable stack storage keeps in-visit views without claiming a durable 
   workspace.hydrate(null);
   assert.equal(
     workspace.setStackView("2026-10-31", ["a", "b"], {
-      heads: ["a", "b"],
-      expanded: [],
+      heads: ["a"],
+      expanded: ["a"],
     }),
     false,
   );
   assert.deepEqual(workspace.getSnapshot().stackViews["2026-10-31"].heads, [
     "a",
-    "b",
+  ]);
+  assert.deepEqual(workspace.getSnapshot().stackViews["2026-10-31"].expanded, [
+    "a",
   ]);
   assert.equal(workspace.getSnapshot().status, "memory");
 });

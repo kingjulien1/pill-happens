@@ -1,17 +1,13 @@
 type StackEntry = { id: string };
 
 export type IntakeStackView = {
-  /** Additional full-height stack heads; the first entry is always a head. */
+  /** The first entry is the only head; this field retains saved-view compatibility. */
   heads: readonly string[];
-  /** Heads whose own following rows are currently shown at full height. */
+  /** The root ID is present when the complete group is expanded. */
   expanded: readonly string[];
 };
 
-export type IntakeStackStage = "idle" | "open" | "fold-children" | "gather";
-export type IntakeStackStep = {
-  view: IntakeStackView;
-  stage: IntakeStackStage;
-};
+export type IntakeStackStage = "idle" | "open" | "close";
 
 export type IntakeStackFace = {
   id: string;
@@ -35,42 +31,18 @@ export const EMPTY_INTAKE_STACK_VIEW: IntakeStackView = {
   expanded: [],
 };
 
-/** Normalize presentation IDs against live records without changing intake order. */
+/** Retain one group disclosure while ignoring previously saved substack heads. */
 export function normalizeIntakeStackView(
   entries: readonly StackEntry[],
   view: IntakeStackView,
 ): IntakeStackView {
-  if (!entries.length) return EMPTY_INTAKE_STACK_VIEW;
-  const requested = new Set(view.heads);
-  const heads = entries
-    .filter((entry, index) => index === 0 || requested.has(entry.id))
-    .map((entry) => entry.id);
-  const expanded = new Set(view.expanded);
-  const indexes = new Map(entries.map((entry, index) => [entry.id, index]));
+  const first = entries[0];
+  if (!first) return EMPTY_INTAKE_STACK_VIEW;
   return {
-    heads,
-    expanded: heads.filter((id, index) => {
-      const start = indexes.get(id)!;
-      const end = indexes.get(heads[index + 1]) ?? entries.length;
-      return expanded.has(id) && end - start > 1;
-    }),
+    heads: [first.id],
+    expanded:
+      entries.length > 1 && view.expanded.includes(first.id) ? [first.id] : [],
   };
-}
-
-/** Split at the chosen record, keeping earlier/later promoted heads intact. */
-export function promoteIntakeStack(
-  entries: readonly StackEntry[],
-  view: IntakeStackView,
-  id: string,
-): IntakeStackView {
-  const current = normalizeIntakeStackView(entries, view);
-  if (!entries.some((entry) => entry.id === id) || current.heads.includes(id))
-    return current;
-  return normalizeIntakeStackView(entries, {
-    heads: [...current.heads, id],
-    // A new head starts with its suffix folded, even inside a shown segment.
-    expanded: current.expanded.filter((head) => head !== id),
-  });
 }
 
 export function showIntakeStackChildren(
@@ -84,31 +56,13 @@ export function showIntakeStackChildren(
   });
 }
 
-/** Close shown rows first, then gather the deepest promoted heads into ancestors. */
-export function foldIntakeStackSteps(
+/** Fold the complete group in one transition, with no promoted child stacks. */
+export function foldIntakeStack(
   entries: readonly StackEntry[],
   view: IntakeStackView,
-): IntakeStackStep[] {
-  let current = normalizeIntakeStackView(entries, view);
-  const steps: IntakeStackStep[] = [];
-  if (current.expanded.length) {
-    current = { heads: current.heads, expanded: [] };
-    steps.push({ view: current, stage: "fold-children" });
-  }
-  // The same hierarchy can contain arbitrarily many heads. Compress very deep
-  // views into at most six gather waves rather than queueing minutes of motion.
-  const batchSize = Math.max(1, Math.ceil((current.heads.length - 1) / 6));
-  while (current.heads.length > 1) {
-    current = {
-      heads: current.heads.slice(
-        0,
-        Math.max(1, current.heads.length - batchSize),
-      ),
-      expanded: [],
-    };
-    steps.push({ view: current, stage: "gather" });
-  }
-  return steps;
+): IntakeStackView {
+  const current = normalizeIntakeStackView(entries, view);
+  return { heads: current.heads, expanded: [] };
 }
 
 function framesForView(
@@ -117,42 +71,31 @@ function framesForView(
   view: IntakeStackView,
 ) {
   const current = normalizeIntakeStackView(entries, view);
-  const heads = new Set(current.heads);
-  const expanded = new Set(current.expanded);
+  const headId = entries[0]?.id ?? "";
+  const shown = current.expanded.length > 0;
   const frames: IntakeStackFace[] = [];
-  let headId = "";
-  let depth = 0;
-  let sectionY = 0;
-  let sectionBottom = 0;
+  let lowerEdge = 0;
   for (const [order, entry] of entries.entries()) {
     const measured = heights[entry.id];
     const height = Number.isFinite(measured) && measured > 0 ? measured : 80;
-    const head = heads.has(entry.id);
-    if (head) {
-      if (order > 0) sectionY += sectionBottom + 8;
-      headId = entry.id;
-      depth = 0;
-      sectionBottom = height;
-    } else depth += 1;
-    const shown = expanded.has(headId);
-    const previewDepth = Math.min(depth, INTAKE_STACK_PREVIEW_LIMIT);
+    const head = order === 0;
+    const previewDepth = Math.min(order, INTAKE_STACK_PREVIEW_LIMIT);
     const scale = shown ? 1 : 1 - previewDepth * 0.008;
-    const hidden = !shown && depth > INTAKE_STACK_PREVIEW_LIMIT;
-    let y = sectionY;
-    if (!head) {
-      if (shown) {
-        y = sectionY + sectionBottom + 8;
-        sectionBottom += height + 8;
-      } else if (!hidden) {
-        sectionBottom = Math.max(sectionBottom + 24, height * scale);
-        y = sectionY + Math.max(0, sectionBottom - height * scale);
-      } else y = sectionY + Math.max(0, sectionBottom - height * scale);
+    const hidden = !shown && order > INTAKE_STACK_PREVIEW_LIMIT;
+    let y = 0;
+    if (head) lowerEdge = height;
+    else if (shown) {
+      y = lowerEdge + 8;
+      lowerEdge = y + height;
+    } else {
+      if (!hidden) lowerEdge = Math.max(lowerEdge + 24, height * scale);
+      y = Math.max(0, lowerEdge - height * scale);
     }
     frames.push({
       id: entry.id,
       order,
       headId,
-      depth,
+      depth: order,
       head,
       expanded: shown,
       hidden,
@@ -163,24 +106,22 @@ function framesForView(
       layer: entries.length - order,
     });
   }
-  return { frames, height: entries.length ? sectionY + sectionBottom : 0 };
+  return { frames, height: lowerEdge };
 }
 
-/** Absolute faces stay mounted while their local stack changes around them. */
+/** Full card faces stay mounted while their single group opens or closes. */
 export function layoutIntakeStacks({
   entries,
   heights,
   view,
   from = view,
   stage = "idle",
-  triggerId,
 }: {
   entries: readonly StackEntry[];
   heights: Readonly<Record<string, number>>;
   view: IntakeStackView;
   from?: IntakeStackView;
   stage?: IntakeStackStage;
-  triggerId?: string;
 }) {
   const result = framesForView(entries, heights, view);
   const previousLayout = framesForView(entries, heights, from);
@@ -197,10 +138,6 @@ export function layoutIntakeStacks({
         old.hidden !== face.hidden)
     );
   });
-  const trigger = Math.max(
-    0,
-    entries.findIndex((entry) => entry.id === triggerId),
-  );
   const openStep = Math.min(55, 330 / Math.max(changed.length - 1, 1));
   const closeStep = Math.min(45, 270 / Math.max(changed.length - 1, 1));
   let maxDelay = 0;
@@ -209,14 +146,14 @@ export function layoutIntakeStacks({
       stage === "idle"
         ? 0
         : stage === "open"
-          ? Math.min(330, Math.max(0, face.order - trigger) * openStep)
+          ? Math.min(330, face.order * openStep)
           : (changed.length - rank - 1) * closeStep;
     maxDelay = Math.max(maxDelay, face.delay);
   }
   return {
     ...result,
-    // Shrinking before a late face starts would put the footer/next group over
-    // that face. Follow the latest return; expansion reserves room immediately.
+    // Wait for the latest returning face before shrinking underneath it.
+    // Expansion reserves the destination space before the stagger starts.
     heightDelay: result.height < previousLayout.height ? maxDelay : 0,
     heightDuration:
       changed.length && stage !== "idle" ? INTAKE_STACK_MOVE_MS : 0,

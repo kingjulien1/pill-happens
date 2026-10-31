@@ -264,8 +264,8 @@ export function usePersistentIntakeStackView(
   const members = memory && new Set(memory.members);
   const retained = memory
     ? {
-        // A regroup can bring in another stack's remembered heads. Override
-        // only the failed writer's own IDs instead of discarding that context.
+        // A regroup can bring in another group's remembered open/closed state.
+        // Override only this failed writer's IDs, preserving the other context.
         heads: [
           ...saved.heads.filter((id) => !members!.has(id)),
           ...memory.view.heads,

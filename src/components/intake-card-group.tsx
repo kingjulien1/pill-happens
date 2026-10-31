@@ -18,14 +18,12 @@ import type { IntakeGroup } from "@/lib/intake-groups";
 import { getMedicationClasses } from "@/lib/medication-classification";
 import {
   EMPTY_INTAKE_STACK_VIEW,
-  foldIntakeStackSteps,
+  foldIntakeStack,
   layoutIntakeStacks,
   normalizeIntakeStackView,
-  promoteIntakeStack,
   showIntakeStackChildren,
   type IntakeStackFace,
   type IntakeStackStage,
-  type IntakeStackStep,
   type IntakeStackView,
 } from "@/lib/intake-stack-layout";
 
@@ -42,12 +40,8 @@ type StackDisplay = {
   view: IntakeStackView;
   from: IntakeStackView;
   stage: IntakeStackStage;
-  pending: IntakeStackStep[];
   moving: boolean;
-  folding: boolean;
   serial: number;
-  phase: number;
-  triggerId?: string;
 };
 
 function initialDisplay(view = EMPTY_INTAKE_STACK_VIEW): StackDisplay {
@@ -55,25 +49,19 @@ function initialDisplay(view = EMPTY_INTAKE_STACK_VIEW): StackDisplay {
     view,
     from: view,
     stage: "idle",
-    pending: [],
     moving: false,
-    folding: false,
     serial: 0,
-    phase: 0,
   };
 }
 
 function settleDisplay(current: StackDisplay): StackDisplay {
-  const view = current.pending.at(-1)?.view ?? current.view;
+  const view = current.view;
   return {
     ...current,
     view,
     from: view,
-    pending: [],
     moving: false,
-    folding: false,
     stage: "idle",
-    phase: 0,
     serial: current.serial + 1,
   };
 }
@@ -84,6 +72,8 @@ function StackSlot({
   face,
   day,
   timeZone,
+  collapsed,
+  count,
   controls,
   onActivate,
   onNaturalHeight,
@@ -93,6 +83,8 @@ function StackSlot({
   face: IntakeStackFace;
   day: string;
   timeZone: string;
+  collapsed: boolean;
+  count: number;
   controls: string;
   onActivate: () => void;
   onNaturalHeight: (id: string, height: number) => void;
@@ -151,12 +143,12 @@ function StackSlot({
           shineEligible={exposed}
           onEdit={onActivate}
           actionLabel={
-            face.head
-              ? undefined
-              : `Open a stack starting with ${entry.medicationName} at ${time}`
+            collapsed
+              ? `Show all ${count} intakes in this group; ${entry.medicationName} at ${time}`
+              : undefined
           }
-          controls={face.head ? undefined : controls}
-          expanded={face.head ? undefined : false}
+          controls={collapsed ? controls : undefined}
+          expanded={collapsed ? false : undefined}
         />
       </div>
     </div>
@@ -199,11 +191,11 @@ export function IntakeCardGroup({
     view,
     from: display.from,
     stage: display.moving ? display.stage : "idle",
-    triggerId: display.triggerId,
   });
   const count = group.entries.length;
   const grouped = count > 1;
-  const open = view.heads.length > 1 || view.expanded.length > 0;
+  const open = view.expanded.length > 0;
+  const collapsed = grouped && !open;
   const onNaturalHeight = useCallback((id: string, height: number) => {
     if (!Number.isFinite(height) || height <= 0) return;
     setNaturalHeights((previous) =>
@@ -218,18 +210,7 @@ export function IntakeCardGroup({
       () => {
         setDisplay((current) => {
           if (current.serial !== serial) return current;
-          if (reduced || document.hidden) return settleDisplay(current);
-          const [next, ...pending] = current.pending;
-          if (!next) return settleDisplay(current);
-          return {
-            ...current,
-            from: current.view,
-            view: next.view,
-            stage: next.stage,
-            pending,
-            serial: current.serial + 1,
-            phase: current.phase + 1,
-          };
+          return settleDisplay(current);
         });
       },
       reduced ? 0 : layout.duration + 60,
@@ -248,47 +229,36 @@ export function IntakeCardGroup({
     return () => document.removeEventListener("visibilitychange", settleHidden);
   }, []);
 
-  const activate = (entry: Intake, face: IntakeStackFace) => {
-    if (face.head) {
-      // Keep the selected full head in place while its editor owns focus.
-      setDisplay((current) =>
-        current.moving
-          ? {
-              ...current,
-              view,
-              from: view,
-              pending: [],
-              moving: false,
-              folding: false,
-              stage: "idle",
-              phase: 0,
-              serial: current.serial + 1,
-            }
-          : current,
-      );
-      if (display.moving) remembered.saveView(view);
-      onEdit(entry);
-      return;
-    }
+  const changeOpen = (showing: boolean) => {
     const from = view;
-    const target = promoteIntakeStack(group.entries, from, entry.id);
-    setDisplay((current) => {
-      return {
-        view: target,
-        from,
-        stage: reduced ? "idle" : "open",
-        pending: [],
-        moving: !reduced,
-        folding: false,
-        serial: current.serial + 1,
-        phase: reduced ? 0 : 1,
-        triggerId: entry.id,
-      };
-    });
+    const target = showing
+      ? showIntakeStackChildren(group.entries, from)
+      : foldIntakeStack(group.entries, from);
+    setDisplay((current) => ({
+      view: target,
+      from: reduced ? target : from,
+      stage: reduced ? "idle" : showing ? "open" : "close",
+      moving: !reduced,
+      serial: current.serial + 1,
+    }));
+    // Store final intent immediately, without saving animation frames or timers.
     remembered.saveView(target);
     setAnnouncement(
-      `Stack opened at ${toLocalInput(entry.takenAt, timeZone).slice(11)}. Press the card again to edit.`,
+      showing
+        ? `All ${count} intakes shown. Select an intake to edit.`
+        : `${count} intakes folded together.`,
     );
+  };
+
+  const activate = (entry: Intake) => {
+    if (collapsed) {
+      changeOpen(true);
+      return;
+    }
+    setDisplay((current) =>
+      current.moving ? settleDisplay(current) : current,
+    );
+    onEdit(entry);
   };
 
   const classes = getMedicationClasses({
@@ -318,9 +288,8 @@ export function IntakeCardGroup({
       data-expanded={open}
       data-stack-moving={display.moving}
       data-stack-head-count={view.heads.length}
-      data-stack-folding={display.folding}
+      data-stack-folding={display.moving && display.stage === "close"}
       data-stack-stage={display.stage}
-      data-stack-phase={display.phase}
       data-contains-benzodiazepine={
         classes.includes("benzodiazepine") || undefined
       }
@@ -353,8 +322,10 @@ export function IntakeCardGroup({
               face={face}
               day={day}
               timeZone={timeZone}
+              collapsed={collapsed}
+              count={count}
               controls={cardsId}
-              onActivate={() => activate(entry, face)}
+              onActivate={() => activate(entry)}
               onNaturalHeight={onNaturalHeight}
             />
           );
@@ -367,64 +338,10 @@ export function IntakeCardGroup({
             className="intake-group-toggle"
             aria-expanded={open}
             aria-controls={cardsId}
-            aria-label={`${open && !display.folding ? "Fold" : "Show"} ${count} intakes grouped by consecutive gaps of 13 minutes or less${classificationContext}`}
+            aria-label={`${open ? "Fold" : "Show"} ${count} intakes grouped by consecutive gaps of 13 minutes or less${classificationContext}`}
             onClick={(event) => {
-              const showing = display.folding || !open;
-              const from = view;
-              const steps = showing
-                ? []
-                : foldIntakeStackSteps(group.entries, from);
-              const target = showing
-                ? showIntakeStackChildren(group.entries, from)
-                : (steps.at(-1)?.view ?? from);
-              setDisplay((current) => {
-                if (showing) {
-                  return {
-                    view: target,
-                    from,
-                    stage: reduced ? "idle" : "open",
-                    pending: [],
-                    moving: !reduced,
-                    folding: false,
-                    serial: current.serial + 1,
-                    phase: reduced ? 0 : 1,
-                  };
-                }
-                const [first, ...pending] = steps;
-                if (!first) return settleDisplay(current);
-                if (reduced) {
-                  const final = steps.at(-1)!;
-                  return {
-                    ...current,
-                    view: final.view,
-                    from: final.view,
-                    stage: "idle",
-                    pending: [],
-                    moving: false,
-                    folding: false,
-                    serial: current.serial + 1,
-                    phase: 0,
-                  };
-                }
-                return {
-                  view: first.view,
-                  from,
-                  stage: first.stage,
-                  pending,
-                  moving: true,
-                  folding: true,
-                  serial: current.serial + 1,
-                  phase: 1,
-                };
-              });
-              // Queue local motion first, then synchronously save final intent.
-              // A reload never resumes an intermediate frame or a fold timer.
-              remembered.saveView(target);
-              setAnnouncement(
-                showing
-                  ? `${count} intakes shown. Select a row to make it a stack head.`
-                  : `${count} intakes folding back into one stack.`,
-              );
+              const showing = !open;
+              changeOpen(showing);
               if (showing && event.detail === 0) {
                 requestAnimationFrame(() => {
                   cards.current
@@ -436,8 +353,7 @@ export function IntakeCardGroup({
           >
             <span className="intake-group-label">
               <span>
-                {open && !display.folding ? "Fold" : "Show"}{" "}
-                <strong>{count}</strong> intakes
+                {open ? "Fold" : "Show"} <strong>{count}</strong> intakes
               </span>
               <span className="intake-group-chevron-frame" aria-hidden="true">
                 <ActionIcon
