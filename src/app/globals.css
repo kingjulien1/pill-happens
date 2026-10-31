@@ -3357,6 +3357,54 @@
     background: color-mix(in srgb, var(--palette-ink) 92%, transparent);
   }
 }
+.journal-navigation {
+  --foreground: #fed7aa;
+  --muted-foreground: #fed7aa99;
+  --popover: #2a0f0a;
+  --popover-foreground: #fed7aa;
+  border-color: #fed7aa2e;
+  background:
+    linear-gradient(rgb(249 115 22 / 7%) 0 0),
+    linear-gradient(rgb(154 52 18 / 30%) 0 0), #2a0f0a;
+  color: #fed7aa;
+}
+.journal-navigation-heading {
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 3px 8px;
+}
+.journal-navigation-actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+.journal-navigation-action {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #fed7aa12;
+  border-radius: 7px;
+  outline: none;
+  background: #fed7aa08;
+  color: #fed7aa99;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+.journal-navigation-action:focus-visible {
+  outline: 2px solid #fed7aab3;
+  outline-offset: 1px;
+  background: #fed7aa1a;
+  color: #fed7aa;
+}
 .intake-action-shell {
   display: grid;
   position: relative;
@@ -3378,35 +3426,32 @@
   stroke-linecap: round;
   stroke-dasharray: 18 82;
   animation: intake-shadow-orbit 9.6s linear infinite paused;
+  animation-play-state: var(--intake-effects-play-state, paused);
 }
-.intake-shadow-trail--violet {
-  stroke: var(--palette-violet);
+.intake-shadow-trail--peach {
+  stroke: #ffe8cf;
   stroke-width: 12px;
-  opacity: 0.65;
+  opacity: 0.55;
 }
-.intake-shadow-trail--rust {
-  stroke: var(--palette-rust);
+.intake-shadow-trail--warm {
+  stroke: #ffdab5;
   stroke-width: 14px;
   stroke-dasharray: 15 85;
   stroke-dashoffset: -50;
-  opacity: 0.6;
+  opacity: 0.4;
   animation-delay: -4.8s;
 }
-.intake-shadow-trail--ink {
-  stroke: var(--palette-ink);
+.intake-shadow-trail--cream {
+  stroke: #fff0e2;
   stroke-width: 10px;
   stroke-dasharray: 24 76;
   stroke-dashoffset: -25;
-  opacity: 0.55;
+  opacity: 0.35;
   animation-duration: 14.4s;
   animation-delay: -3.2s;
   animation-direction: reverse;
 }
-/* Reuse the rim's visibility, disabled and reduced-motion lifecycle. */
-.intake-action-shell:has(.intake-specular-light[data-fallback-active="true"])
-  .intake-shadow-trail {
-  animation-play-state: running;
-}
+/* The rim publishes one shared play state for its CSS effects. */
 .intake-action-shell:has(.intake-log-action:disabled) .intake-orbit-shadow {
   opacity: 0.3;
 }
@@ -3419,16 +3464,19 @@
   }
 }
 .intake-log-action {
-  --intake-rim-line: var(--palette-violet);
-  --intake-rim-base: var(--palette-rust);
-  --intake-rim-guard: var(--palette-ink);
-  --intake-rim-glow: var(--palette-violet);
+  --intake-rim-line: #9a3412;
+  --intake-rim-base: #2a0f0a;
+  --intake-rim-guard: #120f17;
+  --intake-rim-glow: #ffe8cf;
   /* Retain Tailwind's focus-ring composition above the moving shadow layer. */
-  --tw-shadow: 0 7px 20px var(--shadow);
+  --tw-shadow:
+    0 0 12px #ffe8cf3d, 0 6px 28px #ffe8cf30, 0 14px 42px #ffe8cf1f,
+    0 5px 16px #2a0f0a4d;
   --tw-ring-color: var(--ring);
   position: relative;
   z-index: 1;
   isolation: isolate;
+  background: #9a3412;
   -webkit-backdrop-filter: blur(13px);
   backdrop-filter: blur(13px);
 }
@@ -3438,6 +3486,53 @@
 .intake-log-action > * {
   position: relative;
   z-index: 1;
+}
+.intake-log-action > .intake-button-surface {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.intake-button-surface > span {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.intake-button-surface > .intake-button-gradient {
+  inset: -90% -20%;
+  background:
+    radial-gradient(ellipse at 18% 28%, #f97316, transparent 58%),
+    radial-gradient(ellipse at 86% 72%, #9a3412 5%, transparent 60%),
+    conic-gradient(
+      from 35deg at 50% 50%,
+      #6b2b17,
+      #9a3412 95deg,
+      #f97316 180deg,
+      #6b2b17 285deg,
+      #6b2b17
+    );
+  transform-origin: center;
+  animation: intake-button-gradient-drift 14s ease-in-out infinite paused;
+  animation-play-state: var(--intake-effects-play-state, paused);
+}
+.intake-button-diagonal {
+  background: linear-gradient(135deg, #fed7aa 8%, #f6b49c 92%);
+  opacity: 0.75;
+}
+.intake-button-wash {
+  background: #fed7aa;
+  opacity: 0.3;
+}
+@keyframes intake-button-gradient-drift {
+  0%,
+  100% {
+    transform: translate3d(-3%, 2%, 0) rotate(-7deg) scale(1.04);
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) rotate(8deg) scale(1.12);
+  }
 }
 .intake-log-action > .intake-specular-light {
   position: absolute;
@@ -3492,9 +3587,16 @@
     transform: translate(-50%, -50%) rotate(0deg);
     animation: intake-specular-fallback-turn 6.8s linear infinite paused;
   }
-  .intake-specular-light[data-rendered="false"][data-fallback-active="true"]
+  .intake-specular-light[data-rendered="false"]
     + .intake-specular-fallback::before {
-    animation-play-state: running;
+    animation-play-state: var(--intake-effects-play-state, paused);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intake-shadow-trail,
+  .intake-button-gradient,
+  .intake-specular-fallback::before {
+    animation-play-state: paused !important;
   }
 }
 @keyframes intake-specular-fallback-turn {
@@ -3543,8 +3645,9 @@
   .brand-menu-link[data-active="true"][data-highlighted] {
     background: color-mix(in srgb, var(--foreground) 18%, transparent);
   }
-  .intake-log-action:not(:disabled):hover {
-    background: var(--action-background);
+  .journal-navigation-action[data-highlighted] {
+    background: #fed7aa1a;
+    color: #fed7aa;
   }
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
@@ -3596,8 +3699,8 @@
 }
 @media (max-width: 767px) {
   .with-intake-dock {
-    /* Clear the summary, action, and quiet guide link at the end of the list. */
-    padding-bottom: calc(164px + max(20px, env(safe-area-inset-bottom)));
+    /* Clear the summary, action and its halo at the end of the list. */
+    padding-bottom: calc(140px + max(20px, env(safe-area-inset-bottom)));
   }
 }
 input[type="datetime-local"],

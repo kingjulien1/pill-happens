@@ -1,4 +1,8 @@
 .popup {
+  --foreground: #fed7aa;
+  --muted-foreground: #fed7aa99;
+  --popover: #2a0f0a;
+  --popover-foreground: #fed7aa;
   position: relative;
   isolation: isolate;
   width: 280px;
@@ -9,7 +13,10 @@
   border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
   border-radius: 24px;
   outline: none;
-  background: color-mix(in srgb, var(--popover) 96%, transparent);
+  background:
+    linear-gradient(rgb(249 115 22 / 7%) 0 0),
+    linear-gradient(rgb(154 52 18 / 30%) 0 0), #2a0f0a;
+  color: #fed7aa;
   -webkit-backdrop-filter: blur(48px);
   backdrop-filter: blur(48px);
   box-shadow: 0 14px 45px
@@ -22,17 +29,14 @@
 .popup[data-streak-active="true"] {
   border: 2px solid
     color-mix(in srgb, var(--party-spark) 48%, var(--foreground));
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--party-accent) 16%, transparent),
-      transparent 65%
-    ),
-    color-mix(in srgb, var(--popover) 95%, transparent);
   box-shadow:
     0 14px 45px color-mix(in srgb, var(--palette-ink) 20%, transparent),
     0 0 30px color-mix(in srgb, var(--party-accent) 22%, transparent),
     inset 0 0 0 4px color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+/* Keep the warm dropdown surface visible beneath the celebration scenery. */
+.popup [data-streak-glow] {
+  opacity: 0.24;
 }
 .popup[data-starting-style],
 .popup[data-ending-style] {

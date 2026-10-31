@@ -67,7 +67,7 @@ export function StreakArtwork({
         } as CSSProperties
       }
     >
-      <span className={styles.glow} />
+      <span className={styles.glow} data-streak-glow />
       <span className={styles.pattern} />
       <span className={styles.orbit} />
       <span className={styles.orbitSecond} />

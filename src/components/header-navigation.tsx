@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "@base-ui/react/menu";
+import { BookOpenTextIcon } from "@phosphor-icons/react/dist/ssr/BookOpenText";
+import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr/GithubLogo";
 import { ActionIcon } from "@/components/action-icon";
 import { usePwa } from "@/components/pwa-provider";
 import { usePageRefresh } from "@/components/page-refresh";
@@ -47,16 +49,47 @@ export function HeaderNavigation({ className }: { className?: string }) {
         >
           <Menu.Popup
             aria-label="Main navigation"
-            className="brand-menu brand-navigation max-h-(--available-height) w-52 max-w-[calc(100vw-2rem)] overflow-y-auto p-1 outline-none"
+            className="brand-menu brand-navigation journal-navigation max-h-(--available-height) w-52 max-w-[calc(100vw-2rem)] overflow-y-auto p-1 outline-none"
           >
             <Menu.Group>
-              <Menu.GroupLabel className="flex h-6 items-center gap-1.5 px-2 text-[11px] font-semibold">
-                <span>Journal</span>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
-                  <span aria-hidden="true">·</span>
-                  <span>{links.length} pages</span>
-                </span>
-              </Menu.GroupLabel>
+              <div className="journal-navigation-heading">
+                <Menu.GroupLabel className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold">
+                  <span>Journal</span>
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
+                    <span aria-hidden="true">·</span>
+                    <span>{links.length + 1} pages</span>
+                  </span>
+                </Menu.GroupLabel>
+                <div className="journal-navigation-actions">
+                  <Menu.LinkItem
+                    href="https://github.com/kingjulien1/pill-happens"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    label="View Project on GitHub"
+                    aria-label="View Project on GitHub (opens in a new tab)"
+                    title="View Project on GitHub"
+                    closeOnClick
+                    className="journal-navigation-action"
+                  >
+                    <GithubLogoIcon
+                      size={14}
+                      weight="bold"
+                      aria-hidden="true"
+                    />
+                  </Menu.LinkItem>
+                  <Menu.Item
+                    render={<button type="button" />}
+                    nativeButton
+                    closeOnClick
+                    label="Close Navigation"
+                    aria-label="Close Navigation"
+                    title="Close Navigation"
+                    className="journal-navigation-action"
+                  >
+                    <ActionIcon name="close" className="size-3.5" />
+                  </Menu.Item>
+                </div>
+              </div>
               <Menu.Separator className="brand-navigation-separator mx-2 my-0.5 h-px" />
               {links.map(({ href, label, page, icon }) => {
                 const active =
@@ -120,6 +153,30 @@ export function HeaderNavigation({ className }: { className?: string }) {
                 </Menu.Item>
               </>
             )}
+            <Menu.Separator className="brand-navigation-separator mx-2 my-1 h-px" />
+            <Menu.LinkItem
+              render={<Link href="/guide#start" prefetch={false} />}
+              label="Guide"
+              closeOnClick
+              aria-current={pathname === "/guide" ? "page" : undefined}
+              data-active={pathname === "/guide"}
+              data-page="guide"
+              className="brand-menu-link flex min-h-8 w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs font-medium outline-none"
+            >
+              <BookOpenTextIcon
+                size={16}
+                weight="bold"
+                aria-hidden="true"
+                className="brand-menu-icon size-4"
+              />
+              <span className="min-w-0 flex-1 truncate">Guide</span>
+              {pathname === "/guide" && (
+                <ActionIcon
+                  name="selected"
+                  className="brand-menu-indicator size-3.5"
+                />
+              )}
+            </Menu.LinkItem>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>

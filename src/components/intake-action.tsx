@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { IntakeSummary } from "@/components/intake-summary";
 import { SpecularRim } from "@/components/specular-rim";
@@ -41,21 +40,21 @@ export function IntakeAction({
                 height="100%"
                 rx="22"
                 pathLength="100"
-                className="intake-shadow-trail intake-shadow-trail--violet"
+                className="intake-shadow-trail intake-shadow-trail--peach"
               />
               <rect
                 width="100%"
                 height="100%"
                 rx="22"
                 pathLength="100"
-                className="intake-shadow-trail intake-shadow-trail--rust"
+                className="intake-shadow-trail intake-shadow-trail--warm"
               />
               <rect
                 width="100%"
                 height="100%"
                 rx="22"
                 pathLength="100"
-                className="intake-shadow-trail intake-shadow-trail--ink"
+                className="intake-shadow-trail intake-shadow-trail--cream"
               />
             </svg>
           </span>
@@ -64,6 +63,11 @@ export function IntakeAction({
             onClick={onClick}
             className="intake-log-action pointer-events-auto h-16 w-full justify-center gap-3.5 rounded-[22px] px-4 text-[15px] shadow-lg max-[359px]:gap-3 max-[359px]:px-3 sm:gap-4 sm:px-5"
           >
+            <span aria-hidden="true" className="intake-button-surface">
+              <span className="intake-button-gradient" />
+              <span className="intake-button-diagonal" />
+              <span className="intake-button-wash" />
+            </span>
             <SpecularRim radius={22} />
             <span aria-hidden="true" className="intake-specular-fallback" />
             <span className="intake-log-symbol relative inline-flex size-7 shrink-0 items-center justify-center max-[359px]:size-[26px]">
@@ -94,15 +98,6 @@ export function IntakeAction({
               <ActionIcon name="next" className="size-full" />
             </span>
           </Button>
-        </div>
-        <div className="relative flex justify-center pt-1">
-          <Link
-            href="/guide"
-            className="inline-flex min-h-6 items-center justify-center rounded-md px-4 text-[9px] leading-none text-canvas-muted-foreground/70 focus-visible:text-canvas-foreground"
-            aria-label="Open Getting Started and Guide"
-          >
-            Guide
-          </Link>
         </div>
       </div>
     </div>

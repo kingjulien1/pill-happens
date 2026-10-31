@@ -72,7 +72,7 @@ void main() {
   float position = loopPosition(p, uHalf, uRadius);
   float key = lobe(position, uSpot);
   float back = lobe(position, uSpot + 0.5);
-  // Opposing colors travel together instead of tinting the whole rim violet.
+  // Opposing warm and dark colors travel together around the rounded rim.
   float streak = key + back * 0.72;
   float leading = key / max(streak, 0.0001);
   vec3 lineColor = mix(uBaseColor, uLineColor, leading);
@@ -225,11 +225,17 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const canvas = canvasRef.current;
     const button = canvas?.closest("button");
     if (!canvas || !button) return;
+    const effects =
+      button.closest<HTMLElement>(".intake-action-shell") ?? button;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let intersecting = true;
     const sync = () => {
-      canvas.dataset.fallbackActive = String(
-        intersecting && !document.hidden && !motion.matches && !button.disabled,
+      const active =
+        intersecting && !document.hidden && !motion.matches && !button.disabled;
+      canvas.dataset.fallbackActive = String(active);
+      effects.style.setProperty(
+        "--intake-effects-play-state",
+        active ? "running" : "paused",
       );
     };
     const intersection =
@@ -254,6 +260,7 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
       motion.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
       canvas.dataset.fallbackActive = "false";
+      effects.style.removeProperty("--intake-effects-play-state");
     };
   }, []);
 
@@ -297,10 +304,10 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const readPalette = () => {
       const styles = getComputedStyle(button);
       return {
-        line: readColor(styles, "--intake-rim-line", APP_COLORS.violet),
-        base: readColor(styles, "--intake-rim-base", APP_COLORS.rust),
-        edge: readColor(styles, "--intake-rim-guard", APP_COLORS.ink),
-        glow: readColor(styles, "--intake-rim-glow", APP_COLORS.violet),
+        line: readColor(styles, "--intake-rim-line", APP_COLORS.rust),
+        base: readColor(styles, "--intake-rim-base", APP_COLORS.ink),
+        edge: readColor(styles, "--intake-rim-guard", "#120f17"),
+        glow: readColor(styles, "--intake-rim-glow", "#ffe8cf"),
       };
     };
     let palette = readPalette();
