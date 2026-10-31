@@ -310,27 +310,42 @@
   }
   .intake-stack-measure[data-entrance-state="running"] {
     transform-origin: 18% 50%;
-    animation: intake-card-arrive 680ms cubic-bezier(0.22, 1, 0.36, 1)
+    animation: intake-card-arrive 950ms cubic-bezier(0.22, 1, 0.36, 1)
       var(--intake-enter-delay, 0ms) backwards;
     will-change: transform, opacity;
   }
   .intake-stack-measure[data-entrance-state="running"] .intake-card-focus {
-    animation: intake-icon-arrive 620ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 55ms) backwards;
+    animation: intake-icon-arrive 880ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 65ms) backwards;
   }
   .intake-stack-measure[data-entrance-state="running"] .intake-card-heading {
-    animation: intake-copy-arrive 380ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 95ms) backwards;
+    animation: intake-copy-arrive 540ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 130ms) backwards;
   }
   .intake-stack-measure[data-entrance-state="running"] .intake-card-bottom,
   .intake-stack-measure[data-entrance-state="running"] .intake-card-note {
-    animation: intake-copy-arrive 420ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 145ms) backwards;
+    animation: intake-copy-arrive 620ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 195ms) backwards;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="preview"] {
     transform-origin: center;
-    animation: intake-preview-arrive 480ms cubic-bezier(0.22, 1, 0.36, 1)
+    animation: intake-preview-arrive 800ms cubic-bezier(0.22, 1, 0.36, 1)
       var(--intake-enter-delay, 0ms) backwards;
+  }
+  .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"] {
+    animation-duration: 800ms;
+  }
+  .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
+    .intake-card-focus {
+    animation-duration: 730ms;
+  }
+  .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
+    .intake-card-heading {
+    animation-duration: 460ms;
+  }
+  .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
+    :is(.intake-card-bottom, .intake-card-note) {
+    animation-duration: 540ms;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="preview"]
     :is(
@@ -353,8 +368,8 @@
         > .intake-stack-measure[data-entrance-state="running"]
     )
     .intake-group-label {
-    animation: intake-stack-arrive 520ms ease-out var(--intake-enter-delay, 0ms)
-      backwards;
+    animation: intake-stack-arrive 700ms ease-out
+      calc(var(--intake-enter-delay, 0ms) + 150ms) backwards;
   }
 }
 @keyframes intake-preview-arrive {
