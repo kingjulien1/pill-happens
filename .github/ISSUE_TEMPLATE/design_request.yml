@@ -1,0 +1,36 @@
+name: Improvement Idea
+description: Suggest a clearer or more useful journal experience.
+title: "[Idea] "
+body:
+  - type: textarea
+    id: moment
+    attributes:
+      label: What Are You Trying To Do?
+      description: Describe the moment in the app that could work better.
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What Would Help?
+      description: Explain the change and why it would make that moment easier.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Daily Log
+        - Medications
+        - History
+        - Goals Or Streaks
+        - Evening Check-In
+        - Guide Or Developer Guide
+        - Navigation Or Installation
+        - Something Else
+  - type: textarea
+    id: reference
+    attributes:
+      label: Example Or Reference
+      description: A sketch, screenshot, or short example is welcome. Use sample journal content.

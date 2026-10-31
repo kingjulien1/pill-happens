@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read The User Guide
+    url: https://pill-happens.vercel.app/guide#start
+    about: Get started and learn how the journal works.
+  - name: Explore The Developer Guide
+    url: https://pill-happens.vercel.app/developer-guide
+    about: Theme tokens, components, source structure, and contribution guidance.

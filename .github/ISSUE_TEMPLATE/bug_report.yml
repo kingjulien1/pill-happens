@@ -1,0 +1,43 @@
+name: Bug Report
+description: Show what happened and how to reproduce it.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: Use sample entries and invented medication names when describing a journal problem.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What Happened?
+      description: Describe what you saw and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      placeholder: |
+        1. Open…
+        2. Choose…
+        3. Notice…
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Device And Browser
+      placeholder: For example, iPhone / Safari / Home Screen app
+  - type: dropdown
+    id: appearance
+    attributes:
+      label: System Appearance
+      options:
+        - Light
+        - Dark
+        - Both
+        - Unsure
+  - type: textarea
+    id: context
+    attributes:
+      label: Screenshots Or Extra Context
+      description: Add a screenshot, relevant timing, or a small sample that helps reproduce the issue.
