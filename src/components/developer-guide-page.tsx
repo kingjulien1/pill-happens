@@ -788,10 +788,13 @@ export function DeveloperGuidePage() {
             <p>
               Benzo cards use a Rose 400 inside outline and a bold circled B.
               The medication tile itself stays free of a Benzo rim or red dot.
-              Type badges share the classification marker’s 22px height and
-              carry a matching medication-type symbol. The ingredient label and
-              quieter calculation adapt to the available width without changing
-              the stored dose.
+              Intake types use plain text with a very slight selected-color
+              tint, aligned with the 22px classification marker. The active
+              substance starts at the left of the second text row and always
+              includes its quieter label; Unspecified represents an unrecorded
+              value without implying that a medicine has no active substance.
+              The calculation and total adapt to the available width without
+              changing the stored dose.
             </p>
             <p>
               Collapsed groups overlap complete ordinary cards with their
@@ -830,9 +833,12 @@ export function DeveloperGuidePage() {
             <div>
               <dt>One-Time Arrivals</dt>
               <dd>
-                Use bounded, finite effects. The streak spotlight clears its
-                generated particles after the celebration and uses a consumed
-                history-entry marker.
+                Use bounded, finite effects. Intake lists pause for half a
+                second after layout settles, finish each visible batch of main
+                cards, then reveal their rear cards at a slightly quicker pace.
+                Scroll reveals wait inside the usable viewport. The streak
+                spotlight clears its particles after the celebration and uses a
+                consumed history-entry marker.
               </dd>
             </div>
             <div>
