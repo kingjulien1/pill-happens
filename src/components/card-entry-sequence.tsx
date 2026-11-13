@@ -81,7 +81,7 @@ export function CardEntrySequence({
     };
     const flush = () => {
       frame = 0;
-      if (!getPageEntryReadiness()) return;
+      if (!getPageEntryReadiness() || document.hidden) return;
       const batch = Array.from(
         scope.querySelectorAll<HTMLElement>(CARD),
       ).filter(
@@ -92,7 +92,7 @@ export function CardEntrySequence({
           !seen.current.has(node),
       );
       queued.clear();
-      if (document.hidden || reduced.matches) {
+      if (reduced.matches) {
         for (const node of batch) finish(node);
         return;
       }
@@ -105,7 +105,7 @@ export function CardEntrySequence({
       }
     };
     const queueFlush = () => {
-      if (getPageEntryReadiness() && !frame && queued.size)
+      if (getPageEntryReadiness() && !document.hidden && !frame && queued.size)
         frame = requestAnimationFrame(flush);
     };
     const createObserver = () => {
@@ -124,6 +124,11 @@ export function CardEntrySequence({
           if (source !== observer) return;
           for (const entry of entries) {
             const node = entry.target as HTMLElement;
+            if (document.hidden) {
+              queued.delete(node);
+              observer?.unobserve(node);
+              continue;
+            }
             if (!entry.isIntersecting || !rendered(node)) {
               queued.delete(node);
               if (active.has(node) && (!rendered(node) || !inViewport(node)))
@@ -172,14 +177,8 @@ export function CardEntrySequence({
       for (const node of eligible) {
         const fresh = !cards.has(node);
         cards.add(node);
-        if (
-          reduced.matches ||
-          document.hidden ||
-          !observer ||
-          seen.current.has(node)
-        ) {
-          if (!active.has(node) || reduced.matches || document.hidden)
-            finish(node);
+        if (reduced.matches || !observer || seen.current.has(node)) {
+          if (!active.has(node) || reduced.matches) finish(node);
           continue;
         }
         if (!rendered(node)) {
@@ -190,6 +189,13 @@ export function CardEntrySequence({
         }
         if (fresh || !node.dataset.cardEntryState)
           node.dataset.cardEntryState = "pending";
+        // A Home Screen app can mount while its document is still hidden.
+        // Keep unseen cards eligible until that first real visible frame.
+        if (document.hidden) {
+          queued.delete(node);
+          observer.unobserve(node);
+          continue;
+        }
         observer.observe(node);
       }
     };
@@ -232,9 +238,11 @@ export function CardEntrySequence({
         });
     };
     const onVisibility = () => {
-      if (document.hidden)
-        for (const node of [...active, ...queued]) finish(node);
-      else sync();
+      if (document.hidden) {
+        for (const node of active) finish(node);
+        for (const node of queued) observer?.unobserve(node);
+        queued.clear();
+      } else sync();
     };
     const onResize = () => {
       observer?.disconnect();

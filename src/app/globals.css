@@ -534,32 +534,32 @@
   }
   [data-card-entry-state="running"] {
     transform-origin: 18% 50%;
-    animation: card-entry-arrive 1140ms cubic-bezier(0.22, 1, 0.36, 1)
+    animation: card-entry-arrive 1440ms cubic-bezier(0.22, 1, 0.36, 1)
       var(--card-entry-delay, 0ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
     will-change: transform, opacity;
   }
   [data-card-entry-state="running"] .intake-card-focus {
-    animation: intake-icon-arrive 1056ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--card-entry-delay, 0ms) + 78ms) backwards;
+    animation: intake-icon-arrive 1320ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--card-entry-delay, 0ms) + 98ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   [data-card-entry-state="running"] .intake-card-indicator {
     transform-origin: 78% 80%;
-    animation: intake-marker-arrive 720ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--card-entry-delay, 0ms) + 216ms) backwards;
+    animation: intake-marker-arrive 900ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--card-entry-delay, 0ms) + 270ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   [data-daily-check-in][data-card-entry-state="running"]
     .intake-card-heading
     > .intake-card-title-group {
-    animation: intake-copy-arrive 648ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--card-entry-delay, 0ms) + 156ms) backwards;
+    animation: intake-copy-arrive 810ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--card-entry-delay, 0ms) + 195ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   [data-daily-check-in][data-card-entry-state="running"] .intake-card-bottom {
-    animation: intake-copy-arrive 744ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--card-entry-delay, 0ms) + 234ms) backwards;
+    animation: intake-copy-arrive 930ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--card-entry-delay, 0ms) + 293ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
 }
@@ -588,86 +588,69 @@
   }
   .intake-stack-measure[data-entrance-state="running"] {
     transform-origin: 18% 50%;
-    animation: intake-card-arrive 1140ms cubic-bezier(0.22, 1, 0.36, 1)
+    animation: intake-card-arrive 1440ms cubic-bezier(0.22, 1, 0.36, 1)
       var(--intake-enter-delay, 0ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
     will-change: transform, opacity;
   }
   .intake-stack-measure[data-entrance-state="running"] .intake-card-focus {
-    animation: intake-icon-arrive 1056ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 78ms) backwards;
+    animation: intake-icon-arrive 1320ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 98ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   .intake-stack-measure[data-entrance-state="running"]
     .intake-card-heading
     > :is(.intake-card-time, .intake-card-title-group) {
-    animation: intake-copy-arrive 648ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 156ms) backwards;
+    animation: intake-copy-arrive 810ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 195ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   .intake-stack-measure[data-entrance-state="running"] .intake-card-indicator {
     transform-origin: 78% 80%;
-    animation: intake-marker-arrive 720ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 216ms) backwards;
+    animation: intake-marker-arrive 900ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 270ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   .intake-stack-measure[data-entrance-state="running"]
     .intake-card-indicator:nth-child(2) {
-    animation-delay: calc(var(--intake-enter-delay, 0ms) + 252ms);
+    animation-delay: calc(var(--intake-enter-delay, 0ms) + 315ms);
   }
   .intake-stack-measure[data-entrance-state="running"]
     .intake-card-indicator:nth-child(3) {
-    animation-delay: calc(var(--intake-enter-delay, 0ms) + 288ms);
+    animation-delay: calc(var(--intake-enter-delay, 0ms) + 360ms);
   }
   .intake-stack-measure[data-entrance-state="running"] .intake-card-bottom {
-    animation: intake-copy-arrive 744ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--intake-enter-delay, 0ms) + 234ms) backwards;
+    animation: intake-copy-arrive 930ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--intake-enter-delay, 0ms) + 293ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="preview"] {
     transform-origin: center;
-    animation: intake-preview-arrive 960ms cubic-bezier(0.22, 1, 0.36, 1)
+    animation: intake-preview-arrive 1200ms cubic-bezier(0.22, 1, 0.36, 1)
       var(--intake-enter-delay, 0ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"] {
-    animation-duration: 960ms;
+    animation-duration: 1200ms;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
     .intake-card-focus {
-    animation-duration: 876ms;
+    animation-duration: 1095ms;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
     .intake-card-heading
     > :is(.intake-card-time, .intake-card-title-group) {
-    animation-duration: 552ms;
+    animation-duration: 690ms;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
     .intake-card-indicator {
-    animation-duration: 600ms;
+    animation-duration: 750ms;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="rear"]
     .intake-card-bottom {
-    animation-duration: 648ms;
+    animation-duration: 810ms;
   }
   .intake-stack-measure[data-entrance-state="running"][data-entrance-kind="preview"]
-    :is(
-      .intake-card-focus,
-      .intake-card-time,
-      .intake-card-title-group,
-      .intake-card-indicator,
-      .intake-card-bottom
-    ) {
-    animation: none;
-  }
-  /* Disclosure moves painted faces; it never replays their content entrances. */
-  .intake-group[data-expanded="true"] .intake-stack-measure {
-    opacity: 1;
-    animation: none;
-    will-change: auto;
-  }
-  .intake-group[data-expanded="true"]
-    .intake-stack-measure
     :is(
       .intake-card-focus,
       .intake-card-time,

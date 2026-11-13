@@ -21,21 +21,21 @@ const next = (faces: readonly IntakeGroupEntranceFace[], now: number) =>
     settle: false,
   });
 
-test("the frame follows the last reserved stack start by the same 180ms card beat", () => {
+test("the frame follows the last reserved stack start by the same 280ms card beat", () => {
   const faces = [running(100), running(280), running(460)];
-  assert.equal(intakeGroupEntranceStart(faces), 640);
-  assert.equal(next(faces, 639), "pending");
-  assert.equal(next(faces, 640), "running");
+  assert.equal(intakeGroupEntranceStart(faces), 740);
+  assert.equal(next(faces, 739), "pending");
+  assert.equal(next(faces, 740), "running");
   // The last card is still well inside its 960ms entrance at this point.
-  assert.equal(next(faces, 700), "running");
+  assert.equal(next(faces, 800), "running");
 });
 
 test("late reservations postpone only their own frame beat", () => {
-  assert.equal(intakeGroupEntranceStart([running(100), running(280)]), 460);
+  assert.equal(intakeGroupEntranceStart([running(100), running(280)]), 560);
   const extended = [running(100), running(280), running(640)];
-  assert.equal(intakeGroupEntranceStart(extended), 820);
+  assert.equal(intakeGroupEntranceStart(extended), 920);
   assert.equal(next(extended, 460), "pending");
-  assert.equal(next(extended, 820), "running");
+  assert.equal(next(extended, 920), "running");
 });
 
 test("capped, inaccessible and not-yet-scheduled offscreen cards invent no future beats", () => {
@@ -46,14 +46,14 @@ test("capped, inaccessible and not-yet-scheduled offscreen cards invent no futur
     { exposed: false, state: "idle" },
     { exposed: true, state: "pending" },
   ];
-  assert.equal(intakeGroupEntranceStart(faces), 460);
-  assert.equal(next(faces, 460), "running");
+  assert.equal(intakeGroupEntranceStart(faces), 560);
+  assert.equal(next(faces, 560), "running");
 });
 
 test("settling or canceling a delayed face releases its future reservation", () => {
   const faces = [running(100), { ...done, startsAt: 10000 }];
-  assert.equal(intakeGroupEntranceStart(faces), 280);
-  assert.equal(next(faces, 280), "running");
+  assert.equal(intakeGroupEntranceStart(faces), 380);
+  assert.equal(next(faces, 380), "running");
   assert.equal(next([done, done], 0), "running");
 });
 
@@ -84,7 +84,7 @@ test("a refreshed page cannot start its frame before the loading curtain is gone
   // Moving reservations by the curtain pause retains their unspent local beat.
   const resumed = [running(100 + 2000), running(280 + 2000)];
   assert.equal(next(resumed, 2300), "pending");
-  assert.equal(next(resumed, 2460), "running");
+  assert.equal(next(resumed, 2560), "running");
 });
 
 test("interaction, disclosure, backgrounding and reduced motion release controls immediately", () => {

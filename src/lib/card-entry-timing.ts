@@ -1,4 +1,5 @@
-export const CARD_ENTRY_SPACING_MS = 180;
+export const CARD_ENTRY_SPACING_MS = 280;
+export const CARD_ENTRY_INITIAL_DELAY_MS = 350;
 
 type CardEntrySchedule = {
   delays: number[];
@@ -23,6 +24,7 @@ export function cardEntrySchedule(
 }
 
 const clocks = new WeakMap<Element, number>();
+const startedScopes = new WeakSet<Element>();
 const scopeFor = (node: Element) =>
   node.closest("[data-log-entry-scope], [data-card-entry-scope]") ?? node;
 
@@ -30,11 +32,14 @@ const scopeFor = (node: Element) =>
 export function reserveCardEntryDelays(node: Element, count: number): number[] {
   if (!Number.isFinite(count) || count <= 0) return [];
   const scope = scopeFor(node);
+  const now = performance.now();
   const schedule = cardEntrySchedule(
     count,
-    performance.now(),
-    clocks.get(scope),
+    now,
+    clocks.get(scope) ??
+      (startedScopes.has(scope) ? now : now + CARD_ENTRY_INITIAL_DELAY_MS),
   );
+  startedScopes.add(scope);
   clocks.set(scope, schedule.nextAvailable);
   return schedule.delays;
 }
@@ -52,9 +57,17 @@ export function reserveTimelineCardEntryDelays<T>(
   const mainCount = entries.filter(
     (entry) => stackFor(entry) === null || isHead(entry),
   ).length;
-  const main = cardEntrySchedule(mainCount, now, clocks.get(scope));
+  const main = cardEntrySchedule(
+    mainCount,
+    now,
+    clocks.get(scope) ??
+      (startedScopes.has(scope) ? now : now + CARD_ENTRY_INITIAL_DELAY_MS),
+  );
   // A rear-only scroll batch cannot reserve or prolong the shared sequence.
-  if (mainCount) clocks.set(scope, main.nextAvailable);
+  if (mainCount) {
+    startedScopes.add(scope);
+    clocks.set(scope, main.nextAvailable);
+  }
   let mainIndex = 0;
   return entries.map((entry) => {
     const stack = stackFor(entry);

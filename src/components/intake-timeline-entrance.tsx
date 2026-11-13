@@ -156,7 +156,7 @@ export function IntakeTimelineEntrance({
           startsAt: faceStarts.get(node),
         }));
         const now = performance.now();
-        const ready = getPageEntryReadiness();
+        const ready = getPageEntryReadiness() && !document.hidden;
         const next = nextIntakeGroupEntranceState({
           current,
           faces,
@@ -165,8 +165,7 @@ export function IntakeTimelineEntrance({
           settle:
             !observer ||
             reduced.matches ||
-            document.hidden ||
-            group.dataset.expanded === "true" ||
+            (document.hidden && current === "running") ||
             group.dataset.stackMoving === "true",
         });
         if (next === "done") finishGroup(group);
@@ -256,7 +255,7 @@ export function IntakeTimelineEntrance({
 
     const flush = () => {
       frame = 0;
-      if (!getPageEntryReadiness()) return;
+      if (!getPageEntryReadiness() || document.hidden) return;
       // A previously queued batch must not start fading while another group
       // moves it. Keep offscreen faces queued for their normal later entrance.
       if (stackMoving()) {
@@ -289,7 +288,7 @@ export function IntakeTimelineEntrance({
         }
         return inBand;
       });
-      if (reduced.matches || document.hidden) {
+      if (reduced.matches) {
         for (const node of candidates) finish(node);
         return;
       }
@@ -335,6 +334,7 @@ export function IntakeTimelineEntrance({
     const scheduleFlush = () => {
       if (
         getPageEntryReadiness() &&
+        !document.hidden &&
         settled &&
         queued.size &&
         !frame &&
@@ -382,7 +382,11 @@ export function IntakeTimelineEntrance({
               continue;
             }
             if (!exposedFace(node) || phase(node) !== "pending") continue;
-            if (document.hidden || reduced.matches) {
+            if (document.hidden) {
+              queued.delete(node);
+              continue;
+            }
+            if (reduced.matches) {
               finish(node);
               continue;
             }
@@ -413,7 +417,6 @@ export function IntakeTimelineEntrance({
       // Removed main faces must not leave future slots alive behind rear tails.
       resetCardEntryDelaysIfIdle(timeline);
       for (const node of timeline.querySelectorAll<HTMLElement>(ENTRY)) {
-        const group = node.closest<HTMLElement>("[data-intake-group]");
         if (!exposedFace(node)) motionCandidates.delete(node);
         else if (moving && phase(node) !== "done") {
           if (inPhysicalViewport(node)) {
@@ -422,12 +425,8 @@ export function IntakeTimelineEntrance({
           }
           motionCandidates.add(node);
         }
-        if (group?.dataset.expanded === "true") {
-          // Open and restored-open groups show complete faces. Do not hide their
-          // content behind entrances, including capped and offscreen children.
-          finish(node);
-          continue;
-        }
+        // Remembered disclosure is layout, not proof that this document has
+        // already shown a face. Real disclosure settles faces in onDisclosure.
         const id = identity(node);
         if (!exposedFace(node)) {
           observer?.unobserve(node);
@@ -442,6 +441,13 @@ export function IntakeTimelineEntrance({
           if (!active.has(node) || reduced.matches) finish(node);
           observer?.unobserve(node);
           watched.delete(node);
+          continue;
+        }
+        if (document.hidden) {
+          setPhase(node, "pending");
+          observer.unobserve(node);
+          watched.delete(node);
+          queued.delete(node);
           continue;
         }
         if (!watched.has(node) && !queued.has(node)) {
@@ -501,7 +507,10 @@ export function IntakeTimelineEntrance({
         return;
       }
       stopMotionWatch();
-      for (const node of [...active, ...queued]) finish(node);
+      for (const node of active) finish(node);
+      for (const node of watched) observer?.unobserve(node);
+      watched.clear();
+      queued.clear();
       syncGroups();
     };
     const onDisclosure = (event: Event) => {
