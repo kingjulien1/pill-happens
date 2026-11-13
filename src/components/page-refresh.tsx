@@ -585,7 +585,7 @@ export function CompactRefreshBrand() {
       ? state.distance
       : Math.max(
           0,
-          tentative === "today" ? dx : tentative === "refresh" ? dy : 0,
+          tentative === "medications" ? dx : tentative === "refresh" ? dy : 0,
         );
     const offset = brandPullOffset(distance);
     const threshold = getBrandPullThreshold(tentative, current.thresholds);
@@ -595,7 +595,7 @@ export function CompactRefreshBrand() {
         // Readiness changes scale and decoration, never the held position.
         x: Math.min(
           84,
-          current.origin.x + (tentative === "today" ? offset : 0),
+          current.origin.x + (tentative === "medications" ? offset : 0),
         ),
         y: Math.min(
           84,
@@ -630,10 +630,10 @@ export function CompactRefreshBrand() {
     }
   };
 
-  const goToToday = () => {
+  const goToMedications = () => {
     if (unavailable) return;
-    workspace.rememberDestination("/");
-    router.push("/", { scroll: true });
+    workspace.rememberDestination("/medications");
+    router.push("/medications", { scroll: true });
   };
 
   const releasePull = (committed: BrandPullAction | "home") => {
@@ -651,7 +651,7 @@ export function CompactRefreshBrand() {
       setReleasing(false);
       settlePull();
       if (committed === "refresh") refreshPage();
-      else if (committed === "today") goToToday();
+      else if (committed === "medications") goToMedications();
       else playBurst("home");
     };
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -875,10 +875,10 @@ export function CompactRefreshBrand() {
       )}
       <span id={hintId} className="sr-only">
         Tap to refresh this page. Pull down and release to refresh, or pull
-        right and release to return to Today. You can change direction until the
-        refresh icon springs outward and its rings light up; that threshold
-        locks the direction. Pull back to cancel. Today is also available in
-        navigation.
+        right and release to open Medications. You can change direction until
+        the refresh icon springs outward and its rings light up; that threshold
+        locks the direction. Pull back to cancel. Medications is also available
+        in navigation.
       </span>
       <span
         className="sr-only"
@@ -887,16 +887,16 @@ export function CompactRefreshBrand() {
         aria-atomic="true"
       >
         {releasing
-          ? feedbackAction === "today"
-            ? "Returning to Today…"
+          ? feedbackAction === "medications"
+            ? "Opening Medications…"
             : "Refreshing…"
           : burst?.kind === "home"
-            ? "You are already on Today."
+            ? "You are already on Medications."
             : visible
-              ? feedbackAction === "today"
+              ? feedbackAction === "medications"
                 ? ready
-                  ? "Release to open Today."
-                  : "Pull right to open Today."
+                  ? "Release to open Medications."
+                  : "Pull right to open Medications."
                 : ready
                   ? "Release to refresh."
                   : "Pull down to refresh."

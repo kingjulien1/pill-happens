@@ -9,7 +9,7 @@ export const BRAND_PULL_EXCHANGE_END =
 export const BRAND_REFRESH_MARKER = "pill-happens:page-refresh";
 export const BRAND_REFRESH_MARKER_TTL = 60_000;
 
-export type BrandPullAction = "refresh" | "today";
+export type BrandPullAction = "refresh" | "medications";
 export type BrandPullThresholds = Readonly<Record<BrandPullAction, number>>;
 
 /** Capture once at pointer-down; subsequent viewport changes cannot move the goal. */
@@ -30,7 +30,7 @@ export function getBrandPullThresholds(
   };
   return Object.freeze({
     refresh: available(startY, viewportBottom),
-    today: available(startX, viewportRight),
+    medications: available(startX, viewportRight),
   });
 }
 
@@ -68,7 +68,7 @@ export function updateBrandPull(
     previous.lockedAction ?? (moved ? getBrandPullAction(x, y) : null);
   const distance = Math.max(
     0,
-    action === "today" ? x : action === "refresh" ? y : 0,
+    action === "medications" ? x : action === "refresh" ? y : 0,
   );
   return {
     action,
@@ -223,12 +223,13 @@ export function getBrandPullFeedback(
       typeof heldIconTurn === "number" && Number.isFinite(heldIconTurn)
         ? heldIconTurn
         : -310 * (1 - p) + 16 * h,
-    buttonTilt: (action === "today" ? 1 : -1) * 4 * p * (1 - clamp(s)) + 6 * h,
+    buttonTilt:
+      (action === "medications" ? 1 : -1) * 4 * p * (1 - clamp(s)) + 6 * h,
     flare: clamp(over * 3 + Math.abs(h) * 0.8),
   };
 }
 
-/** Already-home pulls only recoil. They never close drafts, scroll, reload or navigate. */
+/** Pulls at the destination only recoil; drafts, scroll and navigation stay untouched. */
 export function getBrandPullRelease(
   state: BrandPullState,
   pathname: string,
@@ -240,7 +241,7 @@ export function getBrandPullRelease(
     !state.lockedAction
   )
     return null;
-  return state.lockedAction === "today" && pathname === "/"
+  return state.lockedAction === "medications" && pathname === "/medications"
     ? "home"
     : state.lockedAction;
 }
@@ -257,7 +258,7 @@ export function getBrandPullAction(
 ): BrandPullAction | null {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
   if (y > Math.abs(x) * 1.5) return "refresh";
-  if (x > Math.abs(y) * 1.5) return "today";
+  if (x > Math.abs(y) * 1.5) return "medications";
   return null;
 }
 
@@ -272,14 +273,14 @@ export function isBrandRefreshPull(
   );
 }
 
-export function isBrandTodayPull(
+export function isBrandMedicationsPull(
   x: number,
   y: number,
   thresholds?: BrandPullThresholds,
 ) {
   return (
-    x >= getBrandPullThreshold("today", thresholds) &&
-    getBrandPullAction(x, y) === "today"
+    x >= getBrandPullThreshold("medications", thresholds) &&
+    getBrandPullAction(x, y) === "medications"
   );
 }
 

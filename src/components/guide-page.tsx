@@ -901,7 +901,7 @@ export function GuidePage() {
                 colors stay the same.
               </p>
             </GuideDetail>
-            <GuideDetail title="Refresh Or Return To Today" icon="retry">
+            <GuideDetail title="Refresh Or Open Medications" icon="retry">
               <p>
                 Tap the animated tablets to the left of the menu to refresh this
                 page. Or pull that button downward: its pills fade beneath a
@@ -913,10 +913,11 @@ export function GuidePage() {
               </p>
               <p>
                 Pull the same button to the right until it rebounds, then
-                release to return to Today. This keeps your unfinished drafts
-                and uses in-app navigation; if you are already on Today, it
-                returns to the top without reloading. The menu’s{" "}
-                <strong>Today</strong> link is also available without a gesture.
+                release to open Medications. This keeps your unfinished drafts
+                and uses in-app navigation. If Medications is already open, the
+                button settles back without navigating or changing your scroll
+                position. The menu’s <strong>Medications</strong> link is also
+                available without a gesture.
               </p>
               <p>
                 You can steer between down and right before the button is ready.

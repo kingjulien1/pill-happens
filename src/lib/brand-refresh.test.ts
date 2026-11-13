@@ -20,7 +20,7 @@ import {
   type BrandPullSpring,
   getBrandPullAction,
   isBrandRefreshPull,
-  isBrandTodayPull,
+  isBrandMedicationsPull,
   isRecentBrandRefresh,
 } from "./brand-refresh";
 
@@ -46,22 +46,22 @@ test("horizontal and diagonal gestures cannot arm a refresh", () => {
 test("direction classification precedes release thresholds and tolerates small cross-axis jitter", () => {
   assert.equal(getBrandPullAction(0, 0), null);
   assert.equal(getBrandPullAction(0, BRAND_REFRESH_SLOP / 2), "refresh");
-  assert.equal(getBrandPullAction(BRAND_REFRESH_SLOP / 2, 0), "today");
+  assert.equal(getBrandPullAction(BRAND_REFRESH_SLOP / 2, 0), "medications");
   for (const jitter of [-3, 0, 3]) {
     assert.equal(getBrandPullAction(jitter, 10), "refresh");
-    assert.equal(getBrandPullAction(10, jitter), "today");
+    assert.equal(getBrandPullAction(10, jitter), "medications");
   }
   assert.equal(isBrandRefreshPull(3, 10), false);
-  assert.equal(isBrandTodayPull(10, 3), false);
+  assert.equal(isBrandMedicationsPull(10, 3), false);
 });
 
-test("Today requires the same release distance in the positive horizontal direction", () => {
+test("Medications requires the same release distance in the positive horizontal direction", () => {
   for (const distance of [-200, -1, 0, 8, BRAND_REFRESH_THRESHOLD - 0.01])
-    assert.equal(isBrandTodayPull(distance, 0), false);
-  assert.equal(isBrandTodayPull(BRAND_REFRESH_THRESHOLD, 0), true);
-  assert.equal(isBrandTodayPull(BRAND_REFRESH_THRESHOLD + 40, 0), true);
+    assert.equal(isBrandMedicationsPull(distance, 0), false);
+  assert.equal(isBrandMedicationsPull(BRAND_REFRESH_THRESHOLD, 0), true);
+  assert.equal(isBrandMedicationsPull(BRAND_REFRESH_THRESHOLD + 40, 0), true);
   for (const jitter of [-3, 3]) {
-    assert.equal(isBrandTodayPull(BRAND_REFRESH_THRESHOLD, jitter), true);
+    assert.equal(isBrandMedicationsPull(BRAND_REFRESH_THRESHOLD, jitter), true);
     assert.equal(isBrandRefreshPull(jitter, BRAND_REFRESH_THRESHOLD), true);
   }
 });
@@ -70,10 +70,10 @@ test("strict axis dominance rejects diagonal boundaries without ambiguous dual a
   for (const cross of [-80, 80]) {
     assert.equal(getBrandPullAction(120, cross), null);
     assert.equal(getBrandPullAction(cross, 120), null);
-    assert.equal(isBrandTodayPull(120, cross), false);
+    assert.equal(isBrandMedicationsPull(120, cross), false);
     assert.equal(isBrandRefreshPull(cross, 120), false);
   }
-  assert.equal(getBrandPullAction(120, 79), "today");
+  assert.equal(getBrandPullAction(120, 79), "medications");
   assert.equal(getBrandPullAction(79, 120), "refresh");
   for (const [x, y] of [
     [120, 81],
@@ -83,7 +83,7 @@ test("strict axis dominance rejects diagonal boundaries without ambiguous dual a
   ]) {
     assert.equal(getBrandPullAction(x, y), null);
     assert.equal(isBrandRefreshPull(x, y), false);
-    assert.equal(isBrandTodayPull(x, y), false);
+    assert.equal(isBrandMedicationsPull(x, y), false);
   }
   const beyond = BRAND_REFRESH_THRESHOLD + 64;
   for (const [x, y] of [
@@ -92,7 +92,7 @@ test("strict axis dominance rejects diagonal boundaries without ambiguous dual a
     [-20, beyond],
     [beyond, -20],
   ])
-    assert.notEqual(isBrandRefreshPull(x, y), isBrandTodayPull(x, y));
+    assert.notEqual(isBrandRefreshPull(x, y), isBrandMedicationsPull(x, y));
 });
 
 test("leftward and upward pulls cannot select either supported action", () => {
@@ -104,7 +104,7 @@ test("leftward and upward pulls cannot select either supported action", () => {
   ]) {
     assert.equal(getBrandPullAction(x, y), null);
     assert.equal(isBrandRefreshPull(x, y), false);
-    assert.equal(isBrandTodayPull(x, y), false);
+    assert.equal(isBrandMedicationsPull(x, y), false);
   }
 });
 
@@ -118,7 +118,7 @@ test("non-finite pointer coordinates cannot classify or arm a gesture", () => {
     ]) {
       assert.equal(getBrandPullAction(x, y), null);
       assert.equal(isBrandRefreshPull(x, y), false);
-      assert.equal(isBrandTodayPull(x, y), false);
+      assert.equal(isBrandMedicationsPull(x, y), false);
     }
   }
 });
@@ -208,7 +208,7 @@ test("the longer pull keeps former thresholds tentative on both axes", () => {
     BRAND_REFRESH_THRESHOLD - 0.01,
   ]) {
     assert.equal(isBrandRefreshPull(0, distance), false);
-    assert.equal(isBrandTodayPull(distance, 0), false);
+    assert.equal(isBrandMedicationsPull(distance, 0), false);
     assert.equal(updateBrandPull(idlePull(), 0, distance).lockedAction, null);
     assert.equal(updateBrandPull(idlePull(), distance, 0).lockedAction, null);
   }
@@ -223,18 +223,18 @@ test("pointer-down thresholds reserve a 16px viewport inset and cap travel at 34
     [1_440, 340],
   ]) {
     const thresholds = getBrandPullThresholds(40, 40, width, 844);
-    assert.equal(thresholds.today, horizontal);
+    assert.equal(thresholds.medications, horizontal);
     assert.equal(thresholds.refresh, 340);
-    assert.ok(40 + thresholds.today <= width - 16);
+    assert.ok(40 + thresholds.medications <= width - 16);
     assert.ok(Object.isFrozen(thresholds));
   }
   assert.deepEqual(getBrandPullThresholds(40, 40, 844, 320), {
-    today: 340,
+    medications: 340,
     refresh: 264,
   });
   // Callers pass visual viewport right/bottom coordinates, including offsets.
   assert.deepEqual(getBrandPullThresholds(104, 80, 364, 400), {
-    today: 244,
+    medications: 244,
     refresh: 304,
   });
 });
@@ -246,16 +246,23 @@ test("threshold snapshots stay fixed across viewport resizing and a new gesture 
   assert.equal(state.lockedAction, null);
   assert.equal(getBrandPullRelease(state, "/history", captured), null);
   state = updateBrandPull(state, 334, 0, captured);
-  assert.equal(state.lockedAction, "today");
-  assert.equal(getBrandPullRelease(state, "/history", captured), "today");
-  assert.deepEqual(captured, { today: 334, refresh: 340 });
+  assert.equal(state.lockedAction, "medications");
+  assert.equal(getBrandPullRelease(state, "/history", captured), "medications");
+  assert.deepEqual(captured, { medications: 334, refresh: 340 });
   const nextGesture = updateBrandPull(idlePull(), 264, 0, afterResize);
-  assert.equal(getBrandPullRelease(nextGesture, "/", afterResize), "home");
+  assert.equal(
+    getBrandPullRelease(nextGesture, "/", afterResize),
+    "medications",
+  );
+  assert.equal(
+    getBrandPullRelease(nextGesture, "/medications", afterResize),
+    "home",
+  );
 });
 
 test("adaptive thresholds do not normalize physical direction or alter first-axis locking", () => {
   const thresholds = getBrandPullThresholds(40, 40, 320, 844);
-  // Unequal normalized progress must not turn this physical diagonal into Today.
+  // Unequal normalized progress must not turn this physical diagonal into Medications.
   const diagonal = updateBrandPull(idlePull(), 250, 200, thresholds);
   assert.equal(diagonal.action, null);
   assert.equal(diagonal.lockedAction, null);
@@ -263,23 +270,29 @@ test("adaptive thresholds do not normalize physical direction or alter first-axi
   assert.equal(state.action, "refresh");
   assert.equal(state.lockedAction, null);
   state = updateBrandPull(state, 264, 0, thresholds);
-  assert.equal(state.lockedAction, "today");
-  assert.equal(getBrandPullRelease(state, "/history", thresholds), "today");
+  assert.equal(state.lockedAction, "medications");
+  assert.equal(
+    getBrandPullRelease(state, "/history", thresholds),
+    "medications",
+  );
   // A coalesced crossing followed by cross-axis movement remains locked,
   // but the retracted horizontal distance disarms its release.
   state = updateBrandPull(state, 0, 400, thresholds);
-  assert.equal(state.action, "today");
-  assert.equal(state.lockedAction, "today");
+  assert.equal(state.action, "medications");
+  assert.equal(state.lockedAction, "medications");
   assert.equal(getBrandPullRelease(state, "/history", thresholds), null);
   state = updateBrandPull(state, 264, 400, thresholds);
-  assert.equal(getBrandPullRelease(state, "/history", thresholds), "today");
+  assert.equal(
+    getBrandPullRelease(state, "/history", thresholds),
+    "medications",
+  );
 });
 
 test("adaptive final-up crossings and exact retraction boundaries apply on both axes", () => {
   const thresholds = getBrandPullThresholds(40, 40, 320, 320);
-  for (const action of ["today", "refresh"] as const) {
+  for (const action of ["medications", "refresh"] as const) {
     const point = (distance: number): [number, number] =>
-      action === "today" ? [distance, 0] : [0, distance];
+      action === "medications" ? [distance, 0] : [0, distance];
     const threshold = getBrandPullThreshold(action, thresholds);
     const before = updateBrandPull(
       idlePull(),
@@ -295,51 +308,54 @@ test("adaptive final-up crossings and exact retraction boundaries apply on both 
     assert.equal(back.lockedAction, action);
     assert.equal(getBrandPullRelease(back, "/history", thresholds), null);
   }
-  assert.equal(isBrandTodayPull(264, 0, thresholds), true);
+  assert.equal(isBrandMedicationsPull(264, 0, thresholds), true);
   assert.equal(isBrandRefreshPull(0, 264, thresholds), true);
-  assert.equal(isBrandTodayPull(263.99, 0, thresholds), false);
+  assert.equal(isBrandMedicationsPull(263.99, 0, thresholds), false);
   assert.equal(isBrandRefreshPull(0, 263.99, thresholds), false);
 });
 
 test("invalid or unusable viewport travel and thresholds never create a tiny ready gesture", () => {
   for (const invalid of [NaN, Infinity, -Infinity]) {
-    assert.equal(getBrandPullThresholds(invalid, 40, 320, 844).today, 340);
+    assert.equal(
+      getBrandPullThresholds(invalid, 40, 320, 844).medications,
+      340,
+    );
     assert.equal(getBrandPullThresholds(40, invalid, 320, 844).refresh, 340);
-    assert.equal(getBrandPullThresholds(40, 40, invalid, 844).today, 340);
+    assert.equal(getBrandPullThresholds(40, 40, invalid, 844).medications, 340);
     assert.equal(getBrandPullThresholds(40, 40, 320, invalid).refresh, 340);
   }
   for (const travel of [-100, 0, 8])
     assert.equal(
-      getBrandPullThresholds(40, 40, 40 + 16 + travel, 844).today,
+      getBrandPullThresholds(40, 40, 40 + 16 + travel, 844).medications,
       340,
     );
   for (const invalid of [NaN, Infinity, -Infinity, -1, 0, 8]) {
-    const thresholds = { today: invalid, refresh: invalid };
-    assert.equal(getBrandPullThreshold("today", thresholds), 340);
+    const thresholds = { medications: invalid, refresh: invalid };
+    assert.equal(getBrandPullThreshold("medications", thresholds), 340);
     assert.equal(getBrandPullThreshold("refresh", thresholds), 340);
     const state = updateBrandPull(idlePull(), 20, 0, thresholds);
     assert.equal(state.lockedAction, null);
     assert.equal(getBrandPullRelease(state, "/", thresholds), null);
   }
   assert.equal(
-    getBrandPullThreshold("today", { today: 500, refresh: 500 }),
+    getBrandPullThreshold("medications", { medications: 500, refresh: 500 }),
     340,
   );
   assert.equal(getBrandPullThreshold(null), 340);
-  assert.equal(getBrandPullThreshold("today"), 340);
+  assert.equal(getBrandPullThreshold("medications"), 340);
 });
 
-test("a tentative downward pull can turn right and commit Today only at its threshold", () => {
+test("a tentative downward pull can turn right and commit Medications only at its threshold", () => {
   const initial = idlePull();
   const down = updateBrandPull(initial, 0, 50);
   assert.equal(down.action, "refresh");
   assert.equal(down.lockedAction, null);
   const right = updateBrandPull(down, 70, 0);
-  assert.equal(right.action, "today");
+  assert.equal(right.action, "medications");
   assert.equal(right.lockedAction, null);
   assert.equal(
     updateBrandPull(right, BRAND_REFRESH_THRESHOLD, 0).lockedAction,
-    "today",
+    "medications",
   );
   assert.deepEqual(
     initial,
@@ -369,9 +385,9 @@ test("neutral diagonals recover without cancelling or locking either direction",
 });
 
 test("each direction locks exactly at the threshold and ignores subsequent opposite-axis dominance", () => {
-  for (const action of ["today", "refresh"] as const) {
+  for (const action of ["medications", "refresh"] as const) {
     const point = (along: number, cross: number) =>
-      action === "today" ? [along, cross] : [cross, along];
+      action === "medications" ? [along, cross] : [cross, along];
     let [x, y] = point(BRAND_REFRESH_THRESHOLD - 0.01, 0);
     let state = updateBrandPull(idlePull(), x, y);
     assert.equal(state.lockedAction, null);
@@ -387,9 +403,9 @@ test("each direction locks exactly at the threshold and ignores subsequent oppos
 });
 
 test("retraction disarms release but never unlocks or changes the committed axis", () => {
-  for (const action of ["today", "refresh"] as const) {
+  for (const action of ["medications", "refresh"] as const) {
     const point = (along: number, cross: number) =>
-      action === "today" ? [along, cross] : [cross, along];
+      action === "medications" ? [along, cross] : [cross, along];
     let [x, y] = point(BRAND_REFRESH_THRESHOLD + 14, 0);
     let state = updateBrandPull(idlePull(), x, y);
     for (const along of [40, 0, -30]) {
@@ -408,7 +424,7 @@ test("retraction disarms release but never unlocks or changes the committed axis
 });
 
 test("readiness reverses at the threshold while the first reached axis stays locked", () => {
-  for (const action of ["today", "refresh"] as const) {
+  for (const action of ["medications", "refresh"] as const) {
     let state = idlePull();
     const samples = [
       [BRAND_REFRESH_THRESHOLD - 0.01, false],
@@ -421,7 +437,7 @@ test("readiness reverses at the threshold while the first reached axis stays loc
       const cross = index > 1 ? 3 * BRAND_REFRESH_THRESHOLD : 0;
       state = updateBrandPull(
         state,
-        action === "today" ? along : cross,
+        action === "medications" ? along : cross,
         action === "refresh" ? along : cross,
       );
       assert.equal(state.action, action);
@@ -434,7 +450,7 @@ test("readiness reverses at the threshold while the first reached axis stays loc
 test("the final pointer-up point may commit a threshold without a final move event", () => {
   assert.equal(
     updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD + 4, 0).lockedAction,
-    "today",
+    "medications",
   );
   assert.equal(
     updateBrandPull(idlePull(), 0, BRAND_REFRESH_THRESHOLD + 4).lockedAction,
@@ -450,8 +466,8 @@ test("a coalesced crossing stays locked even if the latest point has turned or r
     [0, BRAND_REFRESH_THRESHOLD + 34],
   ])
     state = updateBrandPull(state, x, y);
-  assert.equal(state.lockedAction, "today");
-  assert.equal(state.action, "today");
+  assert.equal(state.lockedAction, "medications");
+  assert.equal(state.action, "medications");
   assert.equal(state.distance, 0);
 });
 
@@ -489,7 +505,7 @@ test("invalid samples cannot commit an action or preserve a ready distance", () 
     );
     const locked = updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD + 4, 0);
     const next = updateBrandPull(locked, invalid, BRAND_REFRESH_THRESHOLD + 4);
-    assert.equal(next.lockedAction, "today");
+    assert.equal(next.lockedAction, "medications");
     assert.equal(next.distance, 0);
   }
 });
@@ -643,17 +659,17 @@ test("adaptive readiness preserves the same physical 112px pill exchange and its
         1_000 / 60,
       );
     const adaptive = getBrandPullFeedback(
-      distance / small.today,
+      distance / small.medications,
       0,
       0,
-      "today",
+      "medications",
       exchange,
     );
     const full = getBrandPullFeedback(
       distance / BRAND_REFRESH_THRESHOLD,
       0,
       0,
-      "today",
+      "medications",
       exchange,
     );
     assert.equal(adaptive.pillOpacity, full.pillOpacity);
@@ -794,7 +810,7 @@ test("the resting face preserves the original pills and background until the exc
     112 / BRAND_REFRESH_THRESHOLD,
     0,
     0,
-    "today",
+    "medications",
   );
   assert.equal(exchanged.pillOpacity, 0);
   assert.equal(exchanged.reveal, 1);
@@ -813,7 +829,7 @@ test("the longer exchange stays reversible without ever tinting the black face",
     assert.ok(feedback.reveal >= previousGlyph);
     previousPills = feedback.pillOpacity;
     previousGlyph = feedback.reveal;
-    const sideways = getBrandPullFeedback(progress, 0, 0, "today");
+    const sideways = getBrandPullFeedback(progress, 0, 0, "medications");
     assert.equal(sideways.pillOpacity, feedback.pillOpacity);
     assert.equal(sideways.reveal, feedback.reveal);
     assert.equal(sideways.wash, 0);
@@ -885,7 +901,7 @@ test("a slower exchange clock never delays geometry or authoritative readiness",
 });
 
 test("both directions shrink during the pull then hold the button 25% larger when armed", () => {
-  for (const action of ["today", "refresh"] as const) {
+  for (const action of ["medications", "refresh"] as const) {
     const halfway = getBrandPullFeedback(0.5, 0, 0, action);
     const beforeReady = getBrandPullFeedback(1, 0, 0, action);
     const ready = getBrandPullFeedback(1, 1, 0, action);
@@ -893,7 +909,7 @@ test("both directions shrink during the pull then hold the button 25% larger whe
       halfway.buttonScale < 1 && halfway.buttonScale > beforeReady.buttonScale,
     );
     assert.ok(halfway.iconScale > 0.25 && halfway.iconScale < 1);
-    assert.equal(halfway.buttonTilt > 0, action === "today");
+    assert.equal(halfway.buttonTilt > 0, action === "medications");
     assert.equal(ready.buttonScale, 1.25);
     assert.ok(Math.abs(ready.iconScale - 1.14) < 1e-12);
     assert.equal(ready.iconTurn, 0);
@@ -924,7 +940,7 @@ test("retracting progress reverses the glyph and home undershoot recovers to the
 });
 
 test("release and cancellation shrink home without rotating the last painted glyph angle", () => {
-  for (const action of ["refresh", "today"] as const) {
+  for (const action of ["refresh", "medications"] as const) {
     for (const initialProgress of [1, 0.72, 0.18]) {
       let pose = { x: 0, y: 0, progress: initialProgress };
       let exchange = Math.min(initialProgress, BRAND_PULL_EXCHANGE_END);
@@ -970,7 +986,7 @@ test("release and cancellation shrink home without rotating the last painted gly
 });
 
 test("the held return angle changes no other feedback and releasing the hold restores active pull rotation", () => {
-  for (const action of ["refresh", "today"] as const) {
+  for (const action of ["refresh", "medications"] as const) {
     const captured = getBrandPullFeedback(0.63, 0, 0, action).iconTurn;
     const live = getBrandPullFeedback(0.28, -0.1, -0.2, action, 0.2);
     const held = getBrandPullFeedback(0.28, -0.1, -0.2, action, 0.2, captured);
@@ -1017,7 +1033,7 @@ test("feedback stays finite and within visual bounds for overshoot and malformed
   for (const progress of values)
     for (const readiness of values)
       for (const home of values)
-        for (const action of [null, "refresh", "today"] as const) {
+        for (const action of [null, "refresh", "medications"] as const) {
           const feedback = getBrandPullFeedback(
             progress,
             readiness,
@@ -1064,21 +1080,34 @@ test("the actual ready spring rebounds to a larger charged rest without adding t
   );
 });
 
-test("releasing an armed Today gesture while already home produces only a rollback", () => {
-  const today = updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD, 0);
-  assert.equal(getBrandPullRelease(today, "/"), "home");
-  assert.equal(getBrandPullRelease(today, "/history"), "today");
+test("a rightward release opens Medications from Today and other pages", () => {
+  const medications = updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD, 0);
+  for (const pathname of ["/", "/history", "/goals", "/guide"])
+    assert.equal(getBrandPullRelease(medications, pathname), "medications");
+});
+
+test("a rightward release already on Medications only rolls back", () => {
+  const medications = updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD, 0);
+  assert.equal(getBrandPullRelease(medications, "/medications"), "home");
+});
+
+test("a downward release refreshes on both Today and Medications", () => {
   const refresh = updateBrandPull(idlePull(), 0, BRAND_REFRESH_THRESHOLD);
-  assert.equal(getBrandPullRelease(refresh, "/"), "refresh");
-  assert.equal(getBrandPullRelease(refresh, "/history"), "refresh");
+  for (const pathname of ["/", "/history", "/medications"])
+    assert.equal(getBrandPullRelease(refresh, pathname), "refresh");
 });
 
 test("a retracted, incomplete or invalid release cannot trigger a destination", () => {
-  const today = updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD, 0);
-  const retracted = updateBrandPull(today, BRAND_REFRESH_THRESHOLD - 0.01, 0);
+  const medications = updateBrandPull(idlePull(), BRAND_REFRESH_THRESHOLD, 0);
+  const retracted = updateBrandPull(
+    medications,
+    BRAND_REFRESH_THRESHOLD - 0.01,
+    0,
+  );
   assert.equal(getBrandPullRelease(retracted, "/"), null);
   assert.equal(getBrandPullRelease(retracted, "/history"), null);
+  assert.equal(getBrandPullRelease(retracted, "/medications"), null);
   assert.equal(getBrandPullRelease(idlePull(), "/"), null);
   for (const distance of [NaN, Infinity, -Infinity])
-    assert.equal(getBrandPullRelease({ ...today, distance }, "/"), null);
+    assert.equal(getBrandPullRelease({ ...medications, distance }, "/"), null);
 });

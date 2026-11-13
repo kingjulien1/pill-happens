@@ -1362,9 +1362,11 @@ export function DeveloperGuidePage() {
                 refresh action.
               </p>
               <p>
-                A rightward branding pull returns to Today instead of reloading.
-                Both gestures retain an 8px slop, 1.5 axis dominance and a
-                resisted offset capped at 84px, with a deliberate 340px release
+                A rightward branding pull opens Medications with in-app
+                navigation and remembers it as the last screen. Already on
+                Medications, it only settles back without navigating, scrolling
+                or changing drafts. Both gestures retain an 8px slop, 1.5 axis
+                dominance and a resisted offset capped at 84px, with a deliberate 340px release
                 threshold. Each pointer-down captures the available physical
                 travel with a 16px screen-edge inset; a narrow phone or short
                 landscape viewport can use a shorter threshold so the gesture
