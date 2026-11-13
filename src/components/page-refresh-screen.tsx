@@ -65,6 +65,9 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   --refresh-paint-tone-pale-a20: color-mix( in srgb, var(--brand-tone-pale) calc(100% * 20 / 255), transparent );
   --refresh-paper: #f8e7ef;
   --refresh-ink: #000;
+  --refresh-muted: rgb(0 0 0 / 40%);
+  --refresh-cameo: #9d4a70;
+  --refresh-wash: rgb(249 168 212 / 8%);
   --refresh-arrival: var(--page-refresh-elapsed, 0ms);
   --refresh-threshold: calc(var(--page-refresh-elapsed, 0ms) + 1200ms);
   --refresh-loop: calc(var(--page-refresh-elapsed, 0ms) + 2160ms);
@@ -76,8 +79,11 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   box-sizing: border-box;
   place-items: center;
   overflow: hidden;
-  background: var(--refresh-paper);
+  background:
+    radial-gradient(ellipse at 50% 42%, var(--refresh-wash), transparent 68%),
+    var(--refresh-paper);
   color: var(--refresh-ink);
+  color-scheme: light;
   font-family: ui-sans-serif, system-ui, sans-serif;
   isolation: isolate;
 }
@@ -109,6 +115,8 @@ html[data-page-refresh-active] .page-refresh-screen {
     radial-gradient(ellipse at 35% 35%, color-mix(in srgb, var(--brand-tone-ice) 7%, transparent), transparent 58%),
     radial-gradient(ellipse at 64% 66%, color-mix(in srgb, var(--brand-tone-teal) 6%, transparent), transparent 63%),
     radial-gradient(ellipse at center, color-mix(in srgb, var(--brand-copy) 5%, transparent), transparent 68%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 28%, transparent 74%);
+  mask-image: radial-gradient(ellipse at center, #000 28%, transparent 74%);
   transform: translate(-50%, -50%);
   animation: refresh-brand-aura-breathe 3800ms ease-in-out var(--refresh-loop) infinite;
 }
@@ -227,12 +235,16 @@ html[data-page-refresh-active] .page-refresh-screen {
 }
 .page-refresh-charged-glow::after { inset: -4px; border-width: 1px; border-color: var(--refresh-paint-charge-pearl-p22); filter: blur(3px); }
 .page-refresh-glyph { z-index: 3; display: grid; place-items: center; color: var(--brand-copy); }
-.page-refresh-glyph-intro { animation: refresh-brand-glyph-arrive 1200ms linear var(--refresh-arrival) both; }
+.page-refresh-glyph-intro {
+  animation:
+    refresh-brand-glyph-arrive 1200ms linear var(--refresh-arrival) both,
+    refresh-brand-intro-spin 1200ms linear var(--refresh-arrival) both;
+}
 .page-refresh-glyph-threshold { animation: refresh-brand-spring-glyph 960ms linear var(--refresh-threshold) both; }
 .page-refresh-rotor-wind,
 .page-refresh-rotor,
 .page-refresh-rotor-breath { display: grid; place-items: center; }
-.page-refresh-rotor-wind { animation: refresh-brand-threshold-turn 960ms cubic-bezier(.333333, .444444, .666667, .811556) var(--refresh-threshold) both; }
+.page-refresh-rotor-wind { animation: refresh-brand-threshold-turn 960ms cubic-bezier(.333333, .435733932, .666667, .769067265) var(--refresh-threshold) both; }
 .page-refresh-rotor { animation: refresh-brand-fast-rotor 1800ms linear var(--refresh-loop) infinite both; }
 .page-refresh-rotor-breath { animation: refresh-brand-fast-breath 1800ms ease-in-out var(--refresh-loop) infinite both; }
 .page-refresh-glyph svg { display: block; width: 23px; height: 23px; overflow: visible; transform-origin: center; }
@@ -278,9 +290,9 @@ html[data-page-refresh-active] .page-refresh-screen {
 .page-refresh-particle[data-shape="3"] { width: 7px; height: 7px; clip-path: polygon(50% 0, 64% 36%, 100% 50%, 64% 64%, 50% 100%, 36% 64%, 0 50%, 36% 36%); }
 .page-refresh-copy { position: absolute; top: calc(100% + 94px); inset-inline: 0; color: var(--refresh-ink); animation: refresh-brand-copy-enter 500ms ease-out calc(var(--refresh-arrival) + 500ms) both; }
 .page-refresh-title { margin: 0; font-size: 13px; line-height: 20px; font-weight: 450; letter-spacing: -.01em; }
-.page-refresh-secondary { margin: 13px 0 0; color: rgb(0 0 0 / 40%); font-size: 11px; line-height: 18px; font-weight: 400; letter-spacing: 0; }
+.page-refresh-secondary { margin: 13px 0 0; color: var(--refresh-muted); font-size: 11px; line-height: 18px; font-weight: 400; letter-spacing: 0; }
 .page-refresh-secondary span, .page-refresh-footer-copy span { display: block; }
-.page-refresh-footer { position: absolute; z-index: 2; bottom: max(72px, calc(env(safe-area-inset-bottom) + 40px)); left: 50%; width: min(calc(100% - 48px), 340px); transform: translateX(-50%); text-align: center; color: rgb(0 0 0 / 40%); font-weight: 400; }
+.page-refresh-footer { position: absolute; z-index: 2; bottom: max(72px, calc(env(safe-area-inset-bottom) + 40px)); left: 50%; width: min(calc(100% - 48px), 340px); transform: translateX(-50%); text-align: center; color: var(--refresh-muted); font-weight: 400; }
 .page-refresh-footer-links { display: flex; min-height: 32px; justify-content: center; align-items: center; gap: 14px; }
 .page-refresh-footer a { display: none; padding: 8px 4px; color: inherit; font: inherit; font-size: 10px; line-height: 16px; text-decoration: none; text-underline-offset: 3px; }
 .page-refresh-footer a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }
@@ -289,7 +301,7 @@ ${LOADING_SCREEN_LINKS.map(({ id }) => `html[data-page-refresh-link-one="${id}"]
 .page-refresh-wanderers { position: absolute; inset: 0; pointer-events: none; display: none; }
 html[data-page-refresh-pills-ready="true"] .page-refresh-wanderers { display: block; }
 .page-refresh-wanderer { position: absolute; left: var(--pill-x); top: var(--pill-y); width: var(--pill-size, 18px); height: var(--pill-size, 18px); translate: -50% -50%; visibility: var(--pill-visible, hidden); }
-.page-refresh-wanderer svg { display: block; width: 100%; height: 100%; color: #9d4a70; fill: none; stroke-width: 1.65; opacity: 0; animation: refresh-pill-cameo 8000ms linear calc(var(--refresh-loop) + var(--pill-slot) * 1000ms) infinite both; transform-origin: center; }
+.page-refresh-wanderer svg { display: block; width: 100%; height: 100%; color: var(--refresh-cameo); fill: none; stroke-width: 1.65; opacity: 0; animation: refresh-pill-cameo 8000ms linear calc(var(--refresh-loop) + var(--pill-slot) * 1000ms) infinite both; transform-origin: center; }
 @keyframes refresh-pill-cameo {
   0% { opacity: 0; transform: rotate(var(--pill-angle)) scale(.06); animation-timing-function: cubic-bezier(.16,.8,.25,1); }
   6% { opacity: .32; transform: rotate(calc(var(--pill-angle) + var(--pill-spin) * 720deg)) scale(1); animation-timing-function: ease-in-out; }
@@ -324,14 +336,23 @@ html[data-page-refresh-active="fading"] .page-refresh-rays { animation: refresh-
 html[data-page-refresh-active="fading"] .page-refresh-particle { animation: refresh-brand-releaseParticles 560ms cubic-bezier(.16, 1, .3, 1) 20ms both; }
 html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-brand-copy-exit 600ms ease-in both; }
 @keyframes refresh-brand-face-arrive { 0% { opacity: 0; transform: scale(.0001); } 22% { opacity: 1; transform: scale(.42); } 66.666667% { transform: scale(.94); } 100% { opacity: 1; transform: scale(.84); } }
-/* Five-plus fast turns are followed by a slight eased brake over the final third. */
-@keyframes refresh-brand-glyph-arrive { 0% { transform: rotate(0deg) scale(.0001); animation-timing-function: cubic-bezier(.333333, .333333, .666667, .666667); } 66.666667% { transform: rotate(1500deg) scale(.94); animation-timing-function: cubic-bezier(.333333, .378788, .666667, .69697); } 100% { transform: rotate(2160deg) scale(1); } }
+/* Keep the spring's original size track independent of the opening turn. */
+@keyframes refresh-brand-glyph-arrive { 0% { transform: scale(.0001); animation-timing-function: linear; } 66.666667% { transform: scale(.94); animation-timing-function: cubic-bezier(.333333, .378788, .666667, .69697); } 100% { transform: scale(1); } }
+/* 540deg in 300ms, then a 250ms brake from 1800 to 1200deg/s.
+   The rest of the arrival keeps that moderate speed; no reset at either join. */
+@keyframes refresh-brand-intro-spin {
+  0% { rotate: 0deg; animation-timing-function: linear; }
+  25% { rotate: 540deg; animation-timing-function: cubic-bezier(.333333, .4, .666667, .733333); }
+  45.833333% { rotate: 915deg; animation-timing-function: linear; }
+  100% { rotate: 1695deg; }
+}
 @keyframes refresh-brand-edge-enter { 0%, 20% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes refresh-brand-glow-enter { from { opacity: 0; } to { opacity: 1; } }
 @keyframes refresh-brand-rings-enter { from { opacity: 0; } to { opacity: 1; } }
 @keyframes refresh-brand-copy-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
-/* Keep the intro speed through the burst, then hand off at the exact loop speed. */
-@keyframes refresh-brand-threshold-turn { from { transform: rotate(0deg); } to { transform: rotate(1080deg); } }
+/* Continue at 1200deg/s, then ease to the live rotor's 635.983deg/s.
+   Distance and cubic endpoint tangents preserve angle and speed at both joins. */
+@keyframes refresh-brand-threshold-turn { from { transform: rotate(0deg); } to { transform: rotate(881.271739deg); } }
 @keyframes refresh-brand-fast-rotor {
   0% { transform: rotate(0deg); animation-timing-function: cubic-bezier(.333333, .340324, .666667, .67895); }
   25% { transform: rotate(280.31324deg); animation-timing-function: cubic-bezier(.333333, .346568, .666667, .674216); }
@@ -349,9 +370,23 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 @keyframes refresh-brand-orbit-exit { 0% { opacity: .86; transform: scale(1); } 20% { opacity: 1; transform: scale(.92); } 55% { opacity: .8; transform: scale(1.06); } 100% { opacity: 0; transform: scale(1.12); } }
 @keyframes refresh-brand-copy-exit { 0%, 17% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.025); } 100% { opacity: 0; transform: scale(.9); } }
 @media (prefers-color-scheme: dark) {
-  :where(html:not([data-color-mode])) .page-refresh-screen { --refresh-paper: #eddae5; }
+  :where(html:not([data-color-mode])) .page-refresh-screen {
+    --refresh-paper: #17121c;
+    --refresh-ink: #fdf1f7;
+    --refresh-muted: rgb(253 241 247 / 40%);
+    --refresh-cameo: #f9a8d4;
+    --refresh-wash: rgb(244 114 182 / 7%);
+    color-scheme: dark;
+  }
 }
-:where(html[data-color-mode="dark"]) .page-refresh-screen { --refresh-paper: #eddae5; }
+:where(html[data-color-mode="dark"]) .page-refresh-screen {
+  --refresh-paper: #17121c;
+  --refresh-ink: #fdf1f7;
+  --refresh-muted: rgb(253 241 247 / 40%);
+  --refresh-cameo: #f9a8d4;
+  --refresh-wash: rgb(244 114 182 / 7%);
+  color-scheme: dark;
+}
 
 @keyframes refresh-brand-spring-core {
   0% { transform: scale(1.0000000); }
