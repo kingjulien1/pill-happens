@@ -1,0 +1,120 @@
+/* Dialog geometry shares the intake card's shape, not one radius for every size. */
+:root {
+  --dialog-radius-surface: var(--intake-card-radius);
+  --dialog-radius-control: 12px;
+  --dialog-radius-compact: 8px;
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"]) {
+  /* The action's frame, clipped paint, inset rim and aura consume one value. */
+  --dialog-action-radius: var(--dialog-radius-surface);
+}
+
+[data-slot="dialog-content"] {
+  border-radius: var(--dialog-radius-surface);
+}
+
+[data-slot="drawer-popup"] {
+  border-radius: var(--dialog-radius-surface);
+}
+
+[data-slot="drawer-popup"][data-swipe-direction="down"] {
+  /* A bottom sheet meets the viewport along its square bottom edge. */
+  border-radius: var(--dialog-radius-surface) var(--dialog-radius-surface) 0 0;
+}
+
+[data-slot="drawer-popup"][data-swipe-direction="up"] {
+  border-radius: 0 0 var(--dialog-radius-surface) var(--dialog-radius-surface);
+}
+
+[data-slot="drawer-popup"][data-swipe-direction="left"] {
+  border-radius: 0 var(--dialog-radius-surface) var(--dialog-radius-surface) 0;
+}
+
+[data-slot="drawer-popup"][data-swipe-direction="right"] {
+  border-radius: var(--dialog-radius-surface) 0 0 var(--dialog-radius-surface);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  :is(
+    [data-slot="input"],
+    [data-slot="textarea"],
+    [data-slot="select-trigger"]
+  ):not([data-dialog-canvas]) {
+  border-radius: var(--dialog-radius-control);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-slot="button"]:not([data-button-kind]) {
+  border-radius: var(--dialog-button-radius, var(--dialog-radius-control));
+}
+
+/* Plain submit actions get the same extra clearance as dialog accent actions. */
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-slot="button"][type="submit"]:not([data-button-kind]) {
+  margin-block-start: 8px;
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-dialog-corner="control"] {
+  --dialog-button-radius: var(--dialog-radius-control);
+  border-radius: var(--dialog-radius-control);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-dialog-corner="compact"] {
+  --dialog-button-radius: var(--dialog-radius-compact);
+  border-radius: var(--dialog-radius-compact);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-slot="button"]:is(.h-12, .h-13, .h-14, .h-16):not(
+    [data-button-kind],
+    [data-dialog-corner="control"],
+    [data-dialog-corner="compact"]
+  ) {
+  --dialog-button-radius: var(--dialog-radius-surface);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-dialog-panel] {
+  border-radius: var(--dialog-radius-surface);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-slot="button"]:is(
+    .h-6,
+    .h-7,
+    .h-8,
+    .size-6,
+    .size-7,
+    .size-8,
+    [data-dialog-corner="compact"]
+  ):not([data-dialog-corner="control"]) {
+  --dialog-button-radius: var(--dialog-radius-compact);
+}
+
+/* Menus are portaled outside their dialog: give their surfaces explicit roles. */
+[data-slot="select-content"],
+[data-choice-menu] {
+  border-radius: var(--dialog-radius-surface);
+}
+
+[data-slot="select-content"] [data-slot="select-item"],
+[data-choice-menu] [data-choice-option] {
+  border-radius: var(--dialog-radius-compact);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  :is(
+    [data-appearance-result-frame],
+    [data-appearance-results],
+    [data-appearance-color-results]
+  ) {
+  border-radius: var(--dialog-radius-surface);
+}
+
+:is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+  [data-appearance-choice] {
+  border-radius: var(--dialog-radius-compact);
+}

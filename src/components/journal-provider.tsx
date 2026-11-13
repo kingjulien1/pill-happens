@@ -8,9 +8,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/journal-toast";
 import type { AppData } from "@/lib/domain";
 import { probeSession, recoverSession } from "@/lib/session-recovery";
+import { checkInForDay } from "@/lib/daily-check-in";
+import {
+  ReflectionSaveError,
+  confirmReflectionAcknowledgement,
+  reflectionRetryAt,
+  type ReflectionSaveInput,
+  type ReflectionSaveAcknowledgement,
+} from "@/lib/reflection-save";
 
 type JournalContext = {
   data: AppData | null;
@@ -18,6 +26,9 @@ type JournalContext = {
   error: string | null;
   refresh: () => Promise<void>;
   mutate: (path: string, body?: unknown, method?: string) => Promise<void>;
+  saveReflection: (
+    input: ReflectionSaveInput,
+  ) => Promise<ReflectionSaveAcknowledgement>;
   signOut: () => Promise<void>;
   busy: boolean;
 };
@@ -29,6 +40,10 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
+  const manualPending = useRef(false);
+  const reflectionRequest =
+    useRef<Promise<ReflectionSaveAcknowledgement> | null>(null);
+  const reflectionAbort = useRef<AbortController | null>(null);
   const revision = useRef(0);
   const signingOut = useRef(false);
   const refreshRequest = useRef<{
@@ -157,6 +172,7 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
       heartbeat.current?.abort();
       heartbeat.current = null;
       mutationRecovery.current?.abort();
+      reflectionAbort.current?.abort();
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("online", onFocus);
       window.removeEventListener("pageshow", onFocus);
@@ -165,12 +181,19 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const mutate = async (path: string, body?: unknown, method = "POST") => {
-    if (pending.current || signingOut.current)
+    if (
+      manualPending.current ||
+      (pending.current && !reflectionRequest.current) ||
+      signingOut.current
+    )
       throw new Error("Please wait for your last change to save.");
-    pending.current = true;
-    revision.current += 1;
+    manualPending.current = true;
     setBusy(true);
     try {
+      // Foreground saves never race a background response or lose the user's next click.
+      await reflectionRequest.current?.catch(() => {});
+      pending.current = true;
+      revision.current += 1;
       const res = await fetch(`/api/${path}`, {
         method,
         credentials: "same-origin",
@@ -211,13 +234,111 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
         err instanceof Error
           ? err.message
           : "Your change couldn't be saved. Please try again.";
-      toast.error(message);
+      toast.error(message, { heading: "Journal change unsuccessful" });
       throw err;
     } finally {
       pending.current = false;
+      manualPending.current = false;
       setBusy(false);
     }
   };
+
+  const saveReflection = useCallback(
+    (input: ReflectionSaveInput): Promise<ReflectionSaveAcknowledgement> => {
+      if (pending.current || manualPending.current || signingOut.current)
+        return Promise.reject(
+          new ReflectionSaveError(
+            "Another journal change is saving.",
+            0,
+            null,
+            "busy",
+          ),
+        );
+      pending.current = true;
+      revision.current += 1;
+      const controller = new AbortController();
+      reflectionAbort.current = controller;
+      const deadline = setTimeout(() => controller.abort(), 20_000);
+      const work = (async () => {
+        try {
+          const response = await fetch("/api/daily-check-ins/reflection", {
+            method: "PATCH",
+            credentials: "same-origin",
+            signal: controller.signal,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(input),
+          });
+          const result = await response.json().catch(() => null);
+          if (response.status === 401) {
+            const session = await recoverSession({ signal: controller.signal });
+            if (session === "unauthenticated") {
+              setData(null);
+              window.location.replace("/login");
+            }
+            throw new ReflectionSaveError(
+              session === "authenticated"
+                ? "Sign-in restored. Use Save to save your writing again."
+                : "Please sign in again. Your writing is kept locally.",
+              401,
+            );
+          }
+          if (!response.ok)
+            throw new ReflectionSaveError(
+              result?.error ||
+                "Writing could not be saved. It is still kept locally.",
+              response.status,
+              reflectionRetryAt(
+                response.headers.get("Retry-After"),
+                Date.now(),
+              ),
+            );
+          if (
+            !result ||
+            !Array.isArray(result.intakes) ||
+            !Array.isArray(result.medications) ||
+            !Array.isArray(result.dailyCheckIns) ||
+            typeof result.settings?.timezone !== "string"
+          )
+            throw new ReflectionSaveError(
+              "The writing save could not be confirmed. It is kept locally.",
+              0,
+              null,
+              "network",
+            );
+          const saved = checkInForDay(
+            result.dailyCheckIns,
+            input.day,
+            input.period,
+          );
+          const acknowledgement = confirmReflectionAcknowledgement(
+            input.note,
+            saved,
+          );
+          setData(result);
+          setNow(new Date());
+          setError(null);
+          return acknowledgement;
+        } catch (error) {
+          if (error instanceof ReflectionSaveError) throw error;
+          throw new ReflectionSaveError(
+            "The writing save could not be confirmed. Your local draft is safe; use Save to try again.",
+            0,
+            null,
+            "network",
+          );
+        } finally {
+          clearTimeout(deadline);
+          if (reflectionAbort.current === controller)
+            reflectionAbort.current = null;
+          reflectionRequest.current = null;
+          pending.current = false;
+        }
+      })();
+      reflectionRequest.current = work;
+      return work;
+    },
+    [],
+  );
 
   const signOut = async () => {
     if (pending.current)
@@ -244,7 +365,16 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <Context.Provider
-      value={{ data, now, error, refresh, mutate, signOut, busy }}
+      value={{
+        data,
+        now,
+        error,
+        refresh,
+        mutate,
+        saveReflection,
+        signOut,
+        busy,
+      }}
     >
       {children}
     </Context.Provider>

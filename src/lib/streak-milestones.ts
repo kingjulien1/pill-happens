@@ -8,13 +8,25 @@ import {
 } from "@/lib/domain";
 import {
   DAILY_MOODS,
+  getCheckInPeriod,
   type DailyCheckIn,
   type DailyMood,
 } from "@/lib/daily-check-in";
 import { loggingStreak, streakMilestone } from "@/lib/logging-streak";
 import type { MedicationColor } from "@/lib/medication-appearance";
+import { checkInRatingForComparison } from "@/lib/check-in-rating";
 
 const earlyTargets = [2, 3, 4, 5, 7, 10, 13, 15, 17, 20, 25, 30] as const;
+export const UPCOMING_MILESTONE_BATCH = 3;
+
+/** Internal view state grows one batch at a time; the target sequence has no cap. */
+export function normalizeUpcomingMilestoneCount(
+  count = UPCOMING_MILESTONE_BATCH,
+) {
+  return Number.isSafeInteger(count) && count >= UPCOMING_MILESTONE_BATCH
+    ? count
+    : UPCOMING_MILESTONE_BATCH;
+}
 const dayMilliseconds = 86_400_000;
 const isoTimestamp =
   /^(\d{4}-\d{2}-\d{2})T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,9})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/;
@@ -222,8 +234,9 @@ function contextFor(
       runs.push({ start: day, end: day, length: 1 });
     }
   }
-  // One saved response per day. Prefer the latest valid edit if legacy data
-  // happens to contain duplicates, without changing the stored collection.
+  // Comparisons retain one response per day, preferring Evening when both
+  // periods exist. Morning-only days contribute without replacing an Evening's
+  // ratings; duplicate records within a period still use the latest valid edit.
   const checkIns = new Map<string, DailyCheckIn>();
   for (const entry of includeCheckIns ? (data.dailyCheckIns ?? []) : []) {
     if (
@@ -236,7 +249,10 @@ function contextFor(
     const previous = checkIns.get(entry.day);
     if (
       !previous ||
-      Date.parse(entry.updatedAt) > Date.parse(previous.updatedAt)
+      (getCheckInPeriod(entry) === "evening" &&
+        getCheckInPeriod(previous) === "morning") ||
+      (getCheckInPeriod(entry) === getCheckInPeriod(previous) &&
+        Date.parse(entry.updatedAt) > Date.parse(previous.updatedAt))
     )
       checkIns.set(entry.day, entry);
   }
@@ -261,15 +277,6 @@ function ratingSummary(values: (number | null)[]): RatingSummary {
       : null,
     count: present.length,
   };
-}
-
-function validScale(value: number | null) {
-  return typeof value === "number" &&
-    Number.isInteger(value) &&
-    value >= 1 &&
-    value <= 5
-    ? value
-    : null;
 }
 
 function summarizeWindow(
@@ -300,8 +307,16 @@ function summarizeWindow(
     intakeCount: entries.length,
     checkInDays: checkIns.length,
     noteDays: noteDays.size,
-    energy: ratingSummary(checkIns.map((entry) => validScale(entry.energy))),
-    stress: ratingSummary(checkIns.map((entry) => validScale(entry.stress))),
+    energy: ratingSummary(
+      checkIns.map((entry) =>
+        checkInRatingForComparison(entry.energy, entry.energyScale),
+      ),
+    ),
+    stress: ratingSummary(
+      checkIns.map((entry) =>
+        checkInRatingForComparison(entry.stress, entry.stressScale),
+      ),
+    ),
     sleepHours: ratingSummary(
       checkIns.map((entry) =>
         typeof entry.sleepHours === "number" &&
@@ -498,7 +513,11 @@ function nextTarget(target: number) {
       ];
 }
 
-export function getStreakMilestones(data: AppData, now: Date) {
+export function getStreakMilestones(
+  data: AppData,
+  now: Date,
+  upcomingCount = UPCOMING_MILESTONE_BATCH,
+) {
   const context = contextFor(data, now, false);
   const reached = streakMilestone(context.streak.best);
   const achieved: StreakMilestone[] = [];
@@ -508,8 +527,9 @@ export function getStreakMilestones(data: AppData, now: Date) {
     target = previousTarget(target);
   }
   const upcoming: StreakMilestone[] = [];
+  const count = normalizeUpcomingMilestoneCount(upcomingCount);
   let next = reached.next;
-  while (upcoming.length < 3) {
+  while (upcoming.length < count) {
     upcoming.push(milestoneFor(context, next));
     next = nextTarget(next);
   }

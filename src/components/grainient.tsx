@@ -16,6 +16,8 @@ import {
 import {
   getBackgroundFrameElapsed,
   getBackgroundResolution,
+  getBackgroundCompositionZoom,
+  type BackgroundFraming,
 } from "@/lib/background-rendering";
 import { APP_BACKGROUND_COLORS } from "@/lib/app-theme";
 
@@ -32,6 +34,8 @@ export interface GrainientProps extends Omit<
   speed?: number;
   flow?: number;
   scale?: number;
+  /** Portrait framing zooms the whole field out; scale still controls its warp. */
+  framing?: BackgroundFraming;
   softness?: number;
   silk?: number;
   grainAmount?: number;
@@ -59,6 +63,7 @@ type Settings = {
   speed: number;
   flow: number;
   scale: number;
+  framing: BackgroundFraming;
   softness: number;
   silk: number;
   grainAmount: number;
@@ -100,7 +105,7 @@ const MAX_TWIRLS = 4;
 const STIR_LIFE = 1.3;
 const STIR_STEP = 0.06;
 const TWIRL_LIFE = 2.6;
-const INTRO_SECONDS = 1.6;
+const INTRO_SECONDS = 3.2;
 const DEFAULT_COLORS = APP_BACKGROUND_COLORS;
 const TYPES: Record<string, number> = { linear: 0, radial: 1 };
 
@@ -126,6 +131,7 @@ uniform float uBands;
 uniform float uSoftness;
 uniform float uFlow;
 uniform float uScale;
+uniform float uZoom;
 uniform float uSilk;
 uniform vec4 uStir[24];
 uniform float uStirWeight[24];
@@ -219,6 +225,8 @@ void main() {
     float s = sin(a);
     p = uTwirl[i].xy + mat2(c, -s, s, c) * d;
   }
+  // Pointer effects use viewport coordinates; composition framing follows them.
+  p /= uZoom;
   float raw = coord(p);
   float s = raw;
   if (uBands > 1.0) {
@@ -367,6 +375,7 @@ const Grainient = ({
   speed = 1,
   flow = 0.8,
   scale = 1,
+  framing = "native",
   softness = 1,
   silk = 0.35,
   grainAmount = 0.08,
@@ -400,6 +409,7 @@ const Grainient = ({
     speed: Math.max(0, speed),
     flow: clamp(flow, 0, 3),
     scale: clamp(scale, 0.25, 3),
+    framing: framing === "portrait" ? "portrait" : "native",
     softness: clamp(softness, 0, 1),
     silk: clamp(silk, 0, 1),
     grainAmount: clamp(grainAmount, 0, 0.5),
@@ -571,6 +581,10 @@ const Grainient = ({
       gl.uniform1f(fu.uSoftness, s.softness);
       gl.uniform1f(fu.uFlow, s.flow);
       gl.uniform1f(fu.uScale, s.scale);
+      gl.uniform1f(
+        fu.uZoom,
+        getBackgroundCompositionZoom(view.width, view.height, s.framing),
+      );
       gl.uniform1f(fu.uSilk, s.silk);
       gl.uniform4fv(fu.uStir, stirs);
       gl.uniform1fv(fu.uStirWeight, stirWeights);

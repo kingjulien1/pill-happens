@@ -1,0 +1,281 @@
+.button[data-slot="button"] {
+  --accent-play-state: var(
+    --intake-effects-play-state,
+    var(--action-paint-visibility, running)
+  );
+  --accent-rim-one: var(--intake-rim-stop-1, var(--palette-lilac));
+  --accent-rim-two: var(--intake-rim-stop-2, var(--palette-plum));
+  --accent-rim-three: var(--intake-rim-stop-3, var(--action-background));
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  background: var(--action-base);
+  color: var(--action-text);
+  box-shadow:
+    0 5px 18px var(--accent-shadow-soft),
+    0 1px 3px var(--accent-shadow-contact);
+  transition: box-shadow 180ms ease;
+}
+
+.button[data-slot="button"][data-button-kind="accent"] {
+  font-weight: 700;
+}
+
+.aura,
+.surface,
+.field,
+.anchor,
+.sheen,
+.wash,
+.rim,
+.rimFlow {
+  position: absolute;
+  pointer-events: none;
+}
+
+.aura {
+  z-index: 0;
+  inset: -4px -5px;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse at 46% 62%,
+      var(--accent-aura-flame),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse at 62% 45%,
+      var(--accent-aura-rust),
+      transparent 75%
+    );
+  opacity: 0.55;
+  filter: blur(7px);
+  transform: translateY(2px);
+}
+
+.surface {
+  z-index: 2;
+  inset: 3px;
+  overflow: hidden;
+  border-radius: calc(var(--accent-radius, 16px) - 3px);
+  background: var(--action-base);
+}
+
+.field {
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 190%;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(
+      ellipse at 20% 28%,
+      var(--accent-field-haze),
+      transparent 58%
+    ),
+    conic-gradient(
+      from 35deg at 50% 50%,
+      var(--action-field-1),
+      var(--action-field-2) 95deg,
+      var(--action-field-3) 190deg,
+      var(--action-field-4) 285deg,
+      var(--action-field-1)
+    );
+  opacity: var(--action-field-opacity);
+  transform: translate(-50%, -50%) rotate(12deg);
+  transform-origin: center;
+  animation: warm-field 26s linear infinite;
+  animation-play-state: var(--accent-play-state);
+}
+
+.anchor {
+  z-index: 1;
+  inset: 0;
+  opacity: var(--action-diagonal-opacity);
+  background:
+    radial-gradient(
+      ellipse 58% 190% at 51% 46%,
+      var(--action-diagonal-1) 0%,
+      color-mix(in srgb, var(--action-diagonal-2) 90%, transparent) 55%,
+      color-mix(in srgb, var(--palette-apricot) 0%, transparent) 96%
+    ),
+    radial-gradient(
+      ellipse 32% 155% at -5% 100%,
+      var(--accent-anchor-left),
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 30% 145% at 105% 0%,
+      var(--accent-anchor-right),
+      transparent 80%
+    ),
+    conic-gradient(
+      from 55deg at 51% 48%,
+      transparent,
+      var(--accent-anchor-flash) 65deg,
+      transparent 135deg,
+      var(--accent-anchor-depth) 225deg,
+      transparent 310deg
+    );
+}
+
+.wash {
+  z-index: 2;
+  inset: 0;
+  background: var(--action-wash);
+  opacity: var(--action-wash-opacity);
+}
+
+.sheen {
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 var(--accent-sheen-top),
+    inset 0 -1px 0 var(--accent-sheen-bottom);
+}
+
+.rim {
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--accent-rim-one);
+}
+
+.rimFlow {
+  top: 50%;
+  left: 50%;
+  width: 220%;
+  aspect-ratio: 1;
+  background: conic-gradient(
+    from 25deg,
+    var(--accent-rim-one),
+    var(--accent-rim-two) 120deg,
+    var(--accent-rim-three) 240deg,
+    var(--accent-rim-one)
+  );
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: warm-edge 8s linear -2s infinite;
+  animation-play-state: var(--accent-play-state);
+}
+
+.content {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 22px;
+  align-items: center;
+  column-gap: 16px;
+  padding-inline-end: 12px;
+  color: var(--action-text);
+}
+
+.copy {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-self: center;
+  gap: 14px;
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--intake-action-accent);
+}
+
+.icon > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.5;
+}
+
+.spinner {
+  animation: accent-spinner 800ms linear infinite;
+}
+
+/* Dialog submissions gain breathing room without spacing ordinary page actions. */
+:global([data-slot="dialog-content"])
+  .button[data-slot="button"][data-button-kind="accent"],
+:global([data-slot="drawer-popup"])
+  .button[data-slot="button"][data-button-kind="accent"] {
+  margin-block-start: 24px;
+}
+
+.button[data-slot="button"]:is(
+    :disabled,
+    [aria-disabled="true"],
+    [aria-busy="true"]
+  ) {
+  --accent-play-state: paused;
+}
+
+.button[data-slot="button"][data-button-motion="off"] {
+  --accent-play-state: paused;
+}
+
+.button[data-slot="button"]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .button[data-slot="button"]:hover:not(:disabled, [aria-disabled="true"]) {
+    background: var(--action-base);
+    box-shadow:
+      0 6px 22px var(--accent-hover-soft),
+      0 2px 5px var(--accent-hover-contact);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field,
+  .rimFlow,
+  .spinner {
+    animation: none;
+  }
+
+  .button[data-slot="button"] {
+    transition: none;
+  }
+}
+
+/* Matching explicit endpoints keep the full turns intact during interpolation. */
+@keyframes warm-field {
+  from {
+    opacity: var(--action-field-opacity);
+    transform: translate(-50%, -50%) rotate(12deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(372deg);
+  }
+}
+
+@keyframes warm-edge {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes accent-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}

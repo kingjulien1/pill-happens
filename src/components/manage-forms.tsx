@@ -1,19 +1,22 @@
 "use client";
 
+import { sortMedicationsByUsage } from "@/lib/medication-usage";
+
 import { useId, useState, type FormEvent } from "react";
-import { ActionIcon } from "@/components/action-icon";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
+import type { SymbolSourceFilter } from "@/lib/medication-symbol-browser";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import {
-  MedicationClassBadges,
-  medicationClassHighlights,
-} from "@/components/medication-class-badge";
+  ChoiceMenuHeader,
+  ChoiceOptionContent,
+} from "@/components/choice-menu";
+import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
+import { getMedicationIndicatorKinds } from "@/components/medication-indicator";
+import { MedicationTypeSelect } from "@/components/medication-type-select";
 import { MedicationCategoryBadges } from "@/components/medication-category-badges";
 import { MedicationClassificationField } from "@/components/medication-classification-field";
-import {
-  MedicationIcon,
-  MedicationTypeIcon,
-} from "@/components/medication-icon";
+import { MedicationIcon } from "@/components/medication-icon";
 import {
   isMedicationIcon,
   MEDICATION_COLORS,
@@ -29,20 +32,16 @@ import {
   isMeteredMedicationType,
   MEDICATION_TYPES,
 } from "@/lib/medication-types";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/journal-toast";
 import { useJournal } from "@/components/journal-provider";
 import { DraftStatus, usePersistentDraft } from "@/components/journal-drafts";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -60,6 +59,15 @@ const selectClass =
   "h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10";
 const iconError = "Choose an icon or enter one emoji.";
 
+/** Native arrows keep fine saved decimals while using the requested increment. */
+function medicationStepBase(value: string, increment: number, minimum: number) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount < minimum) return increment;
+  // Normalize binary modulo noise in the native step base, never in the value.
+  const remainder = Number((amount % increment).toPrecision(12));
+  return remainder >= minimum ? remainder : remainder + increment;
+}
+
 type MedicationDraft = {
   name: string;
   activeIngredient: string;
@@ -71,7 +79,8 @@ type MedicationDraft = {
   icon: string;
   iconRotation: number;
   searchQuery: string;
-  classificationQuery: string;
+  symbolSource?: SymbolSourceFilter;
+  previewMotion?: boolean;
 };
 
 function medicationDefaults(medication?: Medication): MedicationDraft {
@@ -86,7 +95,8 @@ function medicationDefaults(medication?: Medication): MedicationDraft {
     icon: medication?.icon ?? "pill",
     iconRotation: medication?.iconRotation ?? 0,
     searchQuery: "",
-    classificationQuery: "",
+    symbolSource: "all",
+    previewMotion: true,
   };
 }
 
@@ -114,8 +124,11 @@ function isMedicationDraft(value: unknown): value is MedicationDraft {
     Number.isFinite(draft.iconRotation) &&
     typeof draft.searchQuery === "string" &&
     draft.searchQuery.length <= 1000 &&
-    typeof draft.classificationQuery === "string" &&
-    draft.classificationQuery.length <= 80
+    (draft.symbolSource === undefined ||
+      (typeof draft.symbolSource === "string" &&
+        ["all", "icons", "emojis", "customs"].includes(draft.symbolSource))) &&
+    (draft.previewMotion === undefined ||
+      typeof draft.previewMotion === "boolean")
   );
 }
 
@@ -164,7 +177,8 @@ export function MedicationForm({
     icon,
     iconRotation,
     searchQuery,
-    classificationQuery,
+    symbolSource,
+    previewMotion,
   } = draft.value;
   const setField = <K extends keyof MedicationDraft>(
     key: K,
@@ -181,7 +195,6 @@ export function MedicationForm({
   const setForm = (value: Medication["form"]) => setField("form", value);
   const setColor = (value: Medication["color"]) => setField("color", value);
   const setIcon = (value: string) => setField("icon", value);
-  const setIconRotation = (value: number) => setField("iconRotation", value);
   const { isBenzodiazepine, isOpioid } = medicationCategoryFlags(categories);
   const [error, setError] = useState<string | null>(null);
   const type = getMedicationType(form);
@@ -235,7 +248,9 @@ export function MedicationForm({
         medication ? "PATCH" : "POST",
       );
       draft.clearDraft();
-      toast.success(medication ? "Medication updated." : "Medication added.");
+      toast.success(medication ? "Medication updated." : "Medication added.", {
+        heading: "Medication library",
+      });
       onSaved();
     } catch {
       // The journal provider explains failed saves and keeps the form available.
@@ -243,10 +258,10 @@ export function MedicationForm({
   }
 
   return (
-    <form onSubmit={save} className="flex flex-col gap-4">
+    <form onSubmit={save} className="flex min-w-0 flex-col gap-4">
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
         <div
-          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-end gap-3"
+          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(112px,1fr)] items-end gap-3"
           data-medication-identity-fields
         >
           <div className="flex min-w-0 flex-col gap-2">
@@ -265,78 +280,17 @@ export function MedicationForm({
           </div>
           <div className="flex min-w-0 flex-col gap-2">
             <Label htmlFor={`${id}-form`}>Type</Label>
-            <Select
-              name="form"
+            <MedicationTypeSelect
+              id={`${id}-form`}
               value={form}
-              highlightItemOnHover={false}
-              onValueChange={(value) => {
-                if (value && forms.some((item) => item.value === value)) {
-                  setForm(value as Medication["form"]);
-                }
-              }}
+              onValueChange={setForm}
               disabled={busy}
-            >
-              <SelectTrigger
-                id={`${id}-form`}
-                aria-label="Medication Type"
-                title={type.label}
-                data-medication-type-select
-                className="medication-compact-select h-10 w-full rounded-xl px-2 text-xs data-[size=default]:h-10"
-              >
-                <SelectValue className="gap-1">
-                  <MedicationTypeIcon type={form} className="size-3" />
-                  <span>
-                    {forms.find((item) => item.value === form)?.label}
-                  </span>
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent
-                align="end"
-                alignItemWithTrigger={false}
-                sideOffset={6}
-                className="brand-menu brand-navigation medication-type-menu min-w-[240px] max-w-[calc(100vw-32px)] p-1"
-              >
-                <SelectGroup className="p-0">
-                  <SelectLabel className="flex h-7 items-center gap-1.5 px-2.5 py-0 text-[11px] font-semibold text-popover-foreground">
-                    <span>Medication Type</span>
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
-                      <span aria-hidden="true">·</span>
-                      <span>{forms.length} options</span>
-                    </span>
-                  </SelectLabel>
-                  <SelectSeparator className="brand-navigation-separator mx-2.5 my-1" />
-                  {forms.map((item) => (
-                    <SelectItem
-                      key={item.value}
-                      value={item.value}
-                      label={item.label}
-                      data-active={form === item.value}
-                      className="brand-menu-link medication-type-option min-h-9 cursor-pointer gap-2 rounded-lg py-1.5 pr-9 pl-2.5 text-xs font-medium"
-                    >
-                      <MedicationTypeIcon
-                        type={item.value}
-                        className="medication-type-option-icon size-4"
-                      />
-                      <span>{item.label}</span>
-                      {form === item.value && (
-                        <span
-                          aria-hidden="true"
-                          className="inline-flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground"
-                        >
-                          <span>·</span>
-                          <span>selected</span>
-                        </span>
-                      )}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            />
           </div>
         </div>
 
         <div
-          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-end gap-3"
+          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(112px,1fr)] items-end gap-3"
           data-medication-classification-fields
         >
           <div className="flex min-w-0 flex-col gap-2">
@@ -363,22 +317,15 @@ export function MedicationForm({
             id={`${id}-classification`}
             value={categories}
             onChange={setCategories}
-            searchQuery={classificationQuery}
-            onSearchQueryChange={(value) =>
-              setField("classificationQuery", value)
-            }
             disabled={busy}
           />
         </div>
 
-        <div className="-mt-2 space-y-1.5" data-medication-category-summary>
+        <div className="-mt-2 empty:hidden" data-medication-category-summary>
           <MedicationCategoryBadges
             medication={{ categories }}
             maxGeneral={3}
           />
-          <p className="text-[10px] leading-relaxed text-muted-foreground">
-            Choose one or more categories · shared across your journal.
-          </p>
         </div>
 
         <div
@@ -397,9 +344,13 @@ export function MedicationForm({
               inputMode="decimal"
               value={defaultQuantity}
               onChange={(event) => setDefaultQuantity(event.target.value)}
-              min="0.000001"
+              min={
+                form === "tablet"
+                  ? medicationStepBase(defaultQuantity, 0.5, 0.000001)
+                  : 0.000001
+              }
               max="10000"
-              step="any"
+              step={form === "tablet" ? 0.5 : "any"}
               required
               aria-describedby={`${id}-quantity-help`}
               className={inputClass}
@@ -425,9 +376,9 @@ export function MedicationForm({
               value={strength}
               onChange={(event) => setStrength(event.target.value)}
               placeholder="e.g. 1"
-              min="0.0001"
+              min={medicationStepBase(strength, 0.25, 0.0001)}
               max="100000"
-              step="0.0001"
+              step="0.25"
               required
               aria-describedby={`${id}-strength-help`}
               className={inputClass}
@@ -442,19 +393,24 @@ export function MedicationForm({
         </div>
 
         <MedicationAppearanceFields
+          previewMotion={previewMotion ?? true}
+          onPreviewMotionChange={(value) => setField("previewMotion", value)}
+          symbolSource={symbolSource ?? "all"}
+          onSymbolSourceChange={(value) => setField("symbolSource", value)}
           searchQuery={searchQuery}
           onSearchQueryChange={(value) => setField("searchQuery", value)}
           color={color}
           icon={icon}
           iconRotation={iconRotation}
           name={name}
+          activeIngredient={activeIngredient}
+          categories={categories}
           strength={strength}
           defaultQuantity={defaultQuantity}
           medicationType={form}
           isBenzodiazepine={isBenzodiazepine}
           isOpioid={isOpioid}
           onColorChange={setColor}
-          onRotationChange={setIconRotation}
           onIconChange={(value) => {
             setIcon(value);
             if (isMedicationIcon(value)) {
@@ -464,7 +420,6 @@ export function MedicationForm({
         />
       </fieldset>
 
-      <DraftStatus {...draft} onReset={busy ? undefined : reset} />
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -472,10 +427,10 @@ export function MedicationForm({
       )}
 
       <div className="w-full space-y-3 pt-4" data-medication-save-footer>
-        <MedicationActionButton intent="save" type="submit" pending={busy} />
-        <p className="px-2 text-center text-[10px] leading-relaxed text-muted-foreground">
-          These defaults prefill your next entry. You can edit them anytime.
-        </p>
+        <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+          <MedicationActionButton intent="save" type="submit" pending={busy} />
+          <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+        </div>
       </div>
     </form>
   );
@@ -486,6 +441,10 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
   const id = useId();
   const medications =
     data?.medications.filter((medication) => !medication.archived) ?? [];
+  const medicationOptions = sortMedicationsByUsage(
+    medications,
+    data?.intakes ?? [],
+  );
   const freshGoal = (): GoalDraft => ({
     medicationId: medications[0]?.id ?? "",
     limit: "",
@@ -542,7 +501,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         note: note.trim(),
       });
       draft.clearDraft();
-      toast.success("Your goal has been saved.");
+      toast.success("Your goal has been saved.", { heading: "Daily goal" });
       onSaved();
     } catch {
       // Save failures are shown by the journal provider without clearing inputs.
@@ -551,7 +510,10 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
 
   return (
     <form onSubmit={save} className="flex flex-col gap-4">
-      <div className="rounded-xl border border-primary/10 bg-primary/5 p-3.5 text-xs leading-relaxed text-muted-foreground">
+      <div
+        data-dialog-panel
+        className="rounded-xl border border-primary/10 bg-primary/5 p-3.5 text-xs leading-relaxed text-muted-foreground"
+      >
         Set a daily maximum agreed with your clinician. This is a reference for
         your journal; the app never creates an automatic taper.
       </div>
@@ -571,6 +533,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           <Select
             name="medicationId"
             value={medicationId || null}
+            highlightItemOnHover={false}
             onValueChange={(value) => {
               if (value) setMedicationId(value);
             }}
@@ -585,10 +548,6 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       icon={selectedMedication.icon}
                       rotation={selectedMedication.iconRotation}
                       color={selectedMedication.color}
-                      isBenzodiazepine={
-                        selectedMedication.isBenzodiazepine === true
-                      }
-                      isOpioid={selectedMedication.isOpioid === true}
                       small
                       className="size-5 rounded-md"
                     />
@@ -602,43 +561,71 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                       <span className="shrink-0 text-xs">
                         · {formatDose(selectedMedication.strengthMg)} mg
                       </span>
-                      <MedicationClassBadges medication={selectedMedication} />
+                      {getMedicationIndicatorKinds(selectedMedication).map(
+                        (kind) => (
+                          <MedicationIndicatorMark
+                            key={kind}
+                            kind={kind}
+                            size={20}
+                          />
+                        ),
+                      )}
                     </span>
                   </>
                 ) : null}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent>
-              {medications.map((medication) => (
-                <SelectItem
-                  key={medication.id}
-                  value={medication.id}
-                  className={`min-h-9 pl-3 pr-9 text-sm ${medicationClassHighlights(medication)}`}
-                  data-benzodiazepine={
-                    medication.isBenzodiazepine === true || undefined
-                  }
-                  data-opioid={medication.isOpioid === true || undefined}
-                >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <MedicationIcon
-                      icon={medication.icon}
-                      rotation={medication.iconRotation}
-                      color={medication.color}
-                      isBenzodiazepine={medication.isBenzodiazepine === true}
-                      isOpioid={medication.isOpioid === true}
-                      small
-                      className="size-5 rounded-md"
+            <SelectContent
+              data-choice-menu="medication"
+              align="start"
+              alignItemWithTrigger={false}
+              sideOffset={6}
+            >
+              <ChoiceMenuHeader title="Medication" count={medications.length} />
+              {medicationOptions.map((medication) => {
+                const current = medicationId === medication.id;
+                return (
+                  <SelectItem
+                    key={medication.id}
+                    value={medication.id}
+                    label={`${medication.name} ${formatDose(medication.strengthMg)} mg`}
+                    className="min-h-10 pl-2.5 pr-9 text-xs"
+                    data-choice-option
+                    data-current={current || undefined}
+                  >
+                    <ChoiceOptionContent
+                      current={current}
+                      currentLabel="This goal"
+                      icon={
+                        <MedicationIcon
+                          icon={medication.icon}
+                          rotation={medication.iconRotation}
+                          color={medication.color}
+                          small
+                          className="size-6 rounded-md"
+                        />
+                      }
+                      label={
+                        <span className="inline-flex min-w-0 flex-wrap items-center gap-1.5">
+                          <span>
+                            {medication.name} ·{" "}
+                            {formatDose(medication.strengthMg)} mg
+                          </span>
+                          {getMedicationIndicatorKinds(medication).map(
+                            (kind) => (
+                              <MedicationIndicatorMark
+                                key={kind}
+                                kind={kind}
+                                size={20}
+                              />
+                            ),
+                          )}
+                        </span>
+                      }
                     />
-                    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-                      <span className="min-w-0 break-words">
-                        {medication.name} · {formatDose(medication.strengthMg)}{" "}
-                        mg
-                      </span>
-                      <MedicationClassBadges medication={medication} />
-                    </span>
-                  </span>
-                </SelectItem>
-              ))}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -723,25 +710,24 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           Your draft medication is no longer active. Choose another to continue.
         </p>
       )}
-      <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
         </p>
       )}
 
-      <Button
-        type="submit"
-        disabled={busy || medications.length === 0}
-        className="h-12 w-full gap-2 rounded-xl text-base"
-      >
-        {busy ? (
-          <ActionIcon name="loading" className="animate-spin" />
-        ) : (
-          <ActionIcon name="save" />
-        )}
-        {busy ? "Saving…" : "Save Goal"}
-      </Button>
+      <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+        <DialogPrimaryButton
+          type="submit"
+          disabled={busy || medications.length === 0}
+          pending={busy}
+          className="w-full"
+        >
+          {busy ? "Saving…" : "Save Goal"}
+        </DialogPrimaryButton>
+        <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+      </div>
     </form>
   );
 }

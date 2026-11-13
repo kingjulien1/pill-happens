@@ -1,0 +1,63 @@
+.marker {
+  display: grid;
+  grid-template-columns: 24px max-content 24px;
+  grid-template-rows: auto auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  column-gap: 9px;
+  row-gap: 2px;
+  padding-block: 4px;
+  color: color-mix(in srgb, var(--canvas-foreground) 58%, transparent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.marker::before,
+.marker::after {
+  content: "";
+  width: 24px;
+  height: 1px;
+  grid-row: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--canvas-foreground) 15%, transparent)
+  );
+}
+
+.marker::after {
+  grid-column: 3;
+  rotate: 180deg;
+}
+
+.marker time {
+  grid-column: 2;
+  grid-row: 2;
+  text-align: center;
+  color: color-mix(in srgb, var(--canvas-foreground) 78%, transparent);
+  font-size: 13.5px;
+  line-height: 16px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  color: color-mix(in srgb, var(--canvas-foreground) 58%, transparent);
+  font-size: 11px;
+  font-weight: 550;
+}
+
+@media (prefers-color-scheme: light) {
+  .marker,
+  .label {
+    color: var(--canvas-muted-foreground);
+  }
+  .marker time {
+    color: var(--canvas-foreground);
+  }
+}

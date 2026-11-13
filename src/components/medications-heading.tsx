@@ -1,82 +1,76 @@
 "use client";
 
-import { FirstAidKitIcon } from "@phosphor-icons/react/dist/ssr/FirstAidKit";
-import { StackIcon } from "@phosphor-icons/react/dist/ssr/Stack";
+import { PageHeading } from "@/components/page-heading";
+import { PillBottle } from "lucide-react";
 import { FolderOpenIcon } from "@phosphor-icons/react/dist/ssr/FolderOpen";
 import { FolderSimpleIcon } from "@phosphor-icons/react/dist/ssr/FolderSimple";
 import { ActionIcon } from "@/components/action-icon";
 import { Toggle } from "@/components/ui/toggle";
-import { getMedicationColor } from "@/lib/medication-appearance";
-import type { Medication } from "@/lib/domain";
+import { medicationKitPalette } from "@/lib/medication-kit-preview";
+import type { Intake, Medication } from "@/lib/domain";
+import styles from "./medications-heading.module.css";
 
 export function MedicationsHeading({
   medications,
+  intakes,
 }: {
   medications: Medication[];
+  intakes: Intake[];
 }) {
   const activeCount = medications.filter(
     (medication) => !medication.archived,
   ).length;
+  const palette = medicationKitPalette(medications, intakes);
+  const displayedCount = new Intl.NumberFormat("en", {
+    notation: medications.length >= 10_000 ? "compact" : "standard",
+    maximumFractionDigits: 1,
+  }).format(medications.length);
+  const description = `${medications.length} saved ${medications.length === 1 ? "medication" : "medications"}, ${activeCount} active${palette.length ? `. Accent colors: ${palette.map((color) => color.label).join(", ")}.` : "."}`;
 
   return (
-    <header className="canvas-copy mb-6" data-medications-heading>
-      <div
-        className="flex min-w-0 items-center justify-between gap-2 sm:gap-3"
-        data-medications-title-row
-      >
-        <div className="flex min-w-0 items-center gap-2">
-          <FirstAidKitIcon
-            weight="bold"
-            aria-hidden="true"
-            focusable="false"
-            className="size-[22px] shrink-0 text-foreground"
-          />
-          <h1 className="medications-page-title">Medications</h1>
-          <span className="medications-heading-context inline-flex shrink-0 items-center gap-1.5 text-[10px] text-muted-foreground">
-            <span aria-hidden="true">·</span>
-            Kit
-          </span>
-        </div>
+    <PageHeading
+      title="Medications"
+      context="Your medication kit"
+      icon={<PillBottle strokeWidth={2.25} />}
+      data-medications-heading
+      data-medications-title-row
+      actions={
         <span
-          className="medications-total"
-          aria-label={`${medications.length} saved ${medications.length === 1 ? "medication" : "medications"}, ${activeCount} active`}
+          className={styles.summary}
+          aria-label={description}
+          title={description}
           role="img"
           data-medications-total
         >
-          <span aria-hidden="true" className="medications-total-art">
-            <StackIcon
-              focusable="false"
-              weight="bold"
-              className="size-4 shrink-0"
-            />
-            {medications.length > 0 && (
-              <span className="medications-total-palette">
-                {medications.slice(0, 3).map((medication) => (
-                  <span
-                    key={medication.id}
-                    style={{
-                      backgroundColor: getMedicationColor(medication.color).hex,
-                    }}
-                  />
-                ))}
-              </span>
-            )}
-          </span>
-          <span aria-hidden="true" className="medications-total-copy">
-            <span className="medications-total-saved">
-              <strong>{medications.length}</strong> Saved
+          {palette.length > 0 && (
+            <span
+              className={styles.preview}
+              aria-hidden="true"
+              data-kit-preview
+            >
+              {palette.map((color) => (
+                <span
+                  key={color.hex}
+                  className={styles.swatch}
+                  style={{ backgroundColor: color.hex }}
+                  title={color.label}
+                  data-kit-color={color.value}
+                />
+              ))}
             </span>
-            <span className="medications-total-active">
-              <strong>{activeCount}</strong> Active
+          )}
+          <span className={styles.total} aria-hidden="true">
+            <span className={styles.count} data-kit-count>
+              {displayedCount}
             </span>
+            <span className={styles.countLabel}>Meds</span>
           </span>
         </span>
-      </div>
-      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        Keep names, strengths, and familiar symbols together. Your defaults make
-        each intake quicker to log.
-      </p>
-    </header>
+      }
+    >
+      Keep names, strengths, and familiar symbols together. Your defaults make
+      each intake quicker to log and easier to review.
+    </PageHeading>
   );
 }
 

@@ -1,5 +1,5 @@
 import { Flower2, Pill, Smile, Sparkles } from "lucide-react";
-import { ActionIcon } from "@/components/action-icon";
+import styles from "./symbol-search-state.module.css";
 
 export function SymbolSearchState({
   phase,
@@ -7,53 +7,61 @@ export function SymbolSearchState({
   phase: "idle" | "loading" | "empty";
 }) {
   const messages = {
-    idle: ["Find Your Symbol", "Try a name, “outline”, or “color”."],
-    loading: ["A Little Symbol Hunt…", "Lucide, custom SVGs and emoji."],
-    empty: ["No Matches This Time", "Try a different word or an emoji."],
+    idle: ["Find Your Symbol", "Try “leaf”, “outline”, or an emoji."],
+    loading: ["Finding your match", "A few possibilities, coming into focus."],
+    empty: [
+      "Nothing quite matches yet",
+      "Try a shorter word, or paste an emoji.",
+    ],
   };
 
   return (
-    <div className="symbol-search-state" data-symbol-state={phase}>
+    <div className={styles.state} data-symbol-state={phase}>
       {phase === "loading" ? (
-        <div className="symbol-hunt-scene" aria-hidden="true">
-          <span className="symbol-hunt-track" />
-          <span className="symbol-hunt-sweep" />
-          <span className="symbol-hunt-token symbol-hunt-token--pill">
-            <Pill strokeWidth={2.5} />
+        <div className={styles.scene} aria-hidden="true">
+          <span className={styles.halo} />
+          <span className={styles.arcWide} />
+          <span className={styles.arcInner} />
+          <span className={styles.orbit}>
+            <span />
           </span>
-          <span className="symbol-hunt-token symbol-hunt-token--flower">
-            <Flower2 strokeWidth={2.5} />
+          <span className={`${styles.token} ${styles.pill}`}>
+            <Pill strokeWidth={2} />
           </span>
-          <span className="symbol-hunt-token symbol-hunt-token--smile">
-            <Smile strokeWidth={2.5} />
+          <span className={`${styles.token} ${styles.flower}`}>
+            <Flower2 strokeWidth={2} />
           </span>
-          <span className="symbol-hunt-token symbol-hunt-token--emoji">
+          <span className={`${styles.token} ${styles.smile}`}>
+            <Smile strokeWidth={2} />
+          </span>
+          <span className={`${styles.token} ${styles.emoji}`}>
             <span>🌈</span>
           </span>
-          <span className="symbol-hunt-spark symbol-hunt-spark--first">
-            <Sparkles strokeWidth={2.5} />
+          <span className={styles.core}>
+            <span className={styles.sheen} />
+            <Sparkles strokeWidth={2} />
           </span>
-          <span className="symbol-hunt-spark symbol-hunt-spark--second">
-            <Sparkles strokeWidth={2.5} />
+          <span className={`${styles.glint} ${styles.glintFirst}`}>
+            <Sparkles strokeWidth={1.8} />
           </span>
-          <span className="symbol-hunt-scout">
-            <span className="symbol-hunt-scout-glint" />
-            <ActionIcon name="discover" weight="duotone" className="size-8" />
+          <span className={`${styles.glint} ${styles.glintSecond}`}>
+            <Sparkles strokeWidth={1.8} />
           </span>
         </div>
       ) : (
-        <span
-          className="relative flex size-11 items-center justify-center rounded-xl bg-foreground/5 text-foreground/80"
-          aria-hidden="true"
-        >
-          <ActionIcon name="discover" weight="duotone" className="size-8" />
-        </span>
+        <div className={styles.palette} aria-hidden="true">
+          <span className={`${styles.sample} ${styles.pill}`}>
+            <Pill strokeWidth={1.8} />
+          </span>
+          <span className={`${styles.sample} ${styles.flower}`}>
+            <Flower2 strokeWidth={1.8} />
+          </span>
+          <span className={`${styles.sample} ${styles.emoji}`}>🌈</span>
+        </div>
       )}
-      <div className="symbol-search-state-copy">
-        <p className="text-xs font-medium">{messages[phase][0]}</p>
-        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-          {messages[phase][1]}
-        </p>
+      <div className={styles.copy}>
+        <p className={styles.title}>{messages[phase][0]}</p>
+        <p className={styles.description}>{messages[phase][1]}</p>
       </div>
     </div>
   );

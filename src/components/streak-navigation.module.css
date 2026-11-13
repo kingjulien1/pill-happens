@@ -1,0 +1,200 @@
+.card {
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-width: 0;
+  height: var(--navigation-item-height, 68px);
+  min-height: var(--navigation-item-height, 68px);
+  grid-template-columns: 44px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 10px 12px;
+  border: 1.25px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--popover-foreground);
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.weave {
+  position: absolute;
+  z-index: -1;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  fill: none;
+  stroke: var(--streak-nav-pop);
+  stroke-width: 1.3px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.weave path + path {
+  stroke: var(--streak-nav-spark);
+}
+
+.card[data-streak-navigation-state="milestone"] .weave {
+  opacity: 0.25;
+}
+
+.card:is([data-highlighted], :focus-visible) .title {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+}
+
+.medallion {
+  box-sizing: border-box;
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 3px;
+  border: 1px solid color-mix(in srgb, var(--streak-nav-spark) 60%, transparent);
+  border-radius: 14px;
+  background:
+    radial-gradient(
+      ellipse at 20% 5%,
+      color-mix(in srgb, var(--streak-nav-accent) 35%, transparent),
+      transparent 85%
+    ),
+    color-mix(in srgb, var(--popover-foreground) 5%, transparent);
+  color: var(--popover-foreground);
+}
+
+.medallion strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 20px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 23px;
+  letter-spacing: -0.035em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.medallion strong[data-long="true"] {
+  font-size: 11px;
+}
+
+.medallion > span {
+  font-size: 8.5px;
+  font-weight: 550;
+  line-height: 11px;
+}
+
+.copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.titleRow {
+  display: flex;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.title {
+  flex: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.status {
+  min-width: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--popover-foreground) 72%, transparent);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card:is([data-streak-navigation-state="milestone"], [data-active="true"])
+  .title {
+  font-weight: 750;
+}
+
+.card[data-streak-navigation-state="milestone"] .status {
+  color: color-mix(in srgb, var(--popover-foreground) 85%, transparent);
+  font-weight: 650;
+}
+
+.progress {
+  height: 3px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--popover-foreground) 12%, transparent);
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    100deg,
+    var(--streak-nav-accent),
+    var(--streak-nav-spark),
+    var(--streak-nav-pop)
+  );
+}
+
+.next {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+  color: color-mix(in srgb, var(--popover-foreground) 70%, transparent);
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.next > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.next > strong {
+  flex: none;
+  color: var(--popover-foreground);
+  font-weight: 650;
+}
+
+.direction {
+  display: grid;
+  width: 28px;
+  height: 32px;
+  place-items: center;
+  color: var(--popover-foreground);
+}
+
+.direction > svg {
+  width: 26px;
+  height: 26px;
+}
+
+.direction > .arrow {
+  width: 19.5px;
+  height: 19.5px;
+  opacity: 0.65;
+}

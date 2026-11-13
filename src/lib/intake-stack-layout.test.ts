@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   EMPTY_INTAKE_STACK_VIEW,
+  INTAKE_GROUP_SPACING_PX,
   foldIntakeStack,
   layoutIntakeStacks,
   normalizeIntakeStackView,
@@ -42,6 +43,7 @@ test("a saved root disclosure opens the entire group and ignores extra head IDs"
   const layout = layoutIntakeStacks({ entries, heights, view });
   assert.ok(layout.frames.every((face) => !face.hidden && face.scale === 1));
   assert.equal(layout.frames.filter((face) => face.head).length, 1);
+  assert.equal(INTAKE_GROUP_SPACING_PX, 8);
   assert.equal(layout.height, entries.length * 80 + (entries.length - 1) * 8);
   for (const face of layout.frames) assert.equal(face.y, face.order * 88);
 });
@@ -62,7 +64,7 @@ test("folded groups retain complete cards with six slightly smaller rear preview
     assert.equal(face.scale, 1 - Math.min(face.order, 6) * 0.008);
     assert.equal(face.height, 80);
   }
-  assert.equal(layout.height, 80 + 6 * 24);
+  assert.equal(layout.height, 80 + 6 * 20);
 });
 
 test("Show and Fold affect one complete group and are idempotent", () => {
@@ -107,6 +109,25 @@ test("natural heights keep complete folded faces and define expanded row positio
     const previous = shown.frames[index - 1];
     assert.equal(shown.frames[index].y, previous.y + previous.height + 8);
   }
+});
+
+test("expanded spacing follows natural face heights without adding a trailing gap", () => {
+  const short = entries.slice(0, 3);
+  const layout = layoutIntakeStacks({
+    entries: short,
+    heights: { "entry-0": 80, "entry-1": 100, "entry-2": 68 },
+    view: showIntakeStackChildren(short, EMPTY_INTAKE_STACK_VIEW),
+  });
+  assert.deepEqual(
+    layout.frames.map(({ y, height }) => ({ y, height })),
+    [
+      { y: 0, height: 80 },
+      { y: 88, height: 100 },
+      { y: 196, height: 68 },
+    ],
+  );
+  assert.equal(layout.height, 264);
+  assert.equal(layout.duration, 0);
 });
 
 test("empty, single, removed and reordered groups retain only a valid first entry", () => {

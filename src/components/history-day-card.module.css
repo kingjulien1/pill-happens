@@ -1,0 +1,123 @@
+/* The link owns the existing intake-card paint, rim, 80px frame and typography. */
+.card {
+  position: relative;
+  min-width: 0;
+}
+
+.dayLink {
+  text-decoration: none;
+}
+
+.card .content {
+  column-gap: 11px;
+}
+
+.card .heading {
+  display: flex;
+  align-items: center;
+  gap: var(--entry-text-gap);
+}
+
+.date {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 5px;
+}
+
+.calendarDate {
+  flex: 0 0 auto;
+}
+
+.dateSeparator {
+  flex: none;
+  color: color-mix(in srgb, var(--card-foreground) 45%, transparent);
+  font-size: 10px;
+}
+
+.weekdayShort {
+  display: none;
+}
+
+.counts {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 60%;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 8px;
+  color: var(--card-foreground);
+  white-space: nowrap;
+}
+
+.metric {
+  display: inline-flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 3px;
+}
+
+.number {
+  min-width: 0;
+  overflow: hidden;
+  /* Keep Safari's fractional glyph advance clear of the ellipsis boundary. */
+  padding-inline-end: 1px;
+  color: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card .summary {
+  display: block;
+  flex: 1 1 0;
+}
+
+.summary strong {
+  font-weight: 650;
+}
+
+.recordSeparator {
+  opacity: 0.5;
+}
+
+@container (max-width: 380px) {
+  .card .heading {
+    gap: var(--content-min-gap-secondary, 6.5px);
+  }
+
+  .date {
+    gap: 2px;
+  }
+
+  .counts {
+    gap: 4px;
+  }
+
+  .metric {
+    gap: 2px;
+  }
+
+  .number {
+    font-size: 12.5px;
+  }
+
+  .weekdayLong {
+    display: none;
+  }
+
+  .weekdayShort {
+    display: inline;
+  }
+}
+
+@media (max-width: 359px) {
+  .card .content {
+    column-gap: 7px;
+  }
+}

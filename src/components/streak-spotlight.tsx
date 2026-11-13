@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  getPageEntryReadiness,
+  subscribePageEntryReadiness,
+} from "@/lib/page-entry-readiness";
+
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { APP_COLORS, withAppAlpha, type AppThemeHex } from "@/lib/app-theme";
 import type { StreakPalette } from "@/lib/streak-milestones";
@@ -106,11 +111,11 @@ export function StreakSpotlight({
         );
         piece.style.setProperty(
           "--particle-wait",
-          `${80 + (index % 5) * 34}ms`,
+          `${160 + (index % 5) * 68}ms`,
         );
         piece.style.setProperty(
           "--particle-time",
-          `${1450 + (index % 7) * 90}ms`,
+          `${2900 + (index % 7) * 180}ms`,
         );
         fragment.append(piece);
       }
@@ -118,7 +123,7 @@ export function StreakSpotlight({
     };
     const launch = () => {
       timer = null;
-      if (disposed || document.hidden) return;
+      if (disposed || document.hidden || !getPageEntryReadiness()) return;
       played = true;
       phase = "running";
       markStreakSpotlightPlayed(target);
@@ -131,17 +136,17 @@ export function StreakSpotlight({
         addParticles();
         node.dataset.spotlightState = "running";
       }
-      timer = setTimeout(finish, motion.matches ? 1800 : 2800);
+      timer = setTimeout(finish, motion.matches ? 1800 : 3360);
     };
     const schedule = () => {
       observer?.disconnect();
       observer = null;
-      if (timer !== null || frame) return;
+      if (!getPageEntryReadiness() || timer !== null || frame) return;
       // Give navigation, popover dismissal and scrolling room to settle first.
       frame = requestAnimationFrame(() => {
         frame = requestAnimationFrame(() => {
           frame = 0;
-          timer = setTimeout(launch, motion.matches ? 0 : 180);
+          timer = setTimeout(launch, motion.matches ? 0 : 216);
         });
       });
     };
@@ -149,6 +154,11 @@ export function StreakSpotlight({
       cancelPending();
       layer.replaceChildren();
       status.textContent = "";
+      if (!getPageEntryReadiness()) {
+        phase = "waiting";
+        node.dataset.spotlightState = "waiting";
+        return;
+      }
       if (played && !force) {
         phase = "settled";
         node.dataset.spotlightState = "settled";
@@ -158,7 +168,7 @@ export function StreakSpotlight({
       if (force) played = false;
       phase = "waiting";
       node.dataset.spotlightState = "waiting";
-      if (document.hidden) return;
+      if (document.hidden || !getPageEntryReadiness()) return;
       node.scrollIntoView({
         block: "center",
         behavior: motion.matches ? "auto" : "smooth",
@@ -176,7 +186,7 @@ export function StreakSpotlight({
         timer = setTimeout(() => {
           timer = null;
           schedule();
-        }, 450);
+        }, 900);
       const bounds = node.getBoundingClientRect();
       if (bounds.top >= 12 && bounds.bottom <= window.innerHeight - 12)
         schedule();
@@ -198,9 +208,16 @@ export function StreakSpotlight({
     window.addEventListener(STREAK_SPOTLIGHT_EVENT, onRequest);
     document.addEventListener("visibilitychange", onVisibility);
     motion.addEventListener("change", onMotion);
+    const unsubscribeEntry = subscribePageEntryReadiness(() => {
+      if (!getPageEntryReadiness()) {
+        if (phase === "running") finish();
+        else cancelPending();
+      } else if (phase === "waiting") reveal();
+    });
     reveal();
     return () => {
       disposed = true;
+      unsubscribeEntry();
       cancelPending();
       layer.replaceChildren();
       window.removeEventListener(STREAK_SPOTLIGHT_EVENT, onRequest);

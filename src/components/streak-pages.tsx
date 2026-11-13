@@ -1,6 +1,13 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import { TrophyIcon } from "@phosphor-icons/react/dist/ssr/Trophy";
 import { TrendUpIcon } from "@phosphor-icons/react/dist/ssr/TrendUp";
@@ -9,15 +16,18 @@ import { EqualsIcon } from "@phosphor-icons/react/dist/ssr/Equals";
 import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationClassBadges } from "@/components/medication-class-badge";
-import { HeadingText } from "@/components/heading-text";
+import { Button } from "@/components/ui/button";
+import { PageHeading } from "@/components/page-heading";
 import { useJournal } from "@/components/journal-provider";
 import { StreakArtwork } from "@/components/streak-artwork";
 import { StreakSpotlight } from "@/components/streak-spotlight";
+import { reflectionStats } from "@/lib/reflection-writing";
 import { formatDay, formatDose, shiftDayKey } from "@/lib/domain";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import {
   getStreakMilestone,
   getStreakMilestones,
+  UPCOMING_MILESTONE_BATCH,
   type MilestoneAnalytics,
   type StreakMilestone,
   type StreakPalette,
@@ -38,7 +48,14 @@ const shortDate = (day: string) =>
     year: "numeric",
   });
 
-function paletteStyle(palette: StreakPalette): CSSProperties {
+const pagePalette: StreakPalette = {
+  accent: "var(--palette-lilac)",
+  pop: "var(--palette-apricot)",
+  spark: "var(--palette-lilac)",
+};
+
+function paletteStyle(): CSSProperties {
+  const palette = pagePalette;
   return {
     "--milestone-accent": palette.accent,
     "--milestone-pop": palette.pop,
@@ -68,13 +85,14 @@ function MilestoneCard({ milestone }: { milestone: StreakMilestone }) {
       id={`milestone-${milestone.target}`}
       href={`/streaks/${milestone.target}`}
       className={`${styles.milestoneCard} ${earned ? styles.earnedCard : styles.upcomingCard}`}
-      style={earned ? paletteStyle(milestone.palette) : undefined}
+      style={earned ? paletteStyle() : undefined}
+      data-card-entry
       data-streak-card={earned ? "achieved" : "upcoming"}
       data-streak-target={milestone.target}
       aria-label={`${count(milestone.target)} days, ${earned ? "achieved milestone" : "upcoming milestone"}. ${milestone.title}`}
     >
       {earned && (
-        <StreakArtwork seed={milestone.target} palette={milestone.palette} />
+        <StreakArtwork seed={milestone.target} palette={pagePalette} />
       )}
       <div className={styles.cardForeground}>
         <span className={styles.medallion} aria-hidden="true">
@@ -150,47 +168,55 @@ export function StreaksPage({
   spotlightTarget?: number | null;
 }) {
   const { data, now } = useJournal();
+  const [upcomingCount, setUpcomingCount] = useState(UPCOMING_MILESTONE_BATCH);
+  const upcomingList = useRef<HTMLDivElement>(null);
+  const focusNewIndex = useRef<number | null>(null);
   const view = useMemo(
-    () => (data && now ? getStreakMilestones(data, now) : null),
-    [data, now],
+    () =>
+      data && now ? getStreakMilestones(data, now, upcomingCount + 1) : null,
+    [data, now, upcomingCount],
   );
   const extraSpotlight = useMemo(() => {
     if (!view || !data || !now || spotlightTarget === null) return null;
-    const visible = [...view.achieved, ...view.upcoming].some(
-      (item) => item.target === spotlightTarget,
-    );
+    const visible = [
+      ...view.achieved,
+      ...view.upcoming.slice(0, UPCOMING_MILESTONE_BATCH),
+    ].some((item) => item.target === spotlightTarget);
     return visible ? null : getStreakMilestone(data, now, spotlightTarget);
   }, [view, data, now, spotlightTarget]);
+  // Keep a selected card in its original spotlight section as more cards load.
+  const upcoming =
+    view?.upcoming
+      .filter((item) => item.target !== extraSpotlight?.target)
+      .slice(0, upcomingCount) ?? [];
+  useEffect(() => {
+    const index = focusNewIndex.current;
+    if (index === null) return;
+    focusNewIndex.current = null;
+    upcomingList.current
+      ?.querySelectorAll<HTMLAnchorElement>("a[data-streak-card]")
+      [index]?.focus({ preventScroll: true });
+  }, [upcomingCount]);
   if (!view) return null;
   const renderMilestone = (milestone: StreakMilestone) =>
     milestone.target === spotlightTarget ? (
       <StreakSpotlight
         key={milestone.target}
         target={milestone.target}
-        palette={milestone.palette}
+        palette={pagePalette}
       >
         <MilestoneCard milestone={milestone} />
       </StreakSpotlight>
     ) : (
       <MilestoneCard key={milestone.target} milestone={milestone} />
     );
-  const next = view.upcoming[0];
   return (
     <div className={styles.page} data-streak-list>
-      <header className={styles.pageHeader}>
-        <div className={styles.headerRow}>
-          <h1>
-            <HeadingText
-              title={
-                <span className={styles.headingTitle}>
-                  <TrophyIcon size={23} weight="bold" aria-hidden="true" />
-                  Streaks
-                </span>
-              }
-              context="Little Milestones"
-              className="items-center"
-            />
-          </h1>
+      <PageHeading
+        title="Streaks"
+        context="Little milestones"
+        icon={<TrophyIcon weight="bold" />}
+        actions={
           <dl className={styles.headerStats} aria-label="Logging Streaks">
             <div>
               <dt className="sr-only">Current Run</dt>
@@ -215,12 +241,11 @@ export function StreaksPage({
               </dd>
             </div>
           </dl>
-        </div>
-        <p>
-          A few days of showing up, a little more of your story. Your unlocked
-          milestones stay here, even after a pause.
-        </p>
-      </header>
+        }
+      >
+        A few days of showing up, a little more of your story. Your unlocked
+        milestones stay here, even after a pause.
+      </PageHeading>
 
       {extraSpotlight && (
         <section
@@ -257,7 +282,7 @@ export function StreaksPage({
             {view.achieved.map(renderMilestone)}
           </div>
         ) : (
-          <div className={styles.firstMilestone}>
+          <div className={styles.firstMilestone} data-card-entry>
             <span aria-hidden="true">
               <ActionIcon name="shootingStar" className="size-8" />
             </span>
@@ -272,36 +297,44 @@ export function StreaksPage({
         )}
       </section>
 
-      <div
-        className={styles.encouragement}
-        style={next ? paletteStyle(next.palette) : undefined}
-        data-streak-separator
-      >
-        <span className={styles.encouragementStar} aria-hidden="true">
-          <ActionIcon name="sparkle" weight="fill" className="size-5" />
-        </span>
-        <h2>
-          {view.streak.current
-            ? "Keep A Little Momentum"
-            : "There’s Room To Begin Again"}
-        </h2>
-        <p>{next?.encouragement}</p>
-        {next && <RunProgress milestone={next} />}
-        <span className={styles.separatorContext}>
-          {view.streak.current
-            ? "Your current run can grow toward a new milestone."
-            : "Your next logged day can start a new run."}
+      <div className={styles.streakDivider} data-streak-separator>
+        <span className={styles.streakDividerLabel}>
+          Still to come
+          <ActionIcon name="next" weight="regular" className="size-3" />
         </span>
       </div>
 
       <section aria-label="Upcoming milestones" className={styles.listSection}>
-        <SectionTitle context="The Next Three">
+        <SectionTitle
+          context={
+            <span role="status" aria-live="polite" aria-atomic="true">
+              Showing {count(upcoming.length)}
+            </span>
+          }
+        >
           <ActionIcon name="shootingStar" className="size-4" />
           Up Ahead
         </SectionTitle>
-        <div className={styles.cardList}>
-          {view.upcoming.map(renderMilestone)}
+        <div
+          id="upcoming-milestones"
+          ref={upcomingList}
+          className={styles.cardList}
+        >
+          {upcoming.map(renderMilestone)}
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          className={styles.loadMore}
+          aria-controls="upcoming-milestones"
+          onClick={(event) => {
+            if (event.detail === 0) focusNewIndex.current = upcoming.length;
+            setUpcomingCount((current) => current + UPCOMING_MILESTONE_BATCH);
+          }}
+        >
+          <ActionIcon name="loadMore" className="size-4" />
+          Load {UPCOMING_MILESTONE_BATCH} more milestones
+        </Button>
       </section>
 
       <p className={styles.scopeNote}>
@@ -352,6 +385,7 @@ function RatingComparison({ change }: { change: StreakRatingChange }) {
   return (
     <article
       className={styles.ratingComparison}
+      data-card-entry
       data-streak-rating={change.key}
       data-trend={change.trend}
     >
@@ -400,7 +434,7 @@ function RatingComparison({ change }: { change: StreakRatingChange }) {
 
 function WindowCoverage({ analytics }: { analytics: MilestoneAnalytics }) {
   return (
-    <div className={styles.coverageCard} data-streak-coverage>
+    <div className={styles.coverageCard} data-card-entry data-streak-coverage>
       <div className={styles.coverageTitle}>
         <ActionIcon name="calendar" className="size-4" />
         <h3>Two Equal Windows</h3>
@@ -466,6 +500,7 @@ function MedicationComparisons({
             <article
               key={medication.medicationId}
               className={styles.medicationComparison}
+              data-card-entry
               data-streak-medication={medication.medicationId}
             >
               <div className={styles.medicationHeading}>
@@ -556,6 +591,7 @@ function RecordedJourney({ milestone }: { milestone: StreakMilestone }) {
         {days.map((day, index) => (
           <Link
             key={day}
+            data-card-entry
             href={`/history/${day}`}
             aria-label={`Open daily log for ${formatDay(day, { year: "numeric" })}`}
           >
@@ -619,13 +655,17 @@ function CheckInMemories({ analytics }: { analytics: MilestoneAnalytics }) {
       {memories.length ? (
         <div className={styles.memoryList}>
           {memories.map((entry) => (
-            <Link key={entry.day} href={`/history/${entry.day}`}>
+            <Link
+              key={entry.day}
+              href={`/history/${entry.day}`}
+              data-card-entry
+            >
               <span className={styles.memoryDate}>
                 <MoonStarsIcon size={14} weight="bold" aria-hidden="true" />
                 {shortDate(entry.day)}
                 <ActionIcon name="external" className="size-3" />
               </span>
-              {entry.note && <p>{entry.note}</p>}
+              {entry.note && <p>{reflectionStats(entry.note).excerpt}</p>}
               {entry.helped && (
                 <span className={styles.helped}>
                   <strong>Helped · </strong>
@@ -673,15 +713,12 @@ export function StreakMilestonePage({ target }: { target: number }) {
         Back To Streaks
       </Link>
       <header
+        data-card-entry
         className={`${styles.detailHero} ${milestone.achieved ? styles.earnedHero : styles.upcomingHero}`}
-        style={milestone.achieved ? paletteStyle(milestone.palette) : undefined}
+        style={milestone.achieved ? paletteStyle() : undefined}
       >
         {milestone.achieved && (
-          <StreakArtwork
-            seed={milestone.target}
-            palette={milestone.palette}
-            party
-          />
+          <StreakArtwork seed={milestone.target} palette={pagePalette} party />
         )}
         <div className={styles.heroForeground}>
           <div className={styles.heroTopline}>
@@ -731,7 +768,7 @@ export function StreakMilestonePage({ target }: { target: number }) {
 
       {!milestone.achieved ? (
         <>
-          <div className={styles.upcomingSummary}>
+          <div className={styles.upcomingSummary} data-card-entry>
             <h2>
               {count(milestone.remaining)} More Consecutive Logging{" "}
               {milestone.remaining === 1 ? "Day" : "Days"}
@@ -762,7 +799,7 @@ export function StreakMilestonePage({ target }: { target: number }) {
         <>
           {analytics ? (
             <>
-              <dl className={styles.earnedStats}>
+              <dl className={styles.earnedStats} data-card-entry>
                 <div>
                   <dt>Days In This Milestone</dt>
                   <dd>{count(analytics.current.dayCount)}</dd>
@@ -788,7 +825,8 @@ export function StreakMilestonePage({ target }: { target: number }) {
                   See what improved, stayed the same, or felt harder in your
                   recorded energy and stress. Each comparison uses the
                   milestone’s first recorded stretch and the equally long period
-                  just before it.
+                  just before it. Ratings share a 1–5 comparison scale,
+                  including newer 1–10 responses.
                 </p>
                 <div className={styles.ratingList}>
                   {analytics.ratings.map((change) => (

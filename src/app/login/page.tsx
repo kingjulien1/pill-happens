@@ -6,6 +6,7 @@ import { HeadingText } from "@/components/heading-text";
 import { Brand } from "@/components/brand";
 import { InstallAppButton } from "@/components/install-app-button";
 import { configurationIssue, isAuthenticated } from "@/lib/server/auth";
+import topbarStyles from "@/components/page-topbar.module.css";
 
 export const metadata: Metadata = { title: "Your Private Space" };
 export const dynamic = "force-dynamic";
@@ -16,9 +17,14 @@ export default async function LoginPage() {
 
   return (
     <main className="page-enter mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-14 sm:px-8">
-      <div className="mb-28 flex justify-center sm:mb-32">
+      <div className="flex justify-center" data-page-topbar>
         <Brand />
       </div>
+      <div
+        className={topbarStyles.separator}
+        data-page-topbar-separator
+        aria-hidden="true"
+      />
       <header className="canvas-copy mb-6 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           <HeadingText

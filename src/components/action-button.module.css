@@ -1,0 +1,427 @@
+.button[data-slot="button"],
+.filled[data-slot="button"] {
+  --action-base: var(--action-light-base);
+  --action-field-1: var(--action-light-field-1);
+  --action-field-2: var(--action-light-field-2);
+  --action-field-3: var(--action-light-field-3);
+  --action-field-4: var(--action-light-field-4);
+  --action-field-opacity: var(--action-light-field-opacity);
+  --action-diagonal-1: var(--action-light-diagonal-1);
+  --action-diagonal-2: var(--action-light-diagonal-2);
+  --action-diagonal-opacity: var(--action-light-diagonal-opacity);
+  --action-wash: var(--action-light-wash);
+  --action-wash-opacity: var(--action-light-wash-opacity);
+  --action-text: var(--action-light-text);
+  --action-blur: var(--action-light-blur);
+  --action-rim-1: var(--action-light-rim-1);
+  --action-rim-2: var(--action-light-rim-2);
+  --action-rim-3: var(--action-light-rim-3);
+  --action-size-step: 0;
+  --intake-rim-stop-1: var(--action-rim-1);
+  --intake-rim-stop-2: var(--action-rim-2);
+  --intake-rim-stop-3: var(--action-rim-3);
+  --intake-rim-stop-4: var(--action-rim-1);
+  --intake-rim-stop-5: var(--action-rim-2);
+  --intake-rim-line: var(--action-rim-1);
+  --intake-rim-base: var(--action-rim-2);
+  --intake-rim-guard: var(--action-rim-3);
+  --intake-rim-glow: var(--action-rim-3);
+}
+.button[data-slot="button"] {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  min-width: 0;
+  height: calc(
+    var(--action-base-height, 48px) + var(--action-size-step) * 0.75px
+  );
+  min-height: calc(
+    var(--action-base-height, 48px) + var(--action-size-step) * 0.75px
+  );
+  padding-inline: calc(
+    var(--action-base-padding, 16px) + var(--action-size-step) * 0.5px
+  );
+  padding-block: 8px;
+  background: var(--action-base);
+  color: var(--action-text);
+  font-size: calc(
+    var(--action-base-font, 14px) + var(--action-size-step) * 0.125px
+  );
+  font-weight: 650;
+  line-height: 1.2;
+  box-shadow: 0 4px 14px
+    color-mix(in srgb, var(--palette-black) 14.118%, transparent);
+}
+.button[data-slot="button"][data-button-kind="primary"] {
+  font-weight: 750;
+}
+.button[data-button-face="accent"] {
+  --accent-play-state: var(
+    --intake-effects-play-state,
+    var(--action-paint-visibility, running)
+  );
+}
+.button[data-button-face="accent"] .accentSurface {
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+}
+.button[data-button-face="accent"]:is(
+    :disabled,
+    [aria-busy="true"],
+    [aria-disabled="true"],
+    [data-button-motion="off"]
+  ) {
+  --accent-play-state: paused;
+}
+.button[data-slot="button"]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+@media (min-width: 40rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 1;
+  }
+}
+@media (min-width: 48rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 2;
+  }
+}
+@media (min-width: 64rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 3;
+  }
+}
+@media (min-width: 80rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 4;
+  }
+}
+@media (min-width: 96rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 5;
+  }
+}
+/* The 120rem and 160rem guide bands intentionally retain step 5. */
+@media (prefers-color-scheme: dark) {
+  :is(.button, .filled)[data-slot="button"]:not([data-button-theme="light"]) {
+    --action-base: var(--action-dark-base);
+    --action-field-1: var(--action-dark-field-1);
+    --action-field-2: var(--action-dark-field-2);
+    --action-field-3: var(--action-dark-field-3);
+    --action-field-4: var(--action-dark-field-4);
+    --action-field-opacity: var(--action-dark-field-opacity);
+    --action-diagonal-1: var(--action-dark-diagonal-1);
+    --action-diagonal-2: var(--action-dark-diagonal-2);
+    --action-diagonal-opacity: var(--action-dark-diagonal-opacity);
+    --action-wash: var(--action-dark-wash);
+    --action-wash-opacity: var(--action-dark-wash-opacity);
+    --action-text: var(--action-dark-text);
+    --action-blur: var(--action-dark-blur);
+    --action-rim-1: var(--action-dark-rim-1);
+    --action-rim-2: var(--action-dark-rim-2);
+    --action-rim-3: var(--action-dark-rim-3);
+  }
+}
+:is(.button, .filled)[data-slot="button"][data-button-theme="dark"] {
+  --action-base: var(--action-dark-base);
+  --action-field-1: var(--action-dark-field-1);
+  --action-field-2: var(--action-dark-field-2);
+  --action-field-3: var(--action-dark-field-3);
+  --action-field-4: var(--action-dark-field-4);
+  --action-field-opacity: var(--action-dark-field-opacity);
+  --action-diagonal-1: var(--action-dark-diagonal-1);
+  --action-diagonal-2: var(--action-dark-diagonal-2);
+  --action-diagonal-opacity: var(--action-dark-diagonal-opacity);
+  --action-wash: var(--action-dark-wash);
+  --action-wash-opacity: var(--action-dark-wash-opacity);
+  --action-text: var(--action-dark-text);
+  --action-blur: var(--action-dark-blur);
+  --action-rim-1: var(--action-dark-rim-1);
+  --action-rim-2: var(--action-dark-rim-2);
+  --action-rim-3: var(--action-dark-rim-3);
+}
+.surface,
+.filledSurface,
+.field,
+.diagonal,
+.wash,
+.fallback {
+  position: absolute;
+  pointer-events: none;
+}
+.surface {
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--action-base);
+  -webkit-backdrop-filter: blur(var(--action-blur));
+  backdrop-filter: blur(var(--action-blur));
+}
+.filled[data-slot="button"] {
+  position: relative;
+  isolation: isolate;
+  background: var(--action-base);
+  color: var(--action-text);
+}
+.filledSurface {
+  z-index: -2;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--action-base);
+}
+.filled .filledRim {
+  z-index: -1;
+}
+.tint {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: var(--action-tint-opacity);
+  pointer-events: none;
+}
+.tintFlow {
+  position: absolute;
+  inset: -50% -18%;
+  background:
+    radial-gradient(
+      ellipse 58% 74% at 14% 24%,
+      var(--intake-action-accent) 5%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 46% 65% at 88% 78%,
+      var(--action-rim-2),
+      transparent 76%
+    ),
+    conic-gradient(
+      from 32deg at 58% 46%,
+      var(--action-rim-1),
+      var(--action-tint-emerald) 82deg,
+      var(--action-rim-3) 174deg,
+      var(--intake-action-accent) 267deg,
+      var(--action-rim-2) 326deg,
+      var(--action-rim-1)
+    );
+  transform-origin: 48% 52%;
+  animation: action-tint-drift 16s ease-in-out infinite;
+  animation-play-state: var(
+    --accent-play-state,
+    var(--intake-effects-play-state, running)
+  );
+}
+.tint[data-tint-paused="true"] .tintFlow,
+:is(.button, .filled):is(
+    :disabled,
+    [aria-busy="true"],
+    [aria-disabled="true"],
+    [data-button-motion="off"]
+  )
+  .tintFlow {
+  animation-play-state: paused;
+}
+.button
+  .content
+  svg:not(
+    :where(
+      [data-medication-glyph],
+      [data-medication-glyph] *,
+      [data-medication-mark] *,
+      [data-medication-type],
+      [data-medication-category-glyph],
+      [data-medication-category-glyph] *,
+      [data-medication-class-glyph],
+      [data-medication-class-glyph] *
+    )
+  ),
+.filled
+  > svg:not(
+    [data-medication-glyph],
+    [data-medication-type],
+    [data-medication-category-glyph],
+    [data-medication-class-glyph]
+  ) {
+  color: var(--intake-action-accent);
+}
+.field {
+  inset: -90% -20%;
+  background:
+    radial-gradient(
+      ellipse at 20% 24%,
+      var(--action-field-1) 10%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse at 86% 78%,
+      var(--action-field-2) 5%,
+      transparent 65%
+    ),
+    conic-gradient(
+      from 35deg at 48% 52%,
+      var(--action-field-1),
+      var(--action-field-1) 100deg,
+      var(--action-field-2) 190deg,
+      var(--action-field-3) 275deg,
+      var(--action-field-1)
+    );
+  opacity: var(--action-field-opacity);
+  transform-origin: center;
+  animation: action-field-drift 18s ease-in-out infinite;
+  animation-play-state: var(
+    --intake-effects-play-state,
+    var(--action-paint-visibility, running)
+  );
+}
+.diagonal {
+  inset: 0;
+  /* The small radial pools disperse this diagonal veil without a hard color split. */
+  background:
+    radial-gradient(
+      ellipse 70% 180% at 18% 20%,
+      var(--action-diagonal-1),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 65% 170% at 92% 80%,
+      var(--action-diagonal-2),
+      transparent 76%
+    ),
+    linear-gradient(
+      135deg,
+      var(--action-diagonal-1) 8%,
+      var(--action-diagonal-2) 92%
+    );
+  opacity: var(--action-diagonal-opacity);
+}
+.wash {
+  inset: 0;
+  background: var(--action-wash);
+  opacity: var(--action-wash-opacity);
+}
+.content {
+  position: relative;
+  z-index: 2;
+  /* Keep foreground paint independent of the animated surface in WebKit. */
+  transform: translateZ(0);
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: inherit;
+  gap: inherit;
+  color: inherit;
+}
+.button > :global(.intake-specular-light) {
+  position: absolute;
+  z-index: 1;
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: min(calc(100% + var(--intake-light-size)), 100vw);
+  height: calc(100% + var(--intake-light-size));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.fallback {
+  z-index: 1;
+  inset: 0;
+  border: 3px solid var(--action-rim-1);
+  border-radius: inherit;
+}
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .fallback {
+    overflow: hidden;
+    border: 0;
+    padding: 3px;
+    background: conic-gradient(
+      from 25deg,
+      var(--action-rim-1),
+      var(--action-rim-2) 120deg,
+      var(--action-rim-3) 240deg,
+      var(--action-rim-1)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .fallback::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 220%;
+    aspect-ratio: 1;
+    background: conic-gradient(
+      from 25deg,
+      var(--action-rim-1),
+      var(--action-rim-2) 120deg,
+      var(--action-rim-3) 240deg,
+      var(--action-rim-1)
+    );
+    animation: action-rim-turn 6.8s linear infinite;
+    transform: translate(-50%, -50%);
+    animation-play-state: var(
+      --intake-effects-play-state,
+      var(--action-paint-visibility, running)
+    );
+  }
+  .button[data-button-kind="secondary"] .fallback {
+    /* One paint layer preserves the supplied alpha at translucent rim stops. */
+    background: none;
+  }
+}
+.button > :global(.intake-specular-light[data-rendered="true"]) + .fallback {
+  opacity: 0;
+}
+:is(.button, .filled):is(:disabled, [aria-busy="true"], [aria-disabled="true"])
+  .field,
+:is(.button, .filled):is(:disabled, [aria-busy="true"], [aria-disabled="true"])
+  .fallback::before,
+:is(.button, .filled)[data-button-motion="off"] .field,
+:is(.button, .filled)[data-button-motion="off"] .fallback::before {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .field,
+  .tintFlow,
+  .fallback::before {
+    animation: none;
+  }
+}
+@keyframes action-tint-drift {
+  0%,
+  100% {
+    transform: translate3d(-3%, 2%, 0) rotate(-10deg) scale(1.02);
+  }
+  45% {
+    transform: translate3d(4%, -3%, 0) rotate(14deg) scale(1.08);
+  }
+  72% {
+    transform: translate3d(1%, 3%, 0) rotate(3deg) scale(1.04);
+  }
+}
+@keyframes action-field-drift {
+  0%,
+  100% {
+    transform: translate3d(-3%, 2%, 0) rotate(-7deg) scale(1.04);
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) rotate(8deg) scale(1.12);
+  }
+}
+@keyframes action-rim-turn {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

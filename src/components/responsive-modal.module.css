@@ -1,0 +1,66 @@
+.headingRow {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px 12px;
+  margin-block-start: -8px;
+  margin-inline-end: -8px;
+}
+
+.headingRow[data-has-title-icon] {
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+}
+
+.titleIcon {
+  width: 28px;
+  height: 28px;
+  margin-block-start: 8px;
+  color: var(--foreground);
+}
+
+.headingCopy {
+  min-width: 0;
+  padding-block-start: 8px;
+}
+
+.title {
+  min-width: 0;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 28px;
+  overflow-wrap: anywhere;
+}
+
+.context {
+  margin: 4px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 18px;
+}
+
+.description {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+  padding-inline-end: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.65;
+  text-align: left;
+}
+
+.headingRow[data-has-title-icon] .description {
+  grid-column: 2 / -1;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+}

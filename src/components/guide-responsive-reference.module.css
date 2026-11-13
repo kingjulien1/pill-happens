@@ -1,0 +1,280 @@
+.reference {
+  min-width: 0;
+}
+
+.sectionIntro {
+  max-width: 68ch;
+  margin: 0 0 1.5rem;
+  color: var(--canvas-muted-foreground);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.card {
+  min-width: 0;
+  margin-top: 1rem;
+  padding: clamp(1.125rem, 2.3vw, 2rem);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--surface-reading);
+  color: var(--surface-reading-foreground);
+  text-shadow: none;
+}
+
+.card h3 {
+  max-width: 38ch;
+  margin-bottom: 1rem;
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  scroll-margin-top: 2rem;
+}
+
+.card h4 {
+  margin-bottom: 0.65rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  scroll-margin-top: 2rem;
+}
+
+.card p,
+.card li,
+.card dd {
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.card p {
+  max-width: 68ch;
+  margin-block: 0.8rem;
+}
+
+.card code {
+  overflow-wrap: anywhere;
+}
+
+.card ul {
+  margin-block: 0.8rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.card li + li {
+  margin-top: 0.5rem;
+}
+
+.paired {
+  display: grid;
+  min-width: 0;
+  gap: 1.5rem;
+  margin-block: 1.75rem 0.5rem;
+}
+
+.paired > div {
+  min-width: 0;
+}
+
+.tableScroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-block: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  scrollbar-width: thin;
+}
+
+.tableScroll:focus-visible,
+.sources a:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 4px;
+}
+
+.tableScroll table {
+  width: 100%;
+  min-width: 35rem;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tableScroll caption {
+  padding: 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  text-align: left;
+  caption-side: bottom;
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  vertical-align: top;
+}
+
+.tableScroll th {
+  font-weight: 600;
+}
+
+.tableScroll td {
+  color: var(--muted-foreground);
+}
+
+.tableScroll tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.sources a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--surface-reading-foreground);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 0.3em;
+}
+
+.sources svg {
+  flex-shrink: 0;
+}
+
+.bands {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.band {
+  min-width: 0;
+  padding: 1.125rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+.bandTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.bandTop h4 {
+  margin: 0;
+}
+
+.bandTop code {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.bandWidth {
+  display: block;
+  margin-top: 1rem;
+  font-size: 1.75rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.bandWidth small {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.band p {
+  font-size: 0.9375rem;
+}
+
+.band dl {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.band dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.band dt,
+.band dd {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.band dt {
+  color: var(--muted-foreground);
+}
+
+.band dd {
+  color: var(--surface-reading-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.card .note {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.card .widthLadder {
+  display: flex;
+  max-width: none;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
+  padding-block: 1rem;
+  font-size: 0.875rem;
+}
+
+.widthLadder > span {
+  display: inline-flex;
+  gap: 0.65rem;
+}
+
+.widthLadder i {
+  color: var(--muted-foreground);
+  font-style: normal;
+  opacity: 0.6;
+}
+
+.sourceMap {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.sourceMap dt {
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.sourceMap dd {
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 48rem) and (max-width: 79.999rem), (min-width: 96rem) {
+  .paired {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}

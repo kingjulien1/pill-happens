@@ -11,13 +11,21 @@ import {
   type CSSProperties,
 } from "react";
 import { ActionIcon } from "@/components/action-icon";
+import { JOURNAL_REFERENCE_REVEAL_EVENT } from "@/lib/journal-reference-navigation";
+import { useIntakeGroupSurface } from "@/components/use-intake-group-surface";
 import { IntakeCard } from "@/components/intake-card";
+import { settleIntakeGroupEntrance } from "@/components/intake-timeline-entrance";
+import { useIntakeStackGroupControl } from "@/components/intake-stack-controller";
 import { usePersistentIntakeStackView } from "@/components/journal-drafts";
 import { toLocalInput, type Intake, type Medication } from "@/lib/domain";
 import type { IntakeGroup } from "@/lib/intake-groups";
+import { getIntakeGroupGradient } from "@/lib/intake-group-palette";
 import { getMedicationClasses } from "@/lib/medication-classification";
+import entranceStyles from "@/components/intake-group-entrance.module.css";
+import spacingStyles from "@/components/intake-group-spacing.module.css";
 import {
   EMPTY_INTAKE_STACK_VIEW,
+  INTAKE_GROUP_SPACING_PX,
   foldIntakeStack,
   layoutIntakeStacks,
   normalizeIntakeStackView,
@@ -144,7 +152,7 @@ function StackSlot({
           onEdit={onActivate}
           actionLabel={
             collapsed
-              ? `Show all ${count} intakes in this group; ${entry.medicationName} at ${time}`
+              ? `Reveal all ${count} intakes in this group; ${entry.medicationName} at ${time}`
               : undefined
           }
           controls={collapsed ? controls : undefined}
@@ -196,6 +204,7 @@ export function IntakeCardGroup({
   const grouped = count > 1;
   const open = view.expanded.length > 0;
   const collapsed = grouped && !open;
+  const { groupRef, labelRef } = useIntakeGroupSurface(grouped);
   const onNaturalHeight = useCallback((id: string, height: number) => {
     if (!Number.isFinite(height) || height <= 0) return;
     setNaturalHeights((previous) =>
@@ -229,7 +238,8 @@ export function IntakeCardGroup({
     return () => document.removeEventListener("visibilitychange", settleHidden);
   }, []);
 
-  const changeOpen = (showing: boolean) => {
+  const applyOpen = (showing: boolean, bulk: boolean) => {
+    if (cards.current) settleIntakeGroupEntrance(cards.current);
     const from = view;
     const target = showing
       ? showIntakeStackChildren(group.entries, from)
@@ -243,12 +253,39 @@ export function IntakeCardGroup({
     }));
     // Store final intent immediately, without saving animation frames or timers.
     remembered.saveView(target);
-    setAnnouncement(
-      showing
-        ? `All ${count} intakes shown. Select an intake to edit.`
-        : `${count} intakes folded together.`,
-    );
+    if (!bulk)
+      setAnnouncement(
+        showing
+          ? `All ${count} intakes shown. Select an intake to edit.`
+          : `${count} intakes folded together.`,
+      );
   };
+  const changeOpen = useIntakeStackGroupControl({
+    day,
+    id: group.id,
+    controls: cardsId,
+    enabled: grouped,
+    open,
+    onChange: applyOpen,
+  });
+
+  useEffect(() => {
+    const revealReference = (event: Event) => {
+      if (!(event instanceof CustomEvent) || !grouped || open) return;
+      const id = event.detail?.id;
+      if (
+        typeof id === "string" &&
+        group.entries.some((entry) => entry.id === id)
+      )
+        changeOpen(true);
+    };
+    document.addEventListener(JOURNAL_REFERENCE_REVEAL_EVENT, revealReference);
+    return () =>
+      document.removeEventListener(
+        JOURNAL_REFERENCE_REVEAL_EVENT,
+        revealReference,
+      );
+  }, [group.entries, grouped, open, changeOpen]);
 
   const activate = (entry: Intake) => {
     if (collapsed) {
@@ -282,9 +319,32 @@ export function IntakeCardGroup({
 
   return (
     <div
-      className="intake-group"
+      ref={groupRef}
+      className={`intake-group ${entranceStyles.group} ${spacingStyles.base} ${spacingStyles.group}`}
+      style={
+        grouped
+          ? ({
+              "--intake-group-space": `${INTAKE_GROUP_SPACING_PX}px`,
+              "--intake-group-gradient": getIntakeGroupGradient(
+                group.entries,
+                medications,
+              ),
+            } as CSSProperties)
+          : undefined
+      }
+      onClick={(event) => {
+        const target = event.target;
+        if (
+          collapsed &&
+          target instanceof Element &&
+          !target.closest("button, a, input, select, textarea, [role=button]")
+        )
+          changeOpen(true);
+      }}
       data-intake-group={group.id}
       data-group-size={count}
+      data-grouped={grouped}
+      data-group-entry-state={grouped ? "pending" : undefined}
       data-expanded={open}
       data-stack-moving={display.moving}
       data-stack-head-count={view.heads.length}
@@ -295,6 +355,15 @@ export function IntakeCardGroup({
       }
       data-contains-opioid={classes.includes("opioid") || undefined}
     >
+      {grouped && (
+        <div
+          className={`intake-group-glass ${entranceStyles.surface}`}
+          aria-hidden="true"
+        >
+          <div className="intake-group-blur" />
+          <div className="intake-group-gradient" />
+        </div>
+      )}
       <div
         id={cardsId}
         ref={cards}
@@ -333,37 +402,65 @@ export function IntakeCardGroup({
       </div>
       {grouped && (
         <>
-          <button
-            type="button"
-            className="intake-group-toggle"
-            aria-expanded={open}
-            aria-controls={cardsId}
-            aria-label={`${open ? "Fold" : "Show"} ${count} intakes grouped by consecutive gaps of 13 minutes or less${classificationContext}`}
-            onClick={(event) => {
-              const showing = !open;
-              changeOpen(showing);
-              if (showing && event.detail === 0) {
-                requestAnimationFrame(() => {
-                  cards.current
-                    ?.querySelector<HTMLButtonElement>("[data-intake-card]")
-                    ?.focus({ preventScroll: true });
-                });
-              }
-            }}
+          <div
+            className={`intake-group-footer ${entranceStyles.control}`}
+            data-intake-group-entrance-part="control"
           >
-            <span className="intake-group-label">
-              <span>
-                {open ? "Fold" : "Show"} <strong>{count}</strong> intakes
+            <button
+              type="button"
+              className="intake-group-toggle"
+              aria-expanded={open}
+              aria-controls={cardsId}
+              aria-label={`${open ? "Collapse" : "Reveal"} ${count} intakes grouped by consecutive gaps of 13 minutes or less${classificationContext}`}
+              onClick={(event) => {
+                const showing = !open;
+                changeOpen(showing);
+                if (showing && event.detail === 0) {
+                  requestAnimationFrame(() => {
+                    cards.current
+                      ?.querySelector<HTMLButtonElement>(
+                        "[data-intake-card-action]",
+                      )
+                      ?.focus({ preventScroll: true });
+                  });
+                }
+              }}
+            >
+              <span ref={labelRef} className="intake-group-label">
+                <span className="intake-group-control-paint" aria-hidden="true">
+                  <span className="intake-group-blur" />
+                </span>
+                <span
+                  className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
+                  aria-hidden="true"
+                >
+                  <ActionIcon
+                    name="expand"
+                    weight="regular"
+                    className="intake-group-chevron"
+                  />
+                </span>
+                <span className="intake-group-copy" aria-hidden="true">
+                  <span className="intake-group-verb">
+                    <span data-current={!open}>Reveal</span>
+                    <span data-current={open}>Collapse</span>
+                  </span>
+                  <strong>{count}</strong>
+                  <span>intakes</span>
+                </span>
+                <span
+                  className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
+                  aria-hidden="true"
+                >
+                  <ActionIcon
+                    name="expand"
+                    weight="regular"
+                    className="intake-group-chevron"
+                  />
+                </span>
               </span>
-              <span className="intake-group-chevron-frame" aria-hidden="true">
-                <ActionIcon
-                  name="expand"
-                  weight="regular"
-                  className="intake-group-chevron"
-                />
-              </span>
-            </span>
-          </button>
+            </button>
+          </div>
           <span className="sr-only" role="status">
             {announcement}
           </span>

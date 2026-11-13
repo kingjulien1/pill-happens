@@ -11,6 +11,20 @@ import { mutateJournalState, readJournalState } from "./journal-state";
 function legacyState(): AppData {
   return {
     ...emptyData(),
+    preparedIntakeCompletions: [
+      {
+        groupId: "morning",
+        day: "2026-10-25",
+        confirmedAt: "2026-10-25T10:00:29Z",
+        intakeIds: ["intake-a", "deleted-intake"],
+      },
+      {
+        groupId: "evening",
+        day: "2026-10-25",
+        confirmedAt: "2026-10-25T20:00:00Z",
+        intakeIds: ["another-deleted-intake"],
+      },
+    ],
     medications: [
       {
         id: "medication-a",
@@ -30,6 +44,7 @@ function legacyState(): AppData {
         medicationName: "Old Name",
         strengthMg: 0.5,
         quantity: 0.5,
+        route: "nasal",
         takenAt: "2026-10-25T10:00:29Z",
         createdAt: "2026-10-26T10:00:37Z",
         note: "Preserve this note.",
@@ -38,7 +53,7 @@ function legacyState(): AppData {
   };
 }
 
-test("state reads and exports reconcile legacy details; medication edits save all history atomically", async (t) => {
+test("state and export reads preserve legacy receipts and reconcile details; medication edits save history atomically", async (t) => {
   const db = new PGlite();
   t.after(() => db.close());
   let stateWrites = 0;
@@ -73,6 +88,13 @@ test("state reads and exports reconcile legacy details; medication edits save al
   assert.equal(projected.intakes[0].medicationName, "Current Name");
   assert.equal(projected.intakes[0].strengthMg, 2);
   assert.equal(projected.intakes[0].medicationForm, "tablet");
+  assert.equal(projected.intakes[0].route, "nasal");
+  assert.deepEqual(
+    projected.preparedIntakeCompletions,
+    original.preparedIntakeCompletions,
+    "retired template metadata survives reads without restoring deleted intakes",
+  );
+  assert.equal(projected.intakes.length, 1);
   // Export uses this same read, including all resolved fields in its JSON payload.
   const backup = JSON.parse(
     JSON.stringify({ schemaVersion: 1, data: projected }),
@@ -110,6 +132,10 @@ test("state reads and exports reconcile legacy details; medication edits save al
     medicationForm: "pump-bottle",
   });
   assert.equal(totalsForDay(saved, "2026-10-25")[0].totalMg, 2);
+  assert.deepEqual(
+    saved.preparedIntakeCompletions,
+    original.preparedIntakeCompletions,
+  );
   assert.deepEqual(await repository.readState("personal"), saved);
   assert.deepEqual(await readJournalState(repository, "personal"), saved);
 
@@ -171,6 +197,18 @@ test("state reads and exports reconcile legacy details; medication edits save al
     ),
   );
   assert.ok(retried.intakes.every((item) => item.strengthMg === 8));
+  assert.ok(retried.intakes.every((item) => item.route === "nasal"));
   assert.equal(totalsForDay(retried, "2026-10-25")[0].totalMg, 20);
+  assert.deepEqual(
+    retried.preparedIntakeCompletions,
+    original.preparedIntakeCompletions,
+  );
   assert.deepEqual(await repository.readState("personal"), retried);
+  await db.query(
+    "INSERT INTO pill_happens_state (id, data) VALUES ($1, $2::jsonb)",
+    ["without-retired-templates", JSON.stringify(emptyData())],
+  );
+  const empty = await readJournalState(repository, "without-retired-templates");
+  assert.equal(Object.hasOwn(empty, "preparedIntakeCompletions"), false);
+  assert.deepEqual(empty.intakes, []);
 });

@@ -1,0 +1,217 @@
+.fields {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timeControls {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  gap: 6px;
+}
+
+.field .input {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 40px;
+  padding-block: 0;
+  padding-inline-start: 14px;
+  border-radius: var(--dialog-radius-control, 12px);
+  font-size: 16px;
+  line-height: 1.2;
+  text-align: left;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.field .dateInput {
+  padding-inline-end: 8px;
+}
+
+.field .timeInput {
+  /* Keep HH:MM and the native period field readable in an 86px mobile box. */
+  padding-inline-end: 2px;
+}
+
+.input::-webkit-calendar-picker-indicator,
+.input::-webkit-inner-spin-button,
+.input::-webkit-clear-button {
+  display: none;
+  width: 0;
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+}
+
+.input::-webkit-date-and-time-value {
+  display: inline-flex;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.input::-webkit-datetime-edit {
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+}
+
+.input::-webkit-datetime-edit-fields-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.input::-webkit-datetime-edit,
+.input::-webkit-datetime-edit-fields-wrapper,
+.input::-webkit-datetime-edit-text,
+.input::-webkit-datetime-edit-year-field,
+.input::-webkit-datetime-edit-month-field,
+.input::-webkit-datetime-edit-day-field,
+.input::-webkit-datetime-edit-hour-field,
+.input::-webkit-datetime-edit-minute-field,
+.input::-webkit-datetime-edit-ampm-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.timeControls .resetButton {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: var(--dialog-radius-control, 12px);
+  color: var(--foreground);
+}
+
+.resetVisual {
+  position: relative;
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.resetGlyph,
+.checkGlyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkGlyph {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.resetVisual[data-feedback="confirmed"] .resetGlyph {
+  animation: reset-turn 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.resetVisual[data-feedback="confirmed"] .checkGlyph {
+  animation: reset-check 280ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
+}
+
+.resetVisual[data-feedback="idle"] .resetGlyph {
+  animation: reset-return 200ms ease-out both;
+}
+
+.resetVisual[data-feedback="idle"] .checkGlyph {
+  animation: check-return 160ms ease-out both;
+}
+
+@keyframes reset-turn {
+  0% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: rotate(250deg) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(360deg) scale(0.7);
+  }
+}
+
+@keyframes reset-check {
+  0% {
+    opacity: 0;
+    transform: rotate(-12deg) scale(0.7);
+  }
+  70% {
+    opacity: 1;
+    transform: rotate(2deg) scale(1.14);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes reset-return {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes check-return {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+@media (min-width: 768px) {
+  .field .input {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resetGlyph,
+  .checkGlyph {
+    animation: none !important;
+    transform: none;
+  }
+
+  .resetVisual[data-feedback="confirmed"] .resetGlyph {
+    opacity: 0;
+  }
+
+  .resetVisual[data-feedback="confirmed"] .checkGlyph {
+    opacity: 1;
+  }
+}

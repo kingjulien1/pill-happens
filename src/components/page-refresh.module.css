@@ -1,0 +1,926 @@
+/* The gesture controller owns translation and the spring geometry. Decoration
+   stays on independent children, so interrupted pulls never fight CSS motion. */
+.root {
+  --brand-charge-secondary: var(--brand-tone-teal);
+  --brand-charge-accent: var(--brand-tone-emerald);
+  --brand-charge-pearl: var(--brand-tone-pale);
+  --brand-charge-ice: var(--brand-tone-ice);
+  isolation: isolate;
+  overflow: visible;
+}
+.root .button:global(.header-refresh-button),
+.root
+  .button:global(.header-refresh-button):is(
+    :hover,
+    :focus-visible,
+    :active,
+    :disabled
+  ) {
+  background: var(--brand-surface);
+  overflow: visible;
+}
+.root[data-releasing="true"] .button:global(.header-refresh-button) {
+  opacity: 1;
+}
+.root .button:global(.header-refresh-button) > .pills {
+  opacity: var(--brand-pull-pill-opacity, 1);
+  transform: scale(var(--brand-pull-pill-scale, 1))
+    rotate(var(--brand-pull-pill-turn, 0deg));
+  transform-origin: center;
+  transition: none;
+}
+.feedback {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  overflow: visible;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--brand-copy) calc(100% * 179 / 255), transparent),
+    inset 0 0 0 3px color-mix(in srgb, var(--brand-copy) 14.902%, transparent);
+  opacity: var(--brand-pull-edge, 0);
+}
+.light {
+  position: absolute;
+  inset: -2px;
+  border: 1px solid
+    color-mix(in srgb, var(--brand-copy) calc(100% * 112 / 255), transparent);
+  border-radius: inherit;
+  background: transparent;
+  box-shadow:
+    0 0 13px 3px color-mix(in srgb, var(--brand-copy) 27.059%, transparent),
+    0 0 24px 7px
+      color-mix(in srgb, var(--brand-copy) calc(100% * 31 / 255), transparent);
+  opacity: calc(var(--brand-pull-flare, 0) * 0.82);
+  filter: blur(2px);
+}
+.chargedGlow {
+  position: absolute;
+  z-index: 1;
+  inset: -2px;
+  border-radius: inherit;
+  background: transparent;
+  opacity: 0;
+  box-shadow:
+    -4px -3px 15px 2px
+      color-mix(in srgb, var(--brand-copy) calc(100% * 38 / 255), transparent),
+    4px 3px 18px 3px
+      color-mix(in srgb, var(--brand-charge-secondary) 28%, transparent),
+    0 0 28px 4px color-mix(in srgb, var(--brand-charge-accent) 18%, transparent);
+  transition: opacity 380ms ease-out;
+}
+.chargedGlow::before,
+.chargedGlow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1.5px solid
+    color-mix(in srgb, var(--brand-copy) calc(100% * 115 / 255), transparent);
+  border-radius: inherit;
+  background: transparent;
+  filter: blur(2px);
+}
+.chargedGlow::after {
+  inset: -4px;
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--brand-charge-pearl) 22%, transparent);
+  filter: blur(3px);
+}
+.root[data-ready="true"] .chargedGlow {
+  opacity: 1;
+  animation: chargeGlow 3.8s ease-in-out 180ms infinite;
+}
+.glyph {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: var(--brand-pull-reveal, 0);
+  color: var(--brand-copy);
+  transform: scale(var(--brand-pull-icon-scale, 0.25))
+    rotate(var(--brand-pull-icon-turn, -310deg));
+  transform-origin: center;
+}
+.root[data-ready="true"] .glyph {
+  color: var(--brand-copy);
+}
+.actionGlyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.chargedRotor {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+  animation: chargedRotor 8s linear 960ms infinite both;
+  animation-play-state: paused;
+}
+.chargedRotor svg {
+  animation: chargedBreath 8s ease-in-out 960ms infinite both;
+  animation-play-state: paused;
+}
+.root[data-ready="true"] .chargedRotor,
+.root[data-ready="true"] .chargedRotor svg {
+  animation-play-state: running;
+}
+.glyph svg {
+  display: block;
+  width: 23px;
+  height: 23px;
+  overflow: visible;
+  transform-origin: center;
+}
+.orbit {
+  position: absolute;
+  z-index: 2;
+  inset: -1px;
+  overflow: visible;
+  opacity: var(--brand-pull-ready, 0);
+  transform: rotate(calc(var(--brand-pull-progress, 0) * -120deg));
+  transform-origin: center;
+}
+.orbitTrack,
+.orbitRibbon,
+.orbitCounter,
+.orbitBead {
+  rotate: 20deg;
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation-play-state: paused;
+}
+.orbitTrack {
+  inset: 2px;
+  border: 0.7px solid
+    color-mix(in srgb, var(--brand-copy) calc(100% * 23 / 255), transparent);
+}
+.orbitRibbon {
+  background: conic-gradient(
+    from 14deg,
+    transparent 0deg 64deg,
+    color-mix(in srgb, var(--brand-charge-ice) 9%, transparent) 100deg,
+    color-mix(in srgb, var(--brand-charge-pearl) 34%, transparent) 176deg,
+    color-mix(in srgb, var(--brand-copy) calc(100% * 163 / 255), transparent)
+      244deg,
+    var(--brand-copy) 276deg,
+    transparent 279deg 360deg
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 2.2px),
+    #000 calc(100% - 1.7px)
+  );
+  animation: ribbonDrift 8s linear 960ms infinite both;
+  animation-play-state: paused;
+}
+.orbitCounter {
+  inset: 4px;
+  background: conic-gradient(
+    from 20deg,
+    transparent 0deg 38deg,
+    var(--brand-charge-pearl) 75deg,
+    color-mix(in srgb, var(--brand-copy) calc(100% * 184 / 255), transparent)
+      101deg,
+    transparent 104deg 218deg,
+    var(--brand-charge-ice) 255deg,
+    color-mix(in srgb, var(--brand-copy) calc(100% * 153 / 255), transparent)
+      281deg,
+    transparent 284deg
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 1.3px),
+    #000 calc(100% - 0.8px)
+  );
+  opacity: 0.62;
+  animation: counterDrift 8s linear 960ms infinite both;
+  animation-play-state: paused;
+}
+.orbitBead {
+  animation: ribbonDrift 8s linear 960ms infinite both;
+  animation-play-state: paused;
+}
+.orbitBead::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1.5px);
+  left: -0.4px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--brand-charge-pearl);
+  box-shadow: 0 0 5px 1px
+    color-mix(in srgb, var(--brand-charge-secondary) 30%, transparent);
+  opacity: 0.8;
+}
+.root[data-ready="true"] .edge {
+  animation: edgeBreath 3.2s ease-in-out 700ms infinite;
+}
+.root[data-ready="true"] .orbit {
+  animation: orbitArrival 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.root[data-ready="true"] :is(.orbitRibbon, .orbitCounter, .orbitBead) {
+  animation-play-state: running;
+}
+.innerPop {
+  position: absolute;
+  z-index: 4;
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  opacity: var(--brand-pull-flare, 0);
+  transform: scale(calc(0.65 + var(--brand-pull-flare, 0) * 0.9))
+    rotate(calc(var(--brand-pull-icon-turn, 0deg) * -0.5));
+}
+.burst {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.root[data-ready="true"] .burst {
+  scale: 1.25;
+}
+.wave,
+.echo,
+.shock {
+  position: absolute;
+  inset: -2px;
+  border: 1.8px solid var(--brand-charge-pearl);
+  border-radius: 38%;
+  opacity: 0;
+  animation: ripple 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.echo {
+  inset: -5px;
+  border-color: color-mix(in srgb, var(--brand-charge-ice) 72%, transparent);
+  border-width: 1.2px;
+  animation-delay: 95ms;
+}
+.shock {
+  inset: -1px;
+  border-width: 6px;
+  border-color: color-mix(
+    in srgb,
+    var(--brand-tone-seafoam) calc(100% * 54 / 255),
+    transparent
+  );
+  animation: shockwave 790ms cubic-bezier(0.16, 1, 0.3, 1) 35ms both;
+}
+.rays {
+  position: absolute;
+  inset: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  overflow: visible;
+  fill: none;
+  stroke: var(--brand-charge-pearl);
+  stroke-width: 1.2px;
+  stroke-linecap: round;
+  stroke-dasharray: 8;
+  opacity: 0;
+  transform-origin: center;
+  animation: raysOpen 820ms cubic-bezier(0.16, 1, 0.3, 1) 55ms both;
+}
+.rays path:nth-child(6n + 1) {
+  stroke: var(--brand-tone-pale);
+}
+.rays path:nth-child(6n + 2) {
+  stroke: var(--brand-tone-seafoam);
+}
+.rays path:nth-child(6n + 3) {
+  stroke: var(--brand-copy);
+}
+.rays path:nth-child(6n + 4) {
+  stroke: var(--brand-tone-ice);
+}
+.rays path:nth-child(6n + 5) {
+  stroke: var(--brand-charge-ice);
+}
+.particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3.4px;
+  height: 3.4px;
+  border-radius: 50%;
+  background: var(--particle-color);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--particle-color) 40%, transparent);
+  opacity: 0;
+  animation: confetti 820ms cubic-bezier(0.16, 1, 0.3, 1)
+    calc(45ms + var(--particle-delay) * 0.6) both;
+}
+.particle[data-shape="1"] {
+  width: 2.8px;
+  height: 7px;
+  border-radius: 2px;
+}
+.particle[data-shape="2"] {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+  border: 1.3px solid var(--particle-color);
+  border-radius: 1px;
+}
+.particle[data-shape="3"] {
+  width: 7px;
+  height: 7px;
+  clip-path: polygon(
+    50% 0,
+    64% 36%,
+    100% 50%,
+    64% 64%,
+    50% 100%,
+    36% 64%,
+    0 50%,
+    36% 36%
+  );
+}
+/* A deliberate 600 ms wind-up and launch. The charcoal face remains consistent throughout. */
+.root[data-releasing="true"] .button {
+  animation: releaseButton 600ms cubic-bezier(0.22, 0.8, 0.25, 1) both;
+}
+.root[data-releasing="true"] .actionGlyph svg {
+  animation: releasePulse 600ms cubic-bezier(0.45, 0, 0.25, 1) both;
+}
+.root[data-releasing="true"] .orbit {
+  animation: orbitLaunch 600ms cubic-bezier(0.45, 0, 0.25, 1) both;
+}
+.root[data-releasing="true"]
+  :is(.orbitRibbon, .orbitCounter, .orbitBead, .chargedRotor) {
+  animation-play-state: paused;
+}
+.root[data-releasing="true"] .edge {
+  animation: releaseEdge 600ms ease-out both;
+}
+.root[data-releasing="true"] .chargedGlow {
+  animation: chargeLaunch 600ms ease-out both;
+}
+.burst[data-kind="release"] :is(.wave, .echo) {
+  animation: releaseRipple 600ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+.burst[data-kind="release"] .echo {
+  animation-delay: 55ms;
+  animation-duration: 545ms;
+}
+.burst[data-kind="release"] .shock {
+  animation: shockwave 500ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both;
+}
+.burst[data-kind="release"] .rays {
+  animation: raysLaunch 550ms cubic-bezier(0.16, 1, 0.3, 1) 30ms both;
+}
+.burst[data-kind="release"] .particle {
+  animation: releaseParticles 560ms cubic-bezier(0.16, 1, 0.3, 1) 20ms both;
+}
+.burst[data-kind="home"] :is(.particle, .shock, .rays) {
+  display: none;
+}
+.burst[data-kind="home"] :is(.wave, .echo) {
+  border-color: var(--brand-copy);
+  animation-name: welcomeHome;
+  animation-duration: 560ms;
+}
+@keyframes chargeGlow {
+  0%,
+  100% {
+    box-shadow:
+      -4px -3px 15px 2px
+        color-mix(in srgb, var(--brand-copy) calc(100% * 48 / 255), transparent),
+      4px 3px 18px 3px
+        color-mix(in srgb, var(--brand-charge-secondary) 28%, transparent),
+      0 0 26px 4px
+        color-mix(in srgb, var(--brand-charge-accent) 16%, transparent);
+  }
+  35% {
+    box-shadow:
+      4px -3px 19px 3px
+        color-mix(in srgb, var(--brand-copy) calc(100% * 56 / 255), transparent),
+      -3px 4px 18px 3px
+        color-mix(in srgb, var(--brand-charge-accent) 24%, transparent),
+      0 0 29px 5px
+        color-mix(in srgb, var(--brand-charge-secondary) 22%, transparent);
+  }
+  70% {
+    box-shadow:
+      4px 3px 17px 3px
+        color-mix(in srgb, var(--brand-copy) calc(100% * 50 / 255), transparent),
+      -4px -3px 21px 4px
+        color-mix(in srgb, var(--brand-charge-secondary) 31%, transparent),
+      0 0 26px 4px
+        color-mix(in srgb, var(--brand-charge-accent) 18%, transparent);
+  }
+}
+@keyframes edgeBreath {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px
+        color-mix(
+          in srgb,
+          var(--brand-copy) calc(100% * 179 / 255),
+          transparent
+        ),
+      inset 0 0 0 3px color-mix(in srgb, var(--brand-copy) 14.902%, transparent),
+      0 0 8px color-mix(in srgb, var(--brand-copy) 7.843%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px var(--brand-copy),
+      inset 0 0 0 3px color-mix(in srgb, var(--brand-copy) 27.059%, transparent),
+      0 0 15px
+        color-mix(in srgb, var(--brand-copy) calc(100% * 53 / 255), transparent);
+  }
+}
+@keyframes orbitArrival {
+  0% {
+    transform: rotate(-120deg) scale(0.8);
+  }
+  38% {
+    transform: rotate(-120deg) scale(1.16);
+  }
+  70% {
+    transform: rotate(-120deg) scale(0.96);
+  }
+  100% {
+    transform: rotate(-120deg) scale(1);
+  }
+}
+/* Each phase integrates a continuous angular velocity. Six complete turns and
+   matching endpoint speed make the 8s loop seamless, including its short reverse. */
+@keyframes chargedRotor {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(
+      0.333333,
+      0.111111,
+      0.666667,
+      0.444444
+    );
+  }
+  8.125% {
+    transform: rotate(366.30068deg);
+    animation-timing-function: cubic-bezier(
+      0.333333,
+      0.550964,
+      0.666667,
+      0.884298
+    );
+  }
+  15.625% {
+    transform: rotate(707.24209deg);
+    animation-timing-function: linear;
+  }
+  59.375% {
+    transform: rotate(1397.578deg);
+    animation-timing-function: cubic-bezier(0.333333, 0.666667, 0.666667, 1);
+  }
+  64.375% {
+    transform: rotate(1437.02576deg);
+    animation-timing-function: cubic-bezier(0.333333, 0, 0.666667, 0.333333);
+  }
+  67.25% {
+    transform: rotate(1419.74389deg);
+    animation-timing-function: cubic-bezier(0.333333, 0.666667, 0.666667, 1);
+  }
+  70.625% {
+    transform: rotate(1399.45646deg);
+    animation-timing-function: cubic-bezier(0.333333, 0, 0.666667, 0.333333);
+  }
+  82.5% {
+    transform: rotate(1653.75367deg);
+    animation-timing-function: cubic-bezier(
+      0.333333,
+      0.493506,
+      0.666667,
+      0.82684
+    );
+  }
+  100% {
+    transform: rotate(2160deg);
+  }
+}
+@keyframes chargedBreath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  8.125% {
+    transform: scale(1.12);
+  }
+  15.625%,
+  52% {
+    transform: scale(1.025);
+  }
+  64.375%,
+  70.625% {
+    transform: scale(0.95);
+  }
+  82.5% {
+    transform: scale(1.07);
+  }
+}
+@keyframes ribbonDrift {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(
+      0.333333,
+      0.111111,
+      0.666667,
+      0.444444
+    );
+  }
+  8.125% {
+    transform: rotate(122.10023deg);
+    animation-timing-function: cubic-bezier(
+      0.333333,
+      0.550964,
+      0.666667,
+      0.884298
+    );
+  }
+  15.625% {
+    transform: rotate(235.74736deg);
+    animation-timing-function: linear;
+  }
+  59.375% {
+    transform: rotate(465.85933deg);
+    animation-timing-function: cubic-bezier(0.333333, 0.666667, 0.666667, 1);
+  }
+  64.375% {
+    transform: rotate(479.00859deg);
+    animation-timing-function: cubic-bezier(0.333333, 0, 0.666667, 0.333333);
+  }
+  67.25% {
+    transform: rotate(473.24796deg);
+    animation-timing-function: cubic-bezier(0.333333, 0.666667, 0.666667, 1);
+  }
+  70.625% {
+    transform: rotate(466.48549deg);
+    animation-timing-function: cubic-bezier(0.333333, 0, 0.666667, 0.333333);
+  }
+  82.5% {
+    transform: rotate(551.25122deg);
+    animation-timing-function: cubic-bezier(
+      0.333333,
+      0.493506,
+      0.666667,
+      0.82684
+    );
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+@keyframes counterDrift {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.58;
+  }
+  22% {
+    transform: rotate(-79.2deg);
+    opacity: 0.72;
+  }
+  64% {
+    transform: rotate(-230.4deg);
+    opacity: 0.48;
+  }
+  100% {
+    transform: rotate(-360deg);
+    opacity: 0.58;
+  }
+}
+@keyframes ripple {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotate(-28deg);
+  }
+  15% {
+    opacity: 0.85;
+  }
+  48% {
+    opacity: 0.42;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.2) rotate(40deg);
+    border-radius: 50%;
+  }
+}
+@keyframes shockwave {
+  0% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  17% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.7);
+    border-radius: 50%;
+  }
+}
+@keyframes raysOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-25deg);
+    stroke-dashoffset: 8;
+  }
+  20% {
+    opacity: 0.8;
+    stroke-dashoffset: 0;
+  }
+  70% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8) rotate(22deg);
+    stroke-dashoffset: -8;
+  }
+}
+@keyframes confetti {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+  }
+  13% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 0.82;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--particle-x)),
+        calc(-50% + var(--particle-y))
+      )
+      scale(0.3) rotate(var(--particle-turn));
+  }
+}
+@keyframes releaseButton {
+  0% {
+    scale: 1;
+  }
+  18% {
+    scale: 0.82;
+  }
+  43% {
+    scale: 1.2;
+  }
+  73% {
+    scale: 0.92;
+  }
+  100% {
+    scale: 1;
+  }
+}
+/* The rotor holds its painted angle while this inner size/fade answers release. */
+@keyframes releasePulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  17% {
+    transform: scale(0.75);
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  72% {
+    transform: scale(0.78);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(0.08);
+    opacity: 0;
+  }
+}
+@keyframes orbitLaunch {
+  0% {
+    opacity: 0.86;
+    transform: rotate(-120deg) scale(1);
+  }
+  20% {
+    opacity: 1;
+    transform: rotate(-120deg) scale(0.92);
+  }
+  55% {
+    opacity: 0.8;
+    transform: rotate(-120deg) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-120deg) scale(1.12);
+  }
+}
+@keyframes releaseEdge {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px
+        color-mix(
+          in srgb,
+          var(--brand-copy) calc(100% * 140 / 255),
+          transparent
+        ),
+      inset 0 0 0 3px color-mix(in srgb, var(--brand-copy) 14.902%, transparent);
+  }
+  42% {
+    box-shadow:
+      inset 0 0 0 1.5px var(--brand-copy),
+      inset 0 0 0 3.5px color-mix(in srgb, var(--brand-copy) 40%, transparent),
+      0 0 22px
+        color-mix(
+          in srgb,
+          var(--brand-copy) calc(100% * 102 / 255),
+          transparent
+        );
+  }
+}
+@keyframes chargeLaunch {
+  0% {
+    opacity: 1;
+    box-shadow:
+      -4px -3px 15px 2px
+        color-mix(
+          in srgb,
+          var(--brand-tone-pale) calc(100% * 64 / 255),
+          transparent
+        ),
+      4px 3px 18px 3px
+        color-mix(
+          in srgb,
+          var(--brand-tone-seafoam) calc(100% * 48 / 255),
+          transparent
+        ),
+      0 0 30px 5px
+        color-mix(
+          in srgb,
+          var(--brand-tone-teal) calc(100% * 31 / 255),
+          transparent
+        );
+  }
+  42% {
+    opacity: 1;
+    box-shadow:
+      -4px 3px 22px 4px
+        color-mix(in srgb, var(--brand-copy) calc(100% * 77 / 255), transparent),
+      4px -3px 24px 4px
+        color-mix(
+          in srgb,
+          var(--brand-tone-ice) calc(100% * 69 / 255),
+          transparent
+        ),
+      0 0 38px 8px
+        color-mix(
+          in srgb,
+          var(--brand-tone-emerald) calc(100% * 43 / 255),
+          transparent
+        );
+  }
+  100% {
+    opacity: 0;
+    box-shadow:
+      -4px 3px 25px 5px
+        color-mix(
+          in srgb,
+          var(--brand-tone-seafoam) calc(100% * 31 / 255),
+          transparent
+        ),
+      4px -3px 27px 5px
+        color-mix(
+          in srgb,
+          var(--brand-tone-teal) calc(100% * 31 / 255),
+          transparent
+        ),
+      0 0 42px 8px
+        color-mix(
+          in srgb,
+          var(--brand-tone-pale) calc(100% * 20 / 255),
+          transparent
+        );
+  }
+}
+@keyframes releaseRipple {
+  0% {
+    opacity: 0.2;
+    transform: scale(1.2) rotate(20deg);
+  }
+  22% {
+    opacity: 0.85;
+    transform: scale(0.85) rotate(-10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.8) rotate(42deg);
+    border-radius: 50%;
+  }
+}
+@keyframes raysLaunch {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(15deg);
+    stroke-dashoffset: 8;
+  }
+  23% {
+    opacity: 0.9;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.05) rotate(-18deg);
+    stroke-dashoffset: -8;
+  }
+}
+@keyframes releaseParticles {
+  0% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--particle-x) * 0.32),
+        calc(-50% + var(--particle-y) * 0.32)
+      )
+      scale(0.7) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--particle-x) * 1.2),
+        calc(-50% + var(--particle-y) * 1.2)
+      )
+      scale(0.2) rotate(var(--particle-turn));
+  }
+}
+@keyframes welcomeHome {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(16deg);
+  }
+  22% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.3;
+    transform: scale(0.85) rotate(-7deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) rotate(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root[data-releasing="true"] .button:global(.header-refresh-button) {
+    opacity: 1;
+  }
+  .root .button:global(.header-refresh-button) > .pills {
+    transform: none;
+  }
+  .glyph {
+    transform: none;
+  }
+  .root .button,
+  .root .actionGlyph,
+  .root .chargedRotor,
+  .root .actionGlyph svg,
+  .root .chargedGlow,
+  .root .edge {
+    animation: none !important;
+  }
+  .root[data-ready="true"] .edge {
+    box-shadow:
+      inset 0 0 0 2px var(--brand-copy),
+      0 0 0 1px color-mix(in srgb, var(--brand-copy) 40%, transparent);
+  }
+  .light,
+  .chargedGlow,
+  .innerPop,
+  .orbit,
+  .burst {
+    display: none;
+  }
+}

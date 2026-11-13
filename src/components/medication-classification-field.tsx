@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Combobox } from "@base-ui/react/combobox";
-import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { Select } from "@base-ui/react/select";
 import { TagIcon } from "@phosphor-icons/react/dist/ssr/Tag";
 import { ActionIcon } from "@/components/action-icon";
-import { MedicationCategoryIcon } from "@/components/medication-category-icon";
 import {
-  filterMedicationCategories,
+  ChoiceMenuHeader,
+  ChoiceOptionContent,
+} from "@/components/choice-menu";
+import { MedicationCategoryIcon } from "@/components/medication-category-icon";
+import { SelectItem } from "@/components/ui/select";
+import {
+  MEDICATION_CATEGORIES,
   getMedicationCategory,
   normalizeMedicationCategories,
   type MedicationCategory,
@@ -19,54 +23,35 @@ export function MedicationClassificationField({
   value,
   onChange,
   disabled,
-  searchQuery,
-  onSearchQueryChange,
 }: {
   id: string;
   value: MedicationCategory[];
   onChange: (value: MedicationCategory[]) => void;
   disabled: boolean;
-  searchQuery?: string;
-  onSearchQueryChange?: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [internalQuery, setInternalQuery] = useState("");
-  const query = searchQuery ?? internalQuery;
-  const setQuery = onSearchQueryChange ?? setInternalQuery;
-  const items = filterMedicationCategories(query);
-  const selected = value.map(getMedicationCategory);
+  const normalized = normalizeMedicationCategories(value);
+  const selected = normalized.map(getMedicationCategory);
   const summary = selected.map((item) => item.label).join(", ");
 
   return (
     <div className={styles.field}>
-      <Combobox.Root<MedicationCategory, true>
+      <Select.Root<MedicationCategory, true>
+        id={id}
         multiple
-        value={value}
+        value={normalized}
         onValueChange={(next) => onChange(normalizeMedicationCategories(next))}
-        items={items.map((item) => item.value)}
-        filter={null}
-        itemToStringLabel={(item) => getMedicationCategory(item).label}
+        items={MEDICATION_CATEGORIES}
+        itemToStringLabel={(category) => getMedicationCategory(category).label}
         open={open}
-        onOpenChange={(next, details) => {
-          if (!next && details.reason === "item-press") {
-            details.cancel();
-            return;
-          }
-          setOpen(next);
-        }}
-        inputValue={query}
-        onInputValueChange={(next, details) => {
-          // Keep the user's search when the popup/dialog closes. Base UI otherwise
-          // clears multiple-selection filters after its exit transition.
-          if (details.isItemPress || details.reason !== "input-change")
-            details.cancel();
-          else setQuery(next);
-        }}
+        onOpenChange={(next) => setOpen(next)}
         highlightItemOnHover={false}
         disabled={disabled}
       >
-        <Combobox.Label className={styles.label}>Categories</Combobox.Label>
-        <Combobox.Trigger
+        <label htmlFor={id} className={styles.label}>
+          Categories
+        </label>
+        <Select.Trigger
           id={id}
           aria-label="Medication Categories"
           aria-description={
@@ -75,21 +60,22 @@ export function MedicationClassificationField({
           title={summary || "Choose Medication Categories"}
           className={styles.trigger}
           data-medication-classification-select
+          data-compact-choice-trigger
         >
-          {selected.length === 1 ? (
-            <MedicationCategoryIcon
-              category={selected[0].value}
-              className={styles.triggerIcon}
-            />
-          ) : (
-            <TagIcon
-              size={13}
-              weight="bold"
-              className={styles.triggerIcon}
-              aria-hidden="true"
-            />
-          )}
-          <span className={styles.triggerText}>
+          <span
+            className={`${styles.optionIcon} ${styles.triggerIcon}`}
+            data-category-kind={
+              selected.length === 1 ? selected[0].value : undefined
+            }
+            aria-hidden="true"
+          >
+            {selected.length === 1 ? (
+              <MedicationCategoryIcon category={selected[0].value} />
+            ) : (
+              <TagIcon size={14} weight="bold" aria-hidden="true" />
+            )}
+          </span>
+          <span className={styles.triggerText} data-choice-trigger-label>
             {selected.length > 1 ? (
               <>
                 {selected.length}
@@ -99,102 +85,91 @@ export function MedicationClassificationField({
               (selected[0]?.shortLabel ?? "None")
             )}
           </span>
-          <ActionIcon name="expand" className="size-3 text-muted-foreground" />
-        </Combobox.Trigger>
-        <Combobox.Portal>
-          <Combobox.Positioner
+          <Select.Icon
+            data-slot="select-trigger-icon"
+            className="pointer-events-none flex shrink-0 items-center text-muted-foreground"
+          >
+            <ActionIcon name="expand" className="size-3" />
+          </Select.Icon>
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner
             align="end"
             sideOffset={6}
             collisionPadding={12}
+            alignItemWithTrigger={false}
             className={styles.positioner}
           >
-            <Combobox.Popup
+            <Select.Popup
               className={styles.popup}
               aria-label="Choose Medication Categories"
-              initialFocus={(interaction) =>
-                interaction === "touch" ? false : true
-              }
               data-medication-category-menu
+              data-choice-menu="category"
             >
-              <div className={styles.heading}>
-                <span>Medication Categories</span>
-                <span>Pick Several</span>
-              </div>
-              <div className={styles.search}>
-                <MagnifyingGlassIcon
-                  size={15}
-                  weight="bold"
-                  aria-hidden="true"
-                />
-                <Combobox.Input
-                  aria-label="Search Medication Categories"
-                  placeholder="Find a category…"
-                  maxLength={80}
-                  autoComplete="off"
-                  spellCheck={false}
-                  className={styles.searchInput}
-                />
-              </div>
-              <Combobox.Empty>
-                <div className={styles.empty}>
-                  <TagIcon size={23} weight="duotone" aria-hidden="true" />
-                  <span>No match. Try another word.</span>
-                </div>
-              </Combobox.Empty>
-              <Combobox.List
+              <ChoiceMenuHeader
+                title="Medication Categories"
+                hint="Pick several"
+              />
+              <Select.List
                 className={styles.list}
                 aria-label="Medication Category Options"
               >
-                {(category: MedicationCategory) => {
-                  const item = getMedicationCategory(category);
+                {MEDICATION_CATEGORIES.map((item) => {
+                  const current = normalized.includes(item.value);
                   return (
-                    <Combobox.Item
-                      key={category}
-                      value={category}
+                    <SelectItem
+                      key={item.value}
+                      value={item.value}
+                      label={item.label}
                       className={styles.option}
-                      data-category-option={category}
+                      data-category-option={item.value}
+                      data-choice-option
+                      data-current={current || undefined}
+                      data-choice-secondary={
+                        item.value === "other" || undefined
+                      }
                     >
-                      <span
-                        className={styles.optionIcon}
-                        data-category-kind={category}
-                      >
-                        <MedicationCategoryIcon category={category} />
-                      </span>
-                      <span className={styles.optionText}>{item.label}</span>
-                      <Combobox.ItemIndicator className={styles.indicator}>
-                        <ActionIcon name="selected" className="size-3.5" />
-                      </Combobox.ItemIndicator>
-                    </Combobox.Item>
+                      <ChoiceOptionContent
+                        current={current}
+                        currentLabel="selected"
+                        icon={
+                          <span
+                            className={styles.optionIcon}
+                            data-category-kind={item.value}
+                            aria-hidden="true"
+                          >
+                            <MedicationCategoryIcon category={item.value} />
+                          </span>
+                        }
+                        label={item.label}
+                      />
+                    </SelectItem>
                   );
-                }}
-              </Combobox.List>
+                })}
+              </Select.List>
               <div className={styles.footer}>
                 <button
                   type="button"
                   className={styles.clear}
-                  disabled={disabled || !value.length}
+                  disabled={disabled || !normalized.length}
                   onClick={() => onChange([])}
                 >
-                  Clear{value.length ? ` ${value.length}` : ""}
+                  Clear{normalized.length ? ` ${normalized.length}` : ""}
                 </button>
-                <span>
-                  {items.length} {items.length === 1 ? "option" : "options"}
-                </span>
+                <span>{MEDICATION_CATEGORIES.length} options</span>
                 <button
                   type="button"
                   className={styles.done}
                   disabled={disabled}
-                  onClick={() => {
-                    setOpen(false);
-                  }}
+                  onClick={() => setOpen(false)}
                 >
                   Done <ActionIcon name="selected" className="size-3" />
                 </button>
               </div>
-            </Combobox.Popup>
-          </Combobox.Positioner>
-        </Combobox.Portal>
-      </Combobox.Root>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
     </div>
   );
 }

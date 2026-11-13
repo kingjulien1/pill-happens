@@ -1,0 +1,419 @@
+.state {
+  --symbol-orange: var(--palette-plum);
+  --symbol-violet: #7c3aed;
+  --symbol-green: #047857;
+  --symbol-blue: #0369a1;
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  overflow: hidden;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.state[data-symbol-state="loading"] {
+  gap: 3px;
+}
+
+.copy {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.title {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 16px;
+}
+
+.description {
+  margin: 3px 0 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 15px;
+  text-wrap: balance;
+}
+
+.palette {
+  display: flex;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 7px;
+  pointer-events: none;
+}
+
+.sample,
+.token {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--symbol-accent) 13%, transparent);
+  background: color-mix(in srgb, var(--symbol-pastel) 35%, var(--popover));
+  color: var(--symbol-accent);
+}
+
+.sample {
+  width: 25px;
+  height: 25px;
+  border-radius: var(--dialog-radius-compact);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.sample + .sample {
+  margin-left: -5px;
+}
+
+.sample:first-child {
+  transform: translateY(1px) rotate(-13deg);
+}
+
+.sample:nth-child(2) {
+  position: relative;
+  z-index: 1;
+  transform: translateY(-2px) rotate(4deg);
+}
+
+.sample:last-child {
+  transform: translateY(2px) rotate(12deg);
+}
+
+.sample > svg {
+  width: 14px;
+  height: 14px;
+}
+
+.state[data-symbol-state="empty"] .palette {
+  opacity: 0.65;
+}
+
+.scene {
+  position: relative;
+  isolation: isolate;
+  width: 224px;
+  max-width: 100%;
+  height: 62px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.halo {
+  position: absolute;
+  inset: 2px 12px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 28% 50%, #c084fc26, transparent 60%),
+    radial-gradient(ellipse at 73% 50%, #38bdf826, transparent 60%);
+  transform: scale(0.9);
+  animation: halo-breathe 2400ms ease-in-out infinite;
+}
+
+.arcWide,
+.arcInner,
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.arcWide {
+  width: 186px;
+  height: 42px;
+  border: 1px solid color-mix(in srgb, var(--symbol-violet) 12%, transparent);
+  border-top-color: color-mix(in srgb, var(--symbol-violet) 40%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--symbol-blue) 32%, transparent);
+  animation: arc-tilt 2400ms ease-in-out infinite;
+}
+
+.arcInner {
+  width: 57px;
+  height: 57px;
+  border: 1.5px solid transparent;
+  border-top-color: color-mix(in srgb, var(--symbol-blue) 45%, transparent);
+  border-right-color: color-mix(in srgb, var(--symbol-violet) 22%, transparent);
+  animation: arc-turn 1800ms linear infinite;
+}
+
+.orbit {
+  width: 60px;
+  height: 60px;
+  animation: arc-turn 2400ms linear reverse infinite;
+}
+
+.orbit > span {
+  position: absolute;
+  top: 1px;
+  left: calc(50% - 2px);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--symbol-blue);
+  box-shadow: 0 0 6px #38bdf870;
+}
+
+.token {
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 13px);
+  left: calc(50% - 13px);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--dialog-radius-compact);
+  box-shadow: 0 2px 7px
+    color-mix(in srgb, var(--symbol-accent) 10%, transparent);
+  transform: translate(var(--token-x), var(--token-y))
+    rotate(var(--token-angle));
+  animation: token-dance 2400ms cubic-bezier(0.45, 0, 0.25, 1)
+    var(--token-delay, 0ms) infinite;
+}
+
+.token > svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pill {
+  --symbol-accent: var(--symbol-orange);
+  --symbol-pastel: var(--palette-white);
+  --token-x: -78px;
+  --token-y: 5px;
+  --token-angle: -16deg;
+  --token-delay: 0ms;
+}
+
+.flower {
+  --symbol-accent: var(--symbol-violet);
+  --symbol-pastel: #ddd6fe;
+  --token-x: 47px;
+  --token-y: -16px;
+  --token-angle: 15deg;
+  --token-delay: -180ms;
+}
+
+.smile {
+  --symbol-accent: var(--symbol-green);
+  --symbol-pastel: #a7f3d0;
+  --token-x: -40px;
+  --token-y: -16px;
+  --token-angle: -10deg;
+  --token-delay: -360ms;
+}
+
+.emoji {
+  --symbol-accent: var(--symbol-blue);
+  --symbol-pastel: #bae6fd;
+  --token-x: 78px;
+  --token-y: 10px;
+  --token-angle: 12deg;
+  --token-delay: -540ms;
+}
+
+.emoji > span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.core {
+  position: absolute;
+  z-index: 2;
+  top: calc(50% - 16px);
+  left: calc(50% - 16px);
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--symbol-violet) 20%, transparent);
+  border-radius: var(--dialog-radius-compact);
+  background: linear-gradient(145deg, #ddd6fe, #bae6fd);
+  color: #5b21b6;
+  box-shadow: 0 3px 14px #8b5cf629;
+  transform: rotate(-5deg) scale(1);
+  animation: core-focus 2400ms ease-in-out infinite;
+}
+
+.core > svg {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+.sheen {
+  position: absolute;
+  inset: -12px;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    #ffffffb3 49%,
+    transparent 63%
+  );
+  transform: translateX(-100%);
+  animation: sheen-pass 2400ms ease-in-out infinite;
+}
+
+.glint {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  color: var(--symbol-blue);
+  transform: scale(0.55) rotate(-15deg);
+  animation: glint-pop 1200ms ease-in-out infinite;
+}
+
+.glint > svg {
+  width: 11px;
+  height: 11px;
+}
+
+.glintFirst {
+  top: 3px;
+  left: calc(50% - 30px);
+}
+
+.glintSecond {
+  right: calc(50% - 37px);
+  bottom: 3px;
+  color: var(--symbol-violet);
+  animation-delay: -600ms;
+}
+
+@keyframes token-dance {
+  0%,
+  100% {
+    transform: translate(var(--token-x), var(--token-y))
+      rotate(var(--token-angle)) scale(0.94);
+  }
+  24% {
+    transform: translate(
+        calc(var(--token-x) * 0.86),
+        calc(var(--token-y) - 4px)
+      )
+      rotate(calc(var(--token-angle) * -0.5)) scale(1.06);
+  }
+  48% {
+    transform: translate(
+        calc(var(--token-x) * 0.48),
+        calc(var(--token-y) * 0.62)
+      )
+      rotate(calc(var(--token-angle) * -1)) scale(0.88);
+  }
+  72% {
+    transform: translate(
+        calc(var(--token-x) * 1.05),
+        calc(var(--token-y) + 3px)
+      )
+      rotate(calc(var(--token-angle) * 1.35)) scale(1.02);
+  }
+}
+
+@keyframes arc-turn {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes arc-tilt {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(-8deg) scale(0.94);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(8deg) scale(1);
+  }
+}
+
+@keyframes halo-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes core-focus {
+  0%,
+  100% {
+    transform: rotate(-5deg) scale(1);
+  }
+  38% {
+    transform: rotate(8deg) scale(1.12);
+  }
+  65% {
+    transform: rotate(-8deg) scale(0.95);
+  }
+}
+
+@keyframes sheen-pass {
+  0%,
+  15% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes glint-pop {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.55) rotate(-15deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(15deg);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .state {
+    --symbol-orange: #fdba74;
+    --symbol-violet: #c4b5fd;
+    --symbol-green: #6ee7b7;
+    --symbol-blue: #7dd3fc;
+  }
+
+  .sample,
+  .token {
+    background: color-mix(in srgb, var(--symbol-pastel) 12%, var(--popover));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state *,
+  .state *::before,
+  .state *::after {
+    animation: none;
+  }
+
+  .sheen {
+    display: none;
+  }
+
+  .glint {
+    opacity: 0.7;
+    transform: scale(0.8) rotate(0deg);
+  }
+}

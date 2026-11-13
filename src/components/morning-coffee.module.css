@@ -1,0 +1,83 @@
+.root {
+  position: relative;
+  display: block;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 56px;
+  height: 56px;
+  overflow: visible;
+}
+
+.mug,
+.pot,
+.steam,
+.stream {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mug {
+  stroke: #fdf1f7;
+  stroke-width: 2;
+}
+
+.pot {
+  color: #c1b6cc;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.liquid {
+  fill: #2a212c;
+  stroke: none;
+}
+
+.stream {
+  stroke: #2a212c;
+}
+
+.steam {
+  stroke: var(--color-pink-400, #f472b6);
+  stroke-width: 1.6;
+  transform: translateY(-4px);
+  opacity: 0.65;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .steam {
+    animation: coffee-steam-rise 3300ms linear infinite;
+    animation-play-state: paused;
+  }
+
+  .root[data-coffee-active="true"] .steam {
+    animation-play-state: running;
+  }
+}
+
+@keyframes coffee-steam-rise {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(0.8px, -8px);
+  }
+  75% {
+    opacity: 0.333333;
+    transform: translate(-0.6px, -12px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -16px);
+  }
+}

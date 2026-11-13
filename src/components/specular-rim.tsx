@@ -1,12 +1,17 @@
 "use client";
 
+import { APPEARANCE_CHANGE_EVENT } from "@/lib/appearance";
+
 // Adapted from React Bits SpecularButton by David Haz (2026).
 // MIT + Commons Clause; see /licenses/react-bits.txt.
 // https://github.com/DavidHDev/react-bits/tree/main/src/ts-default/Components/SpecularButton
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { APP_COLORS } from "@/lib/app-theme";
+import { readRimColor } from "@/lib/specular-rim-color";
+import { mapRimToCanvas } from "@/lib/specular-rim-geometry";
+import { cn } from "@/lib/utils";
 
-const PAD = 24;
+const PAD = 64;
 const TAU = Math.PI * 2;
 
 const VERTEX = `#version 300 es
@@ -19,14 +24,22 @@ const FRAGMENT = `#version 300 es
 precision highp float;
 uniform vec2 uCenter;
 uniform vec2 uHalf;
+uniform vec2 uScale;
+uniform vec2 uPixelRatio;
+uniform vec2 uScreenHalf;
+uniform vec2 uScreenRadius;
 uniform float uRadius;
 uniform float uPx;
 uniform float uSpot;
-uniform vec2 uEntry;
-uniform vec3 uLineColor;
-uniform vec3 uBaseColor;
-uniform vec3 uEdgeColor;
-uniform vec3 uGlowColor;
+uniform vec4 uLineColor;
+uniform vec4 uBaseColor;
+uniform vec4 uGlowColor;
+uniform float uSpectrum;
+uniform vec4 uStop1;
+uniform vec4 uStop2;
+uniform vec4 uStop3;
+uniform vec4 uStop4;
+uniform vec4 uStop5;
 uniform float uIntensity;
 uniform vec2 uWindow;
 uniform float uThickness;
@@ -36,6 +49,35 @@ out vec4 outColor;
 float roundedBox(vec2 p, vec2 b, float r) {
   vec2 q = abs(p) - b + r;
   return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+}
+
+// A scaled CSS round corner is an ellipse. Solve its nearest boundary point
+// rather than allowing nonuniform transforms to stretch the border thickness.
+float ellipseDistance(vec2 p, vec2 r) {
+  if (abs(r.x - r.y) < 0.0001) return length(p) - r.x;
+  // The inscribed circle is already safely inside the inner edge here. This
+  // also avoids an ill-conditioned nearest-point solve at the ellipse center.
+  float innerCircle = length(p) - min(r.x, r.y);
+  if (innerCircle < -uThickness - 1.0) return innerCircle;
+  vec2 squared = r * r;
+  bool inside = dot(p / r, p / r) < 1.0;
+  float low = inside ? -min(squared.x, squared.y) + 0.00001 : 0.0;
+  float high = inside ? 0.0 : max(length(p) * max(r.x, r.y), 1.0);
+  for (int i = 0; i < 18; i++) {
+    float midpoint = (low + high) * 0.5;
+    vec2 normalized = r * p / (vec2(midpoint) + squared);
+    if (dot(normalized, normalized) > 1.0) low = midpoint;
+    else high = midpoint;
+  }
+  vec2 nearest = squared * p / (vec2((low + high) * 0.5) + squared);
+  return length(nearest - p) * (inside ? -1.0 : 1.0);
+}
+
+float screenRoundedBox(vec2 p, vec2 b, vec2 r) {
+  if (min(r.x, r.y) < 0.001) return roundedBox(p, b, 0.0);
+  vec2 q = abs(p) - b + r;
+  if (q.x > 0.0 && q.y > 0.0) return ellipseDistance(q, r);
+  return max(abs(p).x - b.x, abs(p).y - b.y);
 }
 
 float loopPosition(vec2 p, vec2 b, float r) {
@@ -57,53 +99,94 @@ float lobe(float position, float center) {
   return 1.0 - smoothstep(uWindow.x, uWindow.x + uWindow.y, gap);
 }
 
-vec4 paint(vec3 color, float alpha) {
-  float opacity = clamp(alpha, 0.0, 1.0);
-  return vec4(color * opacity, opacity);
+vec4 paint(vec4 color, float coverage) {
+  float opacity = clamp(coverage * color.a, 0.0, 1.0);
+  return vec4(color.rgb * opacity, opacity);
 }
 
 vec4 over(vec4 front, vec4 back) {
   return front + back * (1.0 - front.a);
 }
 
+// Like CSS gradients, interpolate translucent stops in premultiplied space.
+// Keep the opaque branch identical to the original RGB interpolation.
+vec4 mixColor(vec4 first, vec4 second, float amount) {
+  if (first.a == 1.0 && second.a == 1.0) {
+    return vec4(mix(first.rgb, second.rgb, amount), 1.0);
+  }
+  float alpha = mix(first.a, second.a, amount);
+  vec3 premultiplied = mix(first.rgb * first.a, second.rgb * second.a, amount);
+  return vec4(premultiplied / max(alpha, 0.000001), alpha);
+}
+
+vec4 spectrum(float position) {
+  if (uSpectrum > 1.5) {
+    float phase = fract(position) * 3.0;
+    if (phase < 1.0) return mixColor(uStop1, uStop2, phase);
+    if (phase < 2.0) return mixColor(uStop2, uStop3, phase - 1.0);
+    return mixColor(uStop3, uStop1, phase - 2.0);
+  }
+  float phase = fract(position) * 5.0;
+  if (phase < 1.0) return mixColor(uStop1, uStop2, phase);
+  if (phase < 2.0) return mixColor(uStop2, uStop3, phase - 1.0);
+  if (phase < 3.0) return mixColor(uStop3, uStop4, phase - 2.0);
+  if (phase < 4.0) return mixColor(uStop4, uStop5, phase - 3.0);
+  return mixColor(uStop5, uStop1, phase - 4.0);
+}
+
 void main() {
-  vec2 p = gl_FragCoord.xy - uCenter;
-  float d = roundedBox(p, uHalf, uRadius);
+  // Work in the host's local CSS coordinates, independent of dialog transforms.
+  vec2 p = (gl_FragCoord.xy - uCenter) / uScale;
+  vec2 screenPoint = (gl_FragCoord.xy - uCenter) / uPixelRatio;
+  float d = screenRoundedBox(screenPoint, uScreenHalf, uScreenRadius);
   float position = loopPosition(p, uHalf, uRadius);
   float key = lobe(position, uSpot);
   float back = lobe(position, uSpot + 0.5);
   // Opposing warm and dark colors travel together around the rounded rim.
   float streak = key + back * 0.72;
   float leading = key / max(streak, 0.0001);
-  vec3 lineColor = mix(uBaseColor, uLineColor, leading);
-  vec3 glowColor = mix(uBaseColor, uGlowColor, leading);
-  float width = max(uThickness * uPx * mix(0.7, 1.0, max(key, back)), 0.35);
-  float band = smoothstep(-width - 0.6, -width + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
-  float baseWidth = uThickness * uPx * 0.55;
-  float baseBand = smoothstep(-baseWidth - 0.6, -baseWidth + 0.6, d) * (1.0 - smoothstep(-0.6, 0.6, d));
+  vec4 lineColor = mixColor(uBaseColor, uLineColor, leading);
+  vec4 glowColor = mixColor(uBaseColor, uGlowColor, leading);
+  if (uSpectrum > 0.5) {
+    lineColor = spectrum(position - uSpot);
+    glowColor = lineColor;
+  }
+  float aa = 0.5 * length(vec2(dFdx(d), dFdy(d)));
+  float width = uThickness;
+  float band = smoothstep(-width - aa, -width + aa, d) * (1.0 - smoothstep(-aa, aa, d));
   float outside = smoothstep(-0.25 * uPx, 0.25 * uPx, d);
-  float edge = outside * (1.0 - smoothstep(0.8 * uPx, 1.6 * uPx, d));
-  vec2 pool = (p - uEntry) / (uHalf.y * vec2(1.6, 1.1));
-  float glow = streak * 0.16 * exp(-abs(d) / (5.0 * uPx)) * outside
-    * (0.8 + 0.2 * exp(-dot(pool, pool)));
+  float glow = (0.12 + streak * 0.04) * exp(-abs(d) / (5.0 * uPx)) * outside;
+  // Keep the expanded bitmap's outer gutter completely transparent.
+  glow *= 1.0 - smoothstep(48.0 * uPx, 64.0 * uPx, d);
   vec4 result = paint(glowColor, glow * uGlow);
-  result = over(paint(uEdgeColor, edge * 0.85), result);
-  result = over(paint(uBaseColor, baseBand * 0.9), result);
-  result = over(paint(lineColor, band * (0.18 + streak * 0.82) * uIntensity), result);
+  // Color and luminance move; the full-width physical band does not.
+  float illumination = clamp((0.18 + streak * 0.82) * uIntensity, 0.0, 1.0);
+  // Illumination changes RGB only: a translucent stop must not gain an opaque
+  // backing from the base color. Apply its alpha once to the physical band.
+  vec4 rimColor = vec4(mix(uBaseColor.rgb, lineColor.rgb, illumination), lineColor.a);
+  result = over(paint(rimColor, band), result);
   outColor = result;
 }`;
 
 const UNIFORMS = [
   "uCenter",
   "uHalf",
+  "uScale",
+  "uPixelRatio",
+  "uScreenHalf",
+  "uScreenRadius",
   "uRadius",
   "uPx",
   "uSpot",
-  "uEntry",
   "uLineColor",
   "uBaseColor",
-  "uEdgeColor",
   "uGlowColor",
+  "uSpectrum",
+  "uStop1",
+  "uStop2",
+  "uStop3",
+  "uStop4",
+  "uStop5",
   "uIntensity",
   "uWindow",
   "uThickness",
@@ -137,43 +220,6 @@ const loopPosition = (
   if (x < 0) s = y >= 0 ? 2 * quarter - s : 2 * quarter + s;
   else if (y < 0) s = 4 * quarter - s;
   return wrap(s / Math.max(4 * quarter, 0.0001));
-};
-
-const rimPoint = (
-  position: number,
-  halfX: number,
-  halfY: number,
-  r: number,
-): [number, number] => {
-  const innerX = halfX - r;
-  const innerY = halfY - r;
-  const arc = (Math.PI / 2) * r;
-  const quarter = innerX + innerY + arc;
-  let s = wrap(position) * 4 * quarter;
-  let signX = 1;
-  let signY = 1;
-  if (s > 3 * quarter) {
-    s = 4 * quarter - s;
-    signY = -1;
-  } else if (s > 2 * quarter) {
-    s -= 2 * quarter;
-    signX = -1;
-    signY = -1;
-  } else if (s > quarter) {
-    s = 2 * quarter - s;
-    signX = -1;
-  }
-  let x = innerX - (s - innerY - arc);
-  let y = halfY;
-  if (s <= innerY) {
-    x = halfX;
-    y = s;
-  } else if (s <= innerY + arc) {
-    const angle = (s - innerY) / Math.max(r, 0.0001);
-    x = innerX + Math.cos(angle) * r;
-    y = innerY + Math.sin(angle) * r;
-  }
-  return [x * signX, y * signY];
 };
 
 const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
@@ -218,7 +264,18 @@ const SETTINGS = {
 };
 
 /** Pointer-independent React Bits rim, leaving the host button's styles intact. */
-export function SpecularRim({ radius = 22 }: { radius?: number }) {
+export function SpecularRim({
+  radius = 22,
+  palette: paletteStyle = "two-tone",
+  glow = true,
+  className,
+}: {
+  radius?: number;
+  palette?: "two-tone" | "spectrum" | "triad";
+  /** A separate renderer may own the exterior halo while this keeps the rim. */
+  glow?: boolean;
+  className?: string;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -287,31 +344,33 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const gl = context;
     const safeRadius = Number.isFinite(radius) ? Math.max(0, radius) : 22;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const theme = window.matchMedia("(prefers-color-scheme: dark)");
     const readColor = (
       styles: CSSStyleDeclaration,
       property: string,
       fallback: string,
     ) => {
-      const value = styles.getPropertyValue(property).trim();
-      const hex = /^#[\da-f]{6}$/i.test(value) ? value : fallback;
-      return new Float32Array(
-        [1, 3, 5].map(
-          (offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255,
-        ),
-      );
+      return readRimColor(styles.getPropertyValue(property), fallback);
     };
     const readPalette = () => {
       const styles = getComputedStyle(button);
       return {
         line: readColor(styles, "--intake-rim-line", APP_COLORS.rust),
         base: readColor(styles, "--intake-rim-base", APP_COLORS.ink),
-        edge: readColor(styles, "--intake-rim-guard", "#120f17"),
         glow: readColor(styles, "--intake-rim-glow", "#ffe8cf"),
+        stops: [1, 2, 3, 4, 5].map((stop) =>
+          readColor(styles, `--intake-rim-stop-${stop}`, APP_COLORS.rust),
+        ),
       };
     };
     let palette = readPalette();
-    const view = { width: 1, height: 1, ratio: 1 };
+    const view = {
+      width: 1,
+      height: 1,
+      paintWidth: 1,
+      paintHeight: 1,
+      ratio: 1,
+    };
+    let geometry: ReturnType<typeof mapRimToCanvas> = null;
     const uniforms: Record<string, WebGLUniformLocation | null> = {};
     let program: WebGLProgram | null = null;
     let buffer: WebGLBuffer | null = null;
@@ -397,50 +456,49 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
       !motion.matches &&
       !button.disabled;
     const draw = () => {
-      if (!available() || !program || !vao || spot === null) {
+      if (!available() || !program || !vao || spot === null || !geometry) {
         mark("rendered", false);
         return false;
       }
       try {
-        const { width, height } = view;
-        const scaleX = canvas.width / (width + PAD * 2);
-        const scaleY = canvas.height / (height + PAD * 2);
+        // CSS transforms do not resize layout boxes. Refresh screen geometry
+        // during the animation so its visible band remains exactly 3 CSS px.
+        geometry = mapRimToCanvas({
+          button: button.getBoundingClientRect(),
+          canvas: canvas.getBoundingClientRect(),
+          buttonWidth: view.width,
+          buttonHeight: view.height,
+          bitmapWidth: canvas.width,
+          bitmapHeight: canvas.height,
+          radius: safeRadius,
+        });
+        if (!geometry) {
+          mark("rendered", false);
+          return false;
+        }
         gl.viewport(0, 0, canvas.width, canvas.height);
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.useProgram(program);
-        gl.uniform2f(
-          uniforms.uCenter,
-          (PAD + width / 2) * scaleX,
-          (PAD + height / 2) * scaleY,
-        );
-        gl.uniform2f(
-          uniforms.uHalf,
-          (width / 2) * scaleX,
-          (height / 2) * scaleY,
-        );
-        gl.uniform1f(uniforms.uRadius, cornerRadius() * scaleX);
-        gl.uniform1f(uniforms.uPx, view.ratio);
-        const [rimX, rimY] = rimPoint(
-          spot,
-          width / 2,
-          height / 2,
-          cornerRadius(),
-        );
-        const distance = Math.hypot(rimX, rimY);
-        const pull =
-          1 -
-          Math.min(0.35 * (height / 2), distance) / Math.max(distance, 0.0001);
+        gl.uniform2f(uniforms.uCenter, ...geometry.center);
+        gl.uniform2f(uniforms.uHalf, ...geometry.half);
+        gl.uniform2f(uniforms.uScale, ...geometry.scale);
+        gl.uniform2f(uniforms.uPixelRatio, ...geometry.pixelRatio);
+        gl.uniform2f(uniforms.uScreenHalf, ...geometry.screenHalf);
+        gl.uniform2f(uniforms.uScreenRadius, ...geometry.screenRadius);
+        gl.uniform1f(uniforms.uRadius, geometry.radius);
+        gl.uniform1f(uniforms.uPx, 1);
         gl.uniform1f(uniforms.uSpot, spot);
-        gl.uniform2f(
-          uniforms.uEntry,
-          rimX * pull * scaleX,
-          rimY * pull * scaleY,
+        gl.uniform4fv(uniforms.uLineColor, palette.line);
+        gl.uniform4fv(uniforms.uBaseColor, palette.base);
+        gl.uniform4fv(uniforms.uGlowColor, palette.glow);
+        gl.uniform1f(
+          uniforms.uSpectrum,
+          paletteStyle === "triad" ? 2 : paletteStyle === "spectrum" ? 1 : 0,
         );
-        gl.uniform3fv(uniforms.uLineColor, palette.line);
-        gl.uniform3fv(uniforms.uBaseColor, palette.base);
-        gl.uniform3fv(uniforms.uEdgeColor, palette.edge);
-        gl.uniform3fv(uniforms.uGlowColor, palette.glow);
+        palette.stops.forEach((color, index) => {
+          gl.uniform4fv(uniforms[`uStop${index + 1}`], color);
+        });
         gl.uniform1f(
           uniforms.uIntensity,
           SETTINGS.intensity * (button.disabled ? SETTINGS.idleIntensity : 1),
@@ -451,7 +509,7 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
           SETTINGS.shineFade / 360 + 0.0001,
         );
         gl.uniform1f(uniforms.uThickness, SETTINGS.thickness);
-        gl.uniform1f(uniforms.uGlow, SETTINGS.glow);
+        gl.uniform1f(uniforms.uGlow, glow ? SETTINGS.glow : 0);
         gl.bindVertexArray(vao);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.bindVertexArray(null);
@@ -494,21 +552,50 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     };
     const measure = (entry?: ResizeObserverEntry) => {
       const box = entry?.borderBoxSize?.[0];
-      view.width = Math.max(1, box ? box.inlineSize : button.offsetWidth);
-      view.height = Math.max(1, box ? box.blockSize : button.offsetHeight);
+      const buttonStyle = getComputedStyle(button);
+      view.width = Math.max(
+        1,
+        box
+          ? box.inlineSize
+          : parseFloat(buttonStyle.width) || button.offsetWidth,
+      );
+      view.height = Math.max(
+        1,
+        box
+          ? box.blockSize
+          : parseFloat(buttonStyle.height) || button.offsetHeight,
+      );
       view.ratio = Math.min(window.devicePixelRatio || 1, 3);
-      canvas.width = Math.max(
+      // Bitmap resolution uses layout size, not the dialog's animated scale.
+      const paintStyle = getComputedStyle(canvas);
+      const paintBox = canvas.getBoundingClientRect();
+      view.paintWidth = Math.max(
         1,
-        Math.round((view.width + PAD * 2) * view.ratio),
+        parseFloat(paintStyle.width) || canvas.offsetWidth,
       );
-      canvas.height = Math.max(
+      view.paintHeight = Math.max(
         1,
-        Math.round((view.height + PAD * 2) * view.ratio),
+        parseFloat(paintStyle.height) || canvas.offsetHeight,
       );
+      canvas.width = Math.max(1, Math.round(view.paintWidth * view.ratio));
+      canvas.height = Math.max(1, Math.round(view.paintHeight * view.ratio));
+      geometry = mapRimToCanvas({
+        button: button.getBoundingClientRect(),
+        canvas: paintBox,
+        buttonWidth: view.width,
+        buttonHeight: view.height,
+        bitmapWidth: canvas.width,
+        bitmapHeight: canvas.height,
+        radius: safeRadius,
+      });
       if (spot === null) spot = restSpot();
       sync();
     };
     const onResize = () => measure();
+    const onTransformEnd = (event: Event) => {
+      if (event.target instanceof Element && event.target.contains(button))
+        measure();
+    };
     const onThemeChange = () => {
       palette = readPalette();
       sync();
@@ -531,8 +618,11 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     const resize =
       typeof ResizeObserver === "undefined"
         ? null
-        : new ResizeObserver((entries) => measure(entries[entries.length - 1]));
+        : new ResizeObserver((entries) =>
+            measure(entries.find((entry) => entry.target === button)),
+          );
     resize?.observe(button);
+    resize?.observe(canvas);
     const intersection =
       typeof IntersectionObserver === "undefined"
         ? null
@@ -549,8 +639,10 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
     canvas.addEventListener("webglcontextlost", onContextLost);
     canvas.addEventListener("webglcontextrestored", onContextRestored);
     motion.addEventListener("change", sync);
-    theme.addEventListener("change", onThemeChange);
+    window.addEventListener(APPEARANCE_CHANGE_EVENT, onThemeChange);
     document.addEventListener("visibilitychange", sync);
+    document.addEventListener("animationend", onTransformEnd, true);
+    document.addEventListener("transitionend", onTransformEnd, true);
     window.addEventListener("resize", onResize);
     measure();
 
@@ -563,22 +655,28 @@ export function SpecularRim({ radius = 22 }: { radius?: number }) {
       canvas.removeEventListener("webglcontextlost", onContextLost);
       canvas.removeEventListener("webglcontextrestored", onContextRestored);
       motion.removeEventListener("change", sync);
-      theme.removeEventListener("change", onThemeChange);
+      window.removeEventListener(APPEARANCE_CHANGE_EVENT, onThemeChange);
       document.removeEventListener("visibilitychange", sync);
+      document.removeEventListener("animationend", onTransformEnd, true);
+      document.removeEventListener("transitionend", onTransformEnd, true);
       window.removeEventListener("resize", onResize);
       release();
       mark("rendered", false);
     };
-  }, [radius]);
+  }, [radius, paletteStyle, glow]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="intake-specular-light"
+      className={cn("intake-specular-light", className)}
+      style={{ "--intake-light-size": `${(PAD + 1) * 2}px` } as CSSProperties}
       aria-hidden="true"
       data-rendered="false"
+      data-exterior-glow={glow}
       data-animated="false"
       data-fallback-active="false"
+      data-rim-thickness={SETTINGS.thickness}
+      data-rim-space="screen-css"
     />
   );
 }

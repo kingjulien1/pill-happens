@@ -1,6 +1,7 @@
 import { MEDICATION_COLORS } from "@/lib/medication-appearance";
 import {
   APP_PALETTE,
+  APP_HARMONY,
   APP_THEME_GROUPS,
   APP_THEME_TOKENS,
   APP_THEME_VALUES,
@@ -12,6 +13,26 @@ export type GuideThemeRole = (typeof APP_THEME_TOKENS)[number];
 
 /** The live application tokens, not a second hand-maintained palette. */
 export const GUIDE_BRAND_COLORS = APP_PALETTE;
+export const GUIDE_HARMONY_COLORS = [
+  {
+    id: "rose",
+    name: "Rose",
+    hex: APP_HARMONY.rose,
+    role: "A small warm admixture for buttons and soft reflected light.",
+  },
+  {
+    id: "iris",
+    name: "Iris",
+    hex: APP_HARMONY.iris,
+    role: "A cool companion for glass edges and check-in highlights.",
+  },
+  {
+    id: "mint",
+    name: "Mint",
+    hex: APP_HARMONY.mint,
+    role: "A restrained pinpoint of freshness in check-in artwork and reflected light.",
+  },
+] as const;
 export const GUIDE_THEME_ROLES = APP_THEME_TOKENS;
 export const GUIDE_THEME_GROUPS = APP_THEME_GROUPS.map((group) => ({
   ...group,
@@ -32,7 +53,12 @@ export const GUIDE_FEATURED_ROLES = [
 
 export const GUIDE_THEME_CSS = renderAppThemeCss();
 export const GUIDE_THEME_JSON = JSON.stringify(
-  { palette: APP_PALETTE, tokens: APP_THEME_TOKENS, modes: APP_THEME_VALUES },
+  {
+    palette: APP_PALETTE,
+    harmony: APP_HARMONY,
+    tokens: APP_THEME_TOKENS,
+    modes: APP_THEME_VALUES,
+  },
   null,
   2,
 );
@@ -78,7 +104,7 @@ function luminance(channels: number[]) {
     );
 }
 
-/** Preview labels use the more readable of the actual Peach and Ink pigments. */
+/** Preview labels use the more readable of the actual White and Black pigments. */
 export function guidePreviewInk(hex: string, mode: GuideThemeMode) {
   const color = guideColorDetails(hex);
   const canvas = APP_THEME_TOKENS.find((role) => role.token === "--background");

@@ -49,7 +49,10 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon className="pointer-events-none flex items-center text-muted-foreground">
+      <SelectPrimitive.Icon
+        data-slot="select-trigger-icon"
+        className="pointer-events-none flex shrink-0 items-center text-muted-foreground"
+      >
         <ActionIcon name="expand" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
@@ -63,12 +66,18 @@ function SelectContent({
   sideOffset = 4,
   align = "center",
   alignOffset = 0,
+  collisionPadding = 12,
   alignItemWithTrigger = true,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
-    "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
+    | "align"
+    | "alignOffset"
+    | "side"
+    | "sideOffset"
+    | "collisionPadding"
+    | "alignItemWithTrigger"
   >) {
   return (
     <SelectPrimitive.Portal>
@@ -77,6 +86,7 @@ function SelectContent({
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
+        collisionPadding={collisionPadding}
         alignItemWithTrigger={alignItemWithTrigger}
         className="isolate z-50"
       >
@@ -84,7 +94,7 @@ function SelectContent({
           data-slot="select-content"
           data-align-trigger={alignItemWithTrigger}
           className={cn(
-            "relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+            "relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:duration-120 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
             className,
           )}
           {...props}
@@ -125,10 +135,14 @@ function SelectItem({
       )}
       {...props}
     >
-      <SelectPrimitive.ItemText className="flex min-w-0 flex-1 items-center gap-2 whitespace-normal [overflow-wrap:anywhere] [&>span]:min-w-0 [&>span]:whitespace-normal [&>svg]:shrink-0">
+      <SelectPrimitive.ItemText
+        data-slot="select-item-text"
+        className="flex min-w-0 flex-1 items-center gap-2 whitespace-normal [overflow-wrap:anywhere] [&>span]:min-w-0 [&>span]:whitespace-normal [&>svg]:shrink-0"
+      >
         {children}
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
+        data-slot="select-item-indicator"
         render={
           <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
         }

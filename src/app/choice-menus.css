@@ -1,0 +1,211 @@
+/* Shared tonal surfaces for medication, route, type and category choices. */
+[data-choice-menu] {
+  --choice-hover: var(--menu-hover);
+  --choice-selected: var(--menu-selected);
+  --choice-selected-focus: var(--menu-selected-focus);
+  border: 1px solid var(--menu-edge);
+  border-radius: var(--dialog-radius-surface);
+  padding: 5px;
+  background: var(--menu-surface);
+  color: var(--menu-foreground);
+  box-shadow: var(--menu-depth);
+  outline: none;
+}
+[data-choice-menu="medication"] {
+  width: max(var(--anchor-width), 300px);
+  max-width: calc(100vw - 24px);
+}
+.choice-menu-heading {
+  position: relative;
+  display: flex;
+  min-height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--content-min-gap-secondary, 6.5px);
+  margin: 0 5px 4px;
+  padding: 6px 5px 10px;
+  border-bottom: 0;
+  color: var(--popover-foreground);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.choice-menu-heading::after {
+  position: absolute;
+  inset-inline: 20px;
+  bottom: 0;
+  height: 1px;
+  background: color-mix(in srgb, var(--popover-foreground) 12%, transparent);
+  content: "";
+  pointer-events: none;
+}
+.choice-menu-heading > span:last-child:not(:first-child) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--content-min-gap-tertiary, 5px);
+  color: var(--menu-muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+}
+[data-choice-menu] [data-choice-option] {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: var(--content-min-gap-secondary, 6.5px);
+  padding: 6.5px calc(24px + var(--content-min-gap-secondary, 6.5px)) 6.5px 11px;
+  border: 0;
+  border-radius: var(--dialog-radius-compact);
+  background: transparent;
+  color: var(--popover-foreground);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  box-shadow: none;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 140ms ease;
+}
+[data-choice-menu] [data-choice-option] > [data-slot="choice-option-text"],
+[data-choice-menu] [data-choice-option] > [data-slot="select-item-text"] {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--content-min-gap-secondary, 6.5px);
+}
+[data-choice-menu] [data-choice-icon] {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+[data-choice-menu="medication"] [data-choice-icon] [data-medication-mark] {
+  width: 25px;
+  height: 25px;
+}
+[data-choice-menu="medication"]
+  [data-choice-icon]
+  [data-medication-mark]
+  > [data-medication-glyph] {
+  width: 21px;
+  height: 21px;
+}
+[data-choice-menu] [data-choice-icon] [data-medication-glyph],
+[data-choice-menu] [data-medication-choice-icon] > svg,
+[data-choice-menu] [data-choice-option] svg * {
+  color: inherit;
+}
+[data-choice-menu] [data-choice-label] {
+  display: block;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+[data-choice-menu] [data-choice-current-label] {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--content-min-gap-tertiary, 5px);
+  color: var(--menu-muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+/* Other is a quiet fallback, separated without adding a full-width rule. */
+[data-choice-menu] [data-choice-option][data-choice-secondary] {
+  position: relative;
+  margin-block-start: 8px;
+  background: color-mix(in srgb, var(--popover-foreground) 2.5%, transparent);
+}
+[data-choice-menu] [data-choice-option][data-choice-secondary]::before {
+  position: absolute;
+  inset-inline: 18px;
+  top: -4px;
+  height: 1px;
+  background: color-mix(in srgb, var(--popover-foreground) 12%, transparent);
+  content: "";
+  pointer-events: none;
+}
+[data-choice-menu]
+  [data-choice-option][data-choice-secondary]:not([data-current="true"])
+  [data-choice-label] {
+  color: var(--menu-muted-foreground);
+}
+/* Benzo marks keep the same canonical pink tile in menus and cards. */
+[data-choice-menu] [data-choice-option][data-highlighted] {
+  background: var(--choice-hover);
+  color: var(--popover-foreground);
+}
+[data-choice-menu] [data-choice-option][data-current="true"] {
+  background: var(--choice-selected);
+  color: var(--popover-foreground);
+  font-weight: 550;
+}
+[data-choice-menu] [data-choice-option][data-current="true"][data-highlighted] {
+  background: var(--choice-selected-focus);
+}
+[data-choice-menu] [data-choice-option]:focus-visible {
+  border: 0;
+  background: var(--choice-hover);
+  box-shadow: none;
+  outline: none;
+}
+[data-choice-menu] [data-choice-option][data-current="true"]:focus-visible {
+  background: var(--choice-selected-focus);
+}
+[data-choice-menu] [data-choice-option]:focus-visible [data-choice-label] {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+[data-choice-menu] [data-slot="select-item-indicator"] {
+  inset-inline-end: 8px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: var(--popover-foreground);
+}
+/* The fixed chevron always keeps its own secondary clearance from the text. */
+[data-compact-choice-trigger] {
+  min-width: 0;
+  gap: var(--content-min-gap-secondary, 6.5px);
+  padding-inline: calc(var(--content-min-gap-secondary, 6.5px) + 6px) 10px;
+}
+[data-compact-choice-trigger] > [data-slot="select-value"] {
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: var(--content-min-gap-secondary, 6.5px);
+  overflow: hidden;
+}
+[data-compact-choice-trigger] [data-choice-trigger-label] {
+  display: block;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-compact-choice-trigger] > [data-slot="select-trigger-icon"] {
+  flex: 0 0 auto;
+}
+[data-compact-choice-trigger] > [data-slot="select-trigger-icon"] > svg {
+  width: 12px;
+  height: 12px;
+}
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  [data-choice-menu] [data-choice-option]:not([data-disabled]):hover {
+    background: var(--choice-hover);
+  }
+  [data-choice-menu]
+    [data-choice-option][data-current="true"]:not([data-disabled]):hover {
+    background: var(--choice-selected-focus);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-choice-menu] [data-choice-option] {
+    transition: none;
+  }
+}

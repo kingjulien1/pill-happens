@@ -2,6 +2,8 @@ import type { MedicationColor } from "@/lib/medication-appearance";
 import type { MedicationType } from "@/lib/medication-types";
 import type { DailyCheckIn } from "@/lib/daily-check-in";
 import type { MedicationCategory } from "@/lib/medication-categories";
+import type { IntakeRoute } from "@/lib/intake-routes";
+import type { ReflectionInsightCacheEntry } from "@/lib/reflection-insights";
 
 /** Shared data and calendar rules. All stored timestamps are UTC ISO strings. */
 export type Medication = {
@@ -38,6 +40,8 @@ export type Intake = {
   strengthMg: number;
   /** The actual amount taken, independent of a medication's default quantity. */
   quantity: number;
+  /** Optional per-entry route; missing legacy values stay unrecorded. */
+  route?: IntakeRoute;
   takenAt: string;
   createdAt: string;
   note: string;
@@ -61,6 +65,15 @@ export type AppData = {
   goals: Goal[];
   /** Missing in older journals; one personal reflection per tracking day. */
   dailyCheckIns?: DailyCheckIn[];
+  /** Derived AI reflections; never advance the source check-in's updatedAt. */
+  reflectionInsights?: ReflectionInsightCacheEntry[];
+  /** @deprecated Backup-only metadata from the removed automatic intake templates. */
+  preparedIntakeCompletions?: {
+    groupId: "morning" | "evening";
+    day: string;
+    confirmedAt: string;
+    intakeIds: string[];
+  }[];
   /** Only new journals opt in; missing on existing journals means introduced. */
   onboarding?: { guidePending: boolean };
   settings: Settings;

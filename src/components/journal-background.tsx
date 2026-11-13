@@ -2,15 +2,11 @@
 
 import { useSyncExternalStore } from "react";
 import Grainient from "@/components/grainient";
-import { APP_BACKGROUND_COLORS } from "@/lib/app-theme";
+import { APP_BACKGROUND_COLORS_BY_MODE } from "@/lib/app-theme";
+import { getAppearanceSnapshot, subscribeAppearance } from "@/lib/appearance";
 
-const colorQuery = "(prefers-color-scheme: dark)";
-const subscribe = (onChange: () => void) => {
-  const media = window.matchMedia(colorQuery);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-};
-const getSnapshot = () => window.matchMedia(colorQuery).matches;
+const subscribe = subscribeAppearance;
+const getSnapshot = () => getAppearanceSnapshot().resolved === "dark";
 const getServerSnapshot = () => null;
 const mobileQuery = "(max-width: 767px), (pointer: coarse)";
 const subscribeMobile = (onChange: () => void) => {
@@ -37,33 +33,35 @@ export function JournalBackground() {
     <div
       className="ambient"
       data-background="grainient"
-      data-motion-profile={mobile ? "mobile" : "desktop"}
+      data-motion-profile="flowing"
+      data-render-profile={mobile ? "mobile" : "desktop"}
       aria-hidden="true"
     >
       {dark !== null && (
         <Grainient
-          colors={APP_BACKGROUND_COLORS}
+          colors={APP_BACKGROUND_COLORS_BY_MODE[dark ? "dark" : "light"]}
           type="radial"
-          flow={mobile ? 1.3 : 0.85}
+          flow={1.4}
           variation={16}
-          speed={mobile ? 5.6 : 2.8}
+          speed={mobile ? 5.4 : 3.6}
           interactive={false}
           saturation={1.01}
-          scale={mobile ? 0.42 : 0.3}
+          scale={0.3}
+          framing={mobile ? "portrait" : "native"}
           contrast={dark ? 0.92 : 1}
           silk={0.58}
           softness={0.96}
           grainAmount={dark ? 0.07 : 0.055}
           grainSize={1.2}
-          grainAnimated
+          grainAnimated={false}
           clickSwirl={false}
-          intro
+          intro={false}
           lightMode={!dark}
           maxDpr={mobile ? 1.25 : undefined}
           maxPixels={mobile ? 750_000 : undefined}
-          className={mobile ? "grainient-mobile-motion" : undefined}
         />
       )}
+      <div className="ambient-depth" data-ambient-depth="" />
     </div>
   );
 }

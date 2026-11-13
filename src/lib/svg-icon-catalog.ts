@@ -13,6 +13,89 @@ import type { TabletShapeName } from "./tablet-icons/geometry";
 /** Original monochrome artwork served from public/icons/medications. */
 const definitions = [
   {
+    slug: "coffee-pot",
+    label: "Coffee Pot",
+    aliases: ["carafe", "jug", "coffee", "kettle", "Kaffeekanne"],
+    keywords: [
+      "coffee",
+      "carafe",
+      "jug",
+      "kettle",
+      "pour",
+      "drink",
+      "morning",
+      "kaffee",
+      "kaffeekanne",
+      "kanne",
+      "gießen",
+      "trinken",
+      "morgen",
+    ],
+  },
+  {
+    slug: "tablet-single",
+    label: "Single tablet",
+    keywords: [
+      "tablet",
+      "tablets",
+      "single",
+      "scored",
+      "pill",
+      "medicine",
+      "medication",
+      "tablette",
+      "tabletten",
+      "einzeln",
+      "pille",
+      "medizin",
+      "medikament",
+    ],
+  },
+  {
+    slug: "tablet-angled",
+    label: "Angled tablet",
+    keywords: [
+      "tablet",
+      "tablets",
+      "angled",
+      "tilted",
+      "perspective",
+      "3d",
+      "single",
+      "scored",
+      "pill",
+      "medicine",
+      "medication",
+      "tablette",
+      "tabletten",
+      "schrag",
+      "geneigt",
+      "geneigte",
+      "perspektive",
+      "einzeln",
+      "pille",
+      "medizin",
+      "medikament",
+    ],
+  },
+  {
+    slug: "nose",
+    label: "Nose",
+    keywords: [
+      "nose",
+      "nasal",
+      "nostril",
+      "breath",
+      "breathing",
+      "smell",
+      "face",
+      "nase",
+      "nasenloch",
+      "atmen",
+      "riechen",
+    ],
+  },
+  {
     slug: "pill-spark",
     label: "Pill spark",
     keywords: [
@@ -280,15 +363,18 @@ function spellingAliases(slug: string): string[] {
 
 /** Persist stable IDs, never filenames supplied by a user or arbitrary SVG text. */
 export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = [
-  ...definitions.map(({ slug, label, keywords }) => ({
-    value: `svg:${slug}` as const,
-    label,
-    componentName: toIconComponentName(slug),
-    aliases: [slug],
-    variant: "mask" as const,
-    src: `/icons/medications/${slug}.svg`,
-    keywords: [...localKeywords, ...keywords],
-  })),
+  ...definitions.map((definition) => {
+    const { slug, label, keywords } = definition;
+    return {
+      value: `svg:${slug}` as const,
+      label,
+      componentName: toIconComponentName(slug),
+      aliases: [slug, ...("aliases" in definition ? definition.aliases : [])],
+      variant: "mask" as const,
+      src: `/icons/medications/${slug}.svg`,
+      keywords: [...localKeywords, ...keywords],
+    };
+  }),
   ...TABLET_ARTWORK.map((entry): SvgIconCatalogEntry => ({
     ...entry,
     assetRevision: entry.shape === "levomethasan" ? "facets-2" : undefined,

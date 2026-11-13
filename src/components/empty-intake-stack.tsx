@@ -42,14 +42,14 @@ export function EmptyIntakeStack({ onLog }: { onLog?: () => void }) {
       <Card
         type={onLog ? "button" : undefined}
         onClick={onLog}
-        aria-label={onLog ? "Log an Intake" : undefined}
+        aria-label={onLog ? "Log Intake" : undefined}
         aria-haspopup={onLog ? "dialog" : undefined}
         className="empty-intake-card empty-intake-tint relative z-30 flex min-h-20 w-full items-center justify-center gap-6 rounded-2xl px-6 py-5 text-foreground"
       >
         <DashedOutline className="text-foreground/40" />
         <ActionIcon name="shootingStar" weight="duotone" className="size-6" />
         <span className="empty-intake-copy min-w-0 max-w-52 text-center text-xs leading-relaxed text-balance">
-          No entries yet. Use “Log an Intake” to record one.
+          No entries yet. Use “Log Intake” to record one.
         </span>
       </Card>
       {blankCards.map(({ className, outline }) => (

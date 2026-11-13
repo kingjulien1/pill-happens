@@ -1,0 +1,89 @@
+/* Opaque Indigo keeps menus distinct; faint Rose/Iris reflections connect them
+   to the shared card and action family without changing state or copy contrast. */
+:is(
+  [data-menu-surface],
+  [data-navigation-menu],
+  [data-appearance-menu],
+  [data-slot="select-content"],
+  [data-choice-menu],
+  [data-journal-mention-menu],
+  [data-streak-popover],
+  .brand-menu
+) {
+  --foreground: var(--menu-foreground);
+  --popover: var(--menu-surface);
+  --popover-foreground: var(--menu-foreground);
+  --muted: var(--menu-hover);
+  --muted-foreground: var(--menu-muted-foreground);
+  --accent: var(--menu-hover);
+  --accent-foreground: var(--menu-foreground);
+  --border: var(--menu-edge);
+  --ring: var(--menu-focus-ring);
+  --menu-depth:
+    inset 0 0 0 1px var(--menu-inset-edge),
+    0 16px 40px color-mix(in srgb, var(--palette-black) 22%, transparent),
+    0 3px 10px color-mix(in srgb, var(--palette-black) 12%, transparent);
+  background:
+    radial-gradient(
+      ellipse at 0% 0%,
+      color-mix(in srgb, var(--harmony-rose-wash) 55%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse at 100% 100%,
+      color-mix(in srgb, var(--harmony-iris-wash) 45%, transparent),
+      transparent 65%
+    ),
+    var(--menu-surface);
+  color: var(--menu-foreground);
+  text-shadow: none;
+}
+
+[data-slot="select-content"] {
+  border: 1px solid var(--menu-edge);
+  box-shadow: var(--menu-depth);
+}
+[data-slot="select-content"] [data-slot="select-label"] {
+  color: var(--menu-muted-foreground);
+}
+[data-slot="select-content"]
+  [data-slot="select-item"]:is([data-highlighted], :focus) {
+  background: var(--menu-hover);
+  color: var(--menu-foreground);
+}
+[data-slot="select-content"] [data-slot="select-item"][data-selected] {
+  background: var(--menu-selected);
+}
+[data-slot="select-content"]
+  [data-slot="select-item"][data-selected]:is([data-highlighted], :focus) {
+  background: var(--menu-selected-focus);
+}
+[data-slot="select-content"] [data-slot="select-item"]:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+[data-slot="select-content"]
+  :is(
+    [data-slot="select-scroll-up-button"],
+    [data-slot="select-scroll-down-button"]
+  ) {
+  background: var(--menu-surface);
+  color: var(--menu-foreground);
+}
+@media (hover: hover) and (pointer: fine) {
+  [data-slot="select-content"]
+    [data-slot="select-item"]:not([data-disabled]):hover {
+    background: var(--menu-hover);
+  }
+  [data-slot="select-content"]
+    [data-slot="select-item"][data-selected]:not([data-disabled]):hover {
+    background: var(--menu-selected-focus);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="select-content"] {
+    animation: none;
+    transition: none;
+  }
+}

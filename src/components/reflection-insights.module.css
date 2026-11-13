@@ -1,0 +1,131 @@
+.panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--dialog-radius-surface);
+  background:
+    radial-gradient(
+      ellipse at 95% 0,
+      color-mix(in srgb, var(--palette-flame) 5%, transparent),
+      transparent 74%
+    ),
+    var(--surface-reading);
+  color: var(--surface-reading-foreground);
+}
+.headingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.headingRow h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.source {
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stats dt {
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.stats dd {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.summary,
+.advice li {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.advice {
+  padding-top: 11px;
+  border-top: 1px solid var(--glass-border);
+}
+.advice h4 {
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.advice ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 15px;
+  color: var(--muted-foreground);
+}
+.advice li::marker {
+  color: var(--palette-flame);
+}
+.footnote {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.5;
+}
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+}
+.status p {
+  flex: 1 1 180px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.retry {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .spinner {
+    animation: insightSpin 1.2s linear infinite;
+  }
+}
+@keyframes insightSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

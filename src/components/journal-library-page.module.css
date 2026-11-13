@@ -1,0 +1,209 @@
+.library {
+  min-width: 0;
+  color: var(--foreground);
+  text-shadow: none;
+}
+.total {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+.total > strong {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.total > span {
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+}
+.searchRow {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 14px 7px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-raised);
+}
+.searchRow > svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  color: var(--muted-foreground);
+}
+.searchRow > input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 13px;
+}
+.searchRow > input::placeholder {
+  color: var(--muted-foreground);
+}
+.searchRow:focus-within {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.searchRow > button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--foreground);
+}
+.searchRow > button > svg {
+  width: 15px;
+  height: 15px;
+}
+.collectionLabel {
+  margin: 22px 2px 12px;
+  color: var(--canvas-muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 17px;
+}
+.entries {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.entry {
+  min-width: 0;
+}
+
+/* Keep the intake frame and 56px artwork stage; four quiet lines add context. */
+.entry :global(.intake-card-content) {
+  align-items: center;
+  column-gap: 11px;
+}
+
+.entry .entryDetails {
+  display: flex;
+  flex-direction: column;
+  padding-block: 0;
+  padding-inline-end: 8px;
+}
+
+.entry .entryDate {
+  font-size: 10.5px;
+  font-weight: 550;
+  line-height: 16px;
+}
+
+.entry .entryTitle {
+  margin-block: 2px 0;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 20px;
+}
+
+.excerpt {
+  display: block;
+  min-width: 0;
+  margin-block-start: 4px;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entryBottom {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin-block-start: 6px;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.entryBottom > span:not([aria-hidden]) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.empty {
+  padding: 36px 24px;
+  border-radius: var(--entry-card-radius, 21px);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: inset 0 0 0 2.5px var(--border);
+  text-align: center;
+}
+.empty > svg {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 15px;
+  color: var(--primary);
+}
+.empty h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.empty p {
+  max-width: 48ch;
+  margin: 0 auto;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.loadMore {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 20px auto 0;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 550;
+}
+.footnote {
+  max-width: 62ch;
+  margin: 24px auto 0;
+  padding-inline: 8px;
+  color: var(--canvas-muted-foreground);
+  font-size: 11px;
+  line-height: 1.75;
+  text-align: center;
+}
+.searchRow > button:focus-visible,
+.loadMore:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .loadMore:hover {
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-raised));
+  }
+}
+@media (max-width: 359px) {
+  .entry :global(.intake-card-content) {
+    column-gap: 7px;
+  }
+}

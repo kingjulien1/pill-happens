@@ -59,8 +59,8 @@ export function IntakeCardShine({
       aria-hidden="true"
       style={
         {
-          "--intake-shine-wait": `${45 + (value % 41)}s`,
-          "--intake-shine-cycle": `${92 + ((value >>> 8) % 29)}s`,
+          "--intake-shine-wait": `${3 * (45 + (value % 41))}s`,
+          "--intake-shine-cycle": `${3 * (92 + ((value >>> 8) % 29))}s`,
         } as CSSProperties
       }
     >

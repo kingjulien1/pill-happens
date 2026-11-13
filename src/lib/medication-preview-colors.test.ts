@@ -1,13 +1,16 @@
+import { APP_FOUNDATION } from "./app-theme";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { MEDICATION_COLORS } from "./medication-appearance";
 import { TAILWIND_MEDICATION_COLORS } from "./medication-palette";
 import {
   getMedicationColorScale,
+  getMedicationIconPigment,
   getMedicationPreviewAccents,
   getMedicationPreviewSurface,
   getMedicationWaveColors,
 } from "./medication-preview-colors";
+import { SVG_ICON_CATALOG } from "./svg-icon-catalog";
 
 function hex(value: string) {
   const color = TAILWIND_MEDICATION_COLORS.find((item) => item.value === value);
@@ -87,6 +90,47 @@ test("every selectable palette entry produces valid opaque preview pigments", ()
     for (const pigment of Object.values(scale))
       assert.match(pigment, /^#[0-9a-f]{6}$/);
   }
+});
+
+test("card identity follows the rendered plain icon instead of the selected raw swatch", () => {
+  assert.equal(
+    getMedicationIconPigment("tw-yellow-400", "pill"),
+    hex("tw-yellow-600"),
+  );
+  assert.notEqual(
+    getMedicationIconPigment("tw-yellow-400", "pill"),
+    hex("tw-yellow-400"),
+  );
+  assert.equal(getMedicationIconPigment("tw-black", "svg:nose"), "#000000");
+  assert.equal(
+    getMedicationIconPigment("tw-white", "svg:tablet-single"),
+    hex("tw-neutral-200"),
+  );
+  assert.equal(
+    getMedicationIconPigment("unknown", "unknown"),
+    getMedicationColorScale().icon,
+  );
+});
+
+test("authored SVG pigment takes precedence over an unrelated medication swatch", () => {
+  const authored = SVG_ICON_CATALOG.filter(
+    (entry) => entry.variant === "color",
+  );
+  assert.ok(authored.length > 0);
+  for (const entry of authored) {
+    assert.ok(entry.color, `${entry.value} supplies its fixed pigment`);
+    for (const selected of ["tw-black", "tw-white", "tw-yellow-400"])
+      assert.equal(
+        getMedicationIconPigment(selected, entry.value),
+        entry.color.hex,
+      );
+  }
+  const outline = SVG_ICON_CATALOG.find((entry) => entry.variant === "outline");
+  assert.ok(outline);
+  assert.equal(
+    getMedicationIconPigment("tw-yellow-400", outline.value),
+    hex("tw-yellow-600"),
+  );
 });
 
 test("decorative accent pairs coordinate by hue family and stay stable across shade changes", () => {
@@ -240,10 +284,10 @@ test("wave color results are independent and all selectable choices use register
 
 test("extreme preview pigments receive opaque contrasting neutral surfaces", () => {
   for (const pigment of ["#000000", hex("tw-zinc-950"), hex("tw-blue-900")]) {
-    assert.equal(getMedicationPreviewSurface(pigment), "#fed7aa");
+    assert.equal(getMedicationPreviewSurface(pigment), APP_FOUNDATION.white);
   }
   for (const pigment of ["#ffffff", hex("tw-zinc-50"), hex("tw-yellow-100")]) {
-    assert.equal(getMedicationPreviewSurface(pigment), "#2a0f0a");
+    assert.equal(getMedicationPreviewSurface(pigment), APP_FOUNDATION.black);
   }
 });
 

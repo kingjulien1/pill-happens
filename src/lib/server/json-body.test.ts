@@ -58,9 +58,9 @@ test("oversized declared bodies are rejected before they are consumed", async ()
   }
 });
 
-test("the check-in override accepts exactly 64 KiB but rejects a byte more", async () => {
+test("the check-in override accepts exactly 1 MiB but rejects a byte more", async () => {
   const maxBytes = JSON_BODY_LIMITS.dailyCheckIn;
-  assert.equal(maxBytes, 65_536);
+  assert.equal(maxBytes, 1_048_576);
   const atLimit = bodyAtBytes(maxBytes);
   for (const declared of [undefined, String(maxBytes)]) {
     assert.deepEqual(
@@ -83,7 +83,7 @@ test("full-length multilingual reflections survive transport and schema validati
     paragraph
       .repeat(Math.ceil(DAILY_REFLECTION_MAX_LENGTH / paragraph.length))
       .slice(0, DAILY_REFLECTION_MAX_LENGTH - 1) + "終";
-  assert.equal(note.length, 8_000);
+  assert.equal(note.length, DAILY_REFLECTION_MAX_LENGTH);
   const body = JSON.stringify({
     day: "2026-10-30",
     note,
@@ -109,7 +109,7 @@ test("full-length Unicode-escaped reflections retain newlines, quotes and backsl
     (character) =>
       `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`,
   );
-  assert.equal(note.length, 8_000);
+  assert.equal(note.length, DAILY_REFLECTION_MAX_LENGTH);
   const bytes = Buffer.byteLength(body, "utf8");
   assert.ok(
     bytes > JSON_BODY_LIMITS.default && bytes < JSON_BODY_LIMITS.dailyCheckIn,

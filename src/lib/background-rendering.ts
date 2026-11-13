@@ -71,3 +71,23 @@ export function getBackgroundFrameElapsed(
   if (!Number.isFinite(previous) || previous < 0 || now < previous) return 0;
   return Math.min((now - previous) / 1_000, 0.25);
 }
+
+export type BackgroundFraming = "native" | "portrait";
+
+/** Reveal more of the composition on tall screens without stretching its shapes. */
+export function getBackgroundCompositionZoom(
+  width: number,
+  height: number,
+  framing: BackgroundFraming = "native",
+): number {
+  if (
+    framing !== "portrait" ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0
+  )
+    return 1;
+  // Balance the two axes; cap the zoom-out so very tall screens retain detail.
+  return Math.min(1, Math.max(0.65, Math.sqrt(width / height)));
+}

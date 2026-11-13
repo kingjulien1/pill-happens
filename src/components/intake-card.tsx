@@ -1,16 +1,12 @@
 "use client";
 
-import {
-  MEDICATION_CLASS_MARKERS,
-  MedicationClassIcon,
-} from "@/components/medication-class-badge";
 import { IntakeCardShine } from "@/components/intake-card-shine";
-import { MedicationCardBase } from "@/components/medication-card-base";
+import { MedicationCard } from "@/components/medication-card";
+import { MedicationCardDose } from "@/components/medication-card-dose";
 import {
-  medicationCardPriority,
-  MedicationCardOpioidDot,
-  MedicationCardPriorityRim,
-} from "@/components/medication-card-priority";
+  getMedicationCategories,
+  getMedicationCategory,
+} from "@/lib/medication-categories";
 import {
   doseMg,
   formatDose,
@@ -24,6 +20,7 @@ import {
   MEDICATION_TYPE_VALUES,
 } from "@/lib/medication-types";
 
+/** An actual intake adds time, recorded amounts and its rare shine to the shared card. */
 export function IntakeCard({
   entry,
   medication,
@@ -54,124 +51,53 @@ export function IntakeCard({
   const localTime = toLocalInput(entry.takenAt, timeZone);
   const time = localTime.slice(11);
   const nextMorning = localTime.slice(0, 10) !== day;
-  const priority = medicationCardPriority(medication);
-  const { classes, benzo: isBenzodiazepine, opioid: isOpioid } = priority;
+  const classes = getMedicationCategories(medication);
   const ingredient = medication?.activeIngredient?.trim();
   const totalMg = formatDose(doseMg(entry));
+  const calculation = `${formatDose(entry.quantity)}${
+    isMeteredMedicationType(type)
+      ? ` ${entry.quantity === 1 ? units.unit : units.units}`
+      : ""
+  } × ${formatDose(entry.strengthMg)} mg`;
 
   return (
-    <MedicationCardBase
-      color={medication?.color}
-      icon={medication?.icon}
-      iconRotation={medication?.iconRotation}
+    <MedicationCard
+      medication={medication}
+      name={entry.medicationName}
+      form={type}
+      formPresentation="icon"
+      ingredient={ingredient}
+      quantity={entry.quantity}
       onClick={onEdit}
       disabled={disabled}
       aria-label={
         actionLabel ??
-        `Edit ${entry.medicationName}${classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${totalMg} milligrams, ${time}${nextMorning ? ", next morning" : ""}`
+        `Edit ${entry.medicationName}${classes.map((kind) => `, ${getMedicationCategory(kind).label.toLowerCase()}`).join("")}, ${hasType ? typeLabel : "medication type not set"}, ${ingredient ? `active ingredient ${ingredient}` : "active ingredient not set"}, ${calculation}, ${totalMg} milligrams total, ${time}${nextMorning ? ", next morning" : ""}`
       }
       aria-controls={controls}
       aria-expanded={expanded}
-      style={priority.style}
       data-intake-card={entry.id}
+      data-intake-card-action
       data-shine-eligible={shineEligible}
-      data-benzodiazepine={isBenzodiazepine || undefined}
-      data-opioid={isOpioid || undefined}
-      data-medication-classification={priority.classification}
-      decoration={
-        <>
-          <IntakeCardShine seed={entry.id} eligible={shineEligible} />
-          <MedicationCardPriorityRim marked={isOpioid} benzo={false} />
-        </>
+      decoration={<IntakeCardShine seed={entry.id} eligible={shineEligible} />}
+      leading={
+        <time
+          className="intake-card-time"
+          dateTime={entry.takenAt}
+          title={`${time}${nextMorning ? " · next morning" : ""}`}
+          data-intake-time
+        >
+          {time}
+          {nextMorning && <span className="sr-only">, next morning</span>}
+        </time>
       }
-      iconDecoration={<MedicationCardOpioidDot present={isOpioid} />}
-    >
-      <div className="intake-card-details">
-        <div className="intake-card-heading" data-intake-heading>
-          <time
-            className="intake-card-time"
-            dateTime={entry.takenAt}
-            title={`${time}${nextMorning ? " · next morning" : ""}`}
-            data-intake-time
-          >
-            {time}
-            {nextMorning && <span className="sr-only">, next morning</span>}
-          </time>
-          <div className="intake-card-title-group" data-intake-title-group>
-            <h3
-              className="intake-card-name"
-              title={entry.medicationName}
-              data-intake-name
-            >
-              {entry.medicationName}
-            </h3>
-            <span className="intake-card-title-dot" aria-hidden="true" />
-            <span
-              className="intake-card-type-text"
-              title={hasType ? typeLabel : "Medication Type Not Set"}
-              data-intake-type
-            >
-              {typeLabel}
-            </span>
-          </div>
-          {classes.length > 0 && (
-            <span className="intake-card-tags">
-              {[...classes].reverse().map((kind) => (
-                <MedicationClassIcon
-                  key={kind}
-                  kind={kind}
-                  className={`intake-card-class-icon${kind === "benzodiazepine" ? " intake-card-benzo-icon" : " intake-card-opioid-icon"}`}
-                  data-intake-benzo-icon={
-                    kind === "benzodiazepine" || undefined
-                  }
-                  data-intake-opioid-icon={kind === "opioid" || undefined}
-                />
-              ))}
-            </span>
-          )}
-        </div>
-        <div className="intake-card-bottom" data-intake-bottom>
-          <div className="intake-card-ingredient-group">
-            <span
-              className="intake-card-ingredient"
-              data-intake-ingredient
-              data-unset={!ingredient || undefined}
-              title={ingredient || "Active substance not specified"}
-            >
-              {ingredient || "Unspecified"}
-            </span>
-            <span className="intake-card-ingredient-context">
-              <span aria-hidden="true">/</span>
-              <span>Active Substance</span>
-            </span>
-          </div>
-          <div className="intake-card-dose-group">
-            <span className="intake-card-amount" data-intake-dose>
-              {formatDose(entry.quantity)}
-              {isMeteredMedicationType(type)
-                ? ` ${entry.quantity === 1 ? units.unit : units.units}`
-                : ""}{" "}
-              × {formatDose(entry.strengthMg)}
-              <span className="intake-card-mg">{"\u00a0"}mg</span>
-            </span>
-            <span
-              className="intake-card-total"
-              data-intake-total
-              data-total-long={totalMg.length > 15 || undefined}
-            >
-              <span className="intake-card-total-value" data-intake-total-value>
-                {totalMg}
-              </span>
-              <span className="intake-card-total-unit">mg</span>
-            </span>
-          </div>
-        </div>
-        {entry.note && (
-          <p className="intake-card-note" data-intake-note>
-            {entry.note}
-          </p>
-        )}
-      </div>
-    </MedicationCardBase>
+      trailing={
+        <MedicationCardDose
+          quantity={entry.quantity}
+          strengthMg={entry.strengthMg}
+          form={type}
+        />
+      }
+    />
   );
 }

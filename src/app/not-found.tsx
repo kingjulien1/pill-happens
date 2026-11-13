@@ -2,11 +2,26 @@ import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { HeadingText } from "@/components/heading-text";
 import { BrandMark } from "@/components/brand";
+import { FilledActionSurface } from "@/components/ui/button";
+import {
+  getBrandThemeStyle,
+  getButtonThemeStyle,
+} from "@/lib/action-button-system";
+import actionStyles from "@/components/action-button.module.css";
 
 export default function NotFound() {
   return (
     <main className="page-enter mx-auto flex min-h-[80dvh] max-w-sm flex-col items-center justify-center px-6 py-14 text-center">
-      <div className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border border-border bg-card text-foreground">
+      <div
+        className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border"
+        data-brand-icon-surface
+        style={{
+          ...getBrandThemeStyle(),
+          backgroundColor: "var(--brand-surface)",
+          color: "var(--brand-copy)",
+          borderColor: "color-mix(in srgb, var(--brand-copy) 67%, transparent)",
+        }}
+      >
         <BrandMark className="size-6" />
       </div>
       <h1 className="canvas-copy text-2xl font-semibold tracking-tight">
@@ -21,8 +36,12 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-action-background px-6 text-sm font-medium text-action-foreground transition-colors hover:bg-action-background/90"
+        data-slot="button"
+        data-filled-action
+        style={getButtonThemeStyle("primary")}
+        className={`mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-medium transition-colors ${actionStyles.filled}`}
       >
+        <FilledActionSurface />
         <ActionIcon name="back" />
         Back to today
       </Link>

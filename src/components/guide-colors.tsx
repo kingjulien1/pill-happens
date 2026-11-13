@@ -4,14 +4,27 @@ import { useEffect, useId, useRef, useState } from "react";
 import { CopyIcon } from "@phosphor-icons/react/dist/ssr/Copy";
 import { SunIcon } from "@phosphor-icons/react/dist/ssr/Sun";
 import { MoonIcon } from "@phosphor-icons/react/dist/ssr/Moon";
+import { PaletteIcon } from "@phosphor-icons/react/dist/ssr/Palette";
+import { SwatchesIcon } from "@phosphor-icons/react/dist/ssr/Swatches";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 import { ActionIcon } from "@/components/action-icon";
+import { usePersistentDraft } from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
+import { GuideColorInspector } from "@/components/guide-color-inspector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   GUIDE_COLOR_FAMILIES,
   GUIDE_BRAND_COLORS,
+  GUIDE_HARMONY_COLORS,
   GUIDE_FEATURED_ROLES,
   GUIDE_MEDICATION_COLORS,
   GUIDE_THEME_CSS,
@@ -27,6 +40,40 @@ import {
 import styles from "./guide-colors.module.css";
 
 const MODES = ["light", "dark"] as const;
+
+type ColorInspectionPreferences = {
+  query: string;
+  family: string;
+  format: "hex" | "rgb";
+  modes: Partial<Record<string, GuideThemeMode>>;
+  inspectionId: string | null;
+};
+
+function isColorInspectionPreferences(
+  value: unknown,
+): value is ColorInspectionPreferences {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const preferences = value as Record<string, unknown>;
+  return (
+    typeof preferences.query === "string" &&
+    preferences.query.length <= 200 &&
+    typeof preferences.family === "string" &&
+    (preferences.family === "all" ||
+      GUIDE_COLOR_FAMILIES.includes(preferences.family)) &&
+    (preferences.format === "hex" || preferences.format === "rgb") &&
+    (preferences.inspectionId === null ||
+      (typeof preferences.inspectionId === "string" &&
+        Boolean(guideRole(preferences.inspectionId)))) &&
+    Boolean(preferences.modes) &&
+    typeof preferences.modes === "object" &&
+    !Array.isArray(preferences.modes) &&
+    Object.entries(preferences.modes as object).length <=
+      GUIDE_THEME_ROLES.length &&
+    Object.entries(preferences.modes as object).every(
+      ([id, mode]) => guideRole(id) && (mode === "light" || mode === "dark"),
+    )
+  );
+}
 
 function ColorPreview({
   role,
@@ -68,25 +115,28 @@ function ColorPreview({
 
 export function GuideColors() {
   const id = useId();
-  const [query, setQuery] = useState("");
-  const [family, setFamily] = useState("all");
   const [copied, setCopied] = useState<string | null>(null);
   const [message, setMessage] = useState("Tap a color to copy its hex value.");
   const [manual, setManual] = useState<{ label: string; value: string } | null>(
     null,
   );
-  const [inspection, setInspection] = useState<{
-    id: string;
-    mode: GuideThemeMode;
-  } | null>(null);
-  const [format, setFormat] = useState<"hex" | "rgb">("hex");
+  const inspectionPreferences = usePersistentDraft<ColorInspectionPreferences>(
+    "view:guide-colors",
+    () => ({
+      query: "",
+      family: "all",
+      format: "hex",
+      modes: {},
+      inspectionId: null,
+    }),
+    isColorInspectionPreferences,
+  );
+  const { query, family, format, inspectionId, modes } =
+    inspectionPreferences.value;
+  const inspection = inspectionId
+    ? { id: inspectionId, mode: modes[inspectionId] ?? "light" }
+    : null;
   const inspectedRole = inspection ? guideRole(inspection.id) : undefined;
-  const inspectionKey = inspection
-    ? `inspection-${inspection.id}-${inspection.mode}-${format}`
-    : "";
-  const declarationKey = inspection
-    ? `declaration-${inspection.id}-${inspection.mode}`
-    : "";
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const copyAttempt = useRef(0);
   const searchInput = useRef<HTMLInputElement>(null);
@@ -106,6 +156,30 @@ export function GuideColors() {
     [],
   );
 
+  function inspect(id: string, chosenMode?: GuideThemeMode) {
+    const mode = chosenMode ?? inspectionPreferences.value.modes[id] ?? "light";
+    inspectionPreferences.setValue((previous) => ({
+      ...previous,
+      inspectionId: id,
+      modes: { ...previous.modes, [id]: mode },
+    }));
+  }
+
+  function closeInspection() {
+    inspectionPreferences.setValue((previous) => ({
+      ...previous,
+      inspectionId: null,
+    }));
+  }
+
+  function setQuery(query: string) {
+    inspectionPreferences.setValue((previous) => ({ ...previous, query }));
+  }
+
+  function setFamily(family: string) {
+    inspectionPreferences.setValue((previous) => ({ ...previous, family }));
+  }
+
   async function copy(value: string, label: string, key: string) {
     const attempt = ++copyAttempt.current;
     try {
@@ -119,7 +193,7 @@ export function GuideColors() {
     } catch {
       if (attempt !== copyAttempt.current) return;
       setCopied(null);
-      setInspection(null);
+      closeInspection();
       setManual({ label, value });
       setMessage(
         "Automatic copy is unavailable. Select and copy the value instead.",
@@ -194,7 +268,51 @@ export function GuideColors() {
         ))}
       </div>
       <div className={styles.sectionHeading}>
-        <h3>Color In Context</h3>
+        <h3 id="developer-colors-harmony" data-guide-outline-level="2">
+          Related Tones
+        </h3>
+        <span>Small mixtures, shared character</span>
+      </div>
+      <div
+        className={`${styles.brandPalette} ${styles.harmonyPalette}`}
+        aria-label="Related Harmony colors"
+      >
+        {GUIDE_HARMONY_COLORS.map((color) => (
+          <button
+            type="button"
+            key={color.id}
+            className={styles.brandColor}
+            title={color.role}
+            aria-label={`Copy ${color.name} ${color.hex}`}
+            data-guide-harmony-color={color.id}
+            onClick={() =>
+              void copy(color.hex, color.name, `harmony-${color.id}`)
+            }
+          >
+            <span
+              className={styles.brandWell}
+              style={{ backgroundColor: color.hex }}
+              aria-hidden="true"
+            >
+              {copied === `harmony-${color.id}` && (
+                <span style={{ color: guidePreviewInk(color.hex, "light") }}>
+                  <ActionIcon name="selected" className="size-4" />
+                </span>
+              )}
+            </span>
+            <strong>{color.name}</strong>
+            <code>{color.hex}</code>
+          </button>
+        ))}
+      </div>
+      <div className={styles.sectionHeading}>
+        <h3
+          id="developer-colors-context"
+          data-guide-outline-level="2"
+          data-guide-outline-label="Color In Context"
+        >
+          Color In Context
+        </h3>
         <span>Light &amp; dark previews</span>
       </div>
       <div className={styles.roleCards}>
@@ -210,7 +328,7 @@ export function GuideColors() {
                   type="button"
                   key={mode}
                   aria-label={`Inspect ${role.label} in ${mode} mode`}
-                  onClick={() => setInspection({ id: role.id, mode })}
+                  onClick={() => inspect(role.id, mode)}
                 >
                   <ColorPreview role={role} mode={mode} />
                 </button>
@@ -218,7 +336,13 @@ export function GuideColors() {
             </div>
             <div className={styles.roleBody}>
               <div className={styles.roleHeading}>
-                <h4>{role.label}</h4>
+                <h4
+                  id={`developer-color-${role.id}`}
+                  data-guide-outline-level="3"
+                  data-guide-outline-label={role.label}
+                >
+                  {role.label}
+                </h4>
                 <button
                   type="button"
                   className={styles.tokenButton}
@@ -288,7 +412,11 @@ export function GuideColors() {
         ))}
       </div>
       <div className={styles.sectionHeading}>
-        <h3>
+        <h3
+          id="developer-every-color"
+          data-guide-outline-level="2"
+          data-guide-outline-label="Every Color"
+        >
           Every Color <span>· Light and dark side by side</span>
         </h3>
         <span>
@@ -303,10 +431,17 @@ export function GuideColors() {
         {GUIDE_THEME_GROUPS.map((group, groupIndex) => (
           <details
             key={group.id}
+            id={`developer-color-group-${group.id}`}
+            data-guide-outline-anchor
             className={styles.group}
             open={groupIndex === 0}
           >
-            <summary className={styles.groupSummary}>
+            <summary
+              className={styles.groupSummary}
+              data-guide-outline-level="3"
+              data-guide-outline-label={group.label}
+              data-guide-outline-target={`developer-color-group-${group.id}`}
+            >
               <span className={styles.groupTitle}>{group.label}</span>
               <span className={styles.groupCount}>
                 <strong>{group.roles.length}</strong> roles
@@ -332,9 +467,7 @@ export function GuideColors() {
                       <button
                         type="button"
                         className={styles.tableRole}
-                        onClick={() =>
-                          setInspection({ id: role.id, mode: "light" })
-                        }
+                        onClick={() => inspect(role.id)}
                         aria-label={`Inspect ${role.label}`}
                       >
                         <span>{role.label}</span>
@@ -389,9 +522,11 @@ export function GuideColors() {
 
       <div className={styles.notes}>
         <p>
-          <strong>Five colors, many roles.</strong> Peach, Flame, Rust, Ink and
-          Violet are the interface palette. Peach and Ink take the place of
-          white and black; mixes and opacity create the quieter layers.
+          <strong>One foundation, related reflections.</strong> Plum and Lilac
+          anchor the interface. Apricot and a small Rose admixture add warmth;
+          Iris and Mint bring quieter cool detail. Black and White keep copy
+          clear. Paired mixtures and opacity create the softer layers, while
+          medication artwork keeps its separately chosen colors.
         </p>
         <p>
           Six-digit hex is a solid color. In <code>#RRGGBBAA</code>, the final
@@ -400,7 +535,7 @@ export function GuideColors() {
           final appearance.
         </p>
         <p>
-          <strong>Your device chooses the app’s theme.</strong> Both preview
+          <strong>Appearance follows your preference.</strong> Both preview
           modes are shown here for comparison. Inspecting a color does not
           change your appearance or any saved medication.
         </p>
@@ -413,14 +548,20 @@ export function GuideColors() {
 
       <div className={styles.medicationPalette}>
         <div className={styles.paletteHeading}>
-          <h3>Medication Accents</h3>
-          <span>{GUIDE_MEDICATION_COLORS.length} choices</span>
+          <span className={styles.paletteIcon} aria-hidden="true">
+            <PaletteIcon size={22} weight="duotone" />
+          </span>
+          <h3
+            id="developer-medication-accents"
+            data-guide-outline-level="2"
+            data-guide-outline-label="Medication Accents"
+          >
+            Medication Accents
+          </h3>
         </div>
         <p className={styles.paletteDescription}>
-          A separate palette for your own medication identities: all original
-          accents and installed Tailwind shades, including Black and White.
-          These are literal saved colors; the app theme does not replace them.
-          Copying a swatch leaves your medication unchanged.
+          A color of your own for every medication. Tap a shade to copy it; your
+          saved colors stay unchanged.
         </p>
         <div className={styles.filters}>
           <div className={styles.search}>
@@ -431,40 +572,91 @@ export function GuideColors() {
               ref={searchInput}
               id={`${id}-search`}
               type="search"
+              maxLength={200}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Find a color"
-              className="h-10 rounded-xl text-base md:text-sm"
+              className={styles.searchInput}
+            />
+            <MagnifyingGlassIcon
+              size={16}
+              weight="bold"
+              aria-hidden="true"
+              className={styles.searchIcon}
             />
           </div>
           <div>
             <label htmlFor={`${id}-family`} className="sr-only">
               Filter color family
             </label>
-            <select
-              id={`${id}-family`}
+            <Select
               value={family}
-              onChange={(event) => setFamily(event.target.value)}
-              className={styles.family}
+              onValueChange={(value) => value && setFamily(value)}
             >
-              <option value="all">All Families</option>
-              {GUIDE_COLOR_FAMILIES.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                id={`${id}-family`}
+                className={styles.controlTrigger}
+              >
+                <SwatchesIcon
+                  size={16}
+                  weight="duotone"
+                  aria-hidden="true"
+                  className={styles.familyGlyph}
+                />
+                <SelectValue>
+                  <span>{family === "all" ? "All families" : family}</span>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent
+                className={styles.controlMenu}
+                align="end"
+                alignItemWithTrigger={false}
+              >
+                <SelectItem
+                  value="all"
+                  label="All families"
+                  className={styles.controlItem}
+                >
+                  <SwatchesIcon size={16} weight="duotone" aria-hidden="true" />
+                  All families
+                </SelectItem>
+                {GUIDE_COLOR_FAMILIES.map((name) => (
+                  <SelectItem
+                    key={name}
+                    value={name}
+                    label={name}
+                    className={styles.controlItem}
+                  >
+                    <span
+                      className={styles.familySwatch}
+                      style={{
+                        backgroundColor:
+                          GUIDE_MEDICATION_COLORS.find(
+                            (color) =>
+                              color.family === name &&
+                              color.label.endsWith(" 500"),
+                          )?.hex ??
+                          GUIDE_MEDICATION_COLORS.find(
+                            (color) => color.family === name,
+                          )?.hex,
+                      }}
+                      aria-hidden="true"
+                    />
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-        <div className={styles.resultRow}>
-          <span aria-live="polite">
-            <strong>{colors.length}</strong>{" "}
-            {colors.length === 1 ? "color" : "colors"}{" "}
-            {query || family !== "all" ? "found" : "to explore"}
-          </span>
-          <button
+          <Button
             type="button"
-            className={styles.copyAction}
+            variant="outline"
+            size="icon-lg"
+            className={styles.copyResults}
+            aria-label={
+              copied === "results" ? "Color results copied" : "Copy Results"
+            }
+            title={copied === "results" ? "Copied" : "Copy Results"}
             disabled={!colors.length}
             onClick={() =>
               void copy(
@@ -477,12 +669,22 @@ export function GuideColors() {
             }
           >
             {copied === "results" ? (
-              <ActionIcon name="selected" className="size-3" />
+              <ActionIcon name="selected" className="size-4" />
             ) : (
-              <CopyIcon size={12} weight="bold" aria-hidden="true" />
+              <CopyIcon
+                size={16}
+                weight="bold"
+                aria-hidden="true"
+                className="size-4"
+              />
             )}
-            Copy Results
-          </button>
+          </Button>
+        </div>
+        <div className={styles.resultRow}>
+          <span aria-live="polite" aria-atomic="true">
+            <strong>{colors.length}</strong>{" "}
+            {colors.length === 1 ? "shade" : "shades"} to browse
+          </span>
         </div>
         <div
           className={styles.paletteGrid}
@@ -542,157 +744,27 @@ export function GuideColors() {
         </div>
       </div>
 
-      <ResponsiveModal
+      <GuideColorInspector
         open={Boolean(inspection && inspectedRole)}
-        onOpenChange={(open) => !open && setInspection(null)}
-        title={inspectedRole?.label ?? "Color Details"}
-        context={inspection?.mode === "dark" ? "Dark Preview" : "Light Preview"}
-        description={
-          inspectedRole?.description ??
-          "Inspect an application color without changing the theme."
+        onOpenChange={(open) => !open && closeInspection()}
+        role={inspectedRole ?? GUIDE_THEME_ROLES[0]}
+        mode={inspection?.mode ?? "light"}
+        onModeChange={(mode) => {
+          if (inspection) inspect(inspection.id, mode);
+        }}
+        format={format}
+        onFormatChange={(format) =>
+          inspectionPreferences.setValue((previous) => ({
+            ...previous,
+            format,
+          }))
         }
-      >
-        {inspection && inspectedRole && (
-          <div className={styles.inspection} data-guide-color-inspection>
-            <div className={styles.inspectionPreview}>
-              <ColorPreview role={inspectedRole} mode={inspection.mode} />
-            </div>
-            <p className={styles.inspectionNote}>
-              Preview only · Your system appearance stays in control.
-            </p>
-            <div className={styles.inspectionControls}>
-              <label htmlFor={`${id}-preview-mode`}>
-                Preview
-                <select
-                  id={`${id}-preview-mode`}
-                  value={inspection.mode}
-                  onChange={(event) =>
-                    setInspection({
-                      ...inspection,
-                      mode: event.target.value as GuideThemeMode,
-                    })
-                  }
-                >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
-              </label>
-              <label htmlFor={`${id}-format`}>
-                Copy Format
-                <select
-                  id={`${id}-format`}
-                  value={format}
-                  onChange={(event) =>
-                    setFormat(event.target.value as "hex" | "rgb")
-                  }
-                >
-                  <option value="hex">HEX</option>
-                  <option value="rgb">RGB / sRGB</option>
-                </select>
-              </label>
-            </div>
-            <dl className={styles.inspectionFacts}>
-              <div>
-                <dt>Token</dt>
-                <dd>
-                  <code>{inspectedRole.token}</code>
-                </dd>
-              </div>
-              <div>
-                <dt>Opacity</dt>
-                <dd>
-                  {guideColorDetails(inspectedRole[inspection.mode]).opacity}
-                </dd>
-              </div>
-              <div>
-                <dt>sRGB</dt>
-                <dd>
-                  <code>
-                    {guideColorDetails(inspectedRole[inspection.mode]).rgb}
-                  </code>
-                </dd>
-              </div>
-            </dl>
-            <label htmlFor={`${id}-color-value`} className={styles.valueLabel}>
-              {format === "hex" ? "Exact HEX Value" : "sRGB Value"}
-            </label>
-            <Input
-              id={`${id}-color-value`}
-              readOnly
-              value={
-                format === "hex"
-                  ? inspectedRole[inspection.mode]
-                  : guideColorDetails(inspectedRole[inspection.mode]).rgb
-              }
-              onFocus={(event) => event.target.select()}
-              className="h-11 rounded-xl font-mono text-base"
-            />
-            <Button
-              type="button"
-              className="h-11 w-full gap-2 rounded-xl"
-              onClick={() =>
-                void copy(
-                  format === "hex"
-                    ? inspectedRole[inspection.mode]
-                    : guideColorDetails(inspectedRole[inspection.mode]).rgb,
-                  `${inspectedRole.label} ${inspection.mode} ${format.toUpperCase()}`,
-                  inspectionKey,
-                )
-              }
-            >
-              {copied === inspectionKey ? (
-                <ActionIcon name="selected" className="size-4" />
-              ) : (
-                <CopyIcon size={16} weight="bold" aria-hidden="true" />
-              )}
-              {copied === inspectionKey
-                ? "Copied"
-                : `Copy ${format.toUpperCase()}`}
-            </Button>
-            <button
-              type="button"
-              className={styles.copyAction}
-              onClick={() =>
-                void copy(
-                  `${inspectedRole.token}: ${inspectedRole[inspection.mode]};`,
-                  `${inspectedRole.label} CSS declaration`,
-                  declarationKey,
-                )
-              }
-            >
-              <CopyIcon size={12} weight="bold" aria-hidden="true" />
-              {copied === declarationKey
-                ? "Declaration Copied"
-                : "Copy CSS Declaration"}
-            </button>
-            {inspectedRole.pairsWith.length > 0 && (
-              <div className={styles.inspectionPairs}>
-                <span>Pairs With</span>
-                <div>
-                  {inspectedRole.pairsWith.map((pair) => {
-                    const role = guideRole(pair);
-                    return role ? (
-                      <button
-                        type="button"
-                        key={pair}
-                        className={styles.copyAction}
-                        onClick={() =>
-                          setInspection({ ...inspection, id: role.id })
-                        }
-                      >
-                        {role.label}
-                        <ActionIcon name="open" className="size-3" />
-                      </button>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </ResponsiveModal>
+        onInspectPair={(pair) => inspect(pair, inspection?.mode ?? "light")}
+        usage="This semantic role comes from the shared application theme. Use its token reference in component styles; its source definition provides the matching light and dark values."
+      />
 
       <ResponsiveModal
+        scrollKey="color-manual-copy"
         open={Boolean(manual)}
         onOpenChange={(open) => !open && setManual(null)}
         title="Copy Values"

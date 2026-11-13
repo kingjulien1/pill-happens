@@ -13,6 +13,8 @@ import {
   getStreakMilestone,
   getStreakMilestones,
   isStreakMilestoneTarget,
+  normalizeUpcomingMilestoneCount,
+  UPCOMING_MILESTONE_BATCH,
 } from "./streak-milestones";
 
 const now = new Date("2026-10-31T12:00:00.000Z");
@@ -115,6 +117,127 @@ test("an empty journal starts with only the next three quiet targets", () => {
     assert.equal(milestone.achievedOn, null);
     assert.equal(milestone.analytics, null);
   }
+});
+
+test("upcoming counts accept internal safe-integer view state and reset invalid counts to one batch", () => {
+  assert.equal(UPCOMING_MILESTONE_BATCH, 3);
+  assert.equal(normalizeUpcomingMilestoneCount(), 3);
+  for (const count of [3, 4, 6, 63, 303, Number.MAX_SAFE_INTEGER])
+    assert.equal(normalizeUpcomingMilestoneCount(count), count);
+  for (const count of [
+    -3,
+    0,
+    1,
+    2,
+    3.5,
+    NaN,
+    Infinity,
+    -Infinity,
+    Number.MAX_SAFE_INTEGER + 1,
+  ]) {
+    assert.equal(normalizeUpcomingMilestoneCount(count), 3);
+    assert.equal(
+      getStreakMilestones(emptyData(), now, count).upcoming.length,
+      3,
+    );
+  }
+});
+
+test("loading more preserves the existing prefix and crosses every early increment into five-day steps", () => {
+  const data = emptyData();
+  const initial = getStreakMilestones(data, now);
+  const expanded = getStreakMilestones(data, now, 15);
+  assert.deepEqual(
+    expanded.upcoming.map((entry) => entry.target),
+    [2, 3, 4, 5, 7, 10, 13, 15, 17, 20, 25, 30, 35, 40, 45],
+  );
+  assert.deepEqual(
+    expanded.upcoming.slice(0, initial.upcoming.length),
+    initial.upcoming,
+  );
+  assert.deepEqual(expanded.achieved, initial.achieved);
+  assert.deepEqual(expanded.streak, initial.streak);
+  assert.ok(
+    expanded.upcoming.every(
+      (entry) =>
+        !entry.achieved &&
+        entry.analytics === null &&
+        entry.achievedOn === null &&
+        entry.runStart === null,
+    ),
+  );
+});
+
+test("expanded upcoming cards continue past arbitrary list caps without inventing achievements or comparisons", () => {
+  const data = emptyData();
+  const before = structuredClone(data);
+  for (const count of [63, 303]) {
+    const result = getStreakMilestones(data, now, count);
+    assert.equal(result.upcoming.length, count);
+    assert.equal(result.upcoming.at(-1)!.target, 35 + (count - 13) * 5);
+    assert.equal(
+      new Set(result.upcoming.map((entry) => entry.target)).size,
+      count,
+    );
+    assert.ok(
+      result.upcoming.every(
+        (entry) =>
+          isStreakMilestoneTarget(entry.target) &&
+          entry.analytics === null &&
+          !entry.achieved &&
+          entry.remaining === entry.target,
+      ),
+    );
+  }
+  assert.deepEqual(data, before);
+});
+
+test("loading beyond the thirty-day milestone preserves only the latest three achieved cards", () => {
+  const data = emptyData();
+  data.intakes = run("2026-09-01", 30);
+  const initial = getStreakMilestones(data, now);
+  const expanded = getStreakMilestones(data, now, 9);
+  assert.deepEqual(
+    expanded.upcoming.map((entry) => entry.target),
+    [35, 40, 45, 50, 55, 60, 65, 70, 75],
+  );
+  assert.deepEqual(
+    expanded.achieved.map((entry) => entry.target),
+    [30, 25, 20],
+  );
+  assert.deepEqual(expanded.achieved, initial.achieved);
+  assert.ok(
+    [...expanded.achieved, ...expanded.upcoming].every(
+      (entry) => entry.analytics === null,
+    ),
+  );
+});
+
+test("expanded targets follow the historical best while progress follows a shorter rebuilt current run", () => {
+  const data = emptyData();
+  data.intakes = [...run("2026-06-01", 40), ...run("2026-10-29", 3)];
+  const initial = getStreakMilestones(data, now);
+  const expanded = getStreakMilestones(data, now, 6);
+  assert.equal(expanded.streak.best, 40);
+  assert.equal(expanded.streak.current, 3);
+  assert.deepEqual(
+    expanded.achieved.map((entry) => entry.target),
+    [40, 35, 30],
+  );
+  assert.deepEqual(expanded.achieved, initial.achieved);
+  assert.deepEqual(
+    expanded.upcoming.map((entry) => entry.target),
+    [45, 50, 55, 60, 65, 70],
+  );
+  assert.ok(
+    expanded.upcoming.every(
+      (entry) =>
+        entry.currentProgress === 3 &&
+        entry.remaining === entry.target - 3 &&
+        !entry.achieved &&
+        entry.analytics === null,
+    ),
+  );
 });
 
 test("the latest three achievements survive a later gap and upcoming progress follows the current run", () => {
@@ -311,6 +434,50 @@ test("duplicate check-ins select the latest actual edit and count moods only onc
   );
 });
 
+test("comparisons prefer Evening ratings while Morning-only days contribute exactly once", () => {
+  const data = comparisonData();
+  const evening = checkIn("2026-10-10", {
+    note: "Evening account.",
+    energy: 4,
+    stress: 2,
+    sleepHours: 8,
+    moods: ["calm"],
+  });
+  const laterMorning = checkIn("2026-10-10", {
+    period: "morning",
+    note: "Morning account, edited later.",
+    energy: 1,
+    moods: ["tired"],
+    updatedAt: "2026-10-30T16:00:00.000Z",
+  });
+  const morningOnly = checkIn("2026-10-11", {
+    period: "morning",
+    energy: 2,
+    moods: ["hopeful"],
+  });
+  for (const records of [
+    [evening, laterMorning, morningOnly],
+    [laterMorning, morningOnly, evening],
+  ]) {
+    data.dailyCheckIns = records;
+    const before = structuredClone(data);
+    const result = analytics(data).current;
+    assert.equal(result.checkInDays, 2);
+    assert.deepEqual(result.energy, { mean: 3, count: 2 });
+    assert.deepEqual(result.stress, { mean: 2, count: 1 });
+    assert.deepEqual(result.sleepHours, { mean: 8, count: 1 });
+    assert.deepEqual(result.checkIns, [evening, morningOnly]);
+    assert.deepEqual(
+      result.moods.map(({ value, count }) => ({ value, count })),
+      [
+        { value: "calm", count: 1 },
+        { value: "hopeful", count: 1 },
+      ],
+    );
+    assert.deepEqual(data, before);
+  }
+});
+
 test("medication amounts stay separate, use current strength, and never turn missing records into zero", () => {
   const data = comparisonData();
   data.medications = [
@@ -392,4 +559,31 @@ test("a distant valid upcoming target stays cheap and has no invented dates or c
   assert.equal(result.achievedOn, null);
   assert.equal(result.runStart, null);
   assert.equal(result.remaining, target);
+});
+
+test("new ten-point ratings and legacy five-point answers share comparable endpoints", () => {
+  const data = comparisonData();
+  data.dailyCheckIns = [
+    checkIn("2026-10-07", { energy: 5, stress: 1 }),
+    checkIn("2026-10-08", { energy: 1, stress: 5 }),
+    checkIn("2026-10-10", {
+      energy: 10,
+      energyScale: 10,
+      stress: 1,
+      stressScale: 10,
+    }),
+    checkIn("2026-10-11", {
+      energy: 1,
+      energyScale: 10,
+      stress: 10,
+      stressScale: 10,
+    }),
+  ];
+  const before = structuredClone(data.dailyCheckIns);
+  const result = analytics(data);
+  assert.equal(result.current.energy.mean, 3);
+  assert.equal(result.previous.energy.mean, 3);
+  assert.equal(result.current.stress.mean, 3);
+  assert.equal(result.previous.stress.mean, 3);
+  assert.deepEqual(data.dailyCheckIns, before);
 });

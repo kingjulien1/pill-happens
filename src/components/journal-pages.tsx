@@ -1,10 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { sortMedicationsByUsage } from "@/lib/medication-usage";
+import {
+  normalizeJournalMentionText,
+  parseJournalMentionHref,
+} from "@/lib/journal-mentions";
+import mentionStyles from "./medication-mention-filter.module.css";
+
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Leaf } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
-import { toast } from "sonner";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { toast } from "@/components/ui/journal-toast";
 import { useJournal } from "@/components/journal-provider";
 import {
   DraftStatus,
@@ -13,9 +22,13 @@ import {
   usePersistentDraft,
 } from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
-import { HeadingText } from "@/components/heading-text";
-import { TodayHeading } from "@/components/today-heading";
-import { loggingStreak } from "@/lib/logging-streak";
+import { PageHeading, PageSurface } from "@/components/page-heading";
+import layoutStyles from "./page-layout.module.css";
+import {
+  countOpioidPills,
+  countPills,
+  countStimulantPills,
+} from "@/lib/pill-counts";
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationLibraryCard } from "@/components/medication-library-card";
 import { MedicationActionButton } from "@/components/medication-action-button";
@@ -32,10 +45,17 @@ import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { IntakeCardGroup } from "@/components/intake-card-group";
 import { IntakeTimelineEntrance } from "@/components/intake-timeline-entrance";
-import { HistoryDayCard } from "@/components/history-day-card";
-import { IntakeSummary } from "@/components/intake-summary";
+import { IntakeStackControllerProvider } from "@/components/intake-stack-controller";
+import {
+  HistoryDayHeading,
+  HistoryHeading,
+} from "@/components/history-heading";
+import { HistoryWeekGroup } from "@/components/history-week-group";
+import { groupHistoryWeeks, visibleHistoryWeeks } from "@/lib/history-weeks";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { DailyCheckInSection } from "@/components/daily-check-in";
+import { DayTimeMarker } from "@/components/day-time-marker";
+import { cn } from "@/lib/utils";
 import { GoalForm, MedicationForm } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +68,7 @@ import {
   formatDay,
   formatDose,
   goalForDay,
+  isValidDayKey,
   shiftDayKey,
   totalsForDay,
   type AppData,
@@ -64,14 +85,22 @@ function medicationView(value: unknown): value is { archived: boolean } {
   );
 }
 
-function historyView(value: unknown): value is { limit: number } {
+type HistoryView = { limit: number; expandedWeeks?: string[] };
+
+function historyView(value: unknown): value is HistoryView {
   return Boolean(
     value &&
     typeof value === "object" &&
     "limit" in value &&
     typeof value.limit === "number" &&
     Number.isSafeInteger(value.limit) &&
-    value.limit >= 20,
+    value.limit >= 20 &&
+    (!("expandedWeeks" in value) ||
+      (Array.isArray(value.expandedWeeks) &&
+        value.expandedWeeks.length <= 1024 &&
+        value.expandedWeeks.every(
+          (week: unknown) => typeof week === "string" && isValidDayKey(week),
+        ))),
   );
 }
 
@@ -85,29 +114,6 @@ function timezoneDraft(value: unknown): value is { timezone: string } {
   );
 }
 
-function PageHeading({
-  title,
-  context,
-  children,
-}: {
-  title: string;
-  context: React.ReactNode;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="canvas-copy mb-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        <HeadingText title={title} context={context} />
-      </h1>
-      {children && (
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          {children}
-        </p>
-      )}
-    </div>
-  );
-}
-
 function EmptyState({
   icon,
   title,
@@ -118,7 +124,7 @@ function EmptyState({
   children: React.ReactNode;
 }) {
   return (
-    <div className="surface flex flex-col items-center rounded-3xl px-7 py-9 text-center">
+    <PageSurface className="flex flex-col items-center px-7 py-9 text-center">
       <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-foreground/70">
         <ActionIcon name={icon} className="size-7" weight="duotone" />
       </div>
@@ -126,7 +132,7 @@ function EmptyState({
       <div className="mt-2 max-w-[270px] text-xs leading-[1.9] text-muted-foreground">
         {children}
       </div>
-    </div>
+    </PageSurface>
   );
 }
 
@@ -134,101 +140,21 @@ function usagePercent(total: number, maximum: number) {
   return maximum > 0 ? (total / maximum) * 100 : total > 0 ? 100 : 0;
 }
 
-function DailyOverview({ data, day }: { data: AppData; day: string }) {
-  const totals = totalsForDay(data, day);
-  const activeIds = [
-    ...new Set([
-      ...totals.map((total) => total.medicationId),
-      ...data.goals
-        .filter(
-          (goal) => goalForDay(data, goal.medicationId, day)?.id === goal.id,
-        )
-        .map((goal) => goal.medicationId),
-    ]),
-  ];
-
-  return (
-    <section
-      aria-label="Daily overview"
-      className="surface rounded-2xl px-4 py-3"
-    >
-      <div
-        className={
-          activeIds.length ? "mb-2" : "flex items-center justify-between gap-3"
-        }
-      >
-        <h2 className="text-xs font-medium text-muted-foreground">
-          Daily Totals
-        </h2>
-        {!activeIds.length && (
-          <span className="text-xs text-muted-foreground">No intakes</span>
-        )}
-      </div>
-      {activeIds.length > 0 && (
-        <ul className="space-y-2.5">
-          {activeIds.map((id) => {
-            const medication = data.medications.find((item) => item.id === id);
-            const benzodiazepine = medication?.isBenzodiazepine === true;
-            const total = totals.find((item) => item.medicationId === id);
-            const goal = goalForDay(data, id, day);
-            const amount = total?.totalMg ?? 0;
-            const name =
-              total?.medicationName ??
-              data.medications.find((medication) => medication.id === id)
-                ?.name ??
-              "Medication";
-            return (
-              <li
-                key={id}
-                className={`${medicationClassHighlights(medication)}${benzodiazepine || medication?.isOpioid === true ? " rounded-lg px-2 py-1" : ""}`}
-                data-benzodiazepine={benzodiazepine || undefined}
-                data-opioid={medication?.isOpioid === true || undefined}
-                data-medication-classification={getMedicationClassification(
-                  medication,
-                )}
-              >
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    <span
-                      className="min-w-0 truncate text-xs font-medium"
-                      title={name}
-                    >
-                      {name}
-                    </span>
-                    <MedicationClassBadges medication={medication} />
-                  </span>
-                  <span className="shrink-0 text-right text-sm font-medium tabular-nums">
-                    {formatDose(amount)} mg
-                    {goal && (
-                      <span className="ml-1 text-[10px] font-normal text-muted-foreground">
-                        / {formatDose(goal.dailyLimitMg)} mg max
-                      </span>
-                    )}
-                  </span>
-                </div>
-                {goal && amount > goal.dailyLimitMg && (
-                  <p className="mt-1 text-[10px] text-foreground">
-                    Above daily maximum
-                  </p>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </section>
-  );
-}
-
 function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
   const { mutate, busy } = useJournal();
   const { store } = useJournalWorkspace();
   const [confirm, setConfirm] = useState(false);
+  const confirmId = useId();
+  const deleteLink = useRef<HTMLButtonElement>(null);
+  const keepButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (confirm) keepButton.current?.focus();
+  }, [confirm]);
   async function remove() {
     try {
       await mutate(`intakes/${intake.id}`, undefined, "DELETE");
       store.clearDraft(`intake:edit:${intake.id}`);
-      toast.success("Entry deleted.");
+      toast.success("Entry deleted.", { heading: "Intake removed" });
       close();
     } catch {
       /* provider displays error */
@@ -238,47 +164,68 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
     <ResponsiveModal
       open
       onOpenChange={(v) => !v && close()}
+      scrollKey={`intake:edit:${intake.id}`}
       title="Edit Intake"
+      titleIcon="pencilSparkles"
       context="Update Entry"
       description="Update this entry. Changes are saved to the day the intake was taken."
     >
-      <IntakeForm intake={intake} onSaved={close} />
-      <div className="mt-5 border-t pt-4">
-        {confirm ? (
-          <div>
-            <p className="mb-3 text-center text-xs text-muted-foreground">
-              Permanently delete this intake?
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-11"
-                onClick={() => setConfirm(false)}
-              >
-                Keep entry
-              </Button>
-              <Button
-                variant="destructive"
-                disabled={busy}
-                className="h-11"
-                onClick={() => void remove()}
-              >
-                <ActionIcon name="delete" />
-                Delete entry
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            className="h-11 w-full gap-2 text-xs text-muted-foreground"
+      <IntakeForm
+        intake={intake}
+        onSaved={close}
+        footerAction={
+          <button
+            ref={deleteLink}
+            type="button"
+            disabled={busy}
+            className="min-h-7 shrink-0 rounded-[var(--dialog-radius-compact)] px-1 py-0.5 font-medium text-foreground/65 underline decoration-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50"
+            aria-expanded={confirm}
+            aria-controls={confirmId}
             onClick={() => setConfirm(true)}
+            data-edit-intake-delete-link
           >
-            <ActionIcon name="delete" />
-            Delete this entry
-          </Button>
-        )}
-      </div>
+            Delete intake
+          </button>
+        }
+      />
+      {confirm && (
+        <div
+          id={confirmId}
+          className="mt-3"
+          role="group"
+          aria-label="Confirm intake deletion"
+          data-edit-intake-delete-confirmation
+        >
+          <p className="mb-3 text-center text-xs text-muted-foreground">
+            Permanently delete this intake?
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              ref={keepButton}
+              type="button"
+              variant="outline"
+              disabled={busy}
+              className="h-11"
+              onClick={() => {
+                setConfirm(false);
+                deleteLink.current?.focus({ preventScroll: true });
+              }}
+            >
+              Keep entry
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={busy}
+              className="h-11"
+              onClick={() => void remove()}
+            >
+              <ActionIcon name="delete" />
+              Delete entry
+            </Button>
+          </div>
+        </div>
+      )}
     </ResponsiveModal>
   );
 }
@@ -286,15 +233,14 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
 function IntakeTimeline({
   data,
   day,
-  showSummary = true,
   onLog,
 }: {
   data: AppData;
   day: string;
-  showSummary?: boolean;
   onLog?: () => void;
 }) {
   const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const intakeTarget = useRef<HTMLDivElement>(null);
   const editing =
     dialog?.kind === "intake-edit"
       ? data.intakes.find((entry) => entry.id === dialog.id)
@@ -302,33 +248,57 @@ function IntakeTimeline({
   useEffect(() => {
     if (dialog?.kind === "intake-edit" && !editing) closeDialog(dialog);
   }, [dialog, editing, closeDialog]);
+  useEffect(() => {
+    const focusIntakes = () => {
+      if (
+        window.location.hash === "#logged-intakes" &&
+        !document.querySelector(
+          '[data-slot="dialog-content"][data-open], [data-slot="drawer-popup"][data-open]',
+        )
+      )
+        intakeTarget.current?.focus({ preventScroll: true });
+    };
+    const frame = requestAnimationFrame(focusIntakes);
+    window.addEventListener("hashchange", focusIntakes);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", focusIntakes);
+    };
+  }, [day]);
   const entries = dayIntakes(data, day);
   const groups = groupIntakes(entries);
   return (
     <>
-      {showSummary && (
-        <div className="mb-4">
-          <IntakeSummary count={entries.length} />
-        </div>
-      )}
-      {!entries.length ? (
-        <EmptyIntakeStack onLog={onLog} />
-      ) : (
-        <IntakeTimelineEntrance key={day}>
-          {groups.map((group) => (
-            <IntakeCardGroup
-              key={group.id}
-              group={group}
-              medications={data.medications}
-              day={day}
-              timeZone={data.settings.timezone}
-              onEdit={(entry) =>
-                openDialog({ kind: "intake-edit", id: entry.id })
-              }
-            />
-          ))}
-        </IntakeTimelineEntrance>
-      )}
+      <div
+        id="logged-intakes"
+        ref={intakeTarget}
+        tabIndex={-1}
+        role="region"
+        aria-label="Logged intakes"
+        className="scroll-mt-6 outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        data-logged-intakes
+      >
+        {!groups.length ? (
+          <EmptyIntakeStack onLog={onLog} />
+        ) : (
+          <IntakeStackControllerProvider key={day} day={day}>
+            <div className="intake-timeline">
+              {groups.map((group) => (
+                <IntakeCardGroup
+                  key={group.id}
+                  group={group}
+                  medications={data.medications}
+                  day={day}
+                  timeZone={data.settings.timezone}
+                  onEdit={(entry) =>
+                    openDialog({ kind: "intake-edit", id: entry.id })
+                  }
+                />
+              ))}
+            </div>
+          </IntakeStackControllerProvider>
+        )}
+      </div>
       {entries.length > 1 && <StackViewStorageStatus />}
       {editing && (
         <EntryEditor
@@ -340,53 +310,141 @@ function IntakeTimeline({
   );
 }
 
+/** Sample check-in availability on each visit; preserve the day's reading order. */
+function CheckInTimeline({
+  data,
+  day,
+  now,
+  onLog,
+  className,
+}: {
+  data: AppData;
+  day: string;
+  now: Date;
+  onLog?: () => void;
+  className?: string;
+}) {
+  const timeZone = data.settings.timezone;
+  const trackingDay = dayKey(now, timeZone);
+  const [visit, setVisit] = useState(() => ({
+    day,
+    timeZone,
+    trackingDay,
+    at: new Date(),
+  }));
+  // New route/day/zone scopes resample without remounting an open editor.
+  // The shared clock still owns the 06:00 reset and other live time displays.
+  if (
+    visit.day !== day ||
+    visit.timeZone !== timeZone ||
+    visit.trackingDay !== trackingDay
+  ) {
+    setVisit({ day, timeZone, trackingDay, at: now });
+  }
+  const current = day === trackingDay;
+  const eveningReady = canCheckIn(day, visit.at, timeZone);
+  const morningReady = canCheckIn(day, visit.at, timeZone, "morning");
+  const hasIntakes = dayIntakes(data, day).length > 0;
+  const evening = checkInForDay(data.dailyCheckIns, day);
+  const morning = checkInForDay(data.dailyCheckIns, day, "morning");
+  const eveningCard = (
+    <div
+      key="check-in-evening"
+      hidden={!eveningReady}
+      data-check-in-slot={current ? "current" : "past"}
+      data-check-in-slot-period="evening"
+      data-check-in-position="after"
+    >
+      <DailyCheckInSection
+        day={day}
+        checkIn={evening}
+        variant={evening ? "saved" : "prompt"}
+        intakeSpacing={hasIntakes ? "before" : undefined}
+      />
+    </div>
+  );
+  const morningCard = (
+    <div
+      key="check-in-morning"
+      hidden={!morningReady}
+      data-check-in-slot={current ? "current" : "past"}
+      data-check-in-slot-period="morning"
+      data-check-in-position="before"
+    >
+      <DailyCheckInSection
+        day={day}
+        period="morning"
+        checkIn={morning}
+        variant={morning ? "saved" : "prompt"}
+        intakeSpacing={hasIntakes ? "after" : undefined}
+      />
+    </div>
+  );
+  return (
+    <IntakeTimelineEntrance
+      className={cn("flex min-w-0 flex-col gap-2", className)}
+      data-check-in-timeline={current ? "current" : "past"}
+    >
+      <DayTimeMarker
+        key="day-start-marker"
+        position="start"
+        day={day}
+        checkIn={morning}
+      />
+      {morningCard}
+      <section
+        key="intakes"
+        aria-label={current ? "Today's entries" : "Day's entries"}
+        data-daily-intake-list
+      >
+        <IntakeTimeline data={data} day={day} onLog={onLog} />
+      </section>
+      {eveningCard}
+      <DayTimeMarker
+        key="day-end-marker"
+        position="end"
+        day={day}
+        checkIn={evening}
+      />
+    </IntakeTimelineEntrance>
+  );
+}
+
 export function TodayPage() {
   const { data, now } = useJournal();
   const { dialog, openDialog, closeDialog } = useJournalWorkspace();
   const open = dialog?.kind === "intake-new";
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
-  const streak = loggingStreak(data, today, now);
-  const checkIn = checkInForDay(data.dailyCheckIns, today);
+  const todayEntries = dayIntakes(data, today);
+  const pillCounts = countPills(todayEntries, data.medications);
   const openLog = () => openDialog({ kind: "intake-new" });
   return (
-    <div className="flex flex-1 flex-col pt-6" data-today-layout>
-      <TodayHeading
+    <div className="flex flex-1 flex-col" data-today-layout>
+      <h1 className="sr-only">Daily Log</h1>
+      <CheckInTimeline
+        data={data}
         day={today}
-        current={streak.current}
         now={now}
-        timeZone={data.settings.timezone}
+        onLog={openLog}
+        className="flex-1"
       />
-      <div hidden={!checkIn}>
-        <DailyCheckInSection day={today} checkIn={checkIn} variant="saved" />
-      </div>
-      <div
-        hidden={
-          Boolean(checkIn) || !canCheckIn(today, now, data.settings.timezone)
-        }
-      >
-        <DailyCheckInSection day={today} variant="prompt" />
-      </div>
-      <section aria-label="Today's entries" className="flex-1">
-        <IntakeTimeline
-          data={data}
-          day={today}
-          showSummary={false}
-          onLog={openLog}
-        />
-      </section>
       <IntakeAction
         onClick={openLog}
-        todayCount={dayIntakes(data, today).length}
+        pillCounts={pillCounts}
+        opioidCount={countOpioidPills(todayEntries, data.medications)}
+        stimulantCount={countStimulantPills(todayEntries, data.medications)}
       />
       <ResponsiveModal
         open={open}
         onOpenChange={(next) => {
           if (!next && dialog?.kind === "intake-new") closeDialog(dialog);
         }}
+        scrollKey="intake:new:today"
         title="Log Intake"
+        titleIcon="pencilSparkles"
         context="New Entry"
-        description="Record what you took, when you took it, and anything on your mind."
+        description="Record what you took, how much, and when."
       >
         {open && <IntakeForm onSaved={() => closeDialog(dialog)} />}
       </ResponsiveModal>
@@ -396,7 +454,35 @@ export function TodayPage() {
 
 export function MedicationsPage() {
   const { data, mutate, busy } = useJournal();
-  const { dialog, openDialog, closeDialog } = useJournalWorkspace();
+  const search = useSearchParams();
+  const medicationReferences = search.getAll("medication");
+  const ingredientReferences = search.getAll("ingredient");
+  const hasReference =
+    medicationReferences.length > 0 || ingredientReferences.length > 0;
+  // Only one reference type/value can own the list. Unrelated query context survives Clear.
+  const referenceQuery =
+    medicationReferences.length === 1 && ingredientReferences.length === 0
+      ? new URLSearchParams({ medication: medicationReferences[0] })
+      : ingredientReferences.length === 1 && medicationReferences.length === 0
+        ? new URLSearchParams({ ingredient: ingredientReferences[0] })
+        : null;
+  const reference = referenceQuery
+    ? parseJournalMentionHref(`/medications?${referenceQuery}`)
+    : null;
+  const clearQuery = new URLSearchParams(search.toString());
+  clearQuery.delete("medication");
+  clearQuery.delete("ingredient");
+  const clearReferenceHref = `/medications${clearQuery.size ? `?${clearQuery}` : ""}`;
+  const referenceKey = hasReference
+    ? JSON.stringify([medicationReferences, ingredientReferences])
+    : "";
+  const referenceVisit = useRef("");
+  const {
+    dialog,
+    openDialog,
+    closeDialog,
+    ready: workspaceReady,
+  } = useJournalWorkspace();
   const view = usePersistentDraft(
     "view:medications",
     () => ({ archived: false }),
@@ -414,14 +500,42 @@ export function MedicationsPage() {
   const open = Boolean(
     medicationDialog && (medicationDialog.kind === "medication-new" || editing),
   );
+  useLayoutEffect(() => {
+    if (!referenceKey) {
+      referenceVisit.current = "";
+      return;
+    }
+    if (!workspaceReady || referenceVisit.current === referenceKey) return;
+    referenceVisit.current = referenceKey;
+    // Direct links arrive at the referenced list, never an unrelated restored editor.
+    if (medicationDialog) closeDialog(medicationDialog);
+  }, [referenceKey, workspaceReady, medicationDialog, closeDialog]);
   useEffect(() => {
     if (data && medicationDialog?.kind === "medication-edit" && !editing)
       closeDialog(medicationDialog);
   }, [data, medicationDialog, editing, closeDialog]);
   if (!data) return null;
-  const medications = data.medications.filter(
-    (item) => item.archived === showArchived,
+  const medications = sortMedicationsByUsage(
+    data.medications.filter((item) =>
+      hasReference
+        ? reference?.kind === "medication"
+          ? item.id === reference.id
+          : reference?.kind === "ingredient"
+            ? normalizeJournalMentionText(item.activeIngredient ?? "") ===
+              normalizeJournalMentionText(reference.ingredient)
+            : false
+        : item.archived === showArchived,
+    ),
+    data.intakes,
   );
+  const referenceAvailable = medications.length > 0;
+  const ReferenceIcon = reference?.kind === "ingredient" ? FlaskConical : Pill;
+  const referenceTitle =
+    reference?.kind === "ingredient"
+      ? medications[0]?.activeIngredient?.trim() || reference.ingredient
+      : reference?.kind === "medication"
+        ? medications[0]?.name || "Medication unavailable"
+        : "Reference unavailable";
   async function archive(medication: Medication) {
     try {
       await mutate(
@@ -433,6 +547,7 @@ export function MedicationsPage() {
         medication.archived
           ? "Medication restored."
           : "Medication archived. Past entries are saved.",
+        { heading: "Medication library" },
       );
       closeDialog(medicationDialog ?? undefined);
     } catch {
@@ -441,17 +556,61 @@ export function MedicationsPage() {
   }
   return (
     <>
-      <MedicationsHeading medications={data.medications} />
+      <MedicationsHeading
+        medications={data.medications}
+        intakes={data.intakes}
+      />
       <MedicationActionButton
         intent="add"
         className="mb-7"
         onClick={() => openDialog({ kind: "medication-new" })}
       />
-      <MedicationListHeading
-        archived={showArchived}
-        count={medications.length}
-        onArchivedChange={(archived) => view.setValue({ archived })}
-      />
+      {hasReference ? (
+        <section
+          className={mentionStyles.filter}
+          aria-label="Journal reference"
+          data-medication-mention-filter
+          data-reference-kind={reference?.kind ?? "invalid"}
+          data-reference-state={referenceAvailable ? "matched" : "unavailable"}
+        >
+          <span className={mentionStyles.icon} aria-hidden="true">
+            <ReferenceIcon size={18} strokeWidth={2.1} />
+          </span>
+          <div className={mentionStyles.copy}>
+            <p className={mentionStyles.eyebrow}>
+              {reference?.kind === "ingredient"
+                ? "Active ingredient"
+                : "Linked medication"}
+            </p>
+            <h2 className={mentionStyles.title} title={referenceTitle}>
+              {referenceTitle}
+            </h2>
+            <p className={mentionStyles.detail} role="status">
+              {referenceAvailable
+                ? `${medications.length} ${medications.length === 1 ? "medication" : "medications"}${medications.some((item) => item.archived) ? " · Includes archived" : " · In your kit"}`
+                : reference?.kind === "ingredient"
+                  ? "No medication currently uses this ingredient. Your journal link stays intact."
+                  : "This reference no longer matches your kit. Your journal link stays intact."}
+            </p>
+          </div>
+          <Link
+            href={clearReferenceHref}
+            scroll={false}
+            className={mentionStyles.clear}
+            aria-label="Clear journal reference and show medication kit"
+            data-medication-mention-clear
+          >
+            <X size={13} strokeWidth={2.2} aria-hidden="true" />
+            Show kit
+          </Link>
+        </section>
+      ) : (
+        <MedicationListHeading
+          archived={showArchived}
+          count={medications.length}
+          onArchivedChange={(archived) => view.setValue({ archived })}
+        />
+      )}
       <div
         className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/90 px-3 py-2.5"
         data-medication-history-notice
@@ -467,16 +626,24 @@ export function MedicationsPage() {
       </div>
       <div id="medication-library-list">
         {!medications.length ? (
-          <EmptyState
-            icon="medications"
-            title={
-              showArchived ? "Nothing Archived." : "Start with Your Medication."
-            }
-          >
-            {showArchived
-              ? "Archived medications stay here, and their past entries stay in your journal."
-              : "Add the exact name and strength from the packaging. Your first log starts here."}
-          </EmptyState>
+          hasReference ? (
+            <p className={mentionStyles.empty} data-medication-mention-empty>
+              Choose Show kit to return to your saved medication list.
+            </p>
+          ) : (
+            <EmptyState
+              icon="medications"
+              title={
+                showArchived
+                  ? "Nothing Archived."
+                  : "Start with Your Medication."
+              }
+            >
+              {showArchived
+                ? "Archived medications stay here, and their past entries stay in your journal."
+                : "Add the exact name and strength from the packaging. Your first log starts here."}
+            </EmptyState>
+          )
         ) : (
           <div className="space-y-3">
             {medications.map((medication) => (
@@ -497,10 +664,11 @@ export function MedicationsPage() {
         onOpenChange={(next) => {
           if (!next && medicationDialog) closeDialog(medicationDialog);
         }}
+        scrollKey={editing ? `med:edit:${editing.id}` : "med:new"}
         title={editing ? "Edit Medication" : "Add Medication"}
         titleIcon="medications"
         headerVariant="medication"
-        context={editing ? "Update Details" : "Name & Strength"}
+        context={editing ? "Update Details" : "The Essentials"}
         description="Medication details and appearance."
       >
         {open && (
@@ -511,7 +679,10 @@ export function MedicationsPage() {
               onSaved={() => closeDialog(medicationDialog ?? undefined)}
             />
             {editing && (
-              <div className="mt-4 rounded-xl border border-border/60 bg-muted/20 p-1">
+              <div
+                data-dialog-panel
+                className="mt-4 rounded-xl border border-border/60 bg-muted/20 p-1"
+              >
                 <Button
                   type="button"
                   variant="ghost"
@@ -555,14 +726,18 @@ export function GoalsPage() {
     try {
       await mutate(`goals/${deleting}`, undefined, "DELETE");
       setDeleting(null);
-      toast.success("Goal removed.");
+      toast.success("Goal removed.", { heading: "Daily goal" });
     } catch {
       /* provider displays error */
     }
   }
   return (
     <>
-      <PageHeading title="Goals" context="Daily Maximums">
+      <PageHeading
+        title="Goals"
+        context="Daily maximums"
+        icon={<ActionIcon name="goals" />}
+      >
         Keep track of the targets agreed with your prescriber.
       </PageHeading>
       <Button
@@ -592,7 +767,7 @@ export function GoalsPage() {
             return (
               <article
                 key={goal.id}
-                className={`surface rounded-3xl p-5 ${medicationClassHighlights(med)}`}
+                className={`${layoutStyles.surface} p-5 ${medicationClassHighlights(med)}`}
                 data-benzodiazepine={
                   med?.isBenzodiazepine === true || undefined
                 }
@@ -687,9 +862,9 @@ export function GoalsPage() {
           })}
         </div>
       )}
-      <div className="mt-7 flex gap-3 p-1">
-        <Leaf size={17} className="mt-1 shrink-0 text-foreground/60" />
-        <p className="text-[11px] leading-[1.9] text-muted-foreground">
+      <div className="canvas-copy mt-7 flex gap-3 p-1">
+        <Leaf size={17} className="mt-1 shrink-0" />
+        <p className="text-[11px] leading-[1.9] text-canvas-muted-foreground">
           This is a record of your own goals, not a taper plan. Always work with
           your prescriber on dose changes. New goals can start on a future date.
         </p>
@@ -699,6 +874,7 @@ export function GoalsPage() {
         onOpenChange={(next) => {
           if (!next && dialog?.kind === "goal-new") closeDialog(dialog);
         }}
+        scrollKey="goal:new"
         title="Set a Goal"
         context="Daily Maximum"
         description="Record a daily maximum you have chosen with your prescriber. This does not calculate a taper schedule."
@@ -708,6 +884,7 @@ export function GoalsPage() {
       <ResponsiveModal
         open={Boolean(deleting)}
         onOpenChange={(v) => !v && setDeleting(null)}
+        scrollKey={deleting ? `goal:remove:${deleting}` : "goal:remove"}
         title="Remove This Goal?"
         context="Confirm Removal"
         description="This also removes it from historical summaries. Your intake entries stay in your journal."
@@ -750,7 +927,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
         try {
           await mutate("settings", { timezone: draft.value.timezone }, "PATCH");
           draft.clearDraft();
-          toast.success("Timezone updated.");
+          toast.success("Timezone updated.", { heading: "Journal settings" });
           onSaved();
         } catch {
           /* The provider displays the error; the draft stays available. */
@@ -788,26 +965,27 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           are handled automatically.
         </p>
       </div>
-      <DraftStatus
-        hasDraft={draft.hasDraft}
-        status={draft.status}
-        restored={draft.restored}
-        onReset={
-          busy
-            ? undefined
-            : () => draft.resetDraft({ timezone: data!.settings.timezone })
-        }
-      />
-      <Button className="h-12 w-full rounded-xl" type="submit" disabled={busy}>
-        {busy ? (
-          <ActionIcon name="loading" className="animate-spin" />
-        ) : (
-          <>
-            <ActionIcon name="save" />
-            Save preferences
-          </>
-        )}
-      </Button>
+
+      <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+        <DialogPrimaryButton
+          className="w-full"
+          type="submit"
+          disabled={busy}
+          pending={busy}
+        >
+          {busy ? "Saving preferences…" : "Save preferences"}
+        </DialogPrimaryButton>
+        <DraftStatus
+          hasDraft={draft.hasDraft}
+          status={draft.status}
+          restored={draft.restored}
+          onReset={
+            busy
+              ? undefined
+              : () => draft.resetDraft({ timezone: data!.settings.timezone })
+          }
+        />
+      </div>
     </form>
   );
 }
@@ -822,7 +1000,9 @@ function JournalPreferences() {
     try {
       await signOut();
     } catch {
-      toast.error("Unable to sign out. Please try again.");
+      toast.error("Unable to sign out. Please try again.", {
+        heading: "Sign-out unsuccessful",
+      });
     } finally {
       setSaving(false);
     }
@@ -852,6 +1032,7 @@ function JournalPreferences() {
         onOpenChange={(next) => {
           if (!next && dialog?.kind === "preferences") closeDialog(dialog);
         }}
+        scrollKey="preferences"
         title="Preferences"
         context="Your Journal"
         description="Your day begins at 06:00 in this timezone. Changing it regroups all of your entries."
@@ -875,7 +1056,7 @@ function JournalPreferences() {
 
 export function HistoryPage() {
   const { data, now } = useJournal();
-  const history = usePersistentDraft(
+  const history = usePersistentDraft<HistoryView>(
     "view:history",
     () => ({ limit: 20 }),
     historyView,
@@ -888,41 +1069,70 @@ export function HistoryPage() {
     data.dailyCheckIns,
     data.settings.timezone,
   ).filter((day) => day < today);
+  const weeks = groupHistoryWeeks(days);
+  const visibleWeeks = visibleHistoryWeeks(weeks, limit);
   return (
     <>
-      <PageHeading title="History" context="Past Days">
-        Intake details and evening check-ins, day by day.
-      </PageHeading>
-      <div className="canvas-copy mb-5 flex items-center justify-between border-b border-border/70 pb-4">
-        <span className="text-xs font-medium">Past Days</span>
-        <span className="text-[10px] text-muted-foreground">
-          {days.length} {days.length === 1 ? "day" : "days"} with entries
-        </span>
-      </div>
+      <HistoryHeading
+        days={days}
+        logCount={data.intakes.reduce(
+          (total, entry) =>
+            total +
+            (dayKey(entry.takenAt, data.settings.timezone) < today ? 1 : 0),
+          0,
+        )}
+        timezone={data.settings.timezone}
+      />
       {!days.length ? (
         <EmptyState icon="history" title="Your Story Starts Here.">
           Past days will appear here as you keep logging. Each new day begins at
           06:00.
         </EmptyState>
       ) : (
-        <div className="space-y-3">
-          {days.slice(0, limit).map((day) => (
-            <HistoryDayCard key={day} data={data} day={day} />
+        <div
+          className="space-y-5 [container-type:inline-size]"
+          data-history-list
+        >
+          {visibleWeeks.map((week) => (
+            <HistoryWeekGroup
+              key={week.id}
+              data={data}
+              week={week}
+              expanded={history.value.expandedWeeks?.includes(week.id) ?? false}
+              onExpandedChange={(expanded) =>
+                history.setValue((previous) => ({
+                  ...previous,
+                  expandedWeeks: expanded
+                    ? [
+                        ...(previous.expandedWeeks ?? []).filter(
+                          (id) => id !== week.id,
+                        ),
+                        week.id,
+                      ].slice(-1024)
+                    : (previous.expandedWeeks ?? []).filter(
+                        (id) => id !== week.id,
+                      ),
+                }))
+              }
+            />
           ))}
         </div>
       )}
-      {days.length > limit && (
+      {weeks.length > visibleWeeks.length && (
         <Button
           variant="outline"
           onClick={() =>
-            history.setValue((previous) => ({ limit: previous.limit + 20 }))
+            history.setValue((previous) => ({
+              ...previous,
+              limit: previous.limit + 20,
+            }))
           }
           className="mt-5 h-12 w-full gap-2 rounded-2xl text-xs"
         >
           <ActionIcon name="loadMore" />
-          Load 20 more days
+          Load more weeks
           <span className="text-muted-foreground">
-            ({days.length - limit} left)
+            ({weeks.length - visibleWeeks.length} left)
           </span>
         </Button>
       )}
@@ -938,49 +1148,27 @@ export function DayPage({ day }: { day: string }) {
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
   const isFuture = day > today;
-  const checkIn = checkInForDay(data.dailyCheckIns, day);
+  const entries = dayIntakes(data, day);
+  const medicationCount = new Set(entries.map((entry) => entry.medicationId))
+    .size;
   return (
     <>
-      <Link
-        href="/history"
-        className="mb-5 inline-flex min-h-11 items-center gap-2 text-[11px] text-muted-foreground"
-      >
-        <ActionIcon name="back" className="size-4.5" />
-        Back to past days
-      </Link>
-      <PageHeading
-        title="Daily Log"
-        context={formatDay(day, {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })}
-      >
-        06:00 to 06:00 the next day ·{" "}
-        {data.settings.timezone.replaceAll("_", " ")}
-      </PageHeading>
-      <DailyOverview data={data} day={day} />
-      <div className="my-6">
-        <div hidden={!checkIn}>
-          <DailyCheckInSection day={day} checkIn={checkIn} variant="saved" />
-        </div>
-        <div
-          hidden={
-            Boolean(checkIn) || !canCheckIn(day, now, data.settings.timezone)
-          }
-        >
-          <DailyCheckInSection day={day} variant="prompt" />
-        </div>
-        <IntakeTimeline
+      <HistoryDayHeading
+        day={day}
+        intakeCount={entries.length}
+        medicationCount={medicationCount}
+      />
+      <div className="mb-6">
+        <CheckInTimeline
           data={data}
           day={day}
+          now={now}
           onLog={
             isFuture ? undefined : () => openDialog({ kind: "intake-new", day })
           }
         />
       </div>
-      <div className="flex items-center justify-between gap-3 border-t pt-4">
+      <div className="canvas-copy flex items-center justify-between gap-3 border-t pt-4">
         <Link
           href={`/history/${shiftDayKey(day, -1)}`}
           className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground"
@@ -1013,7 +1201,9 @@ export function DayPage({ day }: { day: string }) {
         onOpenChange={(next) => {
           if (!next && open) closeDialog(dialog ?? undefined);
         }}
+        scrollKey={`intake:new:${day}`}
         title="Log Intake"
+        titleIcon="pencilSparkles"
         context="Past Entry"
         description="Add an intake you missed. Check the date and time before saving."
       >

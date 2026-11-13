@@ -13,6 +13,8 @@ export const DEVELOPER_SECTIONS = [
   ["setup", "Theme Setup"],
   ["specimens", "In Context"],
   ["typography", "Type & Rhythm"],
+  ["responsive-layout", "Responsive Layout & Breakpoints"],
+  ["buttons", "Buttons & Action Hierarchy"],
   ["layers", "Layers & Light"],
   ["motion", "Motion & Input"],
   ["icons", "Icons & Artwork"],
@@ -146,6 +148,14 @@ export const SOURCE_GROUPS = [
       [
         "src/components/specular-rim.tsx",
         "WebGL rim and fallback coordination",
+      ],
+      [
+        "src/components/accent-button.tsx",
+        "Reusable CSS-only warm accent action",
+      ],
+      [
+        "src/components/accent-button.module.css",
+        "First-frame field, light well and rounded moving rim",
       ],
       [
         "src/components/responsive-modal.tsx",

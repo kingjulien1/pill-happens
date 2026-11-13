@@ -1,0 +1,25 @@
+/* Check-ins share the plain base; the group's existing reflection stays separate. */
+.base {
+  --intake-group-base: transparent;
+  --intake-group-blur: 24px;
+  --intake-group-saturation: 1.08;
+  --intake-group-glass-opacity: 0.5;
+}
+
+.group:global(.intake-group)[data-grouped="true"] {
+  /* Extend only the frame so its cards retain the single-card alignment. */
+  margin-inline: calc(-1 * var(--intake-group-space));
+  padding: var(--intake-group-space) var(--intake-group-space) 0;
+}
+
+.group:global(.intake-group)[data-grouped="true"]
+  > :global(.intake-group-glass) {
+  background: var(--intake-group-base);
+}
+
+.group:global(.intake-group)[data-grouped="true"]
+  > :global(.intake-group-footer) {
+  /* The existing 44px target puts its visible 24px pill 6px below the footer.
+     Reserve only the remaining space; preserve its touch area and border notch. */
+  margin-block-start: calc(var(--intake-group-space) - 6px);
+}

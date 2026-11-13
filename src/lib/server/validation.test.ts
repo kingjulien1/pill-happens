@@ -12,6 +12,11 @@ import {
   MEDICATION_ICON_NAMES,
 } from "../medication-appearance";
 import { SVG_ICON_CATALOG } from "../svg-icon-catalog";
+import {
+  INTAKE_ROUTES,
+  INTAKE_ROUTE_VALUES,
+  isIntakeRoute,
+} from "../intake-routes";
 
 const medicationId = "6cfa88e7-8474-4b17-a148-545fb825785b";
 const intake = {
@@ -20,6 +25,28 @@ const intake = {
   takenAt: "2025-01-01T12:00:00.000Z",
   note: "",
 };
+
+test("intake routes use registered values and an omitted legacy route stays absent", () => {
+  assert.deepEqual(
+    INTAKE_ROUTES.map(({ value }) => value),
+    [...INTAKE_ROUTE_VALUES],
+  );
+  assert.equal(new Set(INTAKE_ROUTE_VALUES).size, INTAKE_ROUTE_VALUES.length);
+  for (const route of INTAKE_ROUTE_VALUES) {
+    assert.equal(isIntakeRoute(route), true);
+    assert.equal(intakeSchema.parse({ ...intake, route }).route, route);
+  }
+  const legacyInput = intakeSchema.parse(intake);
+  assert.equal(Object.hasOwn(legacyInput, "route"), false);
+  assert.equal(legacyInput.route, undefined);
+});
+
+test("unregistered or malformed intake routes are rejected rather than coerced", () => {
+  for (const route of ["", "Oral", "unknown-route", null, 1, [], {}]) {
+    assert.equal(isIntakeRoute(route), false);
+    assert.equal(intakeSchema.safeParse({ ...intake, route }).success, false);
+  }
+});
 
 test("fractional quantities are accepted and nonpositive or nonfinite values are rejected", () => {
   assert.equal(intakeSchema.parse(intake).quantity, 0.25);

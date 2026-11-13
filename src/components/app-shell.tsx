@@ -1,33 +1,127 @@
 "use client";
 
+import {
+  getPageEntryReadiness,
+  subscribePageEntryReadiness,
+} from "@/lib/page-entry-readiness";
+
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, type SyntheticEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
-import { PullToRefreshBrand } from "@/components/page-refresh";
+import { CompactRefreshBrand } from "@/components/page-refresh";
 import { HeaderNavigation } from "@/components/header-navigation";
-import { StreakMenu } from "@/components/streak-menu";
 import { useJournalWorkspace } from "@/components/journal-drafts";
+import { CardEntrySequence } from "@/components/card-entry-sequence";
+import { JournalReferenceArrival } from "@/components/journal-reference-arrival";
+import layoutStyles from "./page-layout.module.css";
+import guideStyles from "./guide-shell.module.css";
+import topbarStyles from "./page-topbar.module.css";
+
+/** An interacted control stays settled even after its menu closes or focus leaves. */
+function settleTopbarControl(event: SyntheticEvent<HTMLElement>) {
+  if (!(event.target instanceof Element)) return;
+  const control = event.target.closest<HTMLElement>("[data-topbar-entry]");
+  if (control && event.currentTarget.contains(control))
+    control.dataset.topbarSettled = "true";
+}
+
+function finishTopbarControl(event: SyntheticEvent<HTMLElement>) {
+  if (
+    event.target instanceof HTMLElement &&
+    event.target.hasAttribute("data-topbar-entry") &&
+    event.currentTarget.contains(event.target)
+  )
+    event.target.dataset.topbarSettled = "true";
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const topbar = useRef<HTMLElement>(null);
   const path = usePathname();
-  const intakePage = path === "/" || path.startsWith("/history/");
+  const intakePage =
+    path === "/" || /^\/history\/\d{4}-\d{2}-\d{2}$/.test(path);
+  const guidePage = path === "/guide" || path === "/developer-guide";
   const { data, error, refresh } = useJournal();
   const { ready } = useJournalWorkspace();
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const settle = () => {
+      if (!reduced.matches && !document.hidden) return;
+      topbar.current
+        ?.querySelectorAll<HTMLElement>("[data-topbar-entry]")
+        .forEach((control) => {
+          control.dataset.topbarSettled = "true";
+        });
+    };
+    settle();
+    const adoptFinished = () => {
+      if (!getPageEntryReadiness()) return;
+      // A server-rendered entrance can finish before hydration attaches its handler.
+      topbar.current
+        ?.querySelectorAll<HTMLElement>("[data-topbar-entry]")
+        .forEach((control) => {
+          if (
+            typeof control.getAnimations === "function" &&
+            control.getAnimations().length === 0
+          )
+            control.dataset.topbarSettled = "true";
+        });
+    };
+    const unsubscribeEntry = subscribePageEntryReadiness(adoptFinished);
+    adoptFinished();
+    reduced.addEventListener("change", settle);
+    document.addEventListener("visibilitychange", settle);
+    return () => {
+      unsubscribeEntry();
+      reduced.removeEventListener("change", settle);
+      document.removeEventListener("visibilitychange", settle);
+    };
+  }, []);
   return (
     <div
-      className={`mx-auto flex min-h-dvh max-w-[510px] flex-col px-6 pt-[max(25px,env(safe-area-inset-top))] pb-[max(28px,env(safe-area-inset-bottom))] sm:px-8 sm:pt-10 ${path === "/" ? "with-intake-dock" : ""}`}
+      className={
+        guidePage
+          ? guideStyles.shell
+          : `${layoutStyles.shell} ${intakePage ? layoutStyles.timeline : ""} ${path === "/" ? "with-intake-dock" : ""}`
+      }
+      data-guide-shell={guidePage || undefined}
+      data-page-layout={
+        guidePage ? "guide" : intakePage ? "timeline" : "collection"
+      }
     >
-      <header className="mb-28 grid h-11 w-full grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 sm:mb-32">
-        <nav
-          aria-label="Main navigation"
-          className="flex size-11 items-center justify-center"
-        >
-          <HeaderNavigation />
-        </nav>
-        <PullToRefreshBrand />
-        <StreakMenu />
+      <header
+        ref={topbar}
+        className={
+          guidePage
+            ? `${topbarStyles.header} ${topbarStyles.guideHeader}`
+            : topbarStyles.header
+        }
+        data-page-topbar
+        onPointerDownCapture={settleTopbarControl}
+        onFocusCapture={settleTopbarControl}
+        onAnimationEndCapture={finishTopbarControl}
+      >
+        <div className={topbarStyles.leftControls} data-header-left-controls>
+          <div className={topbarStyles.control} data-topbar-entry="0">
+            <CompactRefreshBrand />
+          </div>
+        </div>
+        <div className={topbarStyles.rightControls} data-header-right-controls>
+          <nav
+            aria-label="Main navigation"
+            className={topbarStyles.control}
+            data-topbar-entry="1"
+          >
+            <HeaderNavigation />
+          </nav>
+        </div>
       </header>
+      <div
+        className={topbarStyles.separator}
+        data-page-topbar-separator
+        aria-hidden="true"
+      />
       <main id="main" className="flex min-w-0 flex-1 flex-col">
         {error && (
           <div
@@ -72,12 +166,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
         {data && ready && (
-          <div
+          <CardEntrySequence
             key={path}
             className={`min-w-0 flex-1 ${intakePage ? "" : "page-enter"} ${path === "/" ? "flex flex-col" : ""}`}
           >
+            <JournalReferenceArrival />
             {children}
-          </div>
+          </CardEntrySequence>
         )}
       </main>
     </div>

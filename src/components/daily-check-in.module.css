@@ -1,180 +1,141 @@
 .section {
   width: 100%;
   min-width: 0;
-  margin-block: 8px 28px;
+  margin: 0;
 }
 
-.sectionContext {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-inline: 3px;
-  margin-bottom: 9px;
-  color: var(--canvas-muted-foreground);
-  font-size: 9px;
-  font-weight: 450;
-  line-height: 1.4;
-}
-
-.sectionContext > :last-child {
-  flex-shrink: 0;
-}
-
-.sectionHint {
-  padding-inline: 3px;
-  margin-top: 10px;
-  color: var(--canvas-muted-foreground);
-  font-size: 9px;
-  font-weight: 400;
-  line-height: 1.6;
-}
-
-.card {
-  display: flex;
-  align-items: center;
+/* 4px plus the timeline's 8px gap keeps check-in clearance compact at 12px. */
+.intakeSpacer {
   width: 100%;
-  min-width: 0;
-  gap: 12px;
-  padding: 14px 12px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 19%, transparent);
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--card) 25%, transparent);
-  -webkit-backdrop-filter: blur(40px);
-  backdrop-filter: blur(40px);
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--foreground) 4%, transparent);
-  color: var(--foreground);
-  text-align: left;
-  transition:
-    background 220ms ease,
-    border-color 220ms ease;
+  height: 4px;
+  pointer-events: none;
 }
 
-.card[data-filled="true"] {
-  align-items: flex-start;
-  border-color: color-mix(in srgb, #f97316 40%, var(--foreground));
-  background:
-    linear-gradient(115deg, #f9731624, transparent 75%),
-    color-mix(in srgb, var(--card) 60%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--foreground) 9%, transparent),
-    0 3px 20px #f9731609;
+/* Card faces share the group base; these pigments belong to the artwork only. */
+.card:global(.intake-log-card) {
+  --check-in-secondary: var(--action-background);
+  --check-in-accent: color-mix(
+    in srgb,
+    var(--palette-lilac) 88%,
+    var(--palette-rose)
+  );
+  --check-in-rim-dark: color-mix(in srgb, #7b659d 92%, var(--palette-rose));
+  --entry-rim-width: 2.5px;
+  color: var(--card-foreground);
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--card-foreground) 4%, transparent);
+  opacity: 1;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .background {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .card:disabled {
   opacity: 0.5;
 }
 
-.cardIcon {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--foreground) 5%, transparent);
-  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+.card:global(.intake-log-card):focus,
+.card:global(.intake-log-card):focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
-.card[data-filled="true"] .cardIcon {
-  background: #f973161a;
-  color: var(--foreground);
+/* Time, title and the lower invitation share one protected text grid. */
+.card .details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr 1fr;
+  column-gap: calc(var(--entry-text-gap) + 6px);
+  padding-block: 0;
+  padding-inline-end: var(--entry-trailing-inset);
 }
 
-.cardBody {
+.card .details[data-has-progress="true"] {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.card .details > [data-check-in-heading] {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  align-items: start;
+  margin-block-start: 3px;
+  margin-inline-start: -3px;
+  padding-inline-end: 0;
+}
+
+.card .details > [data-check-in-progress] {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: end;
+  /* Center the 40px completion orb inside the card's two-row content area. */
+  margin-block-start: 0;
+  margin-inline-end: 0;
+}
+
+.card .bottom {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  align-items: flex-end;
+  margin-top: 0;
+  padding-inline-end: 0;
+  padding-bottom: 0;
+}
+
+/* Match the title start even while the update time sits below its own column. */
+.card .bottom :global(.intake-card-ingredient-group) {
+  padding-inline-start: calc(
+    var(--entry-time-width) + var(--entry-text-gap) - 3px
+  );
+}
+.timeColumn {
   display: flex;
-  min-width: 0;
-  flex: 1;
   flex-direction: column;
-  gap: 5px;
-}
-
-.cardHeading {
-  display: flex;
+  align-items: flex-start;
+  gap: 1px;
   min-width: 0;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px 7px;
-  line-height: 1.3;
 }
-
-.cardTitle {
-  font-size: 12px;
-  font-weight: 550;
-}
-
-.cardContext,
-.cardDescription {
-  color: var(--muted-foreground);
-  font-size: 10px;
-  font-weight: 400;
-}
-
-.cardContext {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.cardDescription {
-  line-height: 1.6;
-}
-
-.cardAffordance {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 30px;
-  color: color-mix(in srgb, var(--foreground) 65%, transparent);
-}
-
-.note {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.65;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-
-.summaryValues {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding-top: 2px;
-}
-
-.summaryChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 6px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 9%, transparent);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--foreground) 4%, transparent);
-  color: color-mix(in srgb, var(--foreground) 83%, transparent);
+.updatedTime {
+  display: block;
+  color: var(--card-foreground);
+  opacity: 0.36;
+  font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 9px;
-  line-height: 1.2;
-}
-
-.helped {
-  overflow: hidden;
-  color: var(--muted-foreground);
-  font-size: 10px;
-  line-height: 1.6;
-  text-overflow: ellipsis;
+  font-weight: 475;
+  line-height: 12px;
   white-space: nowrap;
 }
 
-.helped > span {
-  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+.card .preview {
+  max-width: 100%;
+  flex: 1 1 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:global(.intake-log-card):focus-visible {
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--card-foreground) 45%, transparent);
+  }
 }
 
 .form {
@@ -185,27 +146,92 @@
   padding-top: 4px;
 }
 
+.eveningFields {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.formSection {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 12px;
+  border: 0;
+  border-radius: var(--dialog-radius-surface);
+  background:
+    radial-gradient(
+      ellipse at 12% 18%,
+      color-mix(in srgb, var(--palette-apricot) 2.5%, transparent),
+      transparent 72%
+    ),
+    color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+/* Two quiet inward bands echo the writing panel without another glow. */
+.formSection::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  box-sizing: border-box;
+  border: 3px solid color-mix(in srgb, var(--palette-white) 7%, transparent);
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 0.75px
+    color-mix(in srgb, var(--palette-apricot) 11%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.formSection:focus-within::before {
+  border-color: color-mix(in srgb, var(--palette-white) 12%, transparent);
+  box-shadow: inset 0 0 0 0.75px
+    color-mix(in srgb, var(--palette-apricot) 18%, transparent);
+}
+
+.sectionHeading {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sectionHeading h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+
+.sectionHeading > span {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+
+.sectionHeading + .fieldHint {
+  margin: -7px 0 0;
+}
+
 .field {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
 .optional,
 .fieldHint,
-.ratingCaptions,
+.bedtimeHint,
 .saveHint {
   color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 400;
-  line-height: 1.5;
-}
-
-.ratingHint {
-  margin-top: -13px;
-  color: var(--muted-foreground);
-  font-size: 9px;
   line-height: 1.5;
 }
 
@@ -214,8 +240,7 @@
   font-size: 9px;
 }
 
-.moodField,
-.ratingField {
+.moodField {
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -235,8 +260,8 @@
   align-items: center;
   gap: 6px;
   color: var(--foreground);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 550;
   line-height: 16px;
 }
 
@@ -251,6 +276,7 @@
 }
 
 .mood {
+  --dialog-button-radius: var(--dialog-radius-compact);
   display: flex;
   min-width: 0;
   min-height: 36px;
@@ -259,7 +285,7 @@
   gap: 5px;
   padding: 5px 6px;
   border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
-  border-radius: 11px;
+  border-radius: var(--dialog-radius-compact);
   background: color-mix(in srgb, var(--foreground) 3%, transparent);
   color: color-mix(in srgb, var(--foreground) 75%, transparent);
   font-size: 10px;
@@ -276,13 +302,16 @@
   line-height: 1;
 }
 
-.mood[aria-pressed="true"],
-.rating[aria-pressed="true"] {
-  border-color: color-mix(in srgb, #f97316 68%, var(--foreground));
-  background: color-mix(in srgb, #f97316 18%, var(--card));
+.mood[aria-pressed="true"] {
+  border-color: color-mix(
+    in srgb,
+    var(--palette-apricot) 68%,
+    var(--foreground)
+  );
+  background: color-mix(in srgb, var(--palette-apricot) 18%, var(--card));
   box-shadow:
-    inset 0 0 0 1px #f9731633,
-    0 0 10px #f9731612;
+    inset 0 0 0 1px color-mix(in srgb, var(--palette-apricot) 20%, transparent),
+    0 0 10px color-mix(in srgb, var(--palette-apricot) 7.059%, transparent);
   color: var(--foreground);
   font-weight: 600;
 }
@@ -292,57 +321,51 @@
 }
 
 .ratingRow {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.ratings {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 3px;
-  margin-top: 9px;
-}
-
-.rating {
-  min-width: 0;
-  height: 32px;
-  padding: 0;
-  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--foreground) 3%, transparent);
-  color: var(--muted-foreground);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  transition:
-    color 180ms ease,
-    background 180ms ease,
-    border-color 180ms ease;
-}
-
-.ratingCaptions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  font-size: 9px;
+  min-width: 0;
+  flex-direction: column;
+  gap: 13px;
 }
 
 .detailsRow {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 2fr);
-  align-items: end;
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
 }
 
-.detailsRow label {
-  min-height: 32px;
+.detailsRow label,
+.helpedField label {
   align-items: center;
   gap: 5px;
   font-size: 11px;
+  font-weight: 450;
   line-height: 16px;
 }
 
-.detailsRow label svg {
+.helpedField > label {
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.field .detailInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--dialog-radius-control);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.field .sleepHoursInput {
+  padding-right: 30px;
+}
+
+.detailsRow label svg,
+.helpedField label svg {
   flex-shrink: 0;
 }
 
@@ -360,6 +383,59 @@
   pointer-events: none;
 }
 
+.field .bedtimeInput {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  align-items: center;
+  justify-content: flex-start;
+  padding-block: 0;
+  padding-inline: 14px 2px;
+  border-radius: var(--dialog-radius-control, 12px);
+  line-height: 1.2;
+  text-align: left;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.bedtimeInput::-webkit-calendar-picker-indicator,
+.bedtimeInput::-webkit-inner-spin-button,
+.bedtimeInput::-webkit-clear-button {
+  display: none;
+  width: 0;
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+}
+
+.bedtimeInput::-webkit-date-and-time-value {
+  display: inline-flex;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.bedtimeInput::-webkit-datetime-edit,
+.bedtimeInput::-webkit-datetime-edit-fields-wrapper {
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.bedtimeHint {
+  margin: 0;
+}
+
 .error {
   margin-top: -6px;
   color: var(--destructive);
@@ -371,32 +447,33 @@
   margin-top: 3px;
 }
 
+/* The form's 20px gap becomes 10px before the morning estimate separator. */
+.submitArea[data-has-sleep-summary="true"] {
+  margin-top: -10px;
+}
+
+/* The estimate owns its 16px action gap, replacing the shared 24px form margin. */
+.submitArea[data-has-sleep-summary="true"]
+  [data-dialog-primary-button][data-slot="button"][data-button-kind="accent"] {
+  margin-block-start: 0;
+}
+
 .saveHint {
   margin-top: 9px;
   text-align: center;
 }
 
 @media (max-width: 359px) {
-  .card {
-    gap: 9px;
-    padding-inline: 10px;
+  .card .details > [data-check-in-heading] {
+    margin-inline-start: -2px;
   }
-  .cardIcon {
-    width: 30px;
-    height: 32px;
-  }
-  .cardContext {
-    gap: 5px;
-    font-size: 9px;
-  }
-  .cardAffordance {
-    width: 18px;
+  .card .bottom :global(.intake-card-ingredient-group) {
+    padding-inline-start: calc(
+      var(--entry-time-width) + var(--entry-text-gap) - 2px
+    );
   }
   .moodGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .ratingRow {
-    gap: 12px;
   }
   .detailsRow {
     gap: 9px;
@@ -404,36 +481,19 @@
 }
 
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .card:hover {
-    border-color: color-mix(in srgb, var(--foreground) 38%, transparent);
-    background-color: color-mix(in srgb, var(--card) 42%, transparent);
-  }
-  .mood:not(:disabled):hover,
-  .rating:not(:disabled):hover {
+  .mood:not(:disabled):hover {
     border-color: color-mix(in srgb, var(--foreground) 45%, transparent);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card,
-  .mood,
-  .rating {
+  .mood {
     transition: none;
   }
 }
 
-@media (prefers-color-scheme: light) {
-  .card {
-    background: color-mix(in srgb, var(--surface-reading) 90%, transparent);
-    color: var(--surface-reading-foreground);
-  }
-  .card[data-filled="true"] {
-    background:
-      linear-gradient(
-        115deg,
-        color-mix(in srgb, var(--palette-flame) 14%, transparent),
-        transparent 75%
-      ),
-      color-mix(in srgb, var(--surface-reading) 94%, transparent);
+@media (min-width: 768px) {
+  .field .detailInput {
+    font-size: 14px;
   }
 }

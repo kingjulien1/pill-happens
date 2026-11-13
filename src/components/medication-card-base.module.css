@@ -1,0 +1,27 @@
+/* An intake retains one measured card face while its badge disclosure is a
+   sibling of the native editing action, never a control nested in a button. */
+.separateAction {
+  cursor: pointer;
+}
+
+.separateAction[aria-disabled="true"] {
+  cursor: inherit;
+}
+
+.cardAction {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  text-align: inherit;
+  cursor: inherit;
+  pointer-events: auto;
+}
+
+.cardAction:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -5px;
+}

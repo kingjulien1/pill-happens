@@ -38,14 +38,14 @@
 .spotlight[data-spotlight-state="running"] {
   z-index: 3;
   transform-origin: center;
-  animation: spotlight-card-arrive 1700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: spotlight-card-arrive 2040ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   will-change: transform;
 }
 .spotlight[data-spotlight-state="running"]::before {
-  animation: spotlight-glow-bloom 2400ms ease-out both;
+  animation: spotlight-glow-bloom 2880ms ease-out both;
 }
 .spotlight[data-spotlight-state="running"]::after {
-  animation: spotlight-ring-expand 2200ms ease-out both;
+  animation: spotlight-ring-expand 2640ms ease-out both;
 }
 .spotlight[data-spotlight-state="quiet"]::after {
   opacity: 0.8;
@@ -66,8 +66,8 @@
   border-radius: 1.5px;
   background: var(--particle-color);
   opacity: 0;
-  animation: spotlight-particle-fly var(--particle-time)
-    cubic-bezier(0.12, 0.65, 0.2, 1) var(--particle-wait) both;
+  animation: spotlight-particle-fly calc(var(--particle-time) * 0.6)
+    cubic-bezier(0.12, 0.65, 0.2, 1) calc(var(--particle-wait) * 0.6) both;
   pointer-events: none;
 }
 .particle[data-kind="dot"] {

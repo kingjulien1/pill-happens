@@ -3,7 +3,7 @@ import { ApiError } from "./api-error";
 /** Byte limits concern JSON transport, separately from each schema's text cap. */
 export const JSON_BODY_LIMITS = {
   default: 16_384,
-  dailyCheckIn: 65_536,
+  dailyCheckIn: 1_048_576,
 } as const;
 
 export type JsonBodyOptions = { maxBytes?: number };

@@ -1,13 +1,41 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import {
+  getPageEntryReadiness,
+  subscribePageEntryReadiness,
+} from "@/lib/page-entry-readiness";
 
-const ENTRY = "[data-intake-entrance]";
+import { useLayoutEffect, useRef, type ComponentProps } from "react";
+import { INTAKE_DOCK_RESIZE_EVENT } from "@/components/use-intake-dock";
+import {
+  reserveTimelineCardEntryDelays,
+  resetCardEntryDelaysIfIdle,
+} from "@/lib/card-entry-timing";
+import {
+  INTAKE_GROUP_ENTRANCE_MS,
+  intakeGroupEntranceStart,
+  nextIntakeGroupEntranceState,
+  type IntakeGroupEntranceState,
+} from "@/lib/intake-group-entrance";
 
-/** Reveal each intake once, in small viewport-sized batches rather than a long queue. */
-export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
+const ENTRY =
+  "[data-intake-entrance], [data-daily-check-in], .empty-intake-card";
+const disclosureEvent = "pill:intake-stack-disclose";
+
+/** Release entrance effects before either disclosure direction moves the timeline. */
+export function settleIntakeGroupEntrance(root: HTMLElement) {
+  root.dispatchEvent(new Event(disclosureEvent, { bubbles: true }));
+}
+
+/** One DOM-ordered entrance owner for the entire daily log, including check-ins. */
+export function IntakeTimelineEntrance({
+  children,
+  className = "intake-timeline",
+  ...props
+}: ComponentProps<"div">) {
   const root = useRef<HTMLDivElement>(null);
   const seen = useRef(new Set<string>());
+  const seenGroups = useRef(new Set<string>());
 
   useLayoutEffect(() => {
     const timeline = root.current;
@@ -16,127 +44,302 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     const watched = new Set<HTMLElement>();
     const queued = new Set<HTMLElement>();
     const active = new Set<HTMLElement>();
-    const frontBatches = new WeakMap<HTMLElement, Set<HTMLElement>>();
+    const motionCandidates = new Set<HTMLElement>();
+    const rearClocks = new WeakMap<Element, number>();
+    const faceStarts = new WeakMap<HTMLElement, number>();
+    const groupTimers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+    const groupStarts = new Map<
+      HTMLElement,
+      { at: number; timer: ReturnType<typeof setTimeout> }
+    >();
     let observer: IntersectionObserver | null = null;
     let frame = 0;
+    let motionFrame = 0;
     let settleFrame = 0;
+    let scrollFrame = 0;
     let settleTimer: ReturnType<typeof setTimeout> | null = null;
     let settled = reduced.matches;
     let disposed = false;
+    let entryPauseAt: number | null = null;
     let revealInsets = { top: 0, bottom: 0 };
 
-    const parentHead = (node: HTMLElement) => {
-      const group = node.closest("[data-intake-group]");
-      const id = node.dataset.entranceParent;
-      return id
-        ? group?.querySelector<HTMLElement>(
-            `[data-intake-entrance="${CSS.escape(id)}"]`,
-          )
-        : group?.querySelector<HTMLElement>(
-            '[data-stack-depth="0"] > [data-intake-entrance]',
-          );
+    // React development replay cleans up painted effects between setup passes.
+    // Only a genuinely finished group should survive that pass as "done".
+    for (const group of timeline.querySelectorAll<HTMLElement>(
+      '[data-intake-group][data-grouped="true"]',
+    ))
+      group.dataset.groupEntryState = seenGroups.current.has(
+        group.dataset.intakeGroup ?? "",
+      )
+        ? "done"
+        : "pending";
+
+    const isIntake = (node: HTMLElement) =>
+      node.hasAttribute("data-intake-entrance");
+    const identity = (node: HTMLElement) =>
+      isIntake(node)
+        ? node.dataset.intakeEntrance
+        : node.hasAttribute("data-daily-check-in")
+          ? `check-in:${node.dataset.checkInDay}:${node.dataset.checkInPeriod}`
+          : "empty-log";
+    const phase = (node: HTMLElement) =>
+      isIntake(node) ? node.dataset.entranceState : node.dataset.cardEntryState;
+    const setPhase = (node: HTMLElement, state: string) => {
+      if (isIntake(node)) node.dataset.entranceState = state;
+      else node.dataset.cardEntryState = state;
+    };
+    const stackFor = (node: HTMLElement) => {
+      const group = node.closest<HTMLElement>("[data-intake-group]");
+      return group?.dataset.grouped === "true" ? group : null;
+    };
+    const layoutNode = (node: HTMLElement) =>
+      node.closest<HTMLElement>("[data-check-in-slot]") ??
+      node.parentElement ??
+      node;
+    const exposedFace = (node: HTMLElement) =>
+      !node.closest('[hidden], [aria-hidden="true"]') &&
+      (!isIntake(node) ||
+        node.dataset.entranceExposed === "true" ||
+        node.dataset.entrancePreview === "true");
+    const inPhysicalViewport = (node: HTMLElement) => {
+      if (
+        !exposedFace(node) ||
+        node.parentElement?.dataset.stackHidden === "true"
+      )
+        return false;
+      const bounds = layoutNode(node).getBoundingClientRect();
+      return (
+        bounds.width > 0 &&
+        bounds.height > 0 &&
+        bounds.bottom > 0 &&
+        bounds.top < window.innerHeight &&
+        bounds.right > 0 &&
+        bounds.left < window.innerWidth
+      );
+    };
+    const stackMoving = () =>
+      timeline.querySelector('[data-stack-moving="true"]') !== null;
+
+    const cancelGroupStart = (group: HTMLElement) => {
+      const reservation = groupStarts.get(group);
+      if (reservation) clearTimeout(reservation.timer);
+      groupStarts.delete(group);
+    };
+    const finishGroup = (group: HTMLElement, remember = true) => {
+      cancelGroupStart(group);
+      group.dataset.groupEntryState = "done";
+      const id = group.dataset.intakeGroup;
+      if (remember && id) seenGroups.current.add(id);
+      const timer = groupTimers.get(group);
+      if (timer !== undefined) clearTimeout(timer);
+      groupTimers.delete(group);
+    };
+    const syncGroups = () => {
+      for (const group of groupStarts.keys())
+        if (!timeline.contains(group)) cancelGroupStart(group);
+      for (const [group, timer] of groupTimers) {
+        if (!timeline.contains(group)) {
+          clearTimeout(timer);
+          groupTimers.delete(group);
+        }
+      }
+      for (const group of timeline.querySelectorAll<HTMLElement>(
+        '[data-intake-group][data-grouped="true"]',
+      )) {
+        const current = (group.dataset.groupEntryState ??
+          "pending") as IntakeGroupEntranceState;
+        const faces = Array.from(
+          group.querySelectorAll<HTMLElement>(ENTRY),
+        ).map((node) => ({
+          exposed: exposedFace(node),
+          state: phase(node),
+          startsAt: faceStarts.get(node),
+        }));
+        const now = performance.now();
+        const ready = getPageEntryReadiness();
+        const next = nextIntakeGroupEntranceState({
+          current,
+          faces,
+          now,
+          ready,
+          settle:
+            !observer ||
+            reduced.matches ||
+            document.hidden ||
+            group.dataset.expanded === "true" ||
+            group.dataset.stackMoving === "true",
+        });
+        if (next === "done") finishGroup(group);
+        else if (next !== current) {
+          cancelGroupStart(group);
+          group.dataset.groupEntryState = next;
+          // animationend is authoritative; this backstop releases controls if
+          // the effect is interrupted by a browser/layout change without it.
+          const timer = setTimeout(() => {
+            groupTimers.delete(group);
+            if (!disposed && getPageEntryReadiness()) finishGroup(group);
+          }, INTAKE_GROUP_ENTRANCE_MS + 100);
+          groupTimers.set(group, timer);
+        } else if (next === "pending") {
+          const at = ready ? intakeGroupEntranceStart(faces) : null;
+          if (at === null) cancelGroupStart(group);
+          else if (groupStarts.get(group)?.at !== at) {
+            cancelGroupStart(group);
+            const timer = setTimeout(
+              () => {
+                groupStarts.delete(group);
+                if (!disposed && timeline.contains(group)) syncGroups();
+              },
+              Math.max(0, Math.ceil(at - now)),
+            );
+            groupStarts.set(group, { at, timer });
+          }
+        } else if (
+          next === "running" &&
+          !groupTimers.has(group) &&
+          getPageEntryReadiness()
+        ) {
+          // A refresh curtain paused the backstop. Once ready, release any
+          // effect that was canceled during the pause rather than hiding it.
+          finishGroup(group);
+        }
+      }
     };
 
     const finish = (node: HTMLElement): void => {
-      const wasDone = node.dataset.entranceState === "done";
-      const id = node.dataset.intakeEntrance;
+      const wasDone = phase(node) === "done";
+      const id = identity(node);
       if (id) seen.current.add(id);
-      node.dataset.entranceState = "done";
+      if (!wasDone) setPhase(node, "done");
       observer?.unobserve(node);
       watched.delete(node);
       active.delete(node);
       queued.delete(node);
-      if (!wasDone && node.parentElement?.dataset.stackDepth === "0")
+      motionCandidates.delete(node);
+      faceStarts.delete(node);
+      if (!wasDone)
         queueMicrotask(() => {
-          if (!disposed) sync();
+          if (disposed) return;
+          resetCardEntryDelaysIfIdle(timeline);
+          sync();
         });
+    };
+
+    const settleFace = finish;
+    const settleMovingFaces = () => {
+      for (const node of motionCandidates) {
+        if (
+          !timeline.contains(node) ||
+          !exposedFace(node) ||
+          phase(node) === "done"
+        ) {
+          motionCandidates.delete(node);
+          continue;
+        }
+        if (inPhysicalViewport(node)) settleFace(node);
+      }
+    };
+    const stopMotionWatch = () => {
+      cancelAnimationFrame(motionFrame);
+      motionFrame = 0;
+    };
+    const watchMotion = () => {
+      motionFrame = 0;
+      if (disposed || document.hidden || reduced.matches || !stackMoving()) {
+        if (!disposed) sync();
+        return;
+      }
+      settleMovingFaces();
+      if (motionCandidates.size)
+        motionFrame = requestAnimationFrame(watchMotion);
     };
 
     const flush = () => {
       frame = 0;
-      // Query order stays chronological even when IO reports intersections in
-      // another order, or several groups are disclosed in the same frame.
-      const batch = Array.from(
+      if (!getPageEntryReadiness()) return;
+      // A previously queued batch must not start fading while another group
+      // moves it. Keep offscreen faces queued for their normal later entrance.
+      if (stackMoving()) {
+        settleMovingFaces();
+        return;
+      }
+      // One readiness boundary and one DOM query keep check-ins and stack
+      // layers in order, independent of IntersectionObserver callback order.
+      const candidates = Array.from(
         timeline.querySelectorAll<HTMLElement>(ENTRY),
       ).filter((node) => {
-        if (!queued.has(node)) return false;
-        if (node.dataset.entrancePreview === "true") return true;
-        // Scroll restoration or a last-moment gesture can move a queued face
-        // before IO delivers its next callback. Check its actual band now too.
-        const bounds = node.getBoundingClientRect();
+        const id = identity(node);
+        if (
+          !id ||
+          seen.current.has(id) ||
+          phase(node) !== "pending" ||
+          !exposedFace(node)
+        )
+          return false;
+        const bounds = layoutNode(node).getBoundingClientRect();
         const inBand =
+          bounds.width > 0 &&
+          bounds.height > 0 &&
           bounds.bottom >= revealInsets.top - 1 &&
           bounds.top <= window.innerHeight - revealInsets.bottom + 1;
         if (!inBand) {
-          // Force a fresh sample: a gesture can leave and re-enter between IO
-          // samples, otherwise its old "inside" state may never emit again.
+          queued.delete(node);
           observer?.unobserve(node);
           observer?.observe(node);
         }
         return inBand;
       });
-      queued.clear();
-      const fronts = new Set(
-        batch.filter(
-          (node) =>
-            node.parentElement?.dataset.stackDepth === "0" &&
-            node.dataset.entranceExposed === "true" &&
-            !seen.current.has(node.dataset.intakeEntrance ?? ""),
-        ),
-      );
-      for (const front of fronts) frontBatches.set(front, fronts);
-      const step = Math.min(180, 900 / Math.max(1, fronts.size - 1));
-      const rearBatches = new Map<Element, { count: number; index: number }>();
-      for (const node of batch) {
-        if (
-          Number(node.parentElement?.dataset.stackDepth ?? 0) === 0 ||
-          seen.current.has(node.dataset.intakeEntrance ?? "")
-        )
-          continue;
-        const owner = parentHead(node) ?? node.closest("[data-intake-group]");
-        if (!owner) continue;
-        const rear = rearBatches.get(owner) ?? { count: 0, index: 0 };
-        rear.count += 1;
-        rearBatches.set(owner, rear);
+      if (reduced.matches || document.hidden) {
+        for (const node of candidates) finish(node);
+        return;
       }
-      let index = 0;
-      for (const node of batch) {
+      const batchStart = performance.now();
+      const delays = reserveTimelineCardEntryDelays(
+        timeline,
+        candidates,
+        stackFor,
+        (node) => node.parentElement?.dataset.stackHead === "true",
+        rearClocks,
+      );
+      for (const [index, node] of candidates.entries()) {
+        const id = identity(node);
+        if (!id) continue;
         const preview = node.dataset.entrancePreview === "true";
-        if (node.dataset.entranceExposed !== "true" && !preview) continue;
-        const id = node.dataset.intakeEntrance;
-        if (!id || seen.current.has(id) || reduced.matches || document.hidden) {
-          finish(node);
-          continue;
-        }
         seen.current.add(id);
+        queued.delete(node);
         const rear = Number(node.parentElement?.dataset.stackDepth ?? 0) > 0;
-        const owner = parentHead(node) ?? node.closest("[data-intake-group]");
-        const rearBatch = owner ? rearBatches.get(owner) : undefined;
-        const delay = `${
-          rear && rearBatch
-            ? rearBatch.index++ *
-              Math.min(150, 750 / Math.max(1, rearBatch.count - 1))
-            : index++ * step
-        }ms`;
+        const delay = `${delays[index]}ms`;
+        faceStarts.set(node, batchStart + delays[index]);
         observer?.unobserve(node);
         watched.delete(node);
-        node.style.setProperty("--intake-enter-delay", delay);
+        node.style.setProperty(
+          isIntake(node) ? "--intake-enter-delay" : "--card-entry-delay",
+          delay,
+        );
         if (node.parentElement?.dataset.stackRear === "false")
           node
             .closest<HTMLElement>("[data-intake-group]")
             ?.style.setProperty("--intake-enter-delay", delay);
-        node.dataset.entranceState = "running";
-        node.dataset.entranceKind = preview
-          ? "preview"
-          : rear
-            ? "rear"
-            : "card";
+        setPhase(node, "running");
+        if (isIntake(node))
+          node.dataset.entranceKind = preview
+            ? "preview"
+            : rear
+              ? "rear"
+              : "card";
         active.add(node);
       }
+      syncGroups();
     };
 
     const scheduleFlush = () => {
-      if (settled && queued.size && !frame)
+      if (
+        getPageEntryReadiness() &&
+        settled &&
+        queued.size &&
+        !frame &&
+        !stackMoving()
+      )
         frame = requestAnimationFrame(flush);
     };
 
@@ -164,6 +367,10 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
           if (source !== observer) return;
           for (const entry of entries) {
             const node = entry.target as HTMLElement;
+            if (stackMoving() && inPhysicalViewport(node)) {
+              settleFace(node);
+              continue;
+            }
             if (
               !entry.isIntersecting ||
               entry.intersectionRect.width <= 0 ||
@@ -174,11 +381,7 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
               queued.delete(node);
               continue;
             }
-            if (
-              node.dataset.entranceExposed !== "true" ||
-              node.dataset.entranceState !== "pending"
-            )
-              continue;
+            if (!exposedFace(node) || phase(node) !== "pending") continue;
             if (document.hidden || reduced.matches) {
               finish(node);
               continue;
@@ -196,23 +399,43 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     observer = createObserver();
 
     const sync = (): void => {
-      for (const node of [...watched, ...active]) {
+      if (disposed) return;
+      const moving = stackMoving();
+      for (const node of [...watched, ...active, ...motionCandidates]) {
         if (!timeline.contains(node)) {
           observer?.unobserve(node);
           watched.delete(node);
           queued.delete(node);
           active.delete(node);
+          motionCandidates.delete(node);
         }
       }
+      // Removed main faces must not leave future slots alive behind rear tails.
+      resetCardEntryDelaysIfIdle(timeline);
       for (const node of timeline.querySelectorAll<HTMLElement>(ENTRY)) {
-        const id = node.dataset.intakeEntrance;
-        const preview = node.dataset.entrancePreview === "true";
-        if (node.dataset.entranceExposed !== "true" && !preview) {
+        const group = node.closest<HTMLElement>("[data-intake-group]");
+        if (!exposedFace(node)) motionCandidates.delete(node);
+        else if (moving && phase(node) !== "done") {
+          if (inPhysicalViewport(node)) {
+            settleFace(node);
+            continue;
+          }
+          motionCandidates.add(node);
+        }
+        if (group?.dataset.expanded === "true") {
+          // Open and restored-open groups show complete faces. Do not hide their
+          // content behind entrances, including capped and offscreen children.
+          finish(node);
+          continue;
+        }
+        const id = identity(node);
+        if (!exposedFace(node)) {
           observer?.unobserve(node);
           watched.delete(node);
           queued.delete(node);
-          if (active.has(node)) finish(node);
-          else node.dataset.entranceState = "idle";
+          if (active.has(node) || (id !== undefined && seen.current.has(id)))
+            finish(node);
+          else setPhase(node, "idle");
           continue;
         }
         if (!observer || reduced.matches || !id || seen.current.has(id)) {
@@ -221,50 +444,35 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
           watched.delete(node);
           continue;
         }
-        const rear = Number(node.parentElement?.dataset.stackDepth ?? 0) > 0;
-        if (rear) {
-          const front = parentHead(node);
-          const fronts = front && frontBatches.get(front);
-          const mainPhaseDone =
-            !fronts ||
-            [...fronts].every(
-              (node) =>
-                !timeline.contains(node) ||
-                node.dataset.entranceState === "done",
-            );
-          if (front?.dataset.entranceState === "done" && mainPhaseDone) {
-            if (document.hidden) finish(node);
-            else if (preview) {
-              observer.unobserve(node);
-              watched.delete(node);
-              queued.add(node);
-              scheduleFlush();
-            } else {
-              if (!watched.has(node) && !queued.has(node)) {
-                node.dataset.entranceState = "pending";
-                watched.add(node);
-                observer.observe(node);
-              }
-            }
-          } else {
-            observer.unobserve(node);
-            watched.delete(node);
-            queued.delete(node);
-            node.dataset.entranceState = "waiting";
-          }
-          continue;
-        }
         if (!watched.has(node) && !queued.has(node)) {
-          node.dataset.entranceState = "pending";
+          setPhase(node, "pending");
           watched.add(node);
           observer.observe(node);
         }
       }
+      if (moving && !document.hidden && !reduced.matches) {
+        if (motionCandidates.size && !motionFrame)
+          motionFrame = requestAnimationFrame(watchMotion);
+      } else {
+        stopMotionWatch();
+        motionCandidates.clear();
+        scheduleFlush();
+      }
+      syncGroups();
     };
 
     const onEnd = (event: AnimationEvent) => {
       if (
-        (event.animationName === "intake-card-arrive" ||
+        event.target instanceof HTMLElement &&
+        event.target.dataset.intakeGroupEntrancePart === "control"
+      ) {
+        const group = event.target.closest<HTMLElement>("[data-intake-group]");
+        if (group) finishGroup(group);
+        return;
+      }
+      if (
+        (event.animationName === "card-entry-arrive" ||
+          event.animationName === "intake-card-arrive" ||
           event.animationName === "intake-preview-arrive") &&
         event.target instanceof HTMLElement &&
         event.target.matches(ENTRY)
@@ -274,28 +482,37 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
     const onInteraction = (event: FocusEvent | PointerEvent) => {
       if (!(event.target instanceof Element)) return;
       const node = event.target.closest<HTMLElement>(ENTRY);
-      const group = event.target.closest("[data-intake-group]");
-      // Disclosure and keyboard focus release visible faces immediately. Capped,
-      // unseen children retain their first entrance when disclosure reveals them.
+      const group = event.target.closest<HTMLElement>("[data-intake-group]");
+      if (group) finishGroup(group);
+      // Interaction releases visible faces immediately. An opening group also
+      // releases its capped children in sync, before the next paint.
       if (!node) {
         for (const member of group?.querySelectorAll<HTMLElement>(ENTRY) ?? [])
-          if (
-            member.dataset.entranceExposed === "true" ||
-            member.dataset.entrancePreview === "true"
-          ) {
-            if (member.parentElement?.dataset.stackDepth === "0")
-              frontBatches.delete(member);
+          if (exposedFace(member)) {
             finish(member);
           }
         return;
       }
-      const front = parentHead(node);
-      if (front) frontBatches.delete(front);
-      if (node && node.dataset.entranceState !== "done") finish(node);
+      if (phase(node) !== "done") finish(node);
     };
     const onVisibility = () => {
-      if (!document.hidden) return;
+      if (!document.hidden) {
+        sync();
+        return;
+      }
+      stopMotionWatch();
       for (const node of [...active, ...queued]) finish(node);
+      syncGroups();
+    };
+    const onDisclosure = (event: Event) => {
+      if (!(event.target instanceof Element)) return;
+      const group = event.target.closest<HTMLElement>("[data-intake-group]");
+      if (!group || !timeline.contains(group)) return;
+      finishGroup(group);
+      // Settle the complete target group AND visible neighbors before React
+      // moves their layout. A seen ID may still have delayed child entrances.
+      for (const node of timeline.querySelectorAll<HTMLElement>(ENTRY))
+        if (group.contains(node) || inPhysicalViewport(node)) settleFace(node);
     };
     const onResize = () => {
       observer?.disconnect();
@@ -304,6 +521,16 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       observer = createObserver();
       for (const node of watched) observer?.observe(node);
       sync();
+    };
+    const settleOffscreenArrivals = () => {
+      scrollFrame = 0;
+      // A fast swipe can abandon starts already reserved by this viewport batch.
+      // Release them rather than making the next visible batch wait for empty slots.
+      for (const node of active) if (!inPhysicalViewport(node)) finish(node);
+    };
+    const onScroll = () => {
+      if (!scrollFrame && active.size)
+        scrollFrame = requestAnimationFrame(settleOffscreenArrivals);
     };
     const mutations = new MutationObserver(sync);
     mutations.observe(timeline, {
@@ -314,32 +541,63 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
         "data-entrance-exposed",
         "data-entrance-preview",
         "data-entrance-parent",
+        "data-stack-moving",
+        "data-stack-stage",
+        "data-expanded",
+        "hidden",
+        "data-check-in-day",
+        "data-check-in-period",
       ],
     });
     timeline.addEventListener("animationend", onEnd);
     timeline.addEventListener("animationcancel", onEnd);
     timeline.addEventListener("focusin", onInteraction);
     timeline.addEventListener("pointerdown", onInteraction, true);
+    timeline.addEventListener(disclosureEvent, onDisclosure);
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener(INTAKE_DOCK_RESIZE_EVENT, onResize);
     reduced.addEventListener("change", sync);
+    const unsubscribeEntry = subscribePageEntryReadiness(() => {
+      if (!getPageEntryReadiness()) {
+        entryPauseAt ??= performance.now();
+        for (const group of groupStarts.keys()) cancelGroupStart(group);
+        return;
+      }
+      if (entryPauseAt !== null) {
+        // CSS pauses delayed card entrances behind the curtain. Keep the local
+        // frame beat on that same paused clock rather than spending it hidden.
+        const paused = performance.now() - entryPauseAt;
+        for (const node of active) {
+          const startsAt = faceStarts.get(node);
+          if (startsAt !== undefined) faceStarts.set(node, startsAt + paused);
+        }
+        entryPauseAt = null;
+      }
+      sync();
+      scheduleFlush();
+    });
     sync();
     if (!settled) {
       // Natural card measurements settle during layout/ResizeObserver updates.
-      // Give that first rendered scene two frames, then a quiet half-second.
+      // Keep two measurement frames, then only a brief 60ms settling pause.
       settleFrame = requestAnimationFrame(() => {
         settleFrame = requestAnimationFrame(() => {
           settleTimer = setTimeout(() => {
             settled = true;
             scheduleFlush();
-          }, 500);
+          }, 60);
         });
       });
     }
     return () => {
       disposed = true;
+      unsubscribeEntry();
       cancelAnimationFrame(frame);
+      stopMotionWatch();
       cancelAnimationFrame(settleFrame);
+      cancelAnimationFrame(scrollFrame);
       if (settleTimer !== null) clearTimeout(settleTimer);
       mutations.disconnect();
       observer?.disconnect();
@@ -347,16 +605,27 @@ export function IntakeTimelineEntrance({ children }: { children: ReactNode }) {
       timeline.removeEventListener("animationcancel", onEnd);
       timeline.removeEventListener("focusin", onInteraction);
       timeline.removeEventListener("pointerdown", onInteraction, true);
+      timeline.removeEventListener(disclosureEvent, onDisclosure);
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener(INTAKE_DOCK_RESIZE_EVENT, onResize);
       reduced.removeEventListener("change", sync);
       for (const node of timeline.querySelectorAll<HTMLElement>(ENTRY))
-        node.dataset.entranceState = "done";
+        setPhase(node, "done");
+      for (const group of timeline.querySelectorAll<HTMLElement>(
+        '[data-intake-group][data-grouped="true"]',
+      ))
+        finishGroup(group, false);
+      for (const timer of groupTimers.values()) clearTimeout(timer);
+      groupTimers.clear();
+      for (const group of groupStarts.keys()) cancelGroupStart(group);
+      resetCardEntryDelaysIfIdle(timeline);
     };
   }, []);
 
   return (
-    <div ref={root} className="intake-timeline">
+    <div {...props} ref={root} className={className} data-log-entry-scope>
       {children}
     </div>
   );

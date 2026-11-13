@@ -1,0 +1,327 @@
+.progress {
+  --progress-return-delay: 180ms;
+  --progress-start: var(
+    --check-in-art-delay,
+    calc(var(--card-entry-delay, 0ms) + var(--progress-return-delay))
+  );
+  --progress-loop-start: calc(var(--progress-start) + 1560ms);
+  --progress-play: var(--page-entry-play-state, running);
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--palette-white);
+  white-space: nowrap;
+}
+
+.progress[data-progress-dormant="true"] {
+  opacity: calc(1 / 3);
+}
+
+.copy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+}
+
+.numberMotion {
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+}
+
+.value {
+  color: var(--check-in-art-copy, #e9d5ff);
+  font-size: 13px;
+  font-weight: 625;
+  opacity: 0.94;
+  letter-spacing: -0.04em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.artwork {
+  position: relative;
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+/* Readable numeric core stays opaque while the surrounding reflection breathes. */
+.artwork::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--check-in-art-base, #4e456e);
+}
+
+.halo {
+  position: absolute;
+  z-index: -1;
+  /* Old 17px radius + one third of the former 9px increase = 20px. */
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--harmony-edge) 35%, transparent);
+  background:
+    radial-gradient(
+      at 25% 20%,
+      color-mix(in srgb, var(--palette-rose) 22%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      at 75% 80%,
+      color-mix(in srgb, var(--palette-iris) 22%, transparent),
+      transparent 65%
+    ),
+    var(--check-in-art-base, #4e456e);
+}
+
+.orb {
+  display: block;
+  width: 40px;
+  height: 40px;
+  overflow: visible;
+}
+
+.track {
+  stroke: color-mix(in srgb, var(--palette-white) 16%, transparent);
+  stroke-width: 2.8;
+}
+
+.arc {
+  stroke-width: 2.8;
+  stroke-linecap: round;
+}
+
+.orb stop:first-child {
+  stop-color: var(--palette-rose);
+}
+
+.orb stop:nth-child(2) {
+  stop-color: var(--palette-iris);
+}
+
+.orb stop:nth-child(3) {
+  stop-color: var(--check-in-secondary, var(--action-background));
+}
+
+.orb stop:last-child {
+  stop-color: color-mix(in srgb, var(--palette-white) 80%, var(--palette-rose));
+}
+
+.sectionDot {
+  fill: var(--check-in-rim-dark, #7b659d);
+  opacity: 0.5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sectionDot[data-section-complete="true"] {
+  opacity: 1;
+}
+
+.confetti {
+  opacity: 0;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transform-origin: 18px 18px;
+}
+
+.confetti path:first-child {
+  stroke: var(--palette-iris);
+}
+
+.confetti path:nth-child(2) {
+  stroke: var(--palette-rose);
+}
+
+.confetti circle {
+  fill: var(--palette-mint);
+}
+
+@media (max-width: 767px) {
+  .progress {
+    --progress-return-delay: 400ms;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global([data-card-entry-state="pending"]) .progress,
+  .progress[data-progress-dialog-open="true"] {
+    --progress-play: paused;
+  }
+  .copy {
+    animation: check-in-progress-copy 1560ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--progress-start) backwards;
+  }
+  .artwork {
+    animation: check-in-progress-arrive 1560ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--progress-start) backwards;
+  }
+  .arc {
+    animation: check-in-progress-draw 1200ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--progress-start) + 160ms) backwards;
+  }
+  .sectionDot[data-section-complete="true"] {
+    animation: check-in-progress-dot 600ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--progress-start) + 200ms + var(--section-index) * 90ms)
+      backwards;
+  }
+  .halo {
+    animation:
+      check-in-progress-halo 1560ms ease-out var(--progress-start) backwards,
+      check-in-progress-breathe 7200ms ease-in-out var(--progress-loop-start)
+        infinite;
+  }
+  .numberMotion {
+    animation: check-in-progress-float 7200ms ease-in-out
+      var(--progress-loop-start) infinite;
+  }
+  .confetti {
+    animation: check-in-progress-confetti 1200ms ease-out
+      calc(var(--progress-start) + 260ms) backwards;
+  }
+  .copy,
+  .artwork,
+  .arc,
+  .numberMotion,
+  .sectionDot,
+  .sectionDot[data-section-complete="true"],
+  .halo,
+  .confetti {
+    animation-play-state: var(--progress-play);
+  }
+}
+
+@keyframes check-in-progress-breathe {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  28% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 0.62;
+  }
+  80% {
+    opacity: 0.88;
+  }
+}
+@keyframes check-in-progress-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  28% {
+    transform: translateY(-0.35px) rotate(-0.6deg);
+  }
+  58% {
+    transform: translateY(0.2px) rotate(0.4deg);
+  }
+  80% {
+    transform: translateY(-0.1px) rotate(-0.2deg);
+  }
+}
+
+@keyframes check-in-progress-copy {
+  0% {
+    opacity: 0.45;
+    transform: translateY(3px) rotate(-5deg) scale(0.72);
+  }
+  38% {
+    opacity: 1;
+    transform: translateY(-0.6px) rotate(2deg) scale(1.08);
+  }
+  65% {
+    transform: translateY(0.3px) rotate(-0.6deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes check-in-progress-arrive {
+  0% {
+    transform: scale(0.7) rotate(-24deg);
+  }
+  38% {
+    transform: scale(1.14) rotate(10deg);
+  }
+  65% {
+    transform: scale(0.97) rotate(-3deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes check-in-progress-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: var(--progress-offset);
+  }
+}
+
+@keyframes check-in-progress-dot {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.25;
+  }
+  65% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes check-in-progress-halo {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  45% {
+    transform: scale(1.45);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes check-in-progress-confetti {
+  0% {
+    transform: scale(0.3) rotate(-20deg);
+    opacity: 0;
+  }
+  32% {
+    transform: scale(1.1) rotate(8deg);
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.25) rotate(14deg);
+    opacity: 0;
+  }
+}

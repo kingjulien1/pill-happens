@@ -1,0 +1,47 @@
+.mark {
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.line {
+  --line-direction: 1;
+  --line-delay: 0ms;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.line:nth-child(2) {
+  --line-direction: -1;
+  --line-delay: 480ms;
+}
+
+.line:nth-child(3) {
+  --line-delay: 960ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .line {
+    animation: menu-line-ripple 18s ease-in-out var(--line-delay) infinite;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+
+  .mark:is([data-menu-mark-open="true"], [data-menu-mark-paused="true"]) .line {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes menu-line-ripple {
+  0%,
+  12%,
+  36%,
+  100% {
+    transform: none;
+  }
+  22% {
+    transform: translateX(calc(var(--line-direction) * -0.6px)) scaleX(0.955);
+  }
+  28% {
+    transform: translateX(calc(var(--line-direction) * 0.4px)) scaleX(0.98);
+  }
+}

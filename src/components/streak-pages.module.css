@@ -1,39 +1,14 @@
 .page {
   min-width: 0;
   --upcoming-ink: var(--muted-foreground);
-  --upcoming-wash: color-mix(in srgb, var(--surface-sunken) 60%, transparent);
+  --upcoming-wash: var(--card);
   --upcoming-edge: var(--border);
 }
-.pageHeader {
-  margin-bottom: 26px;
-}
-.headerRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-}
-.pageHeader h1 {
-  --muted-foreground: var(--canvas-muted-foreground);
-  min-width: 0;
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: -0.035em;
-}
-.headingTitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-}
-.pageHeader > p,
 .sectionDescription,
 .scopeNote {
   color: var(--muted-foreground);
-  font-size: 11px;
-  line-height: 1.85;
-}
-.pageHeader > p {
-  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.75;
 }
 .headerStats {
   display: grid;
@@ -41,7 +16,7 @@
   gap: 4px;
   margin: 0;
   padding: 0;
-  color: var(--canvas-muted-foreground);
+  color: var(--muted-foreground);
   font-size: 10px;
   line-height: 1.5;
 }
@@ -53,9 +28,9 @@
   white-space: nowrap;
 }
 .headerStats strong {
-  color: var(--canvas-foreground);
-  font-size: 13px;
-  font-weight: 550;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
 }
 .earnedStats {
@@ -76,7 +51,7 @@
 }
 .earnedStats dt {
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
 }
 .earnedStats dd {
@@ -99,17 +74,20 @@
   min-width: 0;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
-  font-weight: 550;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.5;
 }
 .sectionTitle > span {
   flex-shrink: 0;
   max-width: 42%;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
   text-align: right;
+}
+.listSection {
+  min-width: 0;
 }
 .cardList {
   display: grid;
@@ -121,7 +99,7 @@
   overflow: hidden;
   display: block;
   min-width: 0;
-  border-radius: 22px;
+  border-radius: var(--entry-card-radius, 21px);
   color: var(--foreground);
   -webkit-backdrop-filter: blur(48px);
   backdrop-filter: blur(48px);
@@ -131,12 +109,11 @@
 }
 .earnedCard,
 .earnedHero {
-  border: 1px solid
-    color-mix(in srgb, var(--milestone-accent) 70%, var(--foreground));
-  background: color-mix(in srgb, var(--card) 84%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--palette-peach) 12.549%, transparent),
-    0 5px 22px color-mix(in srgb, var(--milestone-accent) 12%, transparent);
+  border: 0;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: inset 0 0 0 2.5px
+    color-mix(in srgb, var(--primary) 30%, var(--border));
 }
 .cardForeground {
   position: relative;
@@ -191,7 +168,7 @@
 }
 .medallionUnit {
   color: color-mix(in srgb, var(--foreground) 72%, transparent);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.3;
 }
 .cardCopy {
@@ -206,8 +183,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
-  color: color-mix(in srgb, var(--foreground) 73%, transparent);
-  font-size: 9px;
+  color: color-mix(in srgb, var(--foreground) 86%, transparent);
+  font-size: 10.5px;
   font-weight: 450;
   line-height: 1.4;
 }
@@ -222,7 +199,7 @@
   overflow-wrap: anywhere;
 }
 .cardContext {
-  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+  color: color-mix(in srgb, var(--foreground) 86%, transparent);
   font-size: 10px;
   line-height: 1.5;
 }
@@ -252,16 +229,15 @@
     color-mix(in srgb, var(--milestone-pop) 10%, var(--card))
   );
   color: color-mix(in srgb, var(--foreground) 78%, transparent);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.4;
 }
 .upcomingCard,
 .upcomingHero {
-  border: 1px solid var(--upcoming-edge);
-  background: var(--upcoming-wash);
-  color: var(--upcoming-ink);
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--palette-peach) 3.922%, transparent);
+  border: 0;
+  background: var(--card);
+  color: var(--muted-foreground);
+  box-shadow: inset 0 0 0 2.5px var(--border);
 }
 .upcomingCard .cardForeground {
   gap: 12px;
@@ -287,14 +263,14 @@
 .upcomingCard .medallionUnit,
 .upcomingCard .cardEyebrow,
 .upcomingCard .cardContext {
-  color: color-mix(in srgb, var(--upcoming-ink) 76%, transparent);
+  color: var(--upcoming-ink);
 }
 .upcomingCard .cardEyebrow > svg {
   color: inherit;
 }
 .upcomingCard .cardTitle {
-  font-size: 12px;
-  font-weight: 450;
+  font-size: 14px;
+  font-weight: 550;
 }
 .upcomingCard .cardCopy {
   gap: 4px;
@@ -309,8 +285,8 @@
   gap: 15px;
   padding: 20px 16px;
   border: 1px dashed color-mix(in srgb, var(--foreground) 25%, transparent);
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--card) 35%, transparent);
+  border-radius: var(--entry-card-radius, 21px);
+  background: var(--card);
 }
 .firstMilestone > span {
   color: color-mix(in srgb, var(--foreground) 65%, transparent);
@@ -326,62 +302,59 @@
   font-size: 10px;
   line-height: 1.8;
 }
-.encouragement {
-  position: relative;
-  margin: 32px 0;
-  padding: 24px 18px 20px;
-  border-block: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
-  text-align: center;
+.streakDivider {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+  margin-block: clamp(48px, 6vw, 80px);
+  color: var(--canvas-muted-foreground);
 }
-.encouragement::before,
-.encouragement::after {
+.streakDivider::before,
+.streakDivider::after {
   content: "";
-  position: absolute;
-  left: 50%;
-  width: 1px;
-  height: 20px;
+  height: 1px;
+  min-width: 0;
+  flex: 1;
   background: linear-gradient(
+    to right,
     transparent,
-    color-mix(in srgb, var(--milestone-accent) 65%, transparent)
+    color-mix(in srgb, currentColor 28%, transparent)
   );
 }
-.encouragement::before {
-  top: -21px;
+.streakDivider::after {
+  transform: scaleX(-1);
 }
-.encouragement::after {
-  bottom: -21px;
-  transform: rotate(180deg);
-}
-.encouragementStar {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  margin: 0 auto 10px;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--milestone-spark) 30%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--milestone-accent) 9%, var(--card));
-  color: var(--milestone-spark);
-  transform: rotate(-6deg);
-}
-.encouragement h2 {
-  font-size: 13px;
-  font-weight: 550;
-  line-height: 1.5;
-}
-.encouragement > p {
-  margin: 7px auto 15px;
-  max-width: 270px;
-  color: var(--muted-foreground);
+.streakDividerLabel {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
   font-size: 10px;
-  line-height: 1.8;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
 }
-.separatorContext {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted-foreground);
-  font-size: 9px;
-  line-height: 1.7;
+.streakDividerLabel > svg {
+  opacity: 0.7;
+}
+.loadMore {
+  width: 100%;
+  min-height: 44px;
+  gap: 8px;
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  color: var(--foreground);
+  font-size: 11px;
+}
+.loadMore:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
 }
 .runProgress {
   min-width: 0;
@@ -392,7 +365,7 @@
   justify-content: space-between;
   gap: 10px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
 }
 .progressLabels strong {
@@ -433,7 +406,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border-radius: 26px;
+  border-radius: var(--entry-card-radius, 21px);
   -webkit-backdrop-filter: blur(50px);
   backdrop-filter: blur(50px);
 }
@@ -449,7 +422,7 @@
   justify-content: space-between;
   gap: 10px;
   color: color-mix(in srgb, var(--foreground) 75%, transparent);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.5;
 }
 .heroTopline > span:first-child {
@@ -612,9 +585,10 @@
 .ratingComparison,
 .medicationComparison {
   padding: 15px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
-  border-radius: 17px;
-  background: color-mix(in srgb, var(--card) 80%, transparent);
+  border: 0;
+  border-radius: var(--entry-card-radius, 21px);
+  background: var(--card);
+  box-shadow: inset 0 0 0 2.5px var(--border);
   -webkit-backdrop-filter: blur(30px);
   backdrop-filter: blur(30px);
 }
@@ -631,7 +605,7 @@
 }
 .coverageTitle > span {
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 .coverageColumns {
   display: grid;
@@ -650,7 +624,7 @@
 .coverageColumns p {
   margin-top: 5px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
 }
 .coverageColumns dl {
@@ -667,7 +641,7 @@
 }
 .coverageColumns dt,
 .coverageColumns dd {
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
 }
 .coverageColumns dt {
@@ -681,7 +655,7 @@
   padding-top: 11px;
   border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.8;
 }
 .detailSection {
@@ -716,23 +690,23 @@
   border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
   border-radius: 7px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.5;
 }
 .ratingComparison[data-trend="improved"] .trendPill {
-  border-color: #34d3995c;
-  background: #34d39912;
-  color: #047857;
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+  color: var(--foreground);
 }
 .ratingComparison[data-trend="worse"] .trendPill {
-  border-color: #fb71855c;
-  background: #fb718512;
-  color: #be123c;
+  border-color: var(--border);
+  background: var(--surface-raised);
+  color: var(--foreground);
 }
 .ratingComparison[data-trend="unchanged"] .trendPill {
-  border-color: #fbbf245c;
-  background: #fbbf2412;
-  color: #92400e;
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--muted-foreground);
 }
 .metricValues {
   display: grid;
@@ -747,7 +721,7 @@
 .metricValues > div > span {
   display: block;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
 }
 .metricValues strong {
@@ -769,7 +743,7 @@
 .metricExplanation {
   margin-top: 10px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.85;
 }
 .metricExplanation {
@@ -801,7 +775,7 @@
 .medicationHeading > span:last-child {
   margin-left: auto;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 .medicationAmounts {
   display: grid;
@@ -815,7 +789,7 @@
 .medicationAmounts > div > span {
   display: block;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.6;
 }
 .medicationAmounts strong {
@@ -830,13 +804,13 @@
 .medicationAmounts small {
   display: block;
   color: var(--muted-foreground);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 400;
 }
 .medicationAmounts p {
   margin-top: 6px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.7;
 }
 .dayGrid {
@@ -855,11 +829,11 @@
   border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
   border-radius: 12px;
   background: color-mix(in srgb, var(--card) 60%, transparent);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 .dayGrid a > span:first-child {
   color: var(--muted-foreground);
-  font-size: 8px;
+  font-size: 10px;
 }
 .dayGrid strong {
   font-size: 10px;
@@ -870,7 +844,7 @@
   align-items: center;
   gap: 3px;
   color: var(--muted-foreground);
-  font-size: 8px;
+  font-size: 10px;
 }
 .moodSummary {
   display: flex;
@@ -886,12 +860,12 @@
   border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--card) 54%, transparent);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 .moodSummary strong {
   padding-left: 3px;
   color: var(--muted-foreground);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 550;
 }
 .memoryList a {
@@ -906,7 +880,7 @@
   align-items: center;
   gap: 6px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 .memoryDate > svg:last-child {
   margin-left: auto;
@@ -926,7 +900,7 @@
   display: block;
   margin-top: 7px;
   color: var(--muted-foreground);
-  font-size: 9px;
+  font-size: 10.5px;
   line-height: 1.8;
   overflow-wrap: anywhere;
 }
@@ -942,22 +916,6 @@
   color: var(--muted-foreground);
   font-size: 10px;
   line-height: 1.9;
-}
-@media (prefers-color-scheme: dark) {
-  .page {
-    --upcoming-ink: var(--muted-foreground);
-    --upcoming-wash: color-mix(in srgb, var(--surface-sunken) 45%, transparent);
-    --upcoming-edge: var(--border);
-  }
-  .ratingComparison[data-trend="improved"] .trendPill {
-    color: #6ee7b7;
-  }
-  .ratingComparison[data-trend="worse"] .trendPill {
-    color: #fda4af;
-  }
-  .ratingComparison[data-trend="unchanged"] .trendPill {
-    color: #fde68a;
-  }
 }
 @media (max-width: 359px) {
   .runStats,
@@ -990,20 +948,20 @@
     background: transparent;
   }
   .cardRibbon {
-    font-size: 8px;
+    font-size: 10px;
   }
   .sectionTitle {
     gap: 8px;
   }
   .sectionTitle > span {
     max-width: 36%;
-    font-size: 8px;
+    font-size: 10px;
   }
   .heroForeground {
     padding-inline: 15px;
   }
   .heroTopline {
-    font-size: 8px;
+    font-size: 10px;
   }
   .coverageCard,
   .ratingComparison,
@@ -1031,11 +989,8 @@
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .earnedCard:hover {
-    border-color: var(--milestone-spark);
-    box-shadow:
-      inset 0 1px 0
-        color-mix(in srgb, var(--palette-peach) 18.824%, transparent),
-      0 7px 27px color-mix(in srgb, var(--milestone-accent) 22%, transparent);
+    box-shadow: inset 0 0 0 2.5px
+      color-mix(in srgb, var(--primary) 55%, var(--border));
   }
   .upcomingCard:hover,
   .dayGrid a:hover,
@@ -1049,20 +1004,16 @@
   }
 }
 
-.pageHeader,
 .sectionTitle {
-  color: var(--canvas-foreground);
-  text-shadow: 0 1px 3px var(--palette-ink);
+  color: var(--foreground);
+  text-shadow: none;
 }
-.pageHeader > p,
-.sectionDescription {
-  color: var(--canvas-muted-foreground);
-  text-shadow: 0 1px 3px var(--palette-ink);
-}
-
 .backLink,
 .scopeNote,
 .sectionTitle > span {
   color: var(--canvas-muted-foreground);
-  text-shadow: 0 1px 3px var(--palette-ink);
+  text-shadow: none;
+}
+.listSection > .sectionTitle {
+  color: var(--canvas-foreground);
 }

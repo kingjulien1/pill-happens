@@ -1,3 +1,4 @@
+import type { SVGProps } from "react";
 import { HouseLineIcon } from "@phosphor-icons/react/dist/ssr/HouseLine";
 import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
 import { CalendarHeartIcon } from "@phosphor-icons/react/dist/ssr/CalendarHeart";
@@ -41,6 +42,8 @@ import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ClockC
 import { FirstAidKitIcon } from "@phosphor-icons/react/dist/ssr/FirstAidKit";
 import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
 import { BinocularsIcon } from "@phosphor-icons/react/dist/ssr/Binoculars";
+import { PaletteIcon } from "@phosphor-icons/react/dist/ssr/Palette";
+import { CoffeeIcon } from "@phosphor-icons/react/dist/ssr/Coffee";
 import { cn } from "@/lib/utils";
 
 const icons = {
@@ -87,9 +90,42 @@ const icons = {
   navMedications: FirstAidKitIcon,
   navGoals: TargetIcon,
   discover: BinocularsIcon,
+  palette: PaletteIcon,
+  coffee: CoffeeIcon,
 } as const;
 
-export type ActionIconName = keyof typeof icons;
+export type ActionIconName = keyof typeof icons | "pencilSparkles";
+
+/** One stroke-based pencil-and-sparkles mark shared by headings and Accent actions. */
+export function PencilSparklesIcon({
+  size = 20,
+  strokeWidth = 2.5,
+  className,
+  ...props
+}: SVGProps<SVGSVGElement> & { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      data-action-icon="pencilSparkles"
+      className={className}
+      {...props}
+    >
+      <path d="m3 21 1.1-4.6L16 4.5a2.47 2.47 0 0 1 3.5 3.5L7.6 19.9Z" />
+      <path d="m14.6 5.9 3.5 3.5M4.1 16.4l3.5 3.5" />
+      <path d="m19 12 1.08 2.92L23 16l-2.92 1.08L19 20l-1.08-2.92L15 16l2.92-1.08Z" />
+      <path d="M9 2v4M7 4h4" />
+    </svg>
+  );
+}
 
 export function ActionIcon({
   name,
@@ -100,6 +136,15 @@ export function ActionIcon({
   className?: string;
   weight?: "regular" | "bold" | "fill" | "duotone";
 }) {
+  if (name === "pencilSparkles") {
+    return (
+      <PencilSparklesIcon
+        size={20}
+        strokeWidth={weight === "regular" ? 1.75 : 2.5}
+        className={cn("size-5 shrink-0", className)}
+      />
+    );
+  }
   const Icon = icons[name];
   return (
     <Icon

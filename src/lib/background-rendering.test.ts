@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getBackgroundFrameElapsed,
   getBackgroundResolution,
+  getBackgroundCompositionZoom,
 } from "./background-rendering";
 
 test("the shader clock covers the same real time at 10, 30, 60, and 120fps", () => {
@@ -186,5 +187,61 @@ test("invalid dimensions and density values produce finite positive allocations"
       maxPixels: 0.5,
     }),
     { width: 1, height: 1, ratio: 0.1 },
+  );
+});
+
+test("native framing retains the exact desktop composition on every aspect ratio", () => {
+  for (const [width, height] of [
+    [390, 844],
+    [1920, 1080],
+    [844, 390],
+    [320, 1600],
+  ]) {
+    assert.equal(getBackgroundCompositionZoom(width, height), 1);
+    assert.equal(getBackgroundCompositionZoom(width, height, "native"), 1);
+  }
+});
+
+test("portrait framing reveals more of both axes without distorting the aspect ratio", () => {
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+    [430, 932],
+    [768, 1024],
+  ]) {
+    const zoom = getBackgroundCompositionZoom(width, height, "portrait");
+    assert.ok(Math.abs(zoom - Math.sqrt(width / height)) < 1e-12);
+    const aspect = width / height;
+    const visibleWidth = aspect / zoom;
+    const visibleHeight = 1 / zoom;
+    assert.ok(visibleWidth > aspect && visibleHeight > 1);
+    assert.ok(Math.abs(visibleWidth / visibleHeight - aspect) < 1e-12);
+    assert.ok(1 / (zoom * zoom) > 1, "more of the composition is visible");
+  }
+});
+
+test("portrait framing stays native in landscape and caps very tall zoom-outs", () => {
+  for (const [width, height] of [
+    [844, 390],
+    [1024, 768],
+    [1000, 1000],
+  ])
+    assert.equal(getBackgroundCompositionZoom(width, height, "portrait"), 1);
+  assert.equal(getBackgroundCompositionZoom(320, 1600, "portrait"), 0.65);
+  assert.equal(getBackgroundCompositionZoom(1, 1000000, "portrait"), 0.65);
+});
+
+test("invalid framing dimensions never send a non-finite or zero zoom to the shader", () => {
+  for (const invalid of [NaN, Infinity, -Infinity, 0, -1]) {
+    assert.equal(getBackgroundCompositionZoom(invalid, 844, "portrait"), 1);
+    assert.equal(getBackgroundCompositionZoom(390, invalid, "portrait"), 1);
+  }
+  assert.equal(
+    getBackgroundCompositionZoom(Number.MAX_VALUE, 1, "portrait"),
+    1,
+  );
+  assert.equal(
+    getBackgroundCompositionZoom(1, Number.MAX_VALUE, "portrait"),
+    0.65,
   );
 });

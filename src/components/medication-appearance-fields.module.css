@@ -1,0 +1,614 @@
+.paletteSwatch {
+  display: block;
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--foreground) 14%, transparent);
+  border-radius: 5px;
+}
+
+.appearance {
+  padding: 18px 12px 10px;
+  border-radius: var(--dialog-radius-surface);
+  background: var(--muted);
+  box-shadow: inset 0 1px 0
+    color-mix(in srgb, var(--palette-white) 50%, transparent);
+}
+
+.previewSection {
+  width: 100%;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.showcase {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 14px 12px 4px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: var(--dialog-radius-surface);
+}
+
+.previewPattern {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--palette-plum);
+  opacity: 0.13;
+}
+
+.previewPattern path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  stroke-dasharray: 2 5;
+}
+
+.previewPattern circle {
+  fill: currentColor;
+}
+
+.showcase .previewContent {
+  z-index: 2;
+}
+
+.previewHeader {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.titlePill {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 4px 10px;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(in srgb, var(--final-look-copy) 10%, transparent);
+  color: var(--final-look-muted);
+  font-size: 10px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.titlePill h3 {
+  margin: 0;
+  color: var(--final-look-copy);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: inherit;
+}
+
+.titleSeparator {
+  width: 1px;
+  height: 11px;
+  flex: 0 0 auto;
+  background: color-mix(in srgb, var(--final-look-copy) 28%, transparent);
+}
+
+.colorChip {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 24px;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(
+    in srgb-linear,
+    var(--preview-accent) 40%,
+    var(--palette-white)
+  );
+  color: var(--preview-color-ink);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.colorSwatch {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--preview-color-ink) 14%, transparent);
+}
+
+.colorName,
+.symbolLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.showcase .iconStage {
+  position: relative;
+  display: flex;
+  height: 124px;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewSway {
+  transform: translateY(0) rotate(0deg);
+  transform-origin: 50% 70%;
+}
+
+.showcase[data-preview-motion="on"] .previewSway {
+  animation: preview-sway 7s ease-in-out infinite;
+}
+
+.showcase[data-preview-motion="on"]
+  .iconSurface
+  :global([data-medication-mark]) {
+  animation: preview-glyph-play 4.8s ease-in-out infinite;
+}
+
+.symbolLabelRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.symbolLabel {
+  margin: 0;
+  color: var(--final-look-copy);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 20px;
+}
+
+.motionToggle {
+  --dialog-button-radius: var(--dialog-radius-compact);
+  display: inline-flex;
+  height: 32px;
+  min-width: 43px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: var(--dialog-radius-compact);
+  background: transparent;
+  color: var(--final-look-muted);
+}
+
+.toggleTrack {
+  display: flex;
+  width: 20px;
+  height: 12px;
+  align-items: center;
+  padding: 2px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--final-look-copy) 22%, transparent);
+}
+
+.toggleThumb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--final-look-copy);
+  transform: translateX(0);
+  transition: transform 180ms ease;
+}
+
+.motionToggle[aria-pressed="true"] .toggleTrack {
+  background: color-mix(in srgb, var(--final-look-copy) 40%, transparent);
+}
+
+.motionToggle[aria-pressed="true"] .toggleThumb {
+  transform: translateX(8px);
+}
+
+.fixedColor {
+  margin-top: 2px;
+  color: var(--final-look-muted);
+  text-align: center;
+  font-size: 10px;
+  line-height: 16px;
+}
+
+.fixedColor > span {
+  margin-inline: 4px;
+}
+
+.journalPreview {
+  position: relative;
+  min-width: 0;
+  margin-top: 18px;
+}
+
+.journalHeading {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px 8px;
+  margin-bottom: 7px;
+}
+
+.rowLabel {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+  color: var(--final-look-muted);
+  font-size: 9.5px;
+  line-height: 15px;
+}
+
+.rowLabel > span:first-child {
+  color: var(--final-look-copy);
+  font-weight: 600;
+}
+
+.rowContext {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+  color: var(--final-look-muted);
+  font-size: 9px;
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+.journalCard :global(.intake-card-content) {
+  gap: 8px;
+  padding: 10px;
+}
+
+.journalCard :global(.intake-card-details) {
+  padding-block: 0;
+}
+
+.previewDose .doseCalculation {
+  display: block;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doseCalculation strong {
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.doseCalculation :global([data-preview-quantity]) {
+  font-size: 12.5px;
+}
+
+.doseCalculation > span,
+.doseCalculation > strong {
+  white-space: nowrap;
+}
+
+.doseSlash {
+  margin-inline: 3px;
+  opacity: 0.8;
+}
+
+.doseTotal :global(.intake-card-total-value) {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.doseTotal :global(.intake-card-total-unit) {
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.defaultDose {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 3px 8px;
+  margin-top: 8px;
+  color: var(--final-look-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+
+.defaultSummary {
+  display: inline-flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.defaultSummary strong {
+  color: var(--final-look-copy);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.previewActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.previewAction {
+  --dialog-button-radius: var(--dialog-radius-control);
+  display: inline-flex;
+  height: 40px;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--dialog-radius-control);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.previewAction:disabled {
+  opacity: 0.35;
+}
+
+.previewActionFace {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(in srgb, var(--final-look-copy) 9%, transparent);
+  color: var(--final-look-muted);
+  line-height: 16px;
+  transition: background-color 150ms ease;
+}
+
+.motionToggle:focus-visible,
+.previewAction:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@keyframes preview-sway {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+}
+
+@keyframes preview-glyph-play {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-3deg);
+  }
+  60% {
+    transform: translateY(1px) rotate(3deg);
+  }
+}
+
+.sourceFilters {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--content-min-gap-secondary, 6.5px);
+}
+
+.sourceFilter {
+  --dialog-button-radius: var(--dialog-radius-compact);
+  display: inline-flex;
+  min-width: 0;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--content-min-gap-tertiary, 5px);
+  padding: 4px 6px;
+  border: 0;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  line-height: 16px;
+  white-space: nowrap;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.sourceFilter > span {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sourceFilter[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--foreground) 11%, transparent);
+  color: var(--foreground);
+  font-weight: 550;
+}
+
+.sourceFilter:focus-visible,
+.loadMore:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.batchSeparator {
+  display: flex;
+  height: 9px;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: center;
+}
+
+.batchSeparator::before {
+  width: 44px;
+  height: 1px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--foreground) 13%, transparent);
+  content: "";
+}
+
+.paginationFooter {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 8px 8px;
+  overflow-anchor: none;
+}
+
+.loadMore {
+  --dialog-button-radius: var(--dialog-radius-compact);
+  display: inline-flex;
+  min-width: 96px;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--content-min-gap-secondary, 6.5px);
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  font-weight: 550;
+  line-height: 16px;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.loadMore[aria-disabled="true"] {
+  cursor: default;
+}
+
+.loadMore[data-loading="true"],
+.loadMore[data-complete="true"] {
+  background: color-mix(in srgb, var(--palette-lilac) 22%, transparent);
+  color: var(--foreground);
+}
+
+.loadIcon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke-width: 2.25;
+}
+
+.loadMore[data-loading="true"] .loadIcon {
+  animation: load-turn 450ms ease-in-out infinite;
+}
+
+.pageCount {
+  color: var(--muted-foreground);
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
+}
+
+.revealedChoice {
+  animation: symbols-reveal 132ms ease-out both;
+  animation-play-state: var(--page-entry-play-state, running);
+}
+
+@keyframes load-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes symbols-reveal {
+  from {
+    opacity: 0.5;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .previewAction:not(:disabled):hover .previewActionFace,
+  .motionToggle:hover {
+    background: color-mix(in srgb, var(--final-look-copy) 15%, transparent);
+  }
+
+  .sourceFilter:not([aria-pressed="true"]):hover,
+  .loadMore:not([aria-disabled="true"]):hover {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .appearance {
+    background: var(--muted);
+    box-shadow: inset 0 1px 0
+      color-mix(in srgb, var(--palette-white) 8%, transparent);
+  }
+
+  .previewPattern {
+    color: var(--palette-lilac);
+    opacity: 0.17;
+  }
+
+  .loadMore[data-loading="true"],
+  .loadMore[data-complete="true"] {
+    color: var(--palette-lilac);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase[data-preview-motion="on"] .previewSway,
+  .showcase[data-preview-motion="on"]
+    .iconSurface
+    :global([data-medication-mark]) {
+    animation: none;
+    transform: none;
+  }
+
+  .toggleThumb,
+  .previewActionFace {
+    transition: none;
+  }
+
+  .sourceFilter,
+  .loadMore {
+    transition: none;
+  }
+
+  .loadMore[data-loading="true"] .loadIcon,
+  .revealedChoice {
+    animation: none;
+  }
+}

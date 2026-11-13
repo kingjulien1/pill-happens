@@ -235,8 +235,12 @@ export function JournalDraftProvider({
   );
 }
 
+export function useOptionalJournalWorkspace() {
+  return useContext(Context);
+}
+
 export function useJournalWorkspace() {
-  const value = useContext(Context);
+  const value = useOptionalJournalWorkspace();
   if (!value) throw new Error("Journal draft provider is missing.");
   return value;
 }
@@ -382,41 +386,57 @@ export function DraftStatus({
   status,
   restored = false,
   onReset,
+  action,
+  copy,
 }: {
   hasDraft: boolean;
   status: DraftStorageStatus;
   restored?: boolean;
   onReset?: () => void;
+  action?: ReactNode;
+  /** Custom durable copy never replaces storage-unavailable/error messages. */
+  copy?: { idle?: string; saved?: string; restored?: string };
 }) {
-  if (!hasDraft && status === "saved") return null;
+  if (!hasDraft && status === "saved" && !action && !copy?.idle) return null;
   const durable = status === "saved";
   return (
     <div
-      className="flex min-w-0 items-start justify-between gap-3 text-[10px] leading-relaxed text-muted-foreground"
+      className="flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[10px] leading-relaxed text-muted-foreground"
       data-draft-status={status}
     >
-      <p role="status" className="flex min-w-0 items-start gap-1.5">
-        <ActionIcon
-          name={durable ? "save" : "retry"}
-          className="mt-0.5 size-3 shrink-0"
-        />
-        <span>
-          {durable
-            ? `${restored ? "Restored draft" : "Draft saved"} on this device.`
-            : !hasDraft && status === "error"
-              ? "A saved draft could not be restored. You can continue with fresh values."
-              : "Draft kept for this visit. Device storage is unavailable, so reopening may lose it."}
-        </span>
-      </p>
-      {hasDraft && onReset && (
-        <button
-          type="button"
-          className="shrink-0 rounded px-1 py-0.5 text-foreground/70 underline-offset-2 focus-visible:underline"
-          onClick={onReset}
+      {(hasDraft || !durable || copy?.idle) && (
+        <p
+          role="status"
+          className="flex min-w-0 items-center justify-center gap-1.5"
         >
-          Reset Draft
-        </button>
+          <ActionIcon
+            name={durable ? "save" : "retry"}
+            className="size-3 shrink-0"
+          />
+          <span>
+            {durable
+              ? !hasDraft && copy?.idle
+                ? copy.idle
+                : restored
+                  ? (copy?.restored ?? "Restored draft on this device.")
+                  : (copy?.saved ?? "Draft saved on this device.")
+              : !hasDraft && status === "error"
+                ? "A saved draft could not be restored. You can continue with fresh values."
+                : "Draft kept for this visit. Device storage is unavailable, so reopening may lose it."}
+          </span>
+        </p>
       )}
+      {action ??
+        (hasDraft && onReset && (
+          <button
+            type="button"
+            data-dialog-corner="compact"
+            className="shrink-0 rounded px-1 py-0.5 text-foreground/70 underline-offset-2 focus-visible:underline"
+            onClick={onReset}
+          >
+            Reset Draft
+          </button>
+        ))}
     </div>
   );
 }

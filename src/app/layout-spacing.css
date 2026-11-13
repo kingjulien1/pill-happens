@@ -1,0 +1,63 @@
+/* Three related inline clearances; component padding and touch targets stay separate. */
+:root {
+  --content-min-gap-primary: 8px;
+  --content-min-gap-secondary: 6.5px;
+  --content-min-gap-tertiary: 5px;
+  --content-min-gap: var(--content-min-gap-primary);
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --content-min-gap-primary: 8.5px;
+    --content-min-gap-secondary: 7px;
+    --content-min-gap-tertiary: 5.5px;
+  }
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --content-min-gap-primary: 9px;
+    --content-min-gap-secondary: 7.5px;
+    --content-min-gap-tertiary: 6px;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --content-min-gap-primary: 9.5px;
+    --content-min-gap-secondary: 8px;
+    --content-min-gap-tertiary: 6.5px;
+  }
+}
+
+@media (min-width: 80rem) {
+  :root {
+    --content-min-gap-primary: 10px;
+    --content-min-gap-secondary: 8.5px;
+    --content-min-gap-tertiary: 7px;
+  }
+}
+
+@media (min-width: 96rem) {
+  :root {
+    --content-min-gap-primary: 10.5px;
+    --content-min-gap-secondary: 9px;
+    --content-min-gap-tertiary: 7.5px;
+  }
+}
+
+@media (min-width: 120rem) {
+  :root {
+    --content-min-gap-primary: 11px;
+    --content-min-gap-secondary: 9.5px;
+    --content-min-gap-tertiary: 8px;
+  }
+}
+
+@media (min-width: 160rem) {
+  :root {
+    --content-min-gap-primary: 11.5px;
+    --content-min-gap-secondary: 10px;
+    --content-min-gap-tertiary: 8.5px;
+  }
+}

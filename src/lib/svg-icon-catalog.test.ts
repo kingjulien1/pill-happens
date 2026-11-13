@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import {
+  MedicationGlyph,
+  MedicationTypeIcon,
+} from "../components/medication-icon";
 import { EMOJI_CATALOG } from "./emoji-catalog";
 import { normalizeIconQuery } from "./icon-names";
 import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
@@ -14,7 +20,7 @@ import {
 } from "./svg-icon-catalog";
 
 test("the local SVG catalog has unique stable IDs and corresponding checked-in assets", () => {
-  assert.equal(SVG_ICON_CATALOG.length, 45);
+  assert.equal(SVG_ICON_CATALOG.length, 49);
   assert.equal(
     new Set(SVG_ICON_CATALOG.map(({ value }) => value)).size,
     SVG_ICON_CATALOG.length,
@@ -68,7 +74,13 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
     assert.match(svg, /viewBox="0 0 24 24"/);
     assert.match(
       svg,
-      entry.variant === "mask" ? /stroke-width="2\.5"/ : /stroke-width="2"/,
+      entry.variant === "mask" &&
+        entry.value !== "svg:nose" &&
+        entry.value !== "svg:coffee-pot" &&
+        entry.value !== "svg:tablet-single" &&
+        entry.value !== "svg:tablet-angled"
+        ? /stroke-width="2\.5"/
+        : /stroke-width="2"/,
     );
     assert.match(svg, /<\/(?:svg)>\s*$/);
     assert.doesNotMatch(
@@ -79,7 +91,13 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
       assert.match(target, /^#[a-z0-9-]+$/, entry.value);
       assert.ok(svg.includes(`id="${target.slice(1)}"`), entry.value);
     }
-    if (entry.variant !== "mask") {
+    if (
+      entry.variant !== "mask" ||
+      entry.value === "svg:nose" ||
+      entry.value === "svg:coffee-pot" ||
+      entry.value === "svg:tablet-single" ||
+      entry.value === "svg:tablet-angled"
+    ) {
       const root = svg.match(/<svg\b[\s\S]*?>/)![0];
       for (const attribute of [
         'xmlns="http://www.w3.org/2000/svg"',
@@ -104,6 +122,128 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
   }
 });
 
+test("all colored glyphs render inline vectors with independent transparent cutouts", () => {
+  const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
+  // Repeat shapes in one document, as happens in quantity fans and the picker.
+  const entries = [...colors, colors[0], colors[0]];
+  const markup = renderToStaticMarkup(
+    createElement(
+      "div",
+      null,
+      entries.map(({ value }, index) =>
+        createElement(MedicationGlyph, {
+          key: `${value}-${index}`,
+          icon: value,
+          className: "size-12",
+        }),
+      ),
+    ),
+  );
+  const glyphs = [
+    ...markup.matchAll(
+      /<svg\b(?=[^>]*data-tablet-variant="color")[\s\S]*?<\/svg>/g,
+    ),
+  ].map(([svg]) => svg);
+  assert.equal(colors.length, 17);
+  assert.equal(glyphs.length, entries.length);
+  const maskIds = new Set<string>();
+  glyphs.forEach((svg, index) => {
+    const entry = entries[index];
+    assert.ok(entry.shape && entry.color, entry.value);
+    assert.match(svg, /viewBox="0 0 24 24"/);
+    assert.match(svg, /class="[^"]*size-12/);
+    assert.match(svg, /stroke-width="2"/);
+    assert.match(svg, /focusable="false"/);
+    assert.ok(svg.includes(`data-medication-svg="${entry.value}"`));
+    assert.ok(svg.includes(`fill="${entry.color.hex}"`));
+    assert.match(svg, /maskUnits="userSpaceOnUse"/);
+    assert.match(svg, /maskContentUnits="userSpaceOnUse"/);
+    assert.match(svg, /mask-type:luminance/);
+    assert.match(svg, /fill="white" stroke="white"/);
+    assert.equal(
+      [...svg.matchAll(/stroke="black"/g)].length,
+      TABLET_SHAPES[entry.shape].nodes.length - 1,
+      `${entry.value}: all original details must remain transparent cutouts`,
+    );
+    const maskId = svg.match(/<mask\b[^>]*\bid="([^"]+)"/)?.[1];
+    assert.ok(maskId, entry.value);
+    assert.equal(maskIds.has(maskId), false, "Each instance owns its own mask");
+    maskIds.add(maskId);
+    assert.ok(svg.includes(`mask="url(#${maskId})"`));
+    assert.doesNotMatch(
+      svg,
+      /<(?:image|canvas|foreignObject|filter)\b|background(?:-image)?\s*:|\b(?:href|src)=|data:image/i,
+    );
+  });
+});
+
+test("all original glyphs render their exact asset geometry inline without image masks", () => {
+  const originals = SVG_ICON_CATALOG.filter(
+    ({ variant }) => variant === "mask",
+  );
+  assert.equal(originals.length, 16);
+  // These checked-in assets contain only flat paths/circles/ellipses. Compare
+  // their real attributes rather than reproducing the renderer's node map.
+  const geometry = (svg: string) =>
+    [...svg.matchAll(/<(path|circle|ellipse)\b([^>]*)\/?\s*>/g)].map(
+      ([, tag, attributes]) => ({
+        tag,
+        attributes: Object.fromEntries(
+          [...attributes.matchAll(/([\w:-]+)="([^"]*)"/g)].map(
+            ([, name, value]) => [
+              name,
+              (name === "fill" || name === "stroke") && value === "#000"
+                ? "currentColor"
+                : value,
+            ],
+          ),
+        ),
+      }),
+    );
+
+  for (const entry of originals) {
+    const asset = readFileSync(
+      new URL(entry.src.slice(1), new URL("../../public/", import.meta.url)),
+      "utf8",
+    );
+    const markup = renderToStaticMarkup(
+      createElement(MedicationGlyph, {
+        icon: entry.value,
+        className: "size-12",
+      }),
+    );
+    assert.match(markup, /^<svg\b/);
+    assert.ok(markup.includes(`data-medication-glyph="${entry.value}"`));
+    assert.ok(markup.includes(`data-medication-svg="${entry.value}"`));
+    assert.match(markup, /class="[^"]*size-12/);
+    assert.match(markup, /aria-hidden="true"/);
+    assert.match(markup, /focusable="false"/);
+    const root = markup.match(/^<svg\b[^>]*>/)![0];
+    const assetRoot = asset.match(/^<svg\b[^>]*>/)![0];
+    for (const name of [
+      "viewBox",
+      "fill",
+      "stroke-width",
+      "stroke-linecap",
+      "stroke-linejoin",
+    ]) {
+      const attribute = new RegExp(`\\b${name}="([^"]*)"`);
+      assert.equal(
+        root.match(attribute)?.[1],
+        assetRoot.match(attribute)?.[1],
+        `${entry.value}: ${name}`,
+      );
+    }
+    assert.match(root, /stroke="currentColor"/);
+    assert.deepEqual(geometry(markup), geometry(asset), entry.value);
+    assert.ok(geometry(markup).length > 0, entry.value);
+    assert.doesNotMatch(
+      markup,
+      /<(?:image|mask|filter|canvas|foreignObject)\b|(?:-webkit-)?mask(?:-image)?\s*:|background(?:-image)?\s*:|\b(?:href|src)=|data:image/i,
+    );
+  }
+});
+
 test("SVG values are a strict allowlist rather than arbitrary file paths or markup", () => {
   for (const value of [
     "",
@@ -124,6 +264,41 @@ test("SVG values are a strict allowlist rather than arbitrary file paths or mark
     assert.equal(isMedicationSvgIcon(value), false, value);
     assert.equal(getSvgIcon(value), undefined, value);
   }
+});
+
+test("the tablet form uses one angled Lucide-style tablet with badge stroke overrides", () => {
+  const form = renderToStaticMarkup(
+    createElement(MedicationTypeIcon, {
+      type: "tablet",
+      className: "form-badge-glyph",
+      strokeWidth: 2.5,
+    }),
+  );
+  assert.match(form, /^<svg\b/);
+  assert.match(form, /viewBox="0 0 24 24"/);
+  assert.match(form, /stroke="currentColor"/);
+  assert.match(form, /stroke-width="2\.5"/);
+  assert.match(form, /stroke-linecap="round"/);
+  assert.match(form, /stroke-linejoin="round"/);
+  assert.match(form, /data-medication-type="tablet"/);
+  assert.match(form, /class="[^"]*form-badge-glyph/);
+  assert.match(form, /class="[^"]*lucide-tablet-angled/);
+  assert.equal([...form.matchAll(/<path\b/g)].length, 3);
+  assert.doesNotMatch(form, /<(?:circle|ellipse)\b/);
+  const angled = renderToStaticMarkup(
+    createElement(MedicationGlyph, { icon: "svg:tablet-angled" }),
+  );
+  const paths = (markup: string) =>
+    [...markup.matchAll(/<path\b[^>]*\bd="([^"]+)"/g)].map(([, d]) => d);
+  assert.deepEqual(paths(form), paths(angled));
+  assert.match(paths(form)[0], /[aA]/, "The face remains a tilted ellipse");
+  assert.match(paths(form)[1], /[aA]/, "The body includes visible depth");
+  assert.doesNotMatch(paths(form)[2], /[aAzZ]/, "The score is an open line");
+  const defaultForm = renderToStaticMarkup(
+    createElement(MedicationTypeIcon, { type: "tablet" }),
+  );
+  assert.match(defaultForm, /stroke-width="2\.75"/);
+  assert.doesNotMatch(form, /<(?:image|mask|filter|canvas|foreignObject)\b/);
 });
 
 test("tablet variants preserve requested names, dose labels, color metadata, and unique generic aliases", () => {
@@ -191,6 +366,8 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
     ["TabletBisect", "svg:tablet-meridian"],
     ["TabletEquator", "svg:tablet-meridian"],
     ["HeartLeaf", "svg:heart-leaf"],
+    ["CoffeePot", "svg:coffee-pot"],
+    ["Coffee Pot", "svg:coffee-pot"],
     ["Quetialan100", "svg:color:quetialan-100"],
     ["Quetialan100mg", "svg:color:quetialan-100"],
     ["Queatialan100mg", "svg:color:quetialan-100"],
@@ -252,6 +429,12 @@ test("local SVG discovery supports English, German, direct IDs, and multiple wor
     ["svg:orbit-tablets", "svg:orbit-tablets"],
     ["COZY-CUP", "svg:cozy-cup"],
     ["kaffee", "svg:cozy-cup"],
+    ["carafe", "svg:coffee-pot"],
+    ["jug", "svg:coffee-pot"],
+    ["coffee", "svg:coffee-pot"],
+    ["kettle", "svg:coffee-pot"],
+    ["Kaffeekanne", "svg:coffee-pot"],
+    ["svg:coffee-pot", "svg:coffee-pot"],
     ["herz blätter", "svg:heart-leaf"],
     ["sPrÖsSlInG", "svg:little-sprout"],
     ["schmetterling", "svg:butterfly"],
@@ -259,6 +442,18 @@ test("local SVG discovery supports English, German, direct IDs, and multiple wor
     ["music", "svg:music-note"],
     ["ruhe welle", "svg:calm-wave"],
     ["svg mountain", "svg:mountain-path"],
+    ["nose", "svg:nose"],
+    ["Nose", "svg:nose"],
+    ["nasal", "svg:nose"],
+    ["nase", "svg:nose"],
+    ["svg:nose", "svg:nose"],
+    ["SingleTablet", "svg:tablet-single"],
+    ["tablette einzeln", "svg:tablet-single"],
+    ["AngledTablet", "svg:tablet-angled"],
+    ["tilted tablet", "svg:tablet-angled"],
+    ["3D tablet", "svg:tablet-angled"],
+    ["tablette schräg", "svg:tablet-angled"],
+    ["geneigte tablette", "svg:tablet-angled"],
   ]) {
     assert.ok(
       searchSvgIcons(query).some((entry) => entry.value === value),

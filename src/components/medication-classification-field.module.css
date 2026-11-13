@@ -16,10 +16,11 @@
   min-width: 0;
   height: 40px;
   align-items: center;
-  gap: 5px;
-  padding: 0 8px;
+  gap: var(--content-min-gap-secondary, 6.5px);
+  padding-block: 0;
+  padding-inline: calc(var(--content-min-gap-secondary, 6.5px) + 6px) 10px;
   border: 1px solid var(--input);
-  border-radius: calc(var(--radius) + 4px);
+  border-radius: var(--dialog-radius-control);
   background: transparent;
   color: var(--foreground);
   text-align: left;
@@ -28,10 +29,15 @@
 .trigger:disabled {
   opacity: 0.5;
 }
-.triggerIcon {
+.trigger .triggerIcon {
+  --medication-indicator-mark-size: 18px;
   flex-shrink: 0;
-  width: 13px;
-  height: 13px;
+  width: 18px;
+  height: 18px;
+}
+.trigger .triggerIcon > svg {
+  width: 14px;
+  height: 14px;
 }
 .triggerText {
   min-width: 0;
@@ -46,20 +52,14 @@
 }
 .popup {
   display: flex;
-  width: min(330px, calc(100vw - 24px));
-  max-height: min(438px, var(--available-height));
+  width: min(256px, calc(100vw - 24px));
+  max-height: min(390px, var(--available-height));
   min-height: 0;
   flex-direction: column;
   padding: 5px;
   overflow: hidden;
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  background: var(--popover);
-  color: var(--popover-foreground);
-  box-shadow: 0 8px 30px var(--shadow);
+  border-radius: var(--dialog-radius-surface);
   outline: none;
-  -webkit-backdrop-filter: blur(40px);
-  backdrop-filter: blur(40px);
 }
 .popup,
 .popup * {
@@ -69,56 +69,6 @@
 .popup *::-webkit-scrollbar {
   display: none;
 }
-.heading {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 8px 9px;
-  font-size: 11px;
-  font-weight: 550;
-  line-height: 1.4;
-}
-.heading > span:last-child {
-  color: var(--muted-foreground);
-  font-size: 9px;
-  font-weight: 400;
-}
-.search {
-  display: flex;
-  min-height: 38px;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 8px;
-  margin: 0 4px 6px;
-  padding: 0 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--muted);
-  color: var(--muted-foreground);
-}
-.search:focus-within {
-  border-color: var(--ring);
-}
-.searchInput {
-  width: 100%;
-  min-width: 0;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: var(--foreground);
-  font-size: 16px;
-  line-height: 1.4;
-}
-.searchInput::placeholder {
-  color: var(--muted-foreground);
-}
-.searchInput:focus-visible {
-  outline: none;
-}
 .list {
   min-height: 0;
   max-height: 286px;
@@ -127,73 +77,26 @@
   padding: 0 1px;
 }
 .option {
-  display: flex;
-  min-height: 36px;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 9px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  color: var(--muted-foreground);
-  font-size: 12px;
-  font-weight: 450;
-  line-height: 1.4;
-  cursor: pointer;
-  outline: none;
-}
-.option[data-selected] {
-  background: var(--accent);
-  color: var(--foreground);
-}
-.option[data-highlighted] {
-  border-color: var(--ring);
-  color: var(--foreground);
+  position: relative;
 }
 .optionIcon {
+  --medication-indicator-mark-size: 23px;
   display: grid;
-  width: 22px;
-  height: 22px;
+  width: 23px;
+  height: 23px;
   flex-shrink: 0;
   place-items: center;
-}
-.optionIcon[data-category-kind="benzodiazepine"] {
-  border-radius: 7px;
-  background: #fda4af;
-  color: #e11d48;
-}
-.optionIcon[data-category-kind="opioid"] {
-  border-radius: 7px;
-  background: #fcd34d;
-  color: #92400e;
-}
-.optionText {
-  min-width: 0;
-  flex: 1;
-}
-.indicator {
-  display: flex;
-  flex-shrink: 0;
-  color: var(--foreground);
-}
-.empty {
-  display: flex;
-  min-height: 98px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  background: none;
   color: var(--muted-foreground);
-  font-size: 11px;
-  text-align: center;
 }
+
 .footer {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 5px 1px;
-  border-top: 1px solid var(--glass-border);
+  padding: 4px 5px 1px;
 }
 .footer > span {
   color: var(--muted-foreground);
@@ -201,18 +104,27 @@
 }
 .clear,
 .done {
+  --dialog-button-radius: var(--dialog-radius-compact);
   display: inline-flex;
-  min-height: 32px;
+  min-height: 28px;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 4px 8px;
-  border: 1px solid transparent;
-  border-radius: 9px;
+  padding: 3px 8px;
+  border: 0;
+  box-shadow: none;
+  border-radius: var(--dialog-radius-compact);
   font-size: 10px;
+  line-height: 16px;
 }
 .clear {
+  background: transparent;
   color: var(--muted-foreground);
+}
+.clear:focus-visible,
+.done:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--foreground) 60%, transparent);
+  outline-offset: 2px;
 }
 .clear:disabled {
   opacity: 0.4;
@@ -221,19 +133,17 @@
   background: var(--secondary);
   color: var(--secondary-foreground);
 }
-@media (min-width: 768px) {
-  .searchInput {
-    font-size: 12px;
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .clear:not(:disabled):hover {
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  }
+  .done:hover {
+    background: color-mix(in srgb, var(--foreground) 8%, var(--secondary));
   }
 }
-@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .option:hover {
-    background: var(--accent);
-    color: var(--foreground);
-  }
-  .clear:not(:disabled):hover,
-  .done:hover {
-    border-color: var(--ring);
+@media (prefers-color-scheme: dark) {
+  .trigger {
+    background: color-mix(in oklab, var(--input) 30%, transparent);
   }
 }
 

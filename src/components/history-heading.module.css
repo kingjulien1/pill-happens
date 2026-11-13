@@ -1,0 +1,138 @@
+.coverage {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding-inline-start: 0;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.days,
+.logs {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: baseline;
+  gap: 5px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.days strong,
+.logs strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.days > span,
+.logs > span {
+  flex: 0 0 auto;
+}
+.days strong {
+  font-size: 20px;
+  font-weight: 700;
+}
+.days > span {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 550;
+}
+.logs strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+.logs > span {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 450;
+}
+/* Daily detail has its own centered opening; the History list keeps its layout. */
+.dayHeader {
+  position: relative;
+  min-width: 0;
+  margin-bottom: 16px;
+  padding-bottom: 18px;
+  color: var(--canvas-foreground);
+  text-align: center;
+}
+
+.dayHeader::after {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: min(144px, 60%);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--canvas-foreground) 22%, transparent) 28% 72%,
+    transparent
+  );
+  transform: translateX(-50%);
+  content: "";
+  pointer-events: none;
+}
+
+.dayBack {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding-block: 3px;
+  border-radius: 3px;
+  color: var(--canvas-muted-foreground);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 15px;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 38%, transparent);
+  text-underline-offset: 3px;
+}
+
+.dayBack:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+.dayTitle {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.dayDate {
+  margin: 4px 0 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.dayCounts {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 8px 0 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .dayTitle {
+    font-size: 38px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dayBack:hover {
+    color: var(--canvas-foreground);
+    text-decoration-color: currentColor;
+  }
+}

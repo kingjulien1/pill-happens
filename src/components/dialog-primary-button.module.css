@@ -1,0 +1,8 @@
+.button[data-slot="button"][data-dialog-primary-button] {
+  --dialog-action-height: calc(
+    (var(--action-base-height, 72px) + var(--action-size-step, 0) * 0.75px) *
+      0.74
+  );
+  height: var(--dialog-action-height);
+  min-height: var(--dialog-action-height);
+}

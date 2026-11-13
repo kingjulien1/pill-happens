@@ -1,6 +1,7 @@
 import { APP_COLORS } from "./app-theme";
 import { getMedicationColor } from "./medication-appearance";
 import { TAILWIND_MEDICATION_COLORS } from "./medication-palette";
+import { getSvgIcon } from "./svg-icon-catalog";
 
 type RampColor = {
   value: string;
@@ -26,6 +27,17 @@ export type MedicationWaveColors = {
   aboveValue: string;
   belowValue: string;
 };
+
+/** The selected pigment's family ink, including legacy and neutral endpoints. */
+export function getMedicationColorFamilyInk(value?: string): string {
+  const selected = getMedicationColor(value);
+  const family =
+    selected.value === "tw-black" || selected.value === "tw-white"
+      ? "neutral"
+      : (colorsByValue.get(selected.value) ?? nearestRampColor(selected.hex))
+          .family;
+  return colorsByValue.get(`tw-${family}-900`)!.hex;
+}
 
 const rampColors: RampColor[] = TAILWIND_MEDICATION_COLORS.flatMap((color) => {
   const match = /^tw-([a-z]+)-(\d+)$/.exec(color.value);
@@ -95,6 +107,17 @@ export function getMedicationColorScale(value?: string): MedicationColorScale {
     darker: family[Math.min(family.length - 1, index + 1)].hex,
     icon: family[Math.min(family.length - 1, index + 2)].hex,
   };
+}
+
+/** Match the rendered glyph, including SVG artwork with its own saved pigment. */
+export function getMedicationIconPigment(
+  value?: string,
+  icon?: string,
+): string {
+  const svg = getSvgIcon(icon ?? "pill");
+  return svg?.variant === "color" && svg.color
+    ? svg.color.hex
+    : getMedicationColorScale(value).icon;
 }
 
 /** Neighboring palette families at shade 500; the family order wraps at its ends. */

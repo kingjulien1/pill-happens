@@ -1,0 +1,328 @@
+.reference {
+  min-width: 0;
+}
+
+.reference h3 {
+  margin-bottom: 1rem;
+  font-size: clamp(1.3rem, 1.15rem + 0.4vw, 1.6rem);
+  font-weight: 650;
+  line-height: 1.4;
+  scroll-margin-top: 2rem;
+}
+
+.reference h4 {
+  margin-block: 2rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  scroll-margin-top: 2rem;
+}
+
+.reference > p,
+.reference li,
+.anatomy dd {
+  max-width: 68ch;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.reference > p + p {
+  margin-top: 1rem;
+}
+
+.reference code {
+  overflow-wrap: anywhere;
+}
+
+.reference ol,
+.reference ul {
+  margin-block: 1rem;
+  padding-left: 1.25rem;
+}
+
+.reference ol {
+  list-style: decimal;
+}
+
+.reference ul {
+  list-style: disc;
+}
+
+.reference li + li {
+  margin-top: 0.875rem;
+}
+
+.reference li strong,
+.tiers strong,
+.exampleHeading strong,
+.anatomy dt {
+  color: var(--surface-reading-foreground);
+  font-weight: 600;
+}
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 0.875rem;
+  margin-block: 1.5rem;
+}
+
+.tiers > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+.tiers strong {
+  font-size: 1rem;
+}
+
+.range {
+  font-size: 1.75rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.range small {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.tiers code,
+.exampleHeading code {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+
+.tiers p,
+.tiers > div > small {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.tableScroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-block: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  scrollbar-width: thin;
+}
+
+.tableScroll:focus-visible {
+  outline: 2px solid var(--surface-reading-foreground);
+  outline-offset: 4px;
+}
+
+.tableScroll table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  vertical-align: top;
+}
+
+.tableScroll th {
+  font-weight: 600;
+}
+
+.tableScroll td {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.tableScroll tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.tableScroll caption {
+  padding: 0.875rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  text-align: left;
+  caption-side: bottom;
+}
+
+.examples {
+  display: grid;
+  min-width: 0;
+  gap: 0.875rem;
+  margin-block: 1.5rem;
+}
+
+.example {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--foreground) 3%, transparent);
+}
+
+.exampleHeading {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.875rem;
+}
+
+.exampleHeading strong {
+  font-size: 0.875rem;
+}
+
+.exampleRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.primary {
+  gap: var(--content-min-gap-primary);
+}
+
+.secondary {
+  gap: var(--content-min-gap-secondary);
+}
+
+.tertiary {
+  gap: var(--content-min-gap-tertiary);
+}
+
+.exampleRow.compactTrigger {
+  display: grid;
+  height: 40px;
+  grid-template-columns: minmax(0, 1fr) 12px;
+  padding-inline-start: calc(var(--content-min-gap-secondary) + 6px);
+  padding-inline-end: 10px;
+  border: 1px solid var(--input);
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.compactValue {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--content-min-gap-secondary);
+}
+
+.chevron {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+
+.tinyGlyph {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.tinyCaption {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.flexible {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fixed {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.markers {
+  gap: var(--content-min-gap-secondary);
+}
+
+.example > small {
+  display: block;
+  margin-top: 0.875rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+
+.anatomy {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.25rem;
+}
+
+.anatomy > div {
+  min-width: 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.anatomy > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.anatomy dt {
+  margin-bottom: 0.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.anatomy dd {
+  margin: 0;
+}
+
+.reference > .maintenance {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.reference > [data-developer-code] + [data-developer-code] {
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  .anatomy > div {
+    display: grid;
+    grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .anatomy dt {
+    margin-bottom: 0;
+  }
+}

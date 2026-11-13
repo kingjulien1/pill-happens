@@ -1,0 +1,125 @@
+.shell {
+  display: flex;
+  width: 100%;
+  min-height: 100dvh;
+  max-width: 760px;
+  flex-direction: column;
+  margin-inline: auto;
+  padding-top: max(25px, env(safe-area-inset-top));
+  padding-inline: max(24px, env(safe-area-inset-left))
+    max(24px, env(safe-area-inset-right));
+}
+/* The fixed intake dock owns its measured mobile bottom reserve. */
+.shell:not(:global(.with-intake-dock)) {
+  padding-bottom: max(28px, env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .shell:global(.with-intake-dock) {
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+  }
+}
+.timeline {
+  max-width: 510px;
+}
+.heading {
+  min-width: 0;
+  margin-bottom: 24px;
+  padding-block: 4px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--canvas-foreground);
+  text-shadow: none;
+}
+.headingRow {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 20px;
+}
+.identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+.headingIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  place-items: center;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.headingIcon > svg {
+  width: 22px;
+  height: 22px;
+}
+.headingCopy {
+  min-width: 0;
+}
+.context {
+  margin: 0 0 4px;
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.title {
+  margin: 0;
+  color: var(--canvas-foreground);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+.actions {
+  --foreground: var(--canvas-foreground);
+  --muted-foreground: var(--canvas-muted-foreground);
+  display: flex;
+  margin-inline-start: auto;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  gap: 12px;
+  color: var(--canvas-foreground);
+}
+.description {
+  max-width: 62ch;
+  margin: 16px 0 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+.surface {
+  position: relative;
+  min-width: 0;
+  border: 0;
+  border-radius: var(--entry-card-radius, 21px);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: inset 0 0 0 2.5px var(--border);
+}
+@media (min-width: 640px) {
+  .shell {
+    padding-inline: max(32px, env(safe-area-inset-left))
+      max(32px, env(safe-area-inset-right));
+    padding-top: 40px;
+  }
+  .title {
+    font-size: 38px;
+  }
+  .description {
+    font-size: 14px;
+  }
+  .heading {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+  }
+}

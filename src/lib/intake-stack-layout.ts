@@ -26,6 +26,8 @@ export type IntakeStackFace = {
 
 export const INTAKE_STACK_MOVE_MS = 420;
 export const INTAKE_STACK_PREVIEW_LIMIT = 6;
+/** One rhythm for group insets, expanded faces and the visible disclosure gap. */
+export const INTAKE_GROUP_SPACING_PX = 8;
 export const EMPTY_INTAKE_STACK_VIEW: IntakeStackView = {
   heads: [],
   expanded: [],
@@ -85,10 +87,10 @@ function framesForView(
     let y = 0;
     if (head) lowerEdge = height;
     else if (shown) {
-      y = lowerEdge + 8;
+      y = lowerEdge + INTAKE_GROUP_SPACING_PX;
       lowerEdge = y + height;
     } else {
-      if (!hidden) lowerEdge = Math.max(lowerEdge + 24, height * scale);
+      if (!hidden) lowerEdge = Math.max(lowerEdge + 20, height * scale);
       y = Math.max(0, lowerEdge - height * scale);
     }
     frames.push({

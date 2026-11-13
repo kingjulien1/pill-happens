@@ -1,0 +1,43 @@
+.highlight[data-intake-card],
+.highlight[data-medication-library-card] {
+  scroll-margin-block: 24px;
+  animation: linked-card-arrive 4200ms ease-in-out both;
+}
+
+@keyframes linked-card-arrive {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 transparent,
+      0 0 0 0 transparent;
+  }
+  12%,
+  65% {
+    box-shadow:
+      0 0 0 3px
+        color-mix(in srgb, var(--palette-rose) 72%, var(--palette-lilac)),
+      0 0 20px 5px color-mix(in srgb, var(--palette-iris) 28%, transparent);
+  }
+  35% {
+    box-shadow:
+      0 0 0 3px
+        color-mix(in srgb, var(--palette-iris) 72%, var(--palette-lilac)),
+      0 0 24px 7px color-mix(in srgb, var(--palette-rose) 22%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlight[data-intake-card],
+  .highlight[data-medication-library-card] {
+    animation: none;
+    outline: 3px solid var(--ring);
+    outline-offset: 3px;
+  }
+}
+
+@media (forced-colors: active) {
+  .highlight {
+    outline: 3px solid Highlight;
+    outline-offset: 3px;
+  }
+}

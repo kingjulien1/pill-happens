@@ -1,19 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { sortMedicationsByUsage } from "@/lib/medication-usage";
+
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { ActionIcon } from "@/components/action-icon";
-import { MedicationIcon } from "@/components/medication-icon";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { IntakeMedicationSelect } from "@/components/intake-medication-select";
+import { IntakeAmountField } from "@/components/intake-amount-field";
+import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
 import { MedicationActionButton } from "@/components/medication-action-button";
-import {
-  MedicationClassBadges,
-  medicationClassHighlights,
-} from "@/components/medication-class-badge";
-import { getMedicationClassification } from "@/lib/medication-classification";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/journal-toast";
 import {
   getMedicationType,
-  isMeteredMedicationType,
   medicationQuantityControls,
 } from "@/lib/medication-types";
 import { useJournal } from "@/components/journal-provider";
@@ -28,54 +26,73 @@ import {
   dayKey,
   doseMg,
   formatDay,
-  formatDose,
   fromLocalInput,
-  toLocalInput,
   type Intake,
 } from "@/lib/domain";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { preferredIntakeRoute } from "@/lib/intake-routes";
+import { IntakeRouteSelect } from "@/components/intake-route-select";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  MIN_EDITABLE_INTAKE_QUANTITY,
+  MAX_INTAKE_QUANTITY,
+  parseIntakeQuantity,
+  stepEditableIntakeQuantity,
+  normalizeIntakeQuantityForEditor,
+  hasIntakeQuantityEditorPrecisionLoss,
+} from "@/lib/intake-quantity";
 
 export function IntakeForm({
   intake,
   initialDay,
   onSaved,
+  footerAction,
 }: {
   intake?: Intake;
   initialDay?: string;
   onSaved: () => void;
+  /** The editing owner can place a secondary action beside safe draft feedback. */
+  footerAction?: ReactNode;
 }) {
   const { data, mutate, busy } = useJournal();
   const medications = data!.medications.filter(
     (m) => !m.archived || m.id === intake?.medicationId,
   );
+  // Sorting the menu must not change fresh/reset draft defaults.
+  const medicationOptions = sortMedicationsByUsage(medications, data!.intakes);
   const timezone = data!.settings.timezone;
   const draft = usePersistentDraft(
     intake ? `intake:edit:${intake.id}` : `intake:new:${initialDay ?? "today"}`,
-    () => newIntakeFormDraft({ intake, initialDay, medications, timezone }),
+    () =>
+      newIntakeFormDraft({
+        intake,
+        initialDay,
+        medications,
+        intakes: data!.intakes,
+        timezone,
+      }),
     isIntakeFormDraft,
   );
-  const { medicationId, quantity, note } = draft.value;
+  const { medicationId, quantity } = draft.value;
+  const route =
+    draft.value.route ??
+    (intake
+      ? (intake.route ?? "unspecified")
+      : preferredIntakeRoute(medicationId, data!.intakes));
   const takenAt = intakeDraftDisplayTime(draft.value, timezone);
   const setQuantity = (value: string) =>
     draft.setValue((current) => ({ ...current, quantity: value }));
-  const setNote = (value: string) =>
-    draft.setValue((current) => ({ ...current, note: value }));
   const setTakenAt = (value: string) =>
     draft.setValue((current) => ({ ...current, takenAt: value, timezone }));
   const [error, setError] = useState("");
   const reset = () => {
     draft.resetDraft(
-      newIntakeFormDraft({ intake, initialDay, medications, timezone }),
+      newIntakeFormDraft({
+        intake,
+        initialDay,
+        medications,
+        intakes: data!.intakes,
+        timezone,
+      }),
     );
     setError("");
   };
@@ -86,6 +103,45 @@ export function IntakeForm({
   const medicationForm = medication?.form ?? fallbackIntake?.medicationForm;
   const type = getMedicationType(medicationForm);
   const { increment, presets } = medicationQuantityControls(medicationForm);
+  // Keep the raw draft intact until a quantity interaction explicitly replaces it.
+  const unchangedOriginalQuantity = Boolean(
+    intake &&
+    medicationId === intake.medicationId &&
+    (quantity === String(intake.quantity) ||
+      parseIntakeQuantity(quantity) === intake.quantity),
+  );
+  const normalizedQuantity = normalizeIntakeQuantityForEditor(quantity);
+  const editorQuantity =
+    normalizedQuantity ??
+    (unchangedOriginalQuantity &&
+    intake!.quantity < MIN_EDITABLE_INTAKE_QUANTITY
+      ? "0"
+      : "");
+  const visibleQuantity = parseIntakeQuantity(editorQuantity);
+  const originalQuantityPreserved =
+    unchangedOriginalQuantity &&
+    (normalizedQuantity === null ||
+      hasIntakeQuantityEditorPrecisionLoss(quantity));
+  const effectiveQuantity = originalQuantityPreserved
+    ? intake!.quantity
+    : visibleQuantity;
+  const validQuantity =
+    effectiveQuantity !== null &&
+    effectiveQuantity > 0 &&
+    (originalQuantityPreserved ||
+      effectiveQuantity >= MIN_EDITABLE_INTAKE_QUANTITY) &&
+    effectiveQuantity <= MAX_INTAKE_QUANTITY;
+  const rawDose = validQuantity ? strength * effectiveQuantity! : null;
+  const calculatedDose =
+    rawDose !== null && rawDose > 0 && rawDose < 0.01
+      ? rawDose
+      : validQuantity
+        ? doseMg({ strengthMg: strength, quantity: effectiveQuantity! })
+        : null;
+  const stepQuantity = (delta: number) => {
+    const next = stepEditableIntakeQuantity(editorQuantity, delta);
+    if (next !== null) setQuantity(next);
+  };
   let belongsTo = "";
   try {
     belongsTo = dayKey(fromLocalInput(takenAt, timezone), timezone);
@@ -96,17 +152,19 @@ export function IntakeForm({
   if (!medications.length && !intake)
     return (
       <div className="py-4 text-center">
-        <DraftStatus {...draft} onReset={busy ? undefined : reset} />
         <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
         </p>
-        <MedicationActionButton
-          intent="add"
-          nativeButton={false}
-          render={<Link href="/medications" />}
-          onClick={onSaved}
-        />
+        <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+          <MedicationActionButton
+            intent="add"
+            nativeButton={false}
+            render={<Link href="/medications" />}
+            onClick={onSaved}
+          />
+          <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+        </div>
       </div>
     );
 
@@ -125,20 +183,30 @@ export function IntakeForm({
         setError("Choose a time that has already happened.");
         return;
       }
-      const amount = Number(quantity);
-      if (!Number.isFinite(amount) || amount <= 0) {
-        setError("Enter an amount greater than zero.");
+      const amount = effectiveQuantity;
+      if (!validQuantity || amount === null) {
+        setError(
+          "Enter an amount from 0.01 to 10000 with at most two decimal places. Use a comma or dot for decimals.",
+        );
         return;
       }
       await mutate(
         intake ? `intakes/${intake.id}` : "intakes",
-        { medicationId, quantity: amount, takenAt: timestamp, note },
+        {
+          medicationId,
+          quantity: amount,
+          route,
+          takenAt: timestamp,
+          // Legacy notes remain intact when editing an existing record.
+          ...(intake ? { note: intake.note } : {}),
+        },
         intake ? "PATCH" : "POST",
       );
       toast.success(
         intake
           ? "Your entry has been updated."
           : "Intake saved. A little more awareness.",
+        { heading: intake ? "Intake updated" : "Intake saved" },
       );
       draft.clearDraft();
       onSaved();
@@ -152,99 +220,45 @@ export function IntakeForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
-        <div className="form-field">
-          <Label htmlFor="intake-medication">Medication</Label>
-          <Select
-            value={medicationId}
-            onValueChange={(value) => {
-              if (!value) return;
-              draft.setValue((current) => ({
-                ...current,
-                medicationId: value,
-                quantity:
-                  !intake && value !== current.medicationId
-                    ? String(
-                        medications.find((item) => item.id === value)
-                          ?.defaultQuantity ?? 1,
-                      )
-                    : current.quantity,
-              }));
-            }}
-            disabled={!medications.length}
-          >
-            <SelectTrigger
-              id="intake-medication"
-              className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10"
-            >
-              <SelectValue>
-                {medication ? (
-                  <>
-                    <MedicationIcon
-                      icon={medication.icon}
-                      color={medication.color}
-                      rotation={medication.iconRotation}
-                      isBenzodiazepine={medication.isBenzodiazepine === true}
-                      isOpioid={medication.isOpioid === true}
-                      small
-                      className="size-6 rounded-md"
-                    />
-                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
-                      <span
-                        className="min-w-0 truncate"
-                        title={medication.name}
-                      >
-                        {medication.name}
-                      </span>
-                      <span className="shrink-0 text-xs">
-                        · {formatDose(strength)} mg
-                        {isMeteredMedicationType(medicationForm)
-                          ? " / pump"
-                          : ""}
-                      </span>
-                      <MedicationClassBadges medication={medication} />
-                    </span>
-                  </>
-                ) : fallbackIntake ? (
-                  `${fallbackIntake.medicationName} · ${formatDose(strength)} mg`
-                ) : (
-                  "Choose medication"
-                )}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {medications.map((m) => (
-                <SelectItem
-                  key={m.id}
-                  value={m.id}
-                  className={`min-h-9 pl-3 pr-9 text-xs ${medicationClassHighlights(m)}`}
-                  data-benzodiazepine={m.isBenzodiazepine === true || undefined}
-                  data-opioid={m.isOpioid === true || undefined}
-                  data-medication-classification={getMedicationClassification(
-                    m,
-                  )}
-                >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <MedicationIcon
-                      icon={m.icon}
-                      color={m.color}
-                      rotation={m.iconRotation}
-                      isBenzodiazepine={m.isBenzodiazepine === true}
-                      isOpioid={m.isOpioid === true}
-                      small
-                      className="size-6 rounded-md"
-                    />
-                    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-                      <span className="min-w-0 break-words">
-                        {m.name} · {formatDose(m.strengthMg)} mg
-                        {isMeteredMedicationType(m.form) ? " / pump" : ""}
-                      </span>
-                      <MedicationClassBadges medication={m} />
-                    </span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div
+          className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-[minmax(0,1fr)_136px] sm:grid-cols-[minmax(0,1fr)_144px]"
+          data-intake-medication-route-fields
+        >
+          <div className="form-field min-w-0">
+            <Label htmlFor="intake-medication">Medication</Label>
+            <IntakeMedicationSelect
+              medications={medicationOptions}
+              value={medicationId}
+              fallbackIntake={fallbackIntake}
+              onValueChange={(value) => {
+                draft.setValue((current) => ({
+                  ...current,
+                  medicationId: value,
+                  route:
+                    !intake && value !== current.medicationId
+                      ? preferredIntakeRoute(value, data!.intakes)
+                      : current.route,
+                  quantity:
+                    !intake && value !== current.medicationId
+                      ? String(
+                          medications.find((item) => item.id === value)
+                            ?.defaultQuantity ?? 1,
+                        )
+                      : current.quantity,
+                }));
+              }}
+            />
+          </div>
+          <div className="form-field min-w-0">
+            <Label htmlFor="intake-route">Intake route</Label>
+            <IntakeRouteSelect
+              value={route}
+              disabled={busy}
+              onValueChange={(value) =>
+                draft.setValue((current) => ({ ...current, route: value }))
+              }
+            />
+          </div>
         </div>
         {!medication && !fallbackIntake && medicationId && (
           <p
@@ -256,130 +270,80 @@ export function IntakeForm({
           </p>
         )}
         <div className="form-field">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="intake-quantity">Amount Taken</Label>
-            <span className="text-xs text-muted-foreground">{type.units}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              aria-label="Decrease amount"
-              className="size-10 rounded-xl"
-              disabled={Number(quantity) <= increment}
-              onClick={() =>
-                setQuantity(
-                  String(Math.max(increment, Number(quantity) - increment)),
-                )
-              }
-            >
-              <ActionIcon name="subtract" className="size-4.5" />
-            </Button>
-            <Input
-              id="intake-quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              type="number"
-              inputMode="decimal"
-              min="0.000001"
-              max="10000"
-              step="any"
-              required
-              className="h-10 flex-1 rounded-xl px-3 text-center text-lg! font-medium"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              aria-label="Increase amount"
-              className="size-10 rounded-xl"
-              onClick={() => setQuantity(String(Number(quantity) + increment))}
-            >
-              <ActionIcon name="add" className="size-4.5" />
-            </Button>
-          </div>
+          <Label id="intake-quantity-label" htmlFor="intake-quantity">
+            Amount Taken
+          </Label>
+          <IntakeAmountField
+            value={editorQuantity}
+            onChange={setQuantity}
+            onStep={stepQuantity}
+            increment={increment}
+            unit={visibleQuantity === 1 ? type.unit : type.units}
+            calculatedDose={calculatedDose}
+            originalQuantityPreserved={originalQuantityPreserved}
+            disabled={busy}
+            invalid={Boolean(error) && !validQuantity}
+          />
           <div className="mt-1 grid grid-cols-4 gap-1.5">
             {presets.map((amount) => (
               <button
                 type="button"
                 key={amount}
                 onClick={() => setQuantity(String(amount))}
-                aria-pressed={Number(quantity) === amount}
-                className={`h-8 rounded-lg border text-xs transition-colors ${Number(quantity) === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+                aria-pressed={visibleQuantity === amount}
+                data-dialog-corner="compact"
+                className={`h-8 rounded-lg border text-xs transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
               >
                 {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
               </button>
             ))}
           </div>
-          <p className="text-center text-xs text-muted-foreground">
-            Recorded dose:{" "}
-            <span className="font-medium text-foreground">
-              {formatDose(
-                doseMg({
-                  strengthMg: strength,
-                  quantity: Number(quantity) || 0,
-                }),
-              )}{" "}
-              mg
-            </span>
-          </p>
         </div>
         <div className="form-field">
-          <Label htmlFor="intake-time">
-            <ActionIcon name="calendar" className="mr-1 size-4" />
-            Date & Time Taken
-          </Label>
-          <Input
-            id="intake-time"
-            type="datetime-local"
+          <IntakeDateTimeFields
             value={takenAt}
-            max={toLocalInput(new Date(), timezone)}
-            onChange={(e) => setTakenAt(e.target.value)}
-            required
-            className="h-10 w-full rounded-xl px-3 text-base md:text-sm"
+            onChange={setTakenAt}
+            timezone={timezone}
+            disabled={busy}
           />
           <p className="text-[10px] leading-relaxed text-muted-foreground">
-            {timezone.replaceAll("_", " ")} ·{" "}
             {belongsTo
               ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`
               : "Choose a valid time"}
             . Days begin at 06:00.
           </p>
         </div>
-        <div className="form-field">
-          <Label htmlFor="intake-note">
-            A Little Context{" "}
-            <span className="ml-1 font-normal text-muted-foreground">
-              (optional)
-            </span>
-          </Label>
-          <Textarea
-            id="intake-note"
-            placeholder="How are you feeling? Anything to remember?"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            maxLength={1000}
-            className="min-h-16 resize-none rounded-xl p-3 text-base md:text-sm"
-          />
-        </div>
       </fieldset>
-      <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+
       {error && (
         <p role="alert" className="text-xs leading-relaxed text-destructive">
           {error}
         </p>
       )}
-      <Button
-        type="submit"
-        disabled={busy}
-        className="mt-1 h-13 w-full gap-2 rounded-2xl text-sm"
-      >
-        {busy ? (
-          <ActionIcon name="loading" className="animate-spin" />
-        ) : (
-          <ActionIcon name="save" />
-        )}
-        {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
-      </Button>
+      <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+        <DialogPrimaryButton
+          type="submit"
+          disabled={busy}
+          pending={busy}
+          className="w-full rounded-2xl"
+        >
+          {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
+        </DialogPrimaryButton>
+        <DraftStatus
+          {...draft}
+          onReset={busy || footerAction ? undefined : reset}
+          action={footerAction}
+          copy={
+            footerAction
+              ? {
+                  idle: "Ready when you are. Take a look.",
+                  saved: "Your draft is kept on this device.",
+                  restored: "Your draft is back on this device.",
+                }
+              : undefined
+          }
+        />
+      </div>
     </form>
   );
 }

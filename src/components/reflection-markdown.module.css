@@ -1,0 +1,174 @@
+.prose {
+  width: 100%;
+  min-width: 0;
+  color: var(--foreground);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose > :last-child {
+  margin-bottom: 0;
+}
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose pre,
+.tableScroll {
+  margin-block: 0 1.2em;
+}
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  margin-block: 1.6em 0.65em;
+  color: var(--foreground);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+.prose h1 {
+  font-size: 1.85em;
+}
+.prose h2 {
+  font-size: 1.5em;
+}
+.prose h3 {
+  font-size: 1.2em;
+}
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-size: 1em;
+}
+.prose strong {
+  font-weight: 700;
+}
+.prose em {
+  font-style: italic;
+}
+.prose a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--foreground) 40%, transparent);
+  text-underline-offset: 4px;
+}
+.prose a:hover {
+  text-decoration-color: currentColor;
+}
+.prose a:focus-visible,
+.prose pre:focus-visible,
+.tableScroll:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+.prose ul {
+  padding-left: 1.5em;
+  list-style: disc;
+}
+.prose ol {
+  padding-left: 1.5em;
+  list-style: decimal;
+}
+.prose li {
+  margin-block: 0.3em;
+}
+.prose li > p {
+  margin-block: 0.3em;
+}
+.prose li > ul,
+.prose li > ol {
+  margin-block: 0.5em;
+}
+.prose :global(.contains-task-list) {
+  padding-left: 1.5em;
+  list-style: disc;
+}
+.prose :global(.task-list-item) {
+  list-style: none;
+}
+.prose :global(.task-list-item) > input[type="checkbox"] {
+  margin-left: -1.4em;
+}
+.prose input[type="checkbox"] {
+  margin-right: 0.5em;
+  accent-color: var(--foreground);
+}
+.prose blockquote {
+  padding: 0.5em 1em;
+  border-inline-start: 3px solid
+    color-mix(in srgb, var(--foreground) 30%, transparent);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  color: var(--muted-foreground);
+}
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+.prose code {
+  padding: 0.15em 0.35em;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.87em;
+}
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1em;
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  line-height: 1.65;
+}
+.prose pre code {
+  padding: 0;
+  background: none;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+.prose hr {
+  margin-block: 1.8em;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
+}
+.tableScroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 10px;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+.prose th,
+.prose td {
+  min-width: 100px;
+  padding: 0.6em 0.8em;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--foreground) 12%, transparent);
+  text-align: start;
+}
+.prose th {
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-weight: 600;
+}
+.prose tr:last-child td {
+  border-bottom: 0;
+}
+.prose del {
+  color: var(--muted-foreground);
+}
+.imageLink span {
+  font-size: 0.85em;
+  color: var(--muted-foreground);
+}

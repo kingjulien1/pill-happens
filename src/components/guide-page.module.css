@@ -1,6 +1,5 @@
 .page {
   min-width: 0;
-  color: var(--foreground);
 }
 
 .backLink {
@@ -10,14 +9,11 @@
   gap: 6px;
   margin-bottom: 13px;
   color: var(--muted-foreground);
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .intro h1 {
   margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: -0.035em;
 }
 
 .title {
@@ -30,16 +26,13 @@
 .sectionIntro {
   margin-top: 12px;
   color: var(--muted-foreground);
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.85;
 }
 
 .atAGlance {
   display: grid;
   grid-template-columns: 1fr 1fr 1.25fr;
-  gap: 6px;
-  margin-top: 22px;
-  padding: 13px 0;
   border-block: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
 }
 
@@ -56,35 +49,28 @@
 }
 
 .atAGlance span {
-  font-size: 12px;
   font-weight: 550;
   line-height: 1.5;
 }
 
 .atAGlance small {
   color: var(--muted-foreground);
-  font-size: 9px;
   line-height: 1.6;
 }
 
 .contents {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 21px 0 32px;
 }
 
 .contents a {
   display: inline-flex;
-  min-height: 32px;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px;
   border: 1px solid color-mix(in srgb, var(--foreground) 17%, transparent);
   border-radius: 9px;
   background: color-mix(in srgb, var(--card) 42%, transparent);
   color: color-mix(in srgb, var(--foreground) 85%, transparent);
-  font-size: 10px;
   line-height: 1.4;
   transition:
     background 160ms ease,
@@ -93,29 +79,21 @@
 
 .section {
   min-width: 0;
-  margin-top: 34px;
-  scroll-margin-top: 24px;
 }
 
 .sectionHeading {
   display: flex;
   min-width: 0;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 13px;
 }
 
 .sectionHeading h2 {
   display: inline-flex;
   min-width: 0;
   align-items: center;
-  gap: 7px;
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.5;
+  font-weight: 650;
+  letter-spacing: -0.025em;
 }
 
 .headingIcon {
@@ -126,23 +104,17 @@
 }
 
 .sectionHeading > span {
-  max-width: 40%;
-  color: var(--muted-foreground);
-  font-size: 9px;
   line-height: 1.6;
   text-align: right;
 }
 
 .steps {
   margin: 0;
-  padding: 0;
   list-style: none;
 }
 
 .steps > li {
   display: flex;
-  gap: 12px;
-  padding: 17px 0;
 }
 
 .steps > li + li {
@@ -151,14 +123,11 @@
 
 .stepNumber {
   display: grid;
-  width: 29px;
-  height: 29px;
   flex-shrink: 0;
   place-items: center;
-  border: 1px solid color-mix(in srgb, #f97316 36%, var(--foreground));
-  border-radius: 10px;
-  background: color-mix(in srgb, #f97316 10%, var(--card));
-  font-size: 10px;
+  border: 1px solid
+    color-mix(in srgb, var(--palette-apricot) 36%, var(--foreground));
+  background: color-mix(in srgb, var(--palette-apricot) 10%, var(--card));
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -170,9 +139,10 @@
 
 .steps h3 {
   margin: 1px 0 7px;
-  font-size: 12px;
-  font-weight: 550;
-  line-height: 1.6;
+  color: var(--foreground);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.55;
 }
 
 .steps p,
@@ -182,7 +152,7 @@
 .privacyNote p {
   margin: 0;
   color: var(--muted-foreground);
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.85;
   overflow-wrap: anywhere;
@@ -195,12 +165,9 @@
 
 .pageLink {
   display: inline-flex;
-  min-height: 36px;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
   color: var(--foreground);
-  font-size: 10px;
   font-weight: 500;
   text-decoration-line: underline;
   text-decoration-color: color-mix(in srgb, var(--foreground) 25%, transparent);
@@ -210,29 +177,14 @@
 .panel,
 .readingCard {
   min-width: 0;
-  border: 1px solid color-mix(in srgb, var(--foreground) 17%, transparent);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--card) 82%, transparent);
+  border: 0;
   -webkit-backdrop-filter: blur(32px);
   backdrop-filter: blur(32px);
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--foreground) 4%, transparent);
-}
-
-.readingCard {
-  padding: 17px;
-}
-
-.readingCard > p + p,
-.readingCard > p + .reference,
-.readingCard .reference + p {
-  margin-top: 14px;
+  box-shadow: inset 0 0 0 2.5px var(--border);
 }
 
 .sectionIntro {
   margin-top: -2px;
-  margin-bottom: 17px;
-  font-size: 11px;
 }
 
 .sectionIntro + div {
@@ -249,10 +201,7 @@
 
 .detail summary {
   display: flex;
-  min-height: 49px;
   align-items: center;
-  gap: 8px;
-  padding: 12px 13px;
   border-radius: inherit;
   cursor: pointer;
   list-style: none;
@@ -272,22 +221,18 @@
   min-width: 0;
   flex: 1;
   color: var(--foreground);
-  font-size: 11px;
-  font-weight: 550;
-  line-height: 1.7;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.55;
 }
 
 .detailContext {
-  max-width: 30%;
   color: var(--muted-foreground);
-  font-size: 9px;
   line-height: 1.6;
   text-align: right;
 }
 
 .detailCaret {
-  width: 12px;
-  height: 12px;
   flex-shrink: 0;
   color: var(--muted-foreground);
   transition: transform 180ms ease;
@@ -297,18 +242,8 @@
   transform: rotate(180deg);
 }
 
-.detailBody {
-  padding: 0 15px 16px;
-}
-
 .detailBody > p {
   margin: 0;
-}
-
-.detailBody > p + p,
-.detailBody > p + .example,
-.detailBody .example + p {
-  margin-top: 12px;
 }
 
 .detailBody a {
@@ -320,26 +255,22 @@
 
 .detailBody code {
   color: var(--foreground);
-  font-size: 10px;
 }
 
 .example {
-  padding: 10px 12px;
-  border-left: 2px solid #f97316;
+  border-left: 2px solid var(--palette-apricot);
   border-radius: 0 9px 9px 0;
-  background: color-mix(in srgb, #f97316 6%, var(--background));
+  background: color-mix(in srgb, var(--palette-apricot) 6%, var(--background));
 }
 
 .example > span {
   display: block;
   margin-bottom: 4px;
   color: var(--muted-foreground);
-  font-size: 9px;
 }
 
 .example code {
   display: block;
-  font-size: 10px;
   white-space: normal;
 }
 
@@ -351,19 +282,15 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 12px;
   margin: 0;
 }
 
 .reference > div {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.7fr);
-  gap: 13px;
 }
 
 .reference dt {
   color: var(--foreground);
-  font-size: 10px;
   font-weight: 500;
   line-height: 1.8;
 }
@@ -371,39 +298,31 @@
 .reference dd {
   margin: 0;
   color: var(--muted-foreground);
-  font-size: 10px;
   line-height: 1.8;
 }
 
 .moodList {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
   margin: 15px 0 19px;
 }
 
 .moodList > span {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 7px;
   border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--foreground) 4%, transparent);
   color: var(--foreground);
-  font-size: 9px;
   line-height: 1.4;
 }
 
 .callout {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
-  margin-top: 15px;
-  padding: 12px;
   border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, #f97316 7%, var(--background));
+  background: color-mix(in srgb, var(--palette-apricot) 7%, var(--background));
 }
 
 .callout > svg {
@@ -412,7 +331,7 @@
 }
 
 .callout p {
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .installAction {
@@ -424,7 +343,6 @@
 .privacyNote {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
   margin: 14px 4px 0;
 }
 
@@ -435,19 +353,16 @@
 }
 
 .privacyNote p {
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .footer {
-  margin-top: 32px;
-  padding-top: 23px;
   border-top: 1px solid color-mix(in srgb, var(--foreground) 17%, transparent);
   text-align: center;
 }
 
 .returnAction {
   display: flex;
-  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 9px;
@@ -455,23 +370,19 @@
   border-radius: 14px;
   background: color-mix(in srgb, var(--card) 75%, transparent);
   color: var(--foreground);
-  font-size: 12px;
   font-weight: 550;
   transition: background 160ms ease;
 }
 
 .topLink {
   display: inline-flex;
-  min-height: 36px;
   align-items: center;
   margin-top: 7px;
   color: var(--muted-foreground);
-  font-size: 9px;
 }
 
 .startAction {
   margin: 27px 0 32px;
-  padding: 15px;
   border: 1px solid var(--border);
   border-radius: 17px;
   background: var(--surface-reading);
@@ -480,7 +391,6 @@
 
 .quickStart {
   display: flex;
-  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -488,14 +398,12 @@
   border-radius: 12px;
   background: var(--secondary);
   color: var(--secondary-foreground);
-  font-size: 12px;
   font-weight: 550;
 }
 
 .startAction > p {
   margin: 10px 2px 0;
   color: var(--muted-foreground);
-  font-size: 11px;
   line-height: 1.8;
 }
 
@@ -505,9 +413,7 @@
   align-items: center;
   justify-content: center;
   column-gap: 11px;
-  margin-top: 7px;
-  color: var(--canvas-muted-foreground);
-  font-size: 9px;
+  color: var(--muted-foreground);
 }
 
 .footerLinks .topLink {
@@ -523,36 +429,8 @@
   .atAGlance > div + div {
     padding-left: 7px;
   }
-  .atAGlance span {
-    font-size: 11px;
-  }
-  .atAGlance small {
-    font-size: 8px;
-  }
-  .sectionHeading {
-    gap: 8px;
-  }
-  .sectionHeading h2 {
-    font-size: 13px;
-  }
-  .sectionHeading > span {
-    max-width: 33%;
-    font-size: 8px;
-  }
-  .readingCard {
-    padding: 14px;
-  }
   .detail summary {
-    gap: 6px;
     padding-inline: 11px;
-  }
-  .detailContext {
-    max-width: 26%;
-    font-size: 8px;
-  }
-  .reference > div {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
-    gap: 10px;
   }
 }
 
@@ -579,45 +457,389 @@
   }
 }
 
-/* Reading surfaces stay Peach; headings over the moving field use canvas copy. */
-.intro,
-.atAGlance,
-.steps {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--surface-reading);
-  color: var(--surface-reading-foreground);
+/* Guides use the shell's calm semantic canvas; reading panels keep sharp copy. */
+.page {
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.75;
+  text-shadow: none;
 }
-.backLink,
-.sectionHeading {
-  color: var(--canvas-foreground);
-  text-shadow: 0 1px 3px var(--palette-ink);
+
+.intro {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground);
 }
-.sectionHeading > span,
-.sectionIntro {
-  color: var(--canvas-muted-foreground);
-  text-shadow: 0 1px 3px var(--palette-ink);
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.065em;
+  line-height: 1.6;
+}
+
+.eyebrow > svg {
+  flex-shrink: 0;
+}
+
+.intro h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.intro > p {
+  max-width: 62ch;
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+.atAGlance {
+  gap: 10px;
+  margin-top: 24px;
+  padding: 20px 0;
+  border-inline: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.atAGlance span {
+  font-size: 16px;
+}
+.atAGlance small {
+  font-size: 12px;
+}
+
+.contents {
+  gap: 8px;
+  margin: 28px 0 44px;
 }
 .contents a {
-  background: var(--surface-reading);
-  color: var(--surface-reading-foreground);
+  min-height: 44px;
+  padding: 9px 13px;
+  font-size: 14px;
 }
-@media (prefers-color-scheme: dark) {
-  .intro,
-  .atAGlance,
-  .steps,
-  .contents a,
-  .startAction,
-  .example,
-  .callout {
-    -webkit-backdrop-filter: blur(32px);
-    backdrop-filter: blur(32px);
+
+.section {
+  container-type: inline-size;
+  margin-top: 56px;
+  scroll-margin-top: 32px;
+}
+.sectionHeading {
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px 18px;
+  margin-bottom: 22px;
+  color: var(--foreground);
+  text-shadow: none;
+}
+.sectionHeading h2 {
+  flex: 1 1 18rem;
+  gap: 10px;
+  font-size: clamp(24px, 1.3rem + 0.6vw, 26px);
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.headingIcon {
+  align-self: baseline;
+  transform: translateY(3px);
+}
+.headingIcon > svg {
+  width: 24px;
+  height: 24px;
+}
+.sectionHeading > span {
+  max-width: 100%;
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  text-shadow: none;
+}
+.sectionIntro {
+  max-width: 70ch;
+  margin-bottom: 24px;
+  font-size: 16px;
+}
+
+.steps {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  border-block: 1px solid var(--border);
+  border-radius: 0;
+  background: none;
+}
+.steps > li {
+  gap: 16px;
+  padding: 26px 0;
+}
+.steps > li + li {
+  border-color: var(--border);
+}
+.stepNumber {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+.steps h3 {
+  margin-bottom: 10px;
+}
+.steps p {
+  max-width: 64ch;
+}
+.pageLink {
+  min-height: 44px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.panel,
+.readingCard {
+  border: 0;
+  border-radius: var(--entry-card-radius, 21px);
+  background: var(--card);
+  color: var(--card-foreground);
+  text-shadow: none;
+}
+.readingCard {
+  padding: 22px;
+}
+.readingCard > p,
+.detailBody > p {
+  max-width: 70ch;
+}
+.readingCard > p + p,
+.readingCard > p + .reference,
+.readingCard .reference + p {
+  margin-top: 20px;
+}
+.detail summary {
+  min-height: 64px;
+  gap: 12px;
+  padding: 18px 20px;
+}
+.detail summary > svg:first-child:not(:last-child) {
+  width: 20px;
+  height: 20px;
+}
+.detailContext {
+  max-width: 26%;
+  font-size: 12px;
+}
+.detailCaret {
+  width: 16px;
+  height: 16px;
+}
+.detailBody {
+  padding: 0 22px 24px;
+}
+.detailBody code {
+  font-size: 14px;
+}
+.detailBody > p + p,
+.detailBody > p + .example,
+.detailBody .example + p {
+  margin-top: 18px;
+}
+.example {
+  padding: 15px 17px;
+}
+.example > span {
+  font-size: 12px;
+}
+.example code {
+  font-size: 14px;
+}
+.reference {
+  gap: 18px;
+}
+.reference > div {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 18px;
+}
+.reference dt {
+  font-size: 16px;
+}
+.reference dd {
+  font-size: 15px;
+}
+.moodList {
+  gap: 8px;
+  margin-block: 20px 24px;
+}
+.moodList > span {
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.callout {
+  gap: 12px;
+  margin-top: 24px;
+  padding: 18px;
+}
+.callout p,
+.privacyNote p {
+  font-size: 14px;
+}
+.privacyNote {
+  gap: 12px;
+  margin-top: 22px;
+}
+.startAction {
+  margin-block: 30px 40px;
+  padding: 20px;
+}
+.quickStart {
+  min-height: 48px;
+  font-size: 16px;
+}
+.startAction > p {
+  font-size: 15px;
+}
+.footer {
+  margin-top: 64px;
+  padding-top: 28px;
+}
+.returnAction {
+  max-width: 36rem;
+  min-height: 52px;
+  margin-inline: auto;
+  font-size: 16px;
+}
+.footerLinks {
+  gap: 8px 18px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+.topLink {
+  min-height: 44px;
+  font-size: 13px;
+}
+
+@container (min-width: 40rem) {
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
   }
-  .example {
-    background: color-mix(in srgb, #f97316 6%, var(--surface-sunken));
+  .steps > li {
+    padding-block: 28px;
   }
-  .callout {
-    background: color-mix(in srgb, #f97316 7%, var(--surface-sunken));
+  .steps > li:nth-child(2) {
+    border-top: 0;
+  }
+  .readingCard {
+    padding: 30px;
+  }
+  .detail summary {
+    padding: 22px 28px;
+  }
+  .detailBody {
+    padding: 0 30px 30px;
+  }
+  .reference > div {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .section {
+    margin-top: 72px;
+  }
+  .eyebrow {
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .atAGlance {
+    margin-top: 24px;
+    padding-block: 20px;
+  }
+  .atAGlance span {
+    font-size: 18px;
+  }
+  .atAGlance small {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 359px) {
+  .atAGlance {
+    grid-template-columns: 1fr 1fr 1.2fr;
+  }
+  .atAGlance span {
+    font-size: 14px;
+  }
+  .atAGlance small {
+    font-size: 11px;
+  }
+  .detail summary {
+    padding-inline: 16px;
+    gap: 8px;
+  }
+  .detailContext {
+    max-width: 25%;
+    font-size: 11px;
+  }
+  .readingCard,
+  .detailBody {
+    padding-inline: 18px;
+  }
+  .reference > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.page [data-guide-outline-level="2"] {
+  color: var(--foreground);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: -0.012em;
+}
+.page summary[data-guide-outline-level="2"] > span:first-of-type {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+.page [data-guide-outline-level="3"] {
+  color: color-mix(in srgb, var(--foreground) 88%, transparent);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.65;
+  letter-spacing: 0.005em;
+}
+
+/* The guide keeps its reading rail, but uses the common page-heading scale. */
+.intro {
+  margin-bottom: 24px;
+  padding-block: 4px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.intro .atAGlance {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+@media (min-width: 640px) {
+  .intro {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+  }
+  .intro h1 {
+    font-size: 38px;
+  }
+  .intro > p {
+    font-size: 14px;
   }
 }

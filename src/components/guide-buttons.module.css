@@ -1,0 +1,711 @@
+.reference {
+  --button-doc-line: color-mix(
+    in srgb,
+    var(--canvas-foreground) 17%,
+    transparent
+  );
+  --button-doc-soft: color-mix(
+    in srgb,
+    var(--canvas-foreground) 4%,
+    transparent
+  );
+  min-width: 0;
+  container-type: inline-size;
+  color: var(--canvas-foreground);
+  text-shadow: none;
+}
+
+.reference :is(p, dl, ol, h3, h4, h5) {
+  margin: 0;
+}
+
+.reference :is(button, a, summary, [tabindex="0"]):focus-visible {
+  outline: 2px solid var(--canvas-foreground);
+  outline-offset: 4px;
+}
+
+.intro {
+  max-width: 68ch;
+  color: var(--canvas-muted-foreground);
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+.jumpLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.jumpLinks a {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  padding: 6px 11px;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 9px;
+  color: var(--canvas-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.chapter {
+  min-width: 0;
+  margin-top: 42px;
+  padding-top: 32px;
+  border-top: 1px solid var(--button-doc-line);
+}
+
+.reference .heading {
+  margin-bottom: 14px;
+  color: var(--canvas-foreground);
+  font-size: clamp(22px, 2.5cqi, 29px);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+}
+
+.reference .subheading {
+  color: var(--canvas-foreground);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+}
+
+.lead {
+  max-width: 68ch;
+  color: var(--canvas-muted-foreground);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.roleList {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.roleCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 18px;
+}
+
+.roleHeader {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px 24px;
+  padding: 22px;
+}
+
+.roleHeader > div {
+  min-width: 0;
+  flex: 1 1 260px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 1.6;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.roleHeader .subheading {
+  font-size: 23px;
+}
+
+.roleHeader p {
+  max-width: 58ch;
+  margin-top: 7px;
+  color: var(--canvas-muted-foreground);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.dimensions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 22px;
+  padding-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dimensions dt {
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.dimensions dd {
+  margin: 3px 0 0;
+  color: var(--canvas-foreground);
+  font-size: 15px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.themePair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 225px), 1fr));
+  gap: 1px;
+  border-block: 1px solid var(--button-doc-line);
+  background: var(--button-doc-line);
+}
+
+.themeCanvas {
+  --canvas-foreground: var(--palette-black);
+  --ring: var(--palette-black);
+  min-width: 0;
+  padding: 16px 20px 13px;
+  color: var(--palette-black);
+}
+
+.themeCanvas[data-guide-button-theme="dark"] {
+  --canvas-foreground: var(--palette-white);
+  --ring: var(--palette-white);
+  color: var(--palette-white);
+}
+
+.themeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.liveSample {
+  display: flex;
+  min-height: 124px;
+  align-items: center;
+  justify-content: center;
+  padding-block: 18px;
+}
+
+.sampleButton {
+  max-width: 100%;
+  gap: 8px;
+}
+
+.sampleButton > [data-button-content] {
+  gap: 8px;
+}
+
+.canvasNote {
+  display: block;
+  font-size: 10px;
+  line-height: 1.6;
+  opacity: 0.65;
+}
+
+.usageNotes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 16px 26px;
+  padding: 18px 22px 22px;
+}
+
+.usageNotes dt {
+  margin-bottom: 5px;
+  color: var(--canvas-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.usageNotes dd {
+  margin: 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.feedback {
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 7px;
+  padding-top: 12px;
+  color: var(--canvas-muted-foreground);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.feedback svg {
+  flex: 0 0 auto;
+}
+
+.inspectorToolbar,
+.sectionToolbar {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-block: 20px;
+}
+
+.sectionToolbar .lead {
+  flex: 1 1 340px;
+}
+
+.segmented {
+  display: inline-flex;
+  max-width: 100%;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 10px;
+}
+
+.segmented button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--canvas-foreground) 10%, transparent);
+  color: var(--canvas-foreground);
+}
+
+.anatomy {
+  overflow: hidden;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 16px;
+}
+
+.stackCaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--button-doc-line);
+  background: var(--button-doc-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.stackCaption strong {
+  font-weight: 600;
+}
+
+.stackCaption > span {
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+}
+
+.stackNote {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--button-doc-line);
+  color: var(--canvas-muted-foreground);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.layerStack {
+  padding: 0;
+  list-style: none;
+}
+
+.layer {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px;
+}
+
+.layer + .layer {
+  border-top: 1px solid var(--button-doc-line);
+}
+
+.layerNumber {
+  padding-top: 1px;
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+}
+
+.layerBody {
+  min-width: 0;
+}
+
+.layerHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.layerHeading h5 {
+  color: var(--canvas-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.opacity {
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+
+.layerBody > p {
+  max-width: 65ch;
+  margin-top: 4px;
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.paintWell {
+  height: 26px;
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 7px;
+}
+
+.paintWell > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.colorStops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.colorStop {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--canvas-foreground);
+  text-align: left;
+}
+
+.colorSquare {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 1px solid rgb(127 127 127 / 25%);
+  border-radius: 5px;
+}
+
+.colorStop code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 11px;
+}
+
+.colorStop > svg {
+  flex: 0 0 auto;
+  color: var(--canvas-muted-foreground);
+}
+
+.noteGrid,
+.layoutGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.noteGrid p,
+.layoutExample p,
+.detailBody p {
+  margin-top: 9px;
+  color: var(--canvas-muted-foreground);
+  font-size: 14px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.detail {
+  min-width: 0;
+  margin-top: 20px;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 12px;
+}
+
+.detail > summary {
+  padding: 16px 18px;
+  color: var(--canvas-foreground);
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.7;
+  cursor: pointer;
+}
+
+.detail > :not(summary) {
+  margin: 0 16px 16px;
+}
+
+.detailBody {
+  padding-top: 1px;
+}
+
+.supportingPaint {
+  display: grid;
+  gap: 12px;
+  margin-block: 18px;
+}
+
+.supportingItem {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.supportingItem > div {
+  min-width: 0;
+  flex: 1 1 220px;
+}
+
+.supportingItem strong {
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.supportingItem p {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+.tableScroll {
+  max-width: 100%;
+  margin-block: 20px;
+  overflow-x: auto;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 13px;
+  scrollbar-width: thin;
+}
+
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tableScroll caption {
+  padding: 13px 15px;
+  background: var(--button-doc-soft);
+  color: color-mix(in srgb, var(--surface-reading-foreground) 86%, transparent);
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: 16px;
+  border-top: 1px solid var(--button-doc-line);
+  vertical-align: middle;
+}
+
+.tableScroll th {
+  color: var(--canvas-foreground);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.7;
+}
+
+.tableScroll thead th {
+  font-size: 10px;
+  letter-spacing: 0.025em;
+}
+
+.sizeTable {
+  min-width: 690px;
+}
+
+.sizeTable th:first-child {
+  width: 130px;
+}
+
+.sizeTable th > :is(strong, span, small) {
+  display: block;
+}
+
+.sizeTable th strong {
+  font-weight: 550;
+}
+
+.sizeTable th span {
+  margin-top: 3px;
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.sizeTable th small {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--button-doc-soft);
+  color: var(--canvas-muted-foreground);
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.sizeTable td {
+  min-width: 175px;
+}
+
+.sizeValues,
+.sizeTable td > small {
+  display: block;
+  color: var(--canvas-muted-foreground);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.sizeValues {
+  margin-top: 10px;
+}
+
+.caption {
+  max-width: 70ch;
+  margin-bottom: 18px !important;
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.stateTable {
+  min-width: 625px;
+}
+
+.layoutExample {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--button-doc-line);
+  border-radius: 15px;
+}
+
+.exampleActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 23px;
+}
+
+.apiTable {
+  min-width: 540px;
+}
+
+.apiTable th:first-child {
+  width: 150px;
+}
+
+.apiTable td {
+  min-width: 175px;
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.sourceMap {
+  display: grid;
+  gap: 14px;
+  margin-block: 18px 20px !important;
+}
+
+.sourceMap dt {
+  color: var(--canvas-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.sourceMap dd {
+  margin: 4px 0 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+@container (max-width: 400px) {
+  .roleHeader,
+  .usageNotes,
+  .layoutExample {
+    padding: 17px;
+  }
+
+  .themeCanvas {
+    padding-inline: 16px;
+  }
+
+  .layer {
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .dimensions {
+    gap: 20px;
+  }
+
+  .colorStop {
+    padding-inline: 6px;
+    gap: 5px;
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .jumpLinks a:hover,
+  .segmented button:hover,
+  .colorStop:hover,
+  .detail > summary:hover {
+    background: var(--button-doc-soft);
+  }
+}

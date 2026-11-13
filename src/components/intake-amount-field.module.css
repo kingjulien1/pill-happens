@@ -1,0 +1,147 @@
+.field {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  grid-template-columns: 28px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid var(--input);
+  border-radius: var(--dialog-radius-control, 12px);
+  background: transparent;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.field:focus-within {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 25%, transparent);
+}
+
+.field[data-invalid] {
+  border-color: var(--destructive);
+}
+
+.field[data-disabled] {
+  opacity: 0.5;
+}
+
+.field .stepButton {
+  --dialog-button-radius: var(--dialog-radius-compact, 8px);
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dialog-radius-compact, 8px);
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  color: color-mix(in srgb, var(--foreground) 76%, transparent);
+  box-shadow: none;
+}
+
+.stepButton > svg {
+  width: 14px;
+  height: 14px;
+}
+
+.stepButton:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.center {
+  display: flex;
+  min-width: 0;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: text;
+}
+
+.field .valueInput {
+  /* WebKit reserves a small extra editing/caret advance beyond the glyphs. */
+  min-width: calc(1ch + 2px);
+  max-width: calc(8ch + 2px);
+  height: 28px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+  text-align: right;
+  outline: none;
+  box-shadow: none;
+}
+
+.unit {
+  max-width: 8ch;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.separator,
+.approximate {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.dose {
+  display: inline-flex;
+  max-width: 50%;
+  min-width: 0;
+  align-items: baseline;
+  gap: 3px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.dose strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+.dose > span {
+  flex: 0 0 auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .field {
+    background: color-mix(in srgb, var(--input) 30%, transparent);
+  }
+}
+
+@media (min-width: 768px) {
+  .field .valueInput {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .field .stepButton:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+  }
+}

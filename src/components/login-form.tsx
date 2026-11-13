@@ -293,6 +293,7 @@ export function LoginForm() {
         onOpenChange={(open) => {
           if (!open) closeCreation();
         }}
+        publicScrollKey="create-journal"
         title="Create a New Journal?"
         context="New Space"
         description="This password isn’t linked to a journal yet."
@@ -326,6 +327,7 @@ export function LoginForm() {
 
             <section
               aria-labelledby="new-journal-password-label"
+              data-dialog-panel
               className="min-w-0 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 ring-4 ring-primary/5"
             >
               <div className="flex items-center justify-between gap-3 text-foreground">
@@ -363,7 +365,7 @@ export function LoginForm() {
             {creationError && (
               <p
                 role="alert"
-                className="rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-xs leading-relaxed text-destructive"
+                className="rounded-[var(--dialog-radius-control)] border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-xs leading-relaxed text-destructive"
               >
                 {creationError}
               </p>

@@ -5,27 +5,35 @@ import {
   type Intake,
   type Medication,
 } from "./domain";
+import {
+  isIntakeRoute,
+  preferredIntakeRoute,
+  type IntakeRoute,
+} from "./intake-routes";
 
 /** Raw controls stay strings; the original instant keeps seconds and DST offset. */
 export type IntakeFormDraft = {
   medicationId: string;
   quantity: string;
+  /** Missing on older drafts; the form keeps the entry's saved route. */
+  route?: IntakeRoute;
   initialTimestamp: string;
   takenAt: string;
   timezone: string;
-  note: string;
 };
 
 export function newIntakeFormDraft({
   intake,
   initialDay,
   medications,
+  intakes = [],
   timezone,
   now = new Date(),
 }: {
   intake?: Intake;
   initialDay?: string;
   medications: readonly Medication[];
+  intakes?: readonly Intake[];
   timezone: string;
   now?: Date;
 }): IntakeFormDraft {
@@ -42,10 +50,12 @@ export function newIntakeFormDraft({
         medications.find((item) => item.id === medicationId)?.defaultQuantity ??
         1,
     ),
+    route: intake
+      ? (intake.route ?? "unspecified")
+      : preferredIntakeRoute(medicationId, intakes),
     initialTimestamp,
     takenAt: toLocalInput(initialTimestamp, timezone),
     timezone,
-    note: intake?.note ?? "",
   };
 }
 
@@ -57,15 +67,14 @@ export function isIntakeFormDraft(value: unknown): value is IntakeFormDraft {
     item.medicationId.length > 150 ||
     typeof item.quantity !== "string" ||
     item.quantity.length > 256 ||
+    (item.route !== undefined && !isIntakeRoute(item.route)) ||
     typeof item.initialTimestamp !== "string" ||
     item.initialTimestamp.length > 40 ||
     !Number.isFinite(Date.parse(item.initialTimestamp)) ||
     typeof item.takenAt !== "string" ||
     item.takenAt.length > 80 ||
     typeof item.timezone !== "string" ||
-    item.timezone.length > 128 ||
-    typeof item.note !== "string" ||
-    item.note.length > 1000
+    item.timezone.length > 128
   )
     return false;
   try {

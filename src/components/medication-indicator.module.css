@@ -1,0 +1,17 @@
+.glyph {
+  display: block;
+  flex-shrink: 0;
+  fill: none;
+}
+
+.glyph[data-medication-indicator="benzodiazepine"] {
+  color: var(--medication-indicator-color, var(--color-pink-700));
+}
+
+.glyph[data-medication-indicator="opioid"] {
+  color: var(--medication-indicator-color, var(--color-amber-800, #973c00));
+}
+
+.glyph[data-medication-indicator="stimulant"] {
+  color: var(--medication-indicator-color, var(--palette-lilac));
+}

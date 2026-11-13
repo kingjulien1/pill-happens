@@ -1,0 +1,332 @@
+.stage {
+  --art-ink: var(--check-in-art-copy, #f3e8ff);
+  --art-soft: color-mix(
+    in srgb,
+    var(--check-in-secondary, var(--action-background)) 76%,
+    var(--palette-rose)
+  );
+  --art-rim: color-mix(in srgb, var(--harmony-edge) 35%, transparent);
+  --art-wash: color-mix(in srgb, var(--palette-iris) 20%, transparent);
+  --art-return-delay: 180ms;
+  --art-start: var(
+    --check-in-art-delay,
+    calc(var(--card-entry-delay, 0ms) + var(--art-return-delay))
+  );
+  --art-loop-start: calc(var(--art-start) + 1560ms);
+  --art-play: var(--page-entry-play-state, running);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  align-items: center;
+  justify-content: center;
+  color: var(--art-ink);
+  pointer-events: none;
+}
+
+.halo {
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  border-radius: 19px;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    var(--art-wash),
+    transparent 72%
+  );
+  opacity: 0.8;
+}
+
+.arrival,
+.tile {
+  position: relative;
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+}
+
+.tile {
+  isolation: isolate;
+  overflow: hidden;
+  border: 1.25px solid var(--art-rim);
+  background: var(--check-in-art-surface, #4e456e);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 10%),
+    0 2px 5px color-mix(in srgb, var(--palette-black) 9%, transparent);
+}
+
+.wash {
+  position: absolute;
+  z-index: -1;
+  inset: -30%;
+  background:
+    radial-gradient(ellipse at 30% 20%, var(--art-wash), transparent 55%),
+    radial-gradient(ellipse at 80% 75%, var(--art-wash), transparent 55%);
+  opacity: 0.8;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.frameTrace {
+  stroke-width: 0.8;
+  opacity: 0.32;
+  stroke-dasharray: 100;
+}
+
+.glints {
+  fill: var(--art-soft);
+  opacity: 0.65;
+}
+
+.symbolArrival,
+.symbolFloat {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+}
+
+.symbol {
+  display: block;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+}
+
+.rays {
+  color: var(--art-soft);
+  transform-origin: 18px 5px;
+}
+
+.horizon {
+  opacity: 0.65;
+}
+
+.flourish {
+  position: absolute;
+  inset: 0;
+  width: 56px;
+  height: 56px;
+  overflow: visible;
+  color: var(--art-soft);
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+/* The evening crescent owns its quiet sway and short lunar transitions. */
+.stage[data-check-in-artwork="evening"] .symbolFloat,
+.stage[data-check-in-artwork="evening"] .wash,
+.stage[data-check-in-artwork="evening"] .halo,
+.stage[data-check-in-artwork="evening"] .glints {
+  animation: none;
+}
+
+/* The carafe can pass above the tile while the existing artwork stays framed. */
+.stage[data-check-in-artwork="morning"] .tile {
+  overflow: visible;
+}
+
+.stage[data-check-in-artwork="morning"] .wash {
+  inset: 0;
+  border-radius: inherit;
+}
+
+.stage[data-check-in-artwork="morning"] .symbolFloat {
+  animation: none;
+}
+
+@media (max-width: 767px) {
+  .stage {
+    --art-return-delay: 400ms;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Keep both clocks parked until this card and the refresh curtain are ready. */
+  :global([data-card-entry-state="pending"]) .stage {
+    --art-play: paused;
+  }
+
+  .stage[data-artwork-dialog-open="true"] {
+    --art-play: paused;
+  }
+
+  .arrival {
+    animation: check-in-art-arrive 1560ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--art-start) backwards;
+  }
+
+  .symbolArrival {
+    animation: check-in-art-unfurl 1560ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--art-start) backwards;
+  }
+
+  .frameTrace {
+    animation: check-in-art-trace 1200ms ease-out calc(var(--art-start) + 180ms)
+      backwards;
+  }
+
+  .flourish {
+    animation: check-in-art-flourish 1200ms ease-out
+      calc(var(--art-start) + 260ms) backwards;
+  }
+
+  /* One duration and one start phase keep the quiet details in one choreography. */
+  .symbolFloat {
+    animation: check-in-art-float 7200ms ease-in-out var(--art-loop-start)
+      infinite;
+  }
+
+  .wash {
+    animation: check-in-art-wash 7200ms ease-in-out var(--art-loop-start)
+      infinite;
+  }
+
+  .halo,
+  .glints,
+  .rays {
+    animation: check-in-art-glimmer 7200ms ease-in-out var(--art-loop-start)
+      infinite;
+  }
+
+  .arrival,
+  .symbolArrival,
+  .frameTrace,
+  .flourish,
+  .symbolFloat,
+  .wash,
+  .halo,
+  .glints,
+  .rays {
+    animation-play-state: var(--art-play);
+  }
+}
+
+@keyframes check-in-art-arrive {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.68) rotate(-18deg);
+  }
+  38% {
+    opacity: 1;
+    transform: scale(1.09) rotate(6deg);
+  }
+  66% {
+    transform: scale(0.98) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes check-in-art-unfurl {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.28) rotate(-110deg);
+  }
+  48% {
+    opacity: 1;
+    transform: scale(1.17) rotate(15deg);
+  }
+  74% {
+    transform: scale(0.96) rotate(-4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes check-in-art-trace {
+  from {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 0.32;
+  }
+}
+
+@keyframes check-in-art-flourish {
+  0% {
+    opacity: 0;
+    transform: scale(0.55) rotate(-12deg);
+  }
+  35% {
+    opacity: 0.85;
+    transform: scale(0.95) rotate(3deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05) rotate(8deg);
+  }
+}
+
+@keyframes check-in-art-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  28% {
+    transform: translateY(-0.8px) rotate(-3deg);
+  }
+  58% {
+    transform: translateY(0.3px) rotate(2deg);
+  }
+  80% {
+    transform: translateY(-0.25px) rotate(-0.6deg);
+  }
+}
+
+@keyframes check-in-art-wash {
+  0%,
+  100% {
+    transform: rotate(0) scale(1);
+    opacity: 0.8;
+  }
+  28% {
+    transform: rotate(30deg) scale(1.06);
+    opacity: 1;
+  }
+  58% {
+    transform: rotate(-16deg) scale(0.96);
+    opacity: 0.62;
+  }
+  80% {
+    transform: rotate(7deg) scale(1.02);
+    opacity: 0.88;
+  }
+}
+
+@keyframes check-in-art-glimmer {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+  28% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0.8;
+  }
+}

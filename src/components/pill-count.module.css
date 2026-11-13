@@ -1,0 +1,260 @@
+.counts {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px 6px;
+  color: var(--canvas-foreground);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.part {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+}
+
+.mark {
+  --medication-indicator-mark-size: 18px;
+  flex: 0 0 auto;
+}
+
+.number {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.label,
+.separator {
+  flex: 0 0 auto;
+  color: var(--canvas-muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+@media (max-width: 359px) {
+  .counts {
+    column-gap: 5px;
+  }
+  .number {
+    font-size: 11px;
+  }
+  .label,
+  .separator {
+    font-size: 10px;
+  }
+}
+
+.counts[data-compact="true"] {
+  flex-wrap: wrap;
+  gap: 0 4px;
+}
+
+.counts[data-compact="true"] .part {
+  gap: 2px;
+}
+
+.counts[data-compact="true"] .mark {
+  --medication-indicator-mark-size: 15px;
+}
+
+.counts[data-compact="true"] .number {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.counts[data-compact="true"] .label,
+.counts[data-compact="true"] .separator {
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.counts[data-compact="true"][data-long-counts="true"] .part {
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+}
+
+.counts[data-compact="true"][data-long-counts="true"] .number {
+  width: 100%;
+}
+
+.counts[data-compact="true"][data-long-counts="true"] .separator {
+  display: none;
+}
+
+.counts[data-appearance="history"] {
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.counts[data-appearance="history"] .part {
+  flex: 0 0 auto;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.counts[data-appearance="history"][data-long-counts="true"] .part {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.counts[data-appearance="history"] .mark {
+  --medication-indicator-mark-size: 25px;
+}
+
+.counts[data-appearance="history"] .number {
+  width: auto;
+  min-inline-size: max-content;
+  flex: 0 0 auto;
+  overflow: hidden;
+  color: var(--canvas-foreground);
+  font-size: var(--history-value-size, 16px);
+  font-weight: 800;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.counts[data-appearance="history"][data-long-counts="true"] .number {
+  min-inline-size: 0;
+  flex: 0 1 auto;
+}
+
+.counts[data-appearance="history"] .label {
+  color: var(--canvas-muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.counts[data-appearance="history"] .separator {
+  display: block;
+  width: 1px;
+  height: 18px;
+  margin-inline-end: 8px;
+  background: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--palette-white) 43.922%, transparent) 25% 75%,
+    transparent
+  );
+}
+
+@container (max-width: 479px) {
+  .counts[data-appearance="history"] {
+    gap: 12px;
+  }
+
+  .counts[data-appearance="history"] .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    border: 0;
+    white-space: nowrap;
+  }
+}
+
+@container (max-width: 380px) {
+  .counts[data-appearance="history"] {
+    gap: 10px;
+  }
+
+  .counts[data-appearance="history"] .part {
+    gap: 5px;
+  }
+
+  .counts[data-appearance="history"] .mark {
+    --medication-indicator-mark-size: 20px;
+  }
+
+  .counts[data-appearance="history"] .separator {
+    height: 16px;
+    margin-inline-end: 5px;
+  }
+}
+
+/* Today’s upper and action rows share value/label typography and bottom alignment. */
+.counts:is([data-appearance="summary"], [data-appearance="dock"]) {
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  margin-inline-start: auto;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.counts:is([data-appearance="summary"], [data-appearance="dock"]) .part {
+  flex: 0 1 auto;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.counts:is([data-appearance="summary"], [data-appearance="dock"]) .mark {
+  --medication-indicator-mark-size: 20px;
+}
+
+.summaryValue {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1.2;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.summaryNumber {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--canvas-foreground);
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryLabel {
+  flex-shrink: 0;
+  color: var(--canvas-muted-foreground);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.counts:is([data-appearance="summary"], [data-appearance="dock"]) .separator {
+  align-self: center;
+  margin-inline-end: 2px;
+  color: var(--canvas-foreground);
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+/* Condensed numerals save width without changing the familiar count labels. */
+.counts[data-appearance="dock"] .summaryNumber {
+  font-family: var(--font-intake-numbers, var(--font-sans));
+  font-size: 15.5px;
+  font-weight: 700;
+}

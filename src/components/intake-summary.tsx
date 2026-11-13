@@ -1,38 +1,28 @@
-import { ActionIcon } from "@/components/action-icon";
+import { IntakeLogSymbol } from "@/components/intake-log-symbol";
+import { PillCount } from "@/components/pill-count";
+import type { PillCounts } from "@/lib/pill-counts";
 
 export function IntakeSummary({
   count,
+  pillCounts,
   today = false,
 }: {
   count: number;
+  pillCounts: PillCounts;
   today?: boolean;
 }) {
   return (
-    <div
-      className="canvas-copy flex items-center justify-between gap-2"
-      data-intake-summary
-    >
-      <h2 className="flex shrink-0 items-center gap-1 text-[13px] leading-none font-[550] whitespace-nowrap tabular-nums max-[359px]:text-[12.5px]">
-        <ActionIcon
-          name="confetti"
-          weight="fill"
-          className="streak-counter-icon size-[22px]"
-        />
-        <span className="leading-none">
-          Logged {count}
-          {today ? " Today" : ""}
-        </span>
-        <span className="inline-flex items-center gap-1 text-[10px] leading-none font-normal whitespace-nowrap text-muted-foreground max-[359px]:text-[9px]">
-          <span
-            aria-hidden="true"
-            className="size-[3px] shrink-0 rounded-full bg-current"
-          />
-          <span>{today ? "so far" : "that day"}</span>
+    <div className="intake-summary-row" data-intake-summary>
+      <h2
+        className="intake-summary-title"
+        aria-label={`${count} ${count === 1 ? "intake" : "intakes"} logged ${today ? "today" : "on this day"}`}
+      >
+        <IntakeLogSymbol className="intake-summary-symbol" />
+        <span className="intake-summary-label">
+          Logged <strong>{count}</strong>
         </span>
       </h2>
-      <span className="inline-flex shrink-0 items-center gap-1 text-[10px] leading-none font-normal whitespace-nowrap text-muted-foreground max-[359px]:text-[9px]">
-        <span>New day at 06:00</span>
-      </span>
+      <PillCount counts={pillCounts} appearance="summary" />
     </div>
   );
 }

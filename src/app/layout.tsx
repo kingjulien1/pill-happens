@@ -1,9 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Toaster } from "sonner";
 import { JournalBackground } from "@/components/journal-background";
 import { PwaProvider } from "@/components/pwa-provider";
+import { AppearanceHead } from "@/components/appearance-head";
+import {
+  AppearanceProvider,
+  AppearanceToaster,
+} from "@/components/appearance-provider";
 import { APP_THEME_VALUES } from "@/lib/app-theme";
+import {
+  PageRefreshHead,
+  PageRefreshScreen,
+} from "@/components/page-refresh-screen";
 import "./globals.css";
+import "./layout-spacing.css";
+import "./menu-surfaces.css";
+import "./choice-menus.css";
+import "./action-button-palette.css";
 
 export const metadata: Metadata = {
   title: {
@@ -50,25 +62,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <AppearanceHead />
+        <PageRefreshHead />
+      </head>
       <body>
-        <PwaProvider>
-          <JournalBackground />
-          {children}
-          <Toaster
-            theme="system"
-            position="top-center"
-            richColors
-            closeButton
-            toastOptions={{
-              style: {
-                background: "var(--popover)",
-                color: "var(--popover-foreground)",
-                borderColor: "var(--border)",
-              },
-            }}
-          />
-        </PwaProvider>
+        <PageRefreshScreen />
+        <AppearanceProvider>
+          <PwaProvider>
+            <JournalBackground />
+            {children}
+            <AppearanceToaster />
+          </PwaProvider>
+        </AppearanceProvider>
       </body>
     </html>
   );

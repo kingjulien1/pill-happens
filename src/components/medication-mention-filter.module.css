@@ -1,0 +1,95 @@
+.filter {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: var(--dialog-radius-control, 14px);
+  background:
+    radial-gradient(
+      ellipse at 12% 18%,
+      color-mix(in srgb, var(--palette-lilac) 7%, transparent),
+      transparent 74%
+    ),
+    color-mix(in srgb, var(--card) 90%, transparent);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--foreground) 13%, transparent);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+}
+.icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
+}
+.copy {
+  min-width: 0;
+}
+.eyebrow {
+  margin: 0 0 2px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 13px;
+}
+.title {
+  overflow: hidden;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail {
+  margin: 3px 0 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 15px;
+  overflow-wrap: anywhere;
+}
+.clear {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 7px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  color: var(--foreground);
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.clear:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.empty {
+  margin: 12px 0 20px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 17px;
+}
+@media (max-width: 359px) {
+  .filter {
+    gap: 7px;
+    padding: 10px;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .clear:hover {
+    background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  }
+}

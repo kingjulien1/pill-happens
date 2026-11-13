@@ -1,0 +1,271 @@
+.fields {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.section {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 12px;
+  border-radius: var(--dialog-radius-surface);
+  background:
+    radial-gradient(
+      ellipse at 12% 18%,
+      color-mix(in srgb, var(--palette-apricot) 2.5%, transparent),
+      transparent 72%
+    ),
+    color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+/* Match the evening form's restrained two-band panel treatment. */
+.section::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  box-sizing: border-box;
+  border: 3px solid color-mix(in srgb, var(--palette-white) 7%, transparent);
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 0.75px
+    color-mix(in srgb, var(--palette-apricot) 11%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.section:focus-within::before {
+  border-color: color-mix(in srgb, var(--palette-white) 12%, transparent);
+  box-shadow: inset 0 0 0 0.75px
+    color-mix(in srgb, var(--palette-apricot) 18%, transparent);
+}
+
+.sectionHeading {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sectionHeading h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+
+.sectionHeading > span {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.sectionHeading + .hint {
+  margin-top: -7px;
+}
+
+.ratings {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.field label {
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 16px;
+}
+
+.schedule,
+.interruptions {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.interruptions {
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.pair {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field .input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--dialog-radius-control);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.inputWithUnit {
+  position: relative;
+  min-width: 0;
+}
+
+.field .unitInput {
+  padding-right: 36px;
+}
+
+.inputUnit {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.field .timeInput {
+  display: flex;
+  align-items: center;
+  padding-right: 3px;
+  text-align: left;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.timeInput::-webkit-calendar-picker-indicator,
+.timeInput::-webkit-inner-spin-button,
+.timeInput::-webkit-clear-button {
+  display: none;
+  width: 0;
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+}
+
+.timeInput::-webkit-date-and-time-value {
+  display: inline-flex;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.timeInput::-webkit-datetime-edit,
+.timeInput::-webkit-datetime-edit-fields-wrapper {
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.durations {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.durationField {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.durationLegend {
+  margin-bottom: 6px;
+  padding: 0;
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 16px;
+}
+
+.durationInputs {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.durationInputs label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.summary {
+  display: flex;
+  min-width: 0;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+}
+.summary > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.summary dt {
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+.summary dd {
+  flex-shrink: 0;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 768px) {
+  .field .input {
+    font-size: 14px;
+  }
+}

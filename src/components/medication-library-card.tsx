@@ -1,18 +1,15 @@
 "use client";
 
-import { MedicationCardBase } from "@/components/medication-card-base";
-import {
-  medicationCardPriority,
-  MedicationCardOpioidDot,
-  MedicationCardPriorityRim,
-} from "@/components/medication-card-priority";
-import { MedicationCategoryBadges } from "@/components/medication-category-badges";
-import { MedicationTypeIcon } from "@/components/medication-icon";
-import { MEDICATION_CLASS_MARKERS } from "@/components/medication-class-badge";
+import { MedicationCard } from "@/components/medication-card";
+import { MedicationCardDose } from "@/components/medication-card-dose";
 import { formatDose, type Medication } from "@/lib/domain";
+import {
+  getMedicationCategories,
+  getMedicationCategory,
+} from "@/lib/medication-categories";
 import { getMedicationType } from "@/lib/medication-types";
 
-/** Library content composes the same frame as an intake, with one edit action. */
+/** Saved defaults use exactly the same two-row composition as actual intakes. */
 export function MedicationLibraryCard({
   medication,
   onEdit,
@@ -22,49 +19,55 @@ export function MedicationLibraryCard({
   onEdit: () => void;
   disabled?: boolean;
 }) {
-  const priority = medicationCardPriority(medication);
   const type = getMedicationType(medication.form);
   const ingredient = medication.activeIngredient?.trim();
+  const strength = formatDose(medication.strengthMg);
+  const categories = getMedicationCategories(medication);
+  const quantity = medication.defaultQuantity ?? 1;
+  const label = [
+    `Edit ${medication.name}`,
+    `${strength} milligrams per ${type.unit}`,
+    `default intake quantity ${formatDose(quantity)}`,
+    type.label,
+    ingredient ? `active substance ${ingredient}` : "active substance not set",
+    categories.length
+      ? `categories: ${categories.map((category) => getMedicationCategory(category).label).join(", ")}`
+      : null,
+    medication.archived ? "archived" : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
   return (
-    <MedicationCardBase
-      color={medication.color}
-      icon={medication.icon}
-      iconRotation={medication.iconRotation}
+    <MedicationCard
+      medication={medication}
+      name={medication.name}
+      form={medication.form}
+      ingredient={ingredient}
+      quantity={quantity}
       className="medication-library-card"
-      style={priority.style}
       onClick={onEdit}
       disabled={disabled}
-      aria-label={`Edit ${medication.name}, ${formatDose(medication.strengthMg)} milligrams per ${type.unit}${priority.classes.map((kind) => `, ${MEDICATION_CLASS_MARKERS[kind].accessibleLabel.toLowerCase()}`).join("")}${medication.archived ? ", archived" : ""}`}
+      aria-label={label}
       aria-haspopup="dialog"
+      data-card-entry
       data-medication-library-card={medication.id}
-      data-benzodiazepine={priority.benzo || undefined}
-      data-opioid={priority.opioid || undefined}
-      data-medication-classification={priority.classification}
       data-medication-archived={medication.archived || undefined}
-      decoration={
-        <MedicationCardPriorityRim
-          marked={priority.classes.length > 0}
-          benzo={priority.benzo}
+      leading={
+        <span
+          className="intake-card-time medication-library-default"
+          data-medication-default-label
+        >
+          Default
+        </span>
+      }
+      trailing={
+        <MedicationCardDose
+          quantity={quantity}
+          strengthMg={medication.strengthMg}
+          form={medication.form}
+          source="default"
         />
       }
-      iconDecoration={<MedicationCardOpioidDot present={priority.opioid} />}
-    >
-      <div className="medication-library-card-details">
-        <div className="medication-library-card-heading">
-          <h3 title={medication.name}>{medication.name}</h3>
-          <span className="intake-card-type" title={type.label}>
-            <MedicationTypeIcon type={medication.form} className="size-3" />
-            <span className="intake-card-type-label">{type.label}</span>
-          </span>
-        </div>
-        <div className="medication-library-card-meta">
-          <span>
-            {formatDose(medication.strengthMg)} mg / {type.unit}
-          </span>
-          {ingredient && <span title={ingredient}>{ingredient}</span>}
-        </div>
-        <MedicationCategoryBadges medication={medication} />
-      </div>
-    </MedicationCardBase>
+    />
   );
 }

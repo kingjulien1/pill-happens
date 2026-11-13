@@ -1,0 +1,90 @@
+.tile {
+  --choice-icon-background: #e7e5e4;
+  --choice-icon-foreground: #44403c;
+  display: inline-flex;
+  width: 23px;
+  min-width: 23px;
+  height: 23px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 7.5px;
+  background: color-mix(
+    in srgb,
+    var(--choice-icon-background) 28%,
+    transparent
+  );
+  color: var(--choice-icon-foreground);
+}
+
+.tile[data-choice-icon-tone="sky"] {
+  --choice-icon-background: #bae6fd;
+  --choice-icon-foreground: #075985;
+}
+
+.tile[data-choice-icon-tone="cyan"] {
+  --choice-icon-background: #a5f3fc;
+  --choice-icon-foreground: #155e75;
+}
+
+.tile[data-choice-icon-tone="violet"] {
+  --choice-icon-background: #ddd6fe;
+  --choice-icon-foreground: #5b21b6;
+}
+
+.tile[data-choice-icon-tone="rose"] {
+  --choice-icon-background: #fecdd3;
+  --choice-icon-foreground: #9f1239;
+}
+
+.tile[data-choice-icon-tone="amber"] {
+  --choice-icon-background: #fde68a;
+  --choice-icon-foreground: #92400e;
+}
+
+.tile[data-choice-icon-tone="teal"] {
+  --choice-icon-background: #99f6e4;
+  --choice-icon-foreground: #115e59;
+}
+
+.tile[data-choice-icon-tone="emerald"] {
+  --choice-icon-background: #a7f3d0;
+  --choice-icon-foreground: #065f46;
+}
+
+.tile[data-choice-icon-tone="orange"] {
+  --choice-icon-background: var(--palette-white);
+  --choice-icon-foreground: var(--palette-plum);
+}
+
+.tile .glyph {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  stroke-width: 2;
+  color: inherit;
+}
+
+:global([data-compact-choice-trigger]) .tile {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+:global([data-compact-choice-trigger]) .tile .glyph {
+  width: 14px;
+  height: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tile {
+    background: color-mix(
+      in srgb,
+      var(--choice-icon-background) 22%,
+      transparent
+    );
+    color: var(--choice-icon-background);
+  }
+}

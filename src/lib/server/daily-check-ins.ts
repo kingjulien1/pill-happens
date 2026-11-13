@@ -1,5 +1,5 @@
 import { dayKey, type AppData } from "@/lib/domain";
-import type { DailyCheckIn } from "@/lib/daily-check-in";
+import { getCheckInPeriod, type DailyCheckIn } from "@/lib/daily-check-in";
 import type { DailyCheckInInput } from "./validation";
 
 export const DAILY_CHECK_IN_LIMIT = 50_000;
@@ -21,7 +21,9 @@ export function upsertDailyCheckIn(
     );
 
   const checkIns = state.dailyCheckIns ?? [];
-  const existing = checkIns.find((entry) => entry.day === input.day);
+  const matches = (entry: DailyCheckIn) =>
+    entry.day === input.day && getCheckInPeriod(entry) === input.period;
+  const existing = checkIns.find(matches);
   if (!existing && checkIns.length >= DAILY_CHECK_IN_LIMIT)
     throw new DailyCheckInSaveError(
       "Your journal has reached its check-in limit. Export a backup before continuing.",
@@ -30,13 +32,37 @@ export function upsertDailyCheckIn(
   const timestamp = now.toISOString();
   const saved: DailyCheckIn = {
     ...input,
+    // An older full-form client cannot clear a newer Evening bedtime by omission.
+    ...(input.period === "evening" &&
+    input.bedtime === undefined &&
+    existing?.bedtime !== undefined
+      ? { bedtime: existing.bedtime }
+      : {}),
+    // Earlier clients cannot accidentally erase newer Morning sleep details.
+    ...(input.period === "morning" &&
+    input.morningSleep === undefined &&
+    existing?.morningSleep !== undefined
+      ? {
+          morningSleep:
+            existing.morningSleep === null
+              ? null
+              : { ...existing.morningSleep },
+          // Retained canonical sleep remains authoritative for legacy summaries.
+          sleepHours:
+            existing.morningSleep?.totalSleepMinutes == null
+              ? null
+              : existing.morningSleep.totalSleepMinutes / 60,
+        }
+      : input.morningSleep === undefined
+        ? {}
+        : {
+            morningSleep:
+              input.morningSleep === null ? null : { ...input.morningSleep },
+          }),
     moods: [...input.moods],
     createdAt: existing?.createdAt ?? timestamp,
     updatedAt: timestamp,
   };
-  // The day is the identity. An edit replaces it rather than appending another.
-  state.dailyCheckIns = [
-    ...checkIns.filter((entry) => entry.day !== input.day),
-    saved,
-  ];
+  // A period's edit leaves its counterpart on the same tracking day untouched.
+  state.dailyCheckIns = [...checkIns.filter((entry) => !matches(entry)), saved];
 }

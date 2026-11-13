@@ -16,7 +16,7 @@ import {
   Share2,
   Smartphone,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/journal-toast";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 
@@ -115,9 +115,9 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
       if (announced === waiting && updateToastVisible) return;
       announced = waiting;
       updateToastVisible = true;
-      toast("App update ready", {
+      toast.update("Reload when you’ve finished your current entry.", {
+        heading: "App update ready",
         id: "pwa-update",
-        description: "Reload when you’ve finished your current entry.",
         duration: Infinity,
         onDismiss: () => {
           updateToastVisible = false;
@@ -276,6 +276,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
       <ResponsiveModal
         open={helpOpen && !installed}
         onOpenChange={setHelpOpen}
+        publicScrollKey="install-app"
         title="Keep It Close"
         context="Install App"
         description="Your journal, one tap from your Home Screen or Dock."
@@ -284,6 +285,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
           {steps.map(({ icon: Icon, title, text }, index) => (
             <li
               key={title}
+              data-dialog-panel
               className="flex items-center gap-3 rounded-2xl border border-border/70 bg-foreground/[.025] p-3"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent text-foreground">

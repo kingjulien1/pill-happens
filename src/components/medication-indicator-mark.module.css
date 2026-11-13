@@ -1,0 +1,136 @@
+.mark {
+  display: inline-flex;
+  width: var(--medication-indicator-mark-size, 16px);
+  height: var(--medication-indicator-mark-size, 16px);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.mark > .glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.mark[data-medication-indicator-framed] {
+  width: var(--medication-indicator-mark-size, 22px);
+  height: var(--medication-indicator-mark-size, 22px);
+  border-radius: calc(var(--medication-indicator-mark-size, 22px) * 7 / 22);
+}
+
+.mark[data-medication-indicator-framed] > .glyph {
+  /* Category and count tiles share one frame and glyph proportion. */
+  width: 80%;
+  height: 80%;
+  color: inherit;
+}
+
+.mark[data-medication-indicator-mark="benzodiazepine"] {
+  background: #fda4af;
+  color: var(--color-pink-700, #c6005c);
+}
+
+.mark[data-medication-indicator-mark="opioid"] {
+  background: var(--color-rose-400, #ff637e);
+  color: var(--color-rose-700, #c70036);
+}
+
+.mark[data-medication-indicator-mark="antidepressant"] {
+  background: var(--color-orange-300, #ffb86a);
+  color: var(--color-yellow-600, #d08700);
+}
+
+.mark[data-medication-indicator-mark="antipsychotic"] {
+  background: var(--color-violet-300, #c4b5fd);
+  color: var(--color-purple-700, #8200db);
+}
+
+.mark[data-medication-indicator-mark="sleep-aid"] {
+  background: var(--color-indigo-300, #a3b3ff);
+  color: var(--color-indigo-700, #432dd7);
+}
+
+.mark[data-medication-indicator-mark="stimulant"] {
+  background: var(--color-cyan-300, #53eafd);
+  color: var(--color-cyan-700, #007595);
+}
+
+.mark[data-medication-indicator-mark="mood-stabilizer"] {
+  background: var(--color-lime-300, #bbf451);
+  color: var(--color-lime-700, #497d00);
+}
+
+.mark[data-medication-indicator-mark="pain-relief"] {
+  background: var(--color-pink-300, #fda5d5);
+  color: var(--color-pink-600, #e60076);
+}
+
+.mark[data-medication-indicator-mark="hormone"] {
+  background: var(--color-green-300, #7bf1a8);
+  color: var(--color-emerald-600, #009966);
+}
+
+.mark[data-medication-indicator-mark="digestive"] {
+  background: var(--color-emerald-300, #5ee9b5);
+  color: var(--color-teal-700, #00786f);
+}
+
+/* The remaining manual labels retain the selector's established color pairs. */
+.mark[data-medication-indicator-mark="anti-inflammatory"] {
+  background: #a5f3fc;
+  color: #155e75;
+}
+
+.mark[data-medication-indicator-mark="allergy"] {
+  background: #fbcfe8;
+  color: #9d174d;
+}
+
+.mark[data-medication-indicator-mark="thyroid"] {
+  background: #e9d5ff;
+  color: #6b21a8;
+}
+
+.mark[data-medication-indicator-mark="cardiovascular"] {
+  background: #fecdd3;
+  color: #9f1239;
+}
+
+.mark[data-medication-indicator-mark="antibiotic"] {
+  background: #a7f3d0;
+  color: #065f46;
+}
+
+.mark[data-medication-indicator-mark="anticonvulsant"] {
+  background: #bae6fd;
+  color: #075985;
+}
+
+.mark[data-medication-indicator-mark="diabetes"] {
+  background: #bfdbfe;
+  color: #1e40af;
+}
+
+.mark[data-medication-indicator-mark="supplement"] {
+  background: #bbf7d0;
+  color: #166534;
+}
+
+.mark[data-medication-indicator-mark="other"] {
+  background: #e7e5e4;
+  color: #44403c;
+}
+
+.mark[data-medication-indicator-mark="pills"] {
+  background: var(--color-indigo-300, #a3b3ff);
+  color: var(--color-violet-900, #4d179a);
+}
+
+.mark[data-medication-indicator-mark="check-in"] {
+  background: #d6b397;
+  color: var(--palette-plum);
+}

@@ -1,6 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import {
+  useImperativeHandle,
+  useSyncExternalStore,
+  type Ref,
+  type RefObject,
+  type ReactNode,
+} from "react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import {
   Dialog,
@@ -19,22 +25,32 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { HeadingText } from "@/components/heading-text";
 import { cn } from "@/lib/utils";
+import { useDialogScrollMemory } from "@/components/use-dialog-scroll-memory";
+import type { PublicDialogScrollKey } from "@/lib/dialog-scroll-memory";
+import closeStyles from "./dialog-close.module.css";
+import styles from "./responsive-modal.module.css";
 
 const subscribe = (fn: () => void) => {
   const query = window.matchMedia("(min-width: 768px)");
   query.addEventListener("change", fn);
   return () => query.removeEventListener("change", fn);
 };
+export type DialogScrollControls = { save: () => void };
 export function ResponsiveModal({
   open,
   onOpenChange,
   title,
   titleIcon,
   headerVariant,
+  headerActions,
   context,
   description,
+  scrollKey,
+  publicScrollKey,
+  restoreScroll = true,
+  returnFocus,
+  scrollControlsRef,
   children,
 }: {
   open: boolean;
@@ -42,8 +58,16 @@ export function ResponsiveModal({
   title: string;
   titleIcon?: ActionIconName;
   headerVariant?: "medication";
+  /** Native header controls share the close button’s action rail. */
+  headerActions?: ReactNode;
   context?: string;
   description: string;
+  scrollKey?: string;
+  publicScrollKey?: PublicDialogScrollKey;
+  /** Explicit section shortcuts take precedence over a previously saved position. */
+  restoreScroll?: boolean;
+  returnFocus?: RefObject<HTMLElement | null> | (() => HTMLElement | null);
+  scrollControlsRef?: Ref<DialogScrollControls>;
   children: React.ReactNode;
 }) {
   const desktop = useSyncExternalStore(
@@ -51,113 +75,126 @@ export function ResponsiveModal({
     () => window.matchMedia("(min-width: 768px)").matches,
     () => false,
   );
+  const { setScrollElement, save: saveScroll } =
+    useDialogScrollMemory<HTMLDivElement>({
+      open,
+      scrollKey,
+      publicScrollKey,
+      layout: desktop,
+      restorePosition: restoreScroll,
+    });
+  useImperativeHandle(scrollControlsRef, () => ({ save: saveScroll }), [
+    saveScroll,
+  ]);
+  const changeOpen = (next: boolean) => {
+    if (!next) saveScroll();
+    onOpenChange(next);
+  };
   const medicationHeader = headerVariant === "medication";
-  const heading = (
-    <HeadingText
-      className="items-center gap-y-0"
-      title={
-        <span
-          data-slot="modal-title-line"
-          className="inline-flex min-h-7 items-center gap-2 leading-7"
-        >
-          {titleIcon && (
-            <ActionIcon
-              name={titleIcon}
-              weight="bold"
-              className={medicationHeader ? "size-[22px]" : "size-4"}
-            />
-          )}
-          <span>{title}</span>
-        </span>
-      }
-      context={context}
-    />
+  const headerContent = (
+    titleNode: ReactNode,
+    closeNode: ReactNode,
+    descriptionNode: ReactNode,
+  ) => (
+    <div
+      className={styles.headingRow}
+      data-modal-header
+      data-has-title-icon={titleIcon ? "" : undefined}
+    >
+      {titleIcon && (
+        <ActionIcon
+          name={titleIcon}
+          weight="bold"
+          className={styles.titleIcon}
+          aria-hidden="true"
+        />
+      )}
+      <div className={styles.headingCopy}>
+        {titleNode}
+        {context && <p className={styles.context}>{context}</p>}
+      </div>
+      <div className={closeStyles.actions}>
+        {headerActions}
+        {closeNode}
+      </div>
+      {descriptionNode}
+    </div>
   );
   const closeButton = (
     <Button
       variant="ghost"
       size="icon"
-      className={cn(
-        "absolute -top-2 right-0 size-11 text-foreground",
-        medicationHeader && "-top-2.5 -right-2 size-8",
-      )}
+      className={closeStyles.control}
+      data-dialog-corner="control"
       aria-label="Close"
     />
   );
   if (desktop)
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={changeOpen}>
         <DialogContent
+          finalFocus={returnFocus}
+          ref={setScrollElement}
+          data-dialog-scroll
           showCloseButton={false}
-          className="max-h-[90dvh] overflow-y-auto rounded-3xl p-7 sm:max-w-[440px]"
+          className="max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]"
         >
           <DialogHeader
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
           >
-            <div className="relative">
-              <DialogTitle
-                className={cn(
-                  "pr-13 text-lg font-semibold tracking-tight text-foreground",
-                  medicationHeader && "pr-8",
-                )}
-              >
-                {heading}
-              </DialogTitle>
+            {headerContent(
+              <DialogTitle className={styles.title}>{title}</DialogTitle>,
               <DialogClose render={closeButton}>
                 <ActionIcon
                   name="close"
-                  className={medicationHeader ? "size-3" : "size-4"}
+                  weight="regular"
+                  className="size-[18px]"
                 />
-              </DialogClose>
-            </div>
-            <DialogDescription
-              className={
-                medicationHeader ? "sr-only" : "text-xs leading-relaxed"
-              }
-            >
-              {description}
-            </DialogDescription>
+              </DialogClose>,
+              <DialogDescription
+                className={medicationHeader ? "sr-only" : styles.description}
+              >
+                {description}
+              </DialogDescription>,
+            )}
           </DialogHeader>
           {children}
         </DialogContent>
       </Dialog>
     );
   return (
-    <Drawer open={open} onOpenChange={onOpenChange} showSwipeHandle>
-      <DrawerContent className="rounded-t-[28px]">
+    <Drawer open={open} onOpenChange={changeOpen} showSwipeHandle>
+      <DrawerContent
+        className="rounded-t-[var(--dialog-radius-surface)]"
+        finalFocus={returnFocus}
+      >
         <DrawerHeader
           className={cn(
             "px-6 pt-5 pb-4 text-left!",
             medicationHeader && "pb-3 min-[360px]:pb-5",
           )}
         >
-          <div className="relative">
-            <DrawerTitle
-              className={cn(
-                "pr-13 text-lg font-semibold tracking-tight",
-                medicationHeader && "pr-8",
-              )}
-            >
-              {heading}
-            </DrawerTitle>
+          {headerContent(
+            <DrawerTitle className={styles.title}>{title}</DrawerTitle>,
             <DrawerClose render={closeButton}>
               <ActionIcon
                 name="close"
-                className={medicationHeader ? "size-3" : "size-4"}
+                weight="regular"
+                className="size-[18px]"
               />
-            </DrawerClose>
-          </div>
-          <DrawerDescription
-            className={
-              medicationHeader
-                ? "sr-only"
-                : "mt-1.5 pr-6 text-left text-xs leading-relaxed"
-            }
-          >
-            {description}
-          </DrawerDescription>
+            </DrawerClose>,
+            <DrawerDescription
+              className={medicationHeader ? "sr-only" : styles.description}
+            >
+              {description}
+            </DrawerDescription>,
+          )}
         </DrawerHeader>
-        <div className="overflow-y-auto px-6 pt-1 pb-[max(24px,env(safe-area-inset-bottom))]">
+        <div
+          ref={setScrollElement}
+          data-dialog-scroll
+          className="min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pt-1 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]"
+        >
           {children}
         </div>
       </DrawerContent>
