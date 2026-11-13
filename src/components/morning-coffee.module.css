@@ -21,7 +21,7 @@
 
 .mug {
   stroke: #c1b6cc;
-  stroke-width: 2;
+  stroke-width: 2.4;
 }
 
 .mugBody {
@@ -30,6 +30,12 @@
 
 .mugHandle {
   fill: none;
+}
+
+/* Feathered paint rises from the rim without a filtered or animated blur. */
+.glow {
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .warmth {
@@ -45,29 +51,29 @@
 .ribbon {
   stroke-dasharray: 52 168;
   stroke-dashoffset: 0;
-  opacity: 0.65;
+  opacity: 0.85;
 }
 
 .trace {
-  stroke-width: 0.75;
+  stroke-width: 1;
 }
 
 .halo {
   stroke: var(--steam-ink);
-  stroke-width: 3;
-  opacity: 0.14;
+  stroke-width: 3.6;
+  opacity: 0.24;
   filter: blur(0.8px);
 }
 
 .thread {
   stroke: var(--steam-ink);
-  stroke-width: 1.25;
+  stroke-width: 1.5;
 }
 
 .highlight {
   stroke: #fff1f8;
-  stroke-width: 0.45;
-  opacity: 0.5;
+  stroke-width: 0.6;
+  opacity: 0.72;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -97,17 +103,17 @@
   18% {
     stroke-dasharray: 40 168;
     stroke-dashoffset: 8;
-    opacity: 0.8;
+    opacity: 0.95;
   }
   42% {
     stroke-dasharray: 58 168;
     stroke-dashoffset: -22;
-    opacity: 0.76;
+    opacity: 0.9;
   }
   68% {
     stroke-dasharray: 40 168;
     stroke-dashoffset: -67;
-    opacity: 0.3;
+    opacity: 0.5;
   }
   90%,
   100% {
@@ -141,6 +147,6 @@
 
   .ribbon {
     stroke-dasharray: none;
-    opacity: 0.38;
+    opacity: 0.55;
   }
 }

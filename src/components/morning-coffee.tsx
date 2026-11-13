@@ -23,7 +23,7 @@ const WISPS = [
     delay: "-6.6s",
     duration: "8.9s",
     sway: "12.1s",
-    color: "#f6d7ef",
+    color: "var(--color-fuchsia-300, #f0abfc)",
   },
 ] as const;
 
@@ -130,6 +130,34 @@ export function MorningCoffee({
     >
       <svg className={styles.scene} viewBox="0 0 56 56" fill="none">
         <defs>
+          <radialGradient
+            id={`${id}-steam-glow`}
+            cx="50%"
+            cy="50%"
+            r="50%"
+            fx="50%"
+            fy="78%"
+          >
+            <stop
+              stopColor="var(--color-pink-200, #fbcfe8)"
+              stopOpacity="0.44"
+            />
+            <stop
+              offset=".26"
+              stopColor="var(--color-pink-300, #f9a8d4)"
+              stopOpacity="0.28"
+            />
+            <stop
+              offset=".64"
+              stopColor="var(--color-fuchsia-300, #f0abfc)"
+              stopOpacity="0.1"
+            />
+            <stop
+              offset="1"
+              stopColor="var(--color-pink-300, #f9a8d4)"
+              stopOpacity="0"
+            />
+          </radialGradient>
           {WISPS.map(({ path, color }, index) => (
             <g key={path}>
               <path id={`${id}-steam-${index}`} d={path} pathLength="100" />
@@ -141,14 +169,37 @@ export function MorningCoffee({
                 y2="-4"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor={color} stopOpacity="0.12" />
-                <stop offset=".3" stopColor={color} stopOpacity="0.2" />
-                <stop offset=".7" stopColor={color} stopOpacity="0.1" />
+                <stop stopColor={color} stopOpacity="0.3" />
+                <stop offset=".3" stopColor={color} stopOpacity="0.46" />
+                <stop offset=".7" stopColor={color} stopOpacity="0.24" />
                 <stop offset="1" stopColor={color} stopOpacity="0" />
               </linearGradient>
             </g>
           ))}
         </defs>
+        <g
+          className={styles.glow}
+          fill={`url(#${id}-steam-glow)`}
+          data-coffee-glow
+        >
+          <ellipse cx="26" cy="12" rx="13" ry="19" />
+          <ellipse
+            cx="16"
+            cy="18"
+            rx="9"
+            ry="13"
+            opacity="0.45"
+            transform="rotate(-16 16 18)"
+          />
+          <ellipse
+            cx="36"
+            cy="16"
+            rx="9"
+            ry="15"
+            opacity="0.45"
+            transform="rotate(16 36 16)"
+          />
+        </g>
         <g className={styles.warmth}>
           {WISPS.map((wisp, index) => (
             <g
