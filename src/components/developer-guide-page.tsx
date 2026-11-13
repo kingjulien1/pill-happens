@@ -2308,32 +2308,36 @@ export function DeveloperGuidePage() {
                 provide explicit heading and description copy; the facade never
                 guesses where an arbitrary message should be split. Its six
                 types are Success, Error, Info, Warning, Loading and Update.
-                Semantic icons and restrained palette variations identify each
-                kind beyond color, including the circled exclamation for
-                informational notices and the check for successful operations.
+                Semantic glyphs and secondary type labels identify each kind
+                beyond color: a double check for success, X for error,
+                lightbulb for information, warning triangle, rotating refresh
+                mark for loading and sparkles for an available update.
               </p>
               <p>
-                The canonical Lilac and Plum tones connect the glass surface and
-                layered artwork in both themes. The 2.5px rim shares the
-                check-in card’s border geometry. Its 50px square artwork uses a
-                deepened Plum base, while primary copy follows Black #111014 in
-                light mode and White #ffffff in dark mode. Two decorative rings
-                each cover 84% of their circumference, with a 12% trailing fade.
-                Their opposing ambient rotations take 8 and 11 seconds; a quiet
-                7.2-second float keeps the artwork fluid without moving the
-                text. The rings express activity, not a countdown or measured
-                progress.
+                Short messages use a compact 64px minimum height, 40px artwork
+                and 10px vertical padding. The title and description share a 2px
+                gap; complete descriptions wrap naturally without clamping.
+                A 38% Pink 300 overlay sits above the themed glass surface. A
+                thicker 4px neutral rim and a 2px Pink 500 band at 56% opacity
+                both paint inward using inset shadows, preserving Sonner’s
+                hover and swipe pseudo-elements. The same pink edge token
+                appears in the icon’s rear plate and front tile. Secondary
+                copy uses 78% ink in light mode and 90% in dark mode to stay
+                readable against the brighter pink surface.
               </p>
               <p>
-                The 920ms surface arrival accompanies Sonner’s native card
-                transform overshoot and a border pulse; the card itself never
-                scales, preserving stack height measurements. Artwork arrives
-                over 1440ms after a 160ms delay, with the glyph following at
-                240ms. The coordinated icon and copy exit fits within Sonner’s
-                200ms removal window. Ambient artwork pauses behind the stack,
-                while the surface gradient continues to move. Hidden loading
-                artwork stops after an in-place update. Reduced motion presents
-                settled artwork without the choreography.
+                Three 34px rounded squares replace the circular rings. Pink
+                and lilac rear plates tilt gently in opposite directions over
+                7.4 and 8.1 seconds; the deep Plum front keeps the 18px glyph
+                legible. A short sheen, tiny square sparks and a restrained
+                glyph spring complete the artwork. The icon stack arrives over
+                780ms after an 80ms delay; its glyph follows at 140ms. The
+                notification’s position and scale remain entirely under Sonner’s
+                control. Artwork and copy departures fit within its 200ms
+                removal window. Hidden loading artwork and collapsed rear
+                plates pause, while reduced motion presents the settled design.
+                Button hover styling runs only with a fine pointer that
+                supports hover.
               </p>
               <p>
                 Sonner remains responsible for announcements, keyboard access,
@@ -2344,8 +2348,8 @@ export function DeveloperGuidePage() {
                 request, extra timer or separate lifetime owner.
                 Loading-to-success and loading-to-error updates keep the same ID
                 and list item. The top-center stack caps at 460px, respects safe
-                areas and retains 16px mobile side insets. Its 15px gap exposes
-                rear cards slightly more; three notifications remain visible
+                areas and retains 16px mobile side insets. Its compact 10px gap
+                separates the stack; three notifications remain visible
                 with a default lifetime of 5,500ms.
               </p>
               <p>

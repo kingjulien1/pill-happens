@@ -3,10 +3,10 @@
 import type { CSSProperties } from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
-  ArrowUp,
-  Check,
-  Info,
+  CheckCheck,
+  Lightbulb,
   RefreshCcw,
+  Sparkles,
   TriangleAlert,
   X,
 } from "lucide-react";
@@ -16,16 +16,15 @@ import "./sonner.css";
 type ToastSymbolKind =
   "success" | "error" | "info" | "warning" | "loading" | "update";
 const symbols = {
-  success: Check,
+  success: CheckCheck,
   error: X,
-  info: Info,
+  info: Lightbulb,
   warning: TriangleAlert,
   loading: RefreshCcw,
-  update: ArrowUp,
+  update: Sparkles,
 };
 
-/** Independent wrappers keep arrival, quiet motion and departure from competing.
- * The open rings supply the circle for the default exclamation-point symbol. */
+/** Square plates share the journal artwork language; Sonner owns the card motion. */
 export function ToastSymbol({ kind }: { kind: ToastSymbolKind }) {
   const Icon = symbols[kind];
   return (
@@ -36,39 +35,20 @@ export function ToastSymbol({ kind }: { kind: ToastSymbolKind }) {
     >
       <span className="journal-toast-art-arrival" key={kind}>
         <span className="journal-toast-halo" />
+        <span className="journal-toast-plate journal-toast-plate-back" />
+        <span className="journal-toast-plate journal-toast-plate-middle" />
         <span className="journal-toast-tile">
           <span className="journal-toast-wash" />
-          <span className="journal-toast-orbits">
-            <span className="journal-toast-orbit journal-toast-orbit-main" />
-            <span className="journal-toast-orbit journal-toast-orbit-light" />
-          </span>
           <span className="journal-toast-glyph-enter">
             <span className="journal-toast-glyph-float">
-              {kind === "info" ? (
-                <svg
-                  className="journal-toast-glyph"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 6v8" />
-                  <path d="M12 18h.01" />
-                </svg>
-              ) : (
-                <Icon
-                  className="journal-toast-glyph"
-                  size={22}
-                  strokeWidth={2.5}
-                />
-              )}
+              <Icon
+                className="journal-toast-glyph"
+                size={18}
+                strokeWidth={2.5}
+              />
             </span>
           </span>
         </span>
-        <span className="journal-toast-arrival-wave" />
-        <span className="journal-toast-arrival-wave journal-toast-arrival-echo" />
         <span className="journal-toast-sparks">
           {[0, 1, 2, 3].map((index) => (
             <span
@@ -106,7 +86,7 @@ export function Toaster({
     <Sonner
       position="top-center"
       duration={5500}
-      gap={15}
+      gap={10}
       visibleToasts={3}
       closeButton
       offset={{ top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))" }}

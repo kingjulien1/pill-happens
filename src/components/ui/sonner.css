@@ -1,96 +1,90 @@
-/* Sonner owns transform, hover bridges, stack opacity, gestures and the 200ms
-   removal clock. Artwork uses independent wrappers; no competing transforms. */
+/* Sonner owns card transforms, stack geometry, swipe bridges and lifetime.
+   Decorative motion stays on independent square-artwork wrappers. */
 .journal-toaster[data-sonner-toaster] {
   --toast-ink: var(--palette-black);
-  --toast-muted: color-mix(in srgb, var(--toast-ink) 72%, transparent);
+  --toast-muted: color-mix(in srgb, var(--toast-ink) 78%, transparent);
   --toast-surface: var(--popover);
-  --toast-accent: #9585cb;
-  --toast-bright: #e9dcff;
-  --toast-soft: #b4accf;
+  --toast-accent: #fda5d5;
+  --toast-bright: #fff1f8;
+  --toast-soft: #d8b4fe;
   --toast-tile: #342e49;
   --toast-rim: #87749d;
+  --toast-pink-wash: color-mix(
+    in srgb,
+    var(--color-pink-300, #fda5d5) 38%,
+    transparent
+  );
+  --toast-pink-edge: color-mix(
+    in srgb,
+    var(--color-pink-500, #ec4899) 56%,
+    transparent
+  );
   --toast-shadow: color-mix(in srgb, var(--palette-black) 18.824%, transparent);
-  --toast-wash-strength: 13%;
   font-family: var(--font-sans);
 }
 .journal-toaster[data-sonner-toaster][data-sonner-theme="dark"] {
   --toast-ink: var(--palette-white);
-  --toast-surface: var(--popover);
+  --toast-muted: color-mix(in srgb, var(--toast-ink) 90%, transparent);
   --toast-rim: #9c88b9;
   --toast-shadow: #100b2199;
-  --toast-wash-strength: 15%;
 }
 .journal-toaster [data-type="success"] {
-  --toast-accent: #9e88cc;
-  --toast-bright: #eee8f8;
-  --toast-soft: #b6a2d8;
+  --toast-accent: #fda5d5;
+  --toast-bright: #ffe4f3;
+  --toast-soft: #c4b5fd;
 }
 .journal-toaster [data-type="error"] {
-  --toast-accent: #cf6d94;
+  --toast-accent: #fb7185;
   --toast-bright: #ffe0e9;
-  --toast-soft: #e6a4b7;
+  --toast-soft: #f9a8d4;
   --toast-tile: #452736;
   --toast-rim: #c77a95;
 }
 .journal-toaster [data-type="warning"] {
-  --toast-accent: #c79762;
+  --toast-accent: #f6c989;
   --toast-bright: #ffebc2;
-  --toast-soft: #e1bb8d;
+  --toast-soft: #f9a8d4;
   --toast-tile: #443227;
   --toast-rim: #b78c63;
 }
 .journal-toaster [data-type="info"] {
-  --toast-accent: #8a9ecd;
-  --toast-bright: #dbedff;
-  --toast-soft: #b0c0dd;
-  --toast-tile: #29344b;
-  --toast-rim: #819bc0;
+  --toast-accent: #c4b5fd;
+  --toast-bright: #f5e8ff;
+  --toast-soft: #f9a8d4;
 }
 .journal-toaster [data-type="loading"] {
-  --toast-accent: #9b87d2;
-  --toast-bright: #eee3ff;
-  --toast-soft: #c1b2e0;
+  --toast-accent: #f9a8d4;
+  --toast-bright: #ffe4f3;
+  --toast-soft: #c4b5fd;
 }
 .journal-toaster .journal-toast--update {
-  --toast-accent: #aa83be;
+  --toast-accent: #e5a4f5;
   --toast-bright: #f9dfff;
-  --toast-soft: #d5a8d7;
+  --toast-soft: #f9a8d4;
   --toast-rim: #b18dbd;
 }
 .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
-  --toast-wash: color-mix(
-    in srgb,
-    var(--toast-accent) var(--toast-wash-strength),
-    transparent
-  );
   --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 50%, transparent);
-  --toast-close-fill: color-mix(in srgb, var(--toast-ink) 6.25%, transparent);
+  --toast-close-fill: color-mix(in srgb, var(--toast-ink) 7%, transparent);
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) auto;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px 13px;
-  min-height: 96px;
-  padding: 15px 14px;
-  border: 2.5px solid var(--toast-rim-muted);
-  border-radius: var(--intake-card-radius, 21px);
+  gap: 7px 9px;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 18px;
   background:
-    radial-gradient(ellipse at 0 12%, var(--toast-wash), transparent 66%),
-    radial-gradient(ellipse at 100% 88%, var(--toast-wash), transparent 70%),
+    linear-gradient(var(--toast-pink-wash), var(--toast-pink-wash)),
     color-mix(in srgb, var(--toast-surface) 97%, transparent);
-  background-size:
-    180% 180%,
-    180% 180%,
-    auto;
-  background-position:
-    0% 0%,
-    100% 100%,
-    0 0;
-  background-clip: padding-box;
   color: var(--toast-ink);
+  /* Four pixels of the original rim, then a two-pixel pink band, both inward.
+     No toast pseudo-elements: Sonner needs them for hover and swipe bridges. */
   box-shadow:
-    inset 0 0 0 0.75px color-mix(in srgb, var(--toast-bright) 24%, transparent),
-    0 18px 44px -20px var(--toast-shadow),
-    0 5px 15px -7px var(--toast-shadow);
+    inset 0 0 0 4px var(--toast-rim-muted),
+    inset 0 0 0 6px var(--toast-pink-edge),
+    0 12px 28px -16px var(--toast-shadow),
+    0 3px 10px -5px var(--toast-shadow);
   -webkit-backdrop-filter: blur(30px) saturate(1.15);
   backdrop-filter: blur(30px) saturate(1.15);
   transition:
@@ -116,8 +110,8 @@
   [data-icon] {
   grid-column: 1;
   grid-row: 1;
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   margin: 0;
   display: grid;
   place-items: center;
@@ -128,7 +122,7 @@
   grid-column: 2 / -1;
   grid-row: 1;
   min-width: 0;
-  gap: 5px;
+  gap: 2px;
   padding-right: 23px;
 }
 .journal-toaster[data-sonner-toaster]
@@ -140,23 +134,23 @@
   [data-sonner-toast][data-styled="true"]
   [data-title] {
   color: var(--toast-ink);
-  font-size: 14px;
-  font-weight: 680;
-  line-height: 1.35;
-  letter-spacing: -0.015em;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   text-shadow: none;
   overflow-wrap: anywhere;
 }
 .journal-toast-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 2px 6px;
+  gap: 1px 5px;
 }
 .journal-toast-heading-meta {
   display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
 }
 .journal-toast-heading-text {
@@ -167,28 +161,28 @@
   font-weight: 500;
 }
 .journal-toast-kind {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 500;
-  letter-spacing: 0.015em;
+  letter-spacing: 0.01em;
   color: var(--toast-muted);
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
   [data-description] {
   color: var(--toast-muted);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 450;
-  line-height: 1.5;
+  line-height: 1.4;
   overflow-wrap: anywhere;
   text-shadow: none;
 }
-/* Same square, translucent lip and two corner washes as check-in artwork;
-   #4e456e shaded by one third gives #342e49. */
+/* Three small rounded plates echo medication artwork and the loading mark.
+   Their subdued counter-tilts keep the glyph legible while the stack shuffles. */
 .journal-toast-symbol {
   position: relative;
   display: block;
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   pointer-events: none;
 }
 .journal-toast-art-arrival {
@@ -197,95 +191,65 @@
   display: grid;
   place-items: center;
 }
+.journal-toast-plate,
+.journal-toast-tile {
+  box-sizing: border-box;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+}
+.journal-toast-plate {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  box-shadow: inset 0 0 0 1px var(--toast-pink-edge);
+}
+.journal-toast-plate-back {
+  background: var(--toast-pink-edge);
+  transform: translate(-1px, 1px) rotate(-11deg);
+}
+.journal-toast-plate-middle {
+  background: color-mix(in srgb, var(--toast-soft) 60%, var(--toast-tile));
+  transform: translate(1px, 0) rotate(9deg);
+}
 .journal-toast-tile {
   position: relative;
   isolation: isolate;
   display: grid;
   place-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 16px;
-  border: 1.25px solid color-mix(in srgb, var(--toast-soft) 23%, transparent);
+  overflow: hidden;
   background:
     radial-gradient(
-      ellipse at 5% 4%,
-      color-mix(in srgb, var(--toast-soft) 16%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse at 96% 98%,
-      color-mix(in srgb, var(--toast-accent) 14%, transparent),
-      transparent 66%
+      ellipse at 15% 0%,
+      color-mix(in srgb, var(--toast-accent) 32%, transparent),
+      transparent 76%
     ),
     var(--toast-tile);
   box-shadow:
-    inset 0 1px 1px #ffffff11,
-    0 2px 5px color-mix(in srgb, var(--palette-black) 6.275%, transparent);
+    inset 0 0 0 1.5px var(--toast-pink-edge),
+    inset 0 1px 0 color-mix(in srgb, var(--toast-bright) 24%, transparent);
 }
 .journal-toast-wash {
   position: absolute;
-  inset: 1px;
-  border-radius: 14px;
-  background: radial-gradient(
-    ellipse at 25% 15%,
-    color-mix(in srgb, var(--toast-soft) 15%, transparent),
-    transparent 72%
+  inset: -30% -90%;
+  background: linear-gradient(
+    110deg,
+    transparent 42%,
+    color-mix(in srgb, var(--toast-bright) 20%, transparent) 50%,
+    transparent 58%
   );
+  transform: translateX(-40%);
+  opacity: 0;
 }
 .journal-toast-halo {
   position: absolute;
-  inset: -5px;
-  border-radius: 21px;
+  inset: -4px;
+  border-radius: 14px;
   background: radial-gradient(
     ellipse,
     color-mix(in srgb, var(--toast-accent) 24%, transparent),
     transparent 72%
-  );
-}
-.journal-toast-orbits {
-  position: absolute;
-  inset: 4px;
-}
-/* Exact angular coverage: 72% solid + 12% trailing fade + 16% open.
-   Radial masks keep both rings genuinely circular and vector-sharp. */
-.journal-toast-orbit {
-  position: absolute;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    var(--toast-accent) 0% 72%,
-    transparent 84% 100%
-  );
-  -webkit-mask-image: radial-gradient(
-    farthest-side,
-    transparent calc(100% - 3px),
-    #000 calc(100% - 2.5px)
-  );
-  mask-image: radial-gradient(
-    farthest-side,
-    transparent calc(100% - 3px),
-    #000 calc(100% - 2.5px)
-  );
-}
-.journal-toast-orbit-main {
-  inset: 3px;
-}
-.journal-toast-orbit-light {
-  inset: 0;
-  background: conic-gradient(
-    from 180deg,
-    var(--toast-bright) 0% 72%,
-    transparent 84% 100%
-  );
-  -webkit-mask-image: radial-gradient(
-    farthest-side,
-    transparent calc(100% - 1.35px),
-    #000 calc(100% - 1px)
-  );
-  mask-image: radial-gradient(
-    farthest-side,
-    transparent calc(100% - 1.35px),
-    #000 calc(100% - 1px)
   );
 }
 .journal-toast-glyph-enter,
@@ -293,25 +257,15 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   color: var(--toast-bright);
 }
 .journal-toaster[data-sonner-toaster] [data-icon] .journal-toast-glyph {
   display: block;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   flex: none;
-}
-.journal-toast-arrival-wave {
-  position: absolute;
-  inset: 1px;
-  border: 1px solid var(--toast-soft);
-  border-radius: 16px;
-  opacity: 0;
-}
-.journal-toast-arrival-echo {
-  border-color: var(--toast-bright);
 }
 .journal-toast-sparks {
   position: absolute;
@@ -320,26 +274,24 @@
 .journal-toast-spark-position {
   position: absolute;
   inset: 0;
-  rotate: calc(var(--spark-index) * 90deg + 30deg);
+  rotate: calc(var(--spark-index) * 90deg + 35deg);
 }
 .journal-toast-spark {
   position: absolute;
-  left: calc(50% - 1.5px);
+  left: calc(50% - 1px);
   top: 4px;
-  width: 3px;
-  height: 5px;
-  border-radius: 2px;
-  background: var(--toast-soft);
+  width: 2px;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--toast-pink-edge);
   opacity: 0;
 }
 .journal-toast-spark-position:nth-child(even) .journal-toast-spark {
   background: var(--toast-bright);
-  width: 2px;
-  height: 4px;
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
-  [data-close-button] {
+  button[data-close-button] {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -347,40 +299,32 @@
   transform: none;
   display: grid;
   place-items: center;
-  width: 22.4px;
-  height: 22.4px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: 7px;
   background: var(--toast-close-fill);
-  color: color-mix(in srgb, var(--toast-ink) 59.2%, transparent);
+  color: color-mix(in srgb, var(--toast-ink) 68%, transparent);
   box-shadow: none;
   transition:
     background 180ms ease,
     color 180ms ease;
 }
-/* Preserve a usable target beyond the smaller visual square. */
+/* Keep the visual square small while retaining a 36px dismissal target. */
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
   [data-close-button]::before {
   content: "";
   position: absolute;
-  inset: -7px;
+  inset: -8px;
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
   [data-close-button]
   svg {
-  width: 13px;
-  height: 13px;
-}
-@media (hover: hover) {
-  .journal-toaster[data-sonner-toaster]
-    [data-sonner-toast][data-styled="true"]
-    [data-close-button]:hover {
-    background: color-mix(in srgb, var(--toast-ink) 12%, transparent);
-    color: var(--toast-ink);
-  }
+  width: 12px;
+  height: 12px;
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
@@ -388,15 +332,18 @@
   grid-column: 2 / -1;
   grid-row: 2;
   justify-self: start;
-  height: 30px;
-  min-height: 30px;
-  padding: 0 11px;
+  min-width: 0;
+  max-width: 100%;
+  height: 27px;
+  min-height: 27px;
+  padding: 0 9px;
   margin: 0;
-  border-radius: 9px;
-  border: 1px solid color-mix(in srgb, var(--toast-ink) 15%, transparent);
+  border-radius: 8px;
+  border: 0;
   background: color-mix(in srgb, var(--toast-accent) 22%, var(--toast-surface));
+  box-shadow: inset 0 0 0 1px var(--toast-pink-edge);
   color: var(--toast-ink);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
 }
 .journal-toaster[data-sonner-toaster]
@@ -414,141 +361,93 @@
 .journal-toaster[data-sonner-toaster]
   :is([data-button], [data-close-button], [data-sonner-toast]):focus-visible {
   outline: 2px solid var(--toast-rim);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
-.journal-toaster[data-sonner-toaster]
-  [data-sonner-toast][data-styled="true"]
-  [data-button]:hover {
-  background: color-mix(in srgb, var(--toast-accent) 35%, var(--toast-surface));
+@media (hover: hover) and (pointer: fine) {
+  .journal-toaster[data-sonner-toaster]
+    [data-sonner-toast][data-styled="true"]
+    [data-close-button]:hover {
+    background: color-mix(in srgb, var(--toast-ink) 14%, transparent);
+    color: var(--toast-ink);
+  }
+  .journal-toaster[data-sonner-toaster]
+    [data-sonner-toast][data-styled="true"]
+    [data-button]:hover {
+    background: color-mix(
+      in srgb,
+      var(--toast-accent) 35%,
+      var(--toast-surface)
+    );
+  }
 }
 .journal-toaster .sonner-loader {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
 }
 @media (max-width: 479px) {
   .journal-toaster[data-sonner-toaster]
     [data-sonner-toast][data-styled="true"] {
-    padding: 13px 11px;
-    column-gap: 11px;
-  }
-  .journal-toaster[data-sonner-toaster]
-    [data-sonner-toast][data-styled="true"]
-    [data-title] {
-    font-size: 13px;
-  }
-  .journal-toaster[data-sonner-toaster]
-    [data-sonner-toast][data-styled="true"]
-    [data-description] {
-    font-size: 11.5px;
+    padding-inline: 11px;
   }
 }
 @media (prefers-reduced-motion: no-preference) {
   .journal-toaster[data-sonner-toaster]
-    [data-mounted="true"]:not([data-removed="true"]):not(
-      [data-swipe-out="true"]
-    ) {
-    animation:
-      journal-toast-surface-arrive 920ms cubic-bezier(0.22, 1, 0.36, 1) both,
-      journal-toast-drift 16s ease-in-out 920ms infinite;
-  }
-  .journal-toaster[data-sonner-toaster]
     [data-mounted="true"]
     .journal-toast-art-arrival {
-    animation: journal-toast-art-arrive 1440ms cubic-bezier(0.22, 1, 0.36, 1)
-      160ms backwards;
+    animation: journal-toast-art-arrive 780ms cubic-bezier(0.22, 1, 0.36, 1)
+      80ms backwards;
   }
   .journal-toaster[data-sonner-toaster]
     [data-mounted="true"]
     .journal-toast-glyph-enter {
-    animation: journal-toast-unfurl 1440ms cubic-bezier(0.22, 1, 0.36, 1) 240ms
+    animation: journal-toast-unfurl 780ms cubic-bezier(0.22, 1, 0.36, 1) 140ms
       backwards;
   }
   .journal-toaster[data-sonner-toaster]
     [data-mounted="true"]
-    .journal-toast-arrival-wave {
-    animation: journal-toast-wave 900ms ease-out 450ms both;
-  }
-  .journal-toaster[data-sonner-toaster]
-    [data-mounted="true"]
-    .journal-toast-arrival-echo {
-    animation-delay: 550ms;
-  }
-  .journal-toaster[data-sonner-toaster]
-    [data-mounted="true"]
     .journal-toast-spark {
-    animation: journal-toast-spark-burst 760ms ease-out
-      calc(500ms + var(--spark-index) * 38ms) both;
+    animation: journal-toast-spark-burst 640ms ease-out
+      calc(280ms + var(--spark-index) * 36ms) both;
   }
-  .journal-toast-orbit-main {
-    animation: journal-toast-turn 8s linear infinite;
+  .journal-toast-plate-back {
+    animation: journal-toast-back-shuffle 7.4s ease-in-out infinite;
   }
-  .journal-toast-orbit-light {
-    animation: journal-toast-turn 11s linear infinite reverse;
+  .journal-toast-plate-middle {
+    animation: journal-toast-middle-shuffle 8.1s ease-in-out -2.2s infinite;
   }
   .journal-toast-glyph-float {
-    animation: journal-toast-breathe 7.2s ease-in-out 1680ms infinite;
+    animation: journal-toast-breathe 6.8s ease-in-out 920ms infinite;
   }
-  .journal-toast-wash,
-  .journal-toast-halo {
-    animation: journal-toast-light 7.2s ease-in-out 1680ms infinite;
+  .journal-toast-wash {
+    animation: journal-toast-sheen 4.8s ease-in-out 580ms infinite;
   }
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
       infinite;
   }
-  [data-toast-symbol="error"] .journal-toast-glyph-enter {
-    --toast-glyph-start: 36deg;
-    --toast-glyph-overshoot: -8deg;
-  }
-  [data-toast-symbol="warning"] .journal-toast-glyph-enter {
-    --toast-glyph-start: -25deg;
-    --toast-glyph-overshoot: 8deg;
-  }
-  [data-toast-symbol="update"] .journal-toast-glyph-enter {
-    --toast-glyph-start: -45deg;
-    --toast-glyph-overshoot: 12deg;
-  }
   .journal-toaster[data-sonner-toaster]
     [data-mounted="true"]:not([data-removed="true"])
-    [data-title] {
-    animation: journal-toast-copy-arrive 700ms cubic-bezier(0.22, 1, 0.36, 1)
-      190ms backwards;
-  }
-  .journal-toaster[data-sonner-toaster]
-    [data-mounted="true"]:not([data-removed="true"])
-    [data-description] {
-    animation: journal-toast-copy-arrive 740ms cubic-bezier(0.22, 1, 0.36, 1)
-      270ms backwards;
-  }
-  .journal-toaster[data-sonner-toaster]
-    [data-mounted="true"]:not([data-removed="true"])
-    [data-button] {
-    animation: journal-toast-copy-arrive 700ms ease-out 320ms backwards;
+    [data-content] {
+    animation: journal-toast-copy-arrive 460ms ease-out 90ms backwards;
   }
   .journal-toaster[data-sonner-toaster]
     [data-mounted="true"]
     [data-close-button]
     svg {
-    animation: journal-toast-close-arrive 760ms cubic-bezier(0.22, 1, 0.36, 1)
-      350ms backwards;
+    animation: journal-toast-close-arrive 540ms cubic-bezier(0.22, 1, 0.36, 1)
+      180ms backwards;
   }
-  /* Resting animation only for visible content. Hidden loader art stops too. */
+  /* Collapsed rear content and hidden loaders must not keep decorative loops running. */
   .journal-toaster[data-sonner-toaster]
     [data-front="false"][data-expanded="false"]
     :is(
-      .journal-toast-orbit,
+      .journal-toast-plate,
       .journal-toast-glyph-float,
       .journal-toast-wash,
-      .journal-toast-halo,
       .journal-toast-glyph
     ),
   .journal-toaster .sonner-loader[data-visible="false"] * {
     animation-play-state: paused !important;
-  }
-  /* Separate outer wrappers reverse without resetting an unfinished arrival. */
-  .journal-toaster[data-sonner-toaster]
-    [data-removed="true"]:not([data-swipe-out="true"]) {
-    animation: journal-toast-surface-leave 180ms ease-in both;
   }
   .journal-toaster[data-sonner-toaster]
     [data-removed="true"]
@@ -559,35 +458,17 @@
     animation: journal-toast-copy-leave 170ms ease-in both;
   }
 }
-@keyframes journal-toast-surface-arrive {
-  0%,
-  100% {
-    border-color: var(--toast-rim-muted);
-  }
-  44% {
-    border-color: color-mix(in srgb, var(--toast-rim) 85%, transparent);
-  }
-  68% {
-    border-color: color-mix(in srgb, var(--toast-rim) 40%, transparent);
-  }
-}
 @keyframes journal-toast-art-arrive {
   0% {
     opacity: 0.3;
-    transform: translateY(6px) scale(0.48) rotate(-22deg);
+    transform: translateY(3px) scale(0.62) rotate(-14deg);
   }
-  26% {
+  42% {
     opacity: 1;
-    transform: scale(0.8) rotate(-8deg);
+    transform: translateY(-1px) scale(1.1) rotate(4deg);
   }
-  43% {
-    transform: translateY(-2px) scale(1.22) rotate(8deg);
-  }
-  63% {
-    transform: translateY(1px) scale(0.94) rotate(-3deg);
-  }
-  81% {
-    transform: scale(1.025) rotate(1deg);
+  70% {
+    transform: scale(0.97) rotate(-1deg);
   }
   100% {
     opacity: 1;
@@ -597,49 +478,56 @@
 @keyframes journal-toast-unfurl {
   0% {
     opacity: 0.35;
-    transform: scale(0.22) rotate(var(--toast-glyph-start, -110deg));
+    transform: scale(0.4) rotate(-55deg);
   }
-  45% {
+  48% {
     opacity: 1;
-    transform: scale(1.3) rotate(var(--toast-glyph-overshoot, 16deg));
+    transform: scale(1.2) rotate(9deg);
   }
-  67% {
-    transform: scale(0.92) rotate(-4deg);
-  }
-  84% {
-    transform: scale(1.04) rotate(1deg);
+  76% {
+    transform: scale(0.96) rotate(-2deg);
   }
   100% {
     opacity: 1;
     transform: none;
   }
 }
-@keyframes journal-toast-wave {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  18% {
-    opacity: 0.5;
-  }
+@keyframes journal-toast-back-shuffle {
+  0%,
   100% {
-    opacity: 0;
-    transform: scale(1.65);
-    border-radius: 50%;
+    transform: translate(-1px, 1px) rotate(-11deg);
+  }
+  45% {
+    transform: translate(-2px, 0) rotate(-14deg);
+  }
+  78% {
+    transform: translate(-0.5px, 1.5px) rotate(-9deg);
+  }
+}
+@keyframes journal-toast-middle-shuffle {
+  0%,
+  100% {
+    transform: translate(1px, 0) rotate(9deg);
+  }
+  48% {
+    transform: translate(2px, -0.5px) rotate(12deg);
+  }
+  78% {
+    transform: translate(0.5px, 0.5px) rotate(7deg);
   }
 }
 @keyframes journal-toast-spark-burst {
   0% {
     opacity: 0;
-    transform: translateY(4px) scale(0.3);
+    transform: translateY(3px) scale(0.3);
   }
   24% {
-    opacity: 0.8;
-    transform: translateY(-4px) scale(1.15);
+    opacity: 0.85;
+    transform: translateY(-2px) scale(1.1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-13px) scale(0.2);
+    transform: translateY(-8px) scale(0.2);
   }
 }
 @keyframes journal-toast-turn {
@@ -652,50 +540,32 @@
   100% {
     transform: translateY(0) rotate(0);
   }
-  28% {
-    transform: translateY(-0.8px) rotate(-3deg);
+  32% {
+    transform: translateY(-0.65px) rotate(-3deg);
   }
-  58% {
+  64% {
     transform: translateY(0.3px) rotate(2deg);
   }
-  80% {
-    transform: translateY(-0.25px) rotate(-0.6deg);
-  }
 }
-@keyframes journal-toast-light {
+@keyframes journal-toast-sheen {
   0%,
+  22%,
   100% {
-    opacity: 0.65;
+    opacity: 0;
+    transform: translateX(-40%);
   }
-  28% {
-    opacity: 1;
-  }
-  58% {
-    opacity: 0.5;
-  }
-  80% {
+  38% {
     opacity: 0.8;
   }
-}
-@keyframes journal-toast-drift {
-  0%,
-  100% {
-    background-position:
-      0% 0%,
-      100% 100%,
-      0 0;
-  }
-  50% {
-    background-position:
-      90% 70%,
-      10% 20%,
-      0 0;
+  62% {
+    opacity: 0;
+    transform: translateX(40%);
   }
 }
 @keyframes journal-toast-copy-arrive {
   from {
     opacity: 0;
-    transform: translateY(9px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -705,46 +575,29 @@
 @keyframes journal-toast-close-arrive {
   from {
     opacity: 0;
-    transform: rotate(-70deg) scale(0.4);
+    transform: rotate(-35deg) scale(0.6);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-@keyframes journal-toast-surface-leave {
-  0% {
-    border-color: var(--toast-rim-muted);
-  }
-  28% {
-    border-color: color-mix(in srgb, var(--toast-bright) 65%, transparent);
-  }
-  100% {
-    border-color: transparent;
-  }
-}
 @keyframes journal-toast-art-leave {
   0% {
     transform: scale(1);
   }
-  25% {
-    transform: scale(1.16) rotate(4deg);
+  30% {
+    transform: scale(1.08) rotate(3deg);
   }
   100% {
     opacity: 0;
-    transform: scale(0.38) rotate(-24deg);
+    transform: scale(0.6) rotate(-14deg);
   }
 }
 @keyframes journal-toast-copy-leave {
-  0% {
-    transform: translateY(0);
-  }
-  25% {
-    transform: translateY(1px);
-  }
-  100% {
+  to {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-4px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
