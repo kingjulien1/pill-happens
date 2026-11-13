@@ -180,11 +180,13 @@ export function MorningCoffee({
             </g>
           ))}
         </g>
-        <path
-          className={styles.mug}
-          data-coffee-mug
-          d="M14 29h23v8a7 7 0 0 1-7 7h-9a7 7 0 0 1-7-7v-8Zm23 2h1.5a4 4 0 0 1 0 8H37"
-        />
+        <g className={styles.mug} data-coffee-mug>
+          <path
+            className={styles.mugBody}
+            d="M14 29h23v8a7 7 0 0 1-7 7h-9a7 7 0 0 1-7-7v-8Z"
+          />
+          <path className={styles.mugHandle} d="M37 31h1.5a4 4 0 0 1 0 8H37" />
+        </g>
       </svg>
     </span>
   );

@@ -1,5 +1,11 @@
 /* Paint outside the measured card without changing its layout or hit target. */
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+  --entry-frame-outset: 2.5px;
+  --entry-rim-width: 4px;
+  --entry-inner-rim-width: 2px;
+  --entry-inner-rim-offset: calc(
+    var(--entry-rim-width) - var(--entry-frame-outset)
+  );
   overflow: visible;
 }
 
@@ -17,16 +23,17 @@
 
 /* A stronger neutral frame grows inward; medication color stays a quiet tint. */
 .card:global([data-intake-card]) {
-  --entry-frame-outset: 2.5px;
-  --entry-rim-width: 4px;
-  --entry-inner-rim-width: 2px;
-  --entry-inner-rim-offset: calc(
-    var(--entry-rim-width) - var(--entry-frame-outset)
+  --entry-surface-base: color-mix(
+    in srgb,
+    var(--entry-color) 5.5%,
+    transparent
   );
-  --entry-surface-base: color-mix(in srgb, var(--entry-color) 5.5%, transparent);
 }
 
-.card:global([data-intake-card])::after {
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card]
+  )::after {
   content: "";
   position: absolute;
   z-index: 3;

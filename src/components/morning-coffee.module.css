@@ -20,8 +20,16 @@
 }
 
 .mug {
-  stroke: var(--check-in-art-copy, #fdf1f7);
+  stroke: #c1b6cc;
   stroke-width: 2;
+}
+
+.mugBody {
+  fill: #c1b6cc;
+}
+
+.mugHandle {
+  fill: none;
 }
 
 .warmth {

@@ -20,7 +20,6 @@
     var(--palette-rose)
   );
   --check-in-rim-dark: color-mix(in srgb, #7b659d 92%, var(--palette-rose));
-  --entry-rim-width: 2.5px;
   color: var(--card-foreground);
   box-shadow: none;
   -webkit-tap-highlight-color: transparent;
@@ -49,12 +48,6 @@
 
 .card:disabled {
   opacity: 0.5;
-}
-
-.card:global(.intake-log-card):focus,
-.card:global(.intake-log-card):focus-visible {
-  outline: none;
-  box-shadow: none;
 }
 
 /* Time, title and the lower invitation share one protected text grid. */
