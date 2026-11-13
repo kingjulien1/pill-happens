@@ -3,47 +3,66 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import styles from "./evening-moon.module.css";
 
-type LunarMode = "moon" | "sun-moon";
+const STAR_POSITIONS = [
+  { x: 8, y: 0 },
+  { x: 23, y: 2 },
+  { x: 30, y: 13 },
+  { x: 27, y: 29 },
+  { x: 6, y: 31 },
+  { x: -1, y: 14 },
+  { x: 22, y: 11 },
+] as const;
+const STAR_COLORS = [
+  ["#f9a8d4", "#fce7f3"],
+  ["#c4b5fd", "#f9a8d4"],
+  ["#bae6fd", "#e9d5ff"],
+  ["#fde68a", "#fff7d6"],
+  ["#e9d5ff", "#fbcfe8"],
+] as const;
+const STAR_PATH = "M0-3.2.85-.85 3.2 0 .85.85 0 3.2-.85.85-3.2 0-.85-.85Z";
 
-const TRANSITION_MS = 920;
-const SPARKLES = [
-  { fromX: -2, fromY: -1, toX: -16, toY: -14, color: "#fff5df" },
-  { fromX: 2, fromY: -2, toX: 16, toY: -17, color: "#ffd2a8" },
-  { fromX: 1, fromY: 2, toX: 18, toY: 12, color: "#bce8f5" },
-  { fromX: -2, fromY: 2, toX: -14, toY: 17, color: "#d6d0ff" },
-];
+type EveningStar = {
+  id: number;
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
+  duration: number;
+  size: number;
+  angle: number;
+  turn: number;
+  colors: (typeof STAR_COLORS)[number];
+  bright: boolean;
+};
 
-/** One crescent stays mounted while the sun quietly joins and leaves it. */
+/** A quiet crescent rocks gently while a few short-lived stars find their light. */
 export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
   const rootRef = useRef<HTMLSpanElement>(null);
-  const modeRef = useRef<LunarMode>("moon");
-  const finishTransitionRef = useRef<(() => void) | null>(null);
+  const nextStarId = useRef(0);
   const [view, setView] = useState({
-    mode: "moon" as LunarMode,
     active: false,
-    transitioning: false,
-    bursting: false,
-    burst: 0,
+    stars: [] as EveningStar[],
   });
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-
     const stage = root.closest<HTMLElement>("[data-check-in-artwork]") ?? root;
     const card = root.closest<HTMLElement>(
       "[data-card-entry], [data-card-entry-state]",
     );
+    const readiness = root.closest<HTMLElement>("[data-page-entry-ready]");
+    const refreshContent = root.closest<HTMLElement>(
+      "[data-page-refresh-content]",
+    );
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const timers = new Set<number>();
+    const live = new Map<number, EveningStar>();
     let visible = !("IntersectionObserver" in window);
     let active: boolean | null = null;
     let disposed = false;
-    let inTransition = false;
     let syncFrame: number | null = null;
-    let fallbackTimer: number | null = null;
-    let midpointTimer: number | null = null;
-    let burstEndTimer: number | null = null;
+    let lastSlot = -1;
 
     function later(callback: () => void, delay: number) {
       const timer = window.setTimeout(() => {
@@ -51,74 +70,62 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
         if (!disposed) callback();
       }, delay);
       timers.add(timer);
-      return timer;
     }
 
-    function cancel(timer: number | null) {
-      if (timer === null) return;
-      window.clearTimeout(timer);
-      timers.delete(timer);
-    }
-
-    function clearTimers() {
+    function clearStars() {
       timers.forEach((timer) => window.clearTimeout(timer));
       timers.clear();
-      fallbackTimer = midpointTimer = burstEndTimer = null;
+      live.clear();
     }
 
-    function emitSparkles() {
-      if (!active) return;
-      cancel(burstEndTimer);
-      setView((current) => ({
-        ...current,
-        bursting: true,
-        burst: current.burst + 1,
-      }));
-      burstEndTimer = later(() => {
-        setView((current) => ({ ...current, bursting: false }));
-      }, 1580);
+    function spawnStar() {
+      if (!active || live.size >= 3) return;
+      const slots = STAR_POSITIONS.map((_, index) => index).filter((index) => {
+        if (index === lastSlot) return false;
+        const point = STAR_POSITIONS[index];
+        return !Array.from(live.values()).some(
+          (star) => Math.hypot(star.x - point.x, star.y - point.y) < 12,
+        );
+      });
+      if (!slots.length) return;
+      const slot = slots[Math.floor(Math.random() * slots.length)];
+      const point = STAR_POSITIONS[slot];
+      const star: EveningStar = {
+        id: nextStarId.current++,
+        x: point.x + (Math.random() - 0.5) * 1.4,
+        y: point.y + (Math.random() - 0.5) * 1.4,
+        dx: (Math.random() - 0.5) * 2.4,
+        dy: -0.8 - Math.random() * 1.8,
+        duration: 1000 + Math.random() * 1500,
+        size: 4.8 + Math.random() * 2,
+        angle: (Math.random() - 0.5) * 24,
+        turn: (Math.random() > 0.5 ? 1 : -1) * (12 + Math.random() * 16),
+        colors: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+        bright:
+          Math.random() < 0.28 &&
+          !Array.from(live.values()).some((item) => item.bright),
+      };
+      lastSlot = slot;
+      live.set(star.id, star);
+      setView((current) => ({ ...current, stars: [...current.stars, star] }));
+      later(() => {
+        live.delete(star.id);
+        setView((current) => ({
+          ...current,
+          stars: current.stars.filter((item) => item.id !== star.id),
+        }));
+      }, star.duration);
     }
 
-    function queueSparkles() {
+    function queueStar(first = false) {
       later(
         () => {
           if (!active) return;
-          if (!inTransition) emitSparkles();
-          queueSparkles();
+          spawnStar();
+          queueStar();
         },
-        2500 + Math.random() * 2000,
+        first ? 450 + Math.random() * 450 : 650 + Math.random() * 650,
       );
-    }
-
-    function queueTransition() {
-      later(
-        () => {
-          if (!active) return;
-          inTransition = true;
-          cancel(burstEndTimer);
-          burstEndTimer = null;
-          modeRef.current = modeRef.current === "moon" ? "sun-moon" : "moon";
-          setView((current) => ({
-            ...current,
-            mode: modeRef.current,
-            transitioning: true,
-            bursting: false,
-          }));
-          midpointTimer = later(emitSparkles, 350);
-          fallbackTimer = later(finishTransition, TRANSITION_MS + 160);
-        },
-        5000 + Math.random() * 5000,
-      );
-    }
-
-    function finishTransition() {
-      if (!active || !inTransition) return;
-      inTransition = false;
-      cancel(fallbackTimer);
-      cancel(midpointTimer);
-      fallbackTimer = midpointTimer = null;
-      setView((current) => ({ ...current, transitioning: false }));
-      queueTransition();
     }
 
     function syncActivity() {
@@ -131,22 +138,11 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
         card?.dataset.cardEntryState !== "pending" &&
         getComputedStyle(stage).getPropertyValue("--art-play").trim() !==
           "paused";
-
       if (nextActive === active) return;
       active = nextActive;
-      clearTimers();
-      inTransition = false;
-      setView((current) => ({
-        ...current,
-        active: nextActive,
-        transitioning: false,
-        bursting: false,
-      }));
-
-      if (nextActive) {
-        queueTransition();
-        queueSparkles();
-      }
+      clearStars();
+      setView({ active: nextActive, stars: [] });
+      if (nextActive) queueStar(true);
     }
 
     function queueSync() {
@@ -165,12 +161,16 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
           })
         : null;
     intersection?.observe(root);
-
     const mutations = new MutationObserver(queueSync);
     const watched = new Set(
-      [document.documentElement, document.body, stage, card].filter(
-        (element): element is HTMLElement => element !== null,
-      ),
+      [
+        document.documentElement,
+        document.body,
+        stage,
+        card,
+        readiness,
+        refreshContent,
+      ].filter((element): element is HTMLElement => element !== null),
     );
     watched.forEach((element) =>
       mutations.observe(element, {
@@ -180,27 +180,23 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
           "style",
           "data-card-entry-state",
           "data-page-refresh-active",
+          "data-page-entry-ready",
           "data-artwork-dialog-open",
         ],
       }),
     );
-
-    finishTransitionRef.current = finishTransition;
     document.addEventListener("visibilitychange", syncActivity);
     reducedMotion.addEventListener("change", syncActivity);
     queueSync();
 
     return () => {
       disposed = true;
-      clearTimers();
+      clearStars();
       if (syncFrame !== null) window.cancelAnimationFrame(syncFrame);
       intersection?.disconnect();
       mutations.disconnect();
       document.removeEventListener("visibilitychange", syncActivity);
       reducedMotion.removeEventListener("change", syncActivity);
-      if (finishTransitionRef.current === finishTransition) {
-        finishTransitionRef.current = null;
-      }
     };
   }, [dialogOpen]);
 
@@ -208,68 +204,61 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
     <span
       ref={rootRef}
       className={styles.root}
-      data-lunar-mode={view.mode}
+      data-evening-moon
       data-lunar-active={view.active}
-      data-lunar-transitioning={view.transitioning}
-      data-lunar-bursting={view.bursting}
+      data-lunar-star-count={view.stars.length}
       aria-hidden="true"
     >
       <span className={styles.sway}>
-        <span
-          className={styles.turn}
-          onAnimationEnd={(event) => {
-            if (event.target === event.currentTarget) {
-              finishTransitionRef.current?.();
-            }
-          }}
-        >
-          <svg
-            className={styles.glyph}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.9"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <g className={styles.crescent}>
-              <path
-                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
-                vectorEffect="non-scaling-stroke"
-              />
-            </g>
-            <g className={styles.sunlight}>
-              <path className={styles.sunArc} d="M16 12a4 4 0 0 0-4-4" />
-              <path className={styles.sunRay} d="M12 2v2" />
-              <path className={styles.sunRay} d="m19 5-1.256 1.256" />
-              <path className={styles.sunRay} d="M20 12h2" />
-            </g>
-          </svg>
-        </span>
+        <svg className={styles.moon} viewBox="0 0 24 24" data-evening-crescent>
+          <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401Z" />
+        </svg>
       </span>
-      <svg
-        key={view.burst}
-        className={styles.sparkles}
-        viewBox="-24 -24 48 48"
-        fill="currentColor"
-      >
-        {SPARKLES.map((sparkle, index) => (
-          <path
-            key={index}
-            className={styles.sparkle}
-            d="M0-1.8.45-.45 1.8 0 .45.45 0 1.8-.45.45-1.8 0-.45-.45Z"
+      <span className={styles.sky}>
+        {view.stars.map((star) => (
+          <span
+            key={star.id}
+            className={styles.star}
+            data-lunar-star={star.id}
+            data-bright={star.bright}
+            data-lifetime={Math.round(star.duration)}
             style={
               {
-                "--spark-from-x": `${sparkle.fromX}px`,
-                "--spark-from-y": `${sparkle.fromY}px`,
-                "--spark-to-x": `${sparkle.toX}px`,
-                "--spark-to-y": `${sparkle.toY}px`,
-                "--spark-delay": `${index * 140}ms`,
-                color: sparkle.color,
+                left: `${star.x}px`,
+                top: `${star.y}px`,
+                "--star-duration": `${star.duration}ms`,
+                "--star-size": `${star.size}px`,
+                "--star-dx": `${star.dx}px`,
+                "--star-dy": `${star.dy}px`,
+                "--star-angle": `${star.angle}deg`,
+                "--star-turn": `${star.turn}deg`,
+                "--star-from": star.colors[0],
+                "--star-to": star.colors[1],
               } as CSSProperties
             }
-          />
+          >
+            <svg
+              className={styles.starGlyph}
+              viewBox="-4 -4 8 8"
+              fill="currentColor"
+            >
+              <circle className={styles.aureole} r="3.2" />
+              <path className={styles.starCore} d={STAR_PATH} />
+              <path
+                className={styles.rays}
+                d="M0-5v-2M0 5v2M-5 0h-2M5 0h2M3.6-3.6l1.1-1.1M-3.6 3.6l-1.1 1.1M3.6 3.6l1.1 1.1M-3.6-3.6l-1.1-1.1"
+              />
+            </svg>
+          </span>
         ))}
+      </span>
+      <svg
+        className={styles.stillStars}
+        viewBox="0 0 30 30"
+        fill="currentColor"
+      >
+        <path d="m23 3 .5 1.5L25 5l-1.5.5L23 7l-.5-1.5L21 5l1.5-.5Z" />
+        <path d="m29 20 .4 1.1 1.1.4-1.1.4L29 23l-.4-1.1-1.1-.4 1.1-.4Z" />
       </svg>
     </span>
   );

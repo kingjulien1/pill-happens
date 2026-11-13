@@ -6,172 +6,194 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  color: #fff5df;
+  overflow: visible;
   pointer-events: none;
 }
 
-.sway,
-.turn {
+.sway {
   display: inline-flex;
   width: 100%;
   height: 100%;
   align-items: center;
   justify-content: center;
-  transform-origin: center;
+  transform-origin: 48% 54%;
 }
 
-.glyph {
+.moon {
   display: block;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+  fill: #c1b6cc;
+  stroke: #c1b6cc;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sky,
+.stillStars {
+  position: absolute;
+  inset: 0;
   width: 30px;
   height: 30px;
   overflow: visible;
 }
 
-.glyph path {
-  vector-effect: non-scaling-stroke;
-}
-
-.crescent {
-  transform: matrix(1, 0, 0, 1, 0, 0);
-  transform-origin: 0 0;
-  transition: transform 670ms cubic-bezier(0.22, 0.65, 0.3, 1);
-}
-
-.sunlight {
-  color: #ffd2a8;
-  opacity: 0;
-  transform: scale(0.82);
-  transform-origin: 12px 12px;
-  transition:
-    opacity 180ms ease,
-    transform 480ms ease;
-}
-
-.sunArc,
-.sunRay {
-  stroke-dasharray: 8;
-  stroke-dashoffset: 8;
-  transition: stroke-dashoffset 420ms ease;
-}
-
-.root[data-lunar-mode="sun-moon"] .crescent {
-  transform: matrix(0.6667, 0, 0, 0.6667, 1, 7);
-}
-
-.root[data-lunar-mode="sun-moon"] .sunlight {
-  opacity: 1;
-  transform: scale(1);
-  transition-delay: 220ms;
-}
-
-.root[data-lunar-mode="sun-moon"] .sunArc,
-.root[data-lunar-mode="sun-moon"] .sunRay {
-  stroke-dashoffset: 0;
-  transition-delay: 220ms;
-}
-
-.sparkles {
+.star {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 48px;
-  height: 48px;
-  overflow: visible;
-  transform: translate(-50%, -50%);
-}
-
-.sparkle {
+  display: block;
+  width: var(--star-size);
+  height: var(--star-size);
+  translate: -50% -50%;
   opacity: 0;
-  filter: drop-shadow(0 0 1.2px currentColor);
-  transform-box: fill-box;
+  color: var(--star-from);
   transform-origin: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .root[data-lunar-active="true"] .sway {
-    animation: lunar-sway 6500ms ease-in-out infinite;
-  }
-
-  .root[data-lunar-active="true"][data-lunar-transitioning="true"] .turn {
-    animation: lunar-turn 920ms both;
-  }
-
-  .root[data-lunar-active="true"][data-lunar-bursting="true"] .sparkle {
-    animation: lunar-sparkle 1120ms cubic-bezier(0.16, 0.7, 0.3, 1)
-      var(--spark-delay) both;
-  }
-
-  .root[data-lunar-active="true"] .sway,
-  .root[data-lunar-active="true"][data-lunar-transitioning="true"] .turn,
-  .root[data-lunar-active="true"][data-lunar-bursting="true"] .sparkle {
-    animation-play-state: var(--art-play, running);
-  }
+.starGlyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.root[data-lunar-active="false"] .crescent,
-.root[data-lunar-active="false"] .sunlight,
-.root[data-lunar-active="false"] .sunArc,
-.root[data-lunar-active="false"] .sunRay {
-  transition: none;
+.starCore {
+  filter: drop-shadow(0 0 0.7px currentColor);
+}
+
+.aureole,
+.rays {
+  opacity: 0;
+  transform-origin: 0 0;
+}
+
+.aureole {
+  filter: blur(1.2px);
+}
+
+.rays {
+  fill: none;
+  stroke: #fff6e3;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+}
+
+.stillStars {
+  display: none;
+  color: #e9d5ff;
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sway {
+    animation: lunar-moon-sway 9400ms ease-in-out infinite;
+    animation-play-state: paused;
+  }
+
+  .root[data-lunar-active="true"] .sway {
+    animation-play-state: var(--art-play, running);
+  }
+
+  .star {
+    animation: lunar-star-life var(--star-duration) linear both;
+  }
+
+  .starGlyph {
+    animation: lunar-star-ink var(--star-duration) ease-in-out both;
+  }
+
+  .star[data-bright="true"] .aureole,
+  .star[data-bright="true"] .rays {
+    animation: lunar-star-radiance var(--star-duration) ease-out both;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .crescent,
-  .sunlight,
-  .sunArc,
-  .sunRay {
-    transition: none;
+  .stillStars {
+    display: block;
   }
 }
 
-@keyframes lunar-turn {
-  0% {
-    transform: rotate(0deg) scale(1);
-    animation-timing-function: cubic-bezier(0.42, 0, 0.72, 0.64);
-  }
-  42% {
-    transform: rotate(410deg) scale(0.6);
-    animation-timing-function: cubic-bezier(0.18, 0.5, 0.28, 1);
-  }
-  80% {
-    transform: rotate(684deg) scale(1.04);
-    animation-timing-function: ease-out;
-  }
-  100% {
-    transform: rotate(720deg) scale(1);
-  }
-}
-
-@keyframes lunar-sway {
+@keyframes lunar-moon-sway {
   0%,
   100% {
-    transform: translateY(0) rotate(-1deg);
+    transform: translate(-0.35px, 0.2px) rotate(-3.2deg) scale(0.995);
   }
   28% {
-    transform: translateY(-0.6px) rotate(2deg);
+    transform: translate(0.55px, -0.65px) rotate(1.8deg) scale(1.01);
   }
-  65% {
-    transform: translateY(0.25px) rotate(-2deg);
+  61% {
+    transform: translate(0.3px, -0.15px) rotate(3deg) scale(1.005);
+  }
+  82% {
+    transform: translate(-0.4px, 0.35px) rotate(-0.8deg) scale(0.998);
   }
 }
 
-@keyframes lunar-sparkle {
+@keyframes lunar-star-life {
   0% {
     opacity: 0;
-    transform: translate(var(--spark-from-x), var(--spark-from-y)) scale(0.1);
+    transform: translate(0, 0) rotate(var(--star-angle)) scale(0.16);
+    animation-timing-function: cubic-bezier(0.2, 0.65, 0.3, 1);
   }
   24% {
-    opacity: 0.95;
+    opacity: 0.8;
+    transform: translate(calc(var(--star-dx) * 0.2), calc(var(--star-dy) * 0.2))
+      rotate(var(--star-angle)) scale(0.86);
+    animation-timing-function: ease-in-out;
   }
-  40% {
+  45% {
+    opacity: 1;
     transform: translate(
-        calc(var(--spark-to-x) * 0.55),
-        calc(var(--spark-to-y) * 0.55)
+        calc(var(--star-dx) * 0.43),
+        calc(var(--star-dy) * 0.43)
       )
-      scale(1);
+      rotate(calc(var(--star-angle) + var(--star-turn) * 0.4)) scale(1.12);
+  }
+  66% {
+    opacity: 0.7;
+    transform: translate(
+        calc(var(--star-dx) * 0.65),
+        calc(var(--star-dy) * 0.65)
+      )
+      rotate(calc(var(--star-angle) + var(--star-turn) * 0.65)) scale(0.83);
+    animation-timing-function: ease-in;
   }
   100% {
     opacity: 0;
-    transform: translate(var(--spark-to-x), var(--spark-to-y)) scale(0.25);
+    transform: translate(var(--star-dx), var(--star-dy))
+      rotate(calc(var(--star-angle) + var(--star-turn))) scale(0.12);
+  }
+}
+
+@keyframes lunar-star-ink {
+  0%,
+  18% {
+    color: var(--star-from);
+  }
+  45% {
+    color: #fff9ed;
+  }
+  76%,
+  100% {
+    color: var(--star-to);
+  }
+}
+
+@keyframes lunar-star-radiance {
+  0%,
+  25% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  42% {
+    opacity: 0.92;
+    transform: scale(0.95);
+  }
+  64%,
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
   }
 }
