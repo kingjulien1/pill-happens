@@ -19,8 +19,8 @@ export type PrimaryButtonProps = ComponentProps<typeof Button> & {
   theme?: ActionButtonTheme;
   /** Static documentation/state examples avoid mounting a graphics context. */
   motion?: boolean;
-  /** Reuse the Accent paint while retaining this button's geometry and rim. */
-  surface?: "layered" | "accent";
+  /** Solid keeps the native button and content without decorative paint or graphics. */
+  surface?: "layered" | "accent" | "solid";
 };
 
 export function LayeredActionButton({
@@ -86,7 +86,7 @@ export function LayeredActionButton({
           className={styles.accentSurface}
           data-button-surface
         />
-      ) : (
+      ) : surface === "layered" ? (
         <span
           className={cn(styles.surface, "intake-button-surface")}
           aria-hidden="true"
@@ -106,20 +106,24 @@ export function LayeredActionButton({
           />
           <ActionButtonTint />
         </span>
+      ) : null}
+      {surface !== "solid" && (
+        <>
+          {motion && (
+            <SpecularRim
+              key={theme ?? "system"}
+              radius={corner}
+              palette="triad"
+              glow={false}
+            />
+          )}
+          <span
+            className={cn(styles.fallback, "intake-specular-fallback")}
+            aria-hidden="true"
+            data-button-rim
+          />
+        </>
       )}
-      {motion && (
-        <SpecularRim
-          key={theme ?? "system"}
-          radius={corner}
-          palette="triad"
-          glow={false}
-        />
-      )}
-      <span
-        className={cn(styles.fallback, "intake-specular-fallback")}
-        aria-hidden="true"
-        data-button-rim
-      />
       <span className={styles.content} data-button-content>
         {children}
       </span>

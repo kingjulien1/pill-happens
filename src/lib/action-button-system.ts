@@ -116,7 +116,7 @@ export const INTAKE_ACTION_SUPPORTING_PAINT = {
   "--accent-hover-contact": "#0e0a1059",
 } as const;
 
-/** Header branding shares Today’s charcoal face and pink accent in both themes. */
+/** Header branding uses the shared charcoal face and pink accent in both themes. */
 export function getIntakeBrandStyle(): CSSProperties {
   return {
     "--brand-surface": INTAKE_ACTION_PAINT.light.base,
@@ -441,7 +441,7 @@ function writeButtonPaintStyle(
   });
 }
 
-/** Today keeps its geometry while using the same filled-action paint. */
+/** Supplies Today’s shared foreground/glow tokens; its solid face is styled locally. */
 export function getIntakeActionThemeStyle(
   theme?: ActionButtonTheme,
 ): CSSProperties {

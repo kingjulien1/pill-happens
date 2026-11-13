@@ -270,14 +270,14 @@ export function IntakeAction({
         <div className="intake-action-shell">
           <PrimaryButton
             type="button"
-            surface="accent"
+            surface="solid"
             radius={INTAKE_ACTION_GEOMETRY.radius}
             style={{
               ...getIntakeActionThemeStyle(),
               height: INTAKE_ACTION_GEOMETRY.height,
               minHeight: INTAKE_ACTION_GEOMETRY.height,
             }}
-            data-intake-paint="charcoal-mint"
+            data-intake-paint="solid-pink"
             onClick={onClick}
             className="intake-primary-cta pointer-events-auto w-full"
           >

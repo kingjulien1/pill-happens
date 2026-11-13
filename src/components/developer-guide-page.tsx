@@ -781,20 +781,15 @@ export function DeveloperGuidePage() {
               open
             >
               <p>
-                Primary, Secondary, Accent and ordinary filled actions share the
-                Log Intake paint in both themes: a Charcoal #1d161e base, White
-                copy, Electric Mint #9fffd1 action icons and mode-aware
-                Mint/Ice/Teal rim colors. One separate overlay combines offset
-                radial pools and a conic field of those icon/rim pigments plus
-                Tailwind emerald-500, at exactly 13% opacity. This opacity is
-                applied once to the tint layer; text, icons and the border
-                retain their own full visibility. The field, optional glaze,
-                tint, edge and content remain independent paint layers. Shared
-                components retain their existing heights, corner radii, padding,
-                labels, glyphs, pending/disabled behavior and event handlers.
-                Fuchsia remains available to the established check-in artwork
-                and semantic compatibility roles rather than coloring these
-                filled actions.
+                Today’s main Log Intake action uses a plain Pink 950 face in
+                both themes. A 4px Pink 800 border and a 2px Pink 500 inner band
+                at 30% opacity paint entirely inside the button with inset
+                shadows. Its White label and soft Pink icons stay readable above
+                that dark face. The solid surface does not mount a gradient,
+                tint layer, specular canvas or fallback rim. Native button
+                behavior and the existing entry animation remain attached to the
+                same control. The other action specimens retain their shared
+                layered presentation.
               </p>
               <p>
                 The{" "}
@@ -1117,47 +1112,28 @@ export function DeveloperGuidePage() {
                 The Today action is 74px high at every breakpoint, with a
                 proportional 19.425px corner radius. Its fixed 80px/21px
                 intake-card/action design reference continues to define Accent
-                proportions independently of this shorter Today action. Shared
-                PrimaryButton examples keep their existing sizing. Today passes
-                its explicit 19.425px radius so the face, border and exterior
-                glow follow the same geometry. The button fills the available
-                content width while retaining the existing page gutters. Its
-                opt-in <code>{'surface="accent"'}</code>
-                keeps the Accent moving-field machinery while opting into a
-                dedicated charcoal face with an exact <code>#1d161e</code>
-                base in both themes. Electric Mint <code>#9fffd1</code> colors
-                the Pills mark, arrow and aside, while the main label remains
-                White. Four near-charcoal field stops blend at 26% opacity,
-                preserving the original subtle 26-second rotation without
-                covering the dark base in a saturated color. Light rims use
-                <code> #9fffd1 / #b8f4ff / #2dd4bf</code>; dark rims use
-                <code> #c6ffe2 / #b8f4ff / #5eead4</code>. One dedicated
-                <code> INTAKE_ACTION_PAINT</code> registry and shared serializer
-                feed the CSS fallback and live shader. Mint/Ice/Teal halos share
-                those aliases. The new ActionButtonTint adds one 13% composited
-                layer above the field/glaze and below sheen, rim and content.
-                Its offset radial pools and conic color field use the Mint icon
-                pigment, the current rim stops and the installed emerald-500
-                token, oklch(69.6% 0.17 162.48). A child drifts over 16 seconds
-                while the outer tint stays at 13%. It pauses offscreen, in
-                hidden documents and inactive states; reduced motion settles it.
-                The aside retains 94% visibility, and the existing geometry,
-                entry effects, pause behavior and 3px SpecularRim remain. Shared
-                Primary, Secondary and Accent specimens, dialog submissions and
-                default-filled controls now use this same paint. The main Today
-                action opts into the optional pills variant of IntakeLogSymbol:
-                a 23px Lucide Tablets glyph at 2.5 stroke, with no spark. Its
-                individual scale mirrors the glyph, and its 5px left shift stays
-                independent of entrance transforms. Other callers retain the
-                default signature artwork. AccentButtonSurface remains shared by
-                both buttons, with its outer frame adapted; motion follows the
-                existing pause and reduced-motion states. Other PrimaryButton
-                examples retain their default sizing and radius with the shared
-                Charcoal/Mint paint. Desktop places the section 44px after the
-                entries with 20px bottom padding. Mobile uses{" "}
-                <code>max(0px, env(safe-area-inset-bottom))</code>
-                for bottom clearance, with a 4px minimum in short landscape
-                windows.
+                proportions independently of this shorter action. Today opts
+                into <code>{'surface="solid"'}</code>: a flat Tailwind Pink 950
+                background with no decorative surface or graphics context.
+                A 4px Pink 800 frame begins at the button edge; a second 2px
+                band uses Pink 500 at 30% opacity. Both sit inward, preserving
+                the existing width, height, padding and corner geometry. The
+                existing soft pink exterior glow remains separate from those
+                border bands, and keyboard focus also draws inward.
+              </p>
+              <p>
+                The main label remains White. Soft Pink colors the Tablets
+                mark, arrow and aside, with the aside at 94% visibility. The
+                optional pills variant of IntakeLogSymbol uses a 23px Lucide
+                Tablets glyph at 2.5 stroke, with no spark. Its 5px left shift
+                stays independent of the existing entry transforms. The same
+                button primitive retains the click action, focus and disabled
+                behavior. Shared PrimaryButton, SecondaryButton and Accent
+                examples continue to use their own layered paint and geometry.
+                Desktop places the section 44px after the entries with 20px
+                bottom padding. Mobile uses{" "}
+                <code>max(0px, env(safe-area-inset-bottom))</code> for bottom
+                clearance, with a 4px minimum in short landscape windows.
               </p>
               <p>
                 IntakeAction reserves its final geometry before its own
@@ -1298,12 +1274,11 @@ export function DeveloperGuidePage() {
                 transforms and tablet loops stay on their existing inner owners.
               </p>
               <p>
-                Header branding matches Today’s main action in both modes:
-                charcoal <code>#1d161e</code> for the face and pill scores,
-                electric Mint <code>#9fffd1</code> for the filled tablet pair,
-                refresh glyph and primary border pigment. Its root color aliases
-                read the existing Intake action palette, keeping both controls
-                aligned. Navigation’s static mark retains its own neutral
+                Header branding uses the shared filled-action palette in both
+                modes: charcoal <code>#1d161e</code> for the face and pill
+                scores, and soft Pink <code>#f9a8d4</code> for the filled tablet
+                pair, refresh glyph and primary border pigment. Its root color
+                aliases read the shared action palette. Navigation’s static mark retains its own neutral
                 identity. The header mark measures 34.5px in its 46px control,
                 preserving the menu logo’s 48px/64px ratio. Orbit, approach and
                 spin still share the same base keyframes. A 7.2-second header
@@ -2833,8 +2808,8 @@ export function DeveloperGuidePage() {
                   SecondaryButton opens the existing writer. Its local 56px base
                   height retains the shared responsive increments; an 18px
                   radius is passed to both the frame and specular rim. The
-                  Accent face now uses the same Charcoal/Mint field, 13% tint
-                  and mode-aware Mint/Ice/Teal rim as Log Intake. Local
+                  Accent face uses the shared charcoal field, 13% Pink tint
+                  and mode-aware Pink rim of the other filled actions. Local
                   background, foreground and dimmed face/rim overrides are
                   removed so the same shared pigments remain visible at this
                   existing size. Decorative journal-icon paint keeps its earlier
