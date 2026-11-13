@@ -1,3 +1,20 @@
+/* Rear faces stay fully rendered; their copy returns as the stack opens. */
+.card:global([data-intake-card]) :global(.intake-card-content) {
+  transition: opacity 160ms ease;
+}
+
+:global(.intake-stack-slot[data-stack-collapsed="true"])
+  .card:global([data-intake-card])
+  :global(.intake-card-content) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:global([data-intake-card]) :global(.intake-card-content) {
+    transition: none;
+  }
+}
+
 /* Actual dose arithmetic stays at the bottom of its own compact group while
    that whole group shares a visual centre with the ingredient beside it. */
 .card:global([data-intake-card]) :global(.intake-card-bottom) {

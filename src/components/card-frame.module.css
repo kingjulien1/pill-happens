@@ -21,12 +21,12 @@
   );
 }
 
-/* A stronger neutral frame grows inward; medication color stays a quiet tint. */
+/* Solid theme backing hides rear content; the selected color stays a quiet tint. */
 .card:global([data-intake-card]) {
   --entry-surface-base: color-mix(
     in srgb,
     var(--entry-color) 5.5%,
-    transparent
+    var(--card)
   );
 }
 
