@@ -136,7 +136,7 @@
   animation: none;
 }
 
-/* The carafe can pass above the tile while the existing artwork stays framed. */
+/* Steam can drift above the tile while the existing artwork stays framed. */
 .stage[data-check-in-artwork="morning"] .tile {
   overflow: visible;
 }
