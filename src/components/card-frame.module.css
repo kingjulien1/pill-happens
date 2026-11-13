@@ -1,15 +1,20 @@
-/* Paint outside the measured card without changing its layout or hit target. */
+/* Shared rim geometry; saved intakes draw both bands within their footprint. */
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
   --entry-frame-outset: 2.5px;
   --entry-rim-width: 4px;
   --entry-inner-rim-width: 2px;
+  --entry-inner-rim-color: color-mix(
+    in srgb,
+    var(--entry-color) 40%,
+    transparent
+  );
   --entry-inner-rim-offset: calc(
     var(--entry-rim-width) - var(--entry-frame-outset)
   );
   overflow: visible;
 }
 
-/* Preserve the outer footprint independently of the inward stroke width. */
+/* A zero outset keeps the full rim inside the measured intake card. */
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card]
@@ -21,13 +26,30 @@
   );
 }
 
-/* Solid theme backing hides rear content; the selected color stays a quiet tint. */
-.card:global([data-intake-card]) {
+/* Composite pink at 10%, then the selected color at 30%, over a solid backing
+   so folded cards cannot show through the face above them. */
+.card:global(.intake-log-card[data-intake-card]) {
+  --entry-frame-outset: 0px;
+  --entry-edge-color: color-mix(
+    in srgb,
+    var(--card-foreground) 20%,
+    transparent
+  );
+  --entry-inner-rim-color: color-mix(
+    in srgb,
+    var(--entry-color) 80%,
+    transparent
+  );
   --entry-surface-base: color-mix(
     in srgb,
-    var(--entry-color) 5.5%,
-    var(--card)
+    var(--entry-color) 30%,
+    color-mix(in srgb, var(--color-pink-300) 10%, var(--card))
   );
+}
+
+/* Keep keyboard focus as visible as before, inside the same compact footprint. */
+.card:global([data-intake-card]):focus-visible {
+  outline-offset: -2px;
 }
 
 .card:global(.intake-log-card):is(
@@ -41,11 +63,11 @@
   inset: var(--entry-inner-rim-offset);
   border-radius: calc(var(--entry-card-radius) - var(--entry-inner-rim-offset));
   box-shadow: inset 0 0 0 var(--entry-inner-rim-width)
-    color-mix(in srgb, var(--entry-color) 40%, transparent);
+    var(--entry-inner-rim-color);
   pointer-events: none;
 }
 
-/* The neutral frame overflows; the single tint stays inside the card corners. */
+/* Both card faces keep their background paint within the rounded corners. */
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
   :is(:global(.intake-card-glass), [data-check-in-background]) {
   overflow: hidden;

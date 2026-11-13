@@ -22,7 +22,7 @@
   justify-content: center;
   border-radius: calc(var(--form-badge-size) * 7 / 22);
   background: transparent;
-  color: #000;
+  color: #fff;
   line-height: 1;
   pointer-events: none;
 }
@@ -37,6 +37,13 @@
   height: 100%;
   flex-shrink: 0;
   color: inherit;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Remove closed color fills without outlining the glyph's fill-only helpers. */
+.formBadge > .formGlyph * {
+  fill: none;
 }
 
 /* Saved-intake controls share the old tile anchor without entering the hidden
