@@ -285,7 +285,7 @@ export function JournalNotification({
     try {
       await settleNotificationUndo({
         undo: undo.onUndo,
-        isCurrent: () => alive.current && isCurrent(),
+        isCurrent: () => alive.current && isCurrent() && !leaving.current,
         onSuccess: () => {
           setUndoState("done");
           timers.current.push(
