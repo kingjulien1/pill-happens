@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import { MedicationGlyph } from "@/components/medication-icon";
 import { MedicationFormGlyph } from "@/components/medication-form-glyph";
+import { CardIconSettle } from "@/components/card-icon-settle";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationIconStack } from "@/lib/medication-icon-stack";
 import {
@@ -110,11 +111,14 @@ export function MedicationCardIcon({
         } as CSSProperties
       }
     >
-      <MedicationCardMark
-        color={color.value}
-        icon={icon}
-        iconRotation={iconRotation}
-      />
+      <span className={styles.motion} data-medication-icon-motion>
+        <MedicationCardMark
+          color={color.value}
+          icon={icon}
+          iconRotation={iconRotation}
+        />
+      </span>
+      <CardIconSettle />
       {badge}
     </span>
   );
@@ -153,28 +157,31 @@ export function MedicationCardIconStack({
         } as CSSProperties
       }
     >
-      <span className={styles.stage} data-medication-icon-fan>
-        {stack.layers.map((layer) => (
-          <span
-            key={layer.index}
-            className={styles.layer}
-            data-medication-icon-layer={layer.index}
-            style={{
-              left: layer.left,
-              top: layer.top,
-              opacity: layer.opacity,
-              transform: `scale(${layer.scale})`,
-              zIndex: stack.layers.length - layer.index,
-            }}
-          >
-            <MedicationCardMark
-              color={color.value}
-              icon={icon}
-              iconRotation={iconRotation}
-            />
-          </span>
-        ))}
+      <span className={styles.motion} data-medication-icon-motion>
+        <span className={styles.stage} data-medication-icon-fan>
+          {stack.layers.map((layer) => (
+            <span
+              key={layer.index}
+              className={styles.layer}
+              data-medication-icon-layer={layer.index}
+              style={{
+                left: layer.left,
+                top: layer.top,
+                opacity: layer.opacity,
+                transform: `scale(${layer.scale})`,
+                zIndex: stack.layers.length - layer.index,
+              }}
+            >
+              <MedicationCardMark
+                color={color.value}
+                icon={icon}
+                iconRotation={iconRotation}
+              />
+            </span>
+          ))}
+        </span>
       </span>
+      <CardIconSettle />
       {badge}
     </span>
   );

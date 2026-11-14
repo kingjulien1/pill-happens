@@ -1,0 +1,126 @@
+.effect {
+  --settle-delay: calc(
+    var(--intake-enter-delay, var(--card-entry-delay, 0ms)) + 860ms
+  );
+  --settle-duration: 480ms;
+  --settle-play: var(--page-entry-play-state, running);
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  left: var(--icon-settle-x, 50%);
+  width: var(--icon-settle-size, 48px);
+  height: var(--icon-settle-size, 48px);
+  transform: translate(-50%, -50%);
+  color: color-mix(
+    in srgb,
+    var(--icon-settle-color, var(--entry-color, var(--palette-rose))) 72%,
+    var(--palette-white) 28%
+  );
+  pointer-events: none;
+}
+
+.effect[data-card-icon-response="check-in"] {
+  --settle-delay: calc(var(--art-start, 0ms) + 1040ms);
+  --settle-duration: 440ms;
+  --settle-play: var(--art-play, running);
+}
+
+:global(.intake-stack-measure[data-entrance-kind="rear"]) .effect {
+  --settle-delay: calc(var(--intake-enter-delay, 0ms) + 730ms);
+  --settle-duration: 370ms;
+}
+
+:global(.intake-stack-measure[data-entrance-kind="preview"]) .effect {
+  display: none;
+}
+
+.part {
+  position: absolute;
+  opacity: 0;
+  transform: var(--settle-from, scale(0.86));
+}
+
+.halo {
+  --settle-peak: 0.34;
+  --settle-mid: scale(1.06);
+  --settle-to: scale(1.35);
+  inset: -3px;
+  border-radius: 18px;
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, currentColor 30%, transparent),
+    transparent 74%
+  );
+}
+
+.ring,
+.echo {
+  inset: 1px;
+  box-sizing: border-box;
+  border: 1.1px solid currentColor;
+  border-radius: 15px;
+}
+
+.ring {
+  --settle-peak: 0.48;
+  --settle-mid: scale(1.035);
+  --settle-to: scale(1.34);
+}
+
+.echo {
+  --settle-offset: 34ms;
+  --settle-peak: 0.25;
+  --settle-mid: scale(1.02);
+  --settle-to: scale(1.22);
+  border-width: 0.7px;
+}
+
+.sparkAxis {
+  position: absolute;
+  inset: 0;
+  rotate: calc(var(--settle-spark-index) * 90deg + 35deg);
+}
+
+.spark {
+  --settle-offset: calc(var(--settle-spark-index) * 18ms);
+  --settle-peak: 0.72;
+  --settle-from: translateY(3px) scale(0.3);
+  --settle-mid: translateY(-2px) scale(1);
+  --settle-to: translateY(-7px) scale(0.2);
+  top: 3px;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 3px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(
+      :global([data-card-entry-state="running"])
+        .effect[data-card-icon-response="medication"],
+      :global(.intake-stack-measure[data-entrance-state="running"])
+        .effect[data-card-icon-response="medication"],
+      .effect[data-card-icon-response="check-in"]
+    )
+    .part {
+    animation: icon-settle-response var(--settle-duration) ease-out
+      calc(var(--settle-delay) + var(--settle-offset, 0ms)) both;
+    animation-play-state: var(--settle-play);
+  }
+}
+
+@keyframes icon-settle-response {
+  0% {
+    opacity: 0;
+    transform: var(--settle-from, scale(0.86));
+  }
+  24% {
+    opacity: var(--settle-peak);
+    transform: var(--settle-mid);
+  }
+  100% {
+    opacity: 0;
+    transform: var(--settle-to);
+  }
+}
