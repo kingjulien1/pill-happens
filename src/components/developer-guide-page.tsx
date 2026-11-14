@@ -3180,6 +3180,21 @@ export function DeveloperGuidePage() {
                 controller, request limits or draft behavior.
               </p>
               <p>
+                Exactly empty writing begins with a visual H1 such as{" "}
+                <code># Sat, Nov 14 --</code>, followed by one newline and the
+                default caret at the start of line two. The date comes from the
+                entry’s explicit tracking day, without a year; reopening an
+                older day after midnight or the 06:00 reset does not rename it.
+                The scaffold stays outside the raw draft until the first typing,
+                formatting or mention insertion. Opening alone triggers no
+                autosave, unsaved-content state or completion credit. Existing
+                writing, including whitespace-only drafts, remains byte-for-byte
+                unchanged. Empty writing in an otherwise saved check-in can use
+                the same scaffold without changing its other responses. Initial
+                caret placement never focuses the input or resets later
+                selections on the same field.
+              </p>
+              <p>
                 The footer has two compact rows separated by 3px, with no
                 divider below persistence. Confirmed cloud status reads “Writing
                 is up to date.” on the left; local-draft text precedes HardDrive
@@ -3296,6 +3311,60 @@ export function DeveloperGuidePage() {
                 the same check-in; closing the entire form retains the local
                 draft. Save Check-In remains the explicit way to submit all
                 remaining fields together.
+              </p>
+              <h4
+                id={guideHeadingId(
+                  "developer-writing-save",
+                  "Daily Editing Of Finished Journals",
+                )}
+                data-guide-outline-level="3"
+                data-guide-outline-label="Daily Editing Of Finished Journals"
+              >
+                Daily Editing Of Finished Journals
+              </h4>
+              <p>
+                The optional scheduled editor reviews saved, nonempty notes from
+                completed past tracking days in one explicitly configured
+                journal. The current day and device drafts stay untouched. Its
+                policy corrects clear grammar or severe syntax while retaining
+                the writer’s voice, facts, medication names, numbers and dose
+                context, uncertainty, negation and existing links. Independent
+                validation rejects questionable output. The complete body stays
+                present, with no added advice. The one dated H1 carries a
+                few-word summary, limited to 12 words and 110 characters. A
+                changed entry receives a refreshed summary of its entire current
+                body rather than retaining a stale title. Other authored H1
+                titles become H2 without losing their text; additional H2
+                headings or separators stay minimal. New links must match
+                allowlisted existing app references, with no newly introduced
+                external URLs.
+              </p>
+              <p>
+                Source/output hashes and the editing-policy version skip
+                unchanged reviewed notes. The job takes at most eight entries
+                per run within a 240-second work budget, with a 45-second
+                provider timeout and a ten-minute lease against overlapping
+                work. Applying a result atomically compares the original note
+                and its saved timestamp; a concurrent edit is skipped rather
+                than overwritten. Failed reviews preserve the original, keep
+                safe hash-based failure metadata and defer unchanged retries
+                from 48 hours up to seven days; editing the note makes it
+                immediately eligible again. This is separate from typing
+                autosave and manual Refresh.
+              </p>
+              <p>
+                Original and output Markdown remain in{" "}
+                <code>AppData.journalEditing.revisions</code>, with hashes,
+                timestamps and policy metadata, and are included in the normal
+                private <code>/api/export</code> response. An authenticated,
+                same-origin <code>POST /api/journal/editing/restore</code> with{" "}
+                <code>{'{ "revisionId": "…" }'}</code> restores only that
+                revision’s original note when the current note still matches its
+                edited hash. Intervening writing stays intact and returns a
+                conflict. This adds no separate restoration screen or backup
+                import. Deployment configuration below supplies the job’s
+                explicit journal scope; originals remain available independently
+                of scheduler timing.
               </p>
             </Detail>
             <Detail
@@ -3649,6 +3718,59 @@ export function DeveloperGuidePage() {
             code={LOCAL_SETUP_EXAMPLE}
           />
           <div className={styles.detailGroup}>
+            <Detail
+              title="Daily Editing Configuration"
+              context="One Explicit Journal, Server Only"
+            >
+              <p>
+                Vercel invokes <code>/api/cron/journal-editing</code> once a day
+                on the UTC schedule <code>15 5 * * *</code>, after Vienna’s
+                06:00 tracking-day reset. Hobby execution can vary within the
+                scheduled hour. This is best-effort daily work, not an
+                exact-minute deadline; remaining eligible notes can be caught by
+                a later run.
+              </p>
+              <p>
+                Set <code>JOURNAL_EDITING_JOURNAL_ID</code> to the exact one
+                journal to edit. The endpoint requires a server-side{" "}
+                <code>OPENAI_API_KEY</code>, <code>DATABASE_URL</code> and an
+                independent <code>CRON_SECRET</code> of at least 32 characters.
+                Vercel supplies that secret as bearer authorization. Scope is
+                never inferred from a browser session or password. Missing or
+                invalid configuration fails closed. The optional{" "}
+                <code>JOURNAL_EDITING_MODEL</code> defaults to{" "}
+                <code>gpt-5.4-mini</code> and is separate from the retained
+                insights endpoint’s <code>OPENAI_MODEL</code>. Redeploy after
+                changing environment values; none belongs in a browser-prefixed
+                variable, committed file or example export.
+              </p>
+              <p>
+                This optional operation sends eligible saved writing and
+                relevant medication/reference context to the configured
+                provider. Reading, local previews and manual Refresh do not make
+                that request. The daily job preserves revision history so an
+                owner can inspect the exact original and edited Markdown.
+              </p>
+              <DeveloperCode
+                label="Daily Editing Cron Entry"
+                language="JSON Fragment"
+                code={`{
+  "crons": [
+    {
+      "path": "/api/cron/journal-editing",
+      "schedule": "15 5 * * *"
+    }
+  ]
+}`}
+              />
+              <p>
+                Merge this entry with the existing <code>vercel.json</code>
+                configuration, preserving its framework and region settings.
+                Once configured, an owner-authorized first pass can use the same
+                cron endpoint to process eligible backlog. Later daily
+                invocations continue any remaining work.
+              </p>
+            </Detail>
             <Detail
               title="Choose Checks For The Change"
               context="Then Build"
