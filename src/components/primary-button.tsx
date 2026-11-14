@@ -19,8 +19,10 @@ export type PrimaryButtonProps = ComponentProps<typeof Button> & {
   theme?: ActionButtonTheme;
   /** Static documentation/state examples avoid mounting a graphics context. */
   motion?: boolean;
-  /** Solid keeps the native button and content without decorative paint or graphics. */
+  /** Solid omits background layers; its rim can be enabled independently. */
   surface?: "layered" | "accent" | "solid";
+  /** Opt into an animated edge independently of a solid or layered face. */
+  rim?: boolean;
 };
 
 export function LayeredActionButton({
@@ -35,11 +37,13 @@ export function LayeredActionButton({
   theme,
   motion = true,
   surface = "layered",
+  rim,
   kind = "primary",
   "aria-busy": ariaBusy,
   ...props
 }: PrimaryButtonProps & { kind?: "primary" | "secondary" }) {
   const busy = pending || ariaBusy === true || ariaBusy === "true";
+  const showRim = rim ?? surface !== "solid";
   const corner = radius ?? (kind === "primary" ? 22 : 16);
   const classes = buttonVariants({ variant, size });
   const baseStyle = {
@@ -107,7 +111,7 @@ export function LayeredActionButton({
           <ActionButtonTint />
         </span>
       ) : null}
-      {surface !== "solid" && (
+      {showRim && (
         <>
           {motion && (
             <SpecularRim

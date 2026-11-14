@@ -1,11 +1,11 @@
 /* Shared rim geometry; saved intakes draw both bands within their footprint. */
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
-  --entry-frame-outset: 2.5px;
+  --entry-frame-outset: 0px;
   --entry-rim-width: 4px;
   --entry-inner-rim-width: 2px;
   --entry-inner-rim-color: color-mix(
     in srgb,
-    var(--entry-color) 40%,
+    var(--entry-color) 50%,
     transparent
   );
   --entry-inner-rim-offset: calc(
@@ -26,29 +26,20 @@
   );
 }
 
-/* Composite pink at 10%, then the selected color at 30%, over a solid backing
-   so folded cards cannot show through the face above them. */
+/* Opaque canvas plus one selected-color tint keeps folded content hidden. */
 .card:global(.intake-log-card[data-intake-card]) {
-  --entry-frame-outset: 0px;
-  --entry-edge-color: color-mix(
-    in srgb,
-    var(--card-foreground) 20%,
-    transparent
-  );
-  --entry-inner-rim-color: color-mix(
-    in srgb,
-    var(--entry-color) 80%,
-    transparent
-  );
   --entry-surface-base: color-mix(
     in srgb,
-    var(--entry-color) 30%,
-    color-mix(in srgb, var(--color-pink-300) 10%, var(--card))
+    var(--entry-color) 13%,
+    var(--background)
   );
 }
 
 /* Keep keyboard focus as visible as before, inside the same compact footprint. */
-.card:global([data-intake-card]):focus-visible {
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card]
+  ):focus-visible {
   outline-offset: -2px;
 }
 

@@ -170,97 +170,16 @@
 
 .ambient {
   position: fixed;
-  inset: 0 0 auto;
-  height: 100vh;
-  height: 100lvh;
+  inset: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  filter: brightness(1);
-  /* Exact shared ramp remains visible before hydration or without WebGL. */
-  background: radial-gradient(
-    ellipse at 50% 45%,
-    var(--ambient-center),
-    var(--ambient-near) 24%,
-    var(--ambient-mid) 45%,
-    var(--ambient-far) 70%,
-    var(--ambient-edge)
-  );
-}
-.ambient::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  /* A localized Ink veil anchors the center without whitening the field. */
-  background:
-    radial-gradient(
-      ellipse at 50% 45%,
-      var(--ambient-center-scrim),
-      transparent 70%
-    ),
-    var(--ambient-overlay);
-}
-/* The shared veil stays above the original tint and below every page surface.
-   Its own clipped box never moves; only the overscanned color field drifts. */
-.ambient-depth {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  overflow: hidden;
-  background: #1e1a4d;
-  opacity: 0.6;
-  pointer-events: none;
-}
-.ambient-depth::before {
-  content: "";
-  position: absolute;
-  inset: -18%;
-  background:
-    radial-gradient(
-      ellipse at 68% 84%,
-      color-mix(in srgb, var(--palette-rose) 6%, transparent),
-      transparent 68%
-    ),
-    radial-gradient(ellipse at 18% 24%, #2f0d68, #2f0d6800 62%),
-    radial-gradient(ellipse at 82% 76%, #2a212c, #2a212c00 66%),
-    radial-gradient(ellipse at 68% 12%, #1e1a4d, #1e1a4d00 58%),
-    conic-gradient(
-      from 35deg at 47% 52%,
-      #1e1a4d,
-      #2a212c 110deg,
-      #2f0d68 230deg,
-      #1e1a4d
-    );
-  transform: translate3d(-2%, 2%, 0) scale(1.04);
+  background: var(--background);
 }
 @media (prefers-color-scheme: light) {
-  .ambient-depth {
-    /* Keep small canvas copy readable while staying close to the shared 60% veil. */
-    opacity: 0.56;
-  }
   body {
-    /* Bare canvas copy uses opaque ink; cards keep their own semantic colors.
-       The guide retains its native copy above its separate reading veil. */
     --canvas-foreground: #000000;
     --canvas-muted-foreground: #000000;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ambient-depth::before {
-    animation: ambient-depth-drift 68s ease-in-out infinite;
-  }
-}
-@keyframes ambient-depth-drift {
-  0%,
-  100% {
-    transform: translate3d(-2%, 2%, 0) scale(1.04);
-  }
-  38% {
-    transform: translate3d(3%, -3%, 0) scale(1.09);
-  }
-  72% {
-    transform: translate3d(-3%, -1%, 0) scale(1.02);
   }
 }
 @keyframes enter {
@@ -3146,9 +3065,15 @@
   .intake-dock {
     --intake-dock-overlay-base: var(--background);
     --intake-dock-overlay-accent: var(--palette-apricot);
-    --intake-dock-overlay-base-opacity: 0.6164;
-    --intake-dock-overlay-accent-opacity: 0.1608;
-    --intake-dock-overlay-height: 134.4%;
+    --intake-dock-overlay-base-opacity: 0.66;
+    --intake-dock-overlay-accent-opacity: 0.2;
+    --intake-dock-overlay-height: 160%;
+    --canvas-foreground: var(--palette-white);
+    --canvas-muted-foreground: color-mix(
+      in srgb,
+      var(--palette-white) 88%,
+      transparent
+    );
   }
 
   /* These fixed-dock layers fade above the summary without changing its layout. */
@@ -3162,18 +3087,24 @@
     pointer-events: none;
     -webkit-mask-image: linear-gradient(
       to top,
-      #000 0% 60%,
-      rgb(0 0 0 / 92%) 70%,
-      rgb(0 0 0 / 65%) 80%,
-      rgb(0 0 0 / 14.458%) 90%,
+      #000 0%,
+      rgb(0 0 0 / 98%) 12%,
+      rgb(0 0 0 / 90%) 28%,
+      rgb(0 0 0 / 72%) 45%,
+      rgb(0 0 0 / 46%) 62%,
+      rgb(0 0 0 / 23%) 78%,
+      rgb(0 0 0 / 7%) 91%,
       transparent 100%
     );
     mask-image: linear-gradient(
       to top,
-      #000 0% 60%,
-      rgb(0 0 0 / 92%) 70%,
-      rgb(0 0 0 / 65%) 80%,
-      rgb(0 0 0 / 14.458%) 90%,
+      #000 0%,
+      rgb(0 0 0 / 98%) 12%,
+      rgb(0 0 0 / 90%) 28%,
+      rgb(0 0 0 / 72%) 45%,
+      rgb(0 0 0 / 46%) 62%,
+      rgb(0 0 0 / 23%) 78%,
+      rgb(0 0 0 / 7%) 91%,
       transparent 100%
     );
   }
@@ -3202,16 +3133,30 @@
 
   .intake-dock-inner::before {
     z-index: -2;
-    height: calc(var(--intake-dock-overlay-height) * 0.5);
-    background: linear-gradient(to top, #0f172a 0% 50%, #0f172a00 100%);
-    opacity: 0.4;
+    height: calc(var(--intake-dock-overlay-height) * 0.65);
+    background: linear-gradient(
+      to top,
+      #0f172a 0%,
+      #0f172ae6 20%,
+      #0f172a99 48%,
+      #0f172a38 76%,
+      #0f172a00 100%
+    );
+    opacity: 0.55;
   }
 
   .intake-dock-inner::after {
     z-index: -1;
-    height: calc(var(--intake-dock-overlay-height) * 0.3);
-    background: linear-gradient(to top, #030712, #03071200);
-    opacity: 0.33;
+    height: calc(var(--intake-dock-overlay-height) * 0.45);
+    background: linear-gradient(
+      to top,
+      #030712 0%,
+      #030712d9 20%,
+      #0307128c 48%,
+      #03071229 78%,
+      #03071200 100%
+    );
+    opacity: 0.6;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -3227,8 +3172,8 @@
         var(--intake-dock-blue) 92%,
         #fff
       );
-      --intake-dock-overlay-base-opacity: 0.804;
-      --intake-dock-overlay-accent-opacity: 0.2814;
+      --intake-dock-overlay-base-opacity: 0.84;
+      --intake-dock-overlay-accent-opacity: 0.34;
     }
   }
 }
@@ -3353,11 +3298,29 @@ input[type="time"] {
   height: 74px;
   min-height: 74px;
 }
-/* The main daily action has a plain face; both border bands sit inside it. */
+/* An opaque canvas face and one pink tint stay independent of the moving rim. */
 .intake-action-shell
   .intake-primary-cta[data-slot="button"][data-button-face="solid"] {
+  --action-rim-1: #fce7f3;
+  --action-rim-2: #f472b6;
+  --action-rim-3: #831843;
+  --intake-rim-stop-1: var(--action-rim-1);
+  --intake-rim-stop-2: var(--action-rim-2);
+  --intake-rim-stop-3: var(--action-rim-3);
+  --intake-rim-stop-4: #f9a8d4;
+  --intake-rim-stop-5: #be185d;
+  --intake-rim-line: var(--action-rim-1);
+  --intake-rim-base: var(--action-rim-2);
+  --intake-rim-guard: var(--action-rim-3);
+  --intake-rim-glow: var(--action-rim-2);
+  --daily-action-icon: var(--color-pink-800, oklch(45.9% 0.187 3.815));
   border: 0;
-  background: var(--color-pink-950, oklch(28.4% 0.109 3.907));
+  background: color-mix(
+    in srgb,
+    var(--intake-action-accent) 23%,
+    var(--background)
+  );
+  color: var(--foreground);
   box-shadow:
     inset 0 0 0 4px var(--color-pink-800, oklch(45.9% 0.187 3.815)),
     inset 0 0 0 6px
@@ -3371,6 +3334,23 @@ input[type="time"] {
     0 10px 42px color-mix(in srgb, var(--action-rim-3) 16%, transparent),
     0 5px 16px color-mix(in srgb, var(--palette-black) 30.196%, transparent);
   outline-offset: -2px;
+}
+.intake-action-shell
+  .intake-primary-cta[data-slot="button"][data-button-face="solid"]
+  :is(
+    .intake-primary-aside,
+    .intake-log-symbol,
+    .intake-log-symbol-pill,
+    .intake-log-symbol-spark,
+    .intake-primary-next
+  ) {
+  color: var(--daily-action-icon);
+}
+@media (prefers-color-scheme: dark) {
+  .intake-action-shell
+    .intake-primary-cta[data-slot="button"][data-button-face="solid"] {
+    --daily-action-icon: var(--intake-action-accent);
+  }
 }
 .intake-primary-cta .intake-primary-aside {
   color: var(--intake-action-accent);

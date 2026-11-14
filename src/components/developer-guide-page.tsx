@@ -781,15 +781,15 @@ export function DeveloperGuidePage() {
               open
             >
               <p>
-                Today’s main Log Intake action uses a plain Pink 950 face in
-                both themes. A 4px Pink 800 border and a 2px Pink 500 inner band
-                at 30% opacity paint entirely inside the button with inset
-                shadows. Its White label and soft Pink icons stay readable above
-                that dark face. The solid surface does not mount a gradient,
-                tint layer, specular canvas or fallback rim. Native button
-                behavior and the existing entry animation remain attached to the
-                same control. The other action specimens retain their shared
-                layered presentation.
+                Today’s main Log Intake action shares the opaque page canvas
+                and adds one 23% reflection of the branding Pink. Its solid
+                surface omits decorative background layers; the independent
+                specular rim uses pale, saturated and deep Pink stops to keep
+                the moving edge distinct. Text follows the page foreground,
+                with deeper Pink icon ink in light mode and branding Pink in
+                dark mode. Native behavior and the existing entry animation
+                remain attached to the same control. Other action specimens
+                retain their own layered presentation.
               </p>
               <p>
                 The{" "}
@@ -939,115 +939,29 @@ export function DeveloperGuidePage() {
                 order.
               </p>
             </Detail>
-            <Detail
-              title="The Fixed Background"
-              context="Flowing Radial Grainient"
-            >
+            <Detail title="The Fixed Background" context="Plain Shared Canvas">
               <p>
-                <code>JournalBackground</code> uses the resolved appearance and
-                uses its mode-specific background ramp from
-                APP_BACKGROUND_COLORS_BY_MODE. Light mode stays pale Lilac; dark
-                mode stays Plum, with small Apricot traces in both. Grainient is
-                radial, with variation 16, saturation 1.01, silk 0.58 and
-                softness 0.96. Broad folds move continuously at speed 3.6 on
-                desktop and 5.4 on narrow/coarse-pointer devices. Mobile runs
-                50% faster than desktop and 20% faster than its previous 4.5
-                setting. Both use flow strength 1.4 and warp scale 0.3. A
-                separate portrait framing mode reveals more of the whole
-                composition on tall screens, while its viewport layer stays
-                fixed. Grain stays still; intro, pointer interaction and click
-                swirl remain disabled. Reduced motion holds a still composition
-                and stops the idle frame loop. Hidden/offscreen rendering
-                pauses, and resuming never adds elapsed background time.
+                <code>JournalBackground</code> paints one uniform, opaque
+                <code> --background</code> color across the viewport. The
+                current theme resolves to <code>#fbfafd</code> in light mode
+                and <code>#2b233e</code> in dark mode. Page, intake-card and
+                main-action bases use this same token, so their differences
+                come from the deliberate color layers above it.
               </p>
               <p>
-                Above that original field and its tint, a separate
-                viewport-clipped radial/conic veil adds depth using{" "}
-                <code>#1e1a4d</code>, <code>#2f0d68</code> and{" "}
-                <code>#2a212c</code>. The veil is 60% opaque in dark mode and
-                56% in light mode, where opaque canvas copy preserves contrast.
-                Its overscanned color field drifts gently over 68 seconds while
-                the viewport box stays fixed. It is present before hydration,
-                never intercepts input, and stays still with reduced motion.
-                Card and reading-surface text keep their own semantic pairings.
+                The canvas has no shader, grain, corner highlights, center veil,
+                gradient or animation. CSS applies it before hydration and
+                responds immediately to system or saved Appearance changes.
+                No canvas rendering context, frame loop or background resize
+                listener is mounted. Page content and the mobile action fade
+                remain separate layers above this base.
               </p>
               <p>
-                Both guides reuse the daily log’s viewport-fixed background.
-                Their theme-colored reading overlay covers the same screen area
-                at 67% opacity. The field uses the large viewport height
-                (100lvh, with a 100vh fallback) to stay stable as mobile browser
-                controls appear and disappear. Page content scrolls above it.
-              </p>
-              <div
-                className={styles.tableScroll}
-                tabIndex={0}
-                role="region"
-                aria-label="Background rendering settings"
-              >
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Setting</th>
-                      <th>Desktop</th>
-                      <th>Mobile</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Flow</td>
-                      <td>1.4</td>
-                      <td>1.4</td>
-                    </tr>
-                    <tr>
-                      <td>Speed</td>
-                      <td>3.6</td>
-                      <td>5.4</td>
-                    </tr>
-                    <tr>
-                      <td>Scale</td>
-                      <td>0.3</td>
-                      <td>0.3</td>
-                    </tr>
-                    <tr>
-                      <td>Composition Framing</td>
-                      <td>Native · zoom 1</td>
-                      <td>Adaptive Portrait · zoom 0.65–1</td>
-                    </tr>
-                    <tr>
-                      <td>DPR Limit</td>
-                      <td>Component Default</td>
-                      <td>1.25</td>
-                    </tr>
-                    <tr>
-                      <td>Pixel Budget</td>
-                      <td>Component Default</td>
-                      <td>750,000</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p>
-                Portrait framing uses zoom = clamp(√(width ÷ height), 0.65, 1).
-                At 390 × 844 that is about 0.68: the pattern appears 32% smaller
-                and the visible field area is roughly 2.16 times larger. Both
-                coordinate axes use the same factor, preserving shapes rather
-                than stretching them to fill the narrow screen. Square and
-                landscape views remain at zoom 1. Very tall screens stop at 0.65
-                to keep the composition recognizable. Warp scale still controls
-                deformation texture; framing controls the full scene. The shader
-                applies framing after pointer effects, keeping their existing
-                viewport coordinates aligned. The default native mode preserves
-                the desktop view.
-              </p>
-              <p>
-                Mobile retains its bounded rendering budget while animating
-                continuously at the faster pace. Density and pixel caps control
-                rendering cost, while the shader clock advances from elapsed
-                time rather than a fixed amount per frame. Slower frame rates
-                therefore do not automatically slow the animation. The renderer
-                pauses when hidden or offscreen, and reduced motion stops the
-                idle loop. WebGL fallback remains still. Light mode keeps the
-                dark center and warm colors.
+                Both guides use the same viewport canvas beneath their reading
+                surfaces. Medication artwork, loading artwork and local preview
+                decoration keep their own components and lifecycle; they do
+                not alter the uniform page base. The reusable Grainient source
+                remains in the project but is not mounted as the app background.
               </p>
             </Detail>
             <Detail title="A Dock That Leaves Room" context="Mobile Actions">
@@ -1110,20 +1024,24 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 The Today action is 74px high at every breakpoint, with a
-                proportional 19.425px corner radius. Its fixed 80px/21px
-                intake-card/action design reference continues to define Accent
-                proportions independently of this shorter action. Today opts
-                into <code>{'surface="solid"'}</code>: a flat Tailwind Pink 950
-                background with no decorative surface or graphics context.
-                A 4px Pink 800 frame begins at the button edge; a second 2px
-                band uses Pink 500 at 30% opacity. Both sit inward, preserving
-                the existing width, height, padding and corner geometry. The
-                existing soft pink exterior glow remains separate from those
-                border bands, and keyboard focus also draws inward.
+                proportional 19.425px corner radius. It opts into
+                <code>{' surface="solid"'}</code> and an independent
+                <code> rim</code>. The face is the fully opaque
+                <code> --background</code> plus branding Pink at 23%, without
+                the old field, glaze or tint components. The original inward
+                4px Pink 800 frame and 2px Pink 500 band at 30% remain beneath
+                the moving 3px specular edge. Its five hex stops range from
+                pale Pink through saturated Pink to deep Rose, with a matching
+                CSS fallback when WebGL is unavailable. Motion retains its
+                existing hidden, offscreen, disabled and reduced-motion guards.
+                Text and icon colors adapt to the resolved theme so both light
+                and dark faces remain readable. Focus draws inward, while the
+                soft exterior glow stays separate from the border geometry.
               </p>
               <p>
-                The main label remains White. Soft Pink colors the Tablets
-                mark, arrow and aside, with the aside at 94% visibility. The
+                The main label uses the page foreground. The Tablets mark,
+                arrow and aside use deeper Pink in light mode and branding
+                Pink in dark mode, with the aside at 94% visibility. The
                 optional pills variant of IntakeLogSymbol uses a 23px Lucide
                 Tablets glyph at 2.5 stroke, with no spark. Its 5px left shift
                 stays independent of the existing entry transforms. The same
@@ -1176,52 +1094,42 @@ export function DeveloperGuidePage() {
                 inset.
               </p>
               <p>
-                Mobile adds two pointer-inert pseudo-elements directly to the
-                fixed intake-dock, spanning the viewport width and 120% of its
-                height from bottom zero. This extends the decoration 20% above
-                the complete action section without a separate scrolling canvas.
-                Light mode keeps its semantic page-background base at 46% and
-                Apricot overlay at 12%. Dark mode uses two tones of the Blue 800
-                accent (#1e40af): a deeply shaded base mixed with 80% Black at
-                60% layer opacity, followed by the accent mixed with just 8%
-                White at 21% layer opacity. These are approximately #060d23 and
-                #304fb5 before their layer opacity is applied. Both layers use
-                the same multi-stop alpha mask: solid coverage across the bottom
-                60%, then a gradual fade through the top 40% to zero. Manual
-                Appearance and system themes select the same recipes. Desktop
-                has no such overlays. Masks belong only to the decorative
-                layers; the fixed parent keeps visible overflow without a
-                filter, transform or mask, leaving the button’s own rounded glow
-                and animated rim unclipped. Absolute decoration does not enlarge
-                the border box measured by ResizeObserver or its existing
-                height-plus-24px page reserve. Measurement changes still refresh
-                intake entrance bounds. The shared size and scroll padding are
-                released when the dock unmounts or the layout switches to
-                desktop. The retained footer keeps its original
-                animation-completion role.
+                Four pointer-inert layers sit behind the fixed mobile action.
+                The two outer fades now reach 160% of the dock height and taper
+                across their full distance, with no long opaque plateau. Their
+                base/accent opacities are 66%/20% in light mode and 84%/34% in
+                dark mode. Above them, Slate 900 reaches 104% of the dock at
+                55% opacity, a 37.5% increase. The nearest Gray 950 layer reaches
+                72% at 60% opacity. Both use multiple gradual stops ending in
+                complete transparency. The taller decoration moves the fade’s
+                upper edge upward without moving the button or enlarging the
+                measured dock. Footer copy uses light ink over this stronger
+                dark fade. Safe-area clearance, page scroll reserve and native
+                input behavior stay attached to the same fixed parent, and
+                desktop has no mobile fade layers.
               </p>
             </Detail>
             <Detail
-              title="Glass Is A Base, Color Is A Layer"
+              title="Canvas & Color Layers"
               context="Intake Cards"
             >
               <p>
-                MedicationCardBackground supplies one shared surface for intake,
-                medication, history and Final Look cards. Its foundation follows
-                <code> --card</code>: off-white Lilac paper in light mode and
-                opaque Plum in dark mode. Decoration remains below artwork and
-                copy. A small saved-pigment reflection uses 8% in light mode and
-                10% in dark mode, so medication identity remains visible without
-                replacing the interface’s foundation.
+                Actual intake cards composite their selected medication color
+                at 13% over the same fully opaque <code>--background</code>
+                used by the page. This single tint preserves the saved swatch
+                without introducing a second pink base layer. Text and artwork
+                keep their own full opacity. Folded cards cannot show through
+                the opaque face above them.
               </p>
               <p>
-                A quiet 2.5px Lilac-derived inward edge and soft reflection
-                supply depth without increasing the frame. The paired
-                <code> --card-foreground</code> stays above decorative paint,
-                and no opacity is applied to the content owner. Standard and
-                Safari glass handling share the same treatment. Intake rows,
-                library cards, past-day cards and Final Look samples retain
-                their existing 80px geometry and entry behavior.
+                Intake and Morning/Evening check-in cards share one inward
+                frame: a 4px neutral band followed by a 2px identity band at
+                50% opacity. The second band starts 4px inside the measured
+                edge, and both follow the existing card radius. The neutral
+                band uses 10% foreground ink. This geometry adds no outside
+                border area and preserves the existing card size, stack layout,
+                keyboard focus and entry animation. Library and appearance
+                previews retain their own surface recipes.
               </p>
               <p>
                 The Medications heading pairs up to six narrow rounded color
@@ -1621,15 +1529,13 @@ export function DeveloperGuidePage() {
                 appearance previews retain the small plain medication-type label
                 before the ingredient. Library values come from saved defaults;
                 intake values come from the actual record. Both use the same
-                geometry and glyph frame. Actual intakes retain a uniform 19%
-                tint using the exact selected palette swatch from --entry-color.
-                The fill is independent of darker icon ink and fixed-color SVG
-                artwork. Their 2.5px identity rim still follows the rendered
-                main glyph and sits entirely inside the 21px card corner at 50%
-                opacity. The muted primary rim sits 2.5px outside, following a
-                23.5px corner without changing layout or the hit target. Glass
-                reflections stay clipped to the card face. Check-ins use the
-                same frame with their main icon background as the inner pigment;
+                geometry and glyph frame. Actual intakes use the selected
+                palette swatch from <code>--entry-color</code> at 13% over the
+                opaque page canvas. The tint is independent of darker icon ink
+                and fixed-color SVG artwork. Their 4px neutral frame and 2px
+                identity band sit entirely inside the card, with the identity
+                pigment at 50% opacity. Check-ins use that same inward frame
+                with their own main artwork pigment;
                 library and journal surfaces retain their own paint. Their
                 native button opens the appropriate editor; Archive and Restore
                 remain inside the medication dialog.

@@ -271,13 +271,14 @@ export function IntakeAction({
           <PrimaryButton
             type="button"
             surface="solid"
+            rim
             radius={INTAKE_ACTION_GEOMETRY.radius}
             style={{
               ...getIntakeActionThemeStyle(),
               height: INTAKE_ACTION_GEOMETRY.height,
               minHeight: INTAKE_ACTION_GEOMETRY.height,
             }}
-            data-intake-paint="solid-pink"
+            data-intake-paint="canvas-pink"
             onClick={onClick}
             className="intake-primary-cta pointer-events-auto w-full"
           >
