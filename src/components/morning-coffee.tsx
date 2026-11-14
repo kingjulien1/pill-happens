@@ -279,9 +279,48 @@ export function MorningCoffee({
               stopOpacity="0"
             />
           </radialGradient>
-          <clipPath id={`${id}-glow-above-rim`}>
-            <rect x="0" y="-12" width="56" height="41" />
+          <clipPath id={`${id}-glow-above-rim`} clipPathUnits="userSpaceOnUse">
+            {/* The source stays on the 23px rim; only rising light can fan out. */}
+            <path d="M14 29H37C37 8 70-30 90.5-95V-155H-39.5V-95C-19-30 14 8 14 29Z" />
           </clipPath>
+          <linearGradient
+            id={`${id}-plume-fade`}
+            x1="25.5"
+            y1="27"
+            x2="25.5"
+            y2="-146"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor="#fff" />
+            <stop offset=".34" stopColor="#fff" stopOpacity=".88" />
+            <stop offset=".74" stopColor="#fff" stopOpacity=".4" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+          <filter
+            id={`${id}-plume-feather`}
+            x="-50"
+            y="-165"
+            width="151"
+            height="201"
+            filterUnits="userSpaceOnUse"
+          >
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+          <mask
+            id={`${id}-plume-shape`}
+            x="-50"
+            y="-166"
+            width="151"
+            height="195"
+            maskUnits="userSpaceOnUse"
+            maskContentUnits="userSpaceOnUse"
+          >
+            <path
+              d="M20.5 27H30.5C30.5 4 61-34 81.5-98V-146H-30.5V-98C-10-34 20.5 4 20.5 27Z"
+              fill={`url(#${id}-plume-fade)`}
+              filter={`url(#${id}-plume-feather)`}
+            />
+          </mask>
           <linearGradient
             id={`${id}-steam-reveal-gradient`}
             x1="0"
@@ -336,23 +375,28 @@ export function MorningCoffee({
           clipPath={`url(#${id}-glow-above-rim)`}
           data-coffee-glow
         >
-          <ellipse cx="26" cy="12" rx="13" ry="19" />
-          <ellipse
-            cx="16"
-            cy="18"
-            rx="9"
-            ry="13"
-            opacity="0.3"
-            transform="rotate(-16 16 18)"
-          />
-          <ellipse
-            cx="36"
-            cy="16"
-            rx="9"
-            ry="15"
-            opacity="0.3"
-            transform="rotate(16 36 16)"
-          />
+          <g mask={`url(#${id}-plume-shape)`} opacity="0.32" data-coffee-plume>
+            {/* Scale the light, not its mask, rim, steam or 56px layout. */}
+            <g transform="translate(25.5 29) scale(5) translate(-25.5 -29)">
+              <ellipse cx="26" cy="12" rx="13" ry="19" />
+              <ellipse
+                cx="16"
+                cy="18"
+                rx="9"
+                ry="13"
+                opacity="0.3"
+                transform="rotate(-16 16 18)"
+              />
+              <ellipse
+                cx="36"
+                cy="16"
+                rx="9"
+                ry="15"
+                opacity="0.3"
+                transform="rotate(16 36 16)"
+              />
+            </g>
+          </g>
           <ellipse
             cx="25.5"
             cy="27.4"
