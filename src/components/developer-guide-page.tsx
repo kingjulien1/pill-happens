@@ -1587,7 +1587,7 @@ export function DeveloperGuidePage() {
                 with their own main artwork pigment;
                 library and journal surfaces retain their own paint. Their
                 native button opens the appropriate editor; Archive and Restore
-                remain inside the medication dialog.
+                live beside Reset Draft and Close in the medication header.
               </p>
               <p>
                 The shared medication details fill the artwork’s 56px inner
@@ -1704,12 +1704,18 @@ export function DeveloperGuidePage() {
                 shows the settled artwork and badge without response effects.
               </p>
               <p>
-                Appearance color samples use compact rounded squares and a quiet
-                selection treatment. Final Look reuses the actual shared
-                medication-card surface, so the preview reflects the saved icon,
-                chosen pigment, shape and intake content. Its section surface
-                uses the semantic reading roles rather than a separate warm
-                overlay that could obscure the artwork.
+                Appearance groups the symbol search and compact rounded color
+                samples, preserving their quiet selection treatment. Final Look
+                is an independent sibling section rather than another panel
+                inside Appearance. Its visible showcase has 44px of clearance
+                above and 44px before Save Medication; the save gap is reduced
+                by one third from its earlier 66px. Both sections share one
+                stateful component, so search, color, preview motion and Undo
+                remain connected. Final Look reuses the actual shared
+                medication-card surface, reflecting the saved icon, chosen
+                pigment, shape and intake content. Its section surface uses
+                semantic reading roles rather than a separate warm overlay that
+                could obscure the artwork.
               </p>
               <p>
                 Final Look uses a restrained selected-color gradient behind the
@@ -1916,13 +1922,29 @@ export function DeveloperGuidePage() {
                 24px from 768px, without leading title artwork. Context follows
                 beneath the title in 12px copy without a dot or slash, and
                 visible descriptions align to the title’s text column.
-                Medication descriptions retain their screen-reader-only intent.
                 Reader and writing-help headers also begin with text; body
                 artwork and action icons stay in place. The headerActions slot
                 places native controls beside Close; check-in Reset Draft uses
                 the same 44px styling. Its footer keeps draft feedback without a
                 duplicate Reset link. Native dismissal, focus return and scroll
                 memory remain with the existing primitives.
+              </p>
+              <p>
+                Medication dialogs use their own slightly higher, compact header
+                with a longer visible description. Reset Draft and the edit-only
+                Archive or Restore action sit beside Close. The paired actions
+                have a 2px gap, followed by 8px before Close. All three controls
+                use 17/24 of the top bar’s 46px control and 23px glyph sizes:
+                approximately 32.5833px and 16.2917px. Their existing colors and
+                borderless treatment stay intact; other dialog headers keep
+                their shared geometry. Reset and status changes open separate
+                confirmations, initially focusing Keep Editing. Pending work
+                blocks repeated submission and dismissal, while an inline error
+                keeps a failed action available to retry. Focus returns to its
+                trigger, or to Close when resetting disables that trigger.
+                Closing the editor returns to its original list card or Add a
+                Medication; archiving an opener that leaves the visible list
+                falls back to the stable Add action.
               </p>
               <p>
                 Dialog save actions delegate through DialogPrimaryButton to
@@ -3474,12 +3496,12 @@ export function DeveloperGuidePage() {
                 edit IDs, and past tracking days; successful saves clear only
                 their own draft. Failed requests and closing a dialog retain it.
                 Device-draft feedback stays centered below the main form action.
-                Most forms keep Reset Draft there too; check-ins place their
-                native Reset control beside Close in the header, retaining
-                status feedback below Save without a second reset link. Each
-                saved card uses its latest successful journal updatedAt, with a
-                valid createdAt fallback for legacy records, in the journal
-                timezone. Draft changes never advance that time. Missing,
+                Most forms keep Reset Draft there too; medication and check-in
+                forms place their native Reset control beside Close in the
+                header, retaining status feedback below Save without a second
+                reset link. Each saved card uses its latest successful journal
+                updatedAt, with a valid createdAt fallback for legacy records, in
+                the journal timezone. Draft changes never advance that time. Missing,
                 invalid or unzoned legacy timestamps use an unavailable-time
                 description. The visible title/status/summary layout is shared
                 by Morning and Evening. Record identity is the tracking day plus
@@ -3507,6 +3529,20 @@ export function DeveloperGuidePage() {
                 Closing returns focus to the same stable card: touch interaction
                 leaves no outer ring, while fine-pointer keyboard focus has a
                 quiet one-pixel inset cue.
+              </p>
+              <p>
+                Medication Reset Draft is enabled only for the form’s validated
+                local draft, scoped to <code>med:new</code> or its exact
+                <code> med:edit:id</code> key. Header availability and the reset
+                callback come from that form’s existing single draft hook
+                through a ref bridge; the header does not create another draft
+                store. Confirming reset restores the form’s starting values and
+                clears only that draft. Saved medications, past intakes and
+                unrelated drafts remain unchanged. Remounting the appearance
+                scene also clears its transient Surprise Me Undo state. Save
+                Medication remains an explicit server submission; changing
+                archived status uses the existing medication PATCH and its Undo
+                receipt without submitting unsaved form fields.
               </p>
               <p>
                 The workspace also remembers the last route, scroll position,
