@@ -4,6 +4,12 @@ import type { AppData } from "@/lib/domain";
 import { authenticatedJournal } from "./auth";
 import { journalRepository } from "./database";
 import { mutateJournalState, readJournalState } from "./journal-state";
+import {
+  mutateJournalStateWithUndo,
+  undoJournalMutation,
+  type UndoTarget,
+  type UndoableAppData,
+} from "./journal-undo";
 
 async function requireJournal(): Promise<string> {
   const journalId = await authenticatedJournal();
@@ -23,6 +29,29 @@ export async function mutateState(
     journalRepository(),
     await requireJournal(),
     mutate,
+  );
+}
+
+/** Optional response metadata is never part of the persisted journal document. */
+export async function mutateStateWithUndo(
+  target: UndoTarget,
+  mutate: (state: AppData) => void,
+): Promise<UndoableAppData> {
+  return mutateJournalStateWithUndo(
+    journalRepository(),
+    await requireJournal(),
+    target,
+    mutate,
+    process.env.SESSION_SECRET ?? "",
+  );
+}
+
+export async function undoState(token: string): Promise<AppData> {
+  return undoJournalMutation(
+    journalRepository(),
+    await requireJournal(),
+    token,
+    process.env.SESSION_SECRET ?? "",
   );
 }
 

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { api, ApiError, jsonBody } from "@/lib/server/api";
-import { mutateState } from "@/lib/server/store";
+import { mutateStateWithUndo } from "@/lib/server/store";
 import { medicationSchema } from "@/lib/server/validation";
 import { resolveMedicationCategoryPatch } from "@/lib/server/medication-category-patch";
 
@@ -18,14 +18,17 @@ export function POST(request: Request) {
         archived: false,
         createdAt: new Date().toISOString(),
       };
-      return mutateState((state) => {
-        if (state.medications.length >= 1000)
-          throw new ApiError(
-            400,
-            "Your medication list has reached its limit.",
-          );
-        state.medications.push(medication);
-      });
+      return mutateStateWithUndo(
+        { kind: "medication", id: medication.id },
+        (state) => {
+          if (state.medications.length >= 1000)
+            throw new ApiError(
+              400,
+              "Your medication list has reached its limit.",
+            );
+          state.medications.push(medication);
+        },
+      );
     },
     { mutation: true },
   );

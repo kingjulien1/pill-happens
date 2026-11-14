@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { api, ApiError, jsonBody } from "@/lib/server/api";
-import { mutateState } from "@/lib/server/store";
+import { mutateStateWithUndo } from "@/lib/server/store";
 import { intakeSchema } from "@/lib/server/validation";
 
 export const runtime = "nodejs";
@@ -12,7 +12,7 @@ export function POST(request: Request) {
       const input = intakeSchema.parse(await jsonBody(request));
       const id = randomUUID();
       const createdAt = new Date().toISOString();
-      return mutateState((state) => {
+      return mutateStateWithUndo({ kind: "intake", id }, (state) => {
         const medication = state.medications.find(
           (item) => item.id === input.medicationId && !item.archived,
         );

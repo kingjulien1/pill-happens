@@ -1,5 +1,5 @@
 import { api, ApiError, jsonBody } from "@/lib/server/api";
-import { mutateState } from "@/lib/server/store";
+import { mutateStateWithUndo } from "@/lib/server/store";
 import { medicationPatchSchema } from "@/lib/server/validation";
 import { resolveMedicationCategoryPatch } from "@/lib/server/medication-category-patch";
 
@@ -14,7 +14,7 @@ export function PATCH(
     async () => {
       const { id } = await context.params;
       const input = medicationPatchSchema.parse(await jsonBody(request));
-      return mutateState((state) => {
+      return mutateStateWithUndo({ kind: "medication", id }, (state) => {
         const medication = state.medications.find((item) => item.id === id);
         if (!medication)
           throw new ApiError(404, "This medication was not found.");

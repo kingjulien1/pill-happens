@@ -1,5 +1,5 @@
 import { api, ApiError, jsonBody } from "@/lib/server/api";
-import { mutateState } from "@/lib/server/store";
+import { mutateStateWithUndo } from "@/lib/server/store";
 import { intakeSchema } from "@/lib/server/validation";
 
 export const runtime = "nodejs";
@@ -12,7 +12,7 @@ export function PATCH(request: Request, context: Context) {
     async () => {
       const { id } = await context.params;
       const input = intakeSchema.parse(await jsonBody(request));
-      return mutateState((state) => {
+      return mutateStateWithUndo({ kind: "intake", id }, (state) => {
         const intake = state.intakes.find((item) => item.id === id);
         if (!intake) throw new ApiError(404, "This intake was not found.");
         if (input.medicationId !== intake.medicationId) {
@@ -39,7 +39,7 @@ export function DELETE(request: Request, context: Context) {
     request,
     async () => {
       const { id } = await context.params;
-      return mutateState((state) => {
+      return mutateStateWithUndo({ kind: "intake", id }, (state) => {
         const index = state.intakes.findIndex((item) => item.id === id);
         if (index < 0) throw new ApiError(404, "This intake was not found.");
         state.intakes.splice(index, 1);

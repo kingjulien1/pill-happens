@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { api, ApiError, jsonBody } from "@/lib/server/api";
-import { mutateState } from "@/lib/server/store";
+import { mutateStateWithUndo } from "@/lib/server/store";
 import { goalSchema } from "@/lib/server/validation";
 
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ export function POST(request: Request) {
         id: randomUUID(),
         createdAt: new Date().toISOString(),
       };
-      return mutateState((state) => {
+      return mutateStateWithUndo({ kind: "goal", id: goal.id }, (state) => {
         if (
           !state.medications.some(
             (item) => item.id === input.medicationId && !item.archived,

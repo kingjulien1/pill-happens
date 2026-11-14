@@ -3,7 +3,7 @@ import {
   DailyCheckInSaveError,
   upsertDailyCheckIn,
 } from "@/lib/server/daily-check-ins";
-import { mutateState } from "@/lib/server/store";
+import { mutateStateWithUndo } from "@/lib/server/store";
 import { dailyCheckInSchema } from "@/lib/server/validation";
 import { JSON_BODY_LIMITS } from "@/lib/server/json-body";
 
@@ -18,8 +18,9 @@ export function POST(request: Request) {
       );
       const now = new Date();
       try {
-        return await mutateState((state) =>
-          upsertDailyCheckIn(state, input, now),
+        return await mutateStateWithUndo(
+          { kind: "check-in", day: input.day, period: input.period },
+          (state) => upsertDailyCheckIn(state, input, now),
         );
       } catch (error) {
         if (error instanceof DailyCheckInSaveError)
