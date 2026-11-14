@@ -4,11 +4,9 @@ import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { PencilSparklesIcon } from "@/components/action-icon";
 import { ActionButtonTint } from "@/components/action-button-tint";
-import { Button as ButtonPrimitive } from "@base-ui/react/button";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  getAccentFinishStyle,
   getAccentRadiusStyle,
   getButtonThemeStyle,
   type AccentButtonFinish,
@@ -64,13 +62,11 @@ export function AccentButtonSurface({
   );
 }
 
-/** A warm, fully painted CSS accent; interaction stays with the shared primitive. */
+/** Accent content and geometry delegate to the same shared action renderer. */
 export function AccentButton({
   children,
   className,
   style,
-  variant = "default",
-  size = "default",
   radius,
   pending = false,
   theme,
@@ -120,42 +116,28 @@ export function AccentButton({
     ) : (
       trailingIcon
     );
-  const classes = buttonVariants({ variant, size });
   const baseStyle = {
     ...getButtonThemeStyle("accent", theme),
-    ...getAccentFinishStyle(finish),
     ...getAccentRadiusStyle(radius),
   } as CSSProperties;
 
   return (
-    <ButtonPrimitive
+    <Button
       {...props}
-      disabled={disabled || pending}
-      aria-busy={pending || ariaBusy}
-      data-slot="button"
+      disabled={disabled}
+      pending={pending}
+      aria-busy={ariaBusy}
+      kind="accent"
+      radius={radius}
+      theme={theme}
+      motion={motion}
       data-accent-button
       data-accent-finish={finish}
-      data-button-kind="accent"
-      data-button-theme={theme}
-      data-button-motion={motion ? "on" : "off"}
       data-accent-state={busy ? "pending" : inactive ? "disabled" : "ready"}
       className={
         typeof className === "function"
-          ? (state) =>
-              cn(
-                classes,
-                "rimmed-action-button",
-                actionStyles.button,
-                styles.button,
-                className(state),
-              )
-          : cn(
-              classes,
-              "rimmed-action-button",
-              actionStyles.button,
-              styles.button,
-              className,
-            )
+          ? (state) => cn(actionStyles.button, styles.button, className(state))
+          : cn(actionStyles.button, styles.button, className)
       }
       style={
         typeof style === "function"
@@ -169,21 +151,13 @@ export function AccentButton({
             }
       }
     >
-      <span className={styles.aura} aria-hidden="true" data-accent-aura />
-      <span className={styles.rim} aria-hidden="true" data-accent-rim>
-        <span
-          className={styles.rimFlow}
-          aria-hidden="true"
-          data-accent-rim-flow
-        />
-      </span>
-      <AccentButtonSurface finish={finish} tint />
       <span className={styles.content} data-accent-content>
         <span className={styles.copy} data-accent-copy>
           {leading != null && (
             <span
               className={styles.icon}
               data-accent-icon="leading"
+              data-button-secondary
               aria-hidden="true"
             >
               {leading}
@@ -197,12 +171,13 @@ export function AccentButton({
           <span
             className={styles.icon}
             data-accent-icon="trailing"
+            data-button-secondary
             aria-hidden="true"
           >
             {trailing}
           </span>
         )}
       </span>
-    </ButtonPrimitive>
+    </Button>
   );
 }

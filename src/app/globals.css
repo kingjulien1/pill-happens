@@ -2912,6 +2912,9 @@
     var(--background)
   );
   --daily-action-inner-edge: var(--color-violet-700, #7008e7);
+  --daily-action-secondary-ink: color-mix(
+    in srgb, #4e456e 94%, var(--palette-rose)
+  );
 }
 /* Shared face/edge colors leave menu artwork and gesture motion independent. */
 [data-page-topbar]
@@ -3420,83 +3423,16 @@ input[type="time"] {
   width: 23px;
   height: 23px;
 }
-.intake-action-shell .intake-log-action[data-slot="button"] {
-  box-shadow:
-    0 0 20px color-mix(in srgb, var(--intake-action-accent) 17%, transparent),
-    0 0 42px color-mix(in srgb, var(--action-rim-2) 12%, transparent),
-    0 10px 42px color-mix(in srgb, var(--action-rim-3) 16%, transparent),
-    0 5px 16px color-mix(in srgb, var(--palette-black) 30.196%, transparent);
-}
 .intake-action-shell .intake-primary-cta[data-slot="button"] {
   height: 74px;
   min-height: 74px;
 }
-/* Keep the opaque purple face, inner violet band and quiet moving rim separate. */
-.intake-action-shell
-  .intake-primary-cta[data-slot="button"][data-button-face="solid"] {
-  --action-rim-1: #f9a8d4;
-  --action-rim-2: #d8b4fe;
-  --action-rim-3: #f0abfc;
-  --intake-rim-stop-1: var(--action-rim-1);
-  --intake-rim-stop-2: var(--action-rim-2);
-  --intake-rim-stop-3: var(--action-rim-3);
-  --intake-rim-stop-4: var(--action-rim-1);
-  --intake-rim-stop-5: var(--action-rim-2);
-  --intake-rim-line: var(--action-rim-1);
-  --intake-rim-base: var(--action-rim-2);
-  --intake-rim-guard: var(--action-rim-3);
-  --intake-rim-glow: var(--action-rim-2);
-  --daily-action-icon: var(--color-pink-800, oklch(45.9% 0.187 3.815));
-  border: 0;
-  background: var(--daily-action-face);
-  color: var(--foreground);
-  box-shadow:
-    /* Keep a 1px gap after the thicker moving rim, then the same 2px inner edge. */
-    inset 0 0 0 calc(var(--action-rim-thickness, 3px) + 1px)
-      var(--daily-action-face),
-    inset 0 0 0 calc(var(--action-rim-thickness, 3px) + 3px)
-      var(--daily-action-inner-edge),
-    0 0 20px color-mix(in srgb, var(--intake-action-accent) 17%, transparent),
-    0 0 42px color-mix(in srgb, var(--action-rim-2) 12%, transparent),
-    0 10px 42px color-mix(in srgb, var(--action-rim-3) 16%, transparent),
-    0 5px 16px color-mix(in srgb, var(--palette-black) 30.196%, transparent);
-  outline-offset: -2px;
-}
-.intake-action-shell
-  .intake-primary-cta[data-slot="button"][data-button-face="solid"]
-  > :is(.intake-specular-light, [data-button-rim]) {
-  opacity: 0.3;
-}
-/* Only one rim paints at a time, including after GPU recovery. */
-.intake-action-shell
-  .intake-primary-cta[data-slot="button"][data-button-face="solid"]
-  > .intake-specular-light[data-rendered="true"]
-  + [data-button-rim] {
-  opacity: 0;
-}
-.intake-action-shell
-  .intake-primary-cta[data-slot="button"][data-button-face="solid"]
-  :is(
-    .intake-primary-aside,
-    .intake-log-symbol,
-    .intake-log-symbol-pill,
-    .intake-log-symbol-spark,
-    .intake-primary-next
-  ) {
-  color: var(--daily-action-icon);
-}
-@media (prefers-color-scheme: dark) {
-  .intake-action-shell
-    .intake-primary-cta[data-slot="button"][data-button-face="solid"] {
-    --daily-action-icon: var(--intake-action-accent);
-  }
-}
 .intake-primary-cta .intake-primary-aside {
-  color: var(--intake-action-accent);
-  opacity: 0.94;
+  color: var(--daily-action-secondary-ink);
+  opacity: 1;
 }
 .intake-primary-cta :is(.intake-log-symbol, .intake-primary-next) {
-  color: var(--intake-action-accent);
+  color: var(--daily-action-secondary-ink);
 }
 .intake-action-content {
   display: flex;

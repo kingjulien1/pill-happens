@@ -270,6 +270,7 @@ export function IntakeAction({
             surface="solid"
             rim
             rimThickness={5.5}
+            gpuRim
             radius={INTAKE_ACTION_GEOMETRY.radius}
             style={{
               ...getIntakeActionThemeStyle(),

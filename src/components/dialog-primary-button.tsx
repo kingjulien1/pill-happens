@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import styles from "./dialog-primary-button.module.css";
 
-/** Existing dialog actions share the reusable accent without changing their API. */
+/** Dialog geometry composes the shared action renderer through AccentButton. */
 export function DialogPrimaryButton({
   className,
   style,

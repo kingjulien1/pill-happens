@@ -9,12 +9,6 @@
   position: relative;
   isolation: isolate;
   overflow: visible;
-  background: var(--action-base);
-  color: var(--action-text);
-  box-shadow:
-    0 5px 18px var(--accent-shadow-soft),
-    0 1px 3px var(--accent-shadow-contact);
-  transition: box-shadow 180ms ease;
 }
 
 .button[data-slot="button"][data-button-kind="accent"] {
@@ -170,7 +164,7 @@
   align-items: center;
   column-gap: 16px;
   padding-inline-end: 12px;
-  color: var(--action-text);
+  color: inherit;
 }
 
 .copy {
@@ -195,7 +189,7 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  color: var(--intake-action-accent);
+  color: var(--button-secondary, var(--daily-action-secondary-ink));
 }
 
 .icon > svg {
@@ -231,15 +225,6 @@
 .button[data-slot="button"]:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 4px;
-}
-
-@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .button[data-slot="button"]:hover:not(:disabled, [aria-disabled="true"]) {
-    background: var(--action-base);
-    box-shadow:
-      0 6px 22px var(--accent-hover-soft),
-      0 2px 5px var(--accent-hover-contact);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

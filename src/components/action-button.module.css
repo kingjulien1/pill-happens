@@ -246,7 +246,7 @@
     [data-medication-category-glyph],
     [data-medication-class-glyph]
   ) {
-  color: var(--intake-action-accent);
+  color: var(--daily-action-secondary-ink, var(--intake-action-accent));
 }
 .field {
   inset: -90% -20%;
