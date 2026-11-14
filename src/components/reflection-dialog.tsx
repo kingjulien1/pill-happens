@@ -66,11 +66,12 @@ import {
 } from "@/lib/daily-check-in";
 import { checkInDraftKey } from "@/lib/check-in-draft";
 import { formatDay } from "@/lib/domain";
+import { createJournalEntryTemplate } from "@/lib/journal-entry-template";
 import {
   applyMarkdownFormat,
   buildMarkdownFormatRanges,
   activeMarkdownFormats,
-  type reflectionStats,
+  reflectionStats,
 } from "@/lib/reflection-writing";
 import styles from "./reflection-dialog.module.css";
 
@@ -122,7 +123,7 @@ function draftLabel(status?: ReflectionDraftStatus) {
 
 export function ReflectionDialog({
   id,
-  value,
+  value: draftValue,
   onChange,
   disabled,
   day,
@@ -131,7 +132,7 @@ export function ReflectionDialog({
   onOpenChange,
   draftStatus,
   savedAt,
-  stats,
+  stats: draftStats,
   launcherRef,
   launcherClassName,
   launcher,
@@ -173,6 +174,10 @@ export function ReflectionDialog({
   });
   const title = useRef<HTMLHeadingElement>(null);
   const selection = useRef({ start: 0, end: 0 });
+  const templateCaret = useRef<{
+    field: HTMLTextAreaElement;
+    scope: string;
+  } | null>(null);
   const pendingSelection = useRef<{
     value: string;
     start: number;
@@ -195,6 +200,28 @@ export function ReflectionDialog({
   const downloadTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const downloadUrls = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const [feedback, setFeedback] = useState("");
+  const [editedTemplateScope, setEditedTemplateScope] = useState<string | null>(
+    null,
+  );
+  const templateScope = `${day}:${period}`;
+  // This scaffold is visual until a real edit: opening never dirties a draft or
+  // schedules an empty journal save. Existing raw writing always takes priority.
+  const template = useMemo(
+    () =>
+      draftValue === "" && editedTemplateScope !== templateScope
+        ? createJournalEntryTemplate(day)
+        : null,
+    [draftValue, editedTemplateScope, templateScope, day],
+  );
+  const value = template?.value ?? draftValue;
+  const stats = useMemo(
+    () => (template ? reflectionStats(template.value) : draftStats),
+    [template, draftStats],
+  );
+  const commitWriting = (next: string) => {
+    setEditedTemplateScope(templateScope);
+    onChange(next);
+  };
   const wide = useSyncExternalStore(
     subscribeSplit,
     splitSnapshot,
@@ -522,6 +549,28 @@ export function ReflectionDialog({
     field.setSelectionRange(pending.start, pending.end);
     setCaret({ start: pending.start, end: pending.end });
   }, [value, open, view]);
+  useLayoutEffect(() => {
+    const field = input.current;
+    if (
+      !template ||
+      !open ||
+      view === "preview" ||
+      !field?.isConnected ||
+      field.value !== template.value ||
+      (templateCaret.current?.field === field &&
+        templateCaret.current.scope === templateScope)
+    )
+      return;
+    // Set the default caret without focusing or changing any existing writing.
+    // Later selections and mode changes on this same field remain untouched.
+    templateCaret.current = { field, scope: templateScope };
+    field.setSelectionRange(template.selectionStart, template.selectionEnd);
+    selection.current = {
+      start: template.selectionStart,
+      end: template.selectionEnd,
+    };
+    setCaret(selection.current);
+  }, [template, templateScope, open, view, dialogRevision]);
   const rememberSelection = () => {
     if (!input.current) return;
     const next = {
@@ -558,7 +607,7 @@ export function ReflectionDialog({
       end: next.selectionEnd,
       activatedFrom,
     };
-    onChange(next.value);
+    commitWriting(next.value);
   };
   const mentions = useJournalMentionMenu({
     value,
@@ -578,7 +627,7 @@ export function ReflectionDialog({
         end: next.selectionEnd,
         activatedFrom: document.activeElement,
       };
-      onChange(next.value);
+      commitWriting(next.value);
     },
     onFeedback: setFeedback,
   });
@@ -677,7 +726,7 @@ export function ReflectionDialog({
         {launcher ? null : (
           <>
             <PencilLine size={16} aria-hidden="true" />
-            {value.trim() ? "Continue Writing" : "Open Writing Space"}
+            {draftValue.trim() ? "Continue Writing" : "Open Writing Space"}
             <ArrowUpRight size={15} aria-hidden="true" />
           </>
         )}
@@ -1035,7 +1084,7 @@ export function ReflectionDialog({
                 aria-label="Your writing"
                 {...mentions.inputProps}
                 onChange={(event) => {
-                  onChange(event.target.value);
+                  commitWriting(event.target.value);
                   rememberSelection();
                   setFeedback("");
                 }}
