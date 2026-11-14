@@ -81,6 +81,40 @@
   opacity: 0.9;
 }
 
+/* The reveal stays separate from the steam mask so no spark is clipped at its tip. */
+.fireworksReveal {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.burstGlow,
+.burstCore,
+.burstRing,
+.spark {
+  opacity: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.burstGlow {
+  fill: var(--steam-ink);
+  filter: blur(0.8px);
+}
+
+.burstCore {
+  fill: #fff1f8;
+}
+
+.burstRing {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.8;
+}
+
+.spark {
+  fill: currentColor;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .glow {
     animation: coffee-glow-emerge 2200ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
@@ -104,7 +138,49 @@
     animation-play-state: paused;
   }
 
-  .root[data-coffee-active="true"] :is(.sway, .ribbon, .glow, .steamReveal) {
+  /* Existing negative lane offsets stay lively, but hide their initial tail
+     until the one-second steam reveal has finished. */
+  .fireworksReveal {
+    animation: coffee-fireworks-reveal 1000ms steps(1, end) both;
+    animation-play-state: paused;
+  }
+
+  .burstGlow {
+    animation: coffee-firework-glow var(--steam-duration) linear
+      var(--steam-delay) infinite;
+    animation-play-state: paused;
+  }
+
+  .burstCore {
+    animation: coffee-firework-core var(--steam-duration) linear
+      var(--steam-delay) infinite;
+    animation-play-state: paused;
+  }
+
+  .burstRing {
+    animation: coffee-firework-ring var(--steam-duration) linear
+      var(--steam-delay) infinite;
+    animation-play-state: paused;
+  }
+
+  .spark {
+    animation: coffee-firework-spark var(--steam-duration) linear
+      var(--steam-delay) infinite;
+    animation-play-state: paused;
+  }
+
+  .root[data-coffee-active="true"]
+    :is(
+      .sway,
+      .ribbon,
+      .glow,
+      .steamReveal,
+      .fireworksReveal,
+      .burstGlow,
+      .burstCore,
+      .burstRing,
+      .spark
+    ) {
     animation-play-state: running;
   }
 }
@@ -143,12 +219,18 @@
     stroke-dashoffset: -22;
     opacity: 0.9;
   }
-  68% {
+  /* Leading tip = dash length − offset = 40 − (−60) = pathLength 100. */
+  62% {
     stroke-dasharray: 40 168;
-    stroke-dashoffset: -67;
-    opacity: 0.5;
+    stroke-dashoffset: -60;
+    opacity: 0.86;
   }
-  90%,
+  70% {
+    stroke-dasharray: 28 168;
+    stroke-dashoffset: -83;
+    opacity: 0.3;
+  }
+  80%,
   100% {
     stroke-dasharray: 12 168;
     stroke-dashoffset: -108;
@@ -181,5 +263,113 @@
   .ribbon {
     stroke-dasharray: none;
     opacity: 0.55;
+  }
+}
+
+/* A common 62% ignition keeps the flash attached to the travelling line.
+   Local coordinates follow the parent curl; sparks arc out, settle and fade. */
+@keyframes coffee-fireworks-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes coffee-firework-core {
+  0%,
+  61.99% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  62% {
+    opacity: 0.9;
+    transform: scale(0.45);
+  }
+  63.4% {
+    opacity: 1;
+    transform: scale(1.55);
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+}
+
+@keyframes coffee-firework-glow {
+  0%,
+  61.99% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  62% {
+    opacity: 0.24;
+    transform: scale(0.4);
+  }
+  64% {
+    opacity: 0.48;
+    transform: scale(1.45);
+  }
+  71%,
+  100% {
+    opacity: 0;
+    transform: scale(3.5);
+  }
+}
+
+@keyframes coffee-firework-ring {
+  0%,
+  61.99% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  62% {
+    opacity: 0.8;
+    transform: scale(0.4);
+  }
+  67% {
+    opacity: 0.42;
+    transform: scale(3.3);
+  }
+  73%,
+  100% {
+    opacity: 0;
+    transform: scale(6);
+  }
+}
+
+@keyframes coffee-firework-spark {
+  0%,
+  61.99% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(var(--spark-angle)) scale(0.2);
+  }
+  62% {
+    opacity: 0.85;
+    transform: translate(0, 0) rotate(var(--spark-angle)) scale(0.4);
+  }
+  67% {
+    opacity: 1;
+    transform: translate(var(--spark-mid-x), var(--spark-mid-y))
+      rotate(var(--spark-angle)) scale(1);
+  }
+  72% {
+    opacity: 0.72;
+    transform: translate(var(--spark-x), var(--spark-y))
+      rotate(var(--spark-turn)) scale(0.78);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-end-x), var(--spark-end-y))
+      rotate(var(--spark-turn)) scale(0.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fireworksReveal {
+    display: none;
   }
 }

@@ -6,6 +6,7 @@ import styles from "./morning-coffee.module.css";
 const WISPS = [
   {
     path: "M17 28C13 24 19 21 17 17S14 9 18 2",
+    tip: [18, 2],
     delay: "-1.1s",
     duration: "8.6s",
     sway: "11.4s",
@@ -13,6 +14,7 @@ const WISPS = [
   },
   {
     path: "M25.5 27C29 23 23 20 25.5 15S28 6 25.5-3",
+    tip: [25.5, -3],
     delay: "-4.1s",
     duration: "9.3s",
     sway: "13.2s",
@@ -20,6 +22,7 @@ const WISPS = [
   },
   {
     path: "M34 28C38 24 32 21 34 17S37 9 33 2",
+    tip: [33, 2],
     delay: "-6.6s",
     duration: "8.9s",
     sway: "12.1s",
@@ -27,7 +30,100 @@ const WISPS = [
   },
 ] as const;
 
-/** An empty cup stays still while three loose threads of warmth gently uncurl. */
+const SPARK_COLORS = [
+  "var(--color-pink-300, #f9a8d4)",
+  "var(--color-fuchsia-300, #f0abfc)",
+  "var(--color-violet-300, #c4b5fd)",
+  "var(--palette-iris, #b7c9f5)",
+  "var(--color-pink-200, #fbcfe8)",
+  "var(--color-amber-200, #fde68a)",
+  "var(--color-cyan-200, #a5f3fc)",
+  "var(--color-orange-200, #fed7aa)",
+] as const;
+
+/* An airy, upward-biased spray fits above the icon without reaching its copy.
+   Fixed vectors avoid timers, random hydration differences and growing DOM. */
+const SPARKS = [
+  { x: -10, y: -2.8, angle: -164, kind: "dot" },
+  { x: -8, y: -10.8, angle: -126, kind: "ray" },
+  { x: 0, y: -13.5, angle: -90, kind: "star" },
+  { x: 8.4, y: -9.6, angle: -49, kind: "ray" },
+  { x: 11, y: -1.5, angle: -8, kind: "dot" },
+  { x: 8.8, y: 5.2, angle: 31, kind: "ray" },
+  { x: 2.2, y: 8.3, angle: 75, kind: "star" },
+  { x: -7.5, y: 7.2, angle: 136, kind: "ray" },
+] as const;
+
+/** One bounded firework inherits the exact travel clock from its steam lane. */
+function SteamFirework({
+  tip,
+  lane,
+}: {
+  tip: readonly [number, number];
+  lane: number;
+}) {
+  return (
+    <g className={styles.fireworksReveal} data-coffee-firework-gate>
+      <g
+        transform={`translate(${tip[0]} ${tip[1]})`}
+        data-coffee-firework-anchor={lane}
+        data-firework-origin={`${tip[0]},${tip[1]}`}
+      >
+        <circle
+          className={styles.burstGlow}
+          r="3.2"
+          data-coffee-firework-glow
+        />
+        <circle
+          className={styles.burstRing}
+          r="1.8"
+          style={{ color: SPARK_COLORS[(lane * 3) % SPARK_COLORS.length] }}
+          data-coffee-firework-ring
+        />
+        <circle
+          className={styles.burstCore}
+          r="1.25"
+          data-coffee-firework-core
+        />
+        {SPARKS.map((spark, index) => (
+          <g
+            key={index}
+            className={styles.spark}
+            data-coffee-spark={spark.kind}
+            style={
+              {
+                "--spark-x": `${spark.x}px`,
+                "--spark-y": `${spark.y}px`,
+                "--spark-mid-x": `${spark.x * 0.64}px`,
+                "--spark-mid-y": `${spark.y * 0.72}px`,
+                "--spark-end-x": `${spark.x * 1.08}px`,
+                "--spark-end-y": `${spark.y + 2.5}px`,
+                "--spark-angle": `${spark.angle}deg`,
+                "--spark-turn": `${spark.angle + (spark.kind === "star" ? 105 : 12)}deg`,
+                color: SPARK_COLORS[(index + lane * 2) % SPARK_COLORS.length],
+              } as CSSProperties
+            }
+          >
+            {spark.kind === "star" ? (
+              <path d="M0 -1.4 L.36 -.36 L1.4 0 L.36 .36 L0 1.4 L-.36 .36 L-1.4 0 L-.36 -.36Z" />
+            ) : spark.kind === "ray" ? (
+              <path
+                d="M-2.4 0H0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            ) : (
+              <circle r="0.8" />
+            )}
+          </g>
+        ))}
+      </g>
+    </g>
+  );
+}
+
+/** A still cup, unhurried steam and tiny celebrations at each thread’s tip. */
 export function MorningCoffee({
   dialogOpen = false,
   ambientReady = true,
@@ -266,7 +362,7 @@ export function MorningCoffee({
             data-coffee-rim-glow
           />
         </g>
-        <g className={styles.warmth} mask={`url(#${id}-steam-reveal)`}>
+        <g className={styles.warmth}>
           {WISPS.map((wisp, index) => (
             <g
               key={wisp.path}
@@ -281,19 +377,25 @@ export function MorningCoffee({
                 } as CSSProperties
               }
             >
-              <use
-                href={`#${id}-steam-${index}`}
-                className={styles.trace}
-                stroke={`url(#${id}-warmth-${index})`}
-              />
-              <g className={styles.ribbon}>
-                <use href={`#${id}-steam-${index}`} className={styles.halo} />
-                <use href={`#${id}-steam-${index}`} className={styles.thread} />
+              <g mask={`url(#${id}-steam-reveal)`}>
                 <use
                   href={`#${id}-steam-${index}`}
-                  className={styles.highlight}
+                  className={styles.trace}
+                  stroke={`url(#${id}-warmth-${index})`}
                 />
+                <g className={styles.ribbon} data-coffee-traveller>
+                  <use href={`#${id}-steam-${index}`} className={styles.halo} />
+                  <use
+                    href={`#${id}-steam-${index}`}
+                    className={styles.thread}
+                  />
+                  <use
+                    href={`#${id}-steam-${index}`}
+                    className={styles.highlight}
+                  />
+                </g>
               </g>
+              <SteamFirework tip={wisp.tip} lane={index} />
             </g>
           ))}
         </g>
