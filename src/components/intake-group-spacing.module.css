@@ -18,6 +18,18 @@
 }
 
 .group:global(.intake-group)[data-grouped="true"]
+  > :global(.intake-group-glass)::before {
+  /* Share the disclosure's resting pigment and its existing surface entrance. */
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--secondary) 9%, transparent);
+  pointer-events: none;
+}
+
+.group:global(.intake-group)[data-grouped="true"]
   > :global(.intake-group-footer) {
   /* The existing 44px target puts its visible 24px pill 6px below the footer.
      Reserve only the remaining space; preserve its touch area and border notch. */

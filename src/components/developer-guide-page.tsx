@@ -2029,19 +2029,21 @@ export function DeveloperGuidePage() {
                 unchanged.
               </p>
               <p>
-                The group background separates a 50%-opacity blur from a
-                20%-opacity gradient made from every card’s current medication
-                color. Repeated colors are weighted by card count; at most three
-                radial/conic layers include the full palette. Missing
-                medications share the card’s default-color fallback. A smooth
-                54-second drift runs in both open and folded states, with no
-                fixed-color base or extra theme wash. Folded cards keep 90%
-                opacity. Visibility, page-hidden and reduced-motion changes
-                pause CSS movement. The disclosure keeps the same blur layer
-                with a steady semantic surface, avoiding a separately animated
-                miniature gradient that can look disconnected from its frame.
-                Hover raises that fill to 56% on desktop, and press uses 66%;
-                reduced motion also removes its paint and chevron transitions.
+                Groups with at least two intakes have a quiet background wash
+                matching the Reveal/Collapse face: the semantic secondary color
+                mixed at 9% with transparent. A separate background-only layer
+                sits behind the cards; the existing border and measured label
+                notch remain independent. The old group blur and medication-color
+                gradient children stay hidden, so this wash adds no drifting
+                gradient or continuous animation. Single intakes and check-in
+                cards receive no additional tint. The wash inherits the existing
+                360ms frameGather entrance fade on the group’s current beat,
+                after its exposed faces’ reserved starts, without changing the
+                scheduler. Shared page-entry pauses hold that fade, and reduced
+                motion shows the settled wash immediately. Folded cards keep 90%
+                opacity. Frame geometry, click targets, disclosure fill and its
+                existing hover/press feedback stay unchanged; reduced motion
+                still removes the control’s paint and chevron transitions.
                 Header actions and nested disclosures keep their own actions.
               </p>
               <p>
