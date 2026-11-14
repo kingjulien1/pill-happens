@@ -3375,22 +3375,40 @@ export function DeveloperGuidePage() {
                 The persistent Journal destination at <code>/journal</code>
                 collects only saved notes with more than 100 Markdown-aware
                 words. Exactly 100 words and unsaved drafts do not qualify. Both
-                check-in periods contribute independently, but collection cards
-                and the reader show no Morning/Evening labels. Titles come from
-                the first usable Markdown heading, falling back to the date.
-                Search checks title, writing and date locally; the first 20
-                entries load with another 20 available per request.
+                check-in periods contribute independently, without labeling the
+                preview’s own Morning/Evening period. Search still checks saved
+                title, writing and date locally; the first 20 entries load with
+                another 20 available per request. Authored titles and body
+                excerpts never enter the preview DOM, including accessible
+                labels and tooltips; those cards expose only date, word count
+                and reading time before the reader opens.
               </p>
               <p>
-                Collection entries reuse MedicationCardBase and its actual
-                layered surface, 21px corners, 2.5px inward rim and framed
-                notebook artwork. A single full-width list keeps the familiar
-                intake-card rhythm. Each compact 106px row retains the date,
-                15px title, one-line writing preview and local word/reading
-                statistics. Long titles and previews truncate visually while the
-                complete reading action stays accessible. The whole card opens
-                the reader and keeps the shared entrance and keyboard focus
-                behavior.
+                JournalPreviewCard composes MedicationCardBase with a quiet
+                accent wash, 21px corners, a neutral 4px inward rim and a 1.5px
+                inner color band at 32% opacity; no border grows outside the
+                card. Its JournalPreviewArtwork reuses the check-in’s 56px
+                stage, 48px tile and 30px motion wrapper around a 32px open
+                book. Colored pages, a tucked bookmark and a small glint breathe
+                slowly after the shared arrival/settle response. Rose, Lilac,
+                Iris, Apricot, Orchid and Aqua pairs are chosen by a stable
+                FNV-1a hash of the entry ID, so edits, filtering and pagination
+                keep the same colors without hydration randomness. Artwork
+                pauses offscreen, when hidden, while the reader is open and
+                under reduced motion.
+              </p>
+              <p>
+                The pure <code>journal-preview-references</code> helper reuses
+                the reader’s canonical typed-marker and explicit Markdown-link
+                rules. It deduplicates all seven supported reference families in
+                source order and uses live entity metadata for labels rather
+                than quoted journal prose. Code, HTML, images and unrelated
+                external links do not become preview chips. A compact Linked
+                Here footer provides independent anchors in a horizontal rail,
+                as siblings of the reader button rather than nested controls. An
+                absent reference list leaves no empty footer. The primary
+                metadata action still opens the saved reader, preserving the
+                shared card entrance and keyboard focus behavior.
               </p>
               <p>
                 The library reader displays saved text; the check-in doorway’s
