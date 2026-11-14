@@ -964,9 +964,9 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Both guides share this backdrop beneath their reading surfaces.
-                Intake cards and the main action retain their opaque
-                <code> --background</code> bases and local color tints, keeping
-                stacked content covered. The mobile dock fades, medication
+                Intake cards use plain, opaque <code>--background</code> faces to
+                cover rear stack content; the main action keeps its own opaque
+                foundation and local tint. The mobile dock fades, medication
                 artwork and check-in animations remain separate from the
                 background renderer.
               </p>
@@ -1123,11 +1123,12 @@ export function DeveloperGuidePage() {
               context="Intake Cards"
             >
               <p>
-                Medication cards composite their selected color at 5% over the
-                fully opaque <code>--background</code> foundation. Morning and
-                Evening use their shared check-in accent at the same 5%. This
-                single tint stays separate from the full-opacity artwork.
-                Folded cards cannot show through the opaque face above them.
+                Intake, medication-library and live preview cards, plus Morning
+                and Evening check-ins, use the plain, fully opaque
+                <code> --background</code> foundation. Their faces add no
+                selected-color or shared-accent tint. This neutral occlusion
+                layer covers rear stack content completely; the medication’s
+                chosen color remains in its full-opacity artwork.
               </p>
               <p>
                 Intakes, Morning/Evening check-ins, medication lists and live
@@ -1538,12 +1539,14 @@ export function DeveloperGuidePage() {
                 appearance previews retain the small plain medication-type label
                 before the ingredient. Library values come from saved defaults;
                 intake values come from the actual record. Both use the same
-                geometry and glyph frame. Actual intakes use the selected
-                palette swatch from <code>--entry-color</code> at 5% over the
-                opaque foundation color. Recolorable Lucide and outline SVG
-                glyphs use that exact swatch at full opacity, rather than a
-                deeper shade or foreground mixture. Fixed-color SVG artwork and
-                multicolor emoji keep their intrinsic pigments. A 1px secondary
+                geometry and glyph frame. Their card faces use the plain, opaque
+                <code> --background</code> foundation without a selected tint. Medication icon tiles also omit their separate 40%
+                selected-color wash: ordinary pigments use the popover surface,
+                while extreme pigments retain their neutral contrast plates.
+                Recolorable Lucide and outline SVG glyphs use the exact selected
+                palette swatch at full opacity, rather than a deeper shade or
+                foreground mixture. Fixed-color SVG artwork and multicolor
+                emoji keep their intrinsic pigments. A 1px secondary
                 icon rim uses the selected color at 80%, inset by 3% with
                 inherited rounding; 48px, 72px and 80px previews keep the same
                 footprint. The shared 4px neutral and 2px check-in-accent frame
@@ -2591,10 +2594,10 @@ export function DeveloperGuidePage() {
                 <li>
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
-                  a 56px stage. Both use the opaque foundation with a 5%
-                  check-in-accent tint. A shared 4px neutral frame and a 2px
-                  check-in-accent band at 50% opacity paint entirely inward. Filled
-                  coffee and crescent artwork distinguish the periods; their
+                  a 56px stage. Both use the plain, opaque canvas foundation
+                  without a check-in-accent tint. A shared 4px neutral frame and
+                  a 2px check-in-accent band at 50% opacity paint entirely inward.
+                  Filled coffee and crescent artwork distinguish the periods; their
                   colors, entry motion, ambient loops and progress replay stay
                   independent of this plain card face. Their secondary artwork
                   trace is 1px at 80% visibility; the two rim glints and the
