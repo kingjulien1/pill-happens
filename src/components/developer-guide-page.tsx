@@ -1612,14 +1612,10 @@ export function DeveloperGuidePage() {
                 on large screens. Actual intake forms use one unframed,
                 decorative icon at the main artwork’s top-left, centered on the
                 first text row and overlapping the artwork’s left edge by 60%,
-                with 40% outside. Its 20px phone size and 22px size from 768px
+                with 40% outside. Its 16px phone size and 17.6px size from 768px
                 stay fixed while rear exposure compresses within the 56px rail.
-                Black #000000 outlines use a 2.5px Lucide stroke; closed areas
-                are filled with opaque Zinc 300 #D4D4D8, the authored
-                Levomethasan border pigment. Open detail strokes remain
-                unfilled. The same native vector appears before the active
-                ingredient at 10px, with a 4px gap, or at 8px beside an unset
-                placeholder. Tablet retains the tilted, scored svg:tablet-angled
+                White outlines use a 2px Lucide stroke, with no filled areas.
+                Tablet retains the tilted, scored svg:tablet-angled
                 geometry; the other forms keep their corresponding symbols. No
                 square backplate, surrounding rim, route icon or expansion
                 control is rendered. Recorded forms take precedence over
@@ -1705,10 +1701,11 @@ export function DeveloperGuidePage() {
               <p>
                 The small corner form badge sits outside the spinning wrapper.
                 It has its own 520ms opacity fade and 1.5px slide, without scale
-                or rotation. Its visible size matches the opposite category
-                glyphs: 12.8px on mobile and 14.08px on desktop. Cards without
-                category glyphs use those same inferred sizes. Reduced motion
-                shows the settled artwork and badge without response effects.
+                or rotation. Its visible size is 25% larger than before: 16px on
+                mobile and 17.6px on desktop. The opposite category glyphs keep
+                their existing sizes. Cards without category glyphs use the same
+                enlarged form badge. Reduced motion shows the settled artwork
+                and badge without response effects.
               </p>
               <p>
                 Appearance groups the symbol search and compact rounded color

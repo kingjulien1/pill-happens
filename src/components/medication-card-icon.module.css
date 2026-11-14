@@ -22,7 +22,7 @@
    centre line, with 40% outside the front mark's left edge.
    Its frame stays full size while rear exposure compresses inside the rail. */
 .formBadge {
-  --form-badge-size: 12.8px;
+  --form-badge-size: 16px;
   position: absolute;
   z-index: 6;
   top: calc(
@@ -165,7 +165,7 @@
 
 @media (min-width: 768px) {
   .formBadge {
-    --form-badge-size: 14.08px;
+    --form-badge-size: 17.6px;
   }
 
   .formBadge[data-has-indicators="true"] {
