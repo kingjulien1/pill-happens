@@ -939,29 +939,33 @@ export function DeveloperGuidePage() {
                 order.
               </p>
             </Detail>
-            <Detail title="The Fixed Background" context="Plain Shared Canvas">
+            <Detail
+              title="The Fixed Background"
+              context="Flowing Color & Highlights"
+            >
               <p>
-                <code>JournalBackground</code> paints one uniform, opaque
-                <code> --background</code> color across the viewport. The
-                current theme resolves to <code>#fbfafd</code> in light mode
-                and <code>#2b233e</code> in dark mode. Page, intake-card and
-                main-action bases use this same token, so their differences
-                come from the deliberate color layers above it.
+                <code>JournalBackground</code> fills the viewport with the
+                mode-aware radial Grainient field. Plum, Lilac and a restrained
+                warm trace flow beneath a center veil and drifting Indigo,
+                Purple and Rose highlights. The CSS radial fallback paints
+                before hydration and remains available without WebGL.
               </p>
               <p>
-                The canvas has no shader, grain, corner highlights, center veil,
-                gradient or animation. CSS applies it before hydration and
-                responds immediately to system or saved Appearance changes.
-                No canvas rendering context, frame loop or background resize
-                listener is mounted. Page content and the mobile action fade
-                remain separate layers above this base.
+                The renderer follows system or saved Appearance changes. Mobile
+                uses portrait framing and a faster 5.4 shader speed, compared
+                with 3.6 on desktop, while limiting backing-store density to
+                1.25 and 750,000 pixels. The overscanned highlight field drifts
+                over 68 seconds without moving its clipped viewport. Reduced
+                motion keeps the composition still; hidden or offscreen
+                rendering pauses instead of accumulating elapsed time.
               </p>
               <p>
-                Both guides use the same viewport canvas beneath their reading
-                surfaces. Medication artwork, loading artwork and local preview
-                decoration keep their own components and lifecycle; they do
-                not alter the uniform page base. The reusable Grainient source
-                remains in the project but is not mounted as the app background.
+                Both guides share this backdrop beneath their reading surfaces.
+                Intake cards and the main action retain their opaque
+                <code> --background</code> bases and local color tints, keeping
+                stacked content covered. The mobile dock fades, medication
+                artwork and check-in animations remain separate from the
+                background renderer.
               </p>
             </Detail>
             <Detail title="A Dock That Leaves Room" context="Mobile Actions">
@@ -1531,8 +1535,8 @@ export function DeveloperGuidePage() {
                 intake values come from the actual record. Both use the same
                 geometry and glyph frame. Actual intakes use the selected
                 palette swatch from <code>--entry-color</code> at 13% over the
-                opaque page canvas. The tint is independent of darker icon ink
-                and fixed-color SVG artwork. Their 4px neutral frame and 2px
+                opaque foundation color. The tint is independent of darker icon
+                ink and fixed-color SVG artwork. Their 4px neutral frame and 2px
                 identity band sit entirely inside the card, with the identity
                 pigment at 50% opacity. Check-ins use that same inward frame
                 with their own main artwork pigment;
@@ -2624,7 +2628,7 @@ export function DeveloperGuidePage() {
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
-                  plain page canvas. A shared 4px neutral frame and a 2px
+                  flowing page background. A shared 4px neutral frame and a 2px
                   identity band at 50% opacity paint entirely inward. Filled
                   coffee and crescent artwork distinguish the periods; their
                   colors, entry motion, ambient loops and progress replay stay

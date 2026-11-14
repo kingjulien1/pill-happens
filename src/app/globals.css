@@ -170,16 +170,97 @@
 
 .ambient {
   position: fixed;
-  inset: 0;
+  inset: 0 0 auto;
+  height: 100vh;
+  height: 100lvh;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: var(--background);
+  filter: brightness(1);
+  /* Exact shared ramp remains visible before hydration or without WebGL. */
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    var(--ambient-center),
+    var(--ambient-near) 24%,
+    var(--ambient-mid) 45%,
+    var(--ambient-far) 70%,
+    var(--ambient-edge)
+  );
+}
+.ambient::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  /* A localized Ink veil anchors the center without whitening the field. */
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      var(--ambient-center-scrim),
+      transparent 70%
+    ),
+    var(--ambient-overlay);
+}
+/* The shared veil stays above the original tint and below every page surface.
+   Its own clipped box never moves; only the overscanned color field drifts. */
+.ambient-depth {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  background: #1e1a4d;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.ambient-depth::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  background:
+    radial-gradient(
+      ellipse at 68% 84%,
+      color-mix(in srgb, var(--palette-rose) 6%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(ellipse at 18% 24%, #2f0d68, #2f0d6800 62%),
+    radial-gradient(ellipse at 82% 76%, #2a212c, #2a212c00 66%),
+    radial-gradient(ellipse at 68% 12%, #1e1a4d, #1e1a4d00 58%),
+    conic-gradient(
+      from 35deg at 47% 52%,
+      #1e1a4d,
+      #2a212c 110deg,
+      #2f0d68 230deg,
+      #1e1a4d
+    );
+  transform: translate3d(-2%, 2%, 0) scale(1.04);
 }
 @media (prefers-color-scheme: light) {
+  .ambient-depth {
+    /* Keep small canvas copy readable while staying close to the shared 60% veil. */
+    opacity: 0.56;
+  }
   body {
+    /* Bare canvas copy uses opaque ink; cards keep their own semantic colors.
+       The guide retains its native copy above its separate reading veil. */
     --canvas-foreground: #000000;
     --canvas-muted-foreground: #000000;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ambient-depth::before {
+    animation: ambient-depth-drift 68s ease-in-out infinite;
+  }
+}
+@keyframes ambient-depth-drift {
+  0%,
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(1.04);
+  }
+  38% {
+    transform: translate3d(3%, -3%, 0) scale(1.09);
+  }
+  72% {
+    transform: translate3d(-3%, -1%, 0) scale(1.02);
   }
 }
 @keyframes enter {
