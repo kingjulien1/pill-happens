@@ -58,14 +58,26 @@
   gap: 8px;
 }
 
+.drawerHeader {
+  padding-block-start: calc(20px * 7 / 12);
+}
+
+.dialog,
+.scrollBody {
+  /* Header reflow at the drawer/dialog breakpoint must not rewrite saved scroll. */
+  overflow-anchor: none;
+}
+
+.dialog {
+  padding-block-start: calc(28px * 7 / 12);
+}
+
 .medicationDrawerHeader {
-  /* Place the centered title at 7/12 of its former 33px top offset. */
-  padding-block-start: 3.958333px;
+  padding-block-start: calc(3.958333px * 7 / 12);
 }
 
 .medicationDialog {
-  /* The desktop title likewise moves from 28px to 16 1/3px. */
-  padding-block-start: 15.041667px;
+  padding-block-start: calc(15.041667px * 7 / 12);
 }
 
 @media (min-width: 768px) {

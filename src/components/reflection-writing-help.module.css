@@ -6,7 +6,9 @@
   min-height: 0;
   flex-direction: column;
   gap: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--foreground) 14%, transparent);
   border-radius: var(--dialog-radius-surface);
@@ -22,7 +24,7 @@
   flex: none;
   align-items: center;
   gap: 10px;
-  padding: 18px 16px 18px 22px;
+  padding: calc(18px * 7 / 12) 16px 18px 22px;
   border-bottom: 1px solid
     color-mix(in srgb, var(--foreground) 11%, transparent);
 }
@@ -54,10 +56,9 @@
 .body {
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  flex: none;
+  overflow: visible;
   padding: 20px 22px 24px;
-  scrollbar-width: thin;
 }
 
 .intro {
@@ -145,7 +146,7 @@
 
   .header {
     gap: 8px;
-    padding: 14px 10px 14px 16px;
+    padding: calc(14px * 7 / 12) 10px 14px 16px;
   }
 
   .title {
@@ -166,4 +167,8 @@
   .example dd {
     font-size: 11px;
   }
+}
+
+.dialog[data-writing-help]::-webkit-scrollbar {
+  display: none;
 }

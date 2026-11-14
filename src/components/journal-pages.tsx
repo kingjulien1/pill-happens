@@ -192,7 +192,6 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
       title="Edit Intake"
-      context="Update Entry"
       description="Update this entry. Changes are saved to the day the intake was taken."
     >
       <IntakeForm

@@ -143,6 +143,7 @@ export function ResponsiveModal({
           showCloseButton={false}
           className={cn(
             "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
+            styles.dialog,
             medicationHeader && styles.medicationDialog,
           )}
         >
@@ -173,33 +174,39 @@ export function ResponsiveModal({
         className="rounded-t-[var(--dialog-radius-surface)]"
         finalFocus={returnFocus}
       >
-        <DrawerHeader
-          className={cn(
-            "px-6 pt-5 pb-4 text-left!",
-            medicationHeader &&
-              cn("pb-3 min-[360px]:pb-5", styles.medicationDrawerHeader),
-          )}
-        >
-          {headerContent(
-            <DrawerTitle className={styles.title}>{title}</DrawerTitle>,
-            <DrawerClose render={closeButton}>
-              <ActionIcon
-                name="close"
-                weight="regular"
-                className="size-[18px]"
-              />
-            </DrawerClose>,
-            <DrawerDescription className={styles.description}>
-              {description}
-            </DrawerDescription>,
-          )}
-        </DrawerHeader>
         <div
           ref={setScrollElement}
           data-dialog-scroll
-          className="min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pt-1 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]"
+          className={cn(
+            "min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]",
+            styles.scrollBody,
+          )}
         >
-          {children}
+          <DrawerHeader
+            className={cn(
+              "px-0 pb-4 text-left!",
+              styles.drawerHeader,
+              medicationHeader &&
+                cn("pb-3 min-[360px]:pb-5", styles.medicationDrawerHeader),
+            )}
+          >
+            {headerContent(
+              <DrawerTitle className={styles.title}>{title}</DrawerTitle>,
+              <DrawerClose render={closeButton}>
+                <ActionIcon
+                  name="close"
+                  weight="regular"
+                  className="size-[18px]"
+                />
+              </DrawerClose>,
+              <DrawerDescription className={styles.description}>
+                {description}
+              </DrawerDescription>,
+            )}
+          </DrawerHeader>
+          <div className="pt-1" data-modal-body>
+            {children}
+          </div>
         </div>
       </DrawerContent>
     </Drawer>

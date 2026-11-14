@@ -9,7 +9,9 @@
   min-height: 0;
   flex-direction: column;
   gap: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--reader-ink) 14%, transparent);
   border-radius: 24px;
@@ -32,7 +34,7 @@
   flex: none;
   align-items: center;
   gap: 11px;
-  padding: 18px 22px;
+  padding: calc(18px * 7 / 12) 22px 18px;
   border-bottom: 1px solid
     color-mix(in srgb, var(--reader-ink) 12%, transparent);
 }
@@ -74,8 +76,8 @@
   --muted-foreground: var(--reader-muted);
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  flex: none;
+  overflow: visible;
   padding: 25px clamp(22px, 6vw, 48px) 36px;
 }
 .body > div {
@@ -109,7 +111,7 @@
   }
   .header {
     gap: 8px;
-    padding: 15px 16px;
+    padding: calc(15px * 7 / 12) 16px 15px;
   }
   .title {
     font-size: 22px;
@@ -127,4 +129,8 @@
   .control:hover::before {
     background: #a78bfa2b;
   }
+}
+
+.dialog[data-reflection-reader]::-webkit-scrollbar {
+  display: none;
 }

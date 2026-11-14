@@ -13,6 +13,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 20px;
+  padding-block-start: calc(20px * 7 / 12);
 }
 
 .title {
