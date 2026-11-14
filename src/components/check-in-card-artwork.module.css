@@ -92,9 +92,14 @@
 }
 
 .frameTrace {
-  stroke-width: 1;
-  opacity: 0.8;
+  stroke-width: 0.8;
+  opacity: 0.32;
   stroke-dasharray: 100;
+}
+
+.glints {
+  fill: var(--art-soft);
+  opacity: 0.65;
 }
 
 .symbolArrival,
@@ -139,7 +144,8 @@
 /* The evening crescent owns its quiet sway and short lunar transitions. */
 .stage[data-check-in-artwork="evening"] .symbolFloat,
 .stage[data-check-in-artwork="evening"] .wash,
-.stage[data-check-in-artwork="evening"] .halo {
+.stage[data-check-in-artwork="evening"] .halo,
+.stage[data-check-in-artwork="evening"] .glints {
   animation: none;
 }
 
@@ -209,6 +215,7 @@
   }
 
   .halo,
+  .glints,
   .rays {
     animation: check-in-art-glimmer 7200ms ease-in-out var(--art-loop-start)
       infinite;
@@ -222,6 +229,7 @@
   .symbolFloat,
   .wash,
   .halo,
+  .glints,
   .rays {
     animation-play-state: var(--art-play);
   }
@@ -294,7 +302,7 @@
   }
   to {
     stroke-dashoffset: 0;
-    opacity: 0.8;
+    opacity: 0.32;
   }
 }
 

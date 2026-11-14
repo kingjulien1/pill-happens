@@ -4,8 +4,11 @@ import { MedicationFormGlyph } from "@/components/medication-form-glyph";
 import { CardIconSettle } from "@/components/card-icon-settle";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationIconStack } from "@/lib/medication-icon-stack";
-import { getMedicationPreviewSurface } from "@/lib/medication-preview-colors";
-import { getSvgIcon } from "@/lib/svg-icon-catalog";
+import {
+  getMedicationColorScale,
+  getMedicationIconPigment,
+  getMedicationPreviewSurface,
+} from "@/lib/medication-preview-colors";
 import {
   getMedicationType,
   MEDICATION_TYPE_VALUES,
@@ -27,24 +30,19 @@ function MedicationCardMark({
   iconRotation = 0,
 }: MedicationArtworkProps) {
   const color = getMedicationColor(value);
-  const artwork = getSvgIcon(icon ?? "pill");
-  const pigment =
-    artwork?.variant === "color" && artwork.color
-      ? artwork.color.hex
-      : color.hex;
+  const scale = getMedicationColorScale(color.value);
+  const pigment = getMedicationIconPigment(color.value, icon);
 
   return (
     <span
-      className={cn("medication-card-mark intake-card-mark", styles.mark)}
+      className="medication-card-mark intake-card-mark"
       data-medication-mark
       data-medication-color={color.value}
       style={
         {
-          color: color.hex,
-          opacity: 1,
+          color: scale.icon,
           backgroundColor:
             getMedicationPreviewSurface(pigment) ?? "var(--popover)",
-          "--medication-mark-inner-rim": `${color.hex}cc`,
           "--medication-rotation": `${iconRotation}deg`,
         } as CSSProperties
       }
@@ -108,6 +106,7 @@ export function MedicationCardIcon({
       style={
         {
           "--entry-color": color.hex,
+          "--entry-icon-tint": `${color.hex}66`,
           ...style,
         } as CSSProperties
       }
@@ -150,6 +149,7 @@ export function MedicationCardIconStack({
       style={
         {
           "--entry-color": color.hex,
+          "--entry-icon-tint": `${color.hex}66`,
           "--icon-stack-width": `${stack.width}px`,
           "--icon-stack-rail-width": `${stack.rail.width}px`,
           "--icon-stack-scale": stack.rail.scale,

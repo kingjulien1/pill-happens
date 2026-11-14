@@ -30,7 +30,7 @@ type MedicationCardBaseProps = Omit<ComponentProps<"button">, "color"> & {
   background?: ReactNode;
 };
 
-/** A neutral occlusion face; the artwork carries the medication color. */
+/** One quiet selected-color tint; the artwork carries the medication identity. */
 export function MedicationCardBackground() {
   return (
     <span
@@ -63,6 +63,7 @@ export function MedicationCardBase({
 
   const frameStyle = {
     "--entry-color": color.hex,
+    "--entry-icon-tint": `${color.hex}66`,
     "--intake-identity-color": getMedicationIconPigment(color.value, icon),
     ...style,
   } as CSSProperties;

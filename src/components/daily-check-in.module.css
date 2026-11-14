@@ -11,10 +11,14 @@
   pointer-events: none;
 }
 
-/* Check-ins use the same inward frame and plain opaque canvas as entries. */
+/* Card faces share the group base; these pigments belong to the artwork only. */
 .card:global(.intake-log-card) {
   --check-in-secondary: var(--action-background);
-  --check-in-accent: var(--entry-frame-accent);
+  --check-in-accent: color-mix(
+    in srgb,
+    var(--palette-lilac) 88%,
+    var(--palette-rose)
+  );
   --check-in-rim-dark: color-mix(in srgb, #7b659d 92%, var(--palette-rose));
   color: var(--card-foreground);
   box-shadow: none;
@@ -28,7 +32,7 @@
   isolation: isolate;
   overflow: hidden;
   border-radius: inherit;
-  background: var(--entry-surface-base);
+  background: color-mix(in srgb, var(--card-foreground) 4%, transparent);
   opacity: 1;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;

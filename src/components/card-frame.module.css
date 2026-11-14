@@ -1,30 +1,24 @@
-/* Medication, preview and check-in cards share the same quiet inward frame. */
-.card:global(.intake-log-card) {
+/* Shared rim geometry; saved intakes draw both bands within their footprint. */
+.card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
   --entry-frame-outset: 0px;
   --entry-rim-width: 4px;
   --entry-inner-rim-width: 2px;
-  --entry-frame-accent: color-mix(
-    in srgb,
-    var(--palette-lilac) 88%,
-    var(--palette-rose)
-  );
-  --entry-rim-color: color-mix(in srgb, var(--card-foreground) 10%, transparent);
-  --entry-rim-paint: var(--entry-rim-color);
   --entry-inner-rim-color: color-mix(
     in srgb,
-    var(--entry-frame-accent) 50%,
+    var(--entry-color) 50%,
     transparent
   );
   --entry-inner-rim-offset: calc(
     var(--entry-rim-width) - var(--entry-frame-outset)
   );
-  /* A plain canvas keeps color in the artwork and fully covers rear cards. */
-  --entry-surface-base: var(--background);
   overflow: visible;
 }
 
 /* A zero outset keeps the full rim inside the measured intake card. */
-.card:global(.intake-log-card)::before {
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card]
+  )::before {
   box-sizing: border-box;
   inset: calc(var(--entry-frame-outset, var(--entry-rim-width)) * -1);
   border-radius: calc(
@@ -32,12 +26,27 @@
   );
 }
 
+/* Opaque canvas plus one selected-color tint keeps folded content hidden. */
+.card:global(.intake-log-card[data-intake-card]) {
+  --entry-surface-base: color-mix(
+    in srgb,
+    var(--entry-color) 13%,
+    var(--background)
+  );
+}
+
 /* Keep keyboard focus as visible as before, inside the same compact footprint. */
-.card:global(.intake-log-card):focus-visible {
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card]
+  ):focus-visible {
   outline-offset: -2px;
 }
 
-.card:global(.intake-log-card)::after {
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card]
+  )::after {
   content: "";
   position: absolute;
   z-index: 3;
@@ -50,7 +59,7 @@
 }
 
 /* Both card faces keep their background paint within the rounded corners. */
-.card:global(.intake-log-card)
+.card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
   :is(:global(.intake-card-glass), [data-check-in-background]) {
   overflow: hidden;
   border-radius: var(--entry-card-radius);
