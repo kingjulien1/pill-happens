@@ -23,6 +23,7 @@ import {
   guidePreviewInk,
   type GuideThemeMode,
 } from "@/lib/guide-colors";
+import { Button } from "@/components/ui/button";
 import styles from "./guide-color-inspector.module.css";
 
 export type GuideColorInspectorRole = {
@@ -105,7 +106,7 @@ function ValueField({
             className={styles.valueInput}
           />
         )}
-        <button
+        <Button variant="ghost" size="icon"
           type="button"
           className={styles.copyButton}
           onClick={onCopy}
@@ -119,7 +120,7 @@ function ValueField({
           ) : (
             <CopyIcon size={14} weight="bold" aria-hidden="true" />
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -522,13 +523,13 @@ export function GuideColorInspector({
               onFocus={(event) => event.target.select()}
               className={styles.manualTextarea}
             />
-            <button
+            <Button variant="ghost" size="sm"
               type="button"
               onClick={() => setManual(null)}
               className={styles.hideManual}
             >
               Hide manual copy
-            </button>
+            </Button>
           </div>
         )}
       </div>

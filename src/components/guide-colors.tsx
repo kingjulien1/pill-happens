@@ -212,7 +212,7 @@ export function GuideColors() {
               ["json", "Copy JSON", GUIDE_THEME_JSON],
             ] as const
           ).map(([key, label, value]) => (
-            <button
+            <Button variant="ghost" size="sm"
               type="button"
               key={key}
               className={styles.copyAction}
@@ -226,7 +226,7 @@ export function GuideColors() {
                 <CopyIcon size={12} weight="bold" aria-hidden="true" />
               )}
               {label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -343,7 +343,7 @@ export function GuideColors() {
                 >
                   {role.label}
                 </h4>
-                <button
+                <Button variant="ghost" size="sm"
                   type="button"
                   className={styles.tokenButton}
                   onClick={() =>
@@ -361,7 +361,7 @@ export function GuideColors() {
                   ) : (
                     <CopyIcon size={10} weight="bold" aria-hidden="true" />
                   )}
-                </button>
+                </Button>
               </div>
               <p className={styles.roleDescription}>{role.description}</p>
               <div className={styles.pairRow}>
@@ -378,7 +378,7 @@ export function GuideColors() {
                 {MODES.map((mode) => {
                   const key = `${role.id}-${mode}`;
                   return (
-                    <button
+                    <Button variant="ghost" size="sm"
                       type="button"
                       key={mode}
                       className={styles.hexField}
@@ -403,7 +403,7 @@ export function GuideColors() {
                           />
                         )}
                       </span>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -478,7 +478,7 @@ export function GuideColors() {
                       const key = `table-${role.id}-${mode}`;
                       return (
                         <td key={mode}>
-                          <button
+                          <Button variant="ghost" size="sm"
                             type="button"
                             className={styles.tableValue}
                             onClick={() =>
@@ -508,7 +508,7 @@ export function GuideColors() {
                                 className={styles.tableCopied}
                               />
                             )}
-                          </button>
+                          </Button>
                         </td>
                       );
                     })}
@@ -728,7 +728,7 @@ export function GuideColors() {
               <ActionIcon name="discover" className="size-7" />
               <p>No colors found.</p>
               <span>Try a name, shade number or hex value.</span>
-              <button
+              <Button variant="ghost" size="sm"
                 type="button"
                 className={styles.copyAction}
                 onClick={() => {
@@ -738,7 +738,7 @@ export function GuideColors() {
                 }}
               >
                 Clear Filters
-              </button>
+              </Button>
             </div>
           )}
         </div>

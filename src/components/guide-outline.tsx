@@ -16,6 +16,7 @@ import {
   type GuideOutlineEntry,
 } from "@/lib/guide-outline";
 import { GUIDE_SIDEBAR_QUERY } from "@/lib/guide-responsive";
+import { Button } from "@/components/ui/button";
 import styles from "./guide-outline.module.css";
 
 const subscribe = (listener: () => void) => {
@@ -285,14 +286,14 @@ export function GuideOutline({ children }: { children: ReactNode }) {
               <span>
                 {entries.filter((entry) => entry.level === 1).length} sections
               </span>
-              <button
+              <Button variant="ghost" size="icon"
                 type="button"
                 onClick={() => findCurrent(true)}
                 aria-label="Find current section"
                 title="Find current section"
               >
                 <CrosshairIcon size={16} weight="regular" aria-hidden="true" />
-              </button>
+              </Button>
             </div>
             <div
               ref={list}

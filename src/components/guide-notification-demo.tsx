@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast, type JournalToastKind } from "@/components/ui/journal-toast";
 import type { NotificationId } from "@/lib/journal-notification-lifecycle";
+import { Button } from "@/components/ui/button";
 import styles from "./guide-notification-demo.module.css";
 
 const kinds = [
@@ -196,32 +197,32 @@ export function GuideNotificationDemo() {
       </p>
       <div className={styles.kinds} aria-label="Notification type examples">
         {kinds.map(({ kind, label, Icon }) => (
-          <button type="button" key={kind} onClick={() => show(kind)}>
+          <Button variant="ghost" size="sm" type="button" key={kind} onClick={() => show(kind)}>
             <Icon size={15} strokeWidth={2.2} aria-hidden="true" />
             {label}
-          </button>
+          </Button>
         ))}
       </div>
       <div
         className={styles.actions}
         aria-label="Notification lifecycle examples"
       >
-        <button type="button" onClick={() => flow(false)}>
+        <Button variant="ghost" size="sm" type="button" onClick={() => flow(false)}>
           <RefreshCw size={14} aria-hidden="true" />
           Loading → Success
-        </button>
-        <button type="button" onClick={() => flow(true)}>
+        </Button>
+        <Button variant="ghost" size="sm" type="button" onClick={() => flow(true)}>
           <CircleAlert size={14} aria-hidden="true" />
           Loading → Error
-        </button>
-        <button type="button" onClick={undoExample}>
+        </Button>
+        <Button variant="ghost" size="sm" type="button" onClick={undoExample}>
           <Undo2 size={14} aria-hidden="true" />
           Intake & Undo
-        </button>
-        <button type="button" onClick={clear}>
+        </Button>
+        <Button variant="ghost" size="sm" type="button" onClick={clear}>
           <Trash2 size={14} aria-hidden="true" />
           Clear Demos
-        </button>
+        </Button>
       </div>
       <div className={styles.status}>
         <p role="status" aria-live="polite">

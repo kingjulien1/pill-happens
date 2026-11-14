@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CopyIcon } from "@phosphor-icons/react/dist/ssr/Copy";
 import { ActionIcon } from "@/components/action-icon";
+import { Button } from "@/components/ui/button";
 import styles from "./developer-guide.module.css";
 
 /** Copy is explicit and local; a selectable fallback keeps every example usable. */
@@ -50,7 +51,7 @@ export function DeveloperCode({
           <strong>{label}</strong>
           <small>{language}</small>
         </span>
-        <button
+        <Button variant="ghost" size="sm"
           type="button"
           onClick={() => void copy()}
           aria-label={`Copy ${label}`}
@@ -62,7 +63,7 @@ export function DeveloperCode({
             <CopyIcon size={14} weight="bold" aria-hidden="true" />
           )}
           {state === "copied" ? "Copied" : "Copy"}
-        </button>
+        </Button>
       </div>
       <pre tabIndex={0} aria-label={label}>
         <code>{code}</code>

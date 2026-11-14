@@ -13,20 +13,14 @@ import {
 } from "@/components/guide-color-inspector";
 import {
   ACTION_BUTTON_KINDS,
-  ACTION_BUTTON_TINT,
-  INTAKE_ACTION_SUPPORTING_PAINT,
-  ACCENT_FINISHES,
-  ACCENT_SUPPORTING_PAINT,
   BUTTON_SIZE_BANDS,
   BUTTON_SYSTEM,
   getAccentButtonDimensions,
   getButtonSizeStyle,
-  type AccentButtonFinish,
   type ActionButtonKind,
-  type ActionButtonPaint,
   type ActionButtonTheme,
 } from "@/lib/action-button-system";
-import { APP_THEME_VALUES } from "@/lib/app-theme";
+import { APP_HARMONY, APP_THEME_VALUES, mixAppColors } from "@/lib/app-theme";
 import { GUIDE_LAYOUT_BANDS } from "@/lib/guide-responsive";
 import { guideHeadingId } from "@/lib/guide-outline";
 import guideStyles from "./developer-guide.module.css";
@@ -46,21 +40,19 @@ const number = (value: number) =>
   new Intl.NumberFormat("en", { maximumFractionDigits: 3 }).format(value);
 const percentage = (value: number) => `${number(value * 100)}%`;
 
+type ButtonPaint = {
+  base: string;
+  innerEdge: string;
+  rimColors: readonly string[];
+  text: string;
+  icon: string;
+};
 type PaintLayer = {
-  key: string;
+  key: keyof ButtonPaint;
   label: string;
   description: string;
   colors: readonly string[];
   opacity: number;
-  property:
-    | "base"
-    | "fieldColors"
-    | "diagonalColors"
-    | "washColor"
-    | "rimColors"
-    | "tintColors"
-    | "icon"
-    | "text";
 };
 type Inspection = {
   role: GuideColorInspectorRole;
@@ -69,92 +61,67 @@ type Inspection = {
   layerOpacity: number;
 };
 
-function paintLayers(
-  paint: ActionButtonPaint,
-  kind: ActionButtonKind,
-): PaintLayer[] {
-  const transparentBase = /^#[\da-f]{6}00$/i.test(paint.base);
+const roleDescriptions = {
+  primary:
+    "Prominent geometry for the strongest next step, using the same solid face and rim as every other action.",
+  secondary:
+    "Compact supporting geometry on the same renderer, without a separate button paint recipe.",
+  accent:
+    "A commitment adapter with default leading and trailing icons, shared solid paint and responsive proportions.",
+};
+
+/** Rounded inspection swatches mirror shared-button.module.css, not a second renderer. */
+function buttonPaint(mode: ActionButtonTheme): ButtonPaint {
+  return {
+    base: mixAppColors("#3c0366", APP_THEME_VALUES[mode].background, 0.4),
+    innerEdge: "#7008e7",
+    rimColors: ["#f9a8d4", "#d8b4fe", "#f0abfc"],
+    text: APP_THEME_VALUES[mode].foreground,
+    icon: mixAppColors("#4e456e", APP_HARMONY.rose, 0.94),
+  };
+}
+
+function paintLayers(paint: ButtonPaint): PaintLayer[] {
   return [
     {
       key: "base",
-      label: "Base surface",
-      description: transparentBase
-        ? "A transparent glass foundation lets the canvas show through beneath the color field."
-        : "A solid foundation supplies the starting surface beneath the decorative layers.",
+      label: "Solid face",
+      description:
+        "Purple 950 at a forty-percent share mixes with the mode’s opaque canvas. There is no rotating field, glaze or tint layer.",
       colors: [paint.base],
       opacity: 1,
-      property: "base",
     },
     {
-      key: "field",
-      label: "Color field",
+      key: "innerEdge",
+      label: "Violet inner edge",
       description:
-        "Radial and conic color stops give the face depth as the field moves.",
-      colors: paint.fieldColors,
-      opacity: paint.fieldOpacity,
-      property: "fieldColors",
-    },
-    {
-      key: "diagonal",
-      label: kind === "accent" ? "Optional radial glaze" : "Diagonal veil",
-      description:
-        kind === "accent"
-          ? `Absent from the default exposed field. The optional glazed finish adds a stationary charcoal center at ${percentage(ACCENT_FINISHES.glazed.anchorOpacity)} opacity.`
-          : "A lighter diagonal gradient softens the field without changing its raw colors.",
-      colors: paint.diagonalColors,
-      opacity: paint.diagonalOpacity,
-      property: "diagonalColors",
-    },
-    {
-      key: "wash",
-      label: kind === "accent" ? "Optional charcoal wash" : "Finishing wash",
-      description:
-        kind === "accent"
-          ? `Absent from the default exposed field. The glazed finish adds this charcoal wash at ${percentage(ACCENT_FINISHES.glazed.washOpacity)} opacity, above the radial glaze.`
-          : "A restrained top color unifies the face. Its opacity is separate from the hex value.",
-      colors: [paint.washColor],
-      opacity: paint.washOpacity,
-      property: "washColor",
-    },
-    {
-      key: "tint",
-      label: "Mint / Emerald overlay",
-      description:
-        "One 13% layer combines offset radial pools and a conic field above the base field/glaze and below content and the rim. Its child drifts; the containing opacity stays fixed.",
-      colors: [
-        INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"],
-        ...paint.rimColors,
-        ACTION_BUTTON_TINT.emerald,
-      ],
-      opacity: ACTION_BUTTON_TINT.opacity,
-      property: "tintColors",
-    },
-    {
-      key: "rim",
-      label: "Rim spectrum",
-      description:
-        "Three colors travel around the rounded perimeter; the center stays clear.",
-      colors: paint.rimColors,
+        "A two-pixel Violet 700 band sits one pixel inside the moving outer rim. Both edges paint inward without enlarging the control.",
+      colors: [paint.innerEdge],
       opacity: 1,
-      property: "rimColors",
+    },
+    {
+      key: "rimColors",
+      label: "Moving Pink rim",
+      description:
+        "Pink 300, Purple 300 and Fuchsia 300 circulate at thirty-percent opacity. Compact controls use the shared CSS rim; Today’s prominent action opts into its GPU equivalent.",
+      colors: paint.rimColors,
+      opacity: 0.3,
     },
     {
       key: "text",
-      label: "White copy",
+      label: "Primary copy",
       description:
-        "The foreground sits above the painted face and retains its own full opacity.",
+        "The mode’s foreground keeps the label readable above the solid face, independently of decorative edges.",
       colors: [paint.text],
       opacity: 1,
-      property: "text",
     },
     {
       key: "icon",
-      label: "Mint action icons",
+      label: "Mug-base secondary ink",
       description:
-        "Action icons retain the CTA Mint pigment above the tint; medication identity glyphs keep their domain colors.",
-      colors: [INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"]],
+        "Action icons and secondary CTA copy use the coffee tile’s base: #4e456e at ninety-four percent mixed with Rose. Medication artwork keeps its own pigments.",
+      colors: [paint.icon],
       opacity: 1,
-      property: "icon",
     },
   ];
 }
@@ -167,46 +134,29 @@ function colorRole(
   index: number,
 ): GuideColorInspectorRole {
   const stop = layer.colors.length > 1 ? ` · stop ${index + 1}` : "";
-  const suffix = {
-    base: "base",
-    fieldColors: `field-${index + 1}`,
-    diagonalColors: `diagonal-${index + 1}`,
-    washColor: "wash",
-    rimColors: `rim-${index + 1}`,
-    tintColors: "tint-emerald",
-    icon: "icon",
-    text: "text",
-  }[layer.property];
+  const token = {
+    base: "--button-face",
+    innerEdge: "--button-edge",
+    rimColors: `--action-rim-${index + 1}`,
+    icon: "--daily-action-secondary-ink",
+    text: "--button-copy",
+  }[layer.key];
   return {
     id: `button-${kind}-${mode}-${layer.key}-${index}`,
     label: `${BUTTON_SYSTEM[kind].label} · ${layer.label}${stop}`,
     description: layer.description,
-    token:
-      layer.property === "icon" ||
-      (layer.property === "tintColors" && index === 0)
-        ? "--intake-action-accent"
-        : layer.property === "tintColors"
-          ? index === 4
-            ? "--action-tint-emerald"
-            : `--action-${mode}-rim-${index}`
-          : `--action-${mode}-${suffix}`,
+    token,
     light: color,
     dark: color,
     pairsWith: [],
   };
 }
 
-function ingredientPaint(layer: PaintLayer, kind: ActionButtonKind): string {
-  const [first, second = first] = layer.colors;
-  if (layer.key === "diagonal") {
-    return kind === "accent"
-      ? `radial-gradient(ellipse at 51% 46%, ${first}, transparent 85%)`
-      : `radial-gradient(ellipse at 18% 20%, ${first}, transparent 75%), radial-gradient(ellipse at 92% 80%, ${second}, transparent 76%), linear-gradient(135deg, ${first} 8%, ${second} 92%)`;
-  }
-  if (layer.key === "field" || layer.key === "rim" || layer.key === "tint") {
-    return `radial-gradient(ellipse at 20% 28%, ${first}, transparent 62%), conic-gradient(from 35deg at 48% 52%, ${[...layer.colors, first].join(", ")})`;
-  }
-  return first;
+function ingredientPaint(layer: PaintLayer): string {
+  const [first] = layer.colors;
+  return layer.key === "rimColors"
+    ? `conic-gradient(from 25deg, ${[...layer.colors, first].join(", ")})`
+    : first;
 }
 
 function Heading({ children, level = 2 }: { children: string; level?: 2 | 3 }) {
@@ -296,9 +246,15 @@ function ButtonSample({
   );
 }
 
-const usageCode = `import { PrimaryButton } from "@/components/primary-button";
+const usageCode = `import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/primary-button";
 import { SecondaryButton } from "@/components/secondary-button";
 import { AccentButton } from "@/components/accent-button";
+
+// Compact actions use the same renderer directly.
+<Button type="button" size="sm" onClick={reviewDetails}>
+  Review
+</Button>
 
 // A page's strongest next step.
 <PrimaryButton type="button" onClick={openIntake}>
@@ -310,16 +266,11 @@ import { AccentButton } from "@/components/accent-button";
   Review details
 </SecondaryButton>
 
-// Default Accent: exposed pigment, without a center glaze or Plum wash.
+// Accent adds content slots, not a different paint renderer.
 // Labels only: PencilSparkles and ArrowRight are shared defaults.
 // Pending keeps a meaningful label and prevents another activation.
 <AccentButton type="submit" pending={saving}>
-  {saving ? "Saving…" : "Save medication"}
-</AccentButton>
-
-// Opt into a softer center over the same rotating field.
-<AccentButton type="button" finish="glazed" onClick={reviewChanges}>
-  Review changes
+  {saving ? "Saving…" : "Save Medication"}
 </AccentButton>
 
 // Optional decorative slots accept a React node or null.
@@ -350,8 +301,8 @@ export function GuideButtons() {
   const [feedback, setFeedback] = useState(
     "Choose any live example to try its action.",
   );
-  const paint = BUTTON_SYSTEM[kind].themes[mode];
-  const layers = paintLayers(paint, kind);
+  const paint = buttonPaint(mode);
+  const layers = paintLayers(paint);
   const firstRole = colorRole(kind, mode, layers[0], paint.base, 0);
   const activate = (label: string) =>
     setFeedback(`“${label}” preview activated.`);
@@ -387,10 +338,10 @@ export function GuideButtons() {
         </span>
       </div>
       <p className={styles.intro}>
-        Primary, Secondary and Accent share a button contract, with a distinct
-        visual role for each kind of decision. Compare the real components in
-        both themes, inspect the paint, then choose the smallest amount of
-        emphasis that makes the next step clear.
+        One canonical Button renderer supplies every action’s solid face, inward
+        edges and native behavior. Primary, Secondary and Accent retain their
+        contextual geometry and content slots. Compare the real adapters in both
+        themes, then choose the smallest useful size and emphasis.
       </p>
       <nav className={styles.jumpLinks} aria-label="Button reference sections">
         {[
@@ -416,9 +367,10 @@ export function GuideButtons() {
           device. These are base-size buttons; their native focus and activation
           behavior stays available. Actions in this reference only update the
           preview feedback. Accent starts at 72px high with 14.25px, 700-weight
-          White text in both themes. Its 22px PencilSparkles and ArrowRight
-          glyphs share a 2.5 stroke; the label and icons keep the same centered
-          baseline as the page’s primary action.
+          foreground text. Its 22px PencilSparkles and ArrowRight glyphs use the
+          coffee tile’s base pigment and share a 2.5 stroke. Every preview uses
+          the shared solid paint and CSS rim; their native labels, focus and
+          activation remain available.
         </p>
         <div className={styles.roleList}>
           {ACTION_BUTTON_KINDS.map((buttonKind, index) => {
@@ -436,7 +388,7 @@ export function GuideButtons() {
                       0{index + 1} / Action role
                     </span>
                     <Heading level={3}>{`${system.label} Button`}</Heading>
-                    <p>{system.description}</p>
+                    <p>{roleDescriptions[buttonKind]}</p>
                   </div>
                   <dl className={styles.dimensions}>
                     <div>
@@ -518,8 +470,10 @@ export function GuideButtons() {
         <p className={styles.lead}>
           Read the stack from its foundation to its foreground. Each color chip
           opens the same inspector as the palette reference, including copyable
-          hex, RGB and opacity values. A raw color and its layer opacity stay
-          separate, so a 67% field never becomes an invented replacement hex.
+          hex, RGB and opacity values. The face swatch is a rounded sRGB
+          representation of the shared forty-percent Purple / canvas mix. Rim
+          source colors and their thirty-percent layer opacity stay separate.
+          The controls themselves use the real shared CSS tokens.
         </p>
         <div className={styles.inspectorToolbar}>
           <div
@@ -558,8 +512,6 @@ export function GuideButtons() {
           <p className={styles.stackNote}>
             Each strip shows one layer over the base. Inspect a stop for its
             source value; the live buttons show the complete composition.
-            {kind === "accent" &&
-              " Accent shows the default exposed field: its optional glaze and wash are absent, represented by 0% layer opacity below."}
           </p>
           <ol className={styles.layerStack}>
             {layers.map((layer, index) => (
@@ -586,7 +538,7 @@ export function GuideButtons() {
                   >
                     <span
                       style={{
-                        background: ingredientPaint(layer, kind),
+                        background: ingredientPaint(layer),
                         opacity: layer.opacity,
                       }}
                     />
@@ -621,23 +573,22 @@ export function GuideButtons() {
           <div>
             <Heading level={3}>Color, Opacity And Compositing</Heading>
             <p>
-              A gradient’s stops describe its source colors. Layer opacity
-              blends that entire gradient into the surface below it. The final
-              face depends on those overlaps, position and motion; a flat swatch
-              represents one ingredient. Text remains above the decorative
-              stack.
+              The face mixes forty percent Purple 950 with sixty percent opaque
+              canvas; that is a color recipe, not forty-percent element opacity.
+              The moving rim is a separate thirty-percent layer. Primary copy
+              and mug-base secondary ink retain their own colors above the face.
+              Medication identity glyphs keep their domain pigments.
             </p>
           </div>
           <div>
-            <Heading level={3}>Glass, Rim And Geometry</Heading>
+            <Heading level={3}>One Face, Two Inward Edges</Heading>
             <p>
-              This paint uses {paint.blur}px backdrop blur
-              {paint.blur === 0
-                ? "; the Accent’s depth comes from its own color field"
-                : " beneath its layered face"}
-              . A radius shapes the frame; rim thickness follows the perimeter.
-              Changing the radius should preserve a clear center and a steady
-              edge, including the short ends of wide buttons.
+              The opaque face needs no backdrop blur. Compact Button controls
+              default to a 2px outer rim; Primary and Secondary adapters retain
+              their 3px geometry. Today uses 5.5px at the same 74px height and
+              19.425px radius. A 1px face-colored gap precedes the shared 2px
+              Violet band. CSS paints the rim by default; only the main intake
+              action opts into GPU rendering, with the same CSS fallback.
             </p>
           </div>
         </div>
@@ -651,147 +602,21 @@ export function GuideButtons() {
             code={JSON.stringify(paint, null, 2)}
           />
         </details>
-        <details
-          className={styles.detail}
-          data-card-entry="guide-button-accent-details"
-        >
-          <summary>
-            Accent finishing details · {ACCENT_SUPPORTING_PAINT.length}{" "}
-            supporting paints
-          </summary>
+        <details className={styles.detail}>
+          <summary>Legacy finish inputs and decorative artwork</summary>
           <div className={styles.detailBody}>
             <p>
-              The six rows describe the core paint. These additional haze,
-              offset-center reflections, aura, sheens and shadows add depth to
-              Accent. The four anchor paints belong only to the optional glazed
-              finish; the field, aura, sheens and shadows also serve the default
-              exposed field. Each chip preserves the source color’s own alpha;
-              the inspector applies its containing layer’s opacity separately.
-              An optional anchor chip shows its glazed opacity, not a layer
-              present in the default finish.
+              Existing <code>surface</code> and <code>finish</code> props remain
+              accepted so saved examples and callers keep compiling. They no
+              longer select different button backgrounds: Primary, Secondary,
+              Accent and DialogPrimaryButton all delegate to the canonical
+              <code> Button</code> renderer. The separate
+              <code> AccentButtonSurface</code> export remains a paint-only
+              artwork utility for the journal illustration; it is not mounted
+              inside an action button.
             </p>
-            <div className={styles.supportingPaint}>
-              {ACCENT_SUPPORTING_PAINT.map((entry) => (
-                <div key={entry.id} className={styles.supportingItem}>
-                  <button
-                    type="button"
-                    className={styles.colorStop}
-                    data-guide-accent-support={entry.id}
-                    data-guide-button-color={entry.color}
-                    data-layer-opacity={entry.layerOpacity}
-                    aria-label={`Inspect Accent ${entry.label}, ${entry.color}, ${percentage(entry.layerOpacity)} layer opacity`}
-                    onClick={() =>
-                      setInspection({
-                        role: {
-                          id: `button-accent-support-${entry.id}`,
-                          label: `Accent · ${entry.label}`,
-                          description: entry.placement,
-                          token: `--accent-${entry.id}`,
-                          light: entry.color,
-                          dark: entry.color,
-                          pairsWith: [],
-                        },
-                        mode,
-                        usage: entry.placement,
-                        layerOpacity: entry.layerOpacity,
-                      })
-                    }
-                  >
-                    <span
-                      className={styles.colorSquare}
-                      style={{ backgroundColor: entry.color }}
-                      aria-hidden="true"
-                    />
-                    <code>{entry.color}</code>
-                    <ArrowRight size={11} aria-hidden="true" />
-                  </button>
-                  <div>
-                    <strong>{entry.label}</strong>
-                    <p>
-                      {entry.placement} {percentage(entry.layerOpacity)}{" "}
-                      containing-layer opacity.
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <DeveloperCode
-              label="Accent supporting paint values"
-              language="json"
-              code={JSON.stringify(ACCENT_SUPPORTING_PAINT, null, 2)}
-            />
           </div>
         </details>
-        <article
-          className={styles.roleCard}
-          data-card-entry="guide-button-accent-finishes"
-        >
-          <div className={styles.roleHeader}>
-            <div>
-              <Heading level={3}>Two Accent Finishes</Heading>
-              <p>
-                Both finishes share the Charcoal/Mint face, mode-aware
-                Mint/Ice/Teal rim and one 13% Emerald/Mint tint. Choose{" "}
-                <code>{'finish="glazed"'}</code> for a stationary{" "}
-                {percentage(ACCENT_FINISHES.glazed.anchorOpacity)} center glaze
-                and a {percentage(ACCENT_FINISHES.glazed.washOpacity)} charcoal
-                wash. Both specimens use the current paint theme, base size and
-                the same initial field phase with motion paused.
-              </p>
-              <p>
-                With motion enabled, the field turns once every 26 seconds; the
-                rim turns independently every 8 seconds. Choosing a finish
-                changes the overlays, while both rotations retain their own
-                timing and geometry.
-              </p>
-            </div>
-          </div>
-          <div className={styles.themePair}>
-            {(
-              [
-                "field",
-                "glazed",
-              ] as const satisfies readonly AccentButtonFinish[]
-            ).map((finish) => (
-              <div
-                key={finish}
-                className={styles.themeCanvas}
-                data-guide-button-theme={mode}
-                style={{
-                  backgroundColor: APP_THEME_VALUES[mode].background,
-                }}
-              >
-                <span className={styles.themeLabel}>
-                  {ACCENT_FINISHES[finish].label}
-                  {finish === "field" ? " · default" : " · opt-in"}
-                </span>
-                <div className={styles.liveSample}>
-                  <AccentButton
-                    type="button"
-                    theme={mode}
-                    finish={finish}
-                    motion={false}
-                    className={styles.sampleButton}
-                    style={getButtonSizeStyle(0)}
-                    onClick={() =>
-                      activate(`${ACCENT_FINISHES[finish].label} finish`)
-                    }
-                    data-guide-button-sample="accent"
-                    data-guide-button-step={0}
-                  >
-                    Save changes
-                  </AccentButton>
-                </div>
-                <span className={styles.canvasNote}>
-                  {percentage(ACCENT_FINISHES[finish].anchorOpacity)} glaze
-                  {" · "}
-                  {percentage(ACCENT_FINISHES[finish].washOpacity)} wash
-                  {" · static field phase 0"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </article>
       </div>
 
       <div className={styles.chapter}>
@@ -815,9 +640,9 @@ export function GuideButtons() {
           Accent’s shape keeps a constant proportion:{" "}
           <code>radius = actual height × 21 / 80</code>. The ratio is 0.2625,
           giving 18.9px at 72px high and 19.884375px at the 75.75px cap. The
-          frame, rim and aura share the effective outer radius; the inset face
-          uses that radius minus its 1.5px inset. This default follows the
-          actual responsive button height even inside a dialog. An explicit
+          face and inward rims share the effective outer radius. This default
+          follows the actual responsive button height even inside a dialog. An
+          explicit
           <code> radius</code> prop remains available. See{" "}
           <a href="#dialog-corner-radius">Dialog Corners &amp; Nested Shapes</a>{" "}
           for how this proportional action relates to the fixed surface, control
@@ -1063,9 +888,10 @@ export function GuideButtons() {
       <div className={styles.chapter}>
         <Heading>Component Contract</Heading>
         <p className={styles.lead}>
-          Import the named component for the role. Keep form ownership, action
-          state and accessible naming in the caller; the component supplies its
-          shared button behavior, paint and responsive geometry.
+          Use Button directly for compact actions, or a named adapter for its
+          contextual geometry and content slots. Keep form ownership, action
+          state and accessible naming in the caller. Every path delegates to one
+          Base UI host with the same solid surface and inward-edge renderer.
         </p>
         <DeveloperCode
           label="Primary, Secondary and Accent usage"
@@ -1095,16 +921,25 @@ export function GuideButtons() {
                   <code>surface</code>
                 </th>
                 <td>
-                  Primary / Secondary: <code>{'"layered"'}</code> (default) or{" "}
-                  <code>{'"accent"'}</code>
+                  Legacy <code>{'"layered"'}</code>, <code>{'"accent"'}</code>{" "}
+                  or <code>{'"solid"'}</code>
                 </td>
                 <td>
-                  Accent reuses the charcoal rotating field, 13% Mint/Emerald
-                  tint, sheen, White copy and Mint/Ice/Teal rim while preserving
-                  the button’s size, content and SpecularRim. Today’s Log Intake
-                  opts into this same surface. Exact light and dark stops are
-                  shown in the live paint stack above and come from
-                  BUTTON_SYSTEM; no separate hard-coded recipe is required here.
+                  Accepted for compatibility; all values use the same solid
+                  daily-action face. They do not mount the old gradient, tint,
+                  glaze or wash components.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>variant / size</code>
+                </th>
+                <td>Contextual emphasis and compact geometry</td>
+                <td>
+                  Ordinary actions share one palette and renderer. Ghost keeps a
+                  quiet edge, Link keeps a text presentation, and Destructive
+                  retains its semantic edge color. Sizes preserve the control’s
+                  context instead of turning every action into a large CTA.
                 </td>
               </tr>
               <tr>
@@ -1182,6 +1017,7 @@ export function GuideButtons() {
                 </td>
                 <td>
                   Retains a painted button without continuous decorative motion.
+                  Reduced motion and inactive states pause the shared rim too.
                 </td>
               </tr>
               <tr>
@@ -1205,9 +1041,44 @@ export function GuideButtons() {
                   <code>{'"field"'}</code> or <code>{'"glazed"'}</code>
                 </td>
                 <td>
-                  Defaults to the exposed field, with no glaze or wash nodes.
-                  Glazed adds a 72% stationary center and 12% Plum wash over the
-                  same pigment field.
+                  Compatibility input only. Both values render the same solid
+                  action finish; the separate artwork utility still accepts its
+                  own decorative finish settings.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>rim / rimThickness</code>
+                </th>
+                <td>Optional inward rim and explicit CSS-pixel width</td>
+                <td>
+                  CSS and GPU rendering consume the same width and palette. The
+                  primitive defaults to 2px, Primary and Secondary to 3px, and
+                  Today explicitly requests 5.5px. The two-pixel inner band
+                  keeps a one-pixel gap after that width.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>gpuRim</code>
+                </th>
+                <td>Opt-in for the prominent native intake action</td>
+                <td>
+                  Defaults to false. Compact, repeated and link actions use the
+                  same CSS rim without allocating a graphics context. The CSS
+                  edge remains available if GPU rendering fails.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>render / nativeButton / ref</code>
+                </th>
+                <td>Base UI composition</td>
+                <td>
+                  Preserves one host, stateful className/style callbacks, ref
+                  forwarding and native keyboard semantics. A navigation Link
+                  uses <code>nativeButton={"{false}"}</code> with its rendered
+                  element; do not nest interactive buttons.
                 </td>
               </tr>
               <tr>
@@ -1234,21 +1105,17 @@ export function GuideButtons() {
               meaning or availability of the action.
             </p>
             <p>
-              Accent defines the same complete Charcoal/Mint paint as Log Intake
-              before first render. Its centered 190% square near-charcoal field
-              begins at 12 degrees and rotates once every 26 seconds; the inward
-              3px rim has an independent eight-second turn. One tint element
-              above the field/glaze combines the icon Mint, the current rim
-              pigments and Tailwind emerald-500 at exactly 13% opacity. Its
-              child drifts over 16 seconds without changing that opacity. The
-              exposed finish omits the optional glaze and wash nodes. White copy
-              and Mint action icons stay above the paint at full visibility. The
-              shared model, CSS-first edge, journal writing action and generic
-              filled controls all use these colors while retaining their own
-              existing dimensions, content and interaction behavior. Fuchsia
-              remains available to check-in/decorative artwork and semantic
-              compatibility roles. The 14.25px label uses 700 weight; visual
-              truncation preserves the full accessible action text.
+              The canonical renderer owns the opaque Purple/canvas face, Violet
+              inner band and thirty-percent Pink/Purple/Fuchsia perimeter. Its
+              CSS rim makes one turn every 6.8 seconds. Today alone opts into
+              SpecularRim for the equivalent GPU edge; when that canvas renders,
+              the adjacent CSS fallback becomes invisible. The main CTA’s icons
+              and “Jot it!” use the coffee tile’s base pigment, independently of
+              its primary label. Accent keeps its default icon slots and pending
+              spinner, but no separate aura, gradient field or finish renderer.
+              The paint-only AccentButtonSurface remains available for journal
+              artwork. Visual truncation never removes the full accessible
+              action text.
             </p>
             <p>
               Respect reduced motion and pause decoration for inactive states.
@@ -1262,23 +1129,34 @@ export function GuideButtons() {
           <summary>Implementation map and review checklist</summary>
           <div className={styles.detailBody}>
             <p>
-              <code>BUTTON_SYSTEM</code> supplies the palette and role metadata.
-              <code> getButtonThemeStyle(kind)</code> defines both theme
-              palettes as CSS variables; the component selects the active mode.
+              <code>Button</code> and its shared stylesheet own production
+              painting and native behavior. <code>BUTTON_SYSTEM</code> retains
+              the adapters’ geometry and compatibility metadata;
+              <code> getButtonThemeStyle(kind)</code> supplies their sizing
+              variables without selecting another action renderer.
               <code> getButtonSizeStyle(step)</code> sets one shared size
-              variable, bounded from 0 to 5, for an explicit specimen.
-              <code> ACCENT_FINISHES</code> defines the two overlay choices;
-              <code> getAccentFinishStyle(finish)</code> applies their opacity
-              values to both theme palettes.
+              variable, bounded from 0 to 5, for an explicit specimen. The
+              inspection swatches mirror the shared recipe with rounded hex
+              values; the live specimens use its real theme-aware CSS tokens.
             </p>
             <dl className={styles.sourceMap}>
+              <div>
+                <dt>
+                  <code>components/ui/button.tsx</code>
+                </dt>
+                <dd>
+                  The single Base UI host, native composition, state handling
+                  and CSS-first rim. The shared-button stylesheet owns its face,
+                  inner edge, secondary ink and per-variant emphasis.
+                </dd>
+              </div>
               <div>
                 <dt>
                   <code>lib/action-button-system.ts</code>
                 </dt>
                 <dd>
-                  Role metadata, both theme palettes, size bands and specimen
-                  helpers.
+                  Compatibility geometry, size bands, specimen helpers and
+                  independent artwork paint utilities.
                 </dd>
               </div>
               <div>
@@ -1286,8 +1164,8 @@ export function GuideButtons() {
                   <code>components/primary-button.tsx</code>
                 </dt>
                 <dd>
-                  The main layered action and shared Primary/Secondary
-                  interaction contract.
+                  Primary/Secondary geometry and foreground-content adapters
+                  that delegate to the canonical Button.
                 </dd>
               </div>
               <div>
@@ -1295,7 +1173,7 @@ export function GuideButtons() {
                   <code>components/secondary-button.tsx</code>
                 </dt>
                 <dd>
-                  The supporting role, composed from the shared layered action.
+                  The supporting role, composed from the same geometry adapter.
                 </dd>
               </div>
               <div>
@@ -1303,8 +1181,9 @@ export function GuideButtons() {
                   <code>components/accent-button.tsx</code>
                 </dt>
                 <dd>
-                  The exposed charcoal field, optional glazed center,
-                  independent rim and explicit action state.
+                  Default content slots, pending spinner and proportional
+                  geometry on the same renderer. Its exported paint-only surface
+                  remains available for journal artwork.
                 </dd>
               </div>
             </dl>

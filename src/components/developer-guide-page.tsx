@@ -5,6 +5,7 @@ import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr/GithubLogo";
 import { SunIcon } from "@phosphor-icons/react/dist/ssr/Sun";
 import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
+import { Button } from "@/components/ui/button";
 import { DeveloperCode } from "@/components/developer-code";
 import { GuideColors } from "@/components/guide-colors";
 import { GuideButtons } from "@/components/guide-buttons";
@@ -476,15 +477,19 @@ export function DeveloperGuidePage() {
             </Detail>
             <Detail title="Actions, Focus & Feedback" context="Clear Intent">
               <p>
-                Shared filled buttons use getButtonThemeStyle() for their
-                Charcoal/Mint action paint and 13% tint. The existing
+                Shared actions delegate to the canonical Button renderer and its
+                opaque Purple/canvas face, Violet inner edge and quiet
+                Pink/Purple/Fuchsia perimeter. Primary, Secondary, Accent and
+                DialogPrimaryButton adapt geometry or content, rather than
+                mounting separate painted buttons. Action icons use the coffee
+                tile’s base pigment through
+                <code> --daily-action-secondary-ink</code>. The existing
                 <code> --action-background</code> /{" "}
                 <code>--action-foreground</code>
                 roles retain Fuchsia/White for compatibility with check-in and
-                decorative surfaces. Other supporting controls use
-                <code> --secondary</code> with
-                <code> --secondary-foreground</code>. Component paint remains
-                independent from geometry and semantic feedback colors.
+                decorative surfaces. Quiet and destructive variants keep their
+                contextual emphasis on the same renderer. Component paint
+                remains independent from geometry and semantic feedback colors.
               </p>
               <p>
                 Keep keyboard focus visible through <code>--ring</code>. Borders
@@ -593,16 +598,26 @@ export function DeveloperGuidePage() {
             className={styles.tryLinks}
             aria-label="See The Components In The App"
           >
-            <Link href="/">
+            <Button
+              navigation
+              nativeButton={false}
+              render={<Link href="/" />}
+              className="h-auto"
+            >
               <ActionIcon name="navToday" className="size-3.5" />
               Try The Daily Log
               <ActionIcon name="next" className="size-3.5" />
-            </Link>
-            <Link href="/medications">
+            </Button>
+            <Button
+              navigation
+              nativeButton={false}
+              render={<Link href="/medications" />}
+              className="h-auto"
+            >
               <ActionIcon name="navMedications" className="size-3.5" />
               Medication Appearance
               <ActionIcon name="next" className="size-3.5" />
-            </Link>
+            </Button>
           </div>
           <div className={styles.note}>
             <ActionIcon name="discover" className="size-4" />
@@ -784,15 +799,16 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Today’s main Log Intake action uses the opaque foundation color
-                with a 40% Purple 950 tint. Its solid
-                surface omits decorative background layers; the independent
-                specular rim uses nearby Pink, Purple and Fuchsia shades at 30%
-                opacity for a quieter moving edge. A Violet 700 inner band
-                remains distinct beneath it. Text follows the page foreground,
-                with deeper Pink icon ink in light mode and branding Pink in
-                dark mode. Native behavior and the existing entry animation
-                remain attached to the same control. Other action specimens
-                retain their own layered presentation.
+                with a 40% Purple 950 tint. Its solid surface omits decorative
+                background layers; the independent specular rim uses nearby
+                Pink, Purple and Fuchsia shades at 30% opacity for a quieter
+                moving edge. A Violet 700 inner band remains distinct beneath
+                it. Text follows the page foreground, while the icons and “Jot
+                it!” use the coffee tile’s base pigment in both modes. Native
+                behavior and the existing entry animation remain attached to the
+                same control. Compact buttons and the Primary, Secondary and
+                Accent adapters now share this canonical solid renderer, with
+                contextual geometry retained.
               </p>
               <p>
                 The{" "}
@@ -1049,25 +1065,30 @@ export function DeveloperGuidePage() {
                 nearby Pink 300, Purple 300 and Fuchsia 300 stops are unchanged.
                 Both the GPU layer and CSS fallback consume the same thickness
                 and opacity, with the fallback hidden once the GPU renders
-                successfully. Other action rims retain their 3px default. Motion
-                retains its existing hidden, offscreen, disabled and
-                reduced-motion guards. Text and icon colors adapt to the
-                resolved theme so both light and dark faces remain readable.
-                Focus draws inward, while the soft exterior glow stays separate
-                from the border geometry.
+                successfully. Compact Button controls default to a 2px CSS rim;
+                Primary and Secondary retain their 3px geometry. Only Today opts
+                into the GPU renderer. Motion retains its existing hidden,
+                offscreen, disabled and reduced-motion guards. Text and icon
+                colors adapt to the resolved theme; primary labels retain
+                readable foreground ink. Focus draws inward, while the soft
+                exterior glow stays separate from the border geometry.
               </p>
               <p>
-                The main label uses the page foreground. The Tablets mark,
-                arrow and aside use deeper Pink in light mode and branding
-                Pink in dark mode, with the aside at 94% visibility. The
+                The main label uses the page foreground. The Tablets mark, arrow
+                and aside use
+                <code> --daily-action-secondary-ink</code>: the coffee tile’s
+                base, mixed from #4e456e at 94% and Rose at 6%, approximately
+                #584b74. This is the tile’s base color, not its mug glyph or
+                radial reflections. The aside retains 94% visibility. The
                 optional pills variant of IntakeLogSymbol uses a 23px Lucide
                 Tablets glyph at 2.5 stroke, with no spark. Its 5px left shift
                 stays independent of the existing entry transforms. The same
                 button primitive retains the click action, focus and disabled
                 behavior. Shared PrimaryButton, SecondaryButton and Accent
-                examples continue to use their own layered paint and geometry.
-                Desktop places the section 44px after the entries with 20px
-                bottom padding. Mobile uses{" "}
+                adapters delegate to the same Button host and CSS-first paint,
+                preserving their existing geometry and content slots. Desktop
+                places the section 44px after the entries with 20px bottom
+                padding. Mobile uses{" "}
                 <code>max(0px, env(safe-area-inset-bottom))</code> for bottom
                 clearance, with a 4px minimum in short landscape windows.
               </p>
@@ -1905,22 +1926,25 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Dialog save actions delegate through DialogPrimaryButton to
-                AccentButton, keeping White foreground, 14.25px/700 text and
-                matching 22px PencilSparkles/ArrowRight glyphs at a 2.5 stroke.
-                The wrapper multiplies actual responsive Accent height by 0.74,
-                then derives its corners from the fixed 21/80 design ratio.
-                Heights therefore run from 53.28px to 56.055px and default radii
-                from 13.986px to 14.7144375px. This changes layout geometry
-                rather than scaling a finished button. Standalone Accent actions
-                remain 72–75.75px high with 18.9–19.884375px corners; page-level
-                Add a Medication instead shares Today’s 74px height, 19.425px
-                radius and internal label/icon/arrow spacing. Save Medication
-                retains the compact dialog wrapper. Today remains 74px high with
-                19.425px corners. An explicit radius override remains available.
-                Frame, rim and aura follow the effective radius; the inset face
-                subtracts 1.5px. Pending replaces only the leading glyph with a
-                spinner. Dialog Accent actions retain 24px top clearance; plain
-                submit actions add 8px to their existing layout gap. See the{" "}
+                AccentButton to the canonical Button host, keeping 14.25px/700
+                foreground text and matching 22px PencilSparkles/ArrowRight
+                glyphs at a 2.5 stroke. The label inherits the resolved
+                foreground; its icons use mug-base secondary ink. The wrapper
+                multiplies actual responsive Accent height by 0.74, then derives
+                its corners from the fixed 21/80 design ratio. Heights therefore
+                run from 53.28px to 56.055px and default radii from 13.986px to
+                14.7144375px. This changes layout geometry rather than scaling a
+                finished button. Standalone Accent actions remain 72–75.75px
+                high with 18.9–19.884375px corners; page-level Add a Medication
+                instead shares Today’s 74px height, 19.425px radius and internal
+                label/icon/arrow spacing. Save Medication retains the compact
+                dialog wrapper. Today remains 74px high with 19.425px corners.
+                An explicit radius override remains available. The solid face
+                and both inward edges follow the effective radius, without a
+                separate field, glaze or aura renderer. Pending replaces only
+                the leading glyph with a spinner. Dialog Accent actions retain
+                24px top clearance; plain submit actions add 8px to their
+                existing layout gap. See the{" "}
                 <a href="#buttons">button component reference</a> for shared
                 paints and standalone examples. General focus uses the paired
                 Plum or Lilac focus role. Intake timing hints omit the visible
@@ -2757,12 +2781,12 @@ export function DeveloperGuidePage() {
                   SecondaryButton opens the existing writer. Its local 56px base
                   height retains the shared responsive increments; an 18px
                   radius is passed to both the frame and specular rim. The
-                  Accent face uses the shared charcoal field, 13% Pink tint
-                  and mode-aware Pink rim of the other filled actions. Local
-                  background, foreground and dimmed face/rim overrides are
-                  removed so the same shared pigments remain visible at this
-                  existing size. Decorative journal-icon paint keeps its earlier
-                  palette through a separate artwork helper. The surrounding
+                  action delegates to the same solid Purple/canvas face, Violet
+                  inner edge and CSS Pink rim as other actions. Mug-base
+                  secondary ink colors its action icons while the label keeps
+                  the mode’s foreground. Decorative journal-icon paint keeps its
+                  earlier palette through a separate artwork helper. The
+                  surrounding
                   journal-panel backgrounds and decorations retain their
                   existing Apricot detail. These are local button paint changes;
                   Secondary behavior remains unchanged. Equal 22px outer rails
