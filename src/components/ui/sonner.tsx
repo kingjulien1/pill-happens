@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, SVGProps } from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
   CheckCheck,
@@ -24,29 +24,77 @@ const symbols = {
   update: Sparkles,
 };
 
-/** Square plates share the journal artwork language; Sonner owns the card motion. */
-export function ToastSymbol({ kind }: { kind: ToastSymbolKind }) {
-  const Icon = symbols[kind];
+/** Local Lucide-format artwork keeps the notification set on the same 24px grid. */
+function StarCheck(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="m12 2.6 2.8 5.7 6.3.9-4.55 4.45 1.07 6.28L12 16.96l-5.62 2.97 1.07-6.28L2.9 9.2l6.3-.9Z" />
+      <path d="m9.2 11.65 1.8 1.8 3.9-3.9" />
+    </svg>
+  );
+}
+
+/** Decorative only: the summary and its action buttons own all interaction. */
+export function NotificationBell() {
+  return (
+    <span className="journal-notification-bell" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h10M10 21h4" />
+        <path d="m16 16 2 2 4-4" />
+      </svg>
+    </span>
+  );
+}
+
+/** One finite unfurl and settle; Sonner retains ownership of the surrounding card. */
+export function ToastSymbol({
+  kind,
+  variant,
+  reversed = false,
+}: {
+  kind: ToastSymbolKind;
+  variant?: "intake-saved";
+  reversed?: boolean;
+}) {
+  const Icon = variant === "intake-saved" ? StarCheck : symbols[kind];
   return (
     <span
       className="journal-toast-symbol"
       data-toast-symbol={kind}
+      data-toast-variant={variant}
+      data-toast-reversed={reversed}
       aria-hidden="true"
     >
-      <span className="journal-toast-art-arrival" key={kind}>
+      <span
+        className="journal-toast-art-arrival"
+        key={`${kind}-${variant ?? "default"}`}
+      >
         <span className="journal-toast-halo" />
         <span className="journal-toast-plate journal-toast-plate-back" />
         <span className="journal-toast-plate journal-toast-plate-middle" />
         <span className="journal-toast-tile">
-          <span className="journal-toast-wash" />
           <span className="journal-toast-glyph-enter">
-            <span className="journal-toast-glyph-float">
-              <Icon
-                className="journal-toast-glyph"
-                size={18}
-                strokeWidth={2.5}
-              />
-            </span>
+            <Icon
+              className="journal-toast-glyph"
+              width={22.05}
+              height={22.05}
+              strokeWidth={2.5}
+            />
           </span>
         </span>
         <span className="journal-toast-sparks">
@@ -88,7 +136,6 @@ export function Toaster({
       duration={5500}
       gap={10}
       visibleToasts={3}
-      closeButton
       offset={{ top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))" }}
       mobileOffset={{
         top: "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
@@ -98,6 +145,7 @@ export function Toaster({
       swipeDirections={["top", "left", "right"]}
       containerAriaLabel="Journal notifications"
       {...props}
+      closeButton={false}
       className={cn("toaster group journal-toaster", className)}
       icons={{ ...statusIcons, ...icons }}
       style={
@@ -108,6 +156,7 @@ export function Toaster({
       }
       toastOptions={{
         ...toastOptions,
+        closeButton: false,
         closeButtonAriaLabel:
           toastOptions?.closeButtonAriaLabel ?? "Dismiss notification",
         classNames: {
