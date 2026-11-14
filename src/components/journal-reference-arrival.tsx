@@ -96,7 +96,34 @@ export function JournalReferenceArrival() {
     const finishMissing = (message: string) => {
       processed.current = visit;
       if (status.current) status.current.textContent = message;
-      toast.info(message);
+      toast.info(message, {
+        heading: intake
+          ? "Linked intake"
+          : medication
+            ? "Linked medication"
+            : "Linked check-in",
+        details: {
+          paragraphs: [
+            intake
+              ? "Intake links are matched against the records in your current journal. Browse Today or Past Days to find the entries that are available."
+              : medication
+                ? "Medication links refer to a specific library item. Open Medications to browse the items currently in your journal."
+                : "Check-ins follow the journal timezone and its 06:00 tracking-day boundary. Evening Check-In opens at 17:00; past days remain available.",
+          ],
+          links: intake
+            ? [
+                { label: "Open Today", href: "/" },
+                { label: "Browse Past Days", href: "/history" },
+              ]
+            : medication
+              ? [{ label: "Open Medications", href: "/medications" }]
+              : [
+                  { label: "Browse Past Days", href: "/history" },
+                  { label: "Check-in guide", href: "/guide#check-in" },
+                ],
+          footer: "Following a link does not change your saved records.",
+        },
+      });
     };
     const seek = () => {
       frame = 0;

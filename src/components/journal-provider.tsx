@@ -20,12 +20,23 @@ import {
   type ReflectionSaveAcknowledgement,
 } from "@/lib/reflection-save";
 
+export type JournalMutationResult = {
+  data: AppData;
+  entityId?: string;
+  /** A short-lived, server-checked reversal of this exact successful change. */
+  undo?: () => Promise<void>;
+};
+
 type JournalContext = {
   data: AppData | null;
   now: Date | null;
   error: string | null;
   refresh: () => Promise<void>;
-  mutate: (path: string, body?: unknown, method?: string) => Promise<void>;
+  mutate: (
+    path: string,
+    body?: unknown,
+    method?: string,
+  ) => Promise<JournalMutationResult>;
   saveReflection: (
     input: ReflectionSaveInput,
   ) => Promise<ReflectionSaveAcknowledgement>;
@@ -180,7 +191,12 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
     };
   }, [refresh]);
 
-  const mutate = async (path: string, body?: unknown, method = "POST") => {
+  const mutate = async (
+    path: string,
+    body?: unknown,
+    method = "POST",
+    reportError = true,
+  ): Promise<JournalMutationResult> => {
     if (
       manualPending.current ||
       (pending.current && !reflectionRequest.current) ||
@@ -225,16 +241,41 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
       }
       if (!res.ok)
         throw new Error(result.error || "Your change couldn't be saved.");
-      setData(result);
+      const { _undo: receipt, ...nextData } = result;
+      setData(nextData);
       // New intake timestamps can be later than the last minute tick.
       setNow(new Date());
       setError(null);
+      return {
+        data: nextData as AppData,
+        ...(typeof receipt?.entityId === "string"
+          ? { entityId: receipt.entityId }
+          : {}),
+        ...(typeof receipt?.token === "string"
+          ? {
+              undo: async () => {
+                // Errors stay in the expanded notification; never retry a write.
+                await mutate("undo", { token: receipt.token }, "POST", false);
+              },
+            }
+          : {}),
+      };
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
           : "Your change couldn't be saved. Please try again.";
-      toast.error(message, { heading: "Journal change unsuccessful" });
+      if (reportError)
+        toast.error(message, {
+          heading: "Journal change unsuccessful",
+          details: {
+            paragraphs: [
+              "The server could not confirm this change. Any open form keeps its draft so you can review the inputs and try again.",
+              "Check your connection and sign-in before saving again. A failed request is never replayed automatically.",
+            ],
+            links: [{ label: "Open Daily Log", href: "/" }],
+          },
+        });
       throw err;
     } finally {
       pending.current = false;

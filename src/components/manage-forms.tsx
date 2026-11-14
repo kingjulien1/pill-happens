@@ -230,7 +230,7 @@ export function MedicationForm({
       return;
     }
     try {
-      await mutate(
+      const saved = await mutate(
         medication ? `medications/${medication.id}` : "medications",
         {
           name: name.trim(),
@@ -250,6 +250,41 @@ export function MedicationForm({
       draft.clearDraft();
       toast.success(medication ? "Medication updated." : "Medication added.", {
         heading: "Medication library",
+        details: {
+          paragraphs: [
+            medication
+              ? "Your medication details are saved. Linked past intakes now use its current name, type and strength, so their doses and totals are recalculated too."
+              : "This medication is ready to choose when you log an intake. Saving it to your library does not record a dose.",
+            "The default quantity prefills new entries; quantities and times you have already logged stay as entered. Your chosen appearance helps you recognize it throughout the journal.",
+          ],
+          facts: [
+            { label: "Medication", value: name.trim() },
+            { label: "Strength", value: `${formatDose(strengthMg)} mg` },
+            { label: "Default Amount", value: formatDose(quantity) },
+            {
+              label: "Active Ingredient",
+              value: activeIngredient.trim() || "Not recorded",
+            },
+          ],
+          links: [
+            {
+              label: "Medication Library",
+              href: `/medications${saved.entityId || medication?.id ? `?medication=${encodeURIComponent(saved.entityId ?? medication!.id)}` : ""}`,
+            },
+            { label: "Log Intake", href: "/" },
+          ],
+          footer: medication
+            ? "Undo restores the previous medication details and updates linked totals."
+            : "Undo removes this addition while it has no linked entries or goals.",
+        },
+        ...(saved.undo
+          ? {
+              undo: {
+                label: medication ? "Undo Edit" : "Undo Addition",
+                onUndo: saved.undo,
+              },
+            }
+          : {}),
       });
       onSaved();
     } catch {
@@ -493,7 +528,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       return;
     }
     try {
-      await mutate("goals", {
+      const saved = await mutate("goals", {
         medicationId,
         dailyLimitMg,
         startsOn,
@@ -501,7 +536,29 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         note: note.trim(),
       });
       draft.clearDraft();
-      toast.success("Your goal has been saved.", { heading: "Daily goal" });
+      toast.success("Your goal has been saved.", {
+        heading: "Daily goal",
+        details: {
+          paragraphs: [
+            "This maximum is saved for the selected medication and date range. Daily progress compares the recorded dose for that medication with this value; it does not combine different medications.",
+            "A newer goal’s start date supersedes older goals for the same medication. Goals are tracking references you enter yourself; saving one does not change your intakes.",
+          ],
+          facts: [
+            { label: "Medication", value: selectedMedication.name },
+            { label: "Daily Maximum", value: `${formatDose(dailyLimitMg)} mg` },
+            { label: "Starts", value: startsOn },
+            { label: "Ends", value: endsOn || "Open-ended" },
+          ],
+          links: [
+            { label: "Review Goals", href: "/goals" },
+            { label: "Daily Log", href: "/" },
+          ],
+          footer: "Undo removes only this newly saved goal.",
+        },
+        ...(saved.undo
+          ? { undo: { label: "Undo Goal", onUndo: saved.undo } }
+          : {}),
+      });
       onSaved();
     } catch {
       // Save failures are shown by the journal provider without clearing inputs.

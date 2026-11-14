@@ -26,6 +26,7 @@ import {
   dayKey,
   doseMg,
   formatDay,
+  formatDose,
   fromLocalInput,
   type Intake,
 } from "@/lib/domain";
@@ -190,7 +191,7 @@ export function IntakeForm({
         );
         return;
       }
-      await mutate(
+      const saved = await mutate(
         intake ? `intakes/${intake.id}` : "intakes",
         {
           medicationId,
@@ -202,11 +203,65 @@ export function IntakeForm({
         },
         intake ? "PATCH" : "POST",
       );
+      const savedDay = dayKey(timestamp, timezone);
+      const savedTime = new Intl.DateTimeFormat("en-GB", {
+        timeZone: timezone,
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      }).format(new Date(timestamp));
+      const name = medication?.name ?? fallbackIntake!.medicationName;
+      const savedId = saved.entityId ?? intake?.id;
+      const dayHref = `/history/${savedDay}${savedId ? `?intake=${encodeURIComponent(savedId)}` : ""}`;
       toast.success(
         intake
-          ? "Your entry has been updated."
-          : "Intake saved. A little more awareness.",
-        { heading: intake ? "Intake updated" : "Intake saved" },
+          ? "Your entry is updated and back in place."
+          : "Intake saved. A little more awareness, nicely logged.",
+        {
+          heading: intake ? "Intake updated" : "Intake saved",
+          ...(!intake ? { variant: "intake-saved" as const } : {}),
+          details: {
+            paragraphs: [
+              intake
+                ? "Your saved entry now uses these values. The day’s list, medication total and goal progress have been recalculated from the updated record."
+                : "This intake is now saved in your private journal. It contributes to this medication’s daily total and any goal you have set for it.",
+              "Its tracking day follows Date & Time Taken, with the day boundary at 06:00 in your journal timezone. Nearby entries may appear in the same stack; each intake remains a separate record.",
+            ],
+            facts: [
+              { label: "Medication", value: name },
+              {
+                label: "Amount",
+                value: `${formatDose(amount)} ${amount === 1 ? type.unit : type.units} × ${formatDose(strength)} mg`,
+              },
+              {
+                label: "Total",
+                value: `${formatDose(doseMg({ strengthMg: strength, quantity: amount }))} mg`,
+              },
+              {
+                label: "Taken",
+                value: `${new Intl.DateTimeFormat("en", { timeZone: timezone, month: "short", day: "numeric" }).format(new Date(timestamp))} · ${savedTime}`,
+              },
+            ],
+            links: [
+              { label: "View Entry", href: dayHref },
+              {
+                label: "Medication",
+                href: `/medications?medication=${encodeURIComponent(medicationId)}`,
+              },
+            ],
+            footer: intake
+              ? "Undo restores the previous saved values. Your other entries stay as they are."
+              : "Undo removes only this new entry. Your other entries stay as they are.",
+          },
+          ...(saved.undo
+            ? {
+                undo: {
+                  label: intake ? "Undo Edit" : "Undo Intake",
+                  onUndo: saved.undo,
+                },
+              }
+            : {}),
+        },
       );
       draft.clearDraft();
       onSaved();

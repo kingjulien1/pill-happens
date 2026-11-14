@@ -119,6 +119,14 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
         heading: "App update ready",
         id: "pwa-update",
         duration: Infinity,
+        details: {
+          paragraphs: [
+            "A newer app version is ready. Finish your current entry and check its save status before reloading. Choose Later to keep using this version for now.",
+          ],
+          links: [{ label: "App and offline guide", href: "/guide#app" }],
+          footer:
+            "The page reloads only when you choose Reload; this update does not remove saved journal records.",
+        },
         onDismiss: () => {
           updateToastVisible = false;
         },

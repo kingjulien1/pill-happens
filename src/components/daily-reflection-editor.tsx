@@ -175,11 +175,33 @@ export function DailyReflectionEditor({
       toast.error("Couldn't refresh your journal. Your writing is unchanged.", {
         id: toastId,
         heading: "Refresh unsuccessful",
+        details: {
+          paragraphs: [
+            "The latest saved journal could not be loaded. Your current writing has not been replaced. Check your connection, then use Refresh Journal to try again.",
+          ],
+          links: [{ label: "Drafts and saving", href: "/guide#daily-log" }],
+          footer:
+            "Refreshing reads saved records; it does not submit the check-in form.",
+        },
       });
     else
       toast.success(
         "Journal refreshed. Your writing is right where you left it.",
-        { id: toastId, heading: "Journal refreshed" },
+        {
+          id: toastId,
+          heading: "Journal refreshed",
+          details: {
+            paragraphs: [
+              "The latest saved records have been loaded. Your current writing stays in the editor, ready for you to continue.",
+            ],
+            links: [
+              { label: "Browse your journals", href: "/journal" },
+              { label: "Drafts and saving", href: "/guide#daily-log" },
+            ],
+            footer:
+              "Use the writing editor’s save status to check whether your latest words have been saved.",
+          },
+        },
       );
   }, [refreshFinished, refreshError]);
 
@@ -192,6 +214,12 @@ export function DailyReflectionEditor({
     setRefreshFailed(false);
     refreshToast.current = toast.loading("Refreshing your journal…", {
       heading: "Checking for updates",
+      details: {
+        paragraphs: [
+          "Loading the latest saved records. Your writing stays in place while the journal checks for updates.",
+        ],
+        footer: "This refresh does not submit the check-in form.",
+      },
     });
     try {
       await refresh();

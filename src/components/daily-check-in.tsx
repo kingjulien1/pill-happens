@@ -486,7 +486,7 @@ function CheckInForm({
     let saved = false;
     try {
       await reflectionSave.pauseAndDrain();
-      await mutate("daily-check-ins", {
+      const result = await mutate("daily-check-ins", {
         day,
         period,
         note,
@@ -519,6 +519,34 @@ function CheckInForm({
             : "Your day, saved.",
         {
           heading: `${period === "morning" ? "Morning" : "Evening"} check-in`,
+          undo: result.undo ? { onUndo: result.undo } : undefined,
+          details: {
+            paragraphs: [
+              "Your writing and check-in details are saved for this tracking day. Reopen the check-in whenever you want to add or change something.",
+            ],
+            facts: [
+              { label: "Tracking day", value: formatDay(day) },
+              {
+                label: "Moods",
+                value:
+                  DAILY_MOODS.filter((mood) => moods.includes(mood.value))
+                    .map((mood) => mood.label)
+                    .join(", ") || "Not recorded",
+              },
+              {
+                label: "Journal writing",
+                value: note.trim() ? "Included" : "Not added",
+              },
+            ],
+            links: [
+              {
+                label: "Edit this check-in",
+                href: `/history/${day}?checkin=${period}`,
+              },
+              { label: "Browse Past Days", href: "/history" },
+            ],
+            footer: "Check-ins are saved separately from intake entries.",
+          },
         },
       );
       onSaved();

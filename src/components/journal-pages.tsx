@@ -152,9 +152,29 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
   }, [confirm]);
   async function remove() {
     try {
-      await mutate(`intakes/${intake.id}`, undefined, "DELETE");
+      const saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE");
       store.clearDraft(`intake:edit:${intake.id}`);
-      toast.success("Entry deleted.", { heading: "Intake removed" });
+      toast.success("Entry removed from your daily log.", {
+        heading: "Intake removed",
+        details: {
+          paragraphs: [
+            "This intake has been removed. Its medication’s daily total and goal progress now reflect the remaining entries; the medication itself stays in your library.",
+            "Undo restores this exact entry with its original quantity, time taken and notes.",
+          ],
+          facts: [
+            { label: "Medication", value: intake.medicationName },
+            {
+              label: "Amount Removed",
+              value: `${formatDose(intake.quantity)} × ${formatDose(intake.strengthMg)} mg`,
+            },
+          ],
+          links: [{ label: "Daily Log", href: "/" }],
+          footer: "Your other entries and medication settings are unchanged.",
+        },
+        ...(saved.undo
+          ? { undo: { label: "Restore Entry", onUndo: saved.undo } }
+          : {}),
+      });
       close();
     } catch {
       /* provider displays error */
@@ -538,7 +558,7 @@ export function MedicationsPage() {
         : "Reference unavailable";
   async function archive(medication: Medication) {
     try {
-      await mutate(
+      const saved = await mutate(
         `medications/${medication.id}`,
         { archived: !medication.archived },
         "PATCH",
@@ -547,7 +567,29 @@ export function MedicationsPage() {
         medication.archived
           ? "Medication restored."
           : "Medication archived. Past entries are saved.",
-        { heading: "Medication library" },
+        {
+          heading: "Medication library",
+          details: {
+            paragraphs: [
+              medication.archived
+                ? "This medication is active again and available in the intake selector. Its existing settings and past entries have been kept."
+                : "This medication is now in your archive and is hidden from the selector for new intakes. Its past entries and totals remain in your journal.",
+              "You can switch between Active and Archive in the medication library whenever you need to review it.",
+            ],
+            facts: [
+              { label: "Medication", value: medication.name },
+              {
+                label: "Status",
+                value: medication.archived ? "Active" : "Archived",
+              },
+            ],
+            links: [{ label: "Medication Library", href: "/medications" }],
+            footer: "Undo returns this medication to its previous status.",
+          },
+          ...(saved.undo
+            ? { undo: { label: "Undo Status Change", onUndo: saved.undo } }
+            : {}),
+        },
       );
       closeDialog(medicationDialog ?? undefined);
     } catch {
@@ -724,9 +766,34 @@ export function GoalsPage() {
   async function remove() {
     if (!deleting) return;
     try {
-      await mutate(`goals/${deleting}`, undefined, "DELETE");
+      const removed = goals.find((goal) => goal.id === deleting);
+      const saved = await mutate(`goals/${deleting}`, undefined, "DELETE");
       setDeleting(null);
-      toast.success("Goal removed.", { heading: "Daily goal" });
+      toast.success("Goal removed. Your entries stay saved.", {
+        heading: "Goal removed",
+        details: {
+          paragraphs: [
+            "This goal has been removed from your saved maximums. Intake records are unchanged; daily goal progress now follows the remaining effective goal, if one applies.",
+          ],
+          ...(removed
+            ? {
+                facts: [
+                  {
+                    label: "Removed Maximum",
+                    value: `${formatDose(removed.dailyLimitMg)} mg`,
+                  },
+                  { label: "Started", value: removed.startsOn },
+                ],
+              }
+            : {}),
+          links: [{ label: "Review Goals", href: "/goals" }],
+          footer:
+            "Undo restores the removed goal with its original date range.",
+        },
+        ...(saved.undo
+          ? { undo: { label: "Restore Goal", onUndo: saved.undo } }
+          : {}),
+      });
     } catch {
       /* provider displays error */
     }
@@ -925,9 +992,31 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
       onSubmit={async (event) => {
         event.preventDefault();
         try {
-          await mutate("settings", { timezone: draft.value.timezone }, "PATCH");
+          const saved = await mutate(
+            "settings",
+            { timezone: draft.value.timezone },
+            "PATCH",
+          );
           draft.clearDraft();
-          toast.success("Timezone updated.", { heading: "Journal settings" });
+          toast.success("Timezone updated for your journal.", {
+            heading: "Journal settings",
+            details: {
+              paragraphs: [
+                "Saved instants stay unchanged. This timezone now controls displayed times and the local 06:00 tracking-day boundary, so some entries may appear on a different day.",
+              ],
+              facts: [
+                { label: "Journal Timezone", value: draft.value.timezone },
+              ],
+              links: [
+                { label: "Daily Log", href: "/" },
+                { label: "Past Days", href: "/history" },
+              ],
+              footer: "Undo restores the timezone used before this change.",
+            },
+            ...(saved.undo
+              ? { undo: { label: "Undo Timezone", onUndo: saved.undo } }
+              : {}),
+          });
           onSaved();
         } catch {
           /* The provider displays the error; the draft stays available. */

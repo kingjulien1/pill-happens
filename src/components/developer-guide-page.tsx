@@ -2209,60 +2209,76 @@ export function DeveloperGuidePage() {
                 <ExternalLink href="https://ui.shadcn.com/docs/components/radix/sonner">
                   shadcn Sonner
                 </ExternalLink>{" "}
-                pattern. The <code>journal-toast</code> facade adds a concise
-                contextual heading, a dot separator and a secondary type label,
-                with the complete message in its own description. Callers may
-                provide explicit heading and description copy; the facade never
-                guesses where an arbitrary message should be split. Its six
-                types are Success, Error, Info, Warning, Loading and Update.
-                Semantic glyphs and secondary type labels identify each kind
-                beyond color: a double check for success, X for error,
-                lightbulb for information, warning triangle, rotating refresh
-                mark for loading and sparkles for an available update.
+                pattern. The <code>journal-toast</code> facade renders one
+                expandable notification for Success, Error, Info, Warning,
+                Loading and Update. A real summary button opens detailed
+                explanations, optional record facts and relevant links. Its
+                compact heading, spaced dot and type label stay above the
+                complete short description. A saved intake alone uses an
+                Emerald 400 Star Check; other successes retain their own check
+                artwork. Every kind also has a decorative Bell Check in place
+                of a close button. Swipe left, right or up to dismiss, or use
+                Escape while focused in a dismissible notification.
               </p>
               <p>
-                Short messages use a compact 64px minimum height, 40px artwork
-                and 10px vertical padding. The title and description share a 2px
-                gap; complete descriptions wrap naturally without clamping.
-                A 38% Pink 300 overlay sits above the themed glass surface. A
-                thicker 4px neutral rim and a 2px Pink 500 band at 56% opacity
-                both paint inward using inset shadows, preserving Sonner’s
-                hover and swipe pseudo-elements. The same pink edge token
-                appears in the icon’s rear plate and front tile. Secondary
-                copy uses 78% ink in light mode and 90% in dark mode to stay
-                readable against the brighter pink surface.
+                The opaque foundation receives Black at 24% in light mode or
+                White at 24% in dark mode; the resulting surface remains fully
+                opaque. The neutral 4px frame and 2px Pink 500 band at 56%
+                remain inward. Artwork grows by exactly 22.5%, the midpoint
+                between one fifth and one quarter: 40 × 1.225 = 49px for its
+                frame, 34 × 1.225 = 41.65px for its tile and 18 × 1.225 =
+                22.05px for its glyph. Tiles are pure Black in light mode and
+                pure White in dark mode, with opposing glyph ink except the
+                intake-specific Emerald accent.
               </p>
               <p>
-                Three 34px rounded squares replace the circular rings. Pink
-                and lilac rear plates tilt gently in opposite directions over
-                7.4 and 8.1 seconds; the deep Plum front keeps the 18px glyph
-                legible. A short sheen, tiny square sparks and a restrained
-                glyph spring complete the artwork. The icon stack arrives over
-                780ms after an 80ms delay; its glyph follows at 140ms. The
-                notification’s position and scale remain entirely under Sonner’s
-                control. Artwork and copy departures fit within its 200ms
-                removal window. Hidden loading artwork and collapsed rear
-                plates pause, while reduced motion presents the settled design.
-                Button hover styling runs only with a fine pointer that
-                supports hover.
+                The 14px heading pairs with a 10px/600 type label. The label
+                and short description use exactly seven twelfths of their
+                previous alpha: 78% × 7/12 = 45.5% in light mode and 90% ×
+                7/12 = 52.5% in dark mode. Expanded explanations keep brighter
+                reading ink. The main artwork has the same finite spin,
+                overshoot and settling language as intake icons, with restrained
+                end-state sparks. The small bell rings for the first half of
+                each one-second cycle, with decreasing swings and a still rest.
+                Reduced motion settles all artwork and removes transforms;
+                mobile has no hover effects.
               </p>
               <p>
-                Sonner remains responsible for announcements, keyboard access,
-                stack offsets, height measurement, rear-card visibility, native
-                hover/focus timing, swipe dismissal and notification lifetime.
-                The facade passes IDs, actions, cancellation, callbacks and
-                duration through to the standard toast methods; it adds no
-                request, extra timer or separate lifetime owner.
-                Loading-to-success and loading-to-error updates keep the same ID
-                and list item. The top-center stack caps at 460px, respects safe
-                areas and retains 16px mobile side insets. Its compact 10px gap
-                separates the stack; three notifications remain visible
-                with a default lifetime of 5,500ms.
+                Sonner owns announcements, native stack geometry, height
+                measurement and swipe dismissal. The custom content owns a
+                monotonic reading countdown, normally 5,500ms. Its line shrinks
+                only while the notice is visible and available to read; opening
+                details, focus, hovering, a pointer gesture, a hidden document
+                or a rear stack position pauses it. Loading and explicitly
+                persistent notices have no countdown. Same-ID updates reset the
+                clock and invalidate old exit callbacks. The stack still caps
+                at 460px, with safe-area offsets, 16px mobile insets and three
+                visible notifications.
+              </p>
+              <p>
+                Expansion adds an inset separator at the summary’s former
+                bottom edge, followed by a compact body and separately divided
+                footer. Automatic and programmatic exits first collapse that
+                extension over 280ms, then anticipate downward for 120ms and
+                snap upward over 210ms with a separate reversing icon. Native
+                swipes retain their direct manipulation. Undo waits for the
+                actual server response before showing Undone and starting this
+                exit; failures remain expanded with their explanation.
+              </p>
+              <p>
+                Intake, medication, goal, timezone and full check-in mutations
+                can return a signed, journal-scoped undo receipt lasting 15
+                minutes. The server captures its before/after record inside the
+                existing atomic mutation, and Undo compares the current record
+                before restoring it. Later edits are never silently overwritten;
+                unrelated changes remain. A new medication cannot be removed
+                after it gains linked intakes or goals. Receipts stay out of
+                persisted journal data and do not require a database migration.
               </p>
               <p>
                 PWA Update notices use the shared update artwork and retain{" "}
-                <code>duration: Infinity</code>, their stable ID and native
-                Reload/Later actions. Contextual messages distinguish refreshing
+                <code>duration: Infinity</code>, their stable ID and
+                Reload/Later actions in the expanded footer. Contextual messages distinguish refreshing
                 a journal, changing an intake, managing medications, saving a
                 check-in and updating settings. Success still follows the actual
                 completed operation; error descriptions keep the complete
