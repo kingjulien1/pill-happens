@@ -477,19 +477,20 @@ export function DeveloperGuidePage() {
             </Detail>
             <Detail title="Actions, Focus & Feedback" context="Clear Intent">
               <p>
-                Shared actions delegate to the canonical Button renderer and its
-                opaque Purple/canvas face, Violet inner edge and quiet
-                Pink/Purple/Fuchsia perimeter. Primary, Secondary, Accent and
-                DialogPrimaryButton adapt geometry or content, rather than
-                mounting separate painted buttons. Action icons use the coffee
-                tile’s base pigment through
-                <code> --daily-action-secondary-ink</code>. The existing
-                <code> --action-background</code> /{" "}
-                <code>--action-foreground</code>
-                roles retain Fuchsia/White for compatibility with check-in and
-                decorative surfaces. Quiet and destructive variants keep their
-                contextual emphasis on the same renderer. Component paint
-                remains independent from geometry and semantic feedback colors.
+                Button defaults to standard semantic variants: ordinary
+                controls, toolbar actions, links and guide utilities do not
+                receive intake decoration. Primary, Accent and
+                DialogPrimaryButton explicitly select the intake appearance for
+                main actions, with its opaque Purple/canvas face, Violet inner
+                edge and quiet Pink/Purple/Fuchsia perimeter. Only that
+                appearance uses the coffee tile’s base pigment through
+                <code> --daily-action-secondary-ink</code>. SecondaryButton uses
+                a quiet tonal surface paired with its semantic foreground.
+                Standard filled actions use <code>--action-background</code> /{" "}
+                <code>--action-foreground</code>; secondary, outline, ghost,
+                destructive and link variants retain distinct emphasis. All
+                paths preserve one Base UI host and its native behavior without
+                requiring every control to share one painted surface.
               </p>
               <p>
                 Keep keyboard focus visible through <code>--ring</code>. Borders
@@ -806,9 +807,10 @@ export function DeveloperGuidePage() {
                 it. Text follows the page foreground, while the icons and “Jot
                 it!” use the coffee tile’s base pigment in both modes. Native
                 behavior and the existing entry animation remain attached to the
-                same control. Compact buttons and the Primary, Secondary and
-                Accent adapters now share this canonical solid renderer, with
-                contextual geometry retained.
+                same control. Primary, Accent and dialog submission adapters
+                explicitly opt into this main-action paint. Standard compact
+                controls and the tonal SecondaryButton keep quieter surfaces,
+                while sharing the native host and interaction safeguards.
               </p>
               <p>
                 The{" "}
@@ -1065,13 +1067,14 @@ export function DeveloperGuidePage() {
                 nearby Pink 300, Purple 300 and Fuchsia 300 stops are unchanged.
                 Both the GPU layer and CSS fallback consume the same thickness
                 and opacity, with the fallback hidden once the GPU renders
-                successfully. Compact Button controls default to a 2px CSS rim;
-                Primary and Secondary retain their 3px geometry. Only Today opts
-                into the GPU renderer. Motion retains its existing hidden,
-                offscreen, disabled and reduced-motion guards. Text and icon
-                colors adapt to the resolved theme; primary labels retain
-                readable foreground ink. Focus draws inward, while the soft
-                exterior glow stays separate from the border geometry.
+                successfully. The explicit intake appearance defaults to a 2px
+                CSS rim; Primary keeps its 3px default. Secondary and ordinary
+                controls have no animated perimeter. Only Today opts into the
+                GPU renderer. Motion retains its existing hidden, offscreen,
+                disabled and reduced-motion guards. Text and icon colors adapt
+                to the resolved theme; primary labels retain readable foreground
+                ink. Focus draws inward, while the soft exterior glow stays
+                separate from the border geometry.
               </p>
               <p>
                 The main label uses the page foreground. The Tablets mark, arrow
@@ -1084,11 +1087,12 @@ export function DeveloperGuidePage() {
                 Tablets glyph at 2.5 stroke, with no spark. Its 5px left shift
                 stays independent of the existing entry transforms. The same
                 button primitive retains the click action, focus and disabled
-                behavior. Shared PrimaryButton, SecondaryButton and Accent
-                adapters delegate to the same Button host and CSS-first paint,
-                preserving their existing geometry and content slots. Desktop
-                places the section 44px after the entries with 20px bottom
-                padding. Mobile uses{" "}
+                behavior. PrimaryButton and Accent explicitly request intake
+                paint through the shared Button host. SecondaryButton keeps its
+                supporting geometry with a quiet tonal surface and inherited
+                semantic ink; ordinary controls retain their own variants.
+                Desktop places the section 44px after the entries with 20px
+                bottom padding. Mobile uses{" "}
                 <code>max(0px, env(safe-area-inset-bottom))</code> for bottom
                 clearance, with a 4px minimum in short landscape windows.
               </p>
@@ -1957,17 +1961,18 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Dialog save actions delegate through DialogPrimaryButton to
-                AccentButton to the canonical Button host, keeping 14.25px/700
-                foreground text and matching 22px PencilSparkles/ArrowRight
-                glyphs at a 2.5 stroke. The label inherits the resolved
-                foreground; its icons use mug-base secondary ink. The wrapper
-                multiplies actual responsive Accent height by 0.74, then derives
-                its corners from the fixed 21/80 design ratio. Heights therefore
-                run from 53.28px to 56.055px and default radii from 13.986px to
-                14.7144375px. This changes layout geometry rather than scaling a
-                finished button. Standalone Accent actions remain 72–75.75px
-                high with 18.9–19.884375px corners; page-level Add a Medication
-                instead shares Today’s 74px height, 19.425px radius and internal
+                AccentButton, explicitly selecting intake appearance on the
+                shared Button host and keeping 14.25px/700 foreground text and
+                matching 22px PencilSparkles/ArrowRight glyphs at a 2.5 stroke.
+                The label inherits the resolved foreground; its icons use
+                mug-base secondary ink. The wrapper multiplies actual responsive
+                Accent height by 0.74, then derives its corners from the fixed
+                21/80 design ratio. Heights therefore run from 53.28px to
+                56.055px and default radii from 13.986px to 14.7144375px. This
+                changes layout geometry rather than scaling a finished button.
+                Standalone Accent actions remain 72–75.75px high with
+                18.9–19.884375px corners; page-level Add a Medication instead
+                shares Today’s 74px height, 19.425px radius and internal
                 label/icon/arrow spacing. Save Medication retains the compact
                 dialog wrapper. Today remains 74px high with 19.425px corners.
                 An explicit radius override remains available. The solid face
@@ -2818,54 +2823,52 @@ export function DeveloperGuidePage() {
                   Visibility, hidden tabs, writer and reader states pause
                   decoration; reduced motion keeps it still. A real
                   SecondaryButton opens the existing writer. Its local 56px base
-                  height retains the shared responsive increments; an 18px
-                  radius is passed to both the frame and specular rim. The
-                  action delegates to the same solid Purple/canvas face, Violet
-                  inner edge and CSS Pink rim as other actions. Mug-base
-                  secondary ink colors its action icons while the label keeps
-                  the mode’s foreground. Decorative journal-icon paint keeps its
-                  earlier palette through a separate artwork helper. The
-                  surrounding
-                  journal-panel backgrounds and decorations retain their
-                  existing Apricot detail. These are local button paint changes;
-                  Secondary behavior remains unchanged. Equal 22px outer rails
-                  center the pencil-and-label group while the arrow stays at the
-                  right. Local word, character and reading statistics use one
-                  unboxed single line beneath it: 10.5px values, 10px labels and
-                  a 14px line height. The surrounding 11.5px/600 guidance uses
-                  an 18px line to explain Markdown, draft continuity, reading,
-                  the saved-Journal threshold and the separate Save Check-In
-                  action. Reading opens safe rendered Markdown from the current
-                  draft; Edit entry closes the reader before returning to the
-                  same writer. Manual Refresh synchronizes saved journal data
-                  without replacing unfinished draft fields or making an AI
-                  request. The existing ReflectionDialog and independent saving
-                  controls retain their launcher ref. Writing supports up to
-                  100,000 characters. Done returns to the check-in with the
-                  draft; Save Check-In saves all responses. The plain writer
-                  header has more top space, no heading icon or fade, and a
-                  larger description clamped to three lines. Its context row
-                  above the heading shows the full weekday, abbreviated month
-                  and day without a year, then a dot and Reflection, with the
-                  shared 44px close control opposite. Two icon-only toolbar rows
-                  stay outside the text scroll area; mobile height follows
-                  visualViewport. Top buttons use 33px targets and 2.6-stroke
-                  Lucide glyphs, with 30px formatting buttons below. Pencil/Eye
-                  share neutral coloring, Bookmark/BookmarkCheck reflect saved
-                  state, and CloudCheck keeps Done’s existing celebration
-                  timings, including the 700ms centered hold and downward
-                  departure. Groups use Black at low opacity in light mode and
-                  White at low opacity in dark mode; the top buttons share that
-                  quiet neutral treatment. Active formatting uses a strong
-                  neutral fill and follows the actual source/selection,
-                  including code exclusions. Formatting taps preserve the caret
-                  and keyboard; top actions blur the writing field. Info opens a
-                  nested help dialog with Markdown examples and practical tips,
-                  then restores focus to Info on close. FileDown starts a
-                  trusted local .md download synchronously, followed by visual
-                  preparing/downloading/ready feedback; it makes no network
-                  request. Preview and reader never execute raw HTML or load
-                  remote images automatically.
+                  height retains the shared responsive increments and its 18px
+                  radius. This supporting launcher uses a quiet semantic
+                  secondary surface and paired foreground, without an animated
+                  perimeter, intake glow or mug-base action ink. Its layout and
+                  writer behavior stay intact. Decorative journal-icon paint
+                  keeps its earlier palette through a separate artwork helper.
+                  The surrounding journal-panel backgrounds and decorations
+                  retain their existing Apricot detail. These are local button
+                  paint changes; Secondary behavior remains unchanged. Equal
+                  22px outer rails center the pencil-and-label group while the
+                  arrow stays at the right. Local word, character and reading
+                  statistics use one unboxed single line beneath it: 10.5px
+                  values, 10px labels and a 14px line height. The surrounding
+                  11.5px/600 guidance uses an 18px line to explain Markdown,
+                  draft continuity, reading, the saved-Journal threshold and the
+                  separate Save Check-In action. Reading opens safe rendered
+                  Markdown from the current draft; Edit entry closes the reader
+                  before returning to the same writer. Manual Refresh
+                  synchronizes saved journal data without replacing unfinished
+                  draft fields or making an AI request. The existing
+                  ReflectionDialog and independent saving controls retain their
+                  launcher ref. Writing supports up to 100,000 characters. Done
+                  returns to the check-in with the draft; Save Check-In saves
+                  all responses. The plain writer header has more top space, no
+                  heading icon or fade, and a larger description clamped to
+                  three lines. Its context row above the heading shows the full
+                  weekday, abbreviated month and day without a year, then a dot
+                  and Reflection, with the shared 44px close control opposite.
+                  Two icon-only toolbar rows stay outside the text scroll area;
+                  mobile height follows visualViewport. Top buttons use 33px
+                  targets and 2.6-stroke Lucide glyphs, with 30px formatting
+                  buttons below. Pencil/Eye share neutral coloring,
+                  Bookmark/BookmarkCheck reflect saved state, and CloudCheck
+                  keeps Done’s existing celebration timings, including the 700ms
+                  centered hold and downward departure. Groups use Black at low
+                  opacity in light mode and White at low opacity in dark mode;
+                  the top buttons share that quiet neutral treatment. Active
+                  formatting uses a strong neutral fill and follows the actual
+                  source/selection, including code exclusions. Formatting taps
+                  preserve the caret and keyboard; top actions blur the writing
+                  field. Info opens a nested help dialog with Markdown examples
+                  and practical tips, then restores focus to Info on close.
+                  FileDown starts a trusted local .md download synchronously,
+                  followed by visual preparing/downloading/ready feedback; it
+                  makes no network request. Preview and reader never execute raw
+                  HTML or load remote images automatically.
                 </li>
                 <li>
                   A logging streak counts days with intake records. A

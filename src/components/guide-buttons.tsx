@@ -42,8 +42,8 @@ const percentage = (value: number) => `${number(value * 100)}%`;
 
 type ButtonPaint = {
   base: string;
-  innerEdge: string;
-  rimColors: readonly string[];
+  innerEdge?: string;
+  rimColors?: readonly string[];
   text: string;
   icon: string;
 };
@@ -63,15 +63,25 @@ type Inspection = {
 
 const roleDescriptions = {
   primary:
-    "Prominent geometry for the strongest next step, using the same solid face and rim as every other action.",
+    "The page’s strongest next step, explicitly using the intake face, inward edges and quiet moving rim.",
   secondary:
-    "Compact supporting geometry on the same renderer, without a separate button paint recipe.",
+    "A quiet tonal supporting action with paired semantic ink and no intake rim, glow or secondary icon pigment.",
   accent:
-    "A commitment adapter with default leading and trailing icons, shared solid paint and responsive proportions.",
+    "A main commitment action with intake paint, default leading and trailing icons, and responsive proportions.",
 };
 
-/** Rounded inspection swatches mirror shared-button.module.css, not a second renderer. */
-function buttonPaint(mode: ActionButtonTheme): ButtonPaint {
+/** Inspection values mirror the selected adapter’s actual appearance. */
+function buttonPaint(
+  kind: ActionButtonKind,
+  mode: ActionButtonTheme,
+): ButtonPaint {
+  if (kind === "secondary") {
+    return {
+      base: APP_THEME_VALUES[mode].secondary,
+      text: APP_THEME_VALUES[mode]["secondary-foreground"],
+      icon: APP_THEME_VALUES[mode]["secondary-foreground"],
+    };
+  }
   return {
     base: mixAppColors("#3c0366", APP_THEME_VALUES[mode].background, 0.4),
     innerEdge: "#7008e7",
@@ -81,7 +91,35 @@ function buttonPaint(mode: ActionButtonTheme): ButtonPaint {
   };
 }
 
-function paintLayers(paint: ButtonPaint): PaintLayer[] {
+function paintLayers(kind: ActionButtonKind, paint: ButtonPaint): PaintLayer[] {
+  if (kind === "secondary") {
+    return [
+      {
+        key: "base",
+        label: "Tonal supporting face",
+        description:
+          "The semantic secondary surface keeps this supporting action quiet. Any alpha belongs to that source token; no intake overlay or moving perimeter is added.",
+        colors: [paint.base],
+        opacity: 1,
+      },
+      {
+        key: "text",
+        label: "Paired supporting ink",
+        description:
+          "The secondary-foreground token supplies the label’s paired ink in the selected theme.",
+        colors: [paint.text],
+        opacity: 1,
+      },
+      {
+        key: "icon",
+        label: "Inherited supporting icon ink",
+        description:
+          "Supporting icons inherit the same paired ink as the label, without the main action’s mug-base pigment.",
+        colors: [paint.icon],
+        opacity: 1,
+      },
+    ];
+  }
   return [
     {
       key: "base",
@@ -96,15 +134,15 @@ function paintLayers(paint: ButtonPaint): PaintLayer[] {
       label: "Violet inner edge",
       description:
         "A two-pixel Violet 700 band sits one pixel inside the moving outer rim. Both edges paint inward without enlarging the control.",
-      colors: [paint.innerEdge],
+      colors: paint.innerEdge ? [paint.innerEdge] : [],
       opacity: 1,
     },
     {
       key: "rimColors",
       label: "Moving Pink rim",
       description:
-        "Pink 300, Purple 300 and Fuchsia 300 circulate at thirty-percent opacity. Compact controls use the shared CSS rim; Today’s prominent action opts into its GPU equivalent.",
-      colors: paint.rimColors,
+        "Pink 300, Purple 300 and Fuchsia 300 circulate at thirty-percent opacity on main actions. CSS supplies the rim by default; Today’s prominent action opts into its GPU equivalent.",
+      colors: paint.rimColors ?? [],
       opacity: 0.3,
     },
     {
@@ -119,7 +157,7 @@ function paintLayers(paint: ButtonPaint): PaintLayer[] {
       key: "icon",
       label: "Mug-base secondary ink",
       description:
-        "Action icons and secondary CTA copy use the coffee tile’s base: #4e456e at ninety-four percent mixed with Rose. Medication artwork keeps its own pigments.",
+        "Main-action icons and secondary CTA copy use the coffee tile’s base: #4e456e at ninety-four percent mixed with Rose. Standard controls and medication artwork retain their own ink.",
       colors: [paint.icon],
       opacity: 1,
     },
@@ -134,13 +172,22 @@ function colorRole(
   index: number,
 ): GuideColorInspectorRole {
   const stop = layer.colors.length > 1 ? ` · stop ${index + 1}` : "";
-  const token = {
-    base: "--button-face",
-    innerEdge: "--button-edge",
-    rimColors: `--action-rim-${index + 1}`,
-    icon: "--daily-action-secondary-ink",
-    text: "--button-copy",
-  }[layer.key];
+  const token =
+    kind === "secondary"
+      ? {
+          base: "--secondary",
+          innerEdge: "--border",
+          rimColors: "--border",
+          icon: "--secondary-foreground",
+          text: "--secondary-foreground",
+        }[layer.key]
+      : {
+          base: "--button-face",
+          innerEdge: "--button-edge",
+          rimColors: `--action-rim-${index + 1}`,
+          icon: "--daily-action-secondary-ink",
+          text: "--button-copy",
+        }[layer.key];
   return {
     id: `button-${kind}-${mode}-${layer.key}-${index}`,
     label: `${BUTTON_SYSTEM[kind].label} · ${layer.label}${stop}`,
@@ -251,27 +298,32 @@ import { PrimaryButton } from "@/components/primary-button";
 import { SecondaryButton } from "@/components/secondary-button";
 import { AccentButton } from "@/components/accent-button";
 
-// Compact actions use the same renderer directly.
-<Button type="button" size="sm" onClick={reviewDetails}>
+// Ordinary controls default to standard semantic styling, without intake art.
+<Button type="button" variant="ghost" size="sm" onClick={reviewDetails}>
   Review
 </Button>
 
-// A page's strongest next step.
+// A page's strongest next step opts into intake paint through its adapter.
 <PrimaryButton type="button" onClick={openIntake}>
   Log Intake
 </PrimaryButton>
 
-// A supporting route alongside the commitment.
+// A quiet tonal route alongside the commitment; no intake rim or glow.
 <SecondaryButton type="button" onClick={reviewDetails}>
   Review details
 </SecondaryButton>
 
-// Accent adds content slots, not a different paint renderer.
+// Main form submissions explicitly use intake paint through Accent.
 // Labels only: PencilSparkles and ArrowRight are shared defaults.
 // Pending keeps a meaningful label and prevents another activation.
 <AccentButton type="submit" pending={saving}>
   {saving ? "Saving…" : "Save Medication"}
 </AccentButton>
+
+// A direct main action can opt in without an adapter.
+<Button appearance="intake" type="submit" pending={creating}>
+  {creating ? "Creating…" : "Create Journal"}
+</Button>
 
 // Optional decorative slots accept a React node or null.
 <AccentButton type="button" leadingIcon={null} trailingIcon={null}>
@@ -301,8 +353,8 @@ export function GuideButtons() {
   const [feedback, setFeedback] = useState(
     "Choose any live example to try its action.",
   );
-  const paint = buttonPaint(mode);
-  const layers = paintLayers(paint);
+  const paint = buttonPaint(kind, mode);
+  const layers = paintLayers(kind, paint);
   const firstRole = colorRole(kind, mode, layers[0], paint.base, 0);
   const activate = (label: string) =>
     setFeedback(`“${label}” preview activated.`);
@@ -338,10 +390,11 @@ export function GuideButtons() {
         </span>
       </div>
       <p className={styles.intro}>
-        One canonical Button renderer supplies every action’s solid face, inward
-        edges and native behavior. Primary, Secondary and Accent retain their
-        contextual geometry and content slots. Compare the real adapters in both
-        themes, then choose the smallest useful size and emphasis.
+        Share native behavior, choose visual emphasis. Button defaults to
+        standard semantic controls; Primary and Accent explicitly opt into the
+        Log Intake surface for main actions. Secondary stays quiet and tonal.
+        Compare the real adapters in both themes, then choose the smallest
+        useful size and emphasis.
       </p>
       <nav className={styles.jumpLinks} aria-label="Button reference sections">
         {[
@@ -368,9 +421,9 @@ export function GuideButtons() {
           behavior stays available. Actions in this reference only update the
           preview feedback. Accent starts at 72px high with 14.25px, 700-weight
           foreground text. Its 22px PencilSparkles and ArrowRight glyphs use the
-          coffee tile’s base pigment and share a 2.5 stroke. Every preview uses
-          the shared solid paint and CSS rim; their native labels, focus and
-          activation remain available.
+          coffee tile’s base pigment and share a 2.5 stroke. Primary and Accent
+          use intake paint; Secondary uses its paired semantic surface and ink.
+          All retain native labels, focus and activation.
         </p>
         <div className={styles.roleList}>
           {ACTION_BUTTON_KINDS.map((buttonKind, index) => {
@@ -471,9 +524,10 @@ export function GuideButtons() {
           Read the stack from its foundation to its foreground. Each color chip
           opens the same inspector as the palette reference, including copyable
           hex, RGB and opacity values. The face swatch is a rounded sRGB
-          representation of the shared forty-percent Purple / canvas mix. Rim
-          source colors and their thirty-percent layer opacity stay separate.
-          The controls themselves use the real shared CSS tokens.
+          representation of the main action’s forty-percent Purple / canvas mix.
+          Its rim source colors and thirty-percent opacity stay separate.
+          Secondary instead shows its semantic surface and paired ink, with no
+          moving edge. The controls use their real theme-aware CSS tokens.
         </p>
         <div className={styles.inspectorToolbar}>
           <div
@@ -573,22 +627,23 @@ export function GuideButtons() {
           <div>
             <Heading level={3}>Color, Opacity And Compositing</Heading>
             <p>
-              The face mixes forty percent Purple 950 with sixty percent opaque
-              canvas; that is a color recipe, not forty-percent element opacity.
-              The moving rim is a separate thirty-percent layer. Primary copy
-              and mug-base secondary ink retain their own colors above the face.
-              Medication identity glyphs keep their domain pigments.
+              Main actions mix forty percent Purple 950 with sixty percent
+              opaque canvas; that is a color recipe, not forty-percent element
+              opacity. Their moving rim is a separate thirty-percent layer.
+              Primary copy and mug-base secondary ink stay above that face.
+              Secondary uses its semantic token directly, including any alpha
+              encoded in that value. Medication glyphs keep their own pigments.
             </p>
           </div>
           <div>
             <Heading level={3}>One Face, Two Inward Edges</Heading>
             <p>
-              The opaque face needs no backdrop blur. Compact Button controls
-              default to a 2px outer rim; Primary and Secondary adapters retain
-              their 3px geometry. Today uses 5.5px at the same 74px height and
-              19.425px radius. A 1px face-colored gap precedes the shared 2px
-              Violet band. CSS paints the rim by default; only the main intake
-              action opts into GPU rendering, with the same CSS fallback.
+              The intake appearance needs no backdrop blur. Its default outer
+              rim is 2px; Primary keeps a 3px default. Today uses 5.5px at the
+              same 74px height and 19.425px radius. A 1px face-colored gap
+              precedes the 2px Violet band. CSS supplies this main-action edge;
+              only Today opts into its GPU equivalent. Secondary and standard
+              controls mount neither that perimeter nor its glow.
             </p>
           </div>
         </div>
@@ -608,9 +663,10 @@ export function GuideButtons() {
             <p>
               Existing <code>surface</code> and <code>finish</code> props remain
               accepted so saved examples and callers keep compiling. They no
-              longer select different button backgrounds: Primary, Secondary,
-              Accent and DialogPrimaryButton all delegate to the canonical
-              <code> Button</code> renderer. The separate
+              longer select decorative main-action backgrounds. Primary, Accent
+              and DialogPrimaryButton opt into intake paint on the shared{" "}
+              <code>Button</code> host; Secondary defaults to its quiet standard
+              variant. The separate
               <code> AccentButtonSurface</code> export remains a paint-only
               artwork utility for the journal illustration; it is not mounted
               inside an action button.
@@ -888,10 +944,11 @@ export function GuideButtons() {
       <div className={styles.chapter}>
         <Heading>Component Contract</Heading>
         <p className={styles.lead}>
-          Use Button directly for compact actions, or a named adapter for its
-          contextual geometry and content slots. Keep form ownership, action
-          state and accessible naming in the caller. Every path delegates to one
-          Base UI host with the same solid surface and inward-edge renderer.
+          Use Button directly for ordinary controls, or a named adapter for
+          contextual geometry and content slots. Main actions explicitly choose
+          intake appearance; sharing one Base UI host does not require the same
+          painted surface. Keep form ownership, state and accessible naming in
+          the caller.
         </p>
         <DeveloperCode
           label="Primary, Secondary and Accent usage"
@@ -918,6 +975,21 @@ export function GuideButtons() {
             <tbody>
               <tr>
                 <th scope="row">
+                  <code>appearance</code>
+                </th>
+                <td>
+                  <code>{'"standard"'}</code> by default;{" "}
+                  <code>{'"intake"'}</code> for a main action
+                </td>
+                <td>
+                  Primary, Accent and DialogPrimaryButton opt into intake paint.
+                  A direct Button can select it explicitly. Secondary and
+                  ordinary utility controls keep standard semantic styling,
+                  without the intake rim, glow or secondary icon ink.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
                   <code>surface</code>
                 </th>
                 <td>
@@ -925,9 +997,9 @@ export function GuideButtons() {
                   or <code>{'"solid"'}</code>
                 </td>
                 <td>
-                  Accepted for compatibility; all values use the same solid
-                  daily-action face. They do not mount the old gradient, tint,
-                  glaze or wash components.
+                  Accepted for compatibility; appearance selects the visual
+                  intent. Intake actions use their solid face without mounting
+                  the old gradient, tint, glaze or wash components.
                 </td>
               </tr>
               <tr>
@@ -936,10 +1008,10 @@ export function GuideButtons() {
                 </th>
                 <td>Contextual emphasis and compact geometry</td>
                 <td>
-                  Ordinary actions share one palette and renderer. Ghost keeps a
-                  quiet edge, Link keeps a text presentation, and Destructive
-                  retains its semantic edge color. Sizes preserve the control’s
-                  context instead of turning every action into a large CTA.
+                  Standard variants keep distinct semantic styles: filled,
+                  secondary, outline, ghost, destructive or link. They do not
+                  acquire intake artwork. Sizes preserve the control’s context
+                  instead of turning every action into a large CTA.
                 </td>
               </tr>
               <tr>
@@ -976,7 +1048,10 @@ export function GuideButtons() {
                   <code>pending</code>
                 </th>
                 <td>Work is in progress</td>
-                <td>Sets busy state and prevents repeated activation.</td>
+                <td>
+                  Sets aria-busy and prevents repeated activation. aria-busy
+                  alone remains advisory and does not disable the action.
+                </td>
               </tr>
               <tr>
                 <th scope="row">
@@ -985,6 +1060,8 @@ export function GuideButtons() {
                 <td>The action is unavailable</td>
                 <td>
                   Uses native disabled behavior; provide context where needed.
+                  aria-disabled is also inert, retaining focusability by default
+                  unless explicitly disabled or pending.
                 </td>
               </tr>
               <tr>
@@ -1006,7 +1083,10 @@ export function GuideButtons() {
                 <td>
                   <code>{'"light"'}</code>, <code>{'"dark"'}</code>, or omitted
                 </td>
-                <td>Forces a local specimen or follows the system theme.</td>
+                <td>
+                  Sets local paint for these named adapter specimens; app
+                  controls otherwise follow the resolved appearance.
+                </td>
               </tr>
               <tr>
                 <th scope="row">
@@ -1016,8 +1096,9 @@ export function GuideButtons() {
                   <code>false</code> for a static specimen
                 </td>
                 <td>
-                  Retains a painted button without continuous decorative motion.
-                  Reduced motion and inactive states pause the shared rim too.
+                  Keeps intake paint static when false. Reduced motion and
+                  inactive states pause its decoration too. Standard supporting
+                  controls have no continuous intake motion.
                 </td>
               </tr>
               <tr>
@@ -1053,9 +1134,10 @@ export function GuideButtons() {
                 <td>Optional inward rim and explicit CSS-pixel width</td>
                 <td>
                   CSS and GPU rendering consume the same width and palette. The
-                  primitive defaults to 2px, Primary and Secondary to 3px, and
-                  Today explicitly requests 5.5px. The two-pixel inner band
-                  keeps a one-pixel gap after that width.
+                  intake appearance defaults to 2px, Primary to 3px, and Today
+                  explicitly requests 5.5px. The two-pixel inner band keeps a
+                  one-pixel gap after that width. Standard controls have no
+                  animated rim.
                 </td>
               </tr>
               <tr>
@@ -1064,9 +1146,22 @@ export function GuideButtons() {
                 </th>
                 <td>Opt-in for the prominent native intake action</td>
                 <td>
-                  Defaults to false. Compact, repeated and link actions use the
-                  same CSS rim without allocating a graphics context. The CSS
-                  edge remains available if GPU rendering fails.
+                  Defaults to false and applies only to intake appearance on a
+                  native button. Other main actions use the CSS edge; standard
+                  controls mount no intake renderer. The fallback remains
+                  available if GPU rendering fails.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>navigation</code>
+                </th>
+                <td>Use with a rendered native link</td>
+                <td>
+                  Retains the link role, Space scrolling, Enter activation and
+                  modified clicks. Combine it with nativeButton=false and the
+                  actual Link or anchor; the caller keeps its navigation
+                  handler.
                 </td>
               </tr>
               <tr>
@@ -1077,7 +1172,8 @@ export function GuideButtons() {
                 <td>
                   Preserves one host, stateful className/style callbacks, ref
                   forwarding and native keyboard semantics. A navigation Link
-                  uses <code>nativeButton={"{false}"}</code> with its rendered
+                  uses <code>navigation</code> and{" "}
+                  <code>nativeButton={"{false}"}</code> with its rendered
                   element; do not nest interactive buttons.
                 </td>
               </tr>
@@ -1105,17 +1201,17 @@ export function GuideButtons() {
               meaning or availability of the action.
             </p>
             <p>
-              The canonical renderer owns the opaque Purple/canvas face, Violet
-              inner band and thirty-percent Pink/Purple/Fuchsia perimeter. Its
-              CSS rim makes one turn every 6.8 seconds. Today alone opts into
-              SpecularRim for the equivalent GPU edge; when that canvas renders,
-              the adjacent CSS fallback becomes invisible. The main CTA’s icons
-              and “Jot it!” use the coffee tile’s base pigment, independently of
-              its primary label. Accent keeps its default icon slots and pending
-              spinner, but no separate aura, gradient field or finish renderer.
-              The paint-only AccentButtonSurface remains available for journal
-              artwork. Visual truncation never removes the full accessible
-              action text.
+              The explicit intake appearance owns the opaque Purple/canvas face,
+              Violet inner band and thirty-percent Pink/Purple/Fuchsia
+              perimeter. Its CSS rim makes one turn every 6.8 seconds. Today
+              alone opts into SpecularRim for the equivalent GPU edge; when that
+              canvas renders, the adjacent CSS fallback becomes invisible. The
+              main CTA’s icons and “Jot it!” use the coffee tile’s base pigment,
+              independently of its primary label. Accent keeps its default icon
+              slots and pending spinner, but no separate aura, gradient field or
+              finish renderer. The paint-only AccentButtonSurface remains
+              available for journal artwork. Visual truncation never removes the
+              full accessible action text.
             </p>
             <p>
               Respect reduced motion and pause decoration for inactive states.
@@ -1129,8 +1225,9 @@ export function GuideButtons() {
           <summary>Implementation map and review checklist</summary>
           <div className={styles.detailBody}>
             <p>
-              <code>Button</code> and its shared stylesheet own production
-              painting and native behavior. <code>BUTTON_SYSTEM</code> retains
+              <code>Button</code> owns the native host and standard semantic
+              variants. Its opt-in intake appearance and shared stylesheet own
+              the main-action face and edges. <code>BUTTON_SYSTEM</code> retains
               the adapters’ geometry and compatibility metadata;
               <code> getButtonThemeStyle(kind)</code> supplies their sizing
               variables without selecting another action renderer.
@@ -1145,9 +1242,10 @@ export function GuideButtons() {
                   <code>components/ui/button.tsx</code>
                 </dt>
                 <dd>
-                  The single Base UI host, native composition, state handling
-                  and CSS-first rim. The shared-button stylesheet owns its face,
-                  inner edge, secondary ink and per-variant emphasis.
+                  The single Base UI host, native composition and state
+                  handling. Standard semantic variants stay undecorated; the
+                  explicit intake appearance adds the shared face, edges and
+                  secondary ink.
                 </dd>
               </div>
               <div>
@@ -1164,8 +1262,8 @@ export function GuideButtons() {
                   <code>components/primary-button.tsx</code>
                 </dt>
                 <dd>
-                  Primary/Secondary geometry and foreground-content adapters
-                  that delegate to the canonical Button.
+                  Main-action geometry and foreground-content adapters that
+                  explicitly select intake appearance on Button.
                 </dd>
               </div>
               <div>
@@ -1173,7 +1271,8 @@ export function GuideButtons() {
                   <code>components/secondary-button.tsx</code>
                 </dt>
                 <dd>
-                  The supporting role, composed from the same geometry adapter.
+                  A quiet standard secondary variant with preserved supporting
+                  geometry and paired semantic ink, without intake decoration.
                 </dd>
               </div>
               <div>
@@ -1181,9 +1280,9 @@ export function GuideButtons() {
                   <code>components/accent-button.tsx</code>
                 </dt>
                 <dd>
-                  Default content slots, pending spinner and proportional
-                  geometry on the same renderer. Its exported paint-only surface
-                  remains available for journal artwork.
+                  Main-action intake appearance, default content slots, pending
+                  spinner and proportional geometry. Its exported paint-only
+                  surface remains available for journal artwork.
                 </dd>
               </div>
             </dl>
