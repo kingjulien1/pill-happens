@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { ArrowDown, BookOpenText, Search, X } from "lucide-react";
 import { useJournal } from "@/components/journal-provider";
 import { useJournalWorkspace } from "@/components/journal-drafts";
-import { MedicationCardBase } from "@/components/medication-card-base";
+import { JournalPreviewCard } from "@/components/journal-preview-card";
 import { ReflectionReaderDialog } from "@/components/reflection-reader-dialog";
 import { checkInDraftKey } from "@/lib/check-in-draft";
-import { formatDay } from "@/lib/domain";
+import { dayKey, formatDay } from "@/lib/domain";
+import { createJournalPreviewReferenceExtractor } from "@/lib/journal-preview-references";
 import {
   journalEntryEditDraft,
   journalLibraryEntries,
@@ -22,7 +23,7 @@ const PAGE_SIZE = 20;
 
 /** A reading collection of saved pages; unfinished writing stays in its check-in. */
 export function JournalLibraryPage() {
-  const { data } = useJournal();
+  const { data, now } = useJournal();
   const workspace = useJournalWorkspace();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -35,13 +36,30 @@ export function JournalLibraryPage() {
     [data?.dailyCheckIns],
   );
   const search = query.trim().toLocaleLowerCase("en");
-  const filtered = search
-    ? entries.filter((entry) =>
-        `${entry.title}\n${entry.value}\n${formatDay(entry.day, { year: "numeric" })}`
-          .toLocaleLowerCase("en")
-          .includes(search),
-      )
-    : entries;
+  const filtered = useMemo(
+    () =>
+      search
+        ? entries.filter((entry) =>
+            `${entry.title}\n${entry.value}\n${formatDay(entry.day, { year: "numeric" })}`
+              .toLocaleLowerCase("en")
+              .includes(search),
+          )
+        : entries,
+    [entries, search],
+  );
+  const today = data && now ? dayKey(now, data.settings.timezone) : undefined;
+  const extractReferences = useMemo(
+    () => createJournalPreviewReferenceExtractor(data, today),
+    [data, today],
+  );
+  const visibleEntries = useMemo(
+    () =>
+      filtered.slice(0, limit).map((entry) => ({
+        entry,
+        references: extractReferences(entry.value, entry.day),
+      })),
+    [filtered, limit, extractReferences],
+  );
   const selected = entries.find((entry) => entry.id === selectedId);
 
   const editEntry = (entry: JournalLibraryEntry) => {
@@ -122,48 +140,19 @@ export function JournalLibraryPage() {
 
       {filtered.length ? (
         <div className={styles.entries} data-journal-entries>
-          {filtered.slice(0, limit).map((entry) => (
-            <MedicationCardBase
+          {visibleEntries.map(({ entry, references }) => (
+            <JournalPreviewCard
               key={entry.id}
-              className={styles.entry}
-              color="lilac"
-              icon="notebook-text"
-              data-card-entry
-              data-journal-entry={entry.id}
-              data-journal-entry-words={entry.words}
-              aria-label={`Read ${entry.title}, ${formatDay(entry.day, { year: "numeric" })}, ${entry.words.toLocaleString("en")} words, ${entry.readingMinutes} minute read`}
-              onClick={(event) => {
+              entry={entry}
+              references={references}
+              data={data}
+              readerOpen={readerOpen}
+              onRead={(event) => {
                 returnFocus.current = event.currentTarget;
                 setSelectedId(entry.id);
                 setReaderOpen(true);
               }}
-            >
-              <div className={`intake-card-details ${styles.entryDetails}`}>
-                <time
-                  className={`intake-card-time ${styles.entryDate}`}
-                  dateTime={entry.day}
-                  title={formatDay(entry.day, { year: "numeric" })}
-                >
-                  {formatDay(entry.day, {
-                    weekday: undefined,
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </time>
-                <span
-                  className={`intake-card-name ${styles.entryTitle}`}
-                  title={entry.title}
-                >
-                  {entry.title}
-                </span>
-                <span className={styles.excerpt}>{entry.excerpt}</span>
-                <span className={styles.entryBottom}>
-                  <span>{entry.words.toLocaleString("en")} words</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{entry.readingMinutes} min read</span>
-                </span>
-              </div>
-            </MedicationCardBase>
+            />
           ))}
         </div>
       ) : (

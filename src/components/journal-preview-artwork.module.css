@@ -1,0 +1,139 @@
+.artwork[data-journal-preview-artwork] {
+  --check-in-art-copy: var(--card-foreground);
+  --check-in-art-surface: color-mix(
+    in srgb,
+    var(--journal-accent) 24%,
+    var(--card)
+  );
+  --art-soft: var(--journal-complement);
+  --art-rim: color-mix(in srgb, var(--journal-accent) 55%, transparent);
+  --art-wash: color-mix(in srgb, var(--journal-complement) 29%, transparent);
+  --icon-settle-color: var(--journal-accent);
+}
+
+.artwork[data-artwork-active="false"] {
+  --art-play: paused;
+}
+
+.cover {
+  --journal-cover-rim: color-mix(
+    in srgb,
+    var(--journal-accent) 38%,
+    transparent
+  );
+  position: absolute;
+  inset: 5px;
+  border-radius: 15px;
+  box-shadow: inset 0 0 0 1px var(--journal-cover-rim);
+  pointer-events: none;
+}
+.coverBack {
+  background: color-mix(in srgb, var(--journal-complement) 22%, var(--card));
+  transform: translate(-1px, 1px) rotate(-11deg) scale(0.97);
+}
+.coverFront {
+  background: color-mix(in srgb, var(--journal-accent) 25%, var(--card));
+  transform: translate(1px, -1px) rotate(7deg) scale(0.96);
+}
+.arrival {
+  z-index: 1;
+}
+.artwork .tile {
+  --journal-top-shine: color-mix(in srgb, var(--foreground) 10%, transparent);
+  border: 0;
+  box-shadow:
+    inset 0 0 0 1.25px var(--art-rim),
+    inset 0 1px 1px var(--journal-top-shine);
+}
+.book {
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  color: var(--card-foreground);
+}
+.leftPage,
+.rightPage {
+  transform-box: view-box;
+  transform-origin: 16px 18px;
+}
+.leftFill {
+  fill: color-mix(in srgb, var(--journal-accent) 32%, transparent);
+}
+.rightFill {
+  fill: color-mix(in srgb, var(--journal-complement) 32%, transparent);
+}
+.bookmark {
+  fill: var(--journal-accent);
+  stroke: var(--card-foreground);
+}
+.sparkle {
+  color: var(--journal-complement);
+  fill: currentColor;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .leftPage {
+    animation: journal-page-breathe 9.6s ease-in-out var(--art-loop-start)
+      infinite;
+  }
+  .rightPage {
+    animation: journal-page-breathe 9.6s ease-in-out var(--art-loop-start)
+      infinite reverse;
+  }
+  .bookmark {
+    animation: journal-bookmark-rest 9.6s ease-in-out var(--art-loop-start)
+      infinite;
+  }
+  .sparkle {
+    animation: journal-book-glint 7.4s ease-in-out var(--art-loop-start)
+      infinite;
+  }
+  .leftPage,
+  .rightPage,
+  .bookmark,
+  .sparkle {
+    animation-play-state: var(--art-play);
+  }
+}
+@keyframes journal-page-breathe {
+  0%,
+  100% {
+    transform: perspective(80px) rotateY(0deg);
+  }
+  40% {
+    transform: perspective(80px) rotateY(-11deg) translateY(-0.35px);
+  }
+  72% {
+    transform: perspective(80px) rotateY(3deg);
+  }
+}
+@keyframes journal-bookmark-rest {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  42% {
+    transform: translateY(-0.7px);
+  }
+  75% {
+    transform: translateY(0.15px);
+  }
+}
+@keyframes journal-book-glint {
+  0%,
+  48%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  64% {
+    opacity: 1;
+    transform: scale(1.12) rotate(8deg);
+  }
+  79% {
+    opacity: 0.5;
+    transform: scale(0.9) rotate(0);
+  }
+}

@@ -1,0 +1,272 @@
+.card:global(.intake-log-card) {
+  --entry-rim-width: 4px;
+  --entry-rim-color: color-mix(
+    in srgb,
+    var(--card-foreground) 10%,
+    transparent
+  );
+  --entry-rim-paint: var(--entry-rim-color);
+  overflow: visible;
+  color: var(--card-foreground);
+  -webkit-tap-highlight-color: transparent;
+}
+.card:global(.intake-log-card)::before {
+  inset: 0;
+}
+.card:global(.intake-log-card)::after {
+  --journal-inner-rim: color-mix(
+    in srgb,
+    var(--journal-accent) 32%,
+    transparent
+  );
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 4px;
+  border-radius: calc(var(--entry-card-radius) - 4px);
+  box-shadow: inset 0 0 0 1.5px var(--journal-inner-rim);
+  pointer-events: none;
+}
+.background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 4% 0%,
+      color-mix(in srgb, var(--journal-accent) 9%, transparent),
+      transparent 66%
+    ),
+    color-mix(in srgb, var(--card-foreground) 4%, transparent);
+  pointer-events: none;
+}
+.card :global(.intake-card-content) {
+  align-items: center;
+  gap: 11px;
+}
+.details {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 7px;
+  padding-inline-end: 2px;
+}
+.heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.heading > time {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 21px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.open {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  color: color-mix(in srgb, var(--card-foreground) 64%, transparent);
+  font-size: 10.5px;
+  font-weight: 550;
+}
+.open > svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+}
+.metadata {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: color-mix(in srgb, var(--card-foreground) 60%, transparent);
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.metadata strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.dot {
+  width: 3px;
+  height: 3px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+.references {
+  position: relative;
+  z-index: 2;
+  margin-inline: 15px;
+  padding: 9px 0 12px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--card-foreground) 8%, transparent);
+}
+.referenceHeading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 2px 6px;
+  color: color-mix(in srgb, var(--card-foreground) 53%, transparent);
+  font-size: 9.5px;
+  font-weight: 450;
+  line-height: 14px;
+}
+.referenceHeading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.referenceHeading svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2;
+}
+.referenceHeading b {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.referenceRail {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 3px 2px;
+  margin-inline: -2px;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+.referenceRail::-webkit-scrollbar {
+  display: none;
+}
+.referenceRail > span {
+  display: flex;
+  min-width: 0;
+  flex: none;
+}
+.reference {
+  --reference-rim: color-mix(in srgb, var(--reference-color) 18%, transparent);
+  display: inline-flex;
+  box-sizing: border-box;
+  max-width: 188px;
+  min-width: 0;
+  height: 31px;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 3px 3px;
+  border-radius: 10px;
+  background: color-mix(
+    in srgb,
+    var(--reference-color) 11%,
+    var(--surface-raised)
+  );
+  box-shadow: inset 0 0 0 1px var(--reference-rim);
+  color: var(--card-foreground);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 17px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.referenceIcon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--reference-color) 18%, transparent);
+}
+.referenceIcon > svg,
+.medicationGlyph {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+}
+.referenceName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.medicationGlyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.referenceDetail {
+  flex: none;
+  color: color-mix(in srgb, var(--card-foreground) 60%, transparent);
+  font-size: 9.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.reference:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .reference {
+    transition:
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  .reference:hover {
+    --reference-rim: color-mix(
+      in srgb,
+      var(--reference-color) 40%,
+      transparent
+    );
+    background: color-mix(
+      in srgb,
+      var(--reference-color) 20%,
+      var(--surface-raised)
+    );
+  }
+  .card:hover .open {
+    color: var(--card-foreground);
+  }
+}
+@media (max-width: 359px) {
+  .card :global(.intake-card-content) {
+    gap: 7px;
+  }
+  .heading {
+    gap: 6px;
+  }
+  .heading > time {
+    font-size: 14px;
+  }
+  .open {
+    gap: 2px;
+    font-size: 10px;
+  }
+  .metadata {
+    gap: 6px;
+    font-size: 10.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reference {
+    transition: none;
+  }
+}
