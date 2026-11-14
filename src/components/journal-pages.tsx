@@ -838,6 +838,7 @@ export function GoalsPage() {
         Keep track of the targets agreed with your prescriber.
       </PageHeading>
       <Button
+        appearance="intake"
         className="mb-7 h-13 w-full gap-2 rounded-2xl"
         onClick={() => openDialog({ kind: "goal-new" })}
       >

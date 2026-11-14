@@ -1,0 +1,72 @@
+.button[data-slot="button"] {
+  /* Compatibility aliases keep the writing launcher's local paint semantic. */
+  --action-base: var(--secondary);
+  --action-text: var(--secondary-foreground);
+  --action-size-step: 0;
+  min-width: 0;
+  height: calc(
+    var(--action-base-height, 48px) + var(--action-size-step) * 0.75px
+  );
+  min-height: calc(
+    var(--action-base-height, 48px) + var(--action-size-step) * 0.75px
+  );
+  padding-inline: calc(
+    var(--action-base-padding, 16px) + var(--action-size-step) * 0.5px
+  );
+  padding-block: 8px;
+  font-size: calc(
+    var(--action-base-font, 14px) + var(--action-size-step) * 0.125px
+  );
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.content {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: inherit;
+  gap: inherit;
+  color: inherit;
+}
+
+.content svg {
+  color: inherit;
+}
+
+@media (min-width: 40rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 1;
+  }
+}
+
+@media (min-width: 48rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 2;
+  }
+}
+
+@media (min-width: 64rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 3;
+  }
+}
+
+@media (min-width: 80rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 4;
+  }
+}
+
+@media (min-width: 96rem) {
+  .button[data-slot="button"] {
+    --action-size-step: 5;
+  }
+}

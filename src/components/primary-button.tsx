@@ -50,6 +50,7 @@ export function LayeredActionButton({
   return (
     <Button
       {...props}
+      appearance="intake"
       kind={kind}
       radius={corner}
       theme={theme}

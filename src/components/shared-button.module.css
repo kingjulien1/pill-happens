@@ -4,7 +4,7 @@
   isolation: isolate;
   overflow: visible;
 }
-/* The daily intake action supplies one surface language at every control size. */
+/* Only explicit main actions use the daily intake face, moving rim and glow. */
 .button[data-slot="button"][data-button-system="daily"] {
   --button-canvas: var(--background);
   --button-copy: var(--foreground);

@@ -267,6 +267,7 @@ export function LoginForm() {
         </div>
         <Button
           type="submit"
+          appearance="intake"
           disabled={busy || candidatePassword !== null}
           className="h-12 w-full gap-3 rounded-xl text-sm"
         >
@@ -373,6 +374,7 @@ export function LoginForm() {
             <div className="flex flex-col gap-2">
               <Button
                 type="submit"
+                appearance="intake"
                 disabled={busy}
                 data-create-journal
                 className="h-16 w-full gap-3 rounded-2xl text-base font-semibold"

@@ -37,7 +37,11 @@ export default function ErrorPage({
       <p className="mt-2 max-w-64 text-sm leading-relaxed text-canvas-muted-foreground">
         Something interrupted this page. Try loading it again.
       </p>
-      <Button onClick={reset} className="mt-6 h-12 gap-2.5 rounded-xl px-6">
+      <Button
+        appearance="intake"
+        onClick={reset}
+        className="mt-6 h-12 gap-2.5 rounded-xl px-6"
+      >
         <ActionIcon name="retry" />
         Try again
       </Button>

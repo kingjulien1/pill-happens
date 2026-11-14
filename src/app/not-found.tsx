@@ -31,6 +31,7 @@ export default function NotFound() {
         Let’s head back to your daily journal.
       </p>
       <Button
+        appearance="intake"
         navigation
         nativeButton={false}
         render={<Link href="/" />}

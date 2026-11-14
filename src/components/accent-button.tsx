@@ -124,6 +124,7 @@ export function AccentButton({
   return (
     <Button
       {...props}
+      appearance="intake"
       disabled={disabled}
       pending={pending}
       aria-busy={ariaBusy}

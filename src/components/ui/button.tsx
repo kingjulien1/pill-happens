@@ -9,16 +9,21 @@ import { cn } from "@/lib/utils";
 import styles from "../shared-button.module.css";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg text-center text-sm font-medium whitespace-nowrap outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
+  "group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding text-center text-sm font-medium whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
   {
     variants: {
       variant: {
-        default: "",
-        outline: "",
-        secondary: "",
-        ghost: "",
-        destructive: "",
-        link: "underline-offset-4",
+        default:
+          "bg-action-background text-action-foreground md:hover:bg-action-background/90",
+        outline:
+          "border-border bg-background md:hover:bg-muted md:hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:md:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground md:hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        ghost:
+          "md:hover:bg-muted md:hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:md:hover:bg-muted/50",
+        destructive:
+          "bg-destructive/10 text-destructive md:hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:md:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        link: "text-foreground underline-offset-4 md:hover:underline",
       },
       size: {
         default:
@@ -40,6 +45,8 @@ const buttonVariants = cva(
 
 export type ButtonProps = ButtonPrimitive.Props &
   VariantProps<typeof buttonVariants> & {
+    /** Reserve the intake face, moving rim and glow for deliberate main actions. */
+    appearance?: "standard" | "intake";
     radius?: number;
     pending?: boolean;
     theme?: ActionButtonTheme;
@@ -51,7 +58,7 @@ export type ButtonProps = ButtonPrimitive.Props &
     /** Preserve anchor role and native Space scrolling for navigation actions. */
     navigation?: boolean;
     kind?: "primary" | "secondary" | "accent";
-    /** Compatibility input: all actions now use the shared solid finish. */
+    /** Main-action compatibility input; its intake finish remains solid. */
     surface?: "layered" | "accent" | "solid";
   };
 
@@ -60,13 +67,14 @@ function FilledActionSurface() {
   return <span className={styles.rim} data-button-rim aria-hidden="true" />;
 }
 
-/** One native Base UI host and one paint system for every journal action. */
+/** One native host; ordinary variants and the explicit main-action finish. */
 function Button({
   className,
   style,
   children,
   variant = "default",
   size = "default",
+  appearance = "standard",
   radius,
   pending = false,
   theme,
@@ -83,7 +91,8 @@ function Button({
 }: ButtonProps) {
   const quiet = variant === "ghost";
   const textOnly = variant === "link";
-  const showRim = rim ?? (!quiet && !textOnly);
+  const intake = appearance === "intake";
+  const showRim = intake && (rim ?? (!quiet && !textOnly));
   const width =
     rimThickness === undefined
       ? undefined
@@ -129,11 +138,11 @@ function Button({
       }
       aria-busy={pending || ariaBusy}
       data-slot="button"
-      data-button-system="daily"
+      data-button-system={intake ? "daily" : "standard"}
       data-button-variant={variant}
       data-button-paint={textOnly ? "text" : quiet ? "quiet" : "filled"}
-      data-filled-action={!textOnly || undefined}
-      data-button-face="solid"
+      data-filled-action={(intake && !textOnly) || undefined}
+      data-button-face={intake ? "solid" : undefined}
       data-button-kind={
         kind ?? (variant === "secondary" ? "secondary" : "primary")
       }
@@ -154,7 +163,7 @@ function Button({
     >
       {showRim && (
         <>
-          {gpuRim && motion && props.nativeButton !== false && (
+          {gpuRim && motion && !navigation && props.nativeButton !== false && (
             <SpecularRim
               radius={radius ?? 22}
               thickness={width ?? 3}
