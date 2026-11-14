@@ -222,25 +222,38 @@ export function useJournalMentionMenu({
   useLayoutEffect(() => {
     const node = field.current;
     const pane = node?.parentElement;
+    const viewport = node?.closest<HTMLElement>("[data-writing-scroll]");
     if (!visible || !node || !pane || !token) return;
     let frame = 0;
     const measure = () => {
       frame = 0;
       if (!node.isConnected) return;
       const parent = pane.getBoundingClientRect();
+      const clip = viewport?.getBoundingClientRect() ?? parent;
+      const visibleTop = Math.max(parent.top, clip.top);
+      const visibleBottom = Math.min(parent.bottom, clip.bottom);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
       const point = caretRect(node, token.end);
+      if (
+        visibleHeight === 0 ||
+        point.top + point.height < visibleTop ||
+        point.top > visibleBottom
+      ) {
+        setPosition(null);
+        return;
+      }
       const width = Math.max(0, Math.min(340, parent.width - 16));
       const below =
-        parent.bottom - Math.max(parent.top, point.top + point.height) - 14;
-      const above = Math.min(parent.bottom, point.top) - parent.top - 14;
+        visibleBottom - Math.max(visibleTop, point.top + point.height) - 14;
+      const above = Math.min(visibleBottom, point.top) - visibleTop - 14;
       const lowRoom = Math.max(below, above) < 100;
       const maxHeight = Math.max(
         0,
-        Math.min(280, lowRoom ? parent.height - 16 : Math.max(below, above)),
+        Math.min(280, lowRoom ? visibleHeight - 16 : Math.max(below, above)),
       );
       const belowCaret = below >= above || below >= 250;
       const rawTop = lowRoom
-        ? 8
+        ? visibleTop - parent.top + 8
         : belowCaret
           ? point.top + point.height - parent.top + 6
           : point.top - parent.top - maxHeight - 6;
@@ -249,7 +262,10 @@ export function useJournalMentionMenu({
           8,
           Math.min(point.left - parent.left, parent.width - width - 8),
         ),
-        top: Math.max(8, Math.min(rawTop, parent.height - maxHeight - 8)),
+        top: Math.max(
+          visibleTop - parent.top + 8,
+          Math.min(rawTop, visibleBottom - parent.top - maxHeight - 8),
+        ),
         width,
         maxHeight,
       };
@@ -274,7 +290,9 @@ export function useJournalMentionMenu({
         ? new ResizeObserver(schedule)
         : null;
     observer?.observe(node);
+    if (viewport) observer?.observe(viewport);
     node.addEventListener("scroll", schedule, { passive: true });
+    viewport?.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     window.visualViewport?.addEventListener("resize", schedule);
     window.visualViewport?.addEventListener("scroll", schedule);
@@ -282,6 +300,7 @@ export function useJournalMentionMenu({
       cancelAnimationFrame(frame);
       observer?.disconnect();
       node.removeEventListener("scroll", schedule);
+      viewport?.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       window.visualViewport?.removeEventListener("resize", schedule);
       window.visualViewport?.removeEventListener("scroll", schedule);

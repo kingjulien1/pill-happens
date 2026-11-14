@@ -33,12 +33,32 @@
   color: var(--surface-reading-foreground);
   translate: none;
 }
+.scrollContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.scrollContent::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollContent:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -3px;
+}
+
 .header {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
   align-items: stretch;
-  padding: 24px max(18px, env(safe-area-inset-right)) 16px
+  padding: calc(24px * 7 / 12) max(18px, env(safe-area-inset-right)) 16px
     max(18px, env(safe-area-inset-left));
   border-bottom: 1px solid var(--glass-border);
   background: none;
@@ -767,7 +787,7 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   grid-template-columns: minmax(0, 1fr);
 }
 .workspace[data-view="split"] {
@@ -792,13 +812,13 @@
 }
 .writingArea {
   display: block;
-  field-sizing: fixed;
+  field-sizing: content;
   width: 100%;
-  height: 100%;
-  min-height: 0;
+  height: auto;
+  min-height: 240px;
   max-height: none;
-  flex: 1 1 auto;
-  overflow-y: auto;
+  flex: 1 0 auto;
+  overflow: hidden;
   overscroll-behavior: contain;
   resize: none;
   padding: 12px 22px 30px;
@@ -825,9 +845,8 @@
 .previewContent {
   min-width: 0;
   min-height: 0;
-  flex: 1 1 auto;
-  overflow: auto;
-  overscroll-behavior: contain;
+  flex: 1 0 auto;
+  overflow: visible;
   padding: 12px 22px 30px;
   scrollbar-width: none;
 }
@@ -1034,7 +1053,7 @@
     translate: -50% -50%;
   }
   .header {
-    padding: 30px 26px 20px;
+    padding: calc(30px * 7 / 12) 26px 20px;
   }
   .title {
     font-size: 24px;
@@ -1085,7 +1104,7 @@
     --writer-tool-gap: 6px;
   }
 }
-/* Keep both rows outside the text scroller when Safari reveals its keyboard. */
+/* Retain the compact keyboard layout; heading and tools stay in content flow. */
 @media (max-width: 767px), (pointer: coarse) {
   .dialog[data-reflection-dialog][data-short-viewport="true"] {
     inset: calc(var(--writer-visible-top, 0px) + var(--writer-top-gap)) 0 auto;
@@ -1103,7 +1122,7 @@
     grid-template-columns: minmax(0, 1fr) 44px;
     align-items: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: calc(10px * 7 / 12) 18px 10px;
   }
   .dialog[data-short-viewport="true"] .titleRow {
     display: contents;

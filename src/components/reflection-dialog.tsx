@@ -155,6 +155,7 @@ export function ReflectionDialog({
   saving: ReflectionSaveControls;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
+  const contentScroll = useRef<HTMLDivElement>(null);
   const dialogNode = useRef<HTMLDivElement | null>(null);
   const [dialogRevision, setDialogRevision] = useState(0);
   const setDialogNode = useCallback((node: HTMLDivElement | null) => {
@@ -323,17 +324,54 @@ export function ReflectionDialog({
     };
   }, []);
   const { setScrollElement: setWritingElement, save: saveWritingScroll } =
-    useDialogScrollMemory<HTMLTextAreaElement>({
+    useDialogScrollMemory<HTMLDivElement>({
       open: open && view !== "preview",
       scrollKey: `${checkInDraftKey(day, period)}:writing-source`,
       layout: view,
     });
   const { setScrollElement: setPreviewElement, save: savePreviewScroll } =
     useDialogScrollMemory<HTMLDivElement>({
-      open: open && view !== "write",
+      open: open && view === "preview",
       scrollKey: `${checkInDraftKey(day, period)}:writing-preview`,
       layout: view,
     });
+  const setContentScrollElement = useCallback(
+    (node: HTMLDivElement | null) => {
+      contentScroll.current = node;
+      setWritingElement(node);
+      setPreviewElement(node);
+    },
+    [setWritingElement, setPreviewElement],
+  );
+  useLayoutEffect(() => {
+    const field = input.current;
+    if (!open || !field || window.CSS?.supports("field-sizing", "content"))
+      return;
+    // Older browsers need a content-sized source without introducing an inner
+    // scroller. Preserve the shared viewport while measuring its natural height.
+    let width = field.clientWidth;
+    const fit = () => {
+      if (!field.isConnected || field.closest("[hidden]") || !field.clientWidth)
+        return;
+      const top = contentScroll.current?.scrollTop ?? 0;
+      const grow = field.style.flexGrow;
+      field.style.flexGrow = "0";
+      field.style.height = "auto";
+      field.style.height = `${field.scrollHeight}px`;
+      if (grow) field.style.flexGrow = grow;
+      else field.style.removeProperty("flex-grow");
+      if (contentScroll.current) contentScroll.current.scrollTop = top;
+    };
+    fit();
+    const observer = new ResizeObserver(() => {
+      const next = field.clientWidth;
+      if (next === width) return;
+      width = next;
+      fit();
+    });
+    observer.observe(field.parentElement ?? field);
+    return () => observer.disconnect();
+  }, [value, open, view, dialogRevision]);
   useLayoutEffect(() => {
     const previous = session.current;
     const reset =
@@ -447,13 +485,9 @@ export function ReflectionDialog({
     setMode(next);
     setModeRevision((revision) => revision + 1);
   };
-  const writingRef = useCallback(
-    (node: HTMLTextAreaElement | null) => {
-      input.current = node;
-      setWritingElement(node);
-    },
-    [setWritingElement],
-  );
+  const writingRef = useCallback((node: HTMLTextAreaElement | null) => {
+    input.current = node;
+  }, []);
   const canFormat = !disabled && !finishing && view !== "preview";
   const remaining = DAILY_REFLECTION_MAX_LENGTH - stats.characters;
   const SaveStateIcon =
@@ -666,411 +700,419 @@ export function ReflectionDialog({
         data-reflection-mode={view}
         data-completion-phase={completionPhase}
       >
-        <header className={styles.header} data-writing-header>
-          <div className={styles.titleRow}>
-            <p className={styles.context} data-writing-context>
-              <time dateTime={day} data-writing-date>
-                {formatDay(day, { weekday: "long", month: "short" })}
-              </time>
-              <span className={styles.contextSeparator} aria-hidden="true">
-                ·
-              </span>
-              <span className={styles.periodLabel}>
-                {period === "morning"
-                  ? "Morning Reflection"
-                  : "Evening Reflection"}
-              </span>
-            </p>
-            <DialogClose
-              disabled={finishing}
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  type="button"
-                  className={closeStyles.control}
-                  data-dialog-corner="control"
-                  aria-label="Close writing space"
-                />
-              }
-            >
-              <X strokeWidth={2.2} aria-hidden="true" />
-            </DialogClose>
-          </div>
-          <DialogTitle
-            ref={title}
-            tabIndex={-1}
-            className={styles.title}
-            data-writing-heading
-          >
-            {period === "morning"
-              ? "Your Morning, Your Words"
-              : "Your Day, Your Words"}
-          </DialogTitle>
-          <DialogDescription
-            className={styles.description}
-            data-writing-description
-          >
-            Write in Markdown and read it as a page. Give a passing thought a
-            line, or let a longer story take its time. Headings, lists and
-            emphasis help your words find their shape. Switch to preview
-            whenever you want a quieter view. Your writing is kept in this
-            check-in’s draft as you go. Save a fresh journal copy with the save
-            icon, or let autosave catch the next pause. Mood, sleep and the rest
-            of your check-in stay yours to finish when you’re ready.
-          </DialogDescription>
-        </header>
         <div
-          className={styles.controls}
-          inert={finishing || undefined}
-          data-writing-tools
+          ref={setContentScrollElement}
+          className={styles.scrollContent}
+          role="region"
+          aria-label="Writing space content"
+          tabIndex={0}
+          data-writing-scroll
         >
-          <div
-            className={styles.actionsRow}
-            onPointerDownCapture={blurWritingInput}
-            onClickCapture={blurWritingInput}
-            data-writing-actions
-          >
-            <div className={styles.actionGroup}>
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                className={`${styles.iconControl} ${styles.modeControl}`}
-                data-mode={view}
-                aria-label={
-                  view === "preview"
-                    ? "Return to writing"
-                    : "Show reading preview"
+          <header className={styles.header} data-writing-header>
+            <div className={styles.titleRow}>
+              <p className={styles.context} data-writing-context>
+                <time dateTime={day} data-writing-date>
+                  {formatDay(day, { weekday: "long", month: "short" })}
+                </time>
+                <span className={styles.contextSeparator} aria-hidden="true">
+                  ·
+                </span>
+                <span className={styles.periodLabel}>
+                  {period === "morning"
+                    ? "Morning Reflection"
+                    : "Evening Reflection"}
+                </span>
+              </p>
+              <DialogClose
+                disabled={finishing}
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    className={closeStyles.control}
+                    data-dialog-corner="control"
+                    aria-label="Close writing space"
+                  />
                 }
-                title={
-                  view === "preview"
-                    ? "Return to writing"
-                    : "Show reading preview"
-                }
-                aria-pressed={view === "preview"}
-                onClick={() =>
-                  changeMode(view === "preview" ? "write" : "preview")
-                }
-                data-writing-toggle
               >
-                <span
-                  className={styles.modePulse}
-                  data-pulse={
-                    modeRevision
-                      ? modeRevision % 2
-                        ? "first"
-                        : "second"
-                      : undefined
+                <X strokeWidth={2.2} aria-hidden="true" />
+              </DialogClose>
+            </div>
+            <DialogTitle
+              ref={title}
+              tabIndex={-1}
+              className={styles.title}
+              data-writing-heading
+            >
+              {period === "morning"
+                ? "Your Morning, Your Words"
+                : "Your Day, Your Words"}
+            </DialogTitle>
+            <DialogDescription
+              className={styles.description}
+              data-writing-description
+            >
+              Write in Markdown and read it as a page. Give a passing thought a
+              line, or let a longer story take its time. Headings, lists and
+              emphasis help your words find their shape. Switch to preview
+              whenever you want a quieter view. Your writing is kept in this
+              check-in’s draft as you go. Save a fresh journal copy with the
+              save icon, or let autosave catch the next pause. Mood, sleep and
+              the rest of your check-in stay yours to finish when you’re ready.
+            </DialogDescription>
+          </header>
+          <div
+            className={styles.controls}
+            inert={finishing || undefined}
+            data-writing-tools
+          >
+            <div
+              className={styles.actionsRow}
+              onPointerDownCapture={blurWritingInput}
+              onClickCapture={blurWritingInput}
+              data-writing-actions
+            >
+              <div className={styles.actionGroup}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className={`${styles.iconControl} ${styles.modeControl}`}
+                  data-mode={view}
+                  aria-label={
+                    view === "preview"
+                      ? "Return to writing"
+                      : "Show reading preview"
                   }
+                  title={
+                    view === "preview"
+                      ? "Return to writing"
+                      : "Show reading preview"
+                  }
+                  aria-pressed={view === "preview"}
+                  onClick={() =>
+                    changeMode(view === "preview" ? "write" : "preview")
+                  }
+                  data-writing-toggle
                 >
-                  {view === "preview" ? (
-                    <Eye
+                  <span
+                    className={styles.modePulse}
+                    data-pulse={
+                      modeRevision
+                        ? modeRevision % 2
+                          ? "first"
+                          : "second"
+                        : undefined
+                    }
+                  >
+                    {view === "preview" ? (
+                      <Eye
+                        className={styles.controlGlyph}
+                        strokeWidth={2.6}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Pencil
+                        className={styles.controlGlyph}
+                        strokeWidth={2.6}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </span>
+                </Button>
+                {wide && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className={styles.iconControl}
+                    aria-label="Split writing and preview"
+                    title="Split writing and preview"
+                    aria-pressed={view === "split"}
+                    onClick={() =>
+                      changeMode(view === "split" ? "write" : "split")
+                    }
+                    data-writing-split
+                  >
+                    <Columns2
                       className={styles.controlGlyph}
                       strokeWidth={2.6}
                       aria-hidden="true"
+                    />
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className={`${styles.iconControl} ${styles.saveControl}`}
+                  aria-label="Save reflection"
+                  title={saving.message}
+                  disabled={!saving.canSave || finishing}
+                  aria-busy={saving.status === "saving" || undefined}
+                  onClick={saving.onSave}
+                  data-writing-save
+                  data-save-visual={saveVisual}
+                  data-save-status={saving.status}
+                >
+                  {saving.status === "saved" ? (
+                    <BookmarkCheck
+                      className={styles.saveGlyph}
+                      strokeWidth={2.6}
+                      aria-hidden="true"
+                      data-writing-save-icon="saved"
                     />
                   ) : (
-                    <Pencil
-                      className={styles.controlGlyph}
+                    <Bookmark
+                      className={styles.saveGlyph}
                       strokeWidth={2.6}
                       aria-hidden="true"
+                      data-writing-save-icon="bookmark"
                     />
                   )}
-                </span>
-              </Button>
-              {wide && (
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className={`${styles.iconControl} ${styles.done}`}
+                  aria-label="Done writing"
+                  title="Done writing"
+                  onClick={completeWriting}
+                  disabled={disabled || finishing}
+                  aria-busy={finishing || undefined}
+                  data-writing-done
+                >
+                  <CloudCheck
+                    className={styles.doneIcon}
+                    strokeWidth={2.6}
+                    aria-hidden="true"
+                  />
+                </Button>
+              </div>
+              <div className={styles.actionGroup}>
                 <Button
                   type="button"
                   variant="secondary"
                   size="icon"
                   className={styles.iconControl}
-                  aria-label="Split writing and preview"
-                  title="Split writing and preview"
-                  aria-pressed={view === "split"}
-                  onClick={() =>
-                    changeMode(view === "split" ? "write" : "split")
-                  }
-                  data-writing-split
+                  aria-label="Markdown syntax help"
+                  aria-expanded={help}
+                  ref={helpButton}
+                  aria-haspopup="dialog"
+                  data-writing-info
+                  title="Markdown syntax help"
+                  onClick={() => setHelp(true)}
                 >
-                  <Columns2
+                  <Info
                     className={styles.controlGlyph}
                     strokeWidth={2.6}
                     aria-hidden="true"
                   />
                 </Button>
-              )}
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                className={`${styles.iconControl} ${styles.saveControl}`}
-                aria-label="Save reflection"
-                title={saving.message}
-                disabled={!saving.canSave || finishing}
-                aria-busy={saving.status === "saving" || undefined}
-                onClick={saving.onSave}
-                data-writing-save
-                data-save-visual={saveVisual}
-                data-save-status={saving.status}
-              >
-                {saving.status === "saved" ? (
-                  <BookmarkCheck
-                    className={styles.saveGlyph}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className={`${styles.iconControl} ${styles.downloadControl}`}
+                  aria-label={
+                    downloadState === "preparing"
+                      ? "Preparing Markdown file"
+                      : downloadState === "downloading"
+                        ? "Starting Markdown download"
+                        : downloadState === "complete"
+                          ? "Markdown file ready"
+                          : "Download reflection as Markdown"
+                  }
+                  title="Download Markdown"
+                  disabled={
+                    !value.trim() ||
+                    downloadState === "preparing" ||
+                    downloadState === "downloading" ||
+                    finishing
+                  }
+                  aria-busy={
+                    downloadState === "preparing" ||
+                    downloadState === "downloading" ||
+                    undefined
+                  }
+                  data-writing-download
+                  data-download-state={downloadState}
+                  onClick={download}
+                >
+                  <FileDown
+                    className={styles.controlGlyph}
                     strokeWidth={2.6}
                     aria-hidden="true"
-                    data-writing-save-icon="saved"
                   />
-                ) : (
-                  <Bookmark
-                    className={styles.saveGlyph}
-                    strokeWidth={2.6}
-                    aria-hidden="true"
-                    data-writing-save-icon="bookmark"
-                  />
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                className={`${styles.iconControl} ${styles.done}`}
-                aria-label="Done writing"
-                title="Done writing"
-                onClick={completeWriting}
-                disabled={disabled || finishing}
-                aria-busy={finishing || undefined}
-                data-writing-done
-              >
-                <CloudCheck
-                  className={styles.doneIcon}
-                  strokeWidth={2.6}
-                  aria-hidden="true"
-                />
-              </Button>
+                  {downloadState === "complete" && (
+                    <Check
+                      className={styles.downloadCheck}
+                      strokeWidth={3}
+                      aria-hidden="true"
+                    />
+                  )}
+                </Button>
+              </div>
             </div>
-            <div className={styles.actionGroup}>
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                className={styles.iconControl}
-                aria-label="Markdown syntax help"
-                aria-expanded={help}
-                ref={helpButton}
-                aria-haspopup="dialog"
-                data-writing-info
-                title="Markdown syntax help"
-                onClick={() => setHelp(true)}
-              >
-                <Info
-                  className={styles.controlGlyph}
-                  strokeWidth={2.6}
-                  aria-hidden="true"
-                />
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                className={`${styles.iconControl} ${styles.downloadControl}`}
-                aria-label={
-                  downloadState === "preparing"
-                    ? "Preparing Markdown file"
-                    : downloadState === "downloading"
-                      ? "Starting Markdown download"
-                      : downloadState === "complete"
-                        ? "Markdown file ready"
-                        : "Download reflection as Markdown"
-                }
-                title="Download Markdown"
-                disabled={
-                  !value.trim() ||
-                  downloadState === "preparing" ||
-                  downloadState === "downloading" ||
-                  finishing
-                }
-                aria-busy={
-                  downloadState === "preparing" ||
-                  downloadState === "downloading" ||
-                  undefined
-                }
-                data-writing-download
-                data-download-state={downloadState}
-                onClick={download}
-              >
-                <FileDown
-                  className={styles.controlGlyph}
-                  strokeWidth={2.6}
-                  aria-hidden="true"
-                />
-                {downloadState === "complete" && (
-                  <Check
-                    className={styles.downloadCheck}
-                    strokeWidth={3}
-                    aria-hidden="true"
-                  />
-                )}
-              </Button>
-            </div>
-          </div>
-          <Toolbar.Root
-            className={styles.toolbar}
-            aria-label="Markdown formatting"
-            orientation="horizontal"
-            disabled={!canFormat}
-            data-writing-formats
-            onFocusCapture={(event) => {
-              const target = event.target;
-              if (target instanceof HTMLButtonElement)
-                target.scrollIntoView({
-                  block: "nearest",
-                  inline: "nearest",
-                  behavior: "auto",
-                });
-            }}
-          >
-            {formats.map(({ kind, label, icon: Icon }) => (
-              <Toolbar.Button
-                key={kind}
-                type="button"
-                aria-label={label}
-                title={label}
-                aria-pressed={
-                  kind === "rule" ? undefined : activeFormats.has(kind)
-                }
-                render={<Button type="button" variant="ghost" />}
-                onPointerDown={(event) => {
-                  if (
-                    event.button === 0 &&
-                    document.activeElement === input.current
-                  ) {
-                    rememberSelection();
-                    event.preventDefault();
-                  }
-                }}
-                onMouseDown={(event) => {
-                  if (document.activeElement === input.current)
-                    event.preventDefault();
-                }}
-                onClick={() => format(kind)}
-                data-format={kind}
-              >
-                <Icon
-                  key={formatPulse.kind === kind ? formatPulse.revision : 0}
-                  className={
-                    formatPulse.kind === kind
-                      ? styles.formatPulse
-                      : styles.formatGlyph
-                  }
-                  size={17}
-                  strokeWidth={2.6}
-                  aria-hidden="true"
-                />
-              </Toolbar.Button>
-            ))}
-          </Toolbar.Root>
-        </div>
-        <ReflectionWritingHelp
-          open={open && help && !finishing}
-          onOpenChange={setHelp}
-          returnFocus={helpButton}
-        />
-        <div
-          className={styles.workspace}
-          data-view={view}
-          inert={finishing || undefined}
-        >
-          <section
-            className={styles.writingPane}
-            hidden={view === "preview"}
-            aria-label="Markdown source"
-          >
-            <Textarea
-              ref={writingRef}
-              id={`${id}-writing`}
-              value={value}
-              aria-label="Your writing"
-              {...mentions.inputProps}
-              onChange={(event) => {
-                onChange(event.target.value);
-                rememberSelection();
-                setFeedback("");
+            <Toolbar.Root
+              className={styles.toolbar}
+              aria-label="Markdown formatting"
+              orientation="horizontal"
+              disabled={!canFormat}
+              data-writing-formats
+              onFocusCapture={(event) => {
+                const target = event.target;
+                if (target instanceof HTMLButtonElement)
+                  target.scrollIntoView({
+                    block: "nearest",
+                    inline: "nearest",
+                    behavior: "auto",
+                  });
               }}
-              onSelect={rememberSelection}
-              onFocus={() => {
-                mentions.inputProps.onFocus();
-                rememberSelection();
-              }}
-              onCompositionEnd={() => {
-                mentions.inputProps.onCompositionEnd();
-                rememberSelection();
-              }}
-              onKeyDown={(event) => {
-                if (mentions.onKeyDown(event)) return;
-                if (
-                  !(event.ctrlKey || event.metaKey) ||
-                  event.altKey ||
-                  event.shiftKey ||
-                  event.nativeEvent.isComposing
-                )
-                  return;
-                const key = event.key.toLowerCase();
-                const kind =
-                  key === "b"
-                    ? "bold"
-                    : key === "i"
-                      ? "italic"
-                      : key === "k"
-                        ? "link"
-                        : null;
-                if (kind) {
-                  event.preventDefault();
-                  format(kind);
-                }
-              }}
-              className={styles.writingArea}
-              maxLength={DAILY_REFLECTION_MAX_LENGTH}
-              placeholder="Write your reflection… @ links medications and categories; / links days, weeks and journals."
-              spellCheck
-              autoCapitalize="sentences"
-              disabled={disabled}
-              readOnly={finishing}
-              aria-describedby={`${id}-limit ${id}-save-hint ${mentions.helpId}`}
-              data-dialog-canvas
-              data-journal-input
-            />
-            {mentions.help}
-            {mentions.menu}
-          </section>
-          <section
-            className={styles.previewPane}
-            hidden={view === "write"}
-            aria-label="Formatted reflection preview"
-            aria-busy={deferredValue !== value || undefined}
-          >
-            <div
-              ref={setPreviewElement}
-              className={styles.previewContent}
-              role="region"
-              aria-label="Scrollable reflection preview"
-              tabIndex={0}
-              data-reflection-preview-scroll
             >
-              {view !== "write" &&
-                (deferredValue.trim() ? (
-                  <ReflectionMarkdown value={deferredValue} day={day} />
-                ) : (
-                  <p className={styles.emptyPreview}>
-                    Your formatted reflection will appear here.
-                  </p>
-                ))}
-            </div>
-          </section>
+              {formats.map(({ kind, label, icon: Icon }) => (
+                <Toolbar.Button
+                  key={kind}
+                  type="button"
+                  aria-label={label}
+                  title={label}
+                  aria-pressed={
+                    kind === "rule" ? undefined : activeFormats.has(kind)
+                  }
+                  render={<Button type="button" variant="ghost" />}
+                  onPointerDown={(event) => {
+                    if (
+                      event.button === 0 &&
+                      document.activeElement === input.current
+                    ) {
+                      rememberSelection();
+                      event.preventDefault();
+                    }
+                  }}
+                  onMouseDown={(event) => {
+                    if (document.activeElement === input.current)
+                      event.preventDefault();
+                  }}
+                  onClick={() => format(kind)}
+                  data-format={kind}
+                >
+                  <Icon
+                    key={formatPulse.kind === kind ? formatPulse.revision : 0}
+                    className={
+                      formatPulse.kind === kind
+                        ? styles.formatPulse
+                        : styles.formatGlyph
+                    }
+                    size={17}
+                    strokeWidth={2.6}
+                    aria-hidden="true"
+                  />
+                </Toolbar.Button>
+              ))}
+            </Toolbar.Root>
+          </div>
+          <ReflectionWritingHelp
+            open={open && help && !finishing}
+            onOpenChange={setHelp}
+            returnFocus={helpButton}
+          />
+          <div
+            className={styles.workspace}
+            data-view={view}
+            inert={finishing || undefined}
+          >
+            <section
+              className={styles.writingPane}
+              hidden={view === "preview"}
+              aria-label="Markdown source"
+            >
+              <Textarea
+                ref={writingRef}
+                id={`${id}-writing`}
+                value={value}
+                aria-label="Your writing"
+                {...mentions.inputProps}
+                onChange={(event) => {
+                  onChange(event.target.value);
+                  rememberSelection();
+                  setFeedback("");
+                }}
+                onSelect={rememberSelection}
+                onFocus={() => {
+                  mentions.inputProps.onFocus();
+                  rememberSelection();
+                }}
+                onCompositionEnd={() => {
+                  mentions.inputProps.onCompositionEnd();
+                  rememberSelection();
+                }}
+                onKeyDown={(event) => {
+                  if (mentions.onKeyDown(event)) return;
+                  if (
+                    !(event.ctrlKey || event.metaKey) ||
+                    event.altKey ||
+                    event.shiftKey ||
+                    event.nativeEvent.isComposing
+                  )
+                    return;
+                  const key = event.key.toLowerCase();
+                  const kind =
+                    key === "b"
+                      ? "bold"
+                      : key === "i"
+                        ? "italic"
+                        : key === "k"
+                          ? "link"
+                          : null;
+                  if (kind) {
+                    event.preventDefault();
+                    format(kind);
+                  }
+                }}
+                className={styles.writingArea}
+                maxLength={DAILY_REFLECTION_MAX_LENGTH}
+                placeholder="Write your reflection… @ links medications and categories; / links days, weeks and journals."
+                spellCheck
+                autoCapitalize="sentences"
+                disabled={disabled}
+                readOnly={finishing}
+                aria-describedby={`${id}-limit ${id}-save-hint ${mentions.helpId}`}
+                data-dialog-canvas
+                data-journal-input
+              />
+              {mentions.help}
+              {mentions.menu}
+            </section>
+            <section
+              className={styles.previewPane}
+              hidden={view === "write"}
+              aria-label="Formatted reflection preview"
+              aria-busy={deferredValue !== value || undefined}
+            >
+              <div
+                className={styles.previewContent}
+                role="region"
+                aria-label="Formatted reflection preview"
+                tabIndex={0}
+                data-reflection-preview-scroll
+              >
+                {view !== "write" &&
+                  (deferredValue.trim() ? (
+                    <ReflectionMarkdown value={deferredValue} day={day} />
+                  ) : (
+                    <p className={styles.emptyPreview}>
+                      Your formatted reflection will appear here.
+                    </p>
+                  ))}
+              </div>
+            </section>
+          </div>
+          <span className="sr-only" role="status">
+            {finishing ? "Returning to your check-in…" : ""}
+          </span>
         </div>
-        <span className="sr-only" role="status">
-          {finishing ? "Returning to your check-in…" : ""}
-        </span>
         <footer className={styles.footer} data-writing-footer>
           <div className={styles.footerBody}>
             <div className={styles.persistence} data-writing-persistence>
