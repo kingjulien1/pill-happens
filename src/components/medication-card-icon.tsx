@@ -47,7 +47,7 @@ function MedicationCardMark({
         } as CSSProperties
       }
     >
-      <MedicationGlyph icon={icon} className="size-7" />
+      <MedicationGlyph icon={icon} className="size-[30px]" />
     </span>
   );
 }
@@ -152,8 +152,7 @@ export function MedicationCardIconStack({
           "--entry-icon-tint": `${color.hex}66`,
           "--icon-stack-width": `${stack.width}px`,
           "--icon-stack-rail-width": `${stack.rail.width}px`,
-          "--icon-stack-scale": stack.rail.scale,
-          "--icon-front-left": `${(stack.rail.width - stack.width * stack.rail.scale) / 2}px`,
+          "--icon-front-left": `${stack.rail.frontLeft}px`,
         } as CSSProperties
       }
     >

@@ -24,7 +24,7 @@ test("positive quantities round upward without hiding any ordinary unit", () => 
   }
 });
 
-test("each smaller right-hand layer exposes a fifth and shares one vertical center", () => {
+test("rear layers keep their sizes, opacity and center while sharing a bounded exposure", () => {
   const { layers, width } = getMedicationIconStack(10);
   near(layers[0].left, 0);
   near(layers[0].size, 48);
@@ -39,30 +39,41 @@ test("each smaller right-hand layer exposes a fifth and shares one vertical cent
     near(layer.size, previous.size * 0.92);
     near(layer.opacity, previous.opacity * 0.83);
     const exposed = layer.left + layer.size - (previous.left + previous.size);
-    near(exposed / layer.size, 0.2);
+    assert.ok(exposed > 0);
+    assert.ok(exposed / layer.size <= 0.2);
     assert.ok(layer.left > previous.left);
   }
   near(width, layers.at(-1)!.left + layers.at(-1)!.size);
+  assert.ok(width - layers[0].size <= 4);
 });
 
-test("every quantity fits the same centered 56px rail without shifting card copy", () => {
-  for (let count = 1; count <= MEDICATION_ICON_STACK.maxLayers; count++) {
+test("every quantity keeps a readable 48px front tile inside the same 56px rail", () => {
+  for (const count of [
+    0.01,
+    0.5,
+    ...Array.from(
+      { length: MEDICATION_ICON_STACK.maxLayers },
+      (_, index) => index + 1,
+    ),
+    100,
+    1_000_000,
+  ]) {
     const fan = getMedicationIconStack(count);
     const { rail } = fan;
     assert.equal(rail.width, 56);
     assert.equal(rail.width, MEDICATION_ICON_STACK.rail);
-    assert.ok(rail.scale > 0 && rail.scale <= 1);
-    const renderedWidth = fan.width * rail.scale;
-    near((rail.width - renderedWidth) / 2, 4);
-    assert.ok(MEDICATION_ICON_STACK.size * rail.scale <= 48);
+    near(rail.frontLeft, 4);
+    near(fan.layers[0].size, 48);
+    near(fan.layers[0].scale, 1);
+    near(fan.layers[0].left + rail.frontLeft, 4);
+    assert.ok(rail.frontLeft + fan.width <= rail.width);
     for (const layer of fan.layers) {
-      assert.ok(4 + layer.left * rail.scale >= 4);
-      assert.ok(4 + (layer.left + layer.size) * rail.scale <= 52 + 1e-9);
+      assert.ok(rail.frontLeft + layer.left >= 4);
+      assert.ok(rail.frontLeft + layer.left + layer.size <= rail.width + 1e-9);
     }
   }
-  assert.equal(getMedicationIconStack(1).rail.scale, 1);
   assert.equal(getMedicationIconStack(1).layers[0].size, 48);
-  assert.ok(getMedicationIconStack(2).rail.scale < 1);
+  assert.ok(getMedicationIconStack(2).width > getMedicationIconStack(1).width);
 });
 
 test("huge quantities have bounded decoration while keeping their full count", () => {

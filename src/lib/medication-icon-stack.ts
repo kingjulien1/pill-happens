@@ -21,9 +21,9 @@ export type MedicationIconStackLayer = {
 };
 
 /**
- * Lay out a left-front fan. Each next right edge adds one fifth of that smaller
- * frame; its vertical center stays at the front frame's center. Rail fitting
- * scales the complete fan, preserving overlap, proportions and opacity.
+ * Start with a left-front fan exposing one fifth of each smaller rear frame.
+ * Keep their shared vertical center, then compress only the exposed rear edges
+ * into the rail so the front frame never shrinks.
  */
 export function getMedicationIconStack(quantity?: number) {
   const settings = MEDICATION_ICON_STACK;
@@ -50,13 +50,26 @@ export function getMedicationIconStack(quantity?: number) {
     right = left + size;
   }
 
+  const frontLeft = settings.padding / 2;
+  const maxWidth = settings.rail - frontLeft;
+  const exposure = right - settings.size;
+  const exposureRatio =
+    exposure > 0 ? Math.min(1, (maxWidth - settings.size) / exposure) : 1;
+  if (exposureRatio < 1) {
+    for (const layer of layers) {
+      const edge = layer.left + layer.size;
+      layer.left =
+        settings.size + (edge - settings.size) * exposureRatio - layer.size;
+    }
+  }
+
   return {
     count,
     layers,
-    width: right,
+    width: Math.min(right, maxWidth),
     rail: {
       width: settings.rail,
-      scale: Math.min(1, (settings.rail - settings.padding) / right),
+      frontLeft,
     },
   };
 }

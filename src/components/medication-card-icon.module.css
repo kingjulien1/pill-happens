@@ -1,9 +1,7 @@
 /* The rail stays still; only the complete artwork/fan owns the spin. */
 .stack:global(.intake-card-focus) {
-  --icon-settle-size: calc(48px * var(--icon-stack-scale));
-  --icon-settle-x: calc(
-    var(--icon-front-left) + 24px * var(--icon-stack-scale)
-  );
+  --icon-settle-size: 48px;
+  --icon-settle-x: calc(var(--icon-front-left, 4px) + 24px);
   width: var(--icon-stack-rail-width, 56px);
 }
 
@@ -22,7 +20,7 @@
 /* The first row starts 3px below the artwork stage, with 20px text or a
    category icon plus its 4px rail padding. Keep the small form badge on that
    centre line, with 40% outside the front mark's left edge.
-   Its frame stays full size even when a large quantity fan is fitted to its rail. */
+   Its frame stays full size while rear exposure compresses inside the rail. */
 .formBadge {
   --form-badge-size: 12.8px;
   position: absolute;
@@ -150,10 +148,10 @@
 .stage {
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: var(--icon-front-left, 4px);
   width: var(--icon-stack-width);
   height: 48px;
-  transform: translate(-50%, -50%) scale(var(--icon-stack-scale));
+  transform: translateY(-50%);
   transform-origin: center;
   pointer-events: none;
 }
