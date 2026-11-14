@@ -186,7 +186,6 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
       title="Edit Intake"
-      titleIcon="pencilSparkles"
       context="Update Entry"
       description="Update this entry. Changes are saved to the day the intake was taken."
     >
@@ -462,7 +461,6 @@ export function TodayPage() {
         }}
         scrollKey="intake:new:today"
         title="Log Intake"
-        titleIcon="pencilSparkles"
         context="New Entry"
         description="Record what you took, how much, and when."
       >
@@ -708,7 +706,6 @@ export function MedicationsPage() {
         }}
         scrollKey={editing ? `med:edit:${editing.id}` : "med:new"}
         title={editing ? "Edit Medication" : "Add Medication"}
-        titleIcon="medications"
         headerVariant="medication"
         context={editing ? "Update Details" : "The Essentials"}
         description="Medication details and appearance."
@@ -1292,7 +1289,6 @@ export function DayPage({ day }: { day: string }) {
         }}
         scrollKey={`intake:new:${day}`}
         title="Log Intake"
-        titleIcon="pencilSparkles"
         context="Past Entry"
         description="Add an intake you missed. Check the date and time before saving."
       >

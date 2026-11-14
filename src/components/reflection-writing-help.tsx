@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { BookOpenText, X } from "lucide-react";
+import { X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -48,9 +48,6 @@ export function ReflectionWritingHelp({
         data-writing-help
       >
         <header className={styles.header}>
-          <span className={styles.symbol} aria-hidden="true">
-            <BookOpenText strokeWidth={1.8} />
-          </span>
           <div className={styles.heading}>
             <DialogTitle ref={heading} tabIndex={-1} className={styles.title}>
               A little writing help

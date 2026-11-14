@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { BookOpenText, PencilLine, X } from "lucide-react";
+import { PencilLine, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -54,9 +54,6 @@ export function ReflectionReaderDialog({
         data-reflection-reader
       >
         <header className={styles.header}>
-          <span className={styles.symbol} aria-hidden="true">
-            <BookOpenText strokeWidth={1.8} />
-          </span>
           <div className={styles.heading}>
             <DialogTitle ref={heading} tabIndex={-1} className={styles.title}>
               Journal page

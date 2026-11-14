@@ -287,7 +287,6 @@ export function DailyCheckInSection({
         scrollKey={checkInDraftKey(targetDay, period)}
         returnFocus={returnToCard}
         title={title}
-        titleIcon={morning ? "coffee" : "shootingStar"}
         headerActions={
           <Button
             type="reset"

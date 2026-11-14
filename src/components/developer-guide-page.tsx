@@ -1860,13 +1860,14 @@ export function DeveloperGuidePage() {
                 corners, an 18px glyph and a 44px target. A subtle foreground
                 fill keeps the control visible without a decorative outline.
                 Shared dialog and drawer headers use 22px titles on mobile and
-                24px from 768px, with 28px leading artwork. Context follows
+                24px from 768px, without leading title artwork. Context follows
                 beneath the title in 12px copy without a dot or slash, and
                 visible descriptions align to the title’s text column.
                 Medication descriptions retain their screen-reader-only intent.
-                Morning uses a coffee symbol. The headerActions slot places
-                native controls beside Close; check-in Reset Draft uses the same
-                44px styling. Its footer keeps draft feedback without a
+                Reader and writing-help headers also begin with text; body
+                artwork and action icons stay in place. The headerActions slot
+                places native controls beside Close; check-in Reset Draft uses
+                the same 44px styling. Its footer keeps draft feedback without a
                 duplicate Reset link. Native dismissal, focus return and scroll
                 memory remain with the existing primitives.
               </p>

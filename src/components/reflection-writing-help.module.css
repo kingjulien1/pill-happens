@@ -18,28 +18,13 @@
 .header {
   display: grid;
   min-width: 0;
-  grid-template-columns: 32px minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) auto;
   flex: none;
   align-items: center;
   gap: 10px;
   padding: 18px 16px 18px 22px;
   border-bottom: 1px solid
     color-mix(in srgb, var(--foreground) 11%, transparent);
-}
-
-.symbol {
-  display: grid;
-  width: 32px;
-  height: 36px;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--foreground) 4%, transparent);
-}
-
-.symbol > svg {
-  width: 20px;
-  height: 20px;
 }
 
 .heading {

@@ -7,7 +7,7 @@ import {
   type RefObject,
   type ReactNode,
 } from "react";
-import { ActionIcon, type ActionIconName } from "@/components/action-icon";
+import { ActionIcon } from "@/components/action-icon";
 import {
   Dialog,
   DialogClose,
@@ -41,7 +41,6 @@ export function ResponsiveModal({
   open,
   onOpenChange,
   title,
-  titleIcon,
   headerVariant,
   headerActions,
   context,
@@ -56,7 +55,6 @@ export function ResponsiveModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  titleIcon?: ActionIconName;
   headerVariant?: "medication";
   /** Native header controls share the close button’s action rail. */
   headerActions?: ReactNode;
@@ -96,19 +94,7 @@ export function ResponsiveModal({
     closeNode: ReactNode,
     descriptionNode: ReactNode,
   ) => (
-    <div
-      className={styles.headingRow}
-      data-modal-header
-      data-has-title-icon={titleIcon ? "" : undefined}
-    >
-      {titleIcon && (
-        <ActionIcon
-          name={titleIcon}
-          weight="bold"
-          className={styles.titleIcon}
-          aria-hidden="true"
-        />
-      )}
+    <div className={styles.headingRow} data-modal-header>
       <div className={styles.headingCopy}>
         {titleNode}
         {context && <p className={styles.context}>{context}</p>}

@@ -8,17 +8,6 @@
   margin-inline-end: -8px;
 }
 
-.headingRow[data-has-title-icon] {
-  grid-template-columns: 28px minmax(0, 1fr) auto;
-}
-
-.titleIcon {
-  width: 28px;
-  height: 28px;
-  margin-block-start: 8px;
-  color: var(--foreground);
-}
-
 .headingCopy {
   min-width: 0;
   padding-block-start: 8px;
@@ -52,10 +41,6 @@
   font-size: 12px;
   line-height: 1.65;
   text-align: left;
-}
-
-.headingRow[data-has-title-icon] .description {
-  grid-column: 2 / -1;
 }
 
 @media (min-width: 768px) {

@@ -246,7 +246,6 @@ export function GuideColorInspector({
       open={open}
       onOpenChange={onOpenChange}
       title={role.label}
-      titleIcon="palette"
       context="Color Inspector"
       description={role.description}
       scrollKey={`color-inspection:${role.id}`}
