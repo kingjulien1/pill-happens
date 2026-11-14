@@ -7,7 +7,6 @@ import {
 
 import { useCallback, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
@@ -19,7 +18,6 @@ import {
 } from "@/lib/action-button-system";
 import { IntakeLogSymbol } from "@/components/intake-log-symbol";
 import { useIntakeDock } from "@/components/use-intake-dock";
-import { useJournalWorkspace } from "@/components/journal-drafts";
 
 // Temporary visibility switch: set true to restore the unchanged amounts bar.
 const SHOW_INTAKE_AMOUNTS = false;
@@ -206,7 +204,6 @@ export function IntakeAction({
   opioidCount: number;
   stimulantCount: number;
 }) {
-  const { rememberDestination } = useJournalWorkspace();
   const dockRef = useRef<HTMLDivElement>(null);
   const entryRoot = useIntakeActionEntrance();
   const mobile = useSyncExternalStore(
@@ -272,6 +269,7 @@ export function IntakeAction({
             type="button"
             surface="solid"
             rim
+            rimThickness={5.5}
             radius={INTAKE_ACTION_GEOMETRY.radius}
             style={{
               ...getIntakeActionThemeStyle(),
@@ -303,12 +301,7 @@ export function IntakeAction({
         data-intake-action-note
         data-intake-entry-part="footer"
       >
-        <Link
-          href="/journal"
-          onNavigate={() => rememberDestination("/journal")}
-        >
-          Your journal, your pace.
-        </Link>
+        Your journal, your pace, your way.
       </p>
     </div>
   );

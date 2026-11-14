@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 import { Pill, RefreshCw } from "lucide-react";
-import { getBrandThemeStyle } from "@/lib/action-button-system";
 import { PAGE_REFRESH_BOOT_SCRIPT } from "@/lib/page-refresh-handoff";
 import {
   LOADING_SCREEN_COPY,
@@ -13,13 +12,17 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
    stationary600ms release. PAGE_REFRESH_SEQUENCE owns the handoff durations.
    The46px brand world is uniformly scaled2.5; only its native spring scales vary. */
 .page-refresh-screen {
-  --brand-surface: #1d161e;
-  --brand-copy: #f9a8d4;
-  --brand-tone-ice: #fbcfe8;
-  --brand-tone-teal: #f472b6;
-  --brand-tone-pale: #fbcfe8;
-  --brand-tone-seafoam: #f472b6;
-  --brand-tone-emerald: var(--color-pink-500, oklch(65.6% 0.241 354.308));
+  /* The critical fallbacks match the daily controls before app CSS arrives. */
+  --refresh-canvas: var(--background, #fbfafd);
+  --refresh-face: var(--daily-action-face, color-mix(in srgb, var(--color-purple-950, #3c0366) 40%, var(--refresh-canvas)));
+  --refresh-edge: var(--daily-action-inner-edge, var(--color-violet-700, #7008e7));
+  --brand-surface: var(--refresh-face);
+  --brand-copy: var(--refresh-edge);
+  --brand-tone-ice: var(--color-violet-300, #c4b4ff);
+  --brand-tone-teal: var(--color-violet-400, #a684ff);
+  --brand-tone-pale: var(--color-violet-200, #ddd6ff);
+  --brand-tone-seafoam: var(--color-violet-500, #8e51ff);
+  --brand-tone-emerald: var(--color-purple-500, #ad46ff);
   --brand-charge-secondary: var(--brand-tone-teal);
   --brand-charge-accent: var(--brand-tone-emerald);
   --brand-charge-pearl: var(--brand-tone-pale);
@@ -63,11 +66,11 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   --refresh-paint-tone-emerald-a43: color-mix( in srgb, var(--brand-tone-emerald) calc(100% * 43 / 255), transparent );
   --refresh-paint-tone-seafoam-a31: color-mix( in srgb, var(--brand-tone-seafoam) calc(100% * 31 / 255), transparent );
   --refresh-paint-tone-pale-a20: color-mix( in srgb, var(--brand-tone-pale) calc(100% * 20 / 255), transparent );
-  --refresh-paper: #f8e7ef;
-  --refresh-ink: #000;
-  --refresh-muted: rgb(0 0 0 / 40%);
-  --refresh-cameo: #9d4a70;
-  --refresh-wash: rgb(249 168 212 / 8%);
+  --refresh-paper: var(--refresh-canvas);
+  --refresh-ink: var(--foreground, #111014);
+  --refresh-muted: color-mix(in srgb, var(--refresh-ink) 40%, transparent);
+  --refresh-cameo: var(--refresh-edge);
+  --refresh-wash: color-mix(in srgb, var(--refresh-edge) 8%, transparent);
   --refresh-arrival: var(--page-refresh-elapsed, 0ms);
   --refresh-threshold: calc(var(--page-refresh-elapsed, 0ms) + 1200ms);
   --refresh-loop: calc(var(--page-refresh-elapsed, 0ms) + 2160ms);
@@ -179,7 +182,7 @@ html[data-page-refresh-active] .page-refresh-screen {
 .page-refresh-arrival { animation: refresh-brand-face-arrive 1200ms linear var(--refresh-arrival) both; }
 .page-refresh-threshold { animation: refresh-brand-spring-core 960ms linear var(--refresh-threshold) both; }
 .page-refresh-core {
-  border: 2.5px solid var(--refresh-paint-copy-p67);
+  border: 2.5px solid var(--refresh-edge);
   border-radius: 14px;
   background: var(--brand-surface);
   box-shadow: inset 0 .5625px 0 var(--refresh-paint-copy-p10), 0 1.6875px 6.75px var(--refresh-paint-surface-p10);
@@ -297,6 +300,7 @@ html[data-page-refresh-active] .page-refresh-screen {
 .page-refresh-footer a { display: none; padding: 8px 4px; color: inherit; font: inherit; font-size: 10px; line-height: 16px; text-decoration: none; text-underline-offset: 3px; }
 .page-refresh-footer a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }
 .page-refresh-footer-copy { margin: 15px 0 0; font-size: 9px; line-height: 14px; letter-spacing: .005em; }
+.page-refresh-footer-copy > span:first-child { color: color-mix(in srgb, var(--refresh-muted) 50%, transparent); font-weight: 450; }
 ${LOADING_SCREEN_LINKS.map(({ id }) => `html[data-page-refresh-link-one="${id}"] .page-refresh-footer a[data-loading-link="${id}"], html[data-page-refresh-link-two="${id}"] .page-refresh-footer a[data-loading-link="${id}"] { display: inline-block; }`).join("\n")}
 .page-refresh-wanderers { position: absolute; inset: 0; pointer-events: none; display: none; }
 html[data-page-refresh-pills-ready="true"] .page-refresh-wanderers { display: block; }
@@ -371,20 +375,16 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 @keyframes refresh-brand-copy-exit { 0%, 17% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.025); } 100% { opacity: 0; transform: scale(.9); } }
 @media (prefers-color-scheme: dark) {
   :where(html:not([data-color-mode])) .page-refresh-screen {
-    --refresh-paper: #17121c;
-    --refresh-ink: #fdf1f7;
-    --refresh-muted: rgb(253 241 247 / 40%);
-    --refresh-cameo: #f9a8d4;
-    --refresh-wash: rgb(244 114 182 / 7%);
+    --refresh-canvas: var(--background, #2b233e);
+    --refresh-ink: var(--foreground, #fff);
+    --refresh-wash: color-mix(in srgb, var(--refresh-edge) 7%, transparent);
     color-scheme: dark;
   }
 }
 :where(html[data-color-mode="dark"]) .page-refresh-screen {
-  --refresh-paper: #17121c;
-  --refresh-ink: #fdf1f7;
-  --refresh-muted: rgb(253 241 247 / 40%);
-  --refresh-cameo: #f9a8d4;
-  --refresh-wash: rgb(244 114 182 / 7%);
+  --refresh-canvas: var(--background, #2b233e);
+  --refresh-ink: var(--foreground, #fff);
+  --refresh-wash: color-mix(in srgb, var(--refresh-edge) 7%, transparent);
   color-scheme: dark;
 }
 
@@ -1084,11 +1084,7 @@ export function PageRefreshScreen() {
     "var(--brand-tone-emerald)",
   ];
   return (
-    <div
-      className="page-refresh-screen"
-      data-page-refresh-screen
-      style={getBrandThemeStyle()}
-    >
+    <div className="page-refresh-screen" data-page-refresh-screen>
       <div className="page-refresh-atmosphere" aria-hidden="true">
         <span className="page-refresh-aura" />
       </div>

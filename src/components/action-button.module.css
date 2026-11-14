@@ -331,14 +331,14 @@
 .fallback {
   z-index: 1;
   inset: 0;
-  border: 3px solid var(--action-rim-1);
+  border: var(--action-rim-thickness, 3px) solid var(--action-rim-1);
   border-radius: inherit;
 }
 @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
   .fallback {
     overflow: hidden;
     border: 0;
-    padding: 3px;
+    padding: var(--action-rim-thickness, 3px);
     background: conic-gradient(
       from 25deg,
       var(--action-rim-1),

@@ -266,17 +266,22 @@ const SETTINGS = {
 /** Pointer-independent React Bits rim, leaving the host button's styles intact. */
 export function SpecularRim({
   radius = 22,
+  thickness = SETTINGS.thickness,
   palette: paletteStyle = "two-tone",
   glow = true,
   className,
 }: {
   radius?: number;
+  thickness?: number;
   palette?: "two-tone" | "spectrum" | "triad";
   /** A separate renderer may own the exterior halo while this keeps the rim. */
   glow?: boolean;
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const physicalThickness = Number.isFinite(thickness)
+    ? Math.max(0.5, thickness)
+    : SETTINGS.thickness;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -462,7 +467,7 @@ export function SpecularRim({
       }
       try {
         // CSS transforms do not resize layout boxes. Refresh screen geometry
-        // during the animation so its visible band remains exactly 3 CSS px.
+        // during the animation so its configured band keeps its CSS-pixel width.
         geometry = mapRimToCanvas({
           button: button.getBoundingClientRect(),
           canvas: canvas.getBoundingClientRect(),
@@ -508,7 +513,7 @@ export function SpecularRim({
           SETTINGS.shineSize / 360,
           SETTINGS.shineFade / 360 + 0.0001,
         );
-        gl.uniform1f(uniforms.uThickness, SETTINGS.thickness);
+        gl.uniform1f(uniforms.uThickness, physicalThickness);
         gl.uniform1f(uniforms.uGlow, glow ? SETTINGS.glow : 0);
         gl.bindVertexArray(vao);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -663,7 +668,7 @@ export function SpecularRim({
       release();
       mark("rendered", false);
     };
-  }, [radius, paletteStyle, glow]);
+  }, [radius, paletteStyle, glow, physicalThickness]);
 
   return (
     <canvas
@@ -675,7 +680,7 @@ export function SpecularRim({
       data-exterior-glow={glow}
       data-animated="false"
       data-fallback-active="false"
-      data-rim-thickness={SETTINGS.thickness}
+      data-rim-thickness={physicalThickness}
       data-rim-space="screen-css"
     />
   );

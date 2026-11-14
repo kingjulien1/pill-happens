@@ -19,7 +19,7 @@ export const LOADING_SCREEN_COPY = {
     "Apparently, even pixels need a minute.",
   ],
   footer: [
-    "Your pills, your days, your notes.",
+    "Your journal, your pace, your way.",
     "Slightly more organised than life.",
   ],
 } as const;

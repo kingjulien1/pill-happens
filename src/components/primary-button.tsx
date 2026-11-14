@@ -23,6 +23,8 @@ export type PrimaryButtonProps = ComponentProps<typeof Button> & {
   surface?: "layered" | "accent" | "solid";
   /** Opt into an animated edge independently of a solid or layered face. */
   rim?: boolean;
+  /** Shared GPU/CSS edge width; its paint stays within the button. */
+  rimThickness?: number;
 };
 
 export function LayeredActionButton({
@@ -38,17 +40,22 @@ export function LayeredActionButton({
   motion = true,
   surface = "layered",
   rim,
+  rimThickness = 3,
   kind = "primary",
   "aria-busy": ariaBusy,
   ...props
 }: PrimaryButtonProps & { kind?: "primary" | "secondary" }) {
   const busy = pending || ariaBusy === true || ariaBusy === "true";
   const showRim = rim ?? surface !== "solid";
+  const rimWidth = Number.isFinite(rimThickness)
+    ? Math.max(0.5, rimThickness)
+    : 3;
   const corner = radius ?? (kind === "primary" ? 22 : 16);
   const classes = buttonVariants({ variant, size });
   const baseStyle = {
     ...getButtonThemeStyle(kind, theme, surface === "accent" ? "accent" : kind),
     borderRadius: corner,
+    "--action-rim-thickness": `${rimWidth}px`,
     ...(surface === "accent" ? { "--accent-radius": `${corner}px` } : {}),
   } as CSSProperties;
   return (
@@ -117,6 +124,7 @@ export function LayeredActionButton({
             <SpecularRim
               key={theme ?? "system"}
               radius={corner}
+              thickness={rimWidth}
               palette="triad"
               glow={false}
             />
