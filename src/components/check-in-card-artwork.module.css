@@ -12,7 +12,9 @@
     --check-in-art-delay,
     calc(var(--card-entry-delay, 0ms) + var(--art-return-delay))
   );
-  --art-loop-start: calc(var(--art-start) + 1560ms);
+  --art-entry-end: calc(var(--art-start) + 1560ms);
+  --art-loop-start: calc(var(--art-entry-end) + 300ms);
+  --icon-settle-color: var(--art-soft);
   --art-play: var(--page-entry-play-state, running);
   position: relative;
   isolation: isolate;
@@ -23,6 +25,17 @@
   align-items: center;
   justify-content: center;
   color: var(--art-ink);
+  pointer-events: none;
+}
+
+/* A nonvisual CSS clock hands off only after arrival and the quiet pause. */
+.ambientGate {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 
@@ -166,6 +179,10 @@
     --art-play: paused;
   }
 
+  .ambientGate {
+    animation: check-in-ambient-open 1ms linear var(--art-loop-start) both;
+  }
+
   .arrival {
     animation: check-in-art-arrive 1560ms cubic-bezier(0.22, 1, 0.36, 1)
       var(--art-start) backwards;
@@ -204,6 +221,7 @@
       infinite;
   }
 
+  .ambientGate,
   .arrival,
   .symbolArrival,
   .frameTrace,
@@ -217,17 +235,30 @@
   }
 }
 
+@keyframes check-in-ambient-open {
+  from,
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes check-in-art-arrive {
   0% {
-    opacity: 0.45;
-    transform: scale(0.68) rotate(-18deg);
+    opacity: 0.3;
+    transform: translateY(4px) scale(0.66) rotate(-10deg);
   }
-  38% {
+  28% {
     opacity: 1;
-    transform: scale(1.09) rotate(6deg);
+    transform: translateY(-0.8px) scale(0.96) rotate(1.5deg);
   }
-  66% {
-    transform: scale(0.98) rotate(-2deg);
+  56% {
+    transform: scale(1.06) rotate(1deg);
+  }
+  70% {
+    transform: scale(0.985) rotate(-0.4deg);
+  }
+  82% {
+    transform: scale(1.025) rotate(0.2deg);
   }
   100% {
     opacity: 1;
@@ -237,15 +268,26 @@
 
 @keyframes check-in-art-unfurl {
   0% {
-    opacity: 0.4;
-    transform: scale(0.28) rotate(-110deg);
+    opacity: 0.25;
+    transform: scale(0.3) rotate(-390deg);
+    animation-timing-function: cubic-bezier(0.16, 0.6, 0.3, 1);
   }
-  48% {
+  36% {
     opacity: 1;
-    transform: scale(1.17) rotate(15deg);
+    transform: scale(0.93) rotate(-42deg);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  74% {
-    transform: scale(0.96) rotate(-4deg);
+  56% {
+    transform: scale(1.12) rotate(8deg);
+  }
+  67% {
+    transform: scale(0.97) rotate(-2deg);
+  }
+  76% {
+    transform: scale(1.055) rotate(0.6deg);
+  }
+  88% {
+    transform: scale(0.995) rotate(0);
   }
   100% {
     opacity: 1;

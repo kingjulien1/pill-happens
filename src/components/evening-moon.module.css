@@ -87,7 +87,9 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .sway {
-    animation: lunar-moon-sway 9400ms ease-in-out infinite;
+    animation:
+      lunar-moon-sway 30000ms cubic-bezier(0.83, 0, 0.17, 1) infinite,
+      lunar-moon-arc 15000ms ease-in-out infinite;
     animation-play-state: paused;
   }
 
@@ -115,19 +117,25 @@
   }
 }
 
+/* Each half swing accelerates through the middle and rests at its reversal. */
 @keyframes lunar-moon-sway {
   0%,
   100% {
-    transform: translate(-0.35px, 0.2px) rotate(-3.2deg) scale(0.995);
+    transform: translateX(-1.4px) rotate(-8deg);
   }
-  28% {
-    transform: translate(0.55px, -0.65px) rotate(1.8deg) scale(1.01);
+  50% {
+    transform: translateX(1.4px) rotate(8deg);
   }
-  61% {
-    transform: translate(0.3px, -0.15px) rotate(3deg) scale(1.005);
+}
+
+/* The center crossing is the low point; each reversal rises along the arc. */
+@keyframes lunar-moon-arc {
+  0%,
+  100% {
+    translate: 0 -0.65px;
   }
-  82% {
-    transform: translate(-0.4px, 0.35px) rotate(-0.8deg) scale(0.998);
+  50% {
+    translate: 0 1.1px;
   }
 }
 

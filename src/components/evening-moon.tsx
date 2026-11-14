@@ -36,7 +36,13 @@ type EveningStar = {
 };
 
 /** A quiet crescent rocks gently while a few short-lived stars find their light. */
-export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
+export function EveningMoon({
+  dialogOpen = false,
+  ambientReady = true,
+}: {
+  dialogOpen?: boolean;
+  ambientReady?: boolean;
+}) {
   const rootRef = useRef<HTMLSpanElement>(null);
   const nextStarId = useRef(0);
   const [view, setView] = useState({
@@ -131,6 +137,7 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
     function syncActivity() {
       if (disposed) return;
       const nextActive =
+        ambientReady &&
         !dialogOpen &&
         !document.hidden &&
         !reducedMotion.matches &&
@@ -198,7 +205,7 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
       document.removeEventListener("visibilitychange", syncActivity);
       reducedMotion.removeEventListener("change", syncActivity);
     };
-  }, [dialogOpen]);
+  }, [ambientReady, dialogOpen]);
 
   return (
     <span
@@ -206,6 +213,7 @@ export function EveningMoon({ dialogOpen = false }: { dialogOpen?: boolean }) {
       className={styles.root}
       data-evening-moon
       data-lunar-active={view.active}
+      data-lunar-ambient-ready={ambientReady}
       data-lunar-star-count={view.stars.length}
       aria-hidden="true"
     >

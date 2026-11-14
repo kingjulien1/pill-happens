@@ -30,8 +30,10 @@ const WISPS = [
 /** An empty cup stays still while three loose threads of warmth gently uncurl. */
 export function MorningCoffee({
   dialogOpen = false,
+  ambientReady = true,
 }: {
   dialogOpen?: boolean;
+  ambientReady?: boolean;
 }) {
   const id = useId();
   const rootRef = useRef<HTMLSpanElement>(null);
@@ -56,6 +58,7 @@ export function MorningCoffee({
     function syncActivity() {
       if (disposed) return;
       const active =
+        ambientReady &&
         !dialogOpen &&
         !document.hidden &&
         !reducedMotion.matches &&
@@ -118,13 +121,14 @@ export function MorningCoffee({
       document.removeEventListener("visibilitychange", syncActivity);
       reducedMotion.removeEventListener("change", syncActivity);
     };
-  }, [dialogOpen]);
+  }, [ambientReady, dialogOpen]);
 
   return (
     <span
       ref={rootRef}
       className={styles.root}
       data-coffee-active="false"
+      data-coffee-ambient-ready={ambientReady}
       data-coffee-steam
       aria-hidden="true"
     >
@@ -182,6 +186,35 @@ export function MorningCoffee({
           <clipPath id={`${id}-glow-above-rim`}>
             <rect x="0" y="-12" width="56" height="41" />
           </clipPath>
+          <linearGradient
+            id={`${id}-steam-reveal-gradient`}
+            x1="0"
+            y1="-12"
+            x2="0"
+            y2="29"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor="#fff" stopOpacity="0" />
+            <stop offset="1" stopColor="#fff" stopOpacity="1" />
+          </linearGradient>
+          <mask
+            id={`${id}-steam-reveal`}
+            maskUnits="userSpaceOnUse"
+            x="-4"
+            y="-12"
+            width="64"
+            height="48"
+          >
+            <rect
+              className={styles.steamReveal}
+              x="-4"
+              y="-200"
+              width="64"
+              height="400"
+              fill={`url(#${id}-steam-reveal-gradient)`}
+              data-coffee-steam-reveal
+            />
+          </mask>
           {WISPS.map(({ path, color }, index) => (
             <g key={path}>
               <path id={`${id}-steam-${index}`} d={path} pathLength="100" />
@@ -233,7 +266,7 @@ export function MorningCoffee({
             data-coffee-rim-glow
           />
         </g>
-        <g className={styles.warmth}>
+        <g className={styles.warmth} mask={`url(#${id}-steam-reveal)`}>
           {WISPS.map((wisp, index) => (
             <g
               key={wisp.path}

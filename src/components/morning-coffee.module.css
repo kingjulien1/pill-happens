@@ -42,6 +42,11 @@
   pointer-events: none;
 }
 
+/* A tall gradient mask moves upward, feathering the steam in from the rim. */
+.steamReveal {
+  transform: translateY(-41px);
+}
+
 .sway {
   transform-origin: 26px 29px;
 }
@@ -78,8 +83,12 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .glow {
-    animation: coffee-glow-emerge 2200ms cubic-bezier(0.22, 0.61, 0.36, 1)
-      var(--art-loop-start, 0ms) both;
+    animation: coffee-glow-emerge 2200ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    animation-play-state: paused;
+  }
+
+  .steamReveal {
+    animation: coffee-steam-reveal 1000ms linear both;
     animation-play-state: paused;
   }
 
@@ -95,8 +104,17 @@
     animation-play-state: paused;
   }
 
-  .root[data-coffee-active="true"] :is(.sway, .ribbon, .glow) {
+  .root[data-coffee-active="true"] :is(.sway, .ribbon, .glow, .steamReveal) {
     animation-play-state: running;
+  }
+}
+
+@keyframes coffee-steam-reveal {
+  from {
+    transform: translateY(41px);
+  }
+  to {
+    transform: translateY(-41px);
   }
 }
 

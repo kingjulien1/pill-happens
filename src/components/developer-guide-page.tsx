@@ -1629,10 +1629,29 @@ export function DeveloperGuidePage() {
                 already below 1.4% opacity. This bounds unusually large drop or
                 pump values while normal quantities up to ten retain every
                 frame. The exact quantity remains in the dose and accessible
-                description. One outer entrance hook animates the complete fan;
-                keyed internal frames never replay entrance animations during
+                description. One inner entrance wrapper animates the complete
+                fan while its outer rail stays still. Keyed internal frames
+                never replay entrance animations during
                 group disclosure. Invalid or missing decorative quantities use
                 one frame without rewriting any medication or intake.
+              </p>
+              <p>
+                Card artwork uses a brief spin, full-size rebound and restrained
+                end-state response. <code>CardIconSettle</code> supplies a soft
+                halo, two rounded-square ripples and four small flecks in the
+                artwork’s color. The response fits inside the existing card
+                entrance budget: main icons use 1320ms and rear icons 1095ms,
+                while their parent cards retain 1440ms and 1200ms. Folded
+                previews suppress these decorative entries. Saved glyph rotation
+                and the quantity fan’s layout stay independent of the motion.
+              </p>
+              <p>
+                The small corner form badge sits outside the spinning wrapper.
+                It has its own 520ms opacity fade and 1.5px slide, without scale
+                or rotation. Its visible size matches the opposite category
+                glyphs: 12.8px on mobile and 14.08px on desktop. Cards without
+                category glyphs use those same inferred sizes. Reduced motion
+                shows the settled artwork and badge without response effects.
               </p>
               <p>
                 Appearance color samples use compact rounded squares and a quiet
@@ -2581,11 +2600,25 @@ export function DeveloperGuidePage() {
                   brighter fine highlight and soft halo. Pink emission is
                   anchored to the cup’s top rim, kept above that line and
                   feathered upward with restrained side spill. Its glow fades
-                  in over 2.2 seconds after the existing artwork arrival ends,
-                  using the inherited entry clock. Pauses preserve the fade’s
-                  progress, keyed artwork replay restarts it, and reduced
+                  in over 2.2 seconds after the shared ambient handoff. That
+                  handoff follows the completed main-icon entry by 300ms. The
+                  curved lines reveal upward over one second through a soft SVG
+                  mask. Pauses preserve reveal progress, keyed artwork replay
+                  restarts the sequence, and reduced
                   motion shows a settled static glow. No extra JavaScript
                   timer or frame loop owns this effect.
+                </li>
+                <li>
+                  Check-in artwork keeps its 1560ms main entrance and a toned
+                  down spin-and-settle response. A nonvisual CSS clock opens
+                  the ambient gate only 300ms after that entrance ends; the
+                  coffee animation and the EveningMoon JavaScript star queue
+                  both wait for it. A keyed scene resets the gate on replay,
+                  while page/dialog pauses hold the shared clock. The moon
+                  sways over a slow 30-second cycle with quint-like easing,
+                  roughly ±8° rotation and ±1.4px horizontal travel. A separate
+                  15-second vertical arc places its low point at each center
+                  crossing. Stars keep their own brief, quieter twinkles.
                 </li>
                 <li>
                   Morning and Evening check-ins share the same large-logo
