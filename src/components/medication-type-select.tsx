@@ -1,5 +1,7 @@
 "use client";
 
+import { CircleCheckBig } from "lucide-react";
+
 import {
   ChoiceMenuHeader,
   ChoiceOptionContent,
@@ -80,6 +82,12 @@ export function MedicationTypeSelect({
               key={type.value}
               value={type.value}
               label={type.label}
+              indicator={
+                <CircleCheckBig
+                  className="pointer-events-none size-3.5"
+                  strokeWidth={2.25}
+                />
+              }
               data-choice-option
               data-choice-secondary={type.value === "other" || undefined}
               data-current={current || undefined}

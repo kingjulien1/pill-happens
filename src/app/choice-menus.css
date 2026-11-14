@@ -168,6 +168,51 @@
   transform: translateY(-50%);
   color: var(--popover-foreground);
 }
+/* These two compact pickers keep the selected caption beside its value.
+   The fixed trailing rail protects a generous gap even when labels truncate. */
+:is([data-choice-menu="type"], [data-choice-menu="category"]) {
+  --choice-check-size: 14px;
+  --choice-check-inset: 14px;
+  --choice-check-clearance: 32px;
+}
+:is([data-choice-menu="type"], [data-choice-menu="category"])
+  [data-choice-option] {
+  padding-inline-end: calc(
+    var(--choice-check-size) + var(--choice-check-inset) +
+      var(--choice-check-clearance)
+  );
+}
+:is([data-choice-menu="type"], [data-choice-menu="category"])
+  [data-choice-option]
+  > [data-slot="select-item-text"] {
+  overflow: hidden;
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+:is([data-choice-menu="type"], [data-choice-menu="category"])
+  [data-choice-label] {
+  flex: 0 1 auto;
+  overflow: hidden;
+  overflow-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:is([data-choice-menu="type"], [data-choice-menu="category"])
+  [data-choice-current-label] {
+  margin-inline-start: 5.5px;
+}
+:is([data-choice-menu="type"], [data-choice-menu="category"])
+  [data-slot="select-item-indicator"] {
+  inset-inline-end: var(--choice-check-inset);
+  width: var(--choice-check-size);
+  height: var(--choice-check-size);
+}
+:is([data-choice-menu="type"], [data-choice-menu="category"])
+  [data-slot="select-item-indicator"]
+  > svg {
+  width: 100%;
+  height: 100%;
+}
 /* The fixed chevron always keeps its own secondary clearance from the text. */
 [data-compact-choice-trigger] {
   min-width: 0;

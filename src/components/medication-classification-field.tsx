@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Select } from "@base-ui/react/select";
+import { CheckCheck, CircleCheckBig, Trash } from "lucide-react";
 import { TagIcon } from "@phosphor-icons/react/dist/ssr/Tag";
 import { ActionIcon } from "@/components/action-icon";
 import {
@@ -128,6 +129,13 @@ export function MedicationClassificationField({
                       data-choice-secondary={
                         item.value === "other" || undefined
                       }
+                      indicator={
+                        <CircleCheckBig
+                          className="pointer-events-none size-3.5"
+                          strokeWidth={2.25}
+                          aria-hidden="true"
+                        />
+                      }
                     >
                       <ChoiceOptionContent
                         current={current}
@@ -147,6 +155,7 @@ export function MedicationClassificationField({
                   );
                 })}
               </Select.List>
+              <div className={styles.footerSeparator} aria-hidden="true" />
               <div className={styles.footer}>
                 <button
                   type="button"
@@ -154,7 +163,14 @@ export function MedicationClassificationField({
                   disabled={disabled || !normalized.length}
                   onClick={() => onChange([])}
                 >
-                  Clear{normalized.length ? ` ${normalized.length}` : ""}
+                  <Trash size={9.5} strokeWidth={2.25} aria-hidden="true" />
+                  <span>Clear</span>
+                  <span className={styles.clearDot} aria-hidden="true">
+                    ·
+                  </span>
+                  <span className={styles.selectedCount}>
+                    {normalized.length}
+                  </span>
                 </button>
                 <span>{MEDICATION_CATEGORIES.length} options</span>
                 <button
@@ -163,7 +179,12 @@ export function MedicationClassificationField({
                   disabled={disabled}
                   onClick={() => setOpen(false)}
                 >
-                  Done <ActionIcon name="selected" className="size-3" />
+                  <CheckCheck
+                    size={9.5}
+                    strokeWidth={2.25}
+                    aria-hidden="true"
+                  />
+                  <span>Done</span>
                 </button>
               </div>
             </Select.Popup>

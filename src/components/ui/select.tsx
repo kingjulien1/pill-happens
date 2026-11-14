@@ -124,8 +124,9 @@ function SelectLabel({
 function SelectItem({
   className,
   children,
+  indicator,
   ...props
-}: SelectPrimitive.Item.Props) {
+}: SelectPrimitive.Item.Props & { indicator?: React.ReactNode }) {
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -147,7 +148,9 @@ function SelectItem({
           <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
         }
       >
-        <ActionIcon name="selected" className="pointer-events-none size-4" />
+        {indicator ?? (
+          <ActionIcon name="selected" className="pointer-events-none size-4" />
+        )}
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
   );
