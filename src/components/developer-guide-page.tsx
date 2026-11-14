@@ -958,9 +958,12 @@ export function DeveloperGuidePage() {
                 uses portrait framing and a faster 5.4 shader speed, compared
                 with 3.6 on desktop, while limiting backing-store density to
                 1.25 and 750,000 pixels. The overscanned highlight field drifts
-                over 68 seconds without moving its clipped viewport. Reduced
-                motion keeps the composition still; hidden or offscreen
-                rendering pauses instead of accumulating elapsed time.
+                over 68 seconds without moving its clipped viewport. A new Rose
+                highlight at 32% / 16% mirrors the existing 68% / 84% pool. Its
+                3.3% pigment share is 45% quieter than the original 6%, keeping
+                the diagonal echo restrained. Reduced motion keeps the
+                composition still; hidden or offscreen rendering pauses instead
+                of accumulating elapsed time.
               </p>
               <p>
                 Both guides share this backdrop beneath their reading surfaces.
@@ -1022,30 +1025,36 @@ export function DeveloperGuidePage() {
                 single-line height is 36px: 24px content plus 10px vertical
                 padding and two 1px edges. Reduced transparency uses an opaque
                 semantic fallback. The row remains 7px above the 74px Log Intake
-                button, with the “Your journal, your pace.” footer 10px below
-                it. That exact text now links to the Journal page, retaining the
-                same inherited font, size, weight, color and undecorated
-                appearance. Natural wrapping still participates in the dock’s
-                existing ResizeObserver measurement and page clearance; button
-                corners, paint, rim and glow are unchanged.
+                button, with the plain “Your journal, your pace, your way.”
+                footer 10px below it. It has no link, uses 450 weight, and mixes
+                the existing canvas-muted text color equally with transparency
+                for half its former visibility. Natural wrapping still
+                participates in the dock’s existing ResizeObserver measurement
+                and page clearance; its entry animation remains independent of
+                the text color.
               </p>
               <p>
                 The Today action is 74px high at every breakpoint, with a
                 proportional 19.425px corner radius. It opts into
                 <code>{' surface="solid"'}</code> and an independent
                 <code> rim</code>. The face is the fully opaque
-                <code> --background</code> plus Purple 950 at 40%, without
-                the old field, glaze or tint components. A face-colored 4px
-                inset masks the outer part of a 6px Violet 700 inset, leaving
-                a crisp 2px inner band. The moving 3px outer edge is 30% opaque;
-                nearby Pink 300, Purple 300 and Fuchsia 300 stops reduce its
-                light-to-dark variation. Both the GPU layer and CSS fallback
-                use that same opacity, with the fallback hidden once the GPU
-                renders successfully. Motion retains its
-                existing hidden, offscreen, disabled and reduced-motion guards.
-                Text and icon colors adapt to the resolved theme so both light
-                and dark faces remain readable. Focus draws inward, while the
-                soft exterior glow stays separate from the border geometry.
+                <code> --background</code> plus Purple 950 at 40%, exposed
+                through
+                <code> --daily-action-face</code> without the old field, glaze
+                or tint components. The shared
+                <code> --daily-action-inner-edge</code> supplies Violet 700. Its
+                crisp 2px band runs from 6.5px to 8.5px inside the face, leaving
+                a 1px gap after the moving 5.5px outer rim. That rim is about
+                83.3% thicker than its former 3px width; its 30% opacity and
+                nearby Pink 300, Purple 300 and Fuchsia 300 stops are unchanged.
+                Both the GPU layer and CSS fallback consume the same thickness
+                and opacity, with the fallback hidden once the GPU renders
+                successfully. Other action rims retain their 3px default. Motion
+                retains its existing hidden, offscreen, disabled and
+                reduced-motion guards. Text and icon colors adapt to the
+                resolved theme so both light and dark faces remain readable.
+                Focus draws inward, while the soft exterior glow stays separate
+                from the border geometry.
               </p>
               <p>
                 The main label uses the page foreground. The Tablets mark,
@@ -1167,15 +1176,15 @@ export function DeveloperGuidePage() {
                 control or popover. Both page controls are 46px squares with
                 23px glyphs and 14px corners, about 39% larger than their former
                 33px / 16.5px geometry. The two controls anchor opposite edges
-                of the shared header. Both controls use the coffee mug’s shared
-                <code> --check-in-mug-ink: #c1b6cc</code> for their icons and
-                opaque 2.5px borders. Their background is the same
-                <code> --check-in-art-surface</code> as the mug tile: the
-                Purple base with its Rose and Iris radial reflections. The
-                24px backdrop blur, faint decorative rim and separate keyboard
-                focus stay intact. Hover, focus and open states keep this paint
-                in both themes. Menu-specific layouts determine each popup’s
-                interior dimensions.
+                of the shared header. Both controls share the main action’s
+                <code> --daily-action-face</code>: an opaque canvas mixed with
+                40% Purple 950. Their icons and opaque 2.5px borders use
+                <code> --daily-action-inner-edge</code>, the same Violet 700 as
+                the action’s inner band. The 24px backdrop blur, faint
+                decorative rim and separate keyboard focus stay intact. Hover,
+                focus and open states keep this paint in both themes.
+                Menu-specific layouts determine each popup’s interior
+                dimensions.
               </p>
               <p>
                 After shared page-entry readiness, two separate layout wrappers
@@ -1192,17 +1201,17 @@ export function DeveloperGuidePage() {
                 transforms and tablet loops stay on their existing inner owners.
               </p>
               <p>
-                Header tablet circles use the mug pigment for both fill and
-                stroke; their scores use the artwork’s solid base color. These
-                scoped rules account for BrandMark’s inline palette, so its
-                nested artwork cannot retain the old Pink by accident. The
-                navigation glyph follows the same foreground. Menu and loading
-                branding retain their own palette outside the page topbar.
-                The header mark measures 34.5px in its 46px control,
-                preserving the menu logo’s 48px/64px ratio. Orbit, approach and
-                spin still share the same base keyframes. A 7.2-second header
-                cycle runs at two-thirds of the menu’s 4.8-second speed, with
-                unchanged endpoint geometry.
+                Header tablet circles use Violet 700 for both fill and stroke;
+                their scores use the shared action face. These scoped rules
+                account for BrandMark’s inline palette, so its nested artwork
+                cannot retain the old Pink by accident. The navigation glyph
+                follows the same Violet foreground. Menu branding keeps its
+                separate palette; the loading core now consumes the shared
+                daily-action face and edge too. The header mark measures 34.5px
+                in its 46px control, preserving the menu logo’s 48px/64px ratio.
+                Orbit, approach and spin still share the same base keyframes. A
+                7.2-second header cycle runs at two-thirds of the menu’s
+                4.8-second speed, with unchanged endpoint geometry.
               </p>
               <p>
                 Fine-pointer hover adds exactly 1/18 to the header tablet speed:
@@ -1233,15 +1242,16 @@ export function DeveloperGuidePage() {
                 timers.
               </p>
               <p>
-                Both page controls keep the same opaque mug-colored base edge
-                while resting, hovered, focused, open or pulled. A separate inset
-                edge and outer halo provide the refresh control’s ready feedback.
-                The 2.5px border geometry, 8% blurred decorative rim at 0.8px
-                blur and separate 60% focus outline are preserved. The refresh
-                module reads a local surface override in every interaction state,
+                Both page controls keep the same opaque Violet base edge while
+                resting, hovered, focused, open or pulled. A separate inset edge
+                and outer halo provide the refresh control’s ready feedback. The
+                2.5px border geometry, 8% blurred decorative rim at 0.8px blur
+                and separate 60% focus outline are preserved. The refresh module
+                reads a local surface override in every interaction state,
                 keeping its background aligned with navigation without changing
-                the palette of other branding components. The mug itself reads
-                the same ink token, with its original literal fallback.
+                the palette of other branding components. The coffee mug keeps
+                its separate <code> --check-in-mug-ink</code> token and original
+                literal fallback.
               </p>
               <p>
                 Visibility, reduced-motion, offscreen and refresh-unavailable
@@ -1279,27 +1289,26 @@ export function DeveloperGuidePage() {
                 retain their native behavior.
               </p>
               <p>
-                The live brand marks share the same Charcoal #1d161e face and
-                Mint #9fffd1 pills in both appearances. The original
-                getIntakeBrandStyle() retains its two-value contract for
-                existing callers; getBrandThemeStyle() extends that paint with
-                aliases derived from the action’s current icon/rim palette.
-                Header, menu, sign-in and recovery contexts keep their existing
-                sizes, labels and native link/button behavior. The 46px button
-                retains its exact charcoal face throughout rest, pulling,
-                readiness and release. Its base Mint border stays at 67%; no
-                colored wash covers the pills. The pills turn through 540
-                degrees while shrinking across a 1–88px visual exchange.
-                RefreshCcw appears across 56–112px and grows with pull progress.
-                Both directions use that same 23px icon with a 2.65 stroke,
-                including the ready state. A separate 160ms exchange follower is
-                capped at 112/340 physical progress before easing, so even an
-                immediate threshold crossing still shows the conversion. This
-                visual clock does not delay the authoritative gesture or its
-                release guard. Retraction while the pointer remains held
-                reverses the exchange and progress-driven glyph rotation
-                continuously. Actual release or cancellation holds the last
-                painted glyph angle as it shrinks and fades, so decreasing
+                The original getIntakeBrandStyle() retains its two-value
+                contract for existing callers; getBrandThemeStyle() extends that
+                paint with aliases derived from the action palette. The page
+                topbar and loading core override those pigments locally with
+                their shared Purple face and Violet edge. Menu, sign-in and
+                recovery marks keep their separate paint, sizes, labels and
+                native link/button behavior. The 46px page button retains its
+                shared face and opaque Violet border throughout rest, pulling,
+                readiness and release. No colored wash covers the pills. The
+                pills turn through 540 degrees while shrinking across a 1–88px
+                visual exchange. RefreshCcw appears across 56–112px and grows
+                with pull progress. Both directions use that same 23px icon with
+                a 2.65 stroke, including the ready state. A separate 160ms
+                exchange follower is capped at 112/340 physical progress before
+                easing, so even an immediate threshold crossing still shows the
+                conversion. This visual clock does not delay the authoritative
+                gesture or its release guard. Retraction while the pointer
+                remains held reverses the exchange and progress-driven glyph
+                rotation continuously. Actual release or cancellation holds the
+                last painted glyph angle as it shrinks and fades, so decreasing
                 return progress cannot rotate it backward. A new pull clears the
                 held angle. The charged rotation lives on a separate child, so
                 it can pause at its current angle without taking ownership of
@@ -1315,17 +1324,16 @@ export function DeveloperGuidePage() {
                 or cancellation returns it home; frozen gesture coordinates and
                 capture remain independent. Eighteen small particles, two
                 ripples, a shockwave, eight individually colored rays and inner
-                pops retain their compact celebration choreography. Their colors
-                now come entirely from the Intake action: Electric Mint #9fffd1,
-                Ice #b8f4ff, Teal #2dd4bf, Soft Mint #c6ffe2, Soft Teal #5eead4
-                and the canonical Tailwind emerald-500 token. The refresh glyph,
-                filled pills and base border use the exact Mint icon pigment,
-                with Charcoal #1d161e scores and face. Shared
-                getBrandThemeStyle() aliases also color the navigation heading,
-                sign-in wordmark and standalone recovery marks, including their
-                glow, corona, sheen and animated accents. Opacity, geometry and
-                every existing animation curve remain unchanged. The finite
-                crossing burst stays throttled against threshold jitter.
+                pops retain their compact celebration choreography and existing
+                Pink reflection aliases. The page refresh glyph, filled pills
+                and base border use Violet 700, with the shared daily-action
+                face behind the pills and in their scores. Shared
+                getBrandThemeStyle() aliases continue to color the other
+                branding contexts, including their glow, corona, sheen and
+                animated accents. The loading curtain has its own scoped Violet
+                spark palette. Opacity, geometry and every existing animation
+                curve remain unchanged. The finite crossing burst stays
+                throttled against threshold jitter.
               </p>
               <p>
                 After a 960ms settling pause, the armed RefreshCcw begins its
@@ -1338,8 +1346,8 @@ export function DeveloperGuidePage() {
                 changing the button’s measured size or pulled position. The
                 refreshed waiting artwork pairs a fading conic ribbon with
                 counter-turning split arcs and a travelling bead. Its compact
-                traces stay close to the button and share the restrained
-                Mint/Ice/Teal/Emerald highlights.
+                traces stay close to the button and retain their existing
+                per-context reflection aliases.
               </p>
               <p>
                 Rotation and breathing stay on independent decorative children.
@@ -1437,30 +1445,41 @@ export function DeveloperGuidePage() {
                 root. Critical head styles and a pre-paint handoff script cover
                 the page before external styles or React arrive. The new scene
                 translates the branding pull into a stationary 2.5× stage: its
-                46px internal world paints a 115px Charcoal face, then settles
-                into the same 1.25× charged pose at 143.75px. RefreshCw starts
-                with 57.5px artwork; the face’s 1.25× spring and nested 1.14×
-                icon scale compound to 81.9375px in the charged pose. Mint, Ice,
-                Teal, Soft Mint, Soft Teal and Emerald pigments come from the
-                same shared branding aliases in both appearances. A restrained
-                green atmosphere answers the core’s build-up without adding
-                another card or moving the central position.
+                46px internal world paints a 115px daily-action face, then
+                settles into the same 1.25× charged pose at 143.75px. RefreshCw
+                starts with 57.5px artwork; the face’s 1.25× spring and nested
+                1.14× icon scale compound to 81.9375px in the charged pose. The
+                core face matches the main action’s 40% Purple 950 / opaque
+                canvas mix; its edge and tablet use Violet 700, with nearby
+                Violet and Purple spark tones. Critical CSS supplies the exact
+                prepaint fallbacks: Purple 950 #3c0366, Violet 700 #7008e7,
+                light canvas #fbfafd and dark canvas #2b233e. The full-screen
+                paper follows the system canvas rather than the tinted core.
+                System and explicit appearance rules keep that paint stable
+                before app styles arrive; old inline Pink aliases no longer
+                override it. A restrained Violet atmosphere answers the core’s
+                build-up without adding another card or moving the central
+                position.
               </p>
               <p>
                 The refresh symbol begins at zero size in the center and grows
-                while spinning rapidly clockwise. At roughly 800ms, two thirds
-                of the way to the 1200ms threshold, its angular speed eases
-                slightly; that easing reaches its slowest point just before the
-                threshold. The button’s same analytically sampled spring,
-                including its 3.4 icon-scale cap, now overshoots and rebounds in
-                place. Three layered waves, eight rays, 18 particles in four
-                shape variants and inner pops use the branding burst’s geometry
-                and timing at the larger scale. This finite threshold response
-                happens once per intentional refresh. The visible copy is one
-                compact 14px/650 line: “A little reset. Back to you.” Decorative
-                artwork is hidden from assistive technology, while a single
-                polite status describes the load; the scene contains no
-                interactive controls.
+                while spinning rapidly clockwise: 540 degrees in the first
+                300ms, then a 250ms brake from 1800 to 1200 degrees per second.
+                The remainder of the 1200ms arrival holds that moderate speed
+                without resetting its angle. The button’s analytically sampled
+                spring, including its 3.4 icon-scale cap, now overshoots and
+                rebounds in place. Three layered waves, eight rays, 18 particles
+                in four shape variants and inner pops use the branding burst’s
+                geometry and timing at the larger scale. This finite threshold
+                response happens once per intentional refresh. The visible title
+                remains the compact 13px/450 “Loading. Allegedly...” line above
+                two quieter lines. The first footer line, “Your journal, your
+                pace, your way.”, now uses 450 weight and 20% ink, half its
+                previous 40% muted visibility. The second footer line and two
+                random destination links retain their existing 40% ink
+                treatment. Decorative artwork is hidden from assistive
+                technology, while a single polite status describes the load; the
+                links remain available for navigation.
               </p>
               <p>
                 At 2160ms, after the 960ms threshold settling interval, a fast
@@ -1566,7 +1585,7 @@ export function DeveloperGuidePage() {
                 decorative icon at the main artwork’s top-left, centered on the
                 first text row and overlapping the artwork’s left edge by 60%,
                 with 40% outside. Its 20px phone size and 22px size from 768px
-                stay fixed even when quantity fans scale within their 56px rail.
+                stay fixed while rear exposure compresses within the 56px rail.
                 Black #000000 outlines use a 2.5px Lucide stroke; closed areas
                 are filled with opaque Zinc 300 #D4D4D8, the authored
                 Levomethasan border pigment. Open detail strokes remain
@@ -1625,13 +1644,14 @@ export function DeveloperGuidePage() {
               <p>
                 MedicationCardIconStack places the leftmost frame above the
                 others. Each next frame is 92% of the preceding size and 83% of
-                its opacity. Its right edge extends exactly 20% of its own
-                smaller width beyond the previous frame; all vertical centers
-                match. A single frame measures 48px. Every quantity uses the
-                same 56px rail at all breakpoints; larger fans scale together to
-                fit, preserving relative size, exposure and center. Card height
-                stays 80px; text keeps both single-line rows and their reserved
-                clearances.
+                its opacity, with all vertical centers aligned. Every quantity
+                keeps a 48px front frame, 30px glyph and 56px rail at all
+                breakpoints; the front starts at a fixed 4px inset and never
+                shrinks. Rear frames begin with 20% exposure of their own
+                smaller widths, then compress only those exposed edges into the
+                remaining 4px of rail. This bounds the fan without scaling its
+                main artwork or moving badge anchors. Card height stays 80px;
+                text keeps both single-line rows and their reserved clearances.
               </p>
               <p>
                 Decorative rendering stops at 24 layers, whose last frame is
