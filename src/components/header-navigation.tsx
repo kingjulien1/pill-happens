@@ -17,6 +17,7 @@ import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
 import styles from "./header-menus.module.css";
+import { Button } from "@/components/ui/button";
 
 const links = [
   {
@@ -159,6 +160,7 @@ function NavigationMenu({
   return (
     <Menu.Root open={open} onOpenChange={setOpen} modal={false}>
       <Menu.Trigger
+        render={<Button variant="ghost" size="icon" type="button" />}
         aria-label="Open navigation"
         className={cn(
           "header-icon-button header-icon-button--compact header-brand-surface",
@@ -203,7 +205,7 @@ function NavigationMenu({
               >
                 <AppearanceMenu />
                 <Menu.Item
-                  render={<button type="button" />}
+                  render={<Button variant="ghost" size="icon" type="button" />}
                   nativeButton
                   closeOnClick
                   label="Close navigation"

@@ -3,6 +3,7 @@
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import styles from "./check-in-rating.module.css";
+import { Button } from "@/components/ui/button";
 
 /** A native optional rating, shared by Morning sleep and Evening check-ins. */
 export function CheckInRating({
@@ -64,9 +65,11 @@ export function CheckInRating({
             )}
           </output>
           {rated && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               type="button"
-              className={styles.clearRating}
+              className={`${styles.clearRating} h-auto`}
               aria-label={`Clear ${label.toLowerCase()} rating`}
               disabled={disabled}
               onClick={() => {
@@ -75,7 +78,7 @@ export function CheckInRating({
               }}
             >
               Clear
-            </button>
+            </Button>
           )}
         </div>
       </div>

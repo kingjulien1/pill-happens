@@ -53,6 +53,7 @@ import {
   type MedicationColor,
 } from "@/lib/medication-appearance";
 import styles from "./medication-appearance-fields.module.css";
+import { Button } from "@/components/ui/button";
 
 const SEARCH_DELAY = 2500;
 const LOAD_MORE_DELAY = 450;
@@ -419,7 +420,9 @@ export function MedicationAppearanceFields({
               className="h-10 rounded-xl pr-10 pl-9 text-base md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
             />
             {query && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 onClick={() => {
                   updateQuery("");
@@ -430,7 +433,7 @@ export function MedicationAppearanceFields({
                 className="absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
               >
                 <X className="size-4" strokeWidth={2.75} aria-hidden="true" />
-              </button>
+              </Button>
             )}
           </div>
           <p id={`${id}-search-help`} className="sr-only">
@@ -549,7 +552,9 @@ export function MedicationAppearanceFields({
                   </div>
                   {results.length > SYMBOL_PAGE_SIZE && (
                     <div className={styles.paginationFooter}>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         type="button"
                         onClick={loadMore}
                         className={styles.loadMore}
@@ -586,7 +591,7 @@ export function MedicationAppearanceFields({
                           : hasMore
                             ? "Load more"
                             : "All shown"}
-                      </button>
+                      </Button>
                       <span className={styles.pageCount} aria-hidden="true">
                         {visibleResults.length.toLocaleString("en")} /{" "}
                         {results.length.toLocaleString("en")}
@@ -757,7 +762,9 @@ export function MedicationAppearanceFields({
               <p className={styles.symbolLabel} data-preview-symbol-label>
                 {symbolLabel}
               </p>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 className={styles.motionToggle}
                 aria-label="Animate medication preview"
@@ -776,7 +783,7 @@ export function MedicationAppearanceFields({
                 <span aria-hidden="true" className={styles.toggleTrack}>
                   <span className={styles.toggleThumb} />
                 </span>
-              </button>
+              </Button>
             </div>
             {fixedColor && (
               <p className={styles.fixedColor}>
@@ -882,7 +889,9 @@ export function MedicationAppearanceFields({
               </div>
             </div>
             <div className={styles.previewActions}>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 type="button"
                 disabled={!undo}
                 onClick={() => {
@@ -900,8 +909,10 @@ export function MedicationAppearanceFields({
                 >
                   <Undo2 size={12} strokeWidth={2} aria-hidden="true" /> Undo
                 </span>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 type="button"
                 onClick={shuffleLook}
                 className={styles.previewAction}
@@ -913,7 +924,7 @@ export function MedicationAppearanceFields({
                   <Shuffle size={12} strokeWidth={2} aria-hidden="true" />{" "}
                   Surprise Me
                 </span>
-              </button>
+              </Button>
             </div>
             <p className="sr-only" role="status">
               Selected {symbolLabel}, {selectedColor.label} color.

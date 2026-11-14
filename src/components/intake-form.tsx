@@ -160,6 +160,7 @@ export function IntakeForm({
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
           <MedicationActionButton
             intent="add"
+            navigation
             nativeButton={false}
             render={<Link href="/medications" />}
             onClick={onSaved}

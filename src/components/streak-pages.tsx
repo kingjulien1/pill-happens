@@ -342,10 +342,17 @@ export function StreaksPage({
         tracking day. These milestones describe recorded days, rather than goal
         results or how much was taken.
       </p>
-      <Link href="/" className={styles.backLink}>
+      <Button
+        navigation
+        variant="ghost"
+        size="sm"
+        nativeButton={false}
+        render={<Link href="/" />}
+        className={`${styles.backLink} h-auto p-0`}
+      >
         <ActionIcon name="back" className="size-3.5" />
         Back To Today
-      </Link>
+      </Button>
     </div>
   );
 }
@@ -696,9 +703,16 @@ export function StreakMilestonePage({ target }: { target: number }) {
     return (
       <div className={styles.page}>
         <p>This milestone isn’t available.</p>
-        <Link href="/streaks" className={styles.backLink}>
+        <Button
+          navigation
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={<Link href="/streaks" />}
+          className={`${styles.backLink} h-auto p-0`}
+        >
           Back To Streaks
-        </Link>
+        </Button>
       </div>
     );
   const analytics = milestone.analytics;
@@ -708,10 +722,17 @@ export function StreakMilestonePage({ target }: { target: number }) {
       data-streak-detail={target}
       data-streak-state={milestone.achieved ? "achieved" : "upcoming"}
     >
-      <Link href="/streaks" className={styles.backLink}>
+      <Button
+        navigation
+        variant="ghost"
+        size="sm"
+        nativeButton={false}
+        render={<Link href="/streaks" />}
+        className={`${styles.backLink} h-auto p-0`}
+      >
         <ActionIcon name="back" className="size-3.5" />
         Back To Streaks
-      </Link>
+      </Button>
       <header
         data-card-entry
         className={`${styles.detailHero} ${milestone.achieved ? styles.earnedHero : styles.upcomingHero}`}
@@ -789,11 +810,18 @@ export function StreakMilestonePage({ target }: { target: number }) {
               </div>
             </div>
           </div>
-          <Link href="/" className={styles.todayAction}>
+          <Button
+            navigation
+            variant="default"
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/" />}
+            className={`${styles.todayAction} h-auto p-0`}
+          >
             <ActionIcon name="today" className="size-4" />
             Back To Today
             <ActionIcon name="next" className="size-4" />
-          </Link>
+          </Button>
         </>
       ) : (
         <>
@@ -851,10 +879,17 @@ export function StreakMilestonePage({ target }: { target: number }) {
           </p>
         </>
       )}
-      <Link href="/streaks" className={styles.backLink}>
+      <Button
+        navigation
+        variant="ghost"
+        size="sm"
+        nativeButton={false}
+        render={<Link href="/streaks" />}
+        className={`${styles.backLink} h-auto p-0`}
+      >
         <ActionIcon name="back" className="size-3.5" />
         Milestone List
-      </Link>
+      </Button>
     </div>
   );
 }

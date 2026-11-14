@@ -36,6 +36,7 @@ import {
 import { reflectionStats } from "@/lib/reflection-writing";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import styles from "./daily-reflection-editor.module.css";
+import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
 const symbolPaint = getJournalSymbolPaintStyle();
@@ -301,7 +302,9 @@ export function DailyReflectionEditor({
           </div>
         </div>
         <div className={styles.topActions}>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             ref={readerTrigger}
             type="button"
             className={styles.iconButton}
@@ -312,20 +315,28 @@ export function DailyReflectionEditor({
             data-journal-read
           >
             <BookOpenText size={19} strokeWidth={2.6} aria-hidden="true" />
-          </button>
-          <Link
-            href="/journal"
+          </Button>
+          <Button
+            navigation
+            variant="ghost"
+            size="icon"
+            nativeButton={false}
+            render={
+              <Link
+                href="/journal"
+                onNavigate={() => {
+                  onLibraryNavigate?.();
+                  rememberJournalDestination("/journal");
+                }}
+              />
+            }
             className={styles.iconButton}
             aria-label="Open journal library"
             title="Open journal library"
-            onNavigate={() => {
-              onLibraryNavigate?.();
-              rememberJournalDestination("/journal");
-            }}
             data-journal-library
           >
             <LibraryBig size={19} strokeWidth={2.6} aria-hidden="true" />
-          </Link>
+          </Button>
         </div>
       </div>
       <div className={styles.snapshot} data-journal-snapshot>
@@ -412,7 +423,9 @@ export function DailyReflectionEditor({
             {stats.headings === 1 ? "heading" : "headings"}
           </span>
         </p>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           type="button"
           className={`${styles.iconButton} ${styles.refresh}`}
           onClick={() => void refreshJournal()}
@@ -436,7 +449,7 @@ export function DailyReflectionEditor({
           ) : (
             <RefreshCw size={14} strokeWidth={2} aria-hidden="true" />
           )}
-        </button>
+        </Button>
       </div>
       <ReflectionReaderDialog
         open={reading}

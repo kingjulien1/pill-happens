@@ -8,6 +8,7 @@ import { useAppearance } from "@/components/appearance-provider";
 import { cn } from "@/lib/utils";
 import { APP_FOUNDATION } from "@/lib/app-theme";
 import styles from "./header-menus.module.css";
+import { Button } from "@/components/ui/button";
 
 const options = [
   {
@@ -50,7 +51,7 @@ export function AppearanceMenu() {
   return (
     <Menu.SubmenuRoot open={open} onOpenChange={setOpen}>
       <Menu.SubmenuTrigger
-        render={<button type="button" />}
+        render={<Button variant="ghost" size="icon" type="button" />}
         nativeButton
         openOnHover={false}
         label="Choose color mode"
@@ -153,7 +154,7 @@ export function AppearanceMenu() {
               </span>
             </div>
             <Menu.Item
-              render={<button type="button" />}
+              render={<Button variant="ghost" size="icon" type="button" />}
               nativeButton
               closeOnClick={false}
               onClick={() => setOpen(false)}

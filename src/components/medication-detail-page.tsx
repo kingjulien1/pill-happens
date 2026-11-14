@@ -28,6 +28,7 @@ import {
 } from "@/lib/medication-categories";
 import { getMedicationType } from "@/lib/medication-types";
 import styles from "./journal-reference-details.module.css";
+import { Button } from "@/components/ui/button";
 
 const ingredientSource =
   "https://www.fda.gov/drugs/generic-drugs/what-approval-process-generic-drugs";
@@ -51,9 +52,16 @@ export function MedicationDetailPage({ id }: { id: string }) {
           Any recorded intakes remain part of their daily logs. Open Past Days
           to find the history.
         </ReferenceEmpty>
-        <Link href="/history" className={styles.action}>
+        <Button
+          navigation
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={<Link href="/history" />}
+          className={`${styles.action} h-auto`}
+        >
           Open Past Days <ArrowUpRight size={15} aria-hidden="true" />
-        </Link>
+        </Button>
       </div>
     );
   const ingredient = medication.activeIngredient?.trim();
@@ -79,13 +87,21 @@ export function MedicationDetailPage({ id }: { id: string }) {
         context={ingredient || "Active ingredient not set"}
         icon={<FlaskConical />}
         actions={
-          <Link
-            href={`/medications?medication=${encodeURIComponent(id)}`}
-            className={styles.action}
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={
+              <Link
+                href={`/medications?medication=${encodeURIComponent(id)}`}
+              />
+            }
+            className={`${styles.action} h-auto`}
           >
             <PencilLine size={14} aria-hidden="true" />
             Edit
-          </Link>
+          </Button>
         }
       >
         The saved name, the ingredient behind it, and the history you actually
@@ -181,15 +197,23 @@ export function MedicationDetailPage({ id }: { id: string }) {
               medication.
             </p>
             <div className={styles.inlineActions}>
-              <a
-                href={`https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(ingredient)}`}
-                className={styles.action}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button
+                navigation
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={
+                  <a
+                    href={`https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(ingredient)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+                className={`${styles.action} h-auto`}
               >
                 Find official product labels{" "}
                 <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
+              </Button>
             </div>
           </>
         ) : (

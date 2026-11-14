@@ -13,6 +13,7 @@ import { getMilestoneLook } from "@/lib/streak-milestones";
 import { getStreakSpotlight } from "@/lib/streak-spotlight";
 import { requestStreakSpotlight } from "@/lib/streak-spotlight-client";
 import styles from "./streak-menu.module.css";
+import { Button } from "@/components/ui/button";
 
 export function StreakMenu() {
   const pathname = usePathname();
@@ -36,6 +37,7 @@ function StreakPopover() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen} modal={false}>
       <Popover.Trigger
+        render={<Button variant="ghost" size="icon" type="button" />}
         aria-label="View logging streak"
         className="header-icon-button header-icon-button--compact justify-self-center"
         disabled={!streak}
@@ -74,6 +76,7 @@ function StreakPopover() {
               />
             )}
             <Popover.Close
+              render={<Button variant="ghost" size="icon" type="button" />}
               aria-label="Close streak details"
               className={styles.close}
             >

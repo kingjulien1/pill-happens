@@ -16,6 +16,7 @@ import {
 import { formatDay, shiftDayKey } from "@/lib/domain";
 import { weekRecordDetails } from "@/lib/journal-reference-details";
 import styles from "./journal-reference-details.module.css";
+import { Button } from "@/components/ui/button";
 
 export function HistoryWeekPage({ start }: { start: string }) {
   const { data } = useJournal();
@@ -111,18 +112,32 @@ export function HistoryWeekPage({ start }: { start: string }) {
       )}
       <nav aria-label="Adjacent weeks" className={styles.weekNavigation}>
         {previous ? (
-          <Link className={styles.action} href={`/history/weeks/${previous}`}>
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={`/history/weeks/${previous}`} />}
+            className={`${styles.action} h-auto`}
+          >
             <ChevronLeft size={14} aria-hidden="true" />
             Previous week
-          </Link>
+          </Button>
         ) : (
           <span />
         )}
         {next && (
-          <Link className={styles.action} href={`/history/weeks/${next}`}>
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={`/history/weeks/${next}`} />}
+            className={`${styles.action} h-auto`}
+          >
             Next week
             <ChevronRight size={14} aria-hidden="true" />
-          </Link>
+          </Button>
         )}
       </nav>
     </div>

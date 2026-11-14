@@ -193,18 +193,20 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
         intake={intake}
         onSaved={close}
         footerAction={
-          <button
+          <Button
+            variant="link"
+            size="sm"
             ref={deleteLink}
             type="button"
             disabled={busy}
-            className="min-h-7 shrink-0 rounded-[var(--dialog-radius-compact)] px-1 py-0.5 font-medium text-foreground/65 underline decoration-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50"
+            className="min-h-7 shrink-0 rounded-[var(--dialog-radius-compact)] px-1 py-0.5 font-medium text-foreground/65 underline decoration-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 text-[10px]"
             aria-expanded={confirm}
             aria-controls={confirmId}
             onClick={() => setConfirm(true)}
             data-edit-intake-delete-link
           >
             Delete intake
-          </button>
+          </Button>
         }
       />
       {confirm && (
@@ -633,16 +635,19 @@ export function MedicationsPage() {
                   : "This reference no longer matches your kit. Your journal link stays intact."}
             </p>
           </div>
-          <Link
-            href={clearReferenceHref}
-            scroll={false}
-            className={mentionStyles.clear}
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={clearReferenceHref} scroll={false} />}
+            className={`${mentionStyles.clear} h-auto p-0`}
             aria-label="Clear journal reference and show medication kit"
             data-medication-mention-clear
           >
             <X size={13} strokeWidth={2.2} aria-hidden="true" />
             Show kit
-          </Link>
+          </Button>
         </section>
       ) : (
         <MedicationListHeading
@@ -864,13 +869,15 @@ export function GoalsPage() {
                           : "Previous goal"}
                     </p>
                   </div>
-                  <button
+                  <Button
+                    variant="destructive"
+                    size="icon"
                     aria-label={`Remove ${med?.name ?? "medication"} goal`}
                     className="flex size-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
                     onClick={() => setDeleting(goal.id)}
                   >
                     <ActionIcon name="delete" />
-                  </button>
+                  </Button>
                 </div>
                 <div className="flex items-end justify-between gap-3">
                   <p className="text-[28px] font-semibold leading-none tracking-tight tabular-nums">
@@ -1096,22 +1103,27 @@ function JournalPreferences() {
   return (
     <>
       <div className="canvas-copy mt-8 flex items-center justify-center gap-4">
-        <a
-          href="/api/export"
-          download
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+        <Button
+          navigation
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={<a href="/api/export" download />}
+          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground h-auto p-0"
         >
           <ActionIcon name="export" className="size-4" />
           Export journal
-        </a>
+        </Button>
         <span className="h-3 w-px bg-border" />
-        <button
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground p-0 font-normal"
           onClick={() => openDialog({ kind: "preferences" })}
         >
           <ActionIcon name="settings" className="size-4" />
           Preferences
-        </button>
+        </Button>
       </div>
       <ResponsiveModal
         open={open}
@@ -1255,13 +1267,17 @@ export function DayPage({ day }: { day: string }) {
         />
       </div>
       <div className="canvas-copy flex items-center justify-between gap-3 border-t pt-4">
-        <Link
-          href={`/history/${shiftDayKey(day, -1)}`}
-          className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground"
+        <Button
+          navigation
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={<Link href={`/history/${shiftDayKey(day, -1)}`} />}
+          className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground h-auto p-0"
         >
           <ActionIcon name="back" className="size-4" />
           Previous day
-        </Link>
+        </Button>
         {!isFuture && (
           <Button
             variant="ghost"
@@ -1273,13 +1289,17 @@ export function DayPage({ day }: { day: string }) {
           </Button>
         )}
         {day < today && (
-          <Link
-            href={`/history/${shiftDayKey(day, 1)}`}
-            className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground"
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={`/history/${shiftDayKey(day, 1)}`} />}
+            className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground h-auto p-0"
           >
             Next day
             <ActionIcon name="next" className="size-4" />
-          </Link>
+          </Button>
         )}
       </div>
       <ResponsiveModal

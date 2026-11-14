@@ -18,6 +18,7 @@ import {
   type MedicationCategory,
 } from "@/lib/medication-categories";
 import styles from "./medication-classification-field.module.css";
+import { Button } from "@/components/ui/button";
 
 export function MedicationClassificationField({
   id,
@@ -157,7 +158,9 @@ export function MedicationClassificationField({
               </Select.List>
               <div className={styles.footerSeparator} aria-hidden="true" />
               <div className={styles.footer}>
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   className={styles.clear}
                   disabled={disabled || !normalized.length}
@@ -171,9 +174,11 @@ export function MedicationClassificationField({
                   <span className={styles.selectedCount}>
                     {normalized.length}
                   </span>
-                </button>
+                </Button>
                 <span>{MEDICATION_CATEGORIES.length} options</span>
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   className={styles.done}
                   disabled={disabled}
@@ -185,7 +190,7 @@ export function MedicationClassificationField({
                     aria-hidden="true"
                   />
                   <span>Done</span>
-                </button>
+                </Button>
               </div>
             </Select.Popup>
           </Select.Positioner>

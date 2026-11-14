@@ -17,6 +17,7 @@ import {
   subscribePageEntryReadiness,
 } from "@/lib/page-entry-readiness";
 import styles from "./journal-reference-details.module.css";
+import { Button } from "@/components/ui/button";
 
 export function ReferenceBackLink({
   href,
@@ -26,10 +27,17 @@ export function ReferenceBackLink({
   children: ReactNode;
 }) {
   return (
-    <Link href={href} className={styles.back}>
+    <Button
+      navigation
+      variant="ghost"
+      size="sm"
+      nativeButton={false}
+      render={<Link href={href} />}
+      className={`${styles.back} h-auto`}
+    >
       <ArrowLeft size={14} aria-hidden="true" />
       {children}
-    </Link>
+    </Button>
   );
 }
 

@@ -16,6 +16,7 @@ import {
   type JournalLibraryEntry,
 } from "@/lib/journal-library";
 import styles from "./journal-library-page.module.css";
+import { Button } from "@/components/ui/button";
 
 const PAGE_SIZE = 20;
 
@@ -96,7 +97,9 @@ export function JournalLibraryPage() {
             }}
           />
           {query && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               type="button"
               onClick={() => {
                 setQuery("");
@@ -106,7 +109,7 @@ export function JournalLibraryPage() {
               title="Clear search"
             >
               <X aria-hidden="true" />
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -180,14 +183,16 @@ export function JournalLibraryPage() {
       )}
 
       {filtered.length > limit && (
-        <button
+        <Button
+          variant="default"
+          size="sm"
           type="button"
-          className={styles.loadMore}
+          className={`${styles.loadMore} h-auto`}
           onClick={() => setLimit((previous) => previous + PAGE_SIZE)}
           data-journal-load-more
         >
           <ArrowDown aria-hidden="true" size={15} /> More pages
-        </button>
+        </Button>
       )}
       <p className={styles.footnote}>
         Saved writing with more than 100 words appears here. Shorter notes and

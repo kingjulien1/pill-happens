@@ -44,6 +44,7 @@ import {
   type JournalMention,
 } from "@/lib/journal-mentions";
 import styles from "./journal-mention-menu.module.css";
+import { Button } from "@/components/ui/button";
 
 export const JOURNAL_MENTION_DELAY = 800;
 type Edit = NonNullable<ReturnType<typeof applyJournalMention>>;
@@ -543,7 +544,9 @@ export function useJournalMentionMenu({
                 : `${roots.length} ${roots.length === 1 ? "match" : "matches"} · saved in your journal`}
             </span>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             type="button"
             tabIndex={-1}
             className={styles.close}
@@ -552,7 +555,7 @@ export function useJournalMentionMenu({
             onClick={dismiss}
           >
             <X size={15} strokeWidth={2.2} />
-          </button>
+          </Button>
         </div>
         {failure.key === key && (
           <p

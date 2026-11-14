@@ -14,6 +14,7 @@ import { InstallAppButton } from "@/components/install-app-button";
 import { DAILY_MOODS, DAILY_REFLECTION_MAX_LENGTH } from "@/lib/daily-check-in";
 import { MEDICATION_CATEGORIES } from "@/lib/medication-categories";
 import styles from "./guide-page.module.css";
+import { Button } from "@/components/ui/button";
 
 const sections = [
   { id: "start", label: "Start Here" },
@@ -99,11 +100,27 @@ function PageLink({ href, children }: { href: string; children: ReactNode }) {
     </>
   );
   return href === "/" ? (
-    <GuideStartLink className={styles.pageLink}>{content}</GuideStartLink>
-  ) : (
-    <Link href={href} className={styles.pageLink}>
+    <Button
+      navigation
+      variant="ghost"
+      size="sm"
+      nativeButton={false}
+      render={<GuideStartLink />}
+      className={`${styles.pageLink} h-auto p-0`}
+    >
       {content}
-    </Link>
+    </Button>
+  ) : (
+    <Button
+      navigation
+      variant="ghost"
+      size="sm"
+      nativeButton={false}
+      render={<Link href={href} />}
+      className={`${styles.pageLink} h-auto p-0`}
+    >
+      {content}
+    </Button>
   );
 }
 
@@ -246,10 +263,17 @@ export function GuidePage() {
                   morning sleep rating, or one evening mood is enough. Tap
                   either card to start, continue or edit that part of your day.
                 </p>
-                <a className={styles.pageLink} href="#check-in">
+                <Button
+                  navigation
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<a href="#check-in" />}
+                  className={`${styles.pageLink} h-auto p-0`}
+                >
                   See The Check-In Fields
                   <ActionIcon name="loadMore" className="size-3.5" />
-                </a>
+                </Button>
               </div>
             </li>
           </ol>
@@ -260,11 +284,18 @@ export function GuidePage() {
           aria-label="Start Your Daily Log"
           data-card-entry
         >
-          <GuideStartLink className={styles.quickStart}>
+          <Button
+            navigation
+            variant="default"
+            size="lg"
+            nativeButton={false}
+            render={<GuideStartLink />}
+            className={`${styles.quickStart} h-auto p-0`}
+          >
             <ActionIcon name="shootingStar" className="size-[18px]" />
             Open My Daily Log
             <ActionIcon name="next" className="size-[18px]" />
-          </GuideStartLink>
+          </Button>
           <p>
             Reading on first can help you get familiar with the journal. You can
             also start now and come back anytime.
@@ -1053,11 +1084,18 @@ export function GuidePage() {
       </GuideOutline>
 
       <footer className={styles.footer}>
-        <GuideStartLink className={styles.returnAction}>
+        <Button
+          navigation
+          variant="default"
+          size="lg"
+          nativeButton={false}
+          render={<GuideStartLink />}
+          className={`${styles.returnAction} h-auto p-0`}
+        >
           <ActionIcon name="today" className="size-4" />
           Back To Today
           <ActionIcon name="next" className="size-4" />
-        </GuideStartLink>
+        </Button>
         <div className={styles.footerLinks}>
           <a href="#start" className={styles.topLink}>
             Back To The Steps

@@ -41,12 +41,16 @@ export default function ErrorPage({
         <ActionIcon name="retry" />
         Try again
       </Button>
-      <Link
-        href="/"
-        className="mt-3 inline-flex min-h-11 items-center px-4 text-sm text-canvas-muted-foreground underline-offset-4 hover:text-canvas-foreground hover:underline"
+      <Button
+        navigation
+        variant="ghost"
+        size="sm"
+        nativeButton={false}
+        render={<Link href="/" />}
+        className="mt-3 inline-flex min-h-11 items-center px-4 text-sm text-canvas-muted-foreground underline-offset-4 hover:text-canvas-foreground hover:underline h-auto"
       >
         Back to today
-      </Link>
+      </Button>
     </main>
   );
 }

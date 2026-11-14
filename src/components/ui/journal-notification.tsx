@@ -27,6 +27,7 @@ import {
   type NotificationExitReason,
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
+import { Button } from "@/components/ui/button";
 
 export type JournalNotificationDetails = {
   paragraphs?: ReactNode[];
@@ -318,9 +319,11 @@ export function JournalNotification({
   ) => {
     if (!isAction(value)) return value;
     return (
-      <button
+      <Button
+        variant={cancelAction ? "ghost" : "default"}
+        size="sm"
         type="button"
-        className={`journal-notification-action${cancelAction ? " journal-notification-cancel" : ""}`}
+        className={`journal-notification-action${cancelAction ? " journal-notification-cancel" : ""} h-auto`}
         style={
           cancelAction
             ? cancelButtonStyle
@@ -337,7 +340,7 @@ export function JournalNotification({
       >
         {value.label}
         {!cancelAction && <ArrowUpRight size={12} aria-hidden="true" />}
-      </button>
+      </Button>
     );
   };
 
@@ -493,9 +496,11 @@ export function JournalNotification({
             </span>
             <span className="journal-notification-actions">
               {undo && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   type="button"
-                  className="journal-notification-action journal-notification-undo"
+                  className="journal-notification-action journal-notification-undo h-auto"
                   data-undo-state={undoState}
                   disabled={undoState !== "ready" || phase !== "idle"}
                   aria-busy={undoState === "pending"}
@@ -514,7 +519,7 @@ export function JournalNotification({
                     : undoState === "done"
                       ? (undo.successLabel ?? "Undone")
                       : (undo.label ?? "Undo")}
-                </button>
+                </Button>
               )}
               {renderAction(cancel, true)}
               {renderAction(action)}

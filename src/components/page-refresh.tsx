@@ -52,6 +52,7 @@ import {
 } from "@/lib/page-refresh-handoff";
 
 import { notifyPageEntryReadiness } from "@/lib/page-entry-readiness";
+import { Button } from "@/components/ui/button";
 
 type PageRefreshContext = { refreshPage: () => void; unavailable: boolean };
 const Context = createContext<PageRefreshContext | null>(null);
@@ -745,7 +746,10 @@ export function CompactRefreshBrand() {
         if (gesture.current?.pointer === event.pointerId) cancelPull();
       }}
     >
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
+        render={<button type="button" />}
         ref={handle}
         type="button"
         className={`header-icon-button header-icon-button--compact header-brand-surface header-refresh-button brand-refresh-handle ${styles.button}`}
@@ -816,7 +820,7 @@ export function CompactRefreshBrand() {
             />
           </svg>
         </span>
-      </button>
+      </Button>
       {burst && (
         <span
           key={`${burst.kind}-${burst.sequence}`}

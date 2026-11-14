@@ -684,7 +684,9 @@ export function ReflectionDialog({
             <DialogClose
               disabled={finishing}
               render={
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   type="button"
                   className={closeStyles.control}
                   data-dialog-corner="control"

@@ -13,6 +13,7 @@ import { ReflectionMarkdown } from "@/components/reflection-markdown";
 import { formatDay } from "@/lib/domain";
 import closeStyles from "./dialog-close.module.css";
 import styles from "./reflection-reader-dialog.module.css";
+import { Button } from "@/components/ui/button";
 
 /** Reading changes no draft; editing resumes only after this dialog has closed. */
 export function ReflectionReaderDialog({
@@ -64,7 +65,9 @@ export function ReflectionReaderDialog({
           </div>
           <div className={styles.controls}>
             {onEdit && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 className={`${closeStyles.control} ${styles.control}`}
                 aria-label="Edit entry"
@@ -76,11 +79,13 @@ export function ReflectionReaderDialog({
                 }}
               >
                 <PencilLine aria-hidden="true" strokeWidth={2.2} />
-              </button>
+              </Button>
             )}
             <DialogClose
               render={
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   type="button"
                   className={`${closeStyles.control} ${styles.control}`}
                 />

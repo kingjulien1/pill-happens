@@ -19,6 +19,7 @@ import { checkInForDay, type DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { formatDay } from "@/lib/domain";
 import { reflectionStats } from "@/lib/reflection-writing";
 import styles from "./journal-reference-details.module.css";
+import { Button } from "@/components/ui/button";
 
 /** Direct journal links have no collection word-count threshold. */
 export function JournalEntryPage({
@@ -62,10 +63,17 @@ export function JournalEntryPage({
         context={formatDay(day, { month: "short", year: "numeric" })}
         icon={morning ? <Coffee /> : <MoonStar />}
         actions={
-          <Link className={styles.action} href={editHref}>
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={editHref} />}
+            className={`${styles.action} h-auto p-0`}
+          >
             <PencilLine size={14} aria-hidden="true" />
             {note.trim() ? "Continue writing" : "Open check-in"}
-          </Link>
+          </Button>
         }
       >
         {morning
@@ -81,10 +89,17 @@ export function JournalEntryPage({
               {stats.words === 1 ? "word" : "words"}
               <span aria-hidden="true">·</span>~{stats.readingMinutes} min read
             </span>
-            <Link href={`/history/${day}`} className={styles.periodLink}>
+            <Button
+              navigation
+              variant="ghost"
+              size="sm"
+              nativeButton={false}
+              render={<Link href={`/history/${day}`} />}
+              className={`${styles.periodLink} h-auto p-0`}
+            >
               Daily log
               <ArrowUpRight size={13} aria-hidden="true" />
-            </Link>
+            </Button>
           </div>
           <PageSurface
             className={styles.reading}
@@ -114,18 +129,29 @@ export function JournalEntryPage({
         </ReferenceEmpty>
       )}
       <nav className={styles.readingFooter} aria-label="Related journal pages">
-        <Link href={`/history/${day}`} className={styles.periodLink}>
+        <Button
+          navigation
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={<Link href={`/history/${day}`} />}
+          className={`${styles.periodLink} h-auto p-0`}
+        >
           Back to this day
           <ArrowUpRight size={13} aria-hidden="true" />
-        </Link>
+        </Button>
         {other?.note.trim() && (
-          <Link
-            href={`/journal/${day}/${sibling}`}
-            className={styles.periodLink}
+          <Button
+            navigation
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={`/journal/${day}/${sibling}`} />}
+            className={`${styles.periodLink} h-auto p-0`}
           >
             {morning ? "Evening" : "Morning"} Reflection
             <ArrowUpRight size={13} aria-hidden="true" />
-          </Link>
+          </Button>
         )}
       </nav>
     </div>

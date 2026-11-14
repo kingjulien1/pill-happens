@@ -31,6 +31,7 @@ import {
   type DraftWorkspace,
   type RememberedDialog,
 } from "@/lib/journal-drafts";
+import { Button } from "@/components/ui/button";
 
 export type { RememberedDialog } from "@/lib/journal-drafts";
 const destinationEvent = "pill:workspace-destination";
@@ -428,14 +429,16 @@ export function DraftStatus({
       )}
       {action ??
         (hasDraft && onReset && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
             data-dialog-corner="compact"
-            className="shrink-0 rounded px-1 py-0.5 text-foreground/70 underline-offset-2 focus-visible:underline"
+            className="shrink-0 rounded px-1 py-0.5 text-foreground/70 underline-offset-2 focus-visible:underline h-auto min-h-0 text-[10px] font-normal"
             onClick={onReset}
           >
             Reset Draft
-          </button>
+          </Button>
         ))}
     </div>
   );

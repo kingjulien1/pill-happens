@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { formatDay } from "@/lib/domain";
 import styles from "./history-heading.module.css";
+import { Button } from "@/components/ui/button";
 
 /** A single page opening, with coverage rather than a second list heading. */
 export function HistoryHeading({
@@ -77,9 +78,17 @@ export function HistoryDayHeading({
   const context = `${intakeCount.toLocaleString("en")} ${intakeCount === 1 ? "intake" : "intakes"} · ${medicationCount.toLocaleString("en")} ${medicationCount === 1 ? "medication" : "medications"}`;
   return (
     <header className={styles.dayHeader} data-history-day-heading>
-      <Link href="/history" className={styles.dayBack} data-history-day-back>
+      <Button
+        navigation
+        variant="ghost"
+        size="sm"
+        nativeButton={false}
+        render={<Link href="/history" />}
+        className={`${styles.dayBack} h-auto`}
+        data-history-day-back
+      >
         Past Days
-      </Link>
+      </Button>
       <h1 className={styles.dayTitle} data-history-day-title>
         {weekday}
       </h1>

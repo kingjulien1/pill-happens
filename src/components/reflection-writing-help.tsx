@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import closeStyles from "./dialog-close.module.css";
 import styles from "./reflection-writing-help.module.css";
+import { Button } from "@/components/ui/button";
 
 const examples = [
   ["Heading", "## A small win"],
@@ -58,7 +59,9 @@ export function ReflectionWritingHelp({
           </div>
           <DialogClose
             render={
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 className={`${closeStyles.control} ${styles.close}`}
                 data-dialog-corner="control"
