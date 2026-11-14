@@ -32,6 +32,7 @@ import {
 import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationLibraryCard } from "@/components/medication-library-card";
 import { MedicationActionButton } from "@/components/medication-action-button";
+import { MedicationDialogActions } from "@/components/medication-dialog-actions";
 import {
   MedicationClassBadges,
   medicationClassHighlights,
@@ -56,7 +57,12 @@ import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { DailyCheckInSection } from "@/components/daily-check-in";
 import { DayTimeMarker } from "@/components/day-time-marker";
 import { cn } from "@/lib/utils";
-import { GoalForm, MedicationForm } from "@/components/manage-forms";
+import {
+  GoalForm,
+  MedicationForm,
+  type MedicationDraftAvailability,
+  type MedicationFormControls,
+} from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { groupIntakes } from "@/lib/intake-groups";
@@ -520,6 +526,13 @@ export function MedicationsPage() {
   const open = Boolean(
     medicationDialog && (medicationDialog.kind === "medication-new" || editing),
   );
+  const formControls = useRef<MedicationFormControls>(null);
+  const medicationOpener = useRef<HTMLElement | null>(null);
+  const [formDraft, setFormDraft] =
+    useState<MedicationDraftAvailability | null>(null);
+  const formDraftKey = editing ? `med:edit:${editing.id}` : "med:new";
+  const canResetDraft =
+    formDraft?.draftKey === formDraftKey && formDraft.hasDraft;
   useLayoutEffect(() => {
     if (!referenceKey) {
       referenceVisit.current = "";
@@ -556,7 +569,8 @@ export function MedicationsPage() {
       : reference?.kind === "medication"
         ? medications[0]?.name || "Medication unavailable"
         : "Reference unavailable";
-  async function archive(medication: Medication) {
+  async function archive(medication: Medication): Promise<boolean> {
+    if (busy) return false;
     try {
       const saved = await mutate(
         `medications/${medication.id}`,
@@ -592,8 +606,10 @@ export function MedicationsPage() {
         },
       );
       closeDialog(medicationDialog ?? undefined);
+      return true;
     } catch {
       /* Provider displays the error; keep the editor and draft available. */
+      return false;
     }
   }
   return (
@@ -605,7 +621,10 @@ export function MedicationsPage() {
       <MedicationActionButton
         intent="add"
         className="mb-7"
-        onClick={() => openDialog({ kind: "medication-new" })}
+        onClick={(event) => {
+          medicationOpener.current = event.currentTarget;
+          openDialog({ kind: "medication-new" });
+        }}
       />
       {hasReference ? (
         <section
@@ -696,9 +715,13 @@ export function MedicationsPage() {
                 key={medication.id}
                 medication={medication}
                 disabled={busy}
-                onEdit={() =>
-                  openDialog({ kind: "medication-edit", id: medication.id })
-                }
+                onEdit={() => {
+                  medicationOpener.current =
+                    document.querySelector<HTMLElement>(
+                      `[data-medication-library-card="${CSS.escape(medication.id)}"]`,
+                    );
+                  openDialog({ kind: "medication-edit", id: medication.id });
+                }}
               />
             ))}
           </div>
@@ -710,42 +733,47 @@ export function MedicationsPage() {
           if (!next && medicationDialog) closeDialog(medicationDialog);
         }}
         scrollKey={editing ? `med:edit:${editing.id}` : "med:new"}
+        returnFocus={() => {
+          const opener = medicationOpener.current;
+          // Archive can remove its own list card; keep a stable keyboard target.
+          return opener?.isConnected &&
+            !opener.matches(":disabled, [aria-disabled='true']")
+            ? opener
+            : document.querySelector<HTMLElement>(
+                "[data-medication-add-action]",
+              );
+        }}
         title={editing ? "Edit Medication" : "Add Medication"}
         headerVariant="medication"
-        context={editing ? "Update Details" : "The Essentials"}
-        description="Medication details and appearance."
+        headerActions={
+          <MedicationDialogActions
+            key={formDraftKey}
+            medicationName={editing?.name ?? "New Medication"}
+            resetDisabled={busy || !canResetDraft}
+            archiveDisabled={busy}
+            archived={editing?.archived}
+            onReset={() =>
+              formControls.current?.draftKey === formDraftKey
+                ? formControls.current.resetDraft()
+                : false
+            }
+            onArchive={editing ? () => archive(editing) : undefined}
+          />
+        }
+        description={
+          editing
+            ? "Update details, then review the look. Changes also update linked past doses; recorded quantities and times stay as entered."
+            : "Set the name, strength and usual amount. An ingredient is optional; preview your symbol and color below."
+        }
       >
         {open && (
-          <>
-            <MedicationForm
-              key={editing?.id ?? "new"}
-              medication={editing}
-              onSaved={() => closeDialog(medicationDialog ?? undefined)}
-            />
-            {editing && (
-              <div
-                data-dialog-panel
-                className="mt-4 rounded-xl border border-border/60 bg-muted/20 p-1"
-              >
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={busy}
-                  onClick={() => void archive(editing)}
-                  className="h-11 w-full gap-2 text-xs text-muted-foreground"
-                  data-medication-archive-action
-                >
-                  <ActionIcon
-                    name={editing.archived ? "restore" : "archive"}
-                    className="size-4"
-                  />
-                  {editing.archived
-                    ? "Restore Medication"
-                    : "Archive Medication"}
-                </Button>
-              </div>
-            )}
-          </>
+          <MedicationForm
+            key={editing?.id ?? "new"}
+            medication={editing}
+            controlsRef={formControls}
+            onDraftAvailabilityChange={setFormDraft}
+            onSaved={() => closeDialog(medicationDialog ?? undefined)}
+          />
         )}
       </ResponsiveModal>
     </>

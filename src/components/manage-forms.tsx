@@ -2,7 +2,14 @@
 
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
-import { useId, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useState,
+  type FormEvent,
+  type Ref,
+} from "react";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import type { SymbolSourceFilter } from "@/lib/medication-symbol-browser";
@@ -152,17 +159,32 @@ function isGoalDraft(value: unknown): value is GoalDraft {
   );
 }
 
+export type MedicationFormControls = {
+  draftKey: string;
+  resetDraft: () => boolean;
+};
+
+export type MedicationDraftAvailability = {
+  draftKey: string;
+  hasDraft: boolean;
+};
+
 export function MedicationForm({
   medication,
   onSaved,
+  controlsRef,
+  onDraftAvailabilityChange,
 }: {
   medication?: Medication;
   onSaved: () => void;
+  controlsRef?: Ref<MedicationFormControls>;
+  onDraftAvailabilityChange?: (state: MedicationDraftAvailability) => void;
 }) {
   const { mutate, busy } = useJournal();
   const id = useId();
+  const draftKey = medication ? `med:edit:${medication.id}` : "med:new";
   const draft = usePersistentDraft(
-    medication ? `med:edit:${medication.id}` : "med:new",
+    draftKey,
     () => medicationDefaults(medication),
     isMedicationDraft,
   );
@@ -197,11 +219,21 @@ export function MedicationForm({
   const setIcon = (value: string) => setField("icon", value);
   const { isBenzodiazepine, isOpioid } = medicationCategoryFlags(categories);
   const [error, setError] = useState<string | null>(null);
+  const [resetRevision, setResetRevision] = useState(0);
   const type = getMedicationType(form);
   const reset = () => {
+    if (busy || !draft.hasDraft) return false;
     draft.resetDraft(medicationDefaults(medication));
     setError(null);
+    setResetRevision((revision) => revision + 1);
+    return true;
   };
+  // Header controls use this form's live draft; they never create a second store.
+  useImperativeHandle(controlsRef, () => ({ draftKey, resetDraft: reset }));
+  useEffect(() => {
+    onDraftAvailabilityChange?.({ draftKey, hasDraft: draft.hasDraft });
+    return () => onDraftAvailabilityChange?.({ draftKey, hasDraft: false });
+  }, [draftKey, draft.hasDraft, onDraftAvailabilityChange]);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -428,6 +460,7 @@ export function MedicationForm({
         </div>
 
         <MedicationAppearanceFields
+          key={resetRevision}
           previewMotion={previewMotion ?? true}
           onPreviewMotionChange={(value) => setField("previewMotion", value)}
           symbolSource={symbolSource ?? "all"}
@@ -461,10 +494,10 @@ export function MedicationForm({
         </p>
       )}
 
-      <div className="w-full space-y-3 pt-4" data-medication-save-footer>
+      <div className="w-full space-y-3 pt-1" data-medication-save-footer>
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
           <MedicationActionButton intent="save" type="submit" pending={busy} />
-          <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+          <DraftStatus {...draft} />
         </div>
       </div>
     </form>

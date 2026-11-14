@@ -94,12 +94,25 @@ export function ResponsiveModal({
     closeNode: ReactNode,
     descriptionNode: ReactNode,
   ) => (
-    <div className={styles.headingRow} data-modal-header>
+    <div
+      className={cn(
+        styles.headingRow,
+        medicationHeader && styles.medicationHeader,
+      )}
+      data-modal-header
+    >
       <div className={styles.headingCopy}>
         {titleNode}
-        {context && <p className={styles.context}>{context}</p>}
+        {context && !medicationHeader && (
+          <p className={styles.context}>{context}</p>
+        )}
       </div>
-      <div className={closeStyles.actions}>
+      <div
+        className={cn(
+          closeStyles.actions,
+          medicationHeader && styles.medicationActions,
+        )}
+      >
         {headerActions}
         {closeNode}
       </div>
@@ -110,8 +123,13 @@ export function ResponsiveModal({
     <Button
       variant="ghost"
       size="icon"
-      className={closeStyles.control}
-      data-dialog-corner="control"
+      rim={false}
+      className={cn(
+        closeStyles.control,
+        medicationHeader && closeStyles.medicationControl,
+      )}
+      data-dialog-corner={medicationHeader ? "medication" : "control"}
+      data-modal-close
       aria-label="Close"
     />
   );
@@ -123,7 +141,10 @@ export function ResponsiveModal({
           ref={setScrollElement}
           data-dialog-scroll
           showCloseButton={false}
-          className="max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]"
+          className={cn(
+            "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
+            medicationHeader && styles.medicationDialog,
+          )}
         >
           <DialogHeader
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
@@ -137,9 +158,7 @@ export function ResponsiveModal({
                   className="size-[18px]"
                 />
               </DialogClose>,
-              <DialogDescription
-                className={medicationHeader ? "sr-only" : styles.description}
-              >
+              <DialogDescription className={styles.description}>
                 {description}
               </DialogDescription>,
             )}
@@ -157,7 +176,8 @@ export function ResponsiveModal({
         <DrawerHeader
           className={cn(
             "px-6 pt-5 pb-4 text-left!",
-            medicationHeader && "pb-3 min-[360px]:pb-5",
+            medicationHeader &&
+              cn("pb-3 min-[360px]:pb-5", styles.medicationDrawerHeader),
           )}
         >
           {headerContent(
@@ -169,9 +189,7 @@ export function ResponsiveModal({
                 className="size-[18px]"
               />
             </DrawerClose>,
-            <DrawerDescription
-              className={medicationHeader ? "sr-only" : styles.description}
-            >
+            <DrawerDescription className={styles.description}>
               {description}
             </DrawerDescription>,
           )}

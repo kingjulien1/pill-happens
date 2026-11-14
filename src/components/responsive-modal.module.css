@@ -43,6 +43,31 @@
   text-align: left;
 }
 
+.medicationHeader {
+  align-items: center;
+  column-gap: 8px;
+  margin-block-start: 0;
+}
+
+.medicationHeader .headingCopy {
+  padding-block-start: 0;
+}
+
+.medicationActions {
+  /* Reset and Archive are grouped at 2px; Close gets its own breathing room. */
+  gap: 8px;
+}
+
+.medicationDrawerHeader {
+  /* Place the centered title at 7/12 of its former 33px top offset. */
+  padding-block-start: 3.958333px;
+}
+
+.medicationDialog {
+  /* The desktop title likewise moves from 28px to 16 1/3px. */
+  padding-block-start: 15.041667px;
+}
+
 @media (min-width: 768px) {
   .title {
     font-size: 24px;

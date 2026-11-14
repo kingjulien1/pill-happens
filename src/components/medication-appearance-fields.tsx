@@ -352,326 +352,329 @@ export function MedicationAppearanceFields({
   const hasMore = visibleResults.length < results.length;
 
   return (
-    <section
-      aria-label="Medication appearance"
-      className={`medication-appearance w-full min-w-0 space-y-5 ${styles.appearance}`}
-      data-medication-appearance
-    >
-      <header className="space-y-1.5">
-        <h3 id={`${id}-appearance-title`} className="text-[13px] font-[550]">
-          Appearance
-        </h3>
-        <p
-          id={`${id}-appearance-description`}
-          className="text-[11px] leading-relaxed text-muted-foreground"
-        >
-          Make it easy to spot. Choose a familiar symbol and color.
-        </p>
-      </header>
-
-      <div className="space-y-4">
-        <section
-          aria-label="Medication symbol"
-          className="w-full min-w-0 space-y-2"
-        >
-          <div className="relative">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground"
-              strokeWidth={2.75}
-            />
-            <Input
-              ref={searchInput}
-              id={`${id}-search`}
-              type="search"
-              maxLength={1000}
-              value={query}
-              onChange={(event) => updateQuery(event.target.value)}
-              onCompositionStart={() => {
-                composing.current = true;
-                clearTimeout(timer.current ?? undefined);
-                clearTimeout(loadMoreTimer.current ?? undefined);
-                clearTimeout(feedbackTimer.current ?? undefined);
-                timer.current = null;
-                loadMoreTimer.current = null;
-                feedbackTimer.current = null;
-                searchSequence.current++;
-                setFeedback(null);
-                setLoadingMore(false);
-                setVisibleCount(SYMBOL_PAGE_SIZE);
-                setRevealedFrom(null);
-                setResults([]);
-                setPhase("loading");
-              }}
-              onCompositionEnd={(event) => {
-                composing.current = false;
-                updateQuery(event.currentTarget.value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") event.preventDefault();
-              }}
-              aria-label="Search icons, SVGs, and emoji"
-              aria-describedby={`${id}-appearance-description ${id}-search-help`}
-              aria-controls={`${id}-results`}
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="Find its symbol…"
-              enterKeyHint="search"
-              className="h-10 rounded-xl pr-10 pl-9 text-base md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
-            />
-            {query && (
-              <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={() => {
-                  updateQuery("");
-                  searchInput.current?.focus();
-                }}
-                aria-label="Clear icon search"
-                data-dialog-corner="compact"
-                className="absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
-              >
-                <X className="size-4" strokeWidth={2.75} aria-hidden="true" />
-              </Button>
-            )}
-          </div>
-          <p id={`${id}-search-help`} className="sr-only">
-            Search component names, display names, and keywords in English or
-            German. Type “svg” for local artwork, “outline” for medication
-            outlines, or “color” for flat-color artwork. Results appear 2.5
-            seconds after you stop typing. Searching does not change your
-            selected icon. Choose a source to browse, then load more symbols in
-            groups of 100.
-          </p>
+    <>
+      <section
+        aria-label="Medication appearance"
+        className={`medication-appearance w-full min-w-0 space-y-5 ${styles.appearance}`}
+        data-medication-appearance
+      >
+        <header className="space-y-1.5">
+          <h3 id={`${id}-appearance-title`} className="text-[13px] font-[550]">
+            Appearance
+          </h3>
           <p
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="sr-only"
-            data-appearance-search-status
+            id={`${id}-appearance-description`}
+            className="text-[11px] leading-relaxed text-muted-foreground"
           >
-            {loadingMore
-              ? "Loading more symbols."
-              : phase === "loading"
-                ? "Searching symbols."
-                : phase === "ready"
-                  ? `${visibleResults.length} of ${results.length} symbols shown${query.trim() ? ` for “${query.trim()}”` : ""}.`
-                  : "Search for an icon or emoji."}
+            Make it easy to spot. Choose a familiar symbol and color.
           </p>
-          <div
-            role="group"
-            aria-label="Symbol sources"
-            aria-describedby={`${id}-source-help`}
-            className={styles.sourceFilters}
-            data-appearance-symbol-header
+        </header>
+
+        <div className="space-y-4">
+          <section
+            aria-label="Medication symbol"
+            className="w-full min-w-0 space-y-2"
           >
-            {sourceFilters.map((filter) => (
-              <button
-                key={filter.value}
-                type="button"
-                className={styles.sourceFilter}
-                onClick={() => chooseSource(filter.value)}
-                aria-pressed={sourceFilter === filter.value}
+            <div className="relative">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground"
+                strokeWidth={2.75}
+              />
+              <Input
+                ref={searchInput}
+                id={`${id}-search`}
+                type="search"
+                maxLength={1000}
+                value={query}
+                onChange={(event) => updateQuery(event.target.value)}
+                onCompositionStart={() => {
+                  composing.current = true;
+                  clearTimeout(timer.current ?? undefined);
+                  clearTimeout(loadMoreTimer.current ?? undefined);
+                  clearTimeout(feedbackTimer.current ?? undefined);
+                  timer.current = null;
+                  loadMoreTimer.current = null;
+                  feedbackTimer.current = null;
+                  searchSequence.current++;
+                  setFeedback(null);
+                  setLoadingMore(false);
+                  setVisibleCount(SYMBOL_PAGE_SIZE);
+                  setRevealedFrom(null);
+                  setResults([]);
+                  setPhase("loading");
+                }}
+                onCompositionEnd={(event) => {
+                  composing.current = false;
+                  updateQuery(event.currentTarget.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") event.preventDefault();
+                }}
+                aria-label="Search icons, SVGs, and emoji"
+                aria-describedby={`${id}-appearance-description ${id}-search-help`}
                 aria-controls={`${id}-results`}
-                data-symbol-filter={filter.value}
-              >
-                <span>{filter.count.toLocaleString("en")}</span> {filter.label}
-              </button>
-            ))}
-          </div>
-          <p id={`${id}-source-help`} className="sr-only">
-            Icons includes custom symbols. Customs shows only those symbols.
-            Activate the selected source again to search all sources.
-          </p>
-          <div className="relative rounded-2xl" data-appearance-result-frame>
-            <div
-              id={`${id}-results`}
-              ref={symbolPanel}
-              className={pickerPanelClass}
-              aria-busy={phase === "loading" || loadingMore}
-              data-appearance-results
-              data-symbol-source={sourceFilter}
-              data-symbol-phase={phase}
-              data-symbol-total={results.length}
-              data-symbol-visible={visibleResults.length}
-              data-symbol-loading-more={loadingMore}
-            >
-              {phase !== "ready" || !results.length ? (
-                <SymbolSearchState
-                  phase={phase === "ready" ? "empty" : phase}
-                />
-              ) : (
-                <>
-                  <div
-                    role="radiogroup"
-                    aria-label="Icon search results"
-                    className={pickerGridClass}
-                    data-symbol-result-grid
-                  >
-                    {visibleResults.map((item, index) => (
-                      <Fragment key={`${item.source}-${item.value}`}>
-                        {index > 0 && index % SYMBOL_PAGE_SIZE === 0 && (
-                          <div
-                            aria-hidden="true"
-                            className={styles.batchSeparator}
-                            data-symbol-batch-separator
-                            data-after-count={index}
-                          />
-                        )}
-                        <div
-                          className={`relative min-w-0 ${revealedFrom !== null && index >= revealedFrom ? styles.revealedChoice : ""}`}
-                        >
-                          <input
-                            type="radio"
-                            id={`${id}-symbol-${item.source}-${item.value}`}
-                            name={`${id}-symbol`}
-                            value={item.value}
-                            checked={icon === item.value}
-                            onChange={() => chooseIcon(item.value)}
-                            aria-label={`${item.label} · ${item.source}`}
-                            data-medication-icon={item.value}
-                            data-symbol-source={item.source}
-                            className="peer sr-only"
-                          />
-                          <label
-                            htmlFor={`${id}-symbol-${item.source}-${item.value}`}
-                            title={`${item.label} · ${item.source}`}
-                            className={pickerChoiceClass}
-                            data-appearance-choice="symbol"
-                            data-selected={icon === item.value}
-                          >
-                            <MedicationGlyph
-                              icon={item.value}
-                              className="size-5"
-                            />
-                          </label>
-                        </div>
-                      </Fragment>
-                    ))}
-                  </div>
-                  {results.length > SYMBOL_PAGE_SIZE && (
-                    <div className={styles.paginationFooter}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        type="button"
-                        onClick={loadMore}
-                        className={styles.loadMore}
-                        aria-disabled={loadingMore || !hasMore}
-                        aria-busy={loadingMore}
-                        aria-controls={`${id}-results`}
-                        data-symbol-load-more
-                        data-loading={loadingMore}
-                        data-has-more={hasMore}
-                        data-complete={!hasMore}
-                      >
-                        {loadingMore ? (
-                          <LoaderCircle
-                            aria-hidden="true"
-                            className={styles.loadIcon}
-                            size={14}
-                            data-symbol-load-spinner
-                          />
-                        ) : hasMore ? (
-                          <ArrowDown
-                            aria-hidden="true"
-                            className={styles.loadIcon}
-                            size={14}
-                          />
-                        ) : (
-                          <Check
-                            aria-hidden="true"
-                            className={styles.loadIcon}
-                            size={14}
-                          />
-                        )}
-                        {loadingMore
-                          ? "Loading…"
-                          : hasMore
-                            ? "Load more"
-                            : "All shown"}
-                      </Button>
-                      <span className={styles.pageCount} aria-hidden="true">
-                        {visibleResults.length.toLocaleString("en")} /{" "}
-                        {results.length.toLocaleString("en")}
-                      </span>
-                    </div>
-                  )}
-                </>
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="Find its symbol…"
+                enterKeyHint="search"
+                className="h-10 rounded-xl pr-10 pl-9 text-base md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
+              />
+              {query && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  onClick={() => {
+                    updateQuery("");
+                    searchInput.current?.focus();
+                  }}
+                  aria-label="Clear icon search"
+                  data-dialog-corner="compact"
+                  className="absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5"
+                >
+                  <X className="size-4" strokeWidth={2.75} aria-hidden="true" />
+                </Button>
               )}
             </div>
-            {feedback && (
-              <span
-                key={feedback.id}
-                aria-hidden="true"
-                className="symbol-results-feedback"
-                data-search-feedback={feedback.tone}
-              />
-            )}
-          </div>
-        </section>
-
-        <fieldset className="w-full min-w-0 space-y-2">
-          <legend className="sr-only">Medication color</legend>
-          <div
-            className="flex min-h-4 items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
-            data-appearance-color-header
-          >
-            <span className="shrink-0">Color Palette</span>
-            <span className="flex min-w-0 items-center justify-end gap-1 text-right">
-              <span className="shrink-0 font-[550] tabular-nums">
-                {MEDICATION_COLORS.length}
-              </span>
-              <span className="shrink-0">shades</span>
-              <span className="mx-0.5 shrink-0" aria-hidden="true">
-                ·
-              </span>
-              <span className="truncate" title={selectedColor.label}>
-                {selectedColor.label}
-              </span>
-            </span>
-          </div>
-          <div
-            ref={colorPanel}
-            className={pickerPanelClass}
-            data-appearance-color-results
-          >
-            <div className={pickerGridClass} data-appearance-colors>
-              {MEDICATION_COLORS.map((item) => (
-                <div key={item.value} className="relative min-w-0">
-                  <input
-                    type="radio"
-                    id={`${id}-color-${item.value}`}
-                    name={`${id}-color`}
-                    value={item.value}
-                    checked={color === item.value}
-                    onChange={() => chooseColor(item.value)}
-                    aria-label={`${item.label} medication color`}
-                    data-medication-color={item.value}
-                    className="peer sr-only"
-                  />
-                  <label
-                    htmlFor={`${id}-color-${item.value}`}
-                    title={item.label}
-                    className={pickerChoiceClass}
-                    data-appearance-choice="color"
-                    data-selected={color === item.value}
-                  >
-                    <span
-                      className={styles.paletteSwatch}
-                      data-palette-swatch
-                      style={{
-                        backgroundColor: item.hex,
-                      }}
-                    />
-                  </label>
-                </div>
+            <p id={`${id}-search-help`} className="sr-only">
+              Search component names, display names, and keywords in English or
+              German. Type “svg” for local artwork, “outline” for medication
+              outlines, or “color” for flat-color artwork. Results appear 2.5
+              seconds after you stop typing. Searching does not change your
+              selected icon. Choose a source to browse, then load more symbols
+              in groups of 100.
+            </p>
+            <p
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className="sr-only"
+              data-appearance-search-status
+            >
+              {loadingMore
+                ? "Loading more symbols."
+                : phase === "loading"
+                  ? "Searching symbols."
+                  : phase === "ready"
+                    ? `${visibleResults.length} of ${results.length} symbols shown${query.trim() ? ` for “${query.trim()}”` : ""}.`
+                    : "Search for an icon or emoji."}
+            </p>
+            <div
+              role="group"
+              aria-label="Symbol sources"
+              aria-describedby={`${id}-source-help`}
+              className={styles.sourceFilters}
+              data-appearance-symbol-header
+            >
+              {sourceFilters.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  className={styles.sourceFilter}
+                  onClick={() => chooseSource(filter.value)}
+                  aria-pressed={sourceFilter === filter.value}
+                  aria-controls={`${id}-results`}
+                  data-symbol-filter={filter.value}
+                >
+                  <span>{filter.count.toLocaleString("en")}</span>{" "}
+                  {filter.label}
+                </button>
               ))}
             </div>
-          </div>
-        </fieldset>
-      </div>
+            <p id={`${id}-source-help`} className="sr-only">
+              Icons includes custom symbols. Customs shows only those symbols.
+              Activate the selected source again to search all sources.
+            </p>
+            <div className="relative rounded-2xl" data-appearance-result-frame>
+              <div
+                id={`${id}-results`}
+                ref={symbolPanel}
+                className={pickerPanelClass}
+                aria-busy={phase === "loading" || loadingMore}
+                data-appearance-results
+                data-symbol-source={sourceFilter}
+                data-symbol-phase={phase}
+                data-symbol-total={results.length}
+                data-symbol-visible={visibleResults.length}
+                data-symbol-loading-more={loadingMore}
+              >
+                {phase !== "ready" || !results.length ? (
+                  <SymbolSearchState
+                    phase={phase === "ready" ? "empty" : phase}
+                  />
+                ) : (
+                  <>
+                    <div
+                      role="radiogroup"
+                      aria-label="Icon search results"
+                      className={pickerGridClass}
+                      data-symbol-result-grid
+                    >
+                      {visibleResults.map((item, index) => (
+                        <Fragment key={`${item.source}-${item.value}`}>
+                          {index > 0 && index % SYMBOL_PAGE_SIZE === 0 && (
+                            <div
+                              aria-hidden="true"
+                              className={styles.batchSeparator}
+                              data-symbol-batch-separator
+                              data-after-count={index}
+                            />
+                          )}
+                          <div
+                            className={`relative min-w-0 ${revealedFrom !== null && index >= revealedFrom ? styles.revealedChoice : ""}`}
+                          >
+                            <input
+                              type="radio"
+                              id={`${id}-symbol-${item.source}-${item.value}`}
+                              name={`${id}-symbol`}
+                              value={item.value}
+                              checked={icon === item.value}
+                              onChange={() => chooseIcon(item.value)}
+                              aria-label={`${item.label} · ${item.source}`}
+                              data-medication-icon={item.value}
+                              data-symbol-source={item.source}
+                              className="peer sr-only"
+                            />
+                            <label
+                              htmlFor={`${id}-symbol-${item.source}-${item.value}`}
+                              title={`${item.label} · ${item.source}`}
+                              className={pickerChoiceClass}
+                              data-appearance-choice="symbol"
+                              data-selected={icon === item.value}
+                            >
+                              <MedicationGlyph
+                                icon={item.value}
+                                className="size-5"
+                              />
+                            </label>
+                          </div>
+                        </Fragment>
+                      ))}
+                    </div>
+                    {results.length > SYMBOL_PAGE_SIZE && (
+                      <div className={styles.paginationFooter}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          type="button"
+                          onClick={loadMore}
+                          className={styles.loadMore}
+                          aria-disabled={loadingMore || !hasMore}
+                          aria-busy={loadingMore}
+                          aria-controls={`${id}-results`}
+                          data-symbol-load-more
+                          data-loading={loadingMore}
+                          data-has-more={hasMore}
+                          data-complete={!hasMore}
+                        >
+                          {loadingMore ? (
+                            <LoaderCircle
+                              aria-hidden="true"
+                              className={styles.loadIcon}
+                              size={14}
+                              data-symbol-load-spinner
+                            />
+                          ) : hasMore ? (
+                            <ArrowDown
+                              aria-hidden="true"
+                              className={styles.loadIcon}
+                              size={14}
+                            />
+                          ) : (
+                            <Check
+                              aria-hidden="true"
+                              className={styles.loadIcon}
+                              size={14}
+                            />
+                          )}
+                          {loadingMore
+                            ? "Loading…"
+                            : hasMore
+                              ? "Load more"
+                              : "All shown"}
+                        </Button>
+                        <span className={styles.pageCount} aria-hidden="true">
+                          {visibleResults.length.toLocaleString("en")} /{" "}
+                          {results.length.toLocaleString("en")}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              {feedback && (
+                <span
+                  key={feedback.id}
+                  aria-hidden="true"
+                  className="symbol-results-feedback"
+                  data-search-feedback={feedback.tone}
+                />
+              )}
+            </div>
+          </section>
+
+          <fieldset className="w-full min-w-0 space-y-2">
+            <legend className="sr-only">Medication color</legend>
+            <div
+              className="flex min-h-4 items-center justify-between gap-2 text-[10px] leading-4 text-muted-foreground"
+              data-appearance-color-header
+            >
+              <span className="shrink-0">Color Palette</span>
+              <span className="flex min-w-0 items-center justify-end gap-1 text-right">
+                <span className="shrink-0 font-[550] tabular-nums">
+                  {MEDICATION_COLORS.length}
+                </span>
+                <span className="shrink-0">shades</span>
+                <span className="mx-0.5 shrink-0" aria-hidden="true">
+                  ·
+                </span>
+                <span className="truncate" title={selectedColor.label}>
+                  {selectedColor.label}
+                </span>
+              </span>
+            </div>
+            <div
+              ref={colorPanel}
+              className={pickerPanelClass}
+              data-appearance-color-results
+            >
+              <div className={pickerGridClass} data-appearance-colors>
+                {MEDICATION_COLORS.map((item) => (
+                  <div key={item.value} className="relative min-w-0">
+                    <input
+                      type="radio"
+                      id={`${id}-color-${item.value}`}
+                      name={`${id}-color`}
+                      value={item.value}
+                      checked={color === item.value}
+                      onChange={() => chooseColor(item.value)}
+                      aria-label={`${item.label} medication color`}
+                      data-medication-color={item.value}
+                      className="peer sr-only"
+                    />
+                    <label
+                      htmlFor={`${id}-color-${item.value}`}
+                      title={item.label}
+                      className={pickerChoiceClass}
+                      data-appearance-choice="color"
+                      data-selected={color === item.value}
+                    >
+                      <span
+                        className={styles.paletteSwatch}
+                        data-palette-swatch
+                        style={{
+                          backgroundColor: item.hex,
+                        }}
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </section>
 
       <section
         aria-labelledby={`${id}-preview-title`}
@@ -932,6 +935,6 @@ export function MedicationAppearanceFields({
           </div>
         </div>
       </section>
-    </section>
+    </>
   );
 }

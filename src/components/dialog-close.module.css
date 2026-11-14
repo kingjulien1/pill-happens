@@ -78,3 +78,27 @@
   justify-content: flex-end;
   gap: 4px;
 }
+
+/* The top controls' 46px / 23px geometry, scaled by 17/24 (29 1/6% less). */
+.control.medicationControl[data-slot="button"][data-button-system="daily"] {
+  --dialog-button-radius: 9.916667px;
+  --button-secondary: var(--daily-action-inner-edge, #7008e7);
+  width: 32.583333px;
+  height: 32.583333px;
+  min-width: 32.583333px;
+  min-height: 32.583333px;
+  border: 0;
+  border-radius: 9.916667px;
+  background: var(--button-face);
+  color: var(--button-secondary);
+  box-shadow: none;
+}
+
+.control.medicationControl::before {
+  display: none;
+}
+
+.control.medicationControl > svg {
+  width: 16.291667px;
+  height: 16.291667px;
+}
