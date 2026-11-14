@@ -906,11 +906,7 @@
   --entry-card-radius: var(--intake-card-radius);
   --entry-rim-width: 2.5px;
   --entry-card-padding: 15px;
-  --entry-surface-base: color-mix(
-    in srgb,
-    var(--entry-color, var(--card-foreground)) 4%,
-    transparent
-  );
+  --entry-surface-base: var(--background);
   --entry-edge-color: color-mix(
     in srgb,
     var(--card-foreground) 10%,
@@ -1074,10 +1070,7 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--popover);
-  background-image: linear-gradient(
-    var(--entry-icon-tint),
-    var(--entry-icon-tint)
-  );
+  background-image: none;
 }
 .medication-card-base[data-card-empty="true"] .medication-card-content {
   justify-content: center;

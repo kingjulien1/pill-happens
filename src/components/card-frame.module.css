@@ -18,12 +18,8 @@
   --entry-inner-rim-offset: calc(
     var(--entry-rim-width) - var(--entry-frame-outset)
   );
-  /* The opaque foundation still covers the complete rear faces in a stack. */
-  --entry-surface-base: color-mix(
-    in srgb,
-    var(--entry-color, var(--entry-frame-accent)) 5%,
-    var(--background)
-  );
+  /* A plain canvas keeps color in the artwork and fully covers rear cards. */
+  --entry-surface-base: var(--background);
   overflow: visible;
 }
 

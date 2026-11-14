@@ -108,7 +108,6 @@ export function MedicationCardIcon({
       style={
         {
           "--entry-color": color.hex,
-          "--entry-icon-tint": `${color.hex}66`,
           ...style,
         } as CSSProperties
       }
@@ -151,7 +150,6 @@ export function MedicationCardIconStack({
       style={
         {
           "--entry-color": color.hex,
-          "--entry-icon-tint": `${color.hex}66`,
           "--icon-stack-width": `${stack.width}px`,
           "--icon-stack-rail-width": `${stack.rail.width}px`,
           "--icon-stack-scale": stack.rail.scale,

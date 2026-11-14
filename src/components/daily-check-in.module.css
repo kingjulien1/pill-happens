@@ -11,7 +11,7 @@
   pointer-events: none;
 }
 
-/* Check-ins use the same frame accent and opaque five-percent face as entries. */
+/* Check-ins use the same inward frame and plain opaque canvas as entries. */
 .card:global(.intake-log-card) {
   --check-in-secondary: var(--action-background);
   --check-in-accent: var(--entry-frame-accent);
