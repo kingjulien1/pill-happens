@@ -781,11 +781,12 @@ export function DeveloperGuidePage() {
               open
             >
               <p>
-                Today’s main Log Intake action shares the opaque page canvas
-                and adds one 23% reflection of the branding Pink. Its solid
+                Today’s main Log Intake action uses the opaque foundation color
+                with a 40% Purple 950 tint. Its solid
                 surface omits decorative background layers; the independent
-                specular rim uses pale, saturated and deep Pink stops to keep
-                the moving edge distinct. Text follows the page foreground,
+                specular rim uses nearby Pink, Purple and Fuchsia shades at 30%
+                opacity for a quieter moving edge. A Violet 700 inner band
+                remains distinct beneath it. Text follows the page foreground,
                 with deeper Pink icon ink in light mode and branding Pink in
                 dark mode. Native behavior and the existing entry animation
                 remain attached to the same control. Other action specimens
@@ -1031,12 +1032,14 @@ export function DeveloperGuidePage() {
                 proportional 19.425px corner radius. It opts into
                 <code>{' surface="solid"'}</code> and an independent
                 <code> rim</code>. The face is the fully opaque
-                <code> --background</code> plus branding Pink at 23%, without
-                the old field, glaze or tint components. The original inward
-                4px Pink 800 frame and 2px Pink 500 band at 30% remain beneath
-                the moving 3px specular edge. Its five hex stops range from
-                pale Pink through saturated Pink to deep Rose, with a matching
-                CSS fallback when WebGL is unavailable. Motion retains its
+                <code> --background</code> plus Purple 950 at 40%, without
+                the old field, glaze or tint components. A face-colored 4px
+                inset masks the outer part of a 6px Violet 700 inset, leaving
+                a crisp 2px inner band. The moving 3px outer edge is 30% opaque;
+                nearby Pink 300, Purple 300 and Fuchsia 300 stops reduce its
+                light-to-dark variation. Both the GPU layer and CSS fallback
+                use that same opacity, with the fallback hidden once the GPU
+                renders successfully. Motion retains its
                 existing hidden, offscreen, disabled and reduced-motion guards.
                 Text and icon colors adapt to the resolved theme so both light
                 and dark faces remain readable. Focus draws inward, while the
