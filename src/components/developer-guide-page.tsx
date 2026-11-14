@@ -1946,6 +1946,22 @@ export function DeveloperGuidePage() {
                 memory remain with the existing primitives.
               </p>
               <p>
+                Dialog heading sections use 7/12 of their previous top padding,
+                a 5/12 reduction, while keeping their text and action sizes.
+                Headers are part of the content flow: title, supporting copy
+                and header controls scroll out of view together. Mobile drawers
+                place the header inside the same remembered scroller as the
+                form, matching desktop dialogs. Edit Intake omits the duplicate
+                Update Entry context and keeps its existing description directly
+                beneath the title. Heading artwork is omitted; medication
+                selectors and functional action icons retain their purpose.
+                Reader, writing-help and confirmation dialogs use the same
+                compact top-spacing rule and whole-content scrolling.
+                Shared modal scroll hosts disable browser scroll anchoring, so
+                header reflow at the drawer/dialog breakpoint cannot overwrite
+                a remembered numeric position before the new layout restores it.
+              </p>
+              <p>
                 Medication dialogs use their own slightly higher, compact header
                 with a longer visible description. Reset Draft and the edit-only
                 Archive or Restore action sit beside Close. The paired actions
@@ -2851,13 +2867,17 @@ export function DeveloperGuidePage() {
                   ReflectionDialog and independent saving controls retain their
                   launcher ref. Writing supports up to 100,000 characters. Done
                   returns to the check-in with the draft; Save Check-In saves
-                  all responses. The plain writer header has more top space, no
+                  all responses. The compact writer header has no
                   heading icon or fade, and a larger description clamped to
                   three lines. Its context row above the heading shows the full
                   weekday, abbreviated month and day without a year, then a dot
                   and Reflection, with the shared 44px close control opposite.
-                  Two icon-only toolbar rows stay outside the text scroll area;
-                  mobile height follows visualViewport. Top buttons use 33px
+                  The heading and two icon-only toolbar rows scroll with the
+                  source and preview. The source grows with its content rather
+                  than adding an inner scrollbar; split view also uses that
+                  shared vertical viewport. The footer and keyboard-aware
+                  viewport handling stay separate. Mobile height follows
+                  visualViewport. Top buttons use 33px
                   targets and 2.6-stroke Lucide glyphs, with 30px formatting
                   buttons below. Pencil/Eye share neutral coloring,
                   Bookmark/BookmarkCheck reflect saved state, and CloudCheck
@@ -2917,7 +2937,10 @@ export function DeveloperGuidePage() {
                 text, email addresses, escaped markers, existing Markdown links,
                 inline/fenced code and protected syntax never open the menu. The
                 popup follows the caret and stays within the visible writing
-                pane during scroll, resize and mobile viewport changes. Reduced
+                pane during scroll, resize and mobile viewport changes. Writing
+                Space intersects that room with its shared scroll viewport,
+                watches its scroll and hides suggestions for an offscreen caret.
+                Reduced
                 motion retains readable pending feedback without decoration.
               </p>
             </Detail>
@@ -3573,7 +3596,9 @@ export function DeveloperGuidePage() {
               <p>
                 Each dialog remembers its own scroll position across closing,
                 refresh and switching between desktop dialog and mobile drawer.
-                Writing Space stores independent source and preview positions.
+                Writing Space stores independent source and preview positions
+                on its shared content scroller; write and split modes use the
+                source key, while preview mode uses the preview key.
                 Scroll updates persist quietly without rerendering the journal.
                 Color inspections also retain their preview, format and filters.
                 The public install and create-journal dialogs store numeric
