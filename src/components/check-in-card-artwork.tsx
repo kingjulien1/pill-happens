@@ -91,10 +91,6 @@ function ArtworkScene({
               pathLength="100"
               stroke={`url(#${id})`}
             />
-            <g className={styles.glints}>
-              <circle cx="12" cy="3.8" r="1.35" />
-              <circle cx="44.2" cy="34" r="1.1" />
-            </g>
           </svg>
           <span className={styles.symbolArrival}>
             <span className={styles.symbolFloat}>
@@ -117,7 +113,6 @@ function ArtworkScene({
       <svg className={styles.flourish} viewBox="0 0 56 56" fill="none">
         <path d="M47 4v4m-2-2h4" />
         <path d="M5 44v3m-1.5-1.5h3" />
-        <circle cx="49" cy="47" r="1.1" fill="currentColor" stroke="none" />
       </svg>
     </span>
   );

@@ -1,3 +1,14 @@
+/* An inset rim follows the real mark size, including enlarged live previews. */
+.mark::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 3%;
+  border: 1px solid var(--medication-mark-inner-rim, currentColor);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
 /* The rail stays still; only the complete artwork/fan owns the spin. */
 .stack:global(.intake-card-focus) {
   --icon-settle-size: calc(48px * var(--icon-stack-scale));

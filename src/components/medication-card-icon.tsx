@@ -4,11 +4,8 @@ import { MedicationFormGlyph } from "@/components/medication-form-glyph";
 import { CardIconSettle } from "@/components/card-icon-settle";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationIconStack } from "@/lib/medication-icon-stack";
-import {
-  getMedicationColorScale,
-  getMedicationIconPigment,
-  getMedicationPreviewSurface,
-} from "@/lib/medication-preview-colors";
+import { getMedicationPreviewSurface } from "@/lib/medication-preview-colors";
+import { getSvgIcon } from "@/lib/svg-icon-catalog";
 import {
   getMedicationType,
   MEDICATION_TYPE_VALUES,
@@ -30,19 +27,24 @@ function MedicationCardMark({
   iconRotation = 0,
 }: MedicationArtworkProps) {
   const color = getMedicationColor(value);
-  const scale = getMedicationColorScale(color.value);
-  const pigment = getMedicationIconPigment(color.value, icon);
+  const artwork = getSvgIcon(icon ?? "pill");
+  const pigment =
+    artwork?.variant === "color" && artwork.color
+      ? artwork.color.hex
+      : color.hex;
 
   return (
     <span
-      className="medication-card-mark intake-card-mark"
+      className={cn("medication-card-mark intake-card-mark", styles.mark)}
       data-medication-mark
       data-medication-color={color.value}
       style={
         {
-          color: scale.icon,
+          color: color.hex,
+          opacity: 1,
           backgroundColor:
             getMedicationPreviewSurface(pigment) ?? "var(--popover)",
+          "--medication-mark-inner-rim": `${color.hex}cc`,
           "--medication-rotation": `${iconRotation}deg`,
         } as CSSProperties
       }
