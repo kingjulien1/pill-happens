@@ -2620,16 +2620,24 @@ export function DeveloperGuidePage() {
                   MorningCoffee keeps its filled cup still while three thicker
                   steam curls travel through separate horizontal lanes. The
                   1.4px guide strokes support 2.1px travelling threads, with a
-                  brighter fine highlight and soft halo. Pink emission is
-                  anchored to the cup’s top rim, kept above that line and
-                  feathered upward with restrained side spill. Its glow fades
-                  in over 2.2 seconds after the shared ambient handoff. That
-                  handoff follows the completed main-icon entry by 300ms. The
-                  curved lines reveal upward over one second through a soft SVG
-                  mask. Pauses preserve reveal progress, keyed artwork replay
-                  restarts the sequence, and reduced
-                  motion shows a settled static glow. No extra JavaScript
-                  timer or frame loop owns this effect.
+                  brighter fine highlight and soft halo. Each curl finishes in a
+                  small firework at its swaying tip: a bright center, soft glow
+                  and fine expanding ring release colorful stars, rays and
+                  specks. Pink, Fuchsia, Lilac and Iris mix with warm Amber,
+                  Orange and Aqua accents; the sparks arc outward and dissolve
+                  over roughly 1.5 seconds. Each burst shares its wisp’s 8.6-,
+                  9.3- or 8.9-second CSS clock and phase offset, igniting at 62%
+                  of that cycle. The fireworks sit outside the steam mask, with
+                  a one-second reveal gate that avoids showing a partial burst
+                  on arrival. Pink emission stays anchored to the cup’s top rim
+                  and feathers upward with restrained side spill. Its glow fades
+                  in over 2.2 seconds after the shared ambient handoff, 300ms
+                  after the main-icon entry finishes. The curved lines reveal
+                  upward over one second. Dialog, offscreen and hidden-page
+                  pauses hold these effects; keyed artwork replay restarts them.
+                  Reduced motion keeps settled steam and glow while hiding the
+                  fireworks. No extra JavaScript timer or animation frame loop
+                  owns these flourishes.
                 </li>
                 <li>
                   Check-in artwork keeps its 1560ms main entrance and a toned
