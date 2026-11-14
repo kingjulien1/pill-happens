@@ -4,6 +4,7 @@ import type { DailyCheckIn } from "@/lib/daily-check-in";
 import type { MedicationCategory } from "@/lib/medication-categories";
 import type { IntakeRoute } from "@/lib/intake-routes";
 import type { ReflectionInsightCacheEntry } from "@/lib/reflection-insights";
+import type { JournalEditingState } from "@/lib/journal-editing";
 
 /** Shared data and calendar rules. All stored timestamps are UTC ISO strings. */
 export type Medication = {
@@ -67,6 +68,8 @@ export type AppData = {
   dailyCheckIns?: DailyCheckIn[];
   /** Derived AI reflections; never advance the source check-in's updatedAt. */
   reflectionInsights?: ReflectionInsightCacheEntry[];
+  /** Conservative journal edits retain the exact original and edited Markdown. */
+  journalEditing?: JournalEditingState;
   /** @deprecated Backup-only metadata from the removed automatic intake templates. */
   preparedIntakeCompletions?: {
     groupId: "morning" | "evening";
