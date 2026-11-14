@@ -1167,14 +1167,15 @@ export function DeveloperGuidePage() {
                 control or popover. Both page controls are 46px squares with
                 23px glyphs and 14px corners, about 39% larger than their former
                 33px / 16.5px geometry. The two controls anchor opposite edges
-                of the shared header. Two faint radial reflections and 24px
-                backdrop blur form the shared glass treatment in both themes.
-                The navigation trigger uses the shared Plum/Lilac glass. Its
-                thicker 2.5px foreground edge uses only 14% opacity; an 8%
-                blurred decorative rim softens it while icons and keyboard focus
-                stay crisp. Hover, focus and open states use the same quiet
-                treatment for every control. Menu-specific layouts determine
-                each popup’s interior dimensions.
+                of the shared header. Both controls use the coffee mug’s shared
+                <code> --check-in-mug-ink: #c1b6cc</code> for their icons and
+                opaque 2.5px borders. Their background is the same
+                <code> --check-in-art-surface</code> as the mug tile: the
+                Purple base with its Rose and Iris radial reflections. The
+                24px backdrop blur, faint decorative rim and separate keyboard
+                focus stay intact. Hover, focus and open states keep this paint
+                in both themes. Menu-specific layouts determine each popup’s
+                interior dimensions.
               </p>
               <p>
                 After shared page-entry readiness, two separate layout wrappers
@@ -1191,12 +1192,13 @@ export function DeveloperGuidePage() {
                 transforms and tablet loops stay on their existing inner owners.
               </p>
               <p>
-                Header branding uses the shared filled-action palette in both
-                modes: charcoal <code>#1d161e</code> for the face and pill
-                scores, and soft Pink <code>#f9a8d4</code> for the filled tablet
-                pair, refresh glyph and primary border pigment. Its root color
-                aliases read the shared action palette. Navigation’s static mark retains its own neutral
-                identity. The header mark measures 34.5px in its 46px control,
+                Header tablet circles use the mug pigment for both fill and
+                stroke; their scores use the artwork’s solid base color. These
+                scoped rules account for BrandMark’s inline palette, so its
+                nested artwork cannot retain the old Pink by accident. The
+                navigation glyph follows the same foreground. Menu and loading
+                branding retain their own palette outside the page topbar.
+                The header mark measures 34.5px in its 46px control,
                 preserving the menu logo’s 48px/64px ratio. Orbit, approach and
                 spin still share the same base keyframes. A 7.2-second header
                 cycle runs at two-thirds of the menu’s 4.8-second speed, with
@@ -1231,17 +1233,15 @@ export function DeveloperGuidePage() {
                 timers.
               </p>
               <p>
-                Menu controls share a 2.5px edge at 14% resting opacity, 24% on
-                hover and 28% when active. The branding button instead matches
-                the Mint pill color at 67% border opacity in resting, hover and
-                active/focus states, in both themes. This base border remains
-                unchanged during pulling; a separate inset edge and outer halo
-                provide the brighter ready feedback. It retains the same 2.5px
-                geometry, 8% blurred decorative rim at 0.8px blur and separate
-                60% focus outline. These alpha percentages apply once to the
-                opaque Mint pigment, without theme-token alpha. The charcoal
-                face, Mint silhouettes and charcoal scores remain the same when
-                Appearance changes.
+                Both page controls keep the same opaque mug-colored base edge
+                while resting, hovered, focused, open or pulled. A separate inset
+                edge and outer halo provide the refresh control’s ready feedback.
+                The 2.5px border geometry, 8% blurred decorative rim at 0.8px
+                blur and separate 60% focus outline are preserved. The refresh
+                module reads a local surface override in every interaction state,
+                keeping its background aligned with navigation without changing
+                the palette of other branding components. The mug itself reads
+                the same ink token, with its original literal fallback.
               </p>
               <p>
                 Visibility, reduced-motion, offscreen and refresh-unavailable

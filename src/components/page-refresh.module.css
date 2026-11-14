@@ -16,7 +16,7 @@
     :active,
     :disabled
   ) {
-  background: var(--brand-surface);
+  background: var(--header-button-surface, var(--brand-surface));
   overflow: visible;
 }
 .root[data-releasing="true"] .button:global(.header-refresh-button) {

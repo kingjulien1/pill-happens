@@ -1039,8 +1039,10 @@
   align-items: center;
   justify-content: center;
 }
-/* One artwork surface/copy recipe for check-ins and compact dosage-form tiles. */
-.check-in-icon-theme {
+/* Share the mug pigment and artwork surface with both page-topbar controls. */
+.check-in-icon-theme,
+[data-page-topbar] {
+  --check-in-mug-ink: #c1b6cc;
   --check-in-art-base: color-mix(in srgb, #4e456e 94%, var(--palette-rose));
   --check-in-art-copy: color-mix(
     in srgb,
@@ -2895,6 +2897,39 @@
 }
 .header-refresh-button.header-icon-button:disabled {
   cursor: default;
+}
+/* These two controls borrow the mug's paint without recoloring menu/loading art. */
+[data-page-topbar]
+  .header-icon-button:is([data-brand-refresh], [data-navigation-trigger]) {
+  --header-button-pigment: var(--check-in-mug-ink);
+  --header-button-surface: var(--check-in-art-surface);
+  --header-button-edge: var(--header-button-pigment);
+  --header-button-active-edge: var(--header-button-edge);
+  --header-button-hover-edge: var(--header-button-edge);
+  --header-button-active-fill: var(--check-in-art-base);
+  --header-button-hover-fill: var(--check-in-art-base);
+  --brand-ink: var(--header-button-pigment);
+  border-color: var(--header-button-edge);
+  background: var(--header-button-surface);
+  color: var(--header-button-pigment);
+  box-shadow:
+    inset 0 0.5625px 0
+      color-mix(in srgb, var(--header-button-pigment) 10%, transparent),
+    0 1.6875px 6.75px
+      color-mix(in srgb, var(--check-in-art-base) 10%, transparent);
+}
+[data-page-topbar] [data-brand-refresh] {
+  --brand-copy: var(--check-in-mug-ink);
+}
+[data-page-topbar] [data-brand-refresh] > .brand-mark {
+  color: var(--header-button-pigment);
+}
+[data-page-topbar] [data-brand-refresh] .brand-tablet circle {
+  fill: var(--header-button-pigment);
+  stroke: var(--header-button-pigment);
+}
+[data-page-topbar] [data-brand-refresh] .brand-tablet path {
+  stroke: var(--check-in-art-base);
 }
 .brand-menu {
   position: relative;
