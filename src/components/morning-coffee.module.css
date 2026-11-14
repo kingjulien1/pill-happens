@@ -32,9 +32,9 @@
   fill: none;
 }
 
-/* Feathered paint rises from the rim without a filtered or animated blur. */
+/* Rim-anchored light rises above the cup and reveals after its entry settles. */
 .glow {
-  opacity: 0.85;
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -55,28 +55,34 @@
 }
 
 .trace {
-  stroke-width: 1;
+  stroke-width: 1.4;
 }
 
 .halo {
   stroke: var(--steam-ink);
-  stroke-width: 3.6;
-  opacity: 0.24;
+  stroke-width: 4.8;
+  opacity: 0.32;
   filter: blur(0.8px);
 }
 
 .thread {
   stroke: var(--steam-ink);
-  stroke-width: 1.5;
+  stroke-width: 2.1;
 }
 
 .highlight {
   stroke: #fff1f8;
-  stroke-width: 0.6;
-  opacity: 0.72;
+  stroke-width: 0.8;
+  opacity: 0.9;
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .glow {
+    animation: coffee-glow-emerge 2200ms cubic-bezier(0.22, 0.61, 0.36, 1)
+      var(--art-loop-start, 0ms) both;
+    animation-play-state: paused;
+  }
+
   .sway {
     animation: coffee-heat-curl var(--steam-sway-duration) ease-in-out
       var(--steam-delay) infinite;
@@ -89,8 +95,17 @@
     animation-play-state: paused;
   }
 
-  .root[data-coffee-active="true"] :is(.sway, .ribbon) {
+  .root[data-coffee-active="true"] :is(.sway, .ribbon, .glow) {
     animation-play-state: running;
+  }
+}
+
+@keyframes coffee-glow-emerge {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

@@ -2575,18 +2575,29 @@ export function DeveloperGuidePage() {
                   do not automatically classify a medication.
                 </li>
                 <li>
+                  MorningCoffee keeps its filled cup still while three thicker
+                  steam curls travel through separate horizontal lanes. The
+                  1.4px guide strokes support 2.1px travelling threads, with a
+                  brighter fine highlight and soft halo. Pink emission is
+                  anchored to the cup’s top rim, kept above that line and
+                  feathered upward with restrained side spill. Its glow fades
+                  in over 2.2 seconds after the existing artwork arrival ends,
+                  using the inherited entry clock. Pauses preserve the fade’s
+                  progress, keyed artwork replay restarts it, and reduced
+                  motion shows a settled static glow. No extra JavaScript
+                  timer or frame loop owns this effect.
+                </li>
+                <li>
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
-                  a 56px stage. Both use the plain transparent group base, with
-                  the same 50%-opacity 24px blur and 1.08 saturation. Former
-                  feature gradients, tint and glaze layers are removed. The
-                  shared muted rim sits outside without changing geometry; a
-                  2.5px inner rim uses the main icon background at 50% opacity.
-                  Sunrise and crescent artwork distinguish the periods; their
+                  a 56px stage. Both use a quiet translucent face above the
+                  plain page canvas. A shared 4px neutral frame and a 2px
+                  identity band at 50% opacity paint entirely inward. Filled
+                  coffee and crescent artwork distinguish the periods; their
                   colors, entry motion, ambient loops and progress replay stay
                   independent of this plain card face. Section dots retain the
                   deeper Plum pigment. Details and icon stages remain 56px, the
-                  tile 48px and glyph 28px, with 11px artwork-to-copy clearance
+                  tile 48px and symbol holder 30px, with 11px artwork-to-copy clearance
                   (7px below 360px) and 8px trailing inset. SavedCheckInHeading
                   now separates opening history from save history. Its primary
                   HH:mm is the first recorded opening on this device, using the

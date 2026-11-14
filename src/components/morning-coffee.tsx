@@ -5,21 +5,21 @@ import styles from "./morning-coffee.module.css";
 
 const WISPS = [
   {
-    path: "M19 27C13 22 24 20 20 15S15 7 21 1",
+    path: "M17 28C13 24 19 21 17 17S14 9 18 2",
     delay: "-1.1s",
     duration: "8.6s",
     sway: "11.4s",
     color: "var(--color-pink-300, #f9a8d4)",
   },
   {
-    path: "M26 26C33 21 20 18 25 12S30 4 25-3",
+    path: "M25.5 27C29 23 23 20 25.5 15S28 6 25.5-3",
     delay: "-4.1s",
     duration: "9.3s",
     sway: "13.2s",
     color: "var(--color-pink-200, #fbcfe8)",
   },
   {
-    path: "M32 27C38 22 27 20 32 15S36 7 31 2",
+    path: "M34 28C38 24 32 21 34 17S37 9 33 2",
     delay: "-6.6s",
     duration: "8.9s",
     sway: "12.1s",
@@ -136,21 +136,21 @@ export function MorningCoffee({
             cy="50%"
             r="50%"
             fx="50%"
-            fy="78%"
+            fy="92%"
           >
             <stop
-              stopColor="var(--color-pink-200, #fbcfe8)"
-              stopOpacity="0.44"
+              stopColor="var(--color-pink-300, #f9a8d4)"
+              stopOpacity="0.88"
             />
             <stop
               offset=".26"
               stopColor="var(--color-pink-300, #f9a8d4)"
-              stopOpacity="0.28"
+              stopOpacity="0.66"
             />
             <stop
               offset=".64"
               stopColor="var(--color-fuchsia-300, #f0abfc)"
-              stopOpacity="0.1"
+              stopOpacity="0.24"
             />
             <stop
               offset="1"
@@ -158,6 +158,30 @@ export function MorningCoffee({
               stopOpacity="0"
             />
           </radialGradient>
+          <radialGradient id={`${id}-rim-glow`}>
+            <stop
+              stopColor="var(--color-pink-200, #fbcfe8)"
+              stopOpacity="0.95"
+            />
+            <stop
+              offset=".35"
+              stopColor="var(--color-pink-300, #f9a8d4)"
+              stopOpacity="0.76"
+            />
+            <stop
+              offset=".72"
+              stopColor="var(--color-pink-400, #f472b6)"
+              stopOpacity="0.24"
+            />
+            <stop
+              offset="1"
+              stopColor="var(--color-pink-300, #f9a8d4)"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <clipPath id={`${id}-glow-above-rim`}>
+            <rect x="0" y="-12" width="56" height="41" />
+          </clipPath>
           {WISPS.map(({ path, color }, index) => (
             <g key={path}>
               <path id={`${id}-steam-${index}`} d={path} pathLength="100" />
@@ -169,9 +193,9 @@ export function MorningCoffee({
                 y2="-4"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor={color} stopOpacity="0.3" />
-                <stop offset=".3" stopColor={color} stopOpacity="0.46" />
-                <stop offset=".7" stopColor={color} stopOpacity="0.24" />
+                <stop stopColor={color} stopOpacity="0.48" />
+                <stop offset=".3" stopColor={color} stopOpacity="0.7" />
+                <stop offset=".7" stopColor={color} stopOpacity="0.36" />
                 <stop offset="1" stopColor={color} stopOpacity="0" />
               </linearGradient>
             </g>
@@ -180,6 +204,7 @@ export function MorningCoffee({
         <g
           className={styles.glow}
           fill={`url(#${id}-steam-glow)`}
+          clipPath={`url(#${id}-glow-above-rim)`}
           data-coffee-glow
         >
           <ellipse cx="26" cy="12" rx="13" ry="19" />
@@ -188,7 +213,7 @@ export function MorningCoffee({
             cy="18"
             rx="9"
             ry="13"
-            opacity="0.45"
+            opacity="0.3"
             transform="rotate(-16 16 18)"
           />
           <ellipse
@@ -196,8 +221,16 @@ export function MorningCoffee({
             cy="16"
             rx="9"
             ry="15"
-            opacity="0.45"
+            opacity="0.3"
             transform="rotate(16 36 16)"
+          />
+          <ellipse
+            cx="25.5"
+            cy="27.4"
+            rx="11.5"
+            ry="3.2"
+            fill={`url(#${id}-rim-glow)`}
+            data-coffee-rim-glow
           />
         </g>
         <g className={styles.warmth}>
