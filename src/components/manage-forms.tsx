@@ -392,6 +392,7 @@ export function MedicationForm({
           <MedicationCategoryBadges
             medication={{ categories }}
             maxGeneral={3}
+            presentation="form"
           />
         </div>
 

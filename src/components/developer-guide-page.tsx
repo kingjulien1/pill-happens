@@ -1754,7 +1754,16 @@ export function DeveloperGuidePage() {
                 references reuse the same glyphs and palettes. Current manual
                 metadata is authoritative; names never infer classification. The
                 three quantity-summary categories remain independent of this
-                complete display catalog.
+                complete display catalog. The medication editor’s selected
+                summary uses a scoped <code>{'presentation="form"'}</code> instead:
+                real shadcn Badge pills show plain primary-color glyphs without
+                their colored tiles. A 4/3 layout scale enlarges the pills and
+                text; each side has 12px padding above a more visible neutral
+                fill. Glyphs shrink by 32% before sharing that scale, keeping
+                them compact. Priority labels remain first, followed by up to
+                three general labels and an accessible overflow count. The
+                Categories dropdown and shared card, goal and streak markers
+                retain their existing presentation.
               </p>
               <p>
                 Benzo retains the Categories selector’s #fda4af tile with a

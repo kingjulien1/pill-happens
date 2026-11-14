@@ -1,21 +1,32 @@
 import { MedicationClassBadges } from "@/components/medication-class-badge";
 import { MedicationCategoryIcon } from "@/components/medication-category-icon";
+import { MedicationCategoryGlyph } from "@/components/medication-category-glyph";
+import {
+  getMedicationIndicatorKinds,
+  MEDICATION_INDICATORS,
+  MedicationIndicatorIcon,
+} from "@/components/medication-indicator";
+import { Badge } from "@/components/ui/badge";
 import {
   getMedicationCategories,
   getMedicationCategory,
   type MedicationCategoryMetadata,
 } from "@/lib/medication-categories";
+import styles from "./medication-category-badges.module.css";
 
 /** General labels stay quiet; priority medication markers keep their own color. */
 export function MedicationCategoryBadges({
   medication,
   maxGeneral = 2,
   showPriority = true,
+  presentation = "default",
 }: {
   medication?: MedicationCategoryMetadata;
   maxGeneral?: number;
   /** Shared cards already show their Benzo, Opioid and Stimulant indicators. */
   showPriority?: boolean;
+  /** The medication editor uses roomier badges with plain foreground glyphs. */
+  presentation?: "default" | "form";
 }) {
   const categories = getMedicationCategories(medication);
   const general = categories.filter(
@@ -24,6 +35,70 @@ export function MedicationCategoryBadges({
   );
   const extra = general.slice(maxGeneral);
   if (!general.length && (!showPriority || !categories.length)) return null;
+  if (presentation === "form") {
+    const visible = [
+      ...(showPriority ? getMedicationIndicatorKinds(medication) : []),
+      ...general.slice(0, maxGeneral),
+    ];
+    const extraLabels = extra.map(
+      (value) => getMedicationCategory(value).label,
+    );
+    return (
+      <span
+        className={styles.summary}
+        data-medication-category-badges
+        data-category-badge-presentation="form"
+      >
+        {visible.map((category) => {
+          const item = getMedicationCategory(category);
+          const priority =
+            category === "benzodiazepine" ||
+            category === "opioid" ||
+            category === "stimulant";
+          return (
+            <Badge
+              key={category}
+              variant="secondary"
+              className={styles.badge}
+              title={item.label}
+              role={priority ? "img" : undefined}
+              aria-label={
+                priority
+                  ? MEDICATION_INDICATORS[category].accessibleLabel
+                  : undefined
+              }
+              data-medication-category={category}
+              data-medication-class={priority ? category : undefined}
+              data-priority={priority || undefined}
+            >
+              <span className={styles.icon} aria-hidden="true">
+                {priority ? (
+                  <MedicationIndicatorIcon kind={category} aria-hidden="true" />
+                ) : (
+                  <MedicationCategoryGlyph category={category} />
+                )}
+              </span>
+              <span className={styles.label}>{item.shortLabel}</span>
+            </Badge>
+          );
+        })}
+        {extra.length > 0 && (
+          <Badge
+            variant="secondary"
+            className={styles.badge}
+            title={extraLabels.join(", ")}
+            data-category-overflow
+          >
+            +{extra.length}
+            <span className="sr-only">
+              {" "}
+              more categories: {extraLabels.join(", ")}
+            </span>
+          </Badge>
+        )}
+      </span>
+    );
+  }
   return (
     <span
       className="inline-flex min-w-0 max-w-full flex-wrap items-center gap-1"
