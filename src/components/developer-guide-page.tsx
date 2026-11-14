@@ -1822,16 +1822,28 @@ export function DeveloperGuidePage() {
                 mode and 22% in dark mode. Benzo, Opioid and Stimulant markers
                 retain their canonical opaque pink, orange and cyan tiles in
                 both themes, matching cards and summaries without a second
-                tinted wrapper. Selected Type, Route and Categories rows show “·
-                selected” beside a stronger warm fill and checkmark. Selected
-                and keyboard-focused options have no enclosing border, outline
-                or shadow. Keyboard focus instead underlines the label and
-                strengthens its warm fill. Other sits below a short inset
-                separator and an 8px gap, with quieter text until selected.
-                Categories lists all 19 options without a search field in a
-                256px popup, constrained to the viewport. Its inset header rule
-                and compact 28px Clear/Done footer sit outside the listbox; only
-                the options scroll. Multiple selection keeps the menu open,
+                tinted wrapper. Selected rows keep the “· selected” caption,
+                stronger warm fill and checkmark. Only Type and Categories keep
+                the label and caption together on the left with a 12px gap.
+                Labels stay on one line and truncate instead of wrapping. A
+                minimum 32px rail clearance separates the text from a 14px
+                CircleCheckBig at a 14px trailing inset. The shared SelectItem
+                accepts an optional indicator for these two pickers; Route and
+                other selects retain
+                their existing presentation. Selected and keyboard-focused
+                options have no enclosing border, outline or shadow. Keyboard
+                focus instead underlines the label and strengthens its warm
+                fill. Other sits below a short inset separator and an 8px gap,
+                with quieter text until selected. Categories lists all 19
+                options without a search field in a 256px popup, constrained to
+                the viewport. Its fixed header and footer sit outside the
+                listbox; only the options scroll. An inset separator precedes
+                the footer with 8px spacing on each vertical side. Clear and
+                Done share subtle 28px foreground-tinted controls with compact
+                labels and tiny leading Trash/CheckCheck icons. Clear always
+                appends a dot and the selected count, including 0, and is
+                disabled when empty. The centered “19 options” count stays
+                between the buttons. Multiple selection keeps the menu open,
                 normalizes the stored order and preserves native typeahead,
                 Escape and focus return. Old drafts with a category search
                 string still restore their selections; that obsolete string is
