@@ -1,0 +1,192 @@
+.reference {
+  min-width: 0;
+}
+
+.reference h3,
+.reference h4 {
+  color: var(--surface-reading-foreground);
+  scroll-margin-top: 2rem;
+}
+
+.reference h3 {
+  margin-block: 2.25rem 0.75rem;
+  font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.5rem);
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.reference h4 {
+  margin-block: 1.75rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.reference p,
+.reference li {
+  max-width: 72ch;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.reference p + p,
+.reference p + ul,
+.reference p + ol {
+  margin-top: 1rem;
+}
+
+.reference :is(strong, b) {
+  color: var(--surface-reading-foreground);
+  font-weight: 600;
+}
+
+.reference code {
+  overflow-wrap: anywhere;
+}
+
+.reference p > code,
+.reference li > code {
+  padding: 0.1em 0.25em;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  color: var(--surface-reading-foreground);
+  font-size: 0.85em;
+}
+
+.intro {
+  margin-bottom: 1.25rem;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.875rem 0;
+  border-block: 1px solid var(--border);
+}
+
+.overview > div {
+  min-width: 0;
+}
+
+.overview dt {
+  margin-bottom: 0.3rem;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+}
+
+.overview dd {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.overview strong {
+  margin-right: 0.2rem;
+  font-size: 1rem;
+}
+
+.tableScroll {
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 1.25rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableScroll:focus-visible,
+.sourceLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.tableScroll table {
+  width: 100%;
+  min-width: 35rem;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.tableScroll caption {
+  padding: 0.75rem 0.875rem;
+  color: var(--surface-reading-foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: 0.625rem 0.875rem;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.tableScroll th {
+  border-block: 1px solid var(--border);
+  background: color-mix(in srgb, var(--muted) 55%, transparent);
+  color: var(--surface-reading-foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tableScroll td {
+  color: var(--muted-foreground);
+}
+
+.tableScroll td:first-child {
+  width: 35%;
+  color: var(--surface-reading-foreground);
+  font-weight: 500;
+}
+
+.tableScroll tr + tr td {
+  border-top: 1px solid var(--border);
+}
+
+.sourceLink {
+  color: var(--surface-reading-foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.steps,
+.checklist {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.steps {
+  list-style: decimal;
+  margin-bottom: 1rem;
+}
+
+.checklist {
+  list-style: disc;
+}
+
+@media (max-width: 479px) {
+  .overview {
+    gap: 0.5rem;
+  }
+
+  .overview dt {
+    font-size: 0.625rem;
+  }
+
+  .overview dd {
+    font-size: 0.6875rem;
+  }
+}

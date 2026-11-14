@@ -13,6 +13,8 @@ import { GuideResponsiveReference } from "@/components/guide-responsive-referenc
 import { GuideContentSpacing } from "@/components/guide-content-spacing";
 import { GuideDialogShape } from "@/components/guide-dialog-shape";
 import { GuideMenuSurfaces } from "@/components/guide-menu-surfaces";
+import { GuideNotifications } from "@/components/guide-notifications";
+import { GuideNotificationDemo } from "@/components/guide-notification-demo";
 import { guideHeadingId } from "@/lib/guide-outline";
 import {
   APP_PALETTE,
@@ -2201,89 +2203,18 @@ export function DeveloperGuidePage() {
             </dl>
             <Detail
               title="Notifications With Native Behavior"
-              context="Shared Sonner Adapter"
+              context="Full Component Reference"
             >
               <p>
-                The shared <code>src/components/ui/sonner.tsx</code> adapter and{" "}
-                <code>sonner.css</code> follow the{" "}
-                <ExternalLink href="https://ui.shadcn.com/docs/components/radix/sonner">
-                  shadcn Sonner
-                </ExternalLink>{" "}
-                pattern. The <code>journal-toast</code> facade renders one
-                expandable notification for Success, Error, Info, Warning,
-                Loading and Update. A real summary button opens detailed
-                explanations, optional record facts and relevant links. Its
-                compact heading, spaced dot and type label stay above the
-                complete short description. A saved intake alone uses an
-                Emerald 400 Star Check; other successes retain their own check
-                artwork. Every kind also has a decorative Bell Check in place
-                of a close button. Swipe left, right or up to dismiss, or use
-                Escape while focused in a dismissible notification.
-              </p>
-              <p>
-                The opaque foundation receives Black at 24% in light mode or
-                White at 24% in dark mode; the resulting surface remains fully
-                opaque. The neutral 4px frame and 2px Pink 500 band at 56%
-                remain inward. Artwork grows by exactly 22.5%, the midpoint
-                between one fifth and one quarter: 40 × 1.225 = 49px for its
-                frame, 34 × 1.225 = 41.65px for its tile and 18 × 1.225 =
-                22.05px for its glyph. Tiles are pure Black in light mode and
-                pure White in dark mode, with opposing glyph ink except the
-                intake-specific Emerald accent.
-              </p>
-              <p>
-                The 14px heading pairs with a 10px/600 type label. The label
-                and short description use exactly seven twelfths of their
-                previous alpha: 78% × 7/12 = 45.5% in light mode and 90% ×
-                7/12 = 52.5% in dark mode. Expanded explanations keep brighter
-                reading ink. The main artwork has the same finite spin,
-                overshoot and settling language as intake icons, with restrained
-                end-state sparks. The small bell rings for the first half of
-                each one-second cycle, with decreasing swings and a still rest.
-                Reduced motion settles all artwork and removes transforms;
-                mobile has no hover effects.
-              </p>
-              <p>
-                Sonner owns announcements, native stack geometry, height
-                measurement and swipe dismissal. The custom content owns a
-                monotonic reading countdown, normally 5,500ms. Its line shrinks
-                only while the notice is visible and available to read; opening
-                details, focus, hovering, a pointer gesture, a hidden document
-                or a rear stack position pauses it. Loading and explicitly
-                persistent notices have no countdown. Same-ID updates reset the
-                clock and invalidate old exit callbacks. The stack still caps
-                at 460px, with safe-area offsets, 16px mobile insets and three
-                visible notifications.
-              </p>
-              <p>
-                Expansion adds an inset separator at the summary’s former
-                bottom edge, followed by a compact body and separately divided
-                footer. Automatic and programmatic exits first collapse that
-                extension over 280ms, then anticipate downward for 120ms and
-                snap upward over 210ms with a separate reversing icon. Native
-                swipes retain their direct manipulation. Undo waits for the
-                actual server response before showing Undone and starting this
-                exit; failures remain expanded with their explanation.
-              </p>
-              <p>
-                Intake, medication, goal, timezone and full check-in mutations
-                can return a signed, journal-scoped undo receipt lasting 15
-                minutes. The server captures its before/after record inside the
-                existing atomic mutation, and Undo compares the current record
-                before restoring it. Later edits are never silently overwritten;
-                unrelated changes remain. A new medication cannot be removed
-                after it gains linked intakes or goals. Receipts stay out of
-                persisted journal data and do not require a database migration.
-              </p>
-              <p>
-                PWA Update notices use the shared update artwork and retain{" "}
-                <code>duration: Infinity</code>, their stable ID and
-                Reload/Later actions in the expanded footer. Contextual messages distinguish refreshing
-                a journal, changing an intake, managing medications, saving a
-                check-in and updating settings. Success still follows the actual
-                completed operation; error descriptions keep the complete
-                failure message. Presentation neither applies an app update nor
-                changes when a journal operation succeeds.
+                The shared notification system has its own complete reference:{" "}
+                <Link href="#notifications" className={styles.textLink}>
+                  Notifications &amp; Undo
+                </Link>
+                . It covers the public API, six notification kinds, expandable
+                details, reading clocks, icon and exit motion, accessibility,
+                server-checked Undo and the tests that protect those behaviors.
+                Try the real component with synthetic data, then copy the
+                integration examples into a client event handler.
               </p>
             </Detail>
           </div>
@@ -2295,8 +2226,20 @@ export function DeveloperGuidePage() {
         </Section>
 
         <Section
-          id="icons"
+          id="notifications"
           number="11"
+          title="Notifications & Undo"
+          context="Contract, Motion & Recovery"
+          icon="sparkle"
+        >
+          <GuideNotifications>
+            <GuideNotificationDemo />
+          </GuideNotifications>
+        </Section>
+
+        <Section
+          id="icons"
+          number="12"
           title="Icons, Emoji & Local Artwork"
           context="One Familiar Marker"
           icon="medications"
@@ -2505,7 +2448,7 @@ export function DeveloperGuidePage() {
 
         <Section
           id="architecture"
-          number="12"
+          number="13"
           title="A Map Of The Project"
           context="Find The Right File"
           icon="discover"
@@ -3534,7 +3477,7 @@ export function DeveloperGuidePage() {
 
         <Section
           id="development"
-          number="13"
+          number="14"
           title="Local Development & Verification"
           context="Make It Reviewable"
           icon="create"
@@ -3637,7 +3580,7 @@ export function DeveloperGuidePage() {
 
         <Section
           id="github"
-          number="14"
+          number="15"
           title="GitHub & Contributions"
           context="Build It Together"
           icon="confetti"

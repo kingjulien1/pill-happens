@@ -17,6 +17,7 @@ export const DEVELOPER_SECTIONS = [
   ["buttons", "Buttons & Action Hierarchy"],
   ["layers", "Layers & Light"],
   ["motion", "Motion & Input"],
+  ["notifications", "Notifications & Undo"],
   ["icons", "Icons & Artwork"],
   ["architecture", "Source Map"],
   ["development", "Development"],
@@ -164,6 +165,54 @@ export const SOURCE_GROUPS = [
       [
         "src/components/streak-spotlight.tsx",
         "Targeted milestone arrival and cleanup",
+      ],
+    ],
+  },
+  {
+    title: "Notifications & Undo",
+    description:
+      "Shared notification content, reading clocks, animations and scoped reversals.",
+    files: [
+      [
+        "src/components/ui/journal-toast.tsx",
+        "Public notification facade and same-ID generations",
+      ],
+      [
+        "src/components/ui/journal-notification.tsx",
+        "Expandable content, pauses, actions and staged dismissal",
+      ],
+      [
+        "src/components/ui/sonner.tsx",
+        "Native stack adapter and notification artwork",
+      ],
+      [
+        "src/components/ui/sonner.css",
+        "Mode-aware surfaces, geometry, icon and exit motion",
+      ],
+      [
+        "src/lib/journal-notification-lifecycle.ts",
+        "Monotonic reading clock, exit registry and async Undo settlement",
+      ],
+      [
+        "src/lib/journal-notification-lifecycle.test.ts",
+        "Clock, version and async failure regressions",
+      ],
+      [
+        "src/lib/server/journal-undo.ts",
+        "Signed receipts and atomic target restoration",
+      ],
+      [
+        "src/lib/server/journal-undo.test.ts",
+        "Scope, expiry, conflicts and persistence checks",
+      ],
+      ["src/app/api/undo/route.ts", "Authenticated same-origin Undo endpoint"],
+      [
+        "src/components/guide-notifications.tsx",
+        "Complete notification developer reference",
+      ],
+      [
+        "src/components/guide-notification-demo.tsx",
+        "Isolated, synthetic live examples",
       ],
     ],
   },
