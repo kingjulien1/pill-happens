@@ -631,6 +631,12 @@ export function CompactRefreshBrand() {
     }
   };
 
+  const goToToday = () => {
+    if (unavailable || pendingRelease.current) return;
+    workspace.rememberDestination("/");
+    router.push("/", { scroll: true });
+  };
+
   const goToMedications = () => {
     if (unavailable) return;
     workspace.rememberDestination("/medications");
@@ -753,12 +759,12 @@ export function CompactRefreshBrand() {
         ref={handle}
         type="button"
         className={`header-icon-button header-icon-button--compact header-brand-surface header-refresh-button brand-refresh-handle ${styles.button}`}
-        aria-label="Refresh this page"
-        title="Refresh this page"
+        aria-label="Go to Today"
+        title="Go to Today"
         aria-describedby={hintId}
         disabled={unavailable || releasing}
         data-brand-refresh
-        onClick={refreshPage}
+        onClick={goToToday}
         onDragStart={(event) => event.preventDefault()}
         onClickCapture={(event) => {
           if (suppressClick.current || unavailable || pendingRelease.current) {
@@ -878,11 +884,11 @@ export function CompactRefreshBrand() {
         </span>
       )}
       <span id={hintId} className="sr-only">
-        Tap to refresh this page. Pull down and release to refresh, or pull
-        right and release to open Medications. You can change direction until
-        the refresh icon springs outward and its rings light up; that threshold
-        locks the direction. Pull back to cancel. Medications is also available
-        in navigation.
+        Press to open Today. Pull down and release to refresh, or pull right and
+        release to open Medications. You can change direction until the refresh
+        icon springs outward and its rings light up; that threshold locks the
+        direction. Pull back to cancel. Medications is also available in
+        navigation.
       </span>
       <span
         className="sr-only"

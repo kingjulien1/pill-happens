@@ -1283,10 +1283,10 @@ export function DeveloperGuidePage() {
                 state pause or settle the header loop. Cleanup disconnects
                 observation and listeners. The critical refresh curtain has its
                 own compact tablet duet, separate from the header and menu brand
-                loops. Its existing phase handoff is preserved; click, keyboard
-                activation and downward pulls still use the guarded
-                full-document reload. The navigation menu has no separate
-                refresh action.
+                loops. Its existing phase handoff remains attached to committed
+                downward pulls and their guarded full-document reload. Pressing
+                the branding button opens Today instead; the navigation menu
+                has no separate refresh action.
               </p>
               <p>
                 A rightward branding pull opens Medications with in-app
@@ -1310,8 +1310,8 @@ export function DeveloperGuidePage() {
                 threshold crossings between paints. Pointer capture tolerates
                 interrupted Safari touches; the completed gesture is cleared
                 before releasing capture. The following dragged or cancelled
-                pointer click is suppressed; ordinary taps and keyboard refresh
-                retain their native behavior.
+                pointer click is suppressed; ordinary taps and keyboard
+                activation open Today through the same native button.
               </p>
               <p>
                 The original getIntakeBrandStyle() retains its two-value
@@ -1422,17 +1422,20 @@ export function DeveloperGuidePage() {
                 without bursts or loops.
               </p>
               <p>
-                Client navigation from another page records / through{" "}
+                Clicking or pressing the branding button opens the clean Today
+                route <code>/</code>, dropping any current query or fragment.
+                It first calls{" "}
                 <code>{'workspace.rememberDestination("/")'}</code>, preserving
-                raw drafts while clearing Today’s remembered dialog. Already on
-                plain Today, the release sequence ends with a reversible 560ms
-                inward ripple instead: it does not navigate, scroll or change
-                drafts. A query or fragment still uses client navigation to the
-                plain route. Downward release then enters the existing full-page
-                refresh handoff, including its separate 1500ms outbound hold;
-                taps and keyboard activation go straight to that handoff. The
-                menu’s Today link provides an accessible destination without
-                dragging.
+                raw drafts while clearing Today’s remembered dialog and making
+                this explicit destination take precedence over screen resume.
+                Unavailability or a pending gesture release blocks another
+                activation. Taps and keyboard activation do not reload the
+                document. A rightward pull still opens Medications; when already
+                there, its release plays the existing return burst without
+                navigating, scrolling or changing drafts. A committed downward
+                release enters the full-page refresh handoff, including its
+                separate 1500ms outbound hold. Native button identity, refs,
+                keyboard handling and dragged-click suppression stay intact.
               </p>
               <p>
                 The shared divider matches the topbar’s full padded width,
