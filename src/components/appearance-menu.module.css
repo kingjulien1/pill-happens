@@ -1,0 +1,135 @@
+.positioner {
+  z-index: 70;
+}
+.trigger {
+  min-width: 44px;
+  min-height: 44px;
+}
+.panel[data-appearance-menu] {
+  width: 320px;
+  padding: 6px;
+  border-radius: 20px;
+}
+.panel[data-appearance-menu] .masthead {
+  min-height: 60px;
+  gap: 9px;
+  padding: 8px 46px 8px 10px;
+}
+.panel[data-appearance-menu] .mastheadIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+.panel[data-appearance-menu] .mastheadIcon > svg {
+  width: 19px;
+  height: 19px;
+}
+.panel[data-appearance-menu] .title {
+  font-size: 17px;
+  font-weight: 650;
+}
+.panel[data-appearance-menu] .subtitle {
+  margin-top: 3px;
+  color: var(--menu-muted-foreground);
+  font-size: 10px;
+}
+.panel[data-appearance-menu] .separator {
+  margin: 0 8px 5px;
+}
+.panel[data-appearance-menu] .options {
+  display: grid;
+  gap: 2px;
+}
+.panel[data-appearance-menu] .entry {
+  display: flex;
+  min-height: 52px;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 12px;
+}
+.panel[data-appearance-menu] .iconTile {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+.panel[data-appearance-menu] .iconTile > svg {
+  width: 18px;
+  height: 18px;
+}
+.panel[data-appearance-menu] .copy {
+  gap: 2px;
+}
+.panel[data-appearance-menu] .label {
+  font-size: 12px;
+}
+.panel[data-appearance-menu] .description {
+  color: var(--menu-muted-foreground);
+  font-size: 9px;
+  line-height: 1.35;
+}
+.panel[data-appearance-menu] .swatches {
+  gap: 3px;
+}
+.panel[data-appearance-menu] .swatches > i {
+  width: 6px;
+  height: 12px;
+}
+.panel[data-appearance-menu] .modeCheck,
+.panel[data-appearance-menu] .modeCheck > svg {
+  width: 14px;
+  height: 14px;
+}
+.panel[data-appearance-menu] .footer {
+  margin-top: 6px;
+  padding: 9px 7px 4px;
+  color: var(--menu-muted-foreground);
+  font-size: 8.5px;
+  line-height: 1.4;
+}
+.panel[data-appearance-menu] .resolvedMode {
+  gap: 3px;
+}
+.panel[data-appearance-menu] .resolvedMode > svg {
+  width: 10px;
+  height: 10px;
+}
+/* The quiet 28px face keeps a full 44px keyboard and touch target. */
+.panel[data-appearance-menu] .close {
+  top: 14px;
+  right: 8px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--menu-muted-foreground);
+}
+.panel[data-appearance-menu] .close::before {
+  position: absolute;
+  inset: 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--menu-foreground) 6%, transparent);
+  content: "";
+  pointer-events: none;
+}
+.panel[data-appearance-menu] .close > svg {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+.panel[data-appearance-menu] .close:focus-visible {
+  outline: 2px solid var(--menu-focus-ring);
+  outline-offset: -2px;
+}
+.panel[data-appearance-menu] .close:focus-visible::before {
+  background: var(--menu-hover);
+}
+@media (hover: hover) and (pointer: fine) {
+  .panel[data-appearance-menu] .close:hover {
+    background: transparent;
+  }
+  .panel[data-appearance-menu] .close:hover::before {
+    background: var(--menu-hover);
+  }
+}

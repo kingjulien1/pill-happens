@@ -8,6 +8,7 @@ import { useAppearance } from "@/components/appearance-provider";
 import { cn } from "@/lib/utils";
 import { APP_FOUNDATION } from "@/lib/app-theme";
 import styles from "./header-menus.module.css";
+import compact from "./appearance-menu.module.css";
 import { Button } from "@/components/ui/button";
 
 const options = [
@@ -45,62 +46,80 @@ const options = [
   },
 ] as const;
 
-export function AppearanceMenu() {
+export function AppearanceMenu({ nested = true }: { nested?: boolean }) {
   const [open, setOpen] = useState(false);
   const { preference, resolved, setPreference, persisted } = useAppearance();
+  const Root = nested ? Menu.SubmenuRoot : Menu.Root;
+  const triggerProps = {
+    render: <Button variant="ghost" size="icon" type="button" />,
+    className: cn(
+      styles.headerAction,
+      styles.appearanceTrigger,
+      compact.trigger,
+    ),
+    "aria-label": "Choose color mode",
+    title: "Choose color mode",
+    "data-appearance-trigger": true,
+  };
+  const triggerIcons = (
+    <>
+      <Sun className={styles.lightIcon} strokeWidth={2.5} aria-hidden="true" />
+      <Moon className={styles.darkIcon} strokeWidth={2.5} aria-hidden="true" />
+    </>
+  );
   return (
-    <Menu.SubmenuRoot open={open} onOpenChange={setOpen}>
-      <Menu.SubmenuTrigger
-        render={<Button variant="ghost" size="icon" type="button" />}
-        nativeButton
-        openOnHover={false}
-        label="Choose color mode"
-        className={cn(styles.headerAction, styles.appearanceTrigger)}
-        aria-label="Choose color mode"
-        title="Choose color mode"
-        data-appearance-trigger
-      >
-        <Sun
-          className={styles.lightIcon}
-          strokeWidth={2.5}
-          aria-hidden="true"
-        />
-        <Moon
-          className={styles.darkIcon}
-          strokeWidth={2.5}
-          aria-hidden="true"
-        />
-      </Menu.SubmenuTrigger>
+    <Root
+      open={open}
+      onOpenChange={setOpen}
+      {...(!nested ? { modal: false } : {})}
+    >
+      {nested ? (
+        <Menu.SubmenuTrigger
+          {...triggerProps}
+          nativeButton
+          openOnHover={false}
+          label="Choose color mode"
+        >
+          {triggerIcons}
+        </Menu.SubmenuTrigger>
+      ) : (
+        <Menu.Trigger {...triggerProps}>{triggerIcons}</Menu.Trigger>
+      )}
       <Menu.Portal>
         <Menu.Positioner
           side="bottom"
           align="end"
           sideOffset={10}
           collisionPadding={12}
-          className={styles.positioner}
+          className={cn(styles.positioner, compact.positioner)}
         >
           <Menu.Popup
             aria-label="Appearance"
-            className={cn(styles.popup, styles.appearance)}
+            className={cn(styles.popup, styles.appearance, compact.panel)}
             data-appearance-menu
           >
-            <div className={styles.masthead}>
-              <span className={styles.mastheadIcon} aria-hidden="true">
+            <div className={cn(styles.masthead, compact.masthead)}>
+              <span
+                className={cn(styles.mastheadIcon, compact.mastheadIcon)}
+                aria-hidden="true"
+              >
                 <MoonStar strokeWidth={1.8} />
               </span>
               <div className={styles.mastheadCopy}>
-                <p className={styles.title}>Appearance</p>
-                <p className={styles.subtitle}>
+                <p className={cn(styles.title, compact.title)}>Appearance</p>
+                <p className={cn(styles.subtitle, compact.subtitle)}>
                   Pick the light that feels right.
                 </p>
               </div>
             </div>
-            <Menu.Separator className={styles.separator} />
+            <Menu.Separator
+              className={cn(styles.separator, compact.separator)}
+            />
             <Menu.RadioGroup
               value={preference}
               onValueChange={(value) => setPreference(value)}
               aria-label="Color mode"
-              className={styles.appearanceOptions}
+              className={cn(styles.appearanceOptions, compact.options)}
             >
               {options.map(
                 ({ value, label, description, Icon, tone, swatches }) => (
@@ -111,27 +130,37 @@ export function AppearanceMenu() {
                     closeOnClick={false}
                     data-active={preference === value}
                     data-appearance-option={value}
-                    className={styles.entry}
+                    className={cn(styles.entry, compact.entry)}
                   >
-                    <span className={styles.iconTile} data-tone={tone}>
+                    <span
+                      className={cn(styles.iconTile, compact.iconTile)}
+                      data-tone={tone}
+                    >
                       <Icon strokeWidth={1.8} aria-hidden="true" />
                     </span>
-                    <span className={styles.copy}>
+                    <span className={cn(styles.copy, compact.copy)}>
                       <span className={styles.labelRow}>
-                        <span className={styles.label}>{label}</span>
+                        <span className={cn(styles.label, compact.label)}>
+                          {label}
+                        </span>
                       </span>
-                      <span className={styles.description}>
+                      <span
+                        className={cn(styles.description, compact.description)}
+                      >
                         {preference === value ? "Selected · " : ""}
                         {description}
                       </span>
                     </span>
-                    <span className={styles.swatches} aria-hidden="true">
+                    <span
+                      className={cn(styles.swatches, compact.swatches)}
+                      aria-hidden="true"
+                    >
                       {swatches.map((color) => (
                         <i key={color} style={{ background: color }} />
                       ))}
                     </span>
                     <Menu.RadioItemIndicator
-                      className={styles.modeCheck}
+                      className={cn(styles.modeCheck, compact.modeCheck)}
                       keepMounted
                     >
                       <ActionIcon name="selected" />
@@ -140,11 +169,17 @@ export function AppearanceMenu() {
                 ),
               )}
             </Menu.RadioGroup>
-            <div className={cn(styles.footer, styles.appearanceFooter)}>
+            <div
+              className={cn(
+                styles.footer,
+                styles.appearanceFooter,
+                compact.footer,
+              )}
+            >
               <span>
                 {persisted ? "Saved on this device" : "This visit only"}
               </span>
-              <span className={styles.resolvedMode}>
+              <span className={cn(styles.resolvedMode, compact.resolvedMode)}>
                 {resolved === "dark" ? (
                   <MoonStar aria-hidden="true" />
                 ) : (
@@ -160,13 +195,13 @@ export function AppearanceMenu() {
               onClick={() => setOpen(false)}
               label="Close appearance"
               aria-label="Close appearance"
-              className={styles.close}
+              className={cn(styles.close, compact.close)}
             >
               <ActionIcon name="close" />
             </Menu.Item>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
-    </Menu.SubmenuRoot>
+    </Root>
   );
 }
