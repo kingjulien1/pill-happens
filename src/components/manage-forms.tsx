@@ -40,6 +40,11 @@ import {
   MEDICATION_TYPES,
 } from "@/lib/medication-types";
 import { toast } from "@/components/ui/journal-toast";
+import {
+  goalNotificationSnapshot,
+  medicationNotificationSnapshot,
+  savedNotificationRecord,
+} from "@/lib/notification-change-preview";
 import { useJournal } from "@/components/journal-provider";
 import { DraftStatus, usePersistentDraft } from "@/components/journal-drafts";
 import { Input } from "@/components/ui/input";
@@ -180,7 +185,7 @@ export function MedicationForm({
   controlsRef?: Ref<MedicationFormControls>;
   onDraftAvailabilityChange?: (state: MedicationDraftAvailability) => void;
 }) {
-  const { mutate, busy } = useJournal();
+  const { data, mutate, busy } = useJournal();
   const id = useId();
   const draftKey = medication ? `med:edit:${medication.id}` : "med:new";
   const draft = usePersistentDraft(
@@ -262,6 +267,12 @@ export function MedicationForm({
       return;
     }
     try {
+      const beforePreview = medication
+        ? {
+            kind: "medication" as const,
+            medication: medicationNotificationSnapshot(medication),
+          }
+        : undefined;
       const saved = await mutate(
         medication ? `medications/${medication.id}` : "medications",
         {
@@ -279,10 +290,26 @@ export function MedicationForm({
         },
         medication ? "PATCH" : "POST",
       );
+      const savedMedication = savedNotificationRecord(
+        data?.medications ?? [],
+        saved.data.medications,
+        saved.entityId ?? medication?.id,
+      );
       draft.clearDraft();
       toast.success(medication ? "Medication updated." : "Medication added.", {
         heading: "Medication library",
         details: {
+          ...(savedMedication
+            ? {
+                preview: {
+                  ...(beforePreview ? { before: beforePreview } : {}),
+                  after: {
+                    kind: "medication" as const,
+                    medication: medicationNotificationSnapshot(savedMedication),
+                  },
+                },
+              }
+            : {}),
           paragraphs: [
             medication
               ? "Your medication details are saved. Linked past intakes now use its current name, type and strength, so their doses and totals are recalculated too."
@@ -569,10 +596,27 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         endsOn: endsOn || null,
         note: note.trim(),
       });
+      const savedGoal = savedNotificationRecord(
+        data?.goals ?? [],
+        saved.data.goals,
+        saved.entityId,
+      );
       draft.clearDraft();
       toast.success("Your goal has been saved.", {
         heading: "Daily goal",
         details: {
+          ...(savedGoal
+            ? {
+                preview: {
+                  after: goalNotificationSnapshot(
+                    savedGoal,
+                    saved.data.medications.find(
+                      (item) => item.id === savedGoal.medicationId,
+                    ),
+                  ),
+                },
+              }
+            : {}),
           paragraphs: [
             "This maximum is saved for the selected medication and date range. Daily progress compares the recorded dose for that medication with this value; it does not combine different medications.",
             "A newer goal’s start date supersedes older goals for the same medication. Goals are tracking references you enter yourself; saving one does not change your intakes.",

@@ -10,6 +10,7 @@ import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
 import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
 import { toast } from "@/components/ui/journal-toast";
+import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationCardBase } from "@/components/medication-card-base";
@@ -485,6 +486,9 @@ function CheckInForm({
     let saved = false;
     try {
       await reflectionSave.pauseAndDrain();
+      const beforePreview = checkIn
+        ? checkInNotificationSnapshot(checkIn)
+        : undefined;
       const result = await mutate("daily-check-ins", {
         day,
         period,
@@ -508,6 +512,11 @@ function CheckInForm({
             ? {} // An older restored draft must not erase a newer saved clock.
             : { bedtime: bedtime === "" ? null : bedtime }),
       });
+      const savedCheckIn = checkInForDay(
+        result.data.dailyCheckIns,
+        day,
+        period,
+      );
       saved = true;
       draft.clearDraft();
       toast.success(
@@ -520,6 +529,14 @@ function CheckInForm({
           heading: `${period === "morning" ? "Morning" : "Evening"} check-in`,
           undo: result.undo ? { onUndo: result.undo } : undefined,
           details: {
+            ...(savedCheckIn
+              ? {
+                  preview: {
+                    ...(beforePreview ? { before: beforePreview } : {}),
+                    after: checkInNotificationSnapshot(savedCheckIn),
+                  },
+                }
+              : {}),
             paragraphs: [
               "Your writing and check-in details are saved for this tracking day. Reopen the check-in whenever you want to add or change something.",
             ],

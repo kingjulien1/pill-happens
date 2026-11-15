@@ -11,6 +11,10 @@ import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import { toast } from "@/components/ui/journal-toast";
 import {
+  intakeNotificationSnapshot,
+  savedNotificationRecord,
+} from "@/lib/notification-change-preview";
+import {
   getMedicationType,
   medicationQuantityControls,
 } from "@/lib/medication-types";
@@ -192,6 +196,13 @@ export function IntakeForm({
         );
         return;
       }
+      const beforePreview = intake
+        ? intakeNotificationSnapshot(
+            intake,
+            data!.medications.find((item) => item.id === intake.medicationId),
+            timezone,
+          )
+        : undefined;
       const saved = await mutate(
         intake ? `intakes/${intake.id}` : "intakes",
         {
@@ -213,6 +224,11 @@ export function IntakeForm({
       }).format(new Date(timestamp));
       const name = medication?.name ?? fallbackIntake!.medicationName;
       const savedId = saved.entityId ?? intake?.id;
+      const savedEntry = savedNotificationRecord(
+        data!.intakes,
+        saved.data.intakes,
+        savedId,
+      );
       const dayHref = `/history/${savedDay}${savedId ? `?intake=${encodeURIComponent(savedId)}` : ""}`;
       toast.success(
         intake
@@ -222,6 +238,20 @@ export function IntakeForm({
           heading: intake ? "Intake updated" : "Intake saved",
           ...(!intake ? { variant: "intake-saved" as const } : {}),
           details: {
+            ...(savedEntry
+              ? {
+                  preview: {
+                    ...(beforePreview ? { before: beforePreview } : {}),
+                    after: intakeNotificationSnapshot(
+                      savedEntry,
+                      saved.data.medications.find(
+                        (item) => item.id === savedEntry.medicationId,
+                      ),
+                      saved.data.settings.timezone,
+                    ),
+                  },
+                }
+              : {}),
             paragraphs: [
               intake
                 ? "Your saved entry now uses these values. The day’s list, medication total and goal progress have been recalculated from the updated record."

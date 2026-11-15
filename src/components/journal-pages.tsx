@@ -14,6 +14,11 @@ import { FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { toast } from "@/components/ui/journal-toast";
+import {
+  goalNotificationSnapshot,
+  intakeNotificationSnapshot,
+  medicationNotificationSnapshot,
+} from "@/lib/notification-change-preview";
 import { useJournal } from "@/components/journal-provider";
 import {
   DraftStatus,
@@ -147,7 +152,7 @@ function usagePercent(total: number, maximum: number) {
 }
 
 function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
-  const { mutate, busy } = useJournal();
+  const { data, mutate, busy } = useJournal();
   const { store } = useJournalWorkspace();
   const [confirm, setConfirm] = useState(false);
   const confirmId = useId();
@@ -157,12 +162,20 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
     if (confirm) keepButton.current?.focus();
   }, [confirm]);
   async function remove() {
+    const beforePreview = data
+      ? intakeNotificationSnapshot(
+          intake,
+          data.medications.find((item) => item.id === intake.medicationId),
+          data.settings.timezone,
+        )
+      : undefined;
     try {
       const saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE");
       store.clearDraft(`intake:edit:${intake.id}`);
       toast.success("Entry removed from your daily log.", {
         heading: "Intake removed",
         details: {
+          ...(beforePreview ? { preview: { before: beforePreview } } : {}),
           paragraphs: [
             "This intake has been removed. Its medication’s daily total and goal progress now reflect the remaining entries; the medication itself stays in your library.",
             "Undo restores this exact entry with its original quantity, time taken and notes.",
@@ -570,11 +583,18 @@ export function MedicationsPage() {
         : "Reference unavailable";
   async function archive(medication: Medication): Promise<boolean> {
     if (busy) return false;
+    const beforePreview = {
+      kind: "medication" as const,
+      medication: medicationNotificationSnapshot(medication),
+    };
     try {
       const saved = await mutate(
         `medications/${medication.id}`,
         { archived: !medication.archived },
         "PATCH",
+      );
+      const updatedMedication = saved.data.medications.find(
+        (item) => item.id === medication.id,
       );
       toast.success(
         medication.archived
@@ -583,6 +603,18 @@ export function MedicationsPage() {
         {
           heading: "Medication library",
           details: {
+            ...(updatedMedication
+              ? {
+                  preview: {
+                    before: beforePreview,
+                    after: {
+                      kind: "medication" as const,
+                      medication:
+                        medicationNotificationSnapshot(updatedMedication),
+                    },
+                  },
+                }
+              : {}),
             paragraphs: [
               medication.archived
                 ? "This medication is active again and available in the intake selector. Its existing settings and past entries have been kept."
@@ -797,11 +829,18 @@ export function GoalsPage() {
     if (!deleting) return;
     try {
       const removed = goals.find((goal) => goal.id === deleting);
+      const beforePreview = removed
+        ? goalNotificationSnapshot(
+            removed,
+            data?.medications.find((item) => item.id === removed.medicationId),
+          )
+        : undefined;
       const saved = await mutate(`goals/${deleting}`, undefined, "DELETE");
       setDeleting(null);
       toast.success("Goal removed. Your entries stay saved.", {
         heading: "Goal removed",
         details: {
+          ...(beforePreview ? { preview: { before: beforePreview } } : {}),
           paragraphs: [
             "This goal has been removed from your saved maximums. Intake records are unchanged; daily goal progress now follows the remaining effective goal, if one applies.",
           ],
@@ -1024,6 +1063,9 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
       className="space-y-4"
       onSubmit={async (event) => {
         event.preventDefault();
+        const beforePreview = data
+          ? { kind: "timezone" as const, timeZone: data.settings.timezone }
+          : undefined;
         try {
           const saved = await mutate(
             "settings",
@@ -1034,6 +1076,13 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           toast.success("Timezone updated for your journal.", {
             heading: "Journal settings",
             details: {
+              preview: {
+                ...(beforePreview ? { before: beforePreview } : {}),
+                after: {
+                  kind: "timezone",
+                  timeZone: saved.data.settings.timezone,
+                },
+              },
               paragraphs: [
                 "Saved instants stay unchanged. This timezone now controls displayed times and the local 06:00 tracking-day boundary, so some entries may appear on a different day.",
               ],
