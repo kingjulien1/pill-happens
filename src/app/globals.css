@@ -192,7 +192,7 @@
   position: absolute;
   z-index: 1;
   inset: 0;
-  /* A localized Ink veil anchors the center without whitening the field. */
+  /* Light-mode veils remain; dark-mode theme tokens are fully transparent. */
   background:
     radial-gradient(
       ellipse at 50% 45%,
@@ -201,8 +201,8 @@
     ),
     var(--ambient-overlay);
 }
-/* The shared veil stays above the original tint and below every page surface.
-   Its own clipped box never moves; only the overscanned color field drifts. */
+/* The clipped field never moves; only its overscanned color layers drift.
+   Dark mode below retains bright highlights without the Indigo/Plum veil. */
 .ambient-depth {
   position: absolute;
   z-index: 2;
@@ -239,6 +239,28 @@
       #1e1a4d
     );
   transform: translate3d(-2%, 2%, 0) scale(1.04);
+}
+@media (prefers-color-scheme: dark) {
+  /* Reveal the original field; only the existing bright Rose echoes remain. */
+  .ambient::after {
+    content: none;
+  }
+  .ambient-depth {
+    background: transparent;
+  }
+  .ambient-depth::before {
+    background:
+      radial-gradient(
+        ellipse at 32% 16%,
+        color-mix(in srgb, var(--palette-rose) 3.3%, transparent),
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse at 68% 84%,
+        color-mix(in srgb, var(--palette-rose) 6%, transparent),
+        transparent 68%
+      );
+  }
 }
 @media (prefers-color-scheme: light) {
   .ambient-depth {

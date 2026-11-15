@@ -19,7 +19,7 @@
   padding-left: max(var(--guide-gutter), env(safe-area-inset-left));
 }
 
-/* A viewport-fixed veil lets the shared daily-log background show through. */
+/* Light-mode reading gets a veil; dark mode reveals the shared background. */
 .shell::before {
   content: "";
   position: fixed;
@@ -27,6 +27,13 @@
   inset: 0;
   background: color-mix(in srgb, var(--background) 67%, transparent);
   pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .shell::before {
+    content: none;
+    background: none;
+  }
 }
 
 @media (min-width: 40rem) {
