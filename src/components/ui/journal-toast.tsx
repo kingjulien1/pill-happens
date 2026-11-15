@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/journal-notification";
 import {
   NotificationExitRegistry,
+  NOTIFICATION_DEFAULT_DURATION,
   type NotificationExitReason,
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
@@ -21,7 +22,7 @@ export type JournalToastOptions = ExternalToast & {
   heading?: ReactNode;
   details?: JournalNotificationDetails;
   undo?: JournalNotificationUndo;
-  /** Reserve the Star Check artwork for a successfully saved intake. */
+  /** Identify an intake-save notice while sharing the success Bell Check artwork. */
   variant?: "intake-saved";
 };
 
@@ -58,7 +59,9 @@ function notify(
       : nativeOptions.description;
   const body = typeof description === "function" ? description() : description;
   const duration =
-    kind === "loading" ? Infinity : (nativeOptions.duration ?? 5_500);
+    kind === "loading"
+      ? Infinity
+      : (nativeOptions.duration ?? NOTIFICATION_DEFAULT_DURATION);
   const dismissible = kind !== "loading" && nativeOptions.dismissible !== false;
   let version = -1;
   let record: ToastT;

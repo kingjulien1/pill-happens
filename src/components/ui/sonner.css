@@ -1,35 +1,38 @@
-/* Sonner owns its outer transforms, stack and swipe bridges. All custom motion
-   and opaque painting stay on the inner notification, never its pseudo-elements. */
+/* Sonner owns its outer transforms, stack and swipe bridges. Custom keyframes
+   and the glass surface belong to the inner card and artwork. */
 .journal-toaster[data-sonner-toaster] {
-  --toast-ink: var(--palette-black);
-  /* Exactly 7/12 of the former .78 secondary alpha. Expanded detail stays readable. */
-  --toast-muted: color-mix(in srgb, var(--toast-ink) 45.5%, transparent);
-  --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 78%, transparent);
-  --toast-surface: color-mix(in srgb, #000 24%, var(--background));
-  --toast-tile: #000;
-  --toast-glyph: #fff;
+  --toast-ink: #fff7fc;
+  --toast-muted: color-mix(in srgb, var(--toast-ink) 70%, transparent);
+  --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 88%, transparent);
+  --toast-pink-950: var(--color-pink-950, oklch(28.4% 0.109 3.907));
+  --toast-purple-400: var(--color-purple-400, oklch(71.4% 0.203 305.504));
+  --toast-surface: color-mix(in srgb, var(--toast-pink-950) 85%, transparent);
+  --toast-purple-wash: color-mix(
+    in srgb,
+    var(--toast-purple-400) 18%,
+    transparent
+  );
+  /* The higher Purple layer is above Pink; neither paints an opaque canvas. */
+  --toast-surface-layers:
+    linear-gradient(var(--toast-purple-wash) 0 0),
+    linear-gradient(var(--toast-surface) 0 0);
+  --toast-tile: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
+  --toast-glyph: #ffeaf6;
   --toast-accent: #fda5d5;
   --toast-bright: #fff1f8;
   --toast-soft: #d8b4fe;
-  --toast-rim: #87749d;
+  --toast-rim: var(--toast-purple-400);
   --toast-pink-edge: color-mix(
     in srgb,
     var(--color-pink-500, #ec4899) 56%,
     transparent
   );
   --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 50%, transparent);
-  --toast-shadow: color-mix(in srgb, var(--palette-black) 18.824%, transparent);
+  --toast-shadow: #25071f66;
   --toast-quiet-fill: color-mix(in srgb, var(--toast-ink) 7%, transparent);
   font-family: var(--font-sans);
 }
 .journal-toaster[data-sonner-toaster][data-sonner-theme="dark"] {
-  --toast-ink: var(--palette-white);
-  --toast-muted: color-mix(in srgb, var(--toast-ink) 52.5%, transparent);
-  --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 90%, transparent);
-  --toast-surface: color-mix(in srgb, #fff 24%, var(--background));
-  --toast-tile: #fff;
-  --toast-glyph: #000;
-  --toast-rim: #9c88b9;
   --toast-shadow: #100b2199;
 }
 .journal-toaster :is([data-type="success"], [data-kind="success"]) {
@@ -73,11 +76,14 @@
   box-sizing: border-box;
   border: 0;
   border-radius: 18px;
-  background: var(--toast-surface);
+  background: var(--toast-surface-layers);
+  -webkit-backdrop-filter: blur(128px) saturate(1.6);
+  backdrop-filter: blur(128px) saturate(1.6);
   color: var(--toast-ink);
   box-shadow:
     inset 0 0 0 4px var(--toast-rim-muted),
     inset 0 0 0 6px var(--toast-pink-edge),
+    0 0 26px color-mix(in srgb, var(--toast-purple-400) 16%, transparent),
     0 12px 28px -16px var(--toast-shadow),
     0 3px 10px -5px var(--toast-shadow);
   text-align: left;
@@ -183,6 +189,11 @@
   font-weight: 600;
   letter-spacing: 0.01em;
 }
+.journal-toaster
+  :is([data-kind="success"], [data-type="success"])
+  .journal-toast-kind {
+  color: var(--toast-ink);
+}
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
   [data-description],
@@ -195,7 +206,7 @@
   text-shadow: none;
 }
 
-/* The complete illustration is 1.225 times the previous 40/34/18px artwork. */
+/* The enlarged 27.5625px glyph keeps the existing compact 49px illustration rail. */
 .journal-toast-symbol {
   position: relative;
   display: block;
@@ -237,22 +248,24 @@
   display: grid;
   place-items: center;
   background: var(--toast-tile);
+  box-shadow:
+    inset 0 1px 0 #fff7fc26,
+    inset 0 0 0 1px color-mix(in srgb, var(--toast-accent) 35%, transparent),
+    0 4px 9px #190d2345;
 }
 .journal-toast-glyph-enter {
   display: grid;
   place-items: center;
-  width: 22.05px;
-  height: 22.05px;
+  width: 27.5625px;
+  height: 27.5625px;
   color: var(--toast-glyph);
 }
 .journal-toaster .journal-toast-glyph {
   display: block;
   flex: none;
-  width: 22.05px;
-  height: 22.05px;
-}
-[data-toast-variant="intake-saved"] .journal-toast-glyph-enter {
-  color: var(--color-emerald-400, #34d399);
+  width: 27.5625px;
+  height: 27.5625px;
+  stroke-width: 2.8;
 }
 .journal-toast-halo {
   position: absolute;
@@ -261,6 +274,24 @@
   border-radius: 16px;
   opacity: 0;
 }
+.journal-toast-halo-echo {
+  inset: -7px;
+  border-width: 0.8px;
+  border-color: var(--toast-bright);
+  border-radius: 19px;
+}
+.journal-toast-flash {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--toast-bright) 45%, transparent),
+    transparent 68%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
 .journal-toast-sparks,
 .journal-toast-spark-position {
   position: absolute;
@@ -268,7 +299,7 @@
   pointer-events: none;
 }
 .journal-toast-spark-position {
-  rotate: calc(var(--spark-index) * 90deg + 35deg);
+  rotate: calc(var(--spark-index) * 45deg + 22.5deg);
 }
 .journal-toast-spark {
   position: absolute;
@@ -283,18 +314,42 @@
 .journal-toast-spark-position:nth-child(even) .journal-toast-spark {
   background: var(--toast-bright);
 }
+.journal-toast-spark-position:nth-child(3n) .journal-toast-spark {
+  width: 5px;
+  height: 5px;
+  left: calc(50% - 2.5px);
+  clip-path: polygon(
+    50% 0,
+    62% 38%,
+    100% 50%,
+    62% 62%,
+    50% 100%,
+    38% 62%,
+    0 50%,
+    38% 38%
+  );
+}
 .journal-toaster .sonner-loader {
   width: 49px;
   height: 49px;
 }
 
-/* Expandable notices: one real summary button, readable details, a quiet timer. */
+/* The native summary and optional real revert action occupy separate grid cells. */
 .journal-notification {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
-  transform-origin: 50% 0;
+  transform-origin: 50% 65%;
+}
+.journal-notification-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+  align-items: center;
+  gap: 0;
+  padding-right: 12px;
+  border-radius: inherit;
 }
 .journal-notification-summary {
   display: block;
@@ -316,9 +371,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 69px;
+  min-height: 77px;
   box-sizing: border-box;
-  padding: 10px 35px 10px 12px;
+  padding: 12px 8px 16px 12px;
 }
 .journal-notification-art {
   display: block;
@@ -332,37 +387,6 @@
 }
 .journal-notification-description {
   display: block;
-}
-.journal-notification-chevron {
-  position: absolute;
-  top: 43px;
-  right: 13px;
-  width: 11px;
-  height: 11px;
-  color: var(--toast-muted);
-  stroke-width: 2;
-  transition: rotate 280ms cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-}
-.journal-notification[data-expanded="true"] .journal-notification-chevron {
-  rotate: 180deg;
-}
-.journal-notification-bell {
-  position: absolute;
-  top: 10px;
-  right: 11px;
-  display: grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  color: var(--toast-detail-muted);
-  pointer-events: none;
-}
-.journal-notification-bell svg {
-  display: block;
-  width: 13px;
-  height: 13px;
-  transform-origin: 50% 12%;
 }
 .journal-notification-details {
   display: grid;
@@ -397,7 +421,7 @@
 .journal-notification-details-inner::after {
   content: "";
   display: block;
-  height: 13px;
+  height: 20px;
 }
 .journal-notification-details-inner > :first-child {
   margin-top: 0;
@@ -517,6 +541,52 @@
   width: 12px;
   height: 12px;
 }
+.journal-notification .journal-notification-revert {
+  display: inline-grid;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  align-self: center;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--toast-accent) 28%, transparent),
+      color-mix(in srgb, var(--toast-purple-400) 22%, transparent)
+    ),
+    color-mix(in srgb, var(--toast-tile) 88%, transparent);
+  color: var(--toast-ink);
+  box-shadow:
+    inset 0 0 0 1.5px color-mix(in srgb, var(--toast-accent) 65%, transparent),
+    inset 0 1px 0 #fff7fc26,
+    0 3px 12px color-mix(in srgb, var(--toast-accent) 16%, transparent);
+  cursor: pointer;
+  transition:
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+.journal-notification .journal-notification-revert > svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 2.5;
+}
+.journal-notification .journal-notification-revert:disabled {
+  opacity: 0.78;
+  cursor: default;
+}
+.journal-notification .journal-notification-revert[data-undo-state="done"] {
+  color: var(--color-emerald-300, #6ee7b7);
+  box-shadow:
+    inset 0 0 0 1.5px
+      color-mix(in srgb, var(--color-emerald-300, #6ee7b7) 65%, transparent),
+    0 0 14px
+      color-mix(in srgb, var(--color-emerald-300, #6ee7b7) 18%, transparent);
+}
 .journal-notification-action[data-action="cancel"],
 .journal-notification-cancel {
   background: var(--toast-quiet-fill);
@@ -542,24 +612,29 @@
 }
 .journal-notification-countdown {
   position: absolute;
-  right: 13px;
-  bottom: 6px;
-  left: 13px;
-  height: 2px;
-  border-radius: 1px;
+  right: 16px;
+  bottom: 8px;
+  left: 16px;
+  height: 4px;
+  border-radius: 999px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--toast-ink) 8%, transparent);
+  background: color-mix(in srgb, var(--toast-soft) 20%, transparent);
+  box-shadow: inset 0 0 0 0.75px #fff7fc1f;
   pointer-events: none;
 }
 .journal-notification-countdown-bar {
   display: block;
-  width: 100%;
+  inline-size: calc(var(--notification-remaining, 1) * 100%);
   height: 100%;
   border-radius: inherit;
-  background: color-mix(in srgb, var(--toast-accent) 80%, var(--toast-ink));
-  transform: scaleX(var(--notification-remaining, 1));
-  transform-origin: left center;
-  transition: transform 60ms linear;
+  background: linear-gradient(
+    90deg,
+    var(--toast-soft),
+    var(--toast-bright) 55%,
+    var(--toast-accent)
+  );
+  box-shadow: 0 0 8px color-mix(in srgb, var(--toast-bright) 45%, transparent);
+  transition: inline-size 60ms linear;
 }
 .journal-notification[data-timer-mode="indefinite"]
   .journal-notification-countdown {
@@ -580,6 +655,7 @@
   :is(
     .journal-notification-summary,
     .journal-notification-action,
+    .journal-notification-revert,
     .journal-notification-link,
     .journal-notification-links a,
     [data-button],
@@ -603,6 +679,12 @@
       var(--toast-surface)
     );
   }
+  .journal-notification .journal-notification-revert:not(:disabled):hover {
+    box-shadow:
+      inset 0 0 0 1.5px var(--toast-accent),
+      inset 0 1px 0 #fff7fc33,
+      0 3px 17px color-mix(in srgb, var(--toast-accent) 28%, transparent);
+  }
 }
 @media (max-width: 479px) {
   .journal-notification-summary-content {
@@ -615,72 +697,141 @@
   }
 }
 
+/* The reading clock may pause for focus/hover; decoration has its own visibility gate. */
+.journal-notification[data-motion-paused="true"],
+.journal-toaster
+  [data-sonner-toast]:is(
+    [data-front="false"],
+    [data-visible="false"],
+    [data-mounted="false"]
+  ) {
+  --notification-motion-play-state: paused;
+}
+.journal-notification::after {
+  position: absolute;
+  z-index: -1;
+  inset: -3px;
+  border: 1.5px solid var(--toast-accent);
+  border-radius: 21px;
+  opacity: 0;
+  content: "";
+  pointer-events: none;
+}
 @media (prefers-reduced-motion: no-preference) {
+  .journal-toaster
+    [data-mounted="true"]
+    .journal-notification[data-phase="idle"] {
+    animation: journal-notification-card-arrive 860ms
+      cubic-bezier(0.16, 0.9, 0.23, 1) both;
+  }
+  .journal-toaster
+    [data-mounted="true"]
+    .journal-notification[data-phase="idle"]::after {
+    animation: journal-notification-threshold-ring 1100ms ease-out 350ms both;
+  }
   .journal-toaster [data-mounted="true"] .journal-toast-art-arrival {
     animation: journal-toast-art-arrive 1320ms cubic-bezier(0.22, 1, 0.36, 1)
-      40ms both;
+      90ms both;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-glyph-enter {
-    animation: journal-toast-glyph-reveal 480ms ease-out 100ms backwards;
+    animation: journal-toast-glyph-reveal 720ms cubic-bezier(0.2, 0.8, 0.2, 1)
+      160ms both;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-halo {
-    animation: journal-toast-settle-ring 420ms ease-out 900ms both;
+    animation: journal-toast-settle-ring 760ms ease-out 590ms both;
+  }
+  .journal-toaster [data-mounted="true"] .journal-toast-halo-echo {
+    animation-duration: 900ms;
+    animation-delay: 710ms;
+  }
+  .journal-toaster [data-mounted="true"] .journal-toast-flash {
+    animation: journal-toast-threshold-flash 620ms ease-out 620ms both;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-spark {
-    animation: journal-toast-spark-burst 410ms ease-out
-      calc(890ms + var(--spark-index) * 12ms) both;
+    animation: journal-toast-spark-burst 640ms ease-out
+      calc(640ms + var(--spark-index) * 18ms) both;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-plate-back {
-    animation: journal-toast-back-unfold 850ms cubic-bezier(0.22, 1, 0.36, 1)
-      100ms backwards;
+    animation: journal-toast-back-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
+      120ms backwards;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-plate-middle {
-    animation: journal-toast-middle-unfold 850ms cubic-bezier(0.22, 1, 0.36, 1)
-      130ms backwards;
+    animation: journal-toast-middle-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
+      180ms backwards;
   }
-  .journal-notification-bell svg {
-    animation: journal-notification-bell-ring 1s cubic-bezier(0.36, 0, 0.66, 1)
-      infinite;
+  [data-toast-symbol="success"] .journal-toast-glyph {
+    transform-origin: 50% 14%;
+    animation: journal-notification-bell-ring 3.6s
+      cubic-bezier(0.36, 0, 0.66, 1) 1380ms infinite;
   }
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
       infinite;
   }
-  .journal-notification-undo[data-undo-state="pending"] svg {
+  .journal-notification-revert[data-undo-state="pending"] svg {
     animation: journal-toast-turn 1s linear infinite;
   }
-  .journal-notification[data-paused="true"] .journal-notification-bell svg,
-  .journal-notification[data-paused="true"]
-    [data-toast-symbol="loading"]
-    .journal-toast-glyph,
+  .journal-notification-revert[data-undo-state="done"] svg {
+    animation: journal-toast-undo-settle 240ms cubic-bezier(0.2, 0.8, 0.2, 1)
+      both;
+  }
   .journal-toaster
-    [data-front="false"][data-expanded="false"]
-    .journal-notification-bell
-    svg,
+    [data-mounted="true"]
+    :is(
+      .journal-notification[data-phase="idle"],
+      .journal-toast-symbol,
+      .journal-toast-art-arrival,
+      .journal-toast-glyph-enter,
+      .journal-toast-glyph,
+      .journal-toast-halo,
+      .journal-toast-flash,
+      .journal-toast-spark,
+      .journal-toast-plate,
+      .journal-notification-revert > svg
+    ),
   .journal-toaster
-    [data-front="false"][data-expanded="false"]
-    [data-toast-symbol="loading"]
-    .journal-toast-glyph,
+    [data-mounted="true"]
+    .journal-notification[data-phase="idle"]::after {
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  /* Rear faces remain complete while their entrance clock waits for the front. */
+  .journal-toaster
+    [data-front="false"]
+    :is(
+      .journal-notification[data-phase="idle"],
+      .journal-toast-art-arrival,
+      .journal-toast-glyph-enter
+    ) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
   .journal-toaster .sonner-loader[data-visible="false"] * {
     animation-play-state: paused !important;
   }
   .journal-notification[data-phase="anticipate"] {
-    animation: journal-notification-anticipate 120ms ease-in both;
+    animation: journal-notification-anticipate 180ms
+      cubic-bezier(0.3, 0, 0.7, 1) both;
   }
   .journal-notification[data-phase="depart"] {
-    animation: journal-notification-depart 210ms
-      cubic-bezier(0.5, 0.05, 0.8, 0.4) both;
+    animation: journal-notification-depart 360ms
+      cubic-bezier(0.55, 0.02, 0.8, 0.35) both;
     pointer-events: none;
   }
   .journal-toast-symbol[data-toast-reversed="true"] {
     animation: journal-toast-art-reverse 300ms cubic-bezier(0.4, 0, 0.85, 0.35)
       both;
   }
-  .journal-toast-symbol[data-toast-reversed="true"] .journal-toast-art-arrival {
-    animation: none;
+  .journal-toast-symbol[data-toast-reversed="true"]
+    :is(
+      .journal-toast-art-arrival,
+      .journal-toast-glyph-enter,
+      .journal-toast-glyph,
+      .journal-toast-plate
+    ) {
+    animation-play-state: paused;
   }
   .journal-toast-symbol[data-toast-reversed="true"]
-    :is(.journal-toast-halo, .journal-toast-spark) {
+    :is(.journal-toast-halo, .journal-toast-spark, .journal-toast-flash) {
     animation: none;
     opacity: 0;
   }
@@ -690,27 +841,62 @@
     animation: journal-toast-art-reverse 180ms ease-in both;
   }
 }
+@keyframes journal-notification-card-arrive {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -18px, 0) rotate(-0.7deg) scale(0.84);
+  }
+  24% {
+    opacity: 1;
+    transform: translate3d(0, 7px, 0) rotate(0.35deg) scale(1.025);
+  }
+  48% {
+    transform: translate3d(0, -2px, 0) rotate(-0.12deg) scale(0.992);
+  }
+  72% {
+    transform: translate3d(0, 1px, 0) rotate(0.04deg) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes journal-notification-threshold-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  22% {
+    opacity: 0.55;
+    transform: scale(1.008);
+  }
+  92% {
+    opacity: 0;
+    transform: scale(1.045);
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
 @keyframes journal-toast-art-arrive {
   0% {
     opacity: 0;
-    transform: translateY(4px) scale(0.22) rotate(-420deg);
+    transform: translate3d(0, 6px, 0) scale(0.22) rotate(-210deg);
   }
   2% {
-    opacity: 0.3;
-    transform: translateY(4px) scale(0.22) rotate(-420deg);
+    opacity: 0.25;
+    transform: translate3d(0, 6px, 0) scale(0.22) rotate(-210deg);
   }
-  42% {
+  43% {
     opacity: 1;
-    transform: translateY(-1px) scale(0.9) rotate(-18deg);
+    transform: translate3d(0, -2px, 0) scale(1.1) rotate(7deg);
   }
-  58% {
-    transform: scale(1.08) rotate(5deg);
+  65% {
+    transform: translate3d(0, 1px, 0) scale(0.97) rotate(-3deg);
   }
-  76% {
-    transform: scale(0.98) rotate(-2deg);
-  }
-  90% {
-    transform: scale(1.015) rotate(0.8deg);
+  83% {
+    transform: scale(1.025) rotate(0.9deg);
   }
   100% {
     opacity: 1;
@@ -718,40 +904,74 @@
   }
 }
 @keyframes journal-toast-glyph-reveal {
-  from {
-    opacity: 0.25;
+  0% {
+    opacity: 0;
+    transform: scale(0.25) rotate(-50deg);
   }
-  to {
+  58% {
     opacity: 1;
+    transform: scale(1.18) rotate(8deg);
+  }
+  80% {
+    transform: scale(0.95) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 @keyframes journal-toast-back-unfold {
-  from {
-    transform: scale(0.82) rotate(0);
+  0% {
+    transform: scale(0.5) rotate(0);
   }
-  to {
+  65% {
+    transform: translate(-2.45px, 1.8px) scale(1.06) rotate(-14deg);
+  }
+  100% {
     transform: translate(-1.225px, 1.225px) rotate(-11deg);
   }
 }
 @keyframes journal-toast-middle-unfold {
-  from {
-    transform: scale(0.88) rotate(0);
+  0% {
+    transform: scale(0.65) rotate(0);
   }
-  to {
+  65% {
+    transform: translate(2.45px, -1.225px) scale(1.03) rotate(12deg);
+  }
+  100% {
     transform: translate(1.225px, 0) rotate(9deg);
   }
 }
 @keyframes journal-toast-settle-ring {
   0% {
     opacity: 0;
-    transform: scale(0.7);
+    transform: scale(0.75);
   }
-  20% {
-    opacity: 0.42;
+  24% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  92% {
+    opacity: 0;
+    transform: scale(1.22);
   }
   100% {
     opacity: 0;
-    transform: scale(1.15);
+    transform: none;
+  }
+}
+@keyframes journal-toast-threshold-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  26% {
+    opacity: 0.66;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: none;
   }
 }
 @keyframes journal-toast-spark-burst {
@@ -760,12 +980,16 @@
     transform: translateY(3.675px) scale(0.3);
   }
   24% {
-    opacity: 0.75;
-    transform: translateY(-2.45px) scale(1.05);
+    opacity: 0.85;
+    transform: translateY(-3px) scale(1.05);
+  }
+  92% {
+    opacity: 0;
+    transform: translateY(-13px) scale(0.2);
   }
   100% {
     opacity: 0;
-    transform: translateY(-9.8px) scale(0.2);
+    transform: none;
   }
 }
 @keyframes journal-toast-turn {
@@ -773,48 +997,70 @@
     transform: rotate(360deg);
   }
 }
-/* The bell rings for half a second, loses momentum, then rests for half a beat. */
+/* The main bell gives a damped ring, then rests for most of its 3.6s cycle. */
 @keyframes journal-notification-bell-ring {
   0%,
-  50%,
+  40%,
   100% {
     transform: rotate(0);
   }
   6% {
-    transform: rotate(17deg);
+    transform: rotate(-17deg);
   }
-  13% {
-    transform: rotate(-14deg);
+  12% {
+    transform: rotate(14deg);
   }
-  21% {
-    transform: rotate(10deg);
+  19% {
+    transform: rotate(-10deg);
   }
-  29% {
-    transform: rotate(-7deg);
+  26% {
+    transform: rotate(7deg);
   }
-  37% {
-    transform: rotate(4deg);
+  33% {
+    transform: rotate(-3deg);
   }
-  44% {
-    transform: rotate(-1.5deg);
+  38% {
+    transform: rotate(1deg);
+  }
+}
+@keyframes journal-toast-undo-settle {
+  0% {
+    transform: scale(0.75) rotate(-12deg);
+  }
+  65% {
+    transform: scale(1.14) rotate(5deg);
+  }
+  100% {
+    transform: none;
   }
 }
 @keyframes journal-notification-anticipate {
-  from {
+  0% {
     transform: none;
   }
-  to {
-    transform: translateY(2px) scale(1.008);
+  35% {
+    transform: translate3d(0, -1px, 0) scale(0.994);
+  }
+  100% {
+    transform: translate3d(0, 12px, 0) rotate(0.45deg) scale(1.045);
   }
 }
 @keyframes journal-notification-depart {
-  from {
+  0% {
     opacity: 1;
-    transform: translateY(2px) scale(1.008);
+    transform: translate3d(0, 12px, 0) rotate(0.45deg) scale(1.045);
   }
-  to {
+  62% {
+    opacity: 1;
+  }
+  100% {
     opacity: 0;
-    transform: translateY(-54px) scale(0.96);
+    transform: translate3d(
+        0,
+        var(--notification-exit-y, calc(-100dvh - 128px)),
+        0
+      )
+      rotate(-1deg) scale(0.9, 0.96);
   }
 }
 @keyframes journal-toast-art-reverse {
@@ -824,16 +1070,18 @@
   }
   25% {
     opacity: 1;
-    transform: scale(1.05) rotate(5deg);
+    transform: scale(1.12) rotate(7deg);
   }
   100% {
     opacity: 0;
-    transform: scale(0.22) rotate(-140deg);
+    transform: scale(0.18) rotate(-160deg);
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .journal-toaster[data-sonner-toaster] [data-sonner-toast],
-  .journal-toaster[data-sonner-toaster] [data-sonner-toast] * {
+  .journal-toaster[data-sonner-toaster] [data-sonner-toast] *,
+  .journal-toaster[data-sonner-toaster] [data-sonner-toast]::after,
+  .journal-toaster[data-sonner-toaster] [data-sonner-toast] *::after {
     animation: none !important;
     transition: none !important;
   }

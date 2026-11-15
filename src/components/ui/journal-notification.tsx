@@ -10,15 +10,11 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import {
-  ArrowUpRight,
-  Check,
-  ChevronDown,
-  LoaderCircle,
-  Undo2,
-} from "lucide-react";
+import { ArrowUpRight, Check, LoaderCircle, Undo2 } from "lucide-react";
 import type { Action, ExternalToast } from "sonner";
-import { NotificationBell, ToastSymbol } from "@/components/ui/sonner";
+import { ToastSymbol } from "@/components/ui/sonner";
+import { NotificationChangePreview } from "@/components/notification-change-preview";
+import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
 import type { JournalToastKind } from "@/components/ui/journal-toast";
 import {
   NOTIFICATION_EXIT_TIMING,
@@ -30,6 +26,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 export type JournalNotificationDetails = {
+  /** Display-only snapshots of the actual affected records, never live editors. */
+  preview?: NotificationChangePreviewData;
   paragraphs?: ReactNode[];
   facts?: { label: ReactNode; value: ReactNode }[];
   links?: { label: string; href: string }[];
@@ -163,6 +161,12 @@ export function JournalNotification({
       readingClock.pause(reason, value);
     };
     const syncNative = () => {
+      element.dataset.motionPaused = String(
+        document.hidden ||
+          outer?.dataset.front === "false" ||
+          outer?.dataset.mounted === "false" ||
+          outer?.dataset.visible === "false",
+      );
       setPause("hidden", document.hidden);
       setPause("rear", outer?.dataset.front === "false");
       setPause("unmounted", outer?.dataset.mounted === "false");
@@ -198,7 +202,7 @@ export function JournalNotification({
       );
       element.dataset.paused = String(snapshot.paused);
       if (progress.current)
-        progress.current.style.transform = `scaleX(${snapshot.progress})`;
+        progress.current.style.inlineSize = `${snapshot.progress * 100}%`;
       if (snapshot.expired && !leaving.current && isCurrent()) {
         leaving.current = true;
         onRequestDismiss("timeout");
@@ -244,6 +248,12 @@ export function JournalNotification({
       setExpanded(false);
       setPhase(hadDetails ? "collapsing" : "anticipate");
       const beginExit = () => {
+        const bounds = root.current?.getBoundingClientRect();
+        if (bounds)
+          root.current?.style.setProperty(
+            "--notification-exit-y",
+            `${-Math.max(bounds.bottom + 64, bounds.height + 96)}px`,
+          );
         setPhase("anticipate");
         setReversed(true);
         later(
@@ -288,6 +298,9 @@ export function JournalNotification({
         undo: undo.onUndo,
         isCurrent: () => alive.current && isCurrent() && !leaving.current,
         onSuccess: () => {
+          // Undo is available while collapsed; its success beat must outlive
+          // even a reading clock that was nearly finished before the click.
+          pause("undo-complete", true);
           setUndoState("done");
           timers.current.push(
             setTimeout(() => {
@@ -356,6 +369,7 @@ export function JournalNotification({
       data-phase={phase}
       data-icon-state={reversed ? "reverse" : "forward"}
       data-paused="true"
+      data-motion-paused="true"
       data-timer-mode={Number.isFinite(duration) ? "countdown" : "indefinite"}
       style={{ "--notification-remaining": 1 } as CSSProperties}
       onPointerEnter={(event) => {
@@ -401,46 +415,77 @@ export function JournalNotification({
         }
       }}
     >
-      <button
-        type="button"
-        className="journal-notification-summary"
-        aria-expanded={expanded}
-        aria-controls={detailsId}
-        aria-labelledby={headingId}
-        aria-describedby={messageId}
-        onClick={toggle}
-      >
-        <span className="journal-notification-summary-content">
-          <span className="journal-notification-art">
-            {icon === undefined ? (
-              <ToastSymbol kind={kind} variant={variant} reversed={reversed} />
-            ) : (
-              icon
-            )}
-          </span>
-          <span className="journal-notification-copy">
-            <span className="journal-toast-heading" id={headingId}>
-              <span className="journal-toast-heading-text">{heading}</span>
-              <span className="journal-toast-heading-meta">
-                <span className="journal-toast-heading-dot" aria-hidden="true">
-                  ·
+      <div className="journal-notification-header">
+        <button
+          type="button"
+          className="journal-notification-summary"
+          aria-expanded={expanded}
+          aria-controls={detailsId}
+          aria-labelledby={headingId}
+          aria-describedby={messageId}
+          onClick={toggle}
+        >
+          <span className="journal-notification-summary-content">
+            <span className="journal-notification-art">
+              {icon === undefined ? (
+                <ToastSymbol
+                  kind={kind}
+                  variant={variant}
+                  reversed={reversed}
+                />
+              ) : (
+                icon
+              )}
+            </span>
+            <span className="journal-notification-copy">
+              <span className="journal-toast-heading" id={headingId}>
+                <span className="journal-toast-heading-text">{heading}</span>
+                <span className="journal-toast-heading-meta">
+                  <span
+                    className="journal-toast-heading-dot"
+                    aria-hidden="true"
+                  >
+                    ·
+                  </span>
+                  <span className="journal-toast-kind">{kindLabels[kind]}</span>
                 </span>
-                <span className="journal-toast-kind">{kindLabels[kind]}</span>
+              </span>
+              <span className="journal-notification-description" id={messageId}>
+                {message}
               </span>
             </span>
-            <span className="journal-notification-description" id={messageId}>
-              {message}
-            </span>
           </span>
-          <ChevronDown
-            className="journal-notification-chevron"
-            size={13}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
-        </span>
-      </button>
-      <NotificationBell />
+        </button>
+        {undo && (
+          <Button
+            variant="ghost"
+            size="icon"
+            type="button"
+            className="journal-notification-revert journal-notification-undo"
+            data-undo-state={undoState}
+            disabled={undoState !== "ready" || phase !== "idle"}
+            aria-busy={undoState === "pending"}
+            aria-label={
+              undoState === "pending"
+                ? (undo.pendingLabel ?? "Undoing change")
+                : undoState === "done"
+                  ? (undo.successLabel ?? "Change undone")
+                  : (undo.label ?? "Undo change")
+            }
+            title={undo.label ?? "Undo change"}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={runUndo}
+          >
+            {undoState === "pending" ? (
+              <LoaderCircle aria-hidden="true" />
+            ) : undoState === "done" ? (
+              <Check aria-hidden="true" />
+            ) : (
+              <Undo2 aria-hidden="true" />
+            )}
+          </Button>
+        )}
+      </div>
       <div
         className="journal-notification-details"
         id={detailsId}
@@ -451,10 +496,14 @@ export function JournalNotification({
         onPointerDown={(event) => event.stopPropagation()}
       >
         <div className="journal-notification-details-inner">
-          {paragraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-          {Boolean(details?.facts?.length) && (
+          {details?.preview ? (
+            <NotificationChangePreview preview={details.preview} />
+          ) : (
+            paragraphs
+              .slice(0, 1)
+              .map((paragraph, index) => <p key={index}>{paragraph}</p>)
+          )}
+          {!details?.preview && Boolean(details?.facts?.length) && (
             <dl className="journal-notification-facts">
               {details?.facts?.map((fact, index) => (
                 <div key={index}>
@@ -487,7 +536,7 @@ export function JournalNotification({
           )}
           <div className="journal-notification-footer">
             <span className="journal-notification-footer-copy">
-              {details?.footer ??
+              {(details?.preview ? undefined : details?.footer) ??
                 (expanded
                   ? "A little reading time. The timer’s paused."
                   : kind === "loading"
@@ -495,32 +544,6 @@ export function JournalNotification({
                     : "Tap for context · Swipe to dismiss")}
             </span>
             <span className="journal-notification-actions">
-              {undo && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  className="journal-notification-action journal-notification-undo h-auto"
-                  data-undo-state={undoState}
-                  disabled={undoState !== "ready" || phase !== "idle"}
-                  aria-busy={undoState === "pending"}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={runUndo}
-                >
-                  {undoState === "pending" ? (
-                    <LoaderCircle size={12} aria-hidden="true" />
-                  ) : undoState === "done" ? (
-                    <Check size={12} aria-hidden="true" />
-                  ) : (
-                    <Undo2 size={12} aria-hidden="true" />
-                  )}
-                  {undoState === "pending"
-                    ? (undo.pendingLabel ?? "Undoing…")
-                    : undoState === "done"
-                      ? (undo.successLabel ?? "Undone")
-                      : (undo.label ?? "Undo")}
-                </Button>
-              )}
               {renderAction(cancel, true)}
               {renderAction(action)}
             </span>
@@ -531,7 +554,7 @@ export function JournalNotification({
         <span
           ref={progress}
           className="journal-notification-countdown-bar"
-          style={{ transform: "scaleX(1)" }}
+          style={{ inlineSize: "100%" }}
         />
       </div>
     </div>
