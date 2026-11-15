@@ -849,7 +849,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Inward frame",
-            "4px muted rim at 50%, over inset 6px Pink 500 at 56%; second band extends 2px inward.",
+            "Matches intake geometry: a 4px outer band at 31.5% color alpha (37% less than its former 50%), followed by a separate 2px Pink 500 band at 56%. Both stay inside the card. A 2px outline offset by −6px places the inner band 4–6px inward without overlapping the outer tint, changing layout or occupying Sonner’s swipe/stack pseudo-elements. Existing rim pigments and 18px corners remain.",
           ],
           [
             "Surface / countdown",
