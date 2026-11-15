@@ -420,8 +420,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         summary unless <code>description</code> explicitly overrides it. Missing
         paragraphs use kind-specific context. Footer copy and action/cancel
         controls appear inside expanded details. A supplied Undo is a separate,
-        centered icon button in the header; activating it never toggles
-        expansion. <code>duration</code>, <code>id</code>, styling,
+        compact labelled control in the top-right corner; activating it never
+        toggles expansion. <code>duration</code>, <code>id</code>, styling,
         action/cancel and callbacks originate in <code>ExternalToast</code>; the
         facade deliberately owns the native timer, close-button and rendering
         fields. Loading ignores a finite duration.
@@ -724,18 +724,19 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
 
       <Heading id="visuals">Visual Reference &amp; Alpha Math</Heading>
       <p>
-        The summary starts at <strong>77px</strong>; its independent Undo is
-        centered beside the content. Longer copy and expanded previews may
-        increase the card height. The host is top-center,{" "}
-        <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
-        and a 10px gap. Mobile side offsets are 16px and top offsets include the
-        safe area. Both modes share a static opaque base: 92% canonical Plum
-        mixed with 8% Black. Three faint radial highlights sit at different
-        edges: Violet400 at 5.5%, Indigo400 at 4.5% and Fuchsia400 at 3.5%. This
-        is also the application’s fixed page canvas in both appearance modes.
-        Readable light ink stays paired with this dark surface; semantic reading
-        panels retain their separate light/dark roles. The background has no
-        animation, uniform color wash, backdrop blur or saturation.
+        The summary starts at <strong>77px</strong>; its independent Undo sits
+        at the top right with a quiet icon tile and a short label underneath.
+        Longer copy and expanded previews may increase the card height. The host
+        is top-center, <code>min(460px, 100vw − 32px)</code> wide, with three
+        visible notices and a 10px gap. Mobile side offsets are 16px and top
+        offsets include the safe area. Both modes share a static opaque base:
+        92% canonical Plum mixed with 8% Black. Three faint radial highlights
+        sit at different edges: Violet400 at 5.5%, Indigo400 at 4.5% and
+        Fuchsia400 at 3.5%. This is also the application’s fixed page canvas in
+        both appearance modes. Readable light ink stays paired with this dark
+        surface; semantic reading panels retain their separate light/dark roles.
+        The background has no animation, uniform color wash, backdrop blur or
+        saturation.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
@@ -767,7 +768,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Header Undo",
-            "One 44px target with 13px corners and a 21px, 2.5-stroke state icon, centered vertically beside the independent expansion button.",
+            "One transparent 44px target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon, with a 9px Undo / Undoing / Undone label below; desktop hover changes only color and fill.",
           ],
           [
             "Artwork / bell",
