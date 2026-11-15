@@ -729,10 +729,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         increase the card height. The host is top-center,{" "}
         <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
-        safe area. The glass base uses a strong backdrop blur with an 85%-alpha
-        Pink950 layer underneath an 18%-alpha Purple400 wash. These are separate
-        compositing layers, not an 85/18 solid color mix; their combined paint
-        alpha is 87.7% before the glass and backdrop are considered.
+        safe area. The restored opaque base mixes the theme canvas with 24%
+        Black in light mode or 24% White in dark mode. A separate 9%-alpha
+        Purple200 wash sits above that base. The result remains opaque; it
+        uses no backdrop blur or saturation, and its ink follows the theme.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
@@ -748,7 +748,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Short secondary copy",
-            "Both modes use the bright #fff7fc ink at 70% color alpha, without another element-opacity multiplier.",
+            "Both modes use their theme-aware ink at 70% color alpha, without another element-opacity multiplier.",
           ],
           [
             "Expanded details",
@@ -759,8 +759,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "4px muted rim at 50%, over inset 6px Pink 500 at 56%; second band extends 2px inward.",
           ],
           [
-            "Glass / countdown",
-            "128px standard and Safari backdrop blur with 1.6 saturation; the 4px-high capped rail is inset 16px horizontally and 8px from the bottom.",
+            "Surface / countdown",
+            "Opaque theme-canvas mix beneath a 9%-alpha Purple200 wash, without backdrop blur or saturation; the 4px-high capped rail is inset 16px horizontally and 8px from the bottom.",
           ],
           [
             "Header Undo",
