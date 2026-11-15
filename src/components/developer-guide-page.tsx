@@ -469,7 +469,7 @@ export function DeveloperGuidePage() {
                 inverse surfaces each have their own foreground partner.
               </p>
               <p>
-                Text directly over the animated field uses
+                Text directly over the fixed dark canvas uses
                 <code> --canvas-foreground</code> or
                 <code> --canvas-muted-foreground</code>. A general muted reading
                 color can disappear when moved from a card to the canvas.
@@ -506,7 +506,7 @@ export function DeveloperGuidePage() {
               <p>
                 An eight-digit hex value includes alpha: the last pair controls
                 opacity. The same wash will look different on White, Plum, a
-                card, or the moving field. The inspector displays the exact
+                card, or the static canvas. The inspector displays the exact
                 value and opacity rather than replacing it with an opaque
                 approximation.
               </p>
@@ -870,7 +870,7 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Page-level guidance, dates and milestone labels use the canvas
-                copy pair above the darker moving background. Text inside cards,
+                copy pair above the fixed dark canvas. Text inside cards,
                 dialogs and readers keeps its own paired surface roles. This
                 distinction preserves readable light-mode labels without
                 flattening the hierarchy of the card content. Verify both
@@ -983,41 +983,43 @@ export function DeveloperGuidePage() {
             </Detail>
             <Detail
               title="The Fixed Background"
-              context="Flowing Color & Highlights"
+              context="Static Color & Gentle Edges"
             >
               <p>
-                <code>JournalBackground</code> fills the viewport with the
-                mode-aware radial Grainient field. In dark mode, Plum, Lilac and
-                a restrained warm trace flow without the Plum veil, center scrim
-                or dark Indigo/Plum radial-conic overlay. Only the two subtle
-                Rose highlights remain above the field. Light mode keeps its
-                existing veil, center scrim and complete highlight layer. The
-                CSS radial fallback paints before hydration and remains
-                available without WebGL.
+                <code>JournalBackground</code> fills the viewport with the same
+                opaque foundation in both appearance modes: 92% canonical Plum
+                and 8% Black, resolved to <code>#29213b</code>. Fixed edge
+                gradients add Violet400 at 5.5%, Indigo400 at 4.5% and
+                Fuchsia400 at 3.5%. This is the same restrained background
+                recipe used by notifications, with no moving field, uniform
+                wash, dimming veil, backdrop blur or saturation filter.
               </p>
               <p>
-                The renderer follows system or saved Appearance changes. Mobile
-                uses portrait framing and a faster 5.4 shader speed, compared
-                with 3.6 on desktop, while limiting backing-store density to
-                1.25 and 750,000 pixels. The overscanned highlight field drifts
-                over 68 seconds without moving its clipped viewport. The Rose
-                highlight at 32% / 16% mirrors the 68% / 84% pool with
-                respective 3.3% and 6% pigment shares. Their dark-mode layer
-                retains 60% opacity with a transparent base; light mode retains
-                its full 56%-opacity field. Removing dark dimming layers does
-                not change the underlying ramp, contrast or motion settings.
-                Reduced motion keeps the composition still; hidden or offscreen
-                rendering pauses instead of accumulating elapsed time.
+                The shared <code>--app-canvas-base</code>,
+                <code> --app-canvas-background</code>,
+                <code> --app-canvas-foreground</code> and
+                <code> --app-canvas-muted-foreground</code> roles separate this
+                dark page foundation from semantic reading surfaces. CSS paints
+                it before hydration without a WebGL context, animation frame
+                loop or random placement. White <code>#ffffff</code> primary
+                copy and Lilac <code>#ded8ec</code> secondary copy remain paired
+                with that canvas in either mode. The semantic
+                <code> --background</code> token remains a foundation surface,
+                distinct from the visible page canvas. System and saved
+                Appearance choices still control cards, dialogs, menus and
+                readers. The earlier Grainient component remains available as an
+                optional renderer; the application no longer mounts it for the
+                page background.
               </p>
               <p>
                 Both guides share this backdrop beneath their reading surfaces.
-                Their separate 67% canvas veil remains only in light mode; dark
-                mode shows the backdrop without that reading overlay. Intake
-                cards and the main action retain their opaque
-                <code> --background</code> bases and local color tints, keeping
-                stacked content covered. The mobile dock fades, medication
-                artwork and check-in animations remain separate from the
-                background renderer.
+                Neither mode adds a fullscreen guide veil. Unboxed headings,
+                guidance and the contents rail use the light canvas copy pair;
+                actual panels and specimens keep their own mode-specific
+                foregrounds. Intake cards and the main action retain their
+                opaque component bases and local color tints, keeping stacked
+                content covered. The mobile dock fades, medication artwork and
+                check-in animations remain independent of the static canvas.
               </p>
             </Detail>
             <Detail title="A Dock That Leaves Room" context="Mobile Actions">
@@ -1177,15 +1179,18 @@ export function DeveloperGuidePage() {
                 The two outer fades now reach 160% of the dock height and taper
                 across their full distance, with no long opaque plateau. Their
                 base/accent opacities are 66%/20% in light mode and 84%/34% in
-                dark mode. Above them, Slate 900 reaches 104% of the dock at
-                55% opacity, a 37.5% increase. The nearest Gray 950 layer reaches
+                dark mode. Above them, an inner fade reaches 104% of the dock at
+                55% opacity, a 37.5% increase. The nearest fade layer reaches
                 72% at 60% opacity. Both use multiple gradual stops ending in
-                complete transparency. The taller decoration moves the fade’s
-                upper edge upward without moving the button or enlarging the
-                measured dock. Footer copy uses light ink over this stronger
-                dark fade. Safe-area clearance, page scroll reserve and native
-                input behavior stay attached to the same fixed parent, and
-                desktop has no mobile fade layers.
+                complete transparency. All four layers use the shared
+                <code> --app-canvas-base</code> at <code>#29213b</code>, so no
+                separate Blue, Apricot, Slate or Gray patch changes the page
+                color beneath them. The taller decoration moves the fade’s upper
+                edge upward without moving the button or enlarging the measured
+                dock. Footer copy uses light ink over this stronger dark fade.
+                Safe-area clearance, page scroll reserve and native input
+                behavior stay attached to the same fixed parent, and desktop has
+                no mobile fade layers.
               </p>
             </Detail>
             <Detail
@@ -1194,8 +1199,8 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Actual intake cards composite their selected medication color
-                at 13% over the same fully opaque <code>--background</code>
-                used by the page. This single tint preserves the saved swatch
+                at 13% over the fully opaque <code>--background</code>
+                foundation surface. This single tint preserves the saved swatch
                 without introducing a second pink base layer. Text and artwork
                 keep their own full opacity. Folded cards cannot show through
                 the opaque face above them.
@@ -1545,16 +1550,16 @@ export function DeveloperGuidePage() {
                 starts with 57.5px artwork; the face’s 1.25× spring and nested
                 1.14× icon scale compound to 81.9375px in the charged pose. The
                 core face matches the main action’s 40% Purple 950 / opaque
-                canvas mix; its edge and tablet use Purple 700, with nearby
+                foundation mix; its edge and tablet use Purple 700, with nearby
                 Violet and Purple spark tones. Critical CSS supplies the exact
                 prepaint fallbacks: Purple 950 #3c0366, Purple 700 #8200db,
-                light canvas #fbfafd and dark canvas #2b233e. The full-screen
-                paper follows the system canvas rather than the tinted core.
-                System and explicit appearance rules keep that paint stable
-                before app styles arrive; old inline Pink aliases no longer
-                override it. A restrained Violet atmosphere answers the core’s
-                build-up without adding another card or moving the central
-                position.
+                light foundation #fbfafd and dark foundation #2b233e. The
+                full-screen backdrop instead shares the application’s fixed
+                <code> #29213b</code> canvas and three static edge gradients in
+                both modes. System and explicit Appearance rules still control
+                the tinted core before app styles arrive; old inline Pink
+                aliases no longer override it. Local artwork glow and particles
+                retain their own choreography without moving the page canvas.
               </p>
               <p>
                 The refresh symbol begins at zero size in the center and grows
@@ -4100,10 +4105,10 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Components use Next.js, React, Tailwind CSS and Base UI/shadcn
-                patterns, with Phosphor and Lucide icon systems. The background
-                and specular effect retain their upstream attribution in source.
-                Review those source notices and the upstream terms when reusing
-                third-party material.
+                patterns, with Phosphor and Lucide icon systems. The optional
+                Grainient renderer and active specular effect retain their
+                upstream attribution in source. Review those source notices and
+                the upstream terms when reusing third-party material.
               </p>
               <div className={styles.upstreamLinks}>
                 <ExternalLink href="https://nextjs.org/docs">

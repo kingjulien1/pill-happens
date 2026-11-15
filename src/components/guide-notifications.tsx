@@ -731,9 +731,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
         safe area. Both modes share a static opaque base: 92% canonical Plum
         mixed with 8% Black. Three faint radial highlights sit at different
-        edges: Violet400 at 5.5%, Indigo400 at 4.5% and Fuchsia400 at 3.5%.
-        Readable light ink stays paired with this dark surface. The background
-        has no animation, uniform color wash, backdrop blur or saturation.
+        edges: Violet400 at 5.5%, Indigo400 at 4.5% and Fuchsia400 at 3.5%. This
+        is also the application’s fixed page canvas in both appearance modes.
+        Readable light ink stays paired with this dark surface; semantic reading
+        panels retain their separate light/dark roles. The background has no
+        animation, uniform color wash, backdrop blur or saturation.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
