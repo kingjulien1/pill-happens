@@ -15,7 +15,7 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   /* The critical fallbacks match the daily controls before app CSS arrives. */
   --refresh-canvas: var(--background, #fbfafd);
   --refresh-face: var(--daily-action-face, color-mix(in srgb, var(--color-purple-950, #3c0366) 40%, var(--refresh-canvas)));
-  --refresh-edge: var(--daily-action-inner-edge, var(--color-violet-700, #7008e7));
+  --refresh-edge: var(--daily-action-inner-edge, var(--color-purple-700, #8200db));
   --brand-surface: var(--refresh-face);
   --brand-copy: var(--refresh-edge);
   --brand-tone-ice: var(--color-violet-300, #c4b4ff);

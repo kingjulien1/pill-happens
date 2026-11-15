@@ -134,9 +134,9 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in srgb, var(--canvas-foreground) 32%, transparent)
+    color-mix(in srgb, var(--canvas-foreground) 20.8%, transparent)
       var(--topbar-rule-fade),
-    color-mix(in srgb, var(--canvas-foreground) 32%, transparent)
+    color-mix(in srgb, var(--canvas-foreground) 20.8%, transparent)
       calc(100% - var(--topbar-rule-fade)),
     transparent 100%
   );
