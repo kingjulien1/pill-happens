@@ -1228,6 +1228,39 @@
   }
 }
 
+/* Only unboxed guide copy uses canvas ink; reading specimens retain their pairs. */
+.page,
+.page .intro,
+.page .intro strong,
+.page .sectionHeading {
+  color: var(--app-canvas-foreground);
+}
+.page .intro > p,
+.page .eyebrow,
+.page .intro .atAGlance dt,
+.page .intro .atAGlance small,
+.page .sectionHeading > span,
+.page .section > .sectionIntro,
+.page .section > .sourceNote,
+.page .footer > p,
+.page .footer a,
+.page > .topLinks > a {
+  color: var(--app-canvas-muted-foreground);
+}
+.page .intro,
+.page .intro .atAGlance,
+.page .intro .atAGlance > div + div,
+.page .footer {
+  border-color: color-mix(
+    in srgb,
+    var(--app-canvas-foreground) 16%,
+    transparent
+  );
+}
+.page [data-guide-buttons] [data-guide-outline-level] {
+  color: var(--app-canvas-foreground);
+}
+
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .contents a:hover,
   .copyButton:hover,

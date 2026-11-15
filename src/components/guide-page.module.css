@@ -843,3 +843,48 @@
     font-size: 14px;
   }
 }
+
+/* Bare guide copy belongs to the fixed dark canvas; panels keep semantic ink. */
+.page,
+.page .intro,
+.page .sectionHeading,
+.page .steps h3,
+.page .steps strong,
+.page .steps .pageLink,
+.page .intro strong {
+  color: var(--app-canvas-foreground);
+}
+.page .intro > p,
+.page .eyebrow,
+.page .intro .atAGlance small,
+.page .sectionHeading > span,
+.page .section > .sectionIntro,
+.page .steps p,
+.page .privacyNote p,
+.page .privacyNote > svg,
+.page .footer .topLink,
+.page > .backLink {
+  color: var(--app-canvas-muted-foreground);
+}
+.page .intro .atAGlance,
+.page .intro .atAGlance > div + div,
+.page .steps,
+.page .steps > li + li,
+.page .footer,
+.page .intro {
+  border-color: color-mix(
+    in srgb,
+    var(--app-canvas-foreground) 16%,
+    transparent
+  );
+}
+.page .stepNumber {
+  color: var(--foreground);
+}
+.page .steps .pageLink {
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--app-canvas-foreground) 35%,
+    transparent
+  );
+}

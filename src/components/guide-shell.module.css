@@ -2,8 +2,8 @@
 .shell {
   --guide-content-cap: 32rem;
   --guide-gutter: 1rem;
-  --canvas-foreground: var(--foreground);
-  --canvas-muted-foreground: var(--muted-foreground);
+  --canvas-foreground: var(--app-canvas-foreground);
+  --canvas-muted-foreground: var(--app-canvas-muted-foreground);
   position: relative;
   isolation: isolate;
   display: flex;
@@ -17,23 +17,6 @@
   padding-right: max(var(--guide-gutter), env(safe-area-inset-right));
   padding-bottom: max(28px, env(safe-area-inset-bottom));
   padding-left: max(var(--guide-gutter), env(safe-area-inset-left));
-}
-
-/* Light-mode reading gets a veil; dark mode reveals the shared background. */
-.shell::before {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  inset: 0;
-  background: color-mix(in srgb, var(--background) 67%, transparent);
-  pointer-events: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  .shell::before {
-    content: none;
-    background: none;
-  }
 }
 
 @media (min-width: 40rem) {
