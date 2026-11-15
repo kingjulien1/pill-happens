@@ -31,7 +31,7 @@ function BellCheck(props: SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2.8}
+      strokeWidth={2.9}
       strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
@@ -43,7 +43,7 @@ function BellCheck(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** One finite unfurl and settle; Sonner retains ownership of the surrounding card. */
+/** Finite arrival and independent ambient layers; Sonner owns the outer card. */
 export function ToastSymbol({
   kind,
   variant,
@@ -69,15 +69,19 @@ export function ToastSymbol({
         <span className="journal-toast-halo" />
         <span className="journal-toast-halo journal-toast-halo-echo" />
         <span className="journal-toast-flash" />
-        <span className="journal-toast-plate journal-toast-plate-back" />
-        <span className="journal-toast-plate journal-toast-plate-middle" />
+        <span className="journal-toast-plate-arrival journal-toast-plate-arrival-back">
+          <span className="journal-toast-plate journal-toast-plate-back" />
+        </span>
+        <span className="journal-toast-plate-arrival journal-toast-plate-arrival-middle">
+          <span className="journal-toast-plate journal-toast-plate-middle" />
+        </span>
         <span className="journal-toast-tile">
           <span className="journal-toast-glyph-enter">
             <Icon
               className="journal-toast-glyph"
               width={27.5625}
               height={27.5625}
-              strokeWidth={2.8}
+              strokeWidth={kind === "success" ? 2.9 : 2.8}
             />
           </span>
         </span>

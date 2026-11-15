@@ -232,6 +232,12 @@
 
 /* The enlarged 27.5625px glyph keeps the existing compact 49px illustration rail. */
 .journal-toast-symbol {
+  --toast-art-arrival-duration: 1320ms;
+  --toast-art-arrival-delay: 90ms;
+  --toast-ambient-delay: calc(
+    var(--toast-art-arrival-delay) + var(--toast-art-arrival-duration) + 250ms
+  );
+  --toast-plate-size: calc(41.65px * 7 / 6);
   position: relative;
   display: block;
   flex: none;
@@ -245,27 +251,53 @@
   display: grid;
   place-items: center;
 }
+.journal-toast-plate-arrival,
 .journal-toast-plate,
 .journal-toast-tile {
   box-sizing: border-box;
+  border: 0;
+}
+.journal-toast-tile {
   width: 41.65px;
   height: 41.65px;
-  border: 0;
   border-radius: 12.25px;
+}
+.journal-toast-plate-arrival {
+  position: absolute;
+  top: calc((49px - var(--toast-plate-size)) / 2);
+  left: calc((49px - var(--toast-plate-size)) / 2);
+  width: var(--toast-plate-size);
+  height: var(--toast-plate-size);
+  border-radius: calc(12.25px * 7 / 6);
+}
+.journal-toast-plate-arrival-back {
+  transform: translate(-1.225px, 1.225px) rotate(-18deg);
+}
+.journal-toast-plate-arrival-middle {
+  transform: translate(1.225px, 0) rotate(15deg);
 }
 .journal-toast-plate {
   position: absolute;
-  top: 3.675px;
-  left: 3.675px;
-  box-shadow: inset 0 0 0 1.225px var(--toast-pink-edge);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: 50% 55%;
+  box-shadow: inset 0 0 0 calc(1.225px * 7 / 6) var(--toast-pink-edge);
 }
 .journal-toast-plate-back {
   background: var(--toast-pink-edge);
-  transform: translate(-1.225px, 1.225px) rotate(-11deg);
 }
 .journal-toast-plate-middle {
   background: color-mix(in srgb, var(--toast-soft) 60%, var(--toast-rim));
-  transform: translate(1.225px, 0) rotate(9deg);
+}
+[data-toast-symbol="success"] {
+  --toast-glyph: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
+  --toast-tile: color-mix(
+    in srgb,
+    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
+    transparent
+  );
 }
 .journal-toast-tile {
   position: relative;
@@ -290,6 +322,9 @@
   width: 27.5625px;
   height: 27.5625px;
   stroke-width: 2.8;
+}
+.journal-toaster [data-toast-symbol="success"] .journal-toast-glyph {
+  stroke-width: 2.9;
 }
 .journal-toast-halo {
   position: absolute;
@@ -770,8 +805,8 @@
     animation: journal-notification-threshold-ring 1100ms ease-out 350ms both;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-art-arrival {
-    animation: journal-toast-art-arrive 1320ms cubic-bezier(0.22, 1, 0.36, 1)
-      90ms both;
+    animation: journal-toast-art-arrive var(--toast-art-arrival-duration)
+      cubic-bezier(0.22, 1, 0.36, 1) var(--toast-art-arrival-delay) both;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-glyph-enter {
     animation: journal-toast-glyph-reveal 720ms cubic-bezier(0.2, 0.8, 0.2, 1)
@@ -791,18 +826,29 @@
     animation: journal-toast-spark-burst 640ms ease-out
       calc(640ms + var(--spark-index) * 18ms) both;
   }
-  .journal-toaster [data-mounted="true"] .journal-toast-plate-back {
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-arrival-back {
     animation: journal-toast-back-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
       120ms backwards;
   }
-  .journal-toaster [data-mounted="true"] .journal-toast-plate-middle {
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-arrival-middle {
     animation: journal-toast-middle-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
       180ms backwards;
   }
-  [data-toast-symbol="success"] .journal-toast-glyph {
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-back {
+    animation: journal-toast-back-sway 8.8s cubic-bezier(0.45, 0, 0.55, 1)
+      var(--toast-ambient-delay) infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-middle {
+    animation: journal-toast-middle-sway 8.8s cubic-bezier(0.45, 0, 0.55, 1)
+      var(--toast-ambient-delay) infinite;
+  }
+  .journal-toaster
+    [data-mounted="true"]
+    [data-toast-symbol="success"]
+    .journal-toast-glyph {
     transform-origin: 50% 14%;
-    animation: journal-notification-bell-ring 3.6s
-      cubic-bezier(0.36, 0, 0.66, 1) 1380ms infinite;
+    animation: journal-notification-bell-ring 4.8s
+      cubic-bezier(0.45, 0, 0.55, 1) var(--toast-ambient-delay) infinite;
   }
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
@@ -826,6 +872,7 @@
       .journal-toast-halo,
       .journal-toast-flash,
       .journal-toast-spark,
+      .journal-toast-plate-arrival,
       .journal-toast-plate,
       .journal-notification-revert-symbol > svg
     ),
@@ -861,11 +908,13 @@
     animation: journal-toast-art-reverse 300ms cubic-bezier(0.4, 0, 0.85, 0.35)
       both;
   }
-  .journal-toast-symbol[data-toast-reversed="true"]
+  .journal-toaster
+    .journal-toast-symbol[data-toast-reversed="true"]
     :is(
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-toast-plate-arrival,
       .journal-toast-plate
     ) {
     animation-play-state: paused;
@@ -965,10 +1014,10 @@
     transform: scale(0.5) rotate(0);
   }
   65% {
-    transform: translate(-2.45px, 1.8px) scale(1.06) rotate(-14deg);
+    transform: translate(-2.45px, 1.8px) scale(1.06) rotate(-22deg);
   }
   100% {
-    transform: translate(-1.225px, 1.225px) rotate(-11deg);
+    transform: translate(-1.225px, 1.225px) rotate(-18deg);
   }
 }
 @keyframes journal-toast-middle-unfold {
@@ -976,10 +1025,29 @@
     transform: scale(0.65) rotate(0);
   }
   65% {
-    transform: translate(2.45px, -1.225px) scale(1.03) rotate(12deg);
+    transform: translate(2.45px, -1.225px) scale(1.03) rotate(19deg);
   }
   100% {
-    transform: translate(1.225px, 0) rotate(9deg);
+    transform: translate(1.225px, 0) rotate(15deg);
+  }
+}
+/* Opposing small arcs gently open and close the fan; both meet at identity. */
+@keyframes journal-toast-back-sway {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  50% {
+    transform: translate(0.35px, -0.65px) rotate(3deg);
+  }
+}
+@keyframes journal-toast-middle-sway {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  50% {
+    transform: translate(-0.35px, 0.5px) rotate(-2.7deg);
   }
 }
 @keyframes journal-toast-settle-ring {
@@ -1037,30 +1105,34 @@
     transform: rotate(360deg);
   }
 }
-/* The main bell gives a damped ring, then rests for most of its 3.6s cycle. */
+/* Fast → slow → fast ringing. Neutral seam velocities match at −104.17°/s;
+   every peak turns smoothly, without an idle range or a loop-reset jump. */
 @keyframes journal-notification-bell-ring {
-  0%,
-  40%,
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.2, 0.4, 0.4, 1);
+  }
   100% {
     transform: rotate(0);
   }
   6% {
-    transform: rotate(-17deg);
+    transform: rotate(-15deg);
   }
-  12% {
-    transform: rotate(14deg);
+  16% {
+    transform: rotate(16deg);
   }
-  19% {
-    transform: rotate(-10deg);
+  32% {
+    transform: rotate(-12deg);
   }
-  26% {
-    transform: rotate(7deg);
+  58% {
+    transform: rotate(11deg);
   }
-  33% {
-    transform: rotate(-3deg);
+  80% {
+    transform: rotate(-14deg);
   }
-  38% {
-    transform: rotate(1deg);
+  94% {
+    transform: rotate(15deg);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.6);
   }
 }
 @keyframes journal-toast-undo-settle {
