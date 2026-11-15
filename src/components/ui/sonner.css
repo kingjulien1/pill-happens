@@ -274,7 +274,17 @@
   stroke-width: 2.8;
 }
 .journal-toaster [data-toast-symbol="success"] .journal-toast-glyph {
+  overflow: visible;
   stroke-width: 2.9;
+}
+.journal-toast-bell-rings {
+  opacity: 0;
+}
+.journal-toast-bell-ring-left {
+  transform-origin: 3px 5px;
+}
+.journal-toast-bell-ring-right {
+  transform-origin: 21px 5px;
 }
 .journal-toast-halo {
   position: absolute;
@@ -814,6 +824,26 @@
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
       infinite;
   }
+  .journal-toaster
+    [data-mounted="true"]
+    [data-toast-symbol="success"]
+    .journal-toast-bell-rings {
+    animation: journal-toast-bell-rings-window 4.8s linear
+      var(--toast-ambient-delay) infinite;
+  }
+  .journal-toaster
+    [data-mounted="true"]
+    [data-toast-symbol="success"]
+    .journal-toast-bell-ring-mark {
+    animation: journal-toast-bell-ring-left 200ms cubic-bezier(0.3, 0, 0.7, 1)
+      var(--toast-ambient-delay) infinite;
+  }
+  .journal-toaster
+    [data-mounted="true"]
+    [data-toast-symbol="success"]
+    .journal-toast-bell-ring-right {
+    animation-name: journal-toast-bell-ring-right;
+  }
   .journal-notification-revert[data-undo-state="pending"] svg {
     animation: journal-toast-turn 1s linear infinite;
   }
@@ -829,6 +859,8 @@
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-toast-bell-rings,
+      .journal-toast-bell-ring-mark,
       .journal-toast-halo,
       .journal-toast-flash,
       .journal-toast-spark,
@@ -874,10 +906,18 @@
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-toast-bell-rings,
+      .journal-toast-bell-ring-mark,
       .journal-toast-plate-arrival,
       .journal-toast-plate
     ) {
     animation-play-state: paused;
+  }
+  .journal-toaster
+    .journal-toast-symbol[data-toast-reversed="true"]
+    .journal-toast-bell-rings {
+    animation: none;
+    opacity: 0;
   }
   .journal-toast-symbol[data-toast-reversed="true"]
     :is(.journal-toast-halo, .journal-toast-spark, .journal-toast-flash) {
@@ -1093,6 +1133,42 @@
   94% {
     transform: rotate(15deg);
     animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.6);
+  }
+}
+/* The fast wing crosses the seam continuously; the slow middle stays clear. */
+@keyframes journal-toast-bell-rings-window {
+  0%,
+  12%,
+  88%,
+  100% {
+    opacity: 1;
+  }
+  18%,
+  82% {
+    opacity: 0;
+  }
+}
+/* Twenty-four matched vibrations per bell cycle keep both marks in phase. */
+@keyframes journal-toast-bell-ring-left {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translate(-0.05px, 0.1px) rotate(4deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-0.8px, -0.15px) rotate(-8deg);
+  }
+}
+@keyframes journal-toast-bell-ring-right {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translate(0.05px, 0.1px) rotate(-4deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(0.8px, -0.15px) rotate(8deg);
   }
 }
 @keyframes journal-toast-undo-settle {

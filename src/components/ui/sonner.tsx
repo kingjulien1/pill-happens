@@ -39,6 +39,16 @@ function BellCheck(props: SVGProps<SVGSVGElement>) {
       <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h10" />
       <path d="M10.3 21a2 2 0 0 0 3.4 0" />
       <path d="m16 16 2 2 4-4" />
+      <g className="journal-toast-bell-rings">
+        <path
+          className="journal-toast-bell-ring-mark journal-toast-bell-ring-left"
+          d="M4 2C2.8 3.7 2 5.7 2 8"
+        />
+        <path
+          className="journal-toast-bell-ring-mark journal-toast-bell-ring-right"
+          d="M22 8c0-2.3-.8-4.3-2-6"
+        />
+      </g>
     </svg>
   );
 }
