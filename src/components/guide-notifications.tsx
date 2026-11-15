@@ -181,6 +181,15 @@ export function dismissAllJournalNotices() {
   toast.dismiss(); // Each managed card finishes its own exit.
 }`;
 
+const statusBadge = `import {
+  NotificationStatusBadge,
+  type NotificationStatus,
+} from "@/components/ui/notification-status-badge";
+
+export function NoticeStatus({ status }: { status: NotificationStatus }) {
+  return <NotificationStatusBadge status={status} />;
+}`;
+
 const checks = `node --import tsx --test src/lib/journal-notification-lifecycle.test.ts
 node --import tsx --test src/lib/server/journal-undo.test.ts
 npm run lint
@@ -285,7 +294,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <div>
           <dt>Reading Time</dt>
           <dd>
-            <strong>11s</strong> active countdown
+            <strong>22s</strong> active countdown
           </dd>
         </div>
         <div>
@@ -349,6 +358,18 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "Host configuration, shared artwork, theme values and CSS phase hooks.",
           ],
           [
+            <span key="badge">
+              <Source path="src/components/ui/notification-status-badge.tsx">
+                Status badge
+              </Source>
+              {" + "}
+              <Source path="src/components/ui/notification-status-badge.module.css">
+                Scoped status paint
+              </Source>
+            </span>,
+            "Reusable six-status label/icon registry and static, noninteractive Badge presentation.",
+          ],
+          [
             <Source
               key="provider"
               path="src/components/journal-provider.tsx"
@@ -378,22 +399,22 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="success">toast.success</code>,
             "Change saved",
-            "11,000ms · BellCheck.",
+            "22,000ms · BellCheck.",
           ],
           [
             <code key="error">toast.error</code>,
             "Action failed",
-            "11,000ms · CircleAlert.",
+            "22,000ms · CircleAlert.",
           ],
           [
             <code key="info">toast.info</code>,
             "Journal notice",
-            "11,000ms · Lightbulb.",
+            "22,000ms · Lightbulb.",
           ],
           [
             <code key="warning">toast.warning</code>,
             "Please review",
-            "11,000ms · TriangleAlert.",
+            "22,000ms · TriangleAlert.",
           ],
           [
             <code key="loading">toast.loading</code>,
@@ -403,10 +424,47 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="update">toast.update</code>,
             "Update available",
-            "11,000ms unless overridden · Sparkles.",
+            "22,000ms unless overridden · Sparkles.",
           ],
         ]}
       />
+      <Heading id="status-badges" level={3}>
+        Reusable Status Badges
+      </Heading>
+      <p>
+        The heading uses <code>NotificationStatusBadge</code> instead of a plain
+        kind label and separator dot. Its required <code>status</code> accepts
+        the six notice kinds; optional <code>label</code> and{" "}
+        <code>className</code> customize the display. Exported{" "}
+        <code>NOTIFICATION_STATUS_REGISTRY</code> supplies each default label
+        and Lucide symbol. A status describes the result; it never promises an
+        Undo action.
+      </p>
+      <DeveloperCode
+        label="Reusable Notification Status"
+        language="tsx"
+        code={statusBadge}
+      />
+      <ReferenceTable
+        label="Status Badge Catalog"
+        headings={["Status", "Label / Symbol", "Color Family"]}
+        rows={[
+          ["success", "Success / CircleCheck", "Emerald"],
+          ["error", "Error / CircleAlert", "Rose"],
+          ["warning", "Warning / TriangleAlert", "Amber"],
+          ["info", "Info / Info", "Sky"],
+          ["loading", "Loading / LoaderCircle", "Violet"],
+          ["update", "Update / Sparkles", "Fuchsia"],
+        ]}
+      />
+      <p>
+        The shared shadcn Badge stays 18px high with 10px semibold text, a quiet
+        colored fill and an inward edge. Its 9.5px icon inherits the text color
+        inside a nested glyph wrapper, avoiding Badge’s direct-child SVG size
+        rule. Icons are hidden from accessibility APIs; the visible labels
+        remain readable. The badge has no keyboard target, hover effect or
+        animation and is not a separate live region.
+      </p>
       <Heading id="contract" level={3}>
         Exact Public Contract
       </Heading>
@@ -452,7 +510,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "variant",
-            "Only intake-saved is registered as saved-intake context. It shares the light-pink success BellCheck, without a separate green override; it is not an Undo guarantee.",
+            "Only intake-saved is registered as saved-intake context. It shares the Emerald600 success BellCheck; it is not an Undo guarantee.",
           ],
           [
             "id",
@@ -460,7 +518,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "duration",
-            "11,000ms active time by default; explicit finite durations are honored. Infinity hides the rail. Loading always forces Infinity.",
+            "22,000ms active time by default; explicit finite durations are honored. Infinity hides the rail. Loading always forces Infinity.",
           ],
           [
             "dismissible: false",
@@ -635,15 +693,34 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Finite notices spend only active reading time. The monotonic clock
         samples every <strong>50ms</strong>; the bar’s <code>inline-size</code>
         interpolates over <strong>60ms</strong>. Width shrink preserves its
-        rounded endcaps instead of compressing them with a scale transform. Expansion, focus, non-touch hover, a held
+        rounded endcaps instead of compressing them with a scale transform. The
+        default budget is 22,000ms. Expansion, focus, non-touch hover, a held
         pointer, hidden document, rear position, invisible or unmounted host,
-        swiping, removal, pending Undo and exit each pause independently. Every
-        active reason must clear before counting resumes. These reading pauses
-        are independent of <code>data-motion-paused</code>: hidden documents,
-        rear position and unavailable host visibility pause decoration, while
+        removal, pending Undo and exit each pause independently. Every active
+        reason must clear before counting resumes. These reading pauses are
+        independent of <code>data-motion-paused</code>: hidden documents, rear
+        position and unavailable host visibility pause decoration, while
         hovering, focusing or expanding a readable front card need not freeze
         its finite artwork. Infinite notices hide the line. The clock starts
         with host readiness; it does not wait for artwork to settle.
+      </p>
+      <p>
+        Pointer-down pauses immediately, with each pointer ID tracked
+        separately. A hold of at least 350ms, movement beyond 8px or pointer
+        cancellation suppresses the following click; a short tap still opens
+        details. Window release and cancellation, window blur and page hiding
+        clear stranded holds. Releasing a held gesture clears non-keyboard focus
+        so its timer can resume; keyboard-visible focus remains a reading pause.
+        The card and its descendants disable text selection and touch callouts,
+        without removing their accessible text or normal keyboard interaction.
+      </p>
+      <p>
+        One gesture flag survives intermediate clicks until the last contact
+        releases; the pointer map also covers active drags. Cancelled gestures
+        reset Sonner’s offsets and use its drag-end cleanup, then release only
+        the toaster’s interaction state. They never invoke the toast’s
+        swipe-to-dismiss pointer-up path. A stale native swipe attribute cannot
+        keep the reading clock paused after every contact has ended.
       </p>
       <p>
         The real summary button supports Enter/Space and exposes expanded,
@@ -729,19 +806,21 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
 
       <Heading id="visuals">Visual Reference &amp; Alpha Math</Heading>
       <p>
-        The summary starts at <strong>77px</strong>; its independent Undo sits
-        at the top right with a quiet icon tile and a short label underneath.
-        Longer copy and expanded previews may increase the card height. The host
-        is top-center, <code>min(460px, 100vw − 32px)</code> wide, with three
-        visible notices and a 10px gap. Mobile side offsets are 16px and top
-        offsets include the safe area. Both modes share a static opaque base:
-        92% canonical Plum mixed with 8% Black. Three faint radial highlights
-        sit at different edges: Violet400 at 5.5%, Indigo400 at 4.5% and
-        Fuchsia400 at 3.5%. This is also the application’s fixed page canvas in
-        both appearance modes. Readable light ink stays paired with this dark
-        surface; semantic reading panels retain their separate light/dark roles.
-        The background has no animation, uniform color wash, backdrop blur or
-        saturation.
+        The summary starts at <strong>77px</strong>; finite notices add a 16px
+        root reserve above it for the countdown. Indefinite notices have neither
+        a rail nor that reserve. Its independent Undo sits at the top right with
+        a quiet icon tile and a short label underneath. Longer copy and expanded
+        previews may increase the card height. The host is top-center,{" "}
+        <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
+        and a 10px gap. Mobile side offsets are 16px and top offsets include the
+        safe area. The whole card and success bell tile share{" "}
+        <code>--toast-fuchsia-surface</code>: Fuchsia950 at 85% color alpha in
+        both modes, with readable light ink. The notification has no radial
+        highlights, background animation, backdrop blur or saturation. This
+        translucent surface is separate from the unchanged application canvas:
+        opaque Plum/Black <code>#29213b</code> with its three fixed, faint edge
+        highlights. Semantic reading panels retain their separate light/dark
+        roles.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
@@ -753,7 +832,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Main text / context",
-            "14px, weight 650 / 10px, weight 600; 8px heading-meta gaps.",
+            "14px, weight 650 heading beside an 18px status badge with 10px, weight 600 text and a 9.5px icon; 8px heading gap and 6px between heading and message.",
           ],
           [
             "Short secondary copy",
@@ -769,7 +848,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Static opaque --palette-plum at 92% / --palette-black at 8%, with fixed Violet400 5.5%, Indigo400 4.5% and Fuchsia400 3.5% radial highlights; no backdrop blur or saturation. The 4px-high capped rail is inset 16px horizontally and 8px from the bottom.",
+            "Card and success tile share Fuchsia950 at 85% alpha, with no notification radial highlights or backdrop blur/saturation. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content.",
           ],
           [
             "Header Undo",
