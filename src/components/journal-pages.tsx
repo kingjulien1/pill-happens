@@ -616,6 +616,7 @@ export function MedicationsPage() {
       <MedicationsHeading
         medications={data.medications}
         intakes={data.intakes}
+        dialogOpen={open}
       />
       <MedicationActionButton
         intent="add"

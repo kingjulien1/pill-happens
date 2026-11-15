@@ -24,9 +24,13 @@ export function PageHeading({
       data-page-heading
     >
       <div className={styles.headingRow} data-page-heading-row>
-        <div className={styles.identity}>
+        <div className={styles.identity} data-page-heading-identity>
           {icon && (
-            <span className={styles.headingIcon} aria-hidden="true">
+            <span
+              className={styles.headingIcon}
+              aria-hidden="true"
+              data-page-heading-icon
+            >
               {icon}
             </span>
           )}

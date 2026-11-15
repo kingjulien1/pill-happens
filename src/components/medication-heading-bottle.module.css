@@ -1,0 +1,128 @@
+.stage {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  border-radius: inherit;
+  isolation: isolate;
+}
+
+.container {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.glyph,
+.rock {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+}
+
+.glyph {
+  position: relative;
+  z-index: 1;
+}
+
+.rock {
+  transform-origin: 50% 82%;
+}
+
+.rock svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 640px) {
+  .glyph,
+  .rock {
+    width: 31px;
+    height: 31px;
+  }
+}
+
+@media (max-width: 359px) {
+  .glyph,
+  .rock {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stage[data-medication-bottle-phase="waiting"] .container,
+  .stage[data-medication-bottle-phase="waiting"] .glyph {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+
+  .stage[data-medication-bottle-phase="entering"] .container {
+    animation: tile-arrival 760ms both;
+    animation-play-state: paused;
+  }
+
+  .stage[data-medication-bottle-phase="entering"] .glyph {
+    animation: bottle-arrival 980ms 120ms both;
+    animation-play-state: paused;
+  }
+
+  .stage[data-medication-bottle-active="true"] .container,
+  .stage[data-medication-bottle-active="true"] .glyph {
+    animation-play-state: running;
+  }
+}
+
+@keyframes tile-arrival {
+  0% {
+    opacity: 0;
+    transform: scale(0.18);
+    animation-timing-function: cubic-bezier(0.16, 0.8, 0.2, 1);
+  }
+  43% {
+    opacity: 1;
+    transform: scale(1.1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  64% {
+    transform: scale(0.965);
+    animation-timing-function: cubic-bezier(0.2, 0.65, 0.3, 1);
+  }
+  83% {
+    transform: scale(1.035);
+    animation-timing-function: cubic-bezier(0.25, 0, 0.2, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bottle-arrival {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-720deg);
+    animation-timing-function: cubic-bezier(0.1, 0.62, 0.22, 1);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.13) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.25, 1);
+  }
+  73% {
+    transform: scale(0.965) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.2, 0.65, 0.3, 1);
+  }
+  88% {
+    transform: scale(1.045) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.25, 0, 0.2, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}

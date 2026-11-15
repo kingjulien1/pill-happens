@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/page-heading";
-import { PillBottle } from "lucide-react";
+import { MedicationHeadingBottle } from "@/components/medication-heading-bottle";
 import { FolderOpenIcon } from "@phosphor-icons/react/dist/ssr/FolderOpen";
 import { FolderSimpleIcon } from "@phosphor-icons/react/dist/ssr/FolderSimple";
 import { ActionIcon } from "@/components/action-icon";
@@ -13,9 +13,11 @@ import styles from "./medications-heading.module.css";
 export function MedicationsHeading({
   medications,
   intakes,
+  dialogOpen = false,
 }: {
   medications: Medication[];
   intakes: Intake[];
+  dialogOpen?: boolean;
 }) {
   const activeCount = medications.filter(
     (medication) => !medication.archived,
@@ -30,10 +32,12 @@ export function MedicationsHeading({
   return (
     <PageHeading
       title="Medications"
-      context="Your medication kit"
-      icon={<PillBottle strokeWidth={2.25} />}
+      className={styles.heading}
+      icon={<MedicationHeadingBottle paused={dialogOpen} />}
       data-medications-heading
       data-medications-title-row
+      data-kit-count-wide={displayedCount.length > 1 || undefined}
+      data-kit-count-long={displayedCount.length > 2 || undefined}
       actions={
         <span
           className={styles.summary}
