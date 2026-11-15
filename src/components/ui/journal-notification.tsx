@@ -2,6 +2,7 @@
 
 import {
   isValidElement,
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -13,6 +14,7 @@ import {
 import { ArrowUpRight, Check, LoaderCircle, Undo2 } from "lucide-react";
 import type { Action, ExternalToast } from "sonner";
 import { ToastSymbol } from "@/components/ui/sonner";
+import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
 import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
 import type { JournalToastKind } from "@/components/ui/journal-toast";
@@ -66,15 +68,6 @@ export type JournalNotificationProps = {
   onDetachedUndoFailure: (error: unknown) => void;
 };
 
-const kindLabels: Record<JournalToastKind, string> = {
-  success: "Success",
-  error: "Error",
-  info: "Info",
-  warning: "Warning",
-  loading: "Loading",
-  update: "Update",
-};
-
 const defaultContext: Record<JournalToastKind, string> = {
   success: "Your journal has been updated. You can carry on from here.",
   error:
@@ -126,8 +119,15 @@ export function JournalNotification({
   const alive = useRef(false);
   const leaving = useRef(false);
   const expandedRef = useRef(false);
-  const pointer = useRef<{ x: number; y: number } | null>(null);
+  const heldPointers = useRef(
+    new Map<
+      number,
+      { x: number; y: number; startedAt: number; target: Element | null }
+    >(),
+  );
   const suppressClick = useRef(false);
+  // Individual native clicks may arrive before the last touch has released.
+  const heldGesture = useRef(false);
   const pauseReasons = useRef(new Set<string>());
   const [expanded, setExpanded] = useState(false);
   const [phase, setPhase] = useState("idle");
@@ -140,11 +140,87 @@ export function JournalNotification({
   const headingId = useId();
   const messageId = useId();
 
-  const pause = (reason: string, value: boolean) => {
+  const pause = useCallback((reason: string, value: boolean) => {
     if (value) pauseReasons.current.add(reason);
     else pauseReasons.current.delete(reason);
     clock.current?.pause(reason, value);
-  };
+  }, []);
+
+  const blurHeldFocus = useCallback(() => {
+    const focused = document.activeElement;
+    if (
+      focused instanceof HTMLElement &&
+      root.current?.contains(focused) &&
+      !focused.matches(":focus-visible")
+    )
+      focused.blur();
+  }, []);
+
+  const cancelNativeSwipe = useCallback((pointerId = -1) => {
+    const host = root.current?.closest<HTMLElement>("[data-sonner-toast]");
+    if (
+      !host ||
+      host.dataset.removed === "true" ||
+      host.dataset.swipeOut === "true"
+    )
+      return;
+    // Sonner has drag-end cleanup but no pointer-cancel handler. End the drag
+    // without sending a pointer-up through the toast's swipe-to-dismiss path.
+    host.style.setProperty("--swipe-amount-x", "0px");
+    host.style.setProperty("--swipe-amount-y", "0px");
+    host.dispatchEvent(new Event("dragend", { bubbles: true }));
+    host
+      .closest("[data-sonner-toaster]")
+      ?.dispatchEvent(
+        new PointerEvent("pointerup", { bubbles: true, pointerId }),
+      );
+  }, []);
+
+  const releasePointer = useCallback(
+    (
+      event: Pick<PointerEvent, "pointerId" | "clientX" | "clientY" | "type">,
+    ) => {
+      const start = heldPointers.current.get(event.pointerId);
+      if (!start) return;
+      const heldOrMoved =
+        event.type === "pointercancel" ||
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8 ||
+        performance.now() - start.startedAt >= 350;
+      if (heldOrMoved) {
+        heldGesture.current = true;
+        suppressClick.current = true;
+      }
+      heldPointers.current.delete(event.pointerId);
+      pause("pointer", heldPointers.current.size > 0);
+      if (heldGesture.current && heldPointers.current.size === 0) {
+        suppressClick.current = true;
+        blurHeldFocus();
+      }
+      if (event.type === "pointercancel" && heldPointers.current.size === 0)
+        cancelNativeSwipe(event.pointerId);
+    },
+    [pause, blurHeldFocus, cancelNativeSwipe],
+  );
+
+  const clearPointers = useCallback(() => {
+    const hadPointers = heldPointers.current.size > 0;
+    if (hadPointers) {
+      heldGesture.current = true;
+      suppressClick.current = true;
+      blurHeldFocus();
+      for (const [pointerId, held] of heldPointers.current) {
+        try {
+          if (held.target?.hasPointerCapture(pointerId))
+            held.target.releasePointerCapture(pointerId);
+        } catch {
+          // The captured element may have detached during an interrupted gesture.
+        }
+      }
+    }
+    heldPointers.current.clear();
+    pause("pointer", false);
+    if (hadPointers) cancelNativeSwipe();
+  }, [pause, blurHeldFocus, cancelNativeSwipe]);
 
   useEffect(() => {
     alive.current = true;
@@ -168,16 +244,15 @@ export function JournalNotification({
           outer?.dataset.visible === "false",
       );
       setPause("hidden", document.hidden);
+      if (document.hidden) clearPointers();
       setPause("rear", outer?.dataset.front === "false");
       setPause("unmounted", outer?.dataset.mounted === "false");
       setPause("invisible", outer?.dataset.visible === "false");
-      setPause("swiping", outer?.dataset.swiping === "true");
       if (outer?.dataset.removed === "true") {
         setPause("removed", true);
         setReversed(true);
       }
     };
-    const releasePointer = () => setPause("pointer", false);
     const observer = new MutationObserver(syncNative);
     if (outer)
       observer.observe(outer, {
@@ -186,13 +261,13 @@ export function JournalNotification({
           "data-front",
           "data-mounted",
           "data-visible",
-          "data-swiping",
           "data-removed",
         ],
       });
     document.addEventListener("visibilitychange", syncNative);
     window.addEventListener("pointerup", releasePointer);
     window.addEventListener("pointercancel", releasePointer);
+    window.addEventListener("blur", clearPointers);
     syncNative();
     const tick = () => {
       const snapshot = readingClock.snapshot();
@@ -216,12 +291,13 @@ export function JournalNotification({
       document.removeEventListener("visibilitychange", syncNative);
       window.removeEventListener("pointerup", releasePointer);
       window.removeEventListener("pointercancel", releasePointer);
+      window.removeEventListener("blur", clearPointers);
       clearInterval(interval);
       for (const timer of timers.current) clearTimeout(timer);
       timers.current = [];
       clock.current = null;
     };
-  }, [duration, isCurrent, onRequestDismiss]);
+  }, [duration, isCurrent, onRequestDismiss, releasePointer, clearPointers]);
 
   useEffect(() => {
     const clear = () => {
@@ -378,19 +454,18 @@ export function JournalNotification({
       onPointerLeave={() => pause("hover", false)}
       onPointerDownCapture={(event) => {
         if (undoState === "pending") event.stopPropagation();
-        suppressClick.current = false;
-        pointer.current = { x: event.clientX, y: event.clientY };
+        heldGesture.current = heldPointers.current.size > 0;
+        suppressClick.current = heldGesture.current;
+        heldPointers.current.set(event.pointerId, {
+          x: event.clientX,
+          y: event.clientY,
+          startedAt: performance.now(),
+          target: event.target instanceof Element ? event.target : null,
+        });
         pause("pointer", true);
       }}
-      onPointerUpCapture={(event) => {
-        const start = pointer.current;
-        suppressClick.current = Boolean(
-          start &&
-          Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8,
-        );
-        pointer.current = null;
-        pause("pointer", false);
-      }}
+      onPointerUpCapture={releasePointer}
+      onPointerCancelCapture={releasePointer}
       onClickCapture={(event) => {
         if (suppressClick.current) {
           event.preventDefault();
@@ -404,6 +479,8 @@ export function JournalNotification({
           pause("focus", false);
       }}
       onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ")
+          suppressClick.current = false;
         if (
           event.key === "Escape" &&
           dismissible &&
@@ -415,6 +492,13 @@ export function JournalNotification({
         }
       }}
     >
+      <div className="journal-notification-countdown" aria-hidden="true">
+        <span
+          ref={progress}
+          className="journal-notification-countdown-bar"
+          style={{ inlineSize: "100%" }}
+        />
+      </div>
       <div className="journal-notification-header">
         <button
           type="button"
@@ -440,15 +524,7 @@ export function JournalNotification({
             <span className="journal-notification-copy">
               <span className="journal-toast-heading" id={headingId}>
                 <span className="journal-toast-heading-text">{heading}</span>
-                <span className="journal-toast-heading-meta">
-                  <span
-                    className="journal-toast-heading-dot"
-                    aria-hidden="true"
-                  >
-                    ·
-                  </span>
-                  <span className="journal-toast-kind">{kindLabels[kind]}</span>
-                </span>
+                <NotificationStatusBadge status={kind} />
               </span>
               <span className="journal-notification-description" id={messageId}>
                 {message}
@@ -564,13 +640,6 @@ export function JournalNotification({
             </span>
           </div>
         </div>
-      </div>
-      <div className="journal-notification-countdown" aria-hidden="true">
-        <span
-          ref={progress}
-          className="journal-notification-countdown-bar"
-          style={{ inlineSize: "100%" }}
-        />
       </div>
     </div>
   );

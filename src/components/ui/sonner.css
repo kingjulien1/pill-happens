@@ -1,48 +1,17 @@
 /* Sonner owns its outer transforms, stack and swipe bridges. Custom keyframes
-   and the opaque surface belong to the inner card and artwork. */
+   and the translucent surface belong to the inner card and artwork. */
 .journal-toaster[data-sonner-toaster] {
   --toast-ink: var(--palette-white);
   --toast-muted: color-mix(in srgb, var(--toast-ink) 70%, transparent);
   --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 88%, transparent);
   --toast-purple-400: var(--color-purple-400, oklch(71.4% 0.203 305.504));
-  --toast-surface: color-mix(
+  --toast-fuchsia-surface: color-mix(
     in srgb,
-    var(--palette-plum) 92%,
-    var(--palette-black)
-  );
-  --toast-violet-highlight: color-mix(
-    in srgb,
-    var(--color-violet-400, oklch(70.2% 0.183 293.541)) 5.5%,
+    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
     transparent
   );
-  --toast-indigo-highlight: color-mix(
-    in srgb,
-    var(--color-indigo-400, oklch(67.3% 0.182 276.935)) 4.5%,
-    transparent
-  );
-  --toast-fuchsia-highlight: color-mix(
-    in srgb,
-    var(--color-fuchsia-400, oklch(74% 0.238 322.16)) 3.5%,
-    transparent
-  );
-  /* Fixed edge reflections leave the deeper Plum base in charge of the face. */
-  --toast-surface-layers:
-    radial-gradient(
-      ellipse at 8% 0%,
-      var(--toast-violet-highlight),
-      transparent 66%
-    ),
-    radial-gradient(
-      ellipse at 100% 24%,
-      var(--toast-indigo-highlight),
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse at 50% 100%,
-      var(--toast-fuchsia-highlight),
-      transparent 70%
-    ),
-    linear-gradient(var(--toast-surface) 0 0);
+  --toast-surface: var(--toast-fuchsia-surface);
+  --toast-surface-layers: linear-gradient(var(--toast-surface) 0 0);
   --toast-tile: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
   --toast-glyph: #ffeaf6;
   --toast-accent: #fda5d5;
@@ -168,7 +137,7 @@
   grid-column: 2 / -1;
   grid-row: 1;
   min-width: 0;
-  gap: 2px;
+  gap: 6px;
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast]:not(:has([data-icon]))
@@ -193,30 +162,8 @@
   flex-wrap: wrap;
   gap: 1px 8px;
 }
-.journal-toast-heading-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
 .journal-toast-heading-text {
   min-width: 0;
-}
-.journal-toast-heading-dot {
-  color: var(--toast-muted);
-  font-size: 11px;
-  font-weight: 600;
-}
-.journal-toast-kind {
-  color: var(--toast-muted);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-.journal-toaster
-  :is([data-kind="success"], [data-type="success"])
-  .journal-toast-kind {
-  color: var(--toast-ink);
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
@@ -293,10 +240,13 @@
 }
 [data-toast-symbol="success"] {
   --toast-glyph: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
-  --toast-tile: color-mix(
-    in srgb,
-    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
-    transparent
+  --toast-tile: var(
+    --toast-fuchsia-surface,
+    color-mix(
+      in srgb,
+      var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
+      transparent
+    )
   );
 }
 .journal-toast-tile {
@@ -397,9 +347,19 @@
 .journal-notification {
   position: relative;
   width: 100%;
+  padding-top: 16px;
   overflow: visible;
   isolation: isolate;
   transform-origin: 50% 65%;
+}
+.journal-notification,
+.journal-notification * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.journal-notification[data-timer-mode="indefinite"] {
+  padding-top: 0;
 }
 .journal-notification-header {
   display: grid;
@@ -442,7 +402,7 @@
   display: grid;
   flex: 1;
   min-width: 0;
-  gap: 2px;
+  gap: 6px;
 }
 .journal-notification-description {
   display: block;
@@ -687,7 +647,7 @@
 .journal-notification-countdown {
   position: absolute;
   right: 16px;
-  bottom: 8px;
+  top: 10px;
   left: 16px;
   height: 4px;
   border-radius: 999px;

@@ -1,10 +1,24 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  NOTIFICATION_DEFAULT_DURATION,
   NotificationClock,
   NotificationExitRegistry,
   settleNotificationUndo,
 } from "./journal-notification-lifecycle";
+
+test("default notifications use 22 seconds of active reading, excluding a held pause", () => {
+  let now = 0;
+  const clock = new NotificationClock(NOTIFICATION_DEFAULT_DURATION, () => now);
+  now = 11_000;
+  assert.equal(clock.snapshot().progress, 0.5);
+  clock.pause("pointer", true);
+  now += 8_000;
+  assert.equal(clock.snapshot().remaining, 11_000);
+  clock.pause("pointer", false);
+  now += 11_000;
+  assert.equal(clock.snapshot().expired, true);
+});
 
 test("reading clock retains elapsed time across overlapping pause reasons", () => {
   let now = 0;

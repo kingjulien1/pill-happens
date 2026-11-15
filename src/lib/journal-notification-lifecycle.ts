@@ -2,7 +2,7 @@ export type NotificationId = string | number;
 export type NotificationExitReason =
   "dismiss" | "timeout" | "action" | "cancel";
 
-export const NOTIFICATION_DEFAULT_DURATION = 11_000;
+export const NOTIFICATION_DEFAULT_DURATION = 22_000;
 
 /** A monotonic reading clock: every independent pause must clear before it runs. */
 export class NotificationClock {
