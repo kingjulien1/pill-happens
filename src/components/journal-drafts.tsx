@@ -88,6 +88,31 @@ export function JournalDraftProvider({
   }, [store]);
 
   useEffect(() => {
+    if (!snapshot.hydrated) return;
+    const synchronize = () => {
+      store.synchronize();
+    };
+    const storageChanged = (event: StorageEvent) => {
+      if (event.key === null || event.key === store.storageKey) synchronize();
+    };
+    const becameVisible = () => {
+      if (!document.hidden) synchronize();
+    };
+    window.addEventListener("storage", storageChanged);
+    window.addEventListener("focus", synchronize);
+    window.addEventListener("pageshow", synchronize);
+    document.addEventListener("visibilitychange", becameVisible);
+    // Catch writes made between initial hydration and subscribing to events.
+    synchronize();
+    return () => {
+      window.removeEventListener("storage", storageChanged);
+      window.removeEventListener("focus", synchronize);
+      window.removeEventListener("pageshow", synchronize);
+      document.removeEventListener("visibilitychange", becameVisible);
+    };
+  }, [snapshot.hydrated, store]);
+
+  useEffect(() => {
     if (!snapshot.hydrated || !data) return;
     let restoreScroll = false;
     const waitForRoute = (destination: string) => {

@@ -67,6 +67,335 @@ test("first check-in opening survives saves, reset, close, reload and later reop
   assert.equal(reopened.getSnapshot().status, "saved");
 });
 
+test("a stale route writer preserves another tab's unsaved check-in and first opening", (t) => {
+  const openedAt = Date.parse("2026-11-11T07:04:00Z");
+  t.mock.method(Date, "now", () => openedAt);
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("shared_check_in");
+  const stale = createDraftWorkspace("shared_check_in");
+  first.hydrate(storage);
+  stale.hydrate(storage);
+  const day = "2026-11-11";
+  const identity = checkInDraftKey(day, "morning");
+  const draft = checkInDefaults(undefined, "morning");
+  draft.morningSleep!.gotUp = "09:15";
+  first.openDialog("/", { kind: "check-in", day, period: "morning" });
+  first.setDraft(identity, draft);
+  first.closeDialog("/");
+
+  stale.setLocation("/", "", 47);
+  stale.flush();
+  const reopened = createDraftWorkspace("shared_check_in");
+  reopened.hydrate(storage);
+  for (const workspace of [stale, reopened]) {
+    assert.deepEqual(workspace.getSnapshot().drafts[identity].value, draft);
+    assert.equal(workspace.getSnapshot().checkInOpenedAt[identity], openedAt);
+  }
+  reopened.openDialog("/", { kind: "check-in", day, period: "morning" });
+  assert.equal(reopened.getSnapshot().checkInOpenedAt[identity], openedAt);
+});
+
+test("shared opening observations retain the earliest valid instant for the same identity", (t) => {
+  const firstOpened = Date.parse("2026-11-11T07:04:00Z");
+  let now = firstOpened + 60_000;
+  t.mock.method(Date, "now", () => now);
+  const storage = memoryStorage();
+  const later = createDraftWorkspace("shared_earliest");
+  const earlier = createDraftWorkspace("shared_earliest");
+  later.hydrate(storage);
+  earlier.hydrate(storage);
+  const dialog = { kind: "check-in", day: "2026-11-11" } as const;
+  later.openDialog("/", dialog);
+  now = firstOpened;
+  earlier.openDialog("/", dialog);
+  assert.equal(
+    earlier.getSnapshot().checkInOpenedAt["checkin:2026-11-11"],
+    now,
+  );
+  later.synchronize();
+  now += 120_000;
+  later.openDialog("/", dialog);
+  const reopened = createDraftWorkspace("shared_earliest");
+  reopened.hydrate(storage);
+  assert.equal(
+    reopened.getSnapshot().checkInOpenedAt["checkin:2026-11-11"],
+    firstOpened,
+  );
+});
+
+test("shared first-open merges isolate both periods, tracking days and journal namespaces", (t) => {
+  let now = Date.parse("2026-11-11T07:04:00Z");
+  t.mock.method(Date, "now", () => now);
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("shared_periods");
+  const second = createDraftWorkspace("shared_periods");
+  const other = createDraftWorkspace("isolated_periods");
+  for (const workspace of [first, second, other]) workspace.hydrate(storage);
+  const expected: Record<string, number> = {};
+  for (const [workspace, day, period] of [
+    [first, "2026-11-11", "morning"],
+    [second, "2026-11-11", "evening"],
+    [second, "2026-11-10", "morning"],
+    [first, "2026-11-10", "evening"],
+  ] as const) {
+    now += 60_000;
+    workspace.openDialog("/", { kind: "check-in", day, period });
+    expected[checkInDraftKey(day, period)] = now;
+  }
+  other.openDialog("/", {
+    kind: "check-in",
+    day: "2026-11-11",
+    period: "morning",
+  });
+  first.flush();
+  second.synchronize();
+  assert.deepEqual(first.getSnapshot().checkInOpenedAt, expected);
+  assert.deepEqual(second.getSnapshot().checkInOpenedAt, expected);
+  assert.deepEqual(other.getSnapshot().checkInOpenedAt, {
+    "checkin:2026-11-11:morning": now,
+  });
+  assert.notEqual(first.storageKey, other.storageKey);
+});
+
+test("a remote draft clear is not resurrected by a stale flush or an unrelated edit", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("shared_clear");
+  first.hydrate(storage);
+  first.setDraft("med:new", { name: "Reset elsewhere" });
+  first.setDraft("goal:new", { amount: "2" });
+  const stale = createDraftWorkspace("shared_clear");
+  stale.hydrate(storage);
+  first.clearDraft("med:new");
+  first.clearDraft("goal:new");
+  stale.setLocation("/medications", "", 19);
+  stale.flush();
+  stale.setDraft("preferences", { timezone: "Europe/Vienna" });
+  const reopened = createDraftWorkspace("shared_clear");
+  reopened.hydrate(storage);
+  assert.equal(reopened.getSnapshot().drafts["med:new"], undefined);
+  assert.equal(reopened.getSnapshot().drafts["goal:new"], undefined);
+  assert.deepEqual(reopened.getSnapshot().drafts.preferences.value, {
+    timezone: "Europe/Vienna",
+  });
+});
+
+test("an explicit blind clear removes a newer durable draft absent from local memory", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("shared_blind_clear");
+  const stale = createDraftWorkspace("shared_blind_clear");
+  first.hydrate(storage);
+  stale.hydrate(storage);
+  first.setDraft("med:new", { name: "Clear from the other tab" });
+  first.setDraft("goal:new", { amount: "3" });
+  assert.equal(stale.getSnapshot().drafts["med:new"], undefined);
+  stale.clearDraft("med:new");
+  first.flush();
+  assert.equal(first.getSnapshot().drafts["med:new"], undefined);
+  const reopened = createDraftWorkspace("shared_blind_clear");
+  reopened.hydrate(storage);
+  assert.deepEqual(reopened.getSnapshot().drafts["goal:new"].value, {
+    amount: "3",
+  });
+  assert.equal(reopened.getSnapshot().drafts["med:new"], undefined);
+});
+
+test("synchronize is read-only, stable and scoped to protected content rather than local presentation", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("shared_sync");
+  const second = createDraftWorkspace("shared_sync");
+  assert.equal(second.storageKey, "pill-happens:workspace:v1:shared_sync");
+  assert.equal(
+    Object.getOwnPropertyDescriptor(second, "storageKey")?.set,
+    undefined,
+  );
+  assert.equal(second.synchronize(), false);
+  first.hydrate(storage);
+  second.hydrate(storage);
+  second.completeBootstrap();
+  second.openDialog("/medications", { kind: "medication-new" });
+  second.setStackView("2026-11-11", ["entry"], {
+    heads: ["entry"],
+    expanded: ["entry"],
+  });
+  second.setDialogScroll("/medications|med:new:body", { top: 70, left: 4 });
+  const presentation = second.getSnapshot();
+  first.openDialog("/", {
+    kind: "check-in",
+    day: "2026-11-11",
+    period: "morning",
+  });
+  first.setDraft("med:new", { name: "From another tab" });
+  const durable = [...storage.entries];
+  let notifications = 0;
+  second.subscribe(() => notifications++);
+  const synchronize = second.synchronize;
+  assert.equal(synchronize(), true);
+  const synchronized = second.getSnapshot();
+  assert.equal(second.synchronize, synchronize);
+  assert.equal(synchronized.screens, presentation.screens);
+  assert.equal(synchronized.stackViews, presentation.stackViews);
+  assert.equal(synchronized.scrollViews, presentation.scrollViews);
+  assert.equal(synchronized.lastPath, presentation.lastPath);
+  assert.equal(synchronized.ready, true);
+  assert.deepEqual(synchronized.drafts["med:new"].value, {
+    name: "From another tab",
+  });
+  assert.equal(
+    typeof synchronized.checkInOpenedAt["checkin:2026-11-11:morning"],
+    "number",
+  );
+  assert.equal(notifications, 1);
+  assert.equal(synchronize(), false);
+  assert.equal(second.getSnapshot(), synchronized);
+  assert.equal(notifications, 1);
+  assert.deepEqual([...storage.entries], durable, "synchronizing never writes");
+
+  const memory = createDraftWorkspace("memory_sync");
+  memory.hydrate(null);
+  memory.setDraft("med:new", { name: "Only this visit" });
+  const before = memory.getSnapshot();
+  assert.equal(memory.synchronize(), false);
+  assert.equal(memory.getSnapshot(), before);
+});
+
+test("failed writes retain set and blind-clear deltas through read-only sync and retry", (t) => {
+  const openedAt = Date.parse("2026-11-11T07:04:00Z");
+  t.mock.method(Date, "now", () => openedAt);
+  const storage = memoryStorage();
+  let failWrite = false;
+  let writes = 0;
+  const unreliable = {
+    getItem: storage.getItem,
+    setItem(key: string, value: string) {
+      writes++;
+      if (failWrite) throw new Error("Synthetic quota error");
+      storage.setItem(key, value);
+    },
+  };
+  const first = createDraftWorkspace("shared_retry");
+  const second = createDraftWorkspace("shared_retry");
+  first.hydrate(unreliable);
+  second.hydrate(storage);
+  first.setDraft("med:new", { name: "Previously durable" });
+  failWrite = true;
+  assert.equal(
+    first.setDraft("med:new", { name: "Keep the pending edit" }),
+    false,
+  );
+  first.clearDraft("goal:new");
+  first.openDialog("/", { kind: "check-in", day: "2026-11-11" });
+  second.setDraft("goal:new", { amount: "4" });
+  second.setDraft("preferences", { timezone: "UTC" });
+  const attempts = writes;
+  first.synchronize();
+  assert.equal(writes, attempts);
+  assert.equal(first.getSnapshot().status, "error");
+  assert.deepEqual(first.getSnapshot().drafts["med:new"].value, {
+    name: "Keep the pending edit",
+  });
+  assert.equal(first.getSnapshot().drafts["goal:new"], undefined);
+  assert.deepEqual(first.getSnapshot().drafts.preferences.value, {
+    timezone: "UTC",
+  });
+  failWrite = false;
+  first.flush();
+  second.flush();
+  const reopened = createDraftWorkspace("shared_retry");
+  reopened.hydrate(storage);
+  assert.deepEqual(reopened.getSnapshot().drafts["med:new"].value, {
+    name: "Keep the pending edit",
+  });
+  assert.equal(reopened.getSnapshot().drafts["goal:new"], undefined);
+  assert.deepEqual(reopened.getSnapshot().drafts.preferences.value, {
+    timezone: "UTC",
+  });
+  assert.equal(
+    reopened.getSnapshot().checkInOpenedAt["checkin:2026-11-11"],
+    openedAt,
+  );
+  second.clearDraft("med:new");
+  first.flush();
+  assert.equal(
+    first.getSnapshot().drafts["med:new"],
+    undefined,
+    "a successful write releases its old delta rather than replaying it later",
+  );
+});
+
+test("a failed durable read keeps pending input until a later validated read and write succeed", () => {
+  const storage = memoryStorage();
+  let failRead = false;
+  let writes = 0;
+  const unreliable = {
+    getItem(key: string) {
+      if (failRead) throw new Error("Storage temporarily unavailable");
+      return storage.getItem(key);
+    },
+    setItem(key: string, value: string) {
+      writes++;
+      storage.setItem(key, value);
+    },
+  };
+  const first = createDraftWorkspace("shared_read_retry");
+  const second = createDraftWorkspace("shared_read_retry");
+  first.hydrate(unreliable);
+  second.hydrate(storage);
+  first.setDraft("med:new", { name: "Before" });
+  const attempts = writes;
+  failRead = true;
+  assert.equal(
+    first.setDraft("med:new", { name: "Pending after read failure" }),
+    false,
+  );
+  assert.equal(writes, attempts);
+  assert.equal(first.getSnapshot().status, "error");
+  second.setDraft("goal:new", { amount: "2" });
+  failRead = false;
+  first.synchronize();
+  assert.equal(writes, attempts);
+  first.flush();
+  const reopened = createDraftWorkspace("shared_read_retry");
+  reopened.hydrate(storage);
+  assert.deepEqual(reopened.getSnapshot().drafts["med:new"].value, {
+    name: "Pending after read failure",
+  });
+  assert.deepEqual(reopened.getSnapshot().drafts["goal:new"].value, {
+    amount: "2",
+  });
+});
+
+test("an invalid or wrong-scope latest envelope is never imported or overwritten by pending edits", () => {
+  const storage = memoryStorage();
+  const workspace = createDraftWorkspace("validated_latest");
+  workspace.hydrate(storage);
+  workspace.setDraft("med:new", { name: "Our valid draft" });
+  const durable = storage.getItem(workspace.storageKey)!;
+  const wrongScope = JSON.stringify({
+    version: 1,
+    scope: "another_journal",
+    drafts: { "goal:new": { value: { amount: "99" }, updatedAt: 1 } },
+    screens: {},
+  });
+  for (const raw of ["{broken", wrongScope]) {
+    storage.setItem(workspace.storageKey, raw);
+    assert.equal(workspace.setDraft("preferences", { timezone: "UTC" }), false);
+    workspace.synchronize();
+    assert.equal(storage.getItem(workspace.storageKey), raw);
+    assert.equal(workspace.getSnapshot().drafts["goal:new"], undefined);
+    assert.equal(workspace.getSnapshot().status, "error");
+  }
+  storage.setItem(workspace.storageKey, durable);
+  workspace.flush();
+  const reopened = createDraftWorkspace("validated_latest");
+  reopened.hydrate(storage);
+  assert.deepEqual(reopened.getSnapshot().drafts.preferences.value, {
+    timezone: "UTC",
+  });
+  assert.deepEqual(reopened.getSnapshot().drafts["med:new"].value, {
+    name: "Our valid draft",
+  });
+});
+
 test("first-open observations are independent by period, tracking day and journal", (t) => {
   let now = Date.parse("2026-11-11T07:04:00Z");
   t.mock.method(Date, "now", () => now);
@@ -260,6 +589,64 @@ test("first-open history is bounded without evicting earlier observations to rec
   overLimit.hydrate(storage);
   assert.equal(overLimit.getSnapshot().status, "error");
   assert.deepEqual(overLimit.getSnapshot().checkInOpenedAt, observations);
+});
+
+test("a combined first-open history beyond the cap preserves both durable and in-visit observations without eviction", (t) => {
+  const storage = memoryStorage();
+  const start = Date.parse("2000-01-01T12:00:00Z");
+  const observations = Object.fromEntries(
+    Array.from({ length: CHECK_IN_OPENED_AT_LIMIT - 1 }, (_, index) => {
+      const timestamp = start + index * 86_400_000;
+      return [
+        checkInDraftKey(new Date(timestamp).toISOString().slice(0, 10)),
+        timestamp,
+      ];
+    }),
+  );
+  storage.setItem(
+    "pill-happens:workspace:v1:shared_open_limit",
+    JSON.stringify({
+      version: 1,
+      scope: "shared_open_limit",
+      drafts: {},
+      screens: {},
+      checkInOpenedAt: observations,
+    }),
+  );
+  const first = createDraftWorkspace("shared_open_limit");
+  const second = createDraftWorkspace("shared_open_limit");
+  first.hydrate(storage);
+  second.hydrate(storage);
+  const openedAt = Date.parse("2026-11-11T07:04:00Z");
+  t.mock.method(Date, "now", () => openedAt);
+  first.openDialog("/", { kind: "check-in", day: "2026-11-11" });
+  const durable = storage.getItem(first.storageKey);
+  second.openDialog("/", {
+    kind: "check-in",
+    day: "2026-11-11",
+    period: "morning",
+  });
+  assert.equal(second.getSnapshot().status, "error");
+  assert.equal(
+    Object.keys(second.getSnapshot().checkInOpenedAt).length,
+    CHECK_IN_OPENED_AT_LIMIT,
+  );
+  assert.equal(
+    second.getSnapshot().checkInOpenedAt["checkin:2026-11-11:morning"],
+    openedAt,
+  );
+  for (const [identity, timestamp] of Object.entries(observations))
+    assert.equal(second.getSnapshot().checkInOpenedAt[identity], timestamp);
+  assert.equal(storage.getItem(first.storageKey), durable);
+  second.synchronize();
+  second.flush();
+  assert.equal(storage.getItem(first.storageKey), durable);
+  const reopened = createDraftWorkspace("shared_open_limit");
+  reopened.hydrate(storage);
+  assert.equal(
+    reopened.getSnapshot().checkInOpenedAt["checkin:2026-11-11"],
+    openedAt,
+  );
 });
 
 test("first-open metadata remains usable in memory when browser storage is unavailable", (t) => {
@@ -552,6 +939,39 @@ test("ordinary draft byte limits retain oversized edits in memory and cannot be 
     true,
   );
   assert.equal(workspace.getSnapshot().status, "saved");
+});
+
+test("read-only synchronization preserves an oversized pending edit while importing unrelated durable drafts", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("shared_pending_budget");
+  const second = createDraftWorkspace("shared_pending_budget");
+  first.hydrate(storage);
+  second.hydrate(storage);
+  first.setDraft("med:new", { name: "Last durable value" });
+  const oversized = { note: "静".repeat(30_000) };
+  assert.equal(first.setDraft("med:new", oversized), false);
+  second.setDraft("goal:new", { amount: "2" });
+  const durable = [...storage.entries];
+  assert.equal(first.synchronize(), true);
+  assert.deepEqual(first.getSnapshot().drafts["med:new"].value, oversized);
+  assert.deepEqual(first.getSnapshot().drafts["goal:new"].value, {
+    amount: "2",
+  });
+  assert.equal(first.getSnapshot().status, "error");
+  first.flush();
+  assert.deepEqual([...storage.entries], durable);
+  assert.equal(
+    first.setDraft("med:new", { name: "Shorter pending value" }),
+    true,
+  );
+  const reopened = createDraftWorkspace("shared_pending_budget");
+  reopened.hydrate(storage);
+  assert.deepEqual(reopened.getSnapshot().drafts["med:new"].value, {
+    name: "Shorter pending value",
+  });
+  assert.deepEqual(reopened.getSnapshot().drafts["goal:new"].value, {
+    amount: "2",
+  });
 });
 
 test("multibyte text uses UTF-8 budgets, with the larger allowance confined to check-in drafts", () => {

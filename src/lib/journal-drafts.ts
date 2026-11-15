@@ -545,6 +545,9 @@ export function createDraftWorkspace(scope: string) {
   };
   const serverState = state;
   const listeners = new Set<() => void>();
+  // A clean local snapshot is not a write: another tab may have changed or
+  // cleared its drafts since this instance last read the shared workspace.
+  const dirtyDrafts = new Map<string, DraftRecord | null>();
   const emit = () => listeners.forEach((listener) => listener());
   const serialized = () =>
     JSON.stringify({
@@ -557,29 +560,88 @@ export function createDraftWorkspace(scope: string) {
       checkInOpenedAt: state.checkInOpenedAt,
       lastPath: state.lastPath,
     });
+  const sameRecords = <T>(a: Record<string, T>, b: Record<string, T>) => {
+    const keys = Object.keys(a);
+    return (
+      keys.length === Object.keys(b).length &&
+      keys.every(
+        (entry) =>
+          Object.hasOwn(b, entry) &&
+          JSON.stringify(a[entry]) === JSON.stringify(b[entry]),
+      )
+    );
+  };
+  const readLatest = (candidate: DraftStorage) => {
+    const raw = candidate.getItem(key);
+    if (raw === null) return { workspace: fresh(scope), damaged: false };
+    const latest = parseWorkspace(raw, scope);
+    if (!latest) throw new Error("The saved draft workspace is unavailable.");
+    return latest;
+  };
+  const mergeProtected = (latest: SavedWorkspace) => {
+    const drafts = { ...latest.drafts };
+    for (const [draftKey, record] of dirtyDrafts) {
+      if (record === null) delete drafts[draftKey];
+      else drafts[draftKey] = record;
+    }
+    const checkInOpenedAt = { ...state.checkInOpenedAt };
+    let count = Object.keys(checkInOpenedAt).length;
+    let overflow = false;
+    for (const [identity, openedAt] of Object.entries(latest.checkInOpenedAt)) {
+      const previous = checkInOpenedAt[identity];
+      if (previous !== undefined)
+        checkInOpenedAt[identity] = Math.min(previous, openedAt);
+      else if (count < CHECK_IN_OPENED_AT_LIMIT) {
+        checkInOpenedAt[identity] = openedAt;
+        count++;
+      } else overflow = true;
+    }
+    const changed =
+      !sameRecords(state.drafts, drafts) ||
+      !sameRecords(state.checkInOpenedAt, checkInOpenedAt);
+    if (changed) state = { ...state, drafts, checkInOpenedAt };
+    return { changed, overflow };
+  };
+  const assertBudget = (raw: string) => {
+    if (
+      utf8Length(raw) > MAX_WORKSPACE ||
+      Object.keys(state.drafts).length > MAX_DRAFTS ||
+      Object.entries(state.drafts).some(
+        ([draftKey, draft]) =>
+          jsonBytes(draft.value) > draftByteLimit(draftKey),
+      )
+    )
+      throw new Error("Draft storage is full.");
+  };
   const persist = (preserveError = false, notify = true) => {
     const previousStatus = state.status;
     let status: DraftStorageStatus = "memory";
+    let protectedChanged = false;
     try {
+      let damaged = false;
+      if (storage) {
+        const latest = readLatest(storage);
+        damaged = latest.damaged;
+        const merged = mergeProtected(latest.workspace);
+        protectedChanged = merged.changed;
+        // Never evict an established opening to make a combined history fit.
+        if (merged.overflow) throw new Error("Opening history is full.");
+      }
       const raw = serialized();
-      if (
-        utf8Length(raw) > MAX_WORKSPACE ||
-        Object.keys(state.drafts).length > MAX_DRAFTS ||
-        Object.entries(state.drafts).some(
-          ([key, draft]) => jsonBytes(draft.value) > draftByteLimit(key),
-        )
-      )
-        throw new Error("Draft storage is full.");
+      assertBudget(raw);
       if (storage) {
         storage.setItem(key, raw);
+        dirtyDrafts.clear();
         status =
-          preserveError && previousStatus === "error" ? "error" : "saved";
+          damaged || (preserveError && previousStatus === "error")
+            ? "error"
+            : "saved";
       }
     } catch {
       status = "error";
     }
     state = { ...state, status };
-    if (notify || status !== previousStatus) emit();
+    if (notify || protectedChanged || status !== previousStatus) emit();
   };
   const screen = (path: string): ScreenRecord =>
     state.screens[path] ?? {
@@ -616,6 +678,10 @@ export function createDraftWorkspace(scope: string) {
     };
   };
   return {
+    /** The namespace is public presentation metadata, never a credential. */
+    get storageKey() {
+      return key;
+    },
     subscribe(listener: () => void) {
       listeners.add(listener);
       return () => {
@@ -649,20 +715,50 @@ export function createDraftWorkspace(scope: string) {
       state = { ...state, ready: true };
       emit();
     },
+    /** Import protected local data only; never navigate, write or save a journal. */
+    synchronize() {
+      if (!state.hydrated || !storage) return false;
+      const previousStatus = state.status;
+      let changed = false;
+      let status = previousStatus;
+      try {
+        const latest = readLatest(storage);
+        const merged = mergeProtected(latest.workspace);
+        changed = merged.changed;
+        assertBudget(serialized());
+        if (
+          latest.damaged ||
+          merged.overflow ||
+          dirtyDrafts.size > 0 ||
+          !sameRecords(state.checkInOpenedAt, latest.workspace.checkInOpenedAt)
+        )
+          status = "error";
+      } catch {
+        status = "error";
+      }
+      if (changed || status !== previousStatus) {
+        state = { ...state, status };
+        emit();
+        return true;
+      }
+      return false;
+    },
     setDraft(draftKey: string, value: unknown) {
       if (!safeDraftKey(draftKey) || !validJson(value)) {
         state = { ...state, status: "error" };
         emit();
         return false;
       }
+      const record = {
+        value: JSON.parse(JSON.stringify(value)),
+        updatedAt: Date.now(),
+      };
+      dirtyDrafts.set(draftKey, record);
       state = {
         ...state,
         drafts: {
           ...state.drafts,
-          [draftKey]: {
-            value: JSON.parse(JSON.stringify(value)),
-            updatedAt: Date.now(),
-          },
+          [draftKey]: record,
         },
       };
       // Keep valid edits in this visit even when their byte budget or the browser
@@ -671,6 +767,8 @@ export function createDraftWorkspace(scope: string) {
       return state.status === "saved";
     },
     clearDraft(draftKey: string) {
+      if (!safeDraftKey(draftKey)) return;
+      dirtyDrafts.set(draftKey, null);
       const drafts = { ...state.drafts };
       delete drafts[draftKey];
       state = { ...state, drafts };
