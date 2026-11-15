@@ -729,10 +729,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         increase the card height. The host is top-center,{" "}
         <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
-        safe area. The restored opaque base mixes the theme canvas with 24%
-        Black in light mode or 24% White in dark mode. A separate 9%-alpha
-        Purple200 wash sits above that base. The result remains opaque; it
-        uses no backdrop blur or saturation, and its ink follows the theme.
+        safe area. Both modes share a static opaque base: 92% canonical Plum
+        mixed with 8% Black. Three faint radial highlights sit at different
+        edges: Violet400 at 5.5%, Indigo400 at 4.5% and Fuchsia400 at 3.5%.
+        Readable light ink stays paired with this dark surface. The background
+        has no animation, uniform color wash, backdrop blur or saturation.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
@@ -748,7 +749,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Short secondary copy",
-            "Both modes use their theme-aware ink at 70% color alpha, without another element-opacity multiplier.",
+            "Both modes use readable light ink at 70% color alpha, without another element-opacity multiplier.",
           ],
           [
             "Expanded details",
@@ -760,7 +761,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Opaque theme-canvas mix beneath a 9%-alpha Purple200 wash, without backdrop blur or saturation; the 4px-high capped rail is inset 16px horizontally and 8px from the bottom.",
+            "Static opaque --palette-plum at 92% / --palette-black at 8%, with fixed Violet400 5.5%, Indigo400 4.5% and Fuchsia400 3.5% radial highlights; no backdrop blur or saturation. The 4px-high capped rail is inset 16px horizontally and 8px from the bottom.",
           ],
           [
             "Header Undo",
