@@ -476,13 +476,28 @@ export function JournalNotification({
             onPointerDown={(event) => event.stopPropagation()}
             onClick={runUndo}
           >
-            {undoState === "pending" ? (
-              <LoaderCircle aria-hidden="true" />
-            ) : undoState === "done" ? (
-              <Check aria-hidden="true" />
-            ) : (
-              <Undo2 aria-hidden="true" />
-            )}
+            <span
+              className="journal-notification-revert-symbol"
+              aria-hidden="true"
+            >
+              {undoState === "pending" ? (
+                <LoaderCircle />
+              ) : undoState === "done" ? (
+                <Check />
+              ) : (
+                <Undo2 />
+              )}
+            </span>
+            <span
+              className="journal-notification-revert-label"
+              aria-hidden="true"
+            >
+              {undoState === "pending"
+                ? "Undoing"
+                : undoState === "done"
+                  ? "Undone"
+                  : "Undo"}
+            </span>
           </Button>
         )}
       </div>

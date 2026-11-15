@@ -372,7 +372,7 @@
   min-width: 0;
   align-items: center;
   gap: 0;
-  padding-right: 12px;
+  padding-right: 16px;
   border-radius: inherit;
 }
 .journal-notification-summary {
@@ -567,37 +567,49 @@
 }
 .journal-notification .journal-notification-revert {
   display: inline-grid;
+  grid-template-rows: 28px 12px;
+  gap: 2px;
   width: 44px;
   min-width: 44px;
   height: 44px;
   min-height: 44px;
-  align-self: center;
-  place-items: center;
-  margin: 0;
+  align-self: start;
+  align-content: center;
+  justify-items: center;
+  margin: 10px 0 0;
   padding: 0;
   border: 0;
-  border-radius: 13px;
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--toast-accent) 28%, transparent),
-      color-mix(in srgb, var(--toast-purple-400) 22%, transparent)
-    ),
-    color-mix(in srgb, var(--toast-tile) 88%, transparent);
-  color: #fff7fc;
-  box-shadow:
-    inset 0 0 0 1.5px color-mix(in srgb, var(--toast-accent) 65%, transparent),
-    inset 0 1px 0 #fff7fc26,
-    0 3px 12px color-mix(in srgb, var(--toast-accent) 16%, transparent);
+  border-radius: 9px;
+  background: transparent;
+  color: color-mix(in srgb, var(--toast-accent) 80%, var(--toast-ink));
+  box-shadow: none;
   cursor: pointer;
   transition:
-    box-shadow 160ms ease,
+    color 160ms ease,
     opacity 160ms ease;
 }
-.journal-notification .journal-notification-revert > svg {
-  width: 21px;
-  height: 21px;
-  stroke-width: 2.5;
+.journal-notification-revert-symbol {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: var(--toast-quiet-fill);
+  box-shadow: none;
+  transition: background-color 160ms ease;
+}
+.journal-notification .journal-notification-revert-symbol > svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.25;
+}
+.journal-notification-revert-label {
+  color: var(--toast-muted);
+  font-size: 9px;
+  font-weight: 550;
+  line-height: 12px;
+  white-space: nowrap;
 }
 .journal-notification .journal-notification-revert:disabled {
   opacity: 0.78;
@@ -605,11 +617,14 @@
 }
 .journal-notification .journal-notification-revert[data-undo-state="done"] {
   color: var(--color-emerald-300, #6ee7b7);
-  box-shadow:
-    inset 0 0 0 1.5px
-      color-mix(in srgb, var(--color-emerald-300, #6ee7b7) 65%, transparent),
-    0 0 14px
-      color-mix(in srgb, var(--color-emerald-300, #6ee7b7) 18%, transparent);
+}
+.journal-notification-revert[data-undo-state="done"]
+  .journal-notification-revert-symbol {
+  background: color-mix(
+    in srgb,
+    var(--color-emerald-300, #6ee7b7) 10%,
+    transparent
+  );
 }
 .journal-notification-action[data-action="cancel"],
 .journal-notification-cancel {
@@ -704,10 +719,11 @@
     );
   }
   .journal-notification .journal-notification-revert:not(:disabled):hover {
-    box-shadow:
-      inset 0 0 0 1.5px var(--toast-accent),
-      inset 0 1px 0 #fff7fc33,
-      0 3px 17px color-mix(in srgb, var(--toast-accent) 28%, transparent);
+    color: var(--toast-ink);
+  }
+  .journal-notification-revert:not(:disabled):hover
+    .journal-notification-revert-symbol {
+    background: color-mix(in srgb, var(--toast-ink) 11%, transparent);
   }
 }
 @media (max-width: 479px) {
@@ -811,7 +827,7 @@
       .journal-toast-flash,
       .journal-toast-spark,
       .journal-toast-plate,
-      .journal-notification-revert > svg
+      .journal-notification-revert-symbol > svg
     ),
   .journal-toaster
     [data-mounted="true"]
