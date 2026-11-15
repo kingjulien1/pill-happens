@@ -2868,13 +2868,17 @@ export function DeveloperGuidePage() {
                   invalid metadata separate from valid drafts. The bounded map
                   retains 8,192 observations without evicting earlier history;
                   quota failures remain visible through the existing storage
-                  status. Close/reopen, refresh, draft reset and successful-save
-                  cleanup preserve the opening record. This is device-local
-                  tracking from now on, not cloud persistence or reconstructed
-                  history. It neither creates a response nor grants completion
-                  or a save; only a successful Save Check-In or reflection PATCH
-                  advances the secondary saved-update time. Neither card has an
-                  extra greeting, date, inline title icon, trailing chevron or
+                  status. Every local workspace write reconciles the latest
+                  validated same-journal opening history, retaining the earliest
+                  instant per day and period. An older tab’s location or
+                  pagehide write cannot replace that history with an empty map.
+                  Close/reopen, refresh, draft reset and successful-save cleanup
+                  preserve the opening record. This is device-local tracking
+                  from now on, not cloud persistence or reconstructed history.
+                  It neither creates a response nor grants completion or a save;
+                  only a successful Save Check-In or reflection PATCH advances
+                  the secondary saved-update time. Neither card has an extra
+                  greeting, date, inline title icon, trailing chevron or
                   external section buttons. Zero outer margins and the intake
                   timeline’s 8px item gap remain. When actual intakes are
                   adjacent, a 4px inert spacer gives 12px visible clearance.
@@ -3756,6 +3760,26 @@ export function DeveloperGuidePage() {
                 daylight-saving hours.
               </p>
               <p>
+                Shared-origin tabs reconcile drafts and first-open observations
+                before local writes. Each store tracks explicit draft set/clear
+                operations and applies only those deltas to the latest validated
+                durable records. Untouched stale copies cannot overwrite another
+                tab’s draft or resurrect one removed by Reset or a successful
+                save. Failed writes retain pending operations for retry, with
+                honest memory/error feedback. Opening history is an append-only
+                union of earliest valid instants within its existing limit.
+              </p>
+              <p>
+                The stable store.synchronize() method reads without writing and
+                emits only when protected content or persistence status changes.
+                JournalDraftProvider calls it after hydration and for matching
+                storage events, focus, pageshow and visible-page return. Each
+                tab keeps its own route, dialog, stack and scroll state. This
+                prevents a background tab’s page-state flush from erasing an
+                unsaved check-in time; it never submits a response or advances
+                the journal’s saved-update timestamp.
+              </p>
+              <p>
                 Each dialog remembers its own scroll position across closing,
                 refresh and switching between desktop dialog and mobile drawer.
                 Writing Space stores independent source and preview positions
@@ -3768,13 +3792,13 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Drafts have no age expiry and remain on that browser or
-                installed app; they are not synchronized or automatically
-                submitted. The workspace validates its version, routes, dialog
-                descriptors, and bounded payloads. Unavailable storage falls
-                back to memory with an honest status. Passwords, authentication
-                tokens, and destructive confirmations never enter the workspace.
-                The service worker still caches only public assets, not private
-                journal responses.
+                installed app; they are not synchronized across devices or
+                automatically submitted. The workspace validates its version,
+                routes, dialog descriptors, and bounded payloads. Unavailable
+                storage falls back to memory with an honest status. Passwords,
+                authentication tokens, and destructive confirmations never enter
+                the workspace. The service worker still caches only public
+                assets, not private journal responses.
               </p>
             </Detail>
           </div>
