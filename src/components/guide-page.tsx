@@ -193,7 +193,7 @@ export function GuidePage() {
                   Add Your Medication
                 </h3>
                 <p>
-                  Open Medications and choose <strong>Add a Medication</strong>.
+                  Open Medications and choose <strong>Add Medication</strong>.
                   Enter its name, strength in mg per unit, medication type, and
                   default quantity for new entries. Active Ingredient means the
                   Wirkstoff; leave it blank if you don’t know it. Add optional

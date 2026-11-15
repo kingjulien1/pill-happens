@@ -1076,12 +1076,22 @@ export function DeveloperGuidePage() {
                 and opacity, with the fallback hidden once the GPU renders
                 successfully. The explicit intake appearance defaults to a 2px
                 CSS rim; Primary keeps its 3px default. Secondary and ordinary
-                controls have no animated perimeter. Only Today opts into the
-                GPU renderer. Motion retains its existing hidden, offscreen,
-                disabled and reduced-motion guards. Text and icon colors adapt
-                to the resolved theme; primary labels retain readable foreground
-                ink. Focus draws inward, while the soft exterior glow stays
-                separate from the border geometry.
+                controls have no animated perimeter. Today and the library’s Add
+                Medication action opt into the GPU renderer. Motion retains its
+                existing hidden, offscreen, disabled and reduced-motion guards.
+                Text and icon colors adapt to the resolved theme; primary labels
+                retain readable foreground ink. Focus draws inward, while the
+                soft exterior glow stays separate from the border geometry.
+              </p>
+              <p>
+                The library’s Add Medication button uses the same PrimaryButton
+                configuration as the live Today action: the solid face, shared
+                theme style, 74px height, 19.425px radius and 5.5px GPU/CSS rim.
+                Its 25px creation-symbol frame, main label, dot, secondary “Set
+                up” aside and trailing arrow use the same content classes,
+                spacing and mode-aware ink. MedicationActionButton keeps the
+                pending loader, “Saving…” label, disabled state and forwarded
+                native-button or navigation behavior.
               </p>
               <p>
                 The main label uses the page foreground. The Tablets mark, arrow
@@ -1180,6 +1190,27 @@ export function DeveloperGuidePage() {
                 previews retain their own surface recipes.
               </p>
               <p>
+                The Medications opening uses a 28px title, increasing to 32px
+                from 640px and reducing to 26px below 360px. Its leading tile
+                grows from 44px to 48px at 640px; the PillBottle glyph is always
+                one pixel smaller than the title at 25px, 27px or 31px. Title,
+                artwork and saved-count summary share a centered row, while the
+                description keeps its own text column.
+              </p>
+              <p>
+                After page-entry readiness, the artwork tile grows and fades
+                into place over 760ms, rebounding through 1.10, 0.97, 1.035 and
+                its final scale. The glyph starts 120ms later, turns 720° over
+                980ms and uses the same scale rebound. Its first playful rock
+                waits another 250ms after that entrance finishes. Each 920ms
+                rock follows a nonlinear path. Later starts are randomized three
+                to six seconds apart, measured start to start: the rest after
+                completion subtracts the rock’s 920ms duration. Visibility,
+                hidden tabs and page readiness gate playback; an observer also
+                holds it while any dialog or drawer portal is open. Resuming
+                chooses a fresh delay. Reduced motion shows the settled artwork.
+              </p>
+              <p>
                 The Medications heading pairs up to six narrow rounded color
                 swatches with a compact bold saved count. Resolve saved pigments
                 and deduplicate by HEX before applying the cap. Ordering keeps
@@ -1187,7 +1218,14 @@ export function DeveloperGuidePage() {
                 and library order; archived entries remain eligible. Empty
                 libraries show zero with no invented colors. Accessible context
                 retains exact saved/active totals and visible accent names, even
-                when large visual counts use compact notation.
+                when large visual counts use compact notation. The decorative
+                strip shows at most three swatches below 480px and hides below
+                360px so the heading row stays compact. At least two formatted
+                characters set <code>data-kit-count-wide</code>, hiding the
+                palette below 480px. At least three characters separately set
+                <code> data-kit-count-long</code>, hiding the visual Meds suffix
+                below 360px; two-character counts keep that label. Its full
+                palette description and exact totals remain accessible.
               </p>
               <p>
                 GuideOutline adds an On This Page rail only from 1024px upward,
@@ -1977,7 +2015,7 @@ export function DeveloperGuidePage() {
                 blocks repeated submission and dismissal, while an inline error
                 keeps a failed action available to retry. Focus returns to its
                 trigger, or to Close when resetting disables that trigger.
-                Closing the editor returns to its original list card or Add a
+                Closing the editor returns to its original list card or Add
                 Medication; archiving an opener that leaves the visible list
                 falls back to the stable Add action.
               </p>
@@ -1993,16 +2031,17 @@ export function DeveloperGuidePage() {
                 to 56.055px and default radii from 13.986px to 14.7144375px.
                 This changes layout geometry rather than scaling a finished
                 button. Standalone Accent actions remain 72–75.75px high with
-                18.9–19.884375px corners; page-level Add a Medication instead
-                shares Today’s 74px height, 19.425px radius and internal
-                label/icon/arrow spacing. Save Medication retains the compact
-                dialog wrapper. Today remains 74px high with 19.425px corners.
-                An explicit radius override remains available. The solid face
-                and both inward edges follow the effective radius, without a
-                separate field, glaze or aura renderer. Pending replaces only
-                the leading glyph with a spinner. Dialog Accent actions retain
-                24px top clearance; plain submit actions add 8px to their
-                existing layout gap. See the{" "}
+                18.9–19.884375px corners; page-level Add Medication instead
+                shares Today’s solid paint, 74px height, 19.425px radius, 5.5px
+                moving rim and internal label/icon/aside/arrow spacing. Its
+                secondary “Set up” copy describes the creation dialog it opens.
+                Save Medication retains the compact dialog wrapper. Today
+                remains 74px high with 19.425px corners. An explicit radius
+                override remains available. The solid face and both inward edges
+                follow the effective radius, without a separate field, glaze or
+                aura renderer. Pending replaces only the leading glyph with a
+                spinner. Dialog Accent actions retain 24px top clearance; plain
+                submit actions add 8px to their existing layout gap. See the{" "}
                 <a href="#buttons">button component reference</a> for shared
                 paints and standalone examples. General focus uses the paired
                 Plum or Lilac focus role. Intake timing hints omit the visible
