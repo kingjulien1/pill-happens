@@ -680,12 +680,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Sparks / plate unfold",
             "8 × 640ms + (640ms + 18ms/index) / 940ms + 120/180ms",
-            "Eight staggered glints and two independently tilted rear plates finish once.",
+            "Eight staggered glints and separate rear-plate wrappers finish their entrance once; the inner plate faces own the later sway.",
+          ],
+          [
+            "Rear-card sway",
+            "8.8s loop after 1,660ms",
+            "Both 7/6-size plates start together 250ms after the 90ms + 1,320ms artwork entrance. Opposing subpixel travel and approximately 3° arcs gently open and close the fan around −18°/+15° base tilts; identical endpoints prevent a reset jump.",
           ],
           [
             "Status motion",
-            "Bell 3.6s after 1,380ms; Loading 2.4s",
-            "The damped success bell and loading loop follow data-motion-paused, independently of reading pauses.",
+            "Bell 4.8s after 1,660ms; Loading 2.4s",
+            "The success bell rings continuously with fast → slow → fast pacing and matched neutral seam velocities. Both loops follow data-motion-paused independently of reading pauses; there is no idle bell interval.",
           ],
           [
             "Undo feedback",
@@ -744,7 +749,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and 41.65px Mauve900 tile; the 27.5625px glyph is exactly 1.25× the former 22.05px size, with 2.8 stroke.",
+            "49px illustration rail and 41.65px front tile; 48.5917px rear plates are exactly 7/6 of their former size, centered at approximately 0.2042px. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds.",
           ],
           [
             "Main text / context",
@@ -772,13 +777,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Artwork / bell",
-            "Mauve900 tile, with #ffeaf6 BellCheck for all successful saves. The old corner bell, chevron, StarCheck shape and green intake override are absent.",
+            "All successful saves use Emerald600 BellCheck (oklch(59.6% 0.145 163.225)) on Fuchsia950 at 85% alpha (oklch(29.3% 0.136 325.661)). Other kinds retain the Mauve900 tile and their existing status glyphs. The old corner bell, chevron and StarCheck shape remain absent.",
           ],
         ]}
       />
       <p>
         Successful saves use BellCheck; Error, Info, Warning, Loading and Update
-        keep fitting status symbols on the same Mauve tile. Their accents retain
+        keep fitting status symbols on their Mauve tile. Their accents retain
         useful distinctions. AppearanceToaster follows the resolved appearance
         context. These values describe the current presentation; they do not
         certify every text/background combination for contrast.
