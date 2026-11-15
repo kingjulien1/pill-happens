@@ -966,26 +966,33 @@ export function DeveloperGuidePage() {
             >
               <p>
                 <code>JournalBackground</code> fills the viewport with the
-                mode-aware radial Grainient field. Plum, Lilac and a restrained
-                warm trace flow beneath a center veil and drifting Indigo,
-                Purple and Rose highlights. The CSS radial fallback paints
-                before hydration and remains available without WebGL.
+                mode-aware radial Grainient field. In dark mode, Plum, Lilac and
+                a restrained warm trace flow without the Plum veil, center scrim
+                or dark Indigo/Plum radial-conic overlay. Only the two subtle
+                Rose highlights remain above the field. Light mode keeps its
+                existing veil, center scrim and complete highlight layer. The
+                CSS radial fallback paints before hydration and remains
+                available without WebGL.
               </p>
               <p>
                 The renderer follows system or saved Appearance changes. Mobile
                 uses portrait framing and a faster 5.4 shader speed, compared
                 with 3.6 on desktop, while limiting backing-store density to
                 1.25 and 750,000 pixels. The overscanned highlight field drifts
-                over 68 seconds without moving its clipped viewport. A new Rose
-                highlight at 32% / 16% mirrors the existing 68% / 84% pool. Its
-                3.3% pigment share is 45% quieter than the original 6%, keeping
-                the diagonal echo restrained. Reduced motion keeps the
-                composition still; hidden or offscreen rendering pauses instead
-                of accumulating elapsed time.
+                over 68 seconds without moving its clipped viewport. The Rose
+                highlight at 32% / 16% mirrors the 68% / 84% pool with
+                respective 3.3% and 6% pigment shares. Their dark-mode layer
+                retains 60% opacity with a transparent base; light mode retains
+                its full 56%-opacity field. Removing dark dimming layers does
+                not change the underlying ramp, contrast or motion settings.
+                Reduced motion keeps the composition still; hidden or offscreen
+                rendering pauses instead of accumulating elapsed time.
               </p>
               <p>
                 Both guides share this backdrop beneath their reading surfaces.
-                Intake cards and the main action retain their opaque
+                Their separate 67% canvas veil remains only in light mode; dark
+                mode shows the backdrop without that reading overlay. Intake
+                cards and the main action retain their opaque
                 <code> --background</code> bases and local color tints, keeping
                 stacked content covered. The mobile dock fades, medication
                 artwork and check-in animations remain separate from the
