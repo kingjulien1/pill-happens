@@ -1,18 +1,17 @@
 /* Sonner owns its outer transforms, stack and swipe bridges. Custom keyframes
-   and the glass surface belong to the inner card and artwork. */
+   and the opaque surface belong to the inner card and artwork. */
 .journal-toaster[data-sonner-toaster] {
-  --toast-ink: #fff7fc;
+  --toast-ink: var(--palette-black);
   --toast-muted: color-mix(in srgb, var(--toast-ink) 70%, transparent);
   --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 88%, transparent);
-  --toast-pink-950: var(--color-pink-950, oklch(28.4% 0.109 3.907));
   --toast-purple-400: var(--color-purple-400, oklch(71.4% 0.203 305.504));
-  --toast-surface: color-mix(in srgb, var(--toast-pink-950) 85%, transparent);
+  --toast-surface: color-mix(in srgb, #000 24%, var(--background));
   --toast-purple-wash: color-mix(
     in srgb,
-    var(--toast-purple-400) 18%,
+    var(--color-purple-200, oklch(90.2% 0.063 306.703)) 9%,
     transparent
   );
-  /* The higher Purple layer is above Pink; neither paints an opaque canvas. */
+  /* A restrained Purple200 wash sits above the restored opaque theme base. */
   --toast-surface-layers:
     linear-gradient(var(--toast-purple-wash) 0 0),
     linear-gradient(var(--toast-surface) 0 0);
@@ -28,11 +27,13 @@
     transparent
   );
   --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 50%, transparent);
-  --toast-shadow: #25071f66;
+  --toast-shadow: color-mix(in srgb, var(--palette-black) 18.824%, transparent);
   --toast-quiet-fill: color-mix(in srgb, var(--toast-ink) 7%, transparent);
   font-family: var(--font-sans);
 }
 .journal-toaster[data-sonner-toaster][data-sonner-theme="dark"] {
+  --toast-ink: var(--palette-white);
+  --toast-surface: color-mix(in srgb, #fff 24%, var(--background));
   --toast-shadow: #100b2199;
 }
 .journal-toaster :is([data-type="success"], [data-kind="success"]) {
@@ -77,13 +78,10 @@
   border: 0;
   border-radius: 18px;
   background: var(--toast-surface-layers);
-  -webkit-backdrop-filter: blur(128px) saturate(1.6);
-  backdrop-filter: blur(128px) saturate(1.6);
   color: var(--toast-ink);
   box-shadow:
     inset 0 0 0 4px var(--toast-rim-muted),
     inset 0 0 0 6px var(--toast-pink-edge),
-    0 0 26px color-mix(in srgb, var(--toast-purple-400) 16%, transparent),
     0 12px 28px -16px var(--toast-shadow),
     0 3px 10px -5px var(--toast-shadow);
   text-align: left;
@@ -560,7 +558,7 @@
       color-mix(in srgb, var(--toast-purple-400) 22%, transparent)
     ),
     color-mix(in srgb, var(--toast-tile) 88%, transparent);
-  color: var(--toast-ink);
+  color: #fff7fc;
   box-shadow:
     inset 0 0 0 1.5px color-mix(in srgb, var(--toast-accent) 65%, transparent),
     inset 0 1px 0 #fff7fc26,
