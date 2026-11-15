@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import { LoaderCircle } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
 import { PrimaryButton } from "@/components/primary-button";
-import { INTAKE_ACTION_GEOMETRY } from "@/lib/action-button-system";
+import {
+  getIntakeActionThemeStyle,
+  INTAKE_ACTION_GEOMETRY,
+} from "@/lib/action-button-system";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,13 +26,17 @@ export function MedicationActionButton({
 }) {
   if (intent === "add") {
     const geometry = {
+      ...getIntakeActionThemeStyle(),
       height: INTAKE_ACTION_GEOMETRY.height,
       minHeight: INTAKE_ACTION_GEOMETRY.height,
     };
     return (
       <PrimaryButton
         {...props}
-        surface="accent"
+        surface="solid"
+        rim
+        rimThickness={5.5}
+        gpuRim
         radius={INTAKE_ACTION_GEOMETRY.radius}
         disabled={disabled || pending}
         pending={pending}
@@ -49,23 +56,31 @@ export function MedicationActionButton({
         <span className="intake-primary-row">
           <span className="intake-primary-copy">
             <span className="intake-primary-label">
-              <span
-                className="relative -left-[5px] inline-flex size-[25px] shrink-0 items-center justify-center"
-                aria-hidden="true"
-              >
+              <span className="intake-log-symbol" aria-hidden="true">
                 {pending ? (
                   <LoaderCircle
-                    className="size-[23px] motion-safe:animate-spin"
+                    className="intake-log-symbol-pill motion-safe:animate-spin"
                     strokeWidth={2.5}
                     aria-hidden="true"
                     focusable="false"
                   />
                 ) : (
-                  <ActionIcon name="pencilSparkles" className="size-[23px]" />
+                  <ActionIcon
+                    name="pencilSparkles"
+                    className="intake-log-symbol-pill"
+                  />
                 )}
               </span>
-              {pending ? "Saving…" : "Add a Medication"}
+              {pending ? "Saving…" : "Add Medication"}
             </span>
+            {!pending && (
+              <>
+                <span className="intake-primary-dot" aria-hidden="true">
+                  ·
+                </span>
+                <span className="intake-primary-aside">Set up</span>
+              </>
+            )}
           </span>
           <ActionIcon name="next" className="intake-primary-next" />
         </span>
