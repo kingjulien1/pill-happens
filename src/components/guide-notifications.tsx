@@ -6,12 +6,14 @@ import styles from "./guide-notifications.module.css";
 
 const contract = `import type { ReactNode } from "react";
 import type { ExternalToast } from "sonner";
+import type { NotificationChangePreview } from "@/lib/notification-change-preview";
 
 export type JournalToastKind =
   | "success" | "error" | "info"
   | "warning" | "loading" | "update";
 
 export type JournalNotificationDetails = {
+  preview?: NotificationChangePreview;
   paragraphs?: ReactNode[];
   facts?: { label: ReactNode; value: ReactNode }[];
   links?: { label: string; href: string }[];
@@ -53,20 +55,38 @@ const intake = `"use client";
 import { useJournal } from "@/components/journal-provider";
 import { toast } from "@/components/ui/journal-toast";
 import type { Intake } from "@/lib/domain";
+import {
+  intakeNotificationSnapshot,
+  savedNotificationRecord,
+} from "@/lib/notification-change-preview";
 
 type IntakeInput = Pick<Intake,
   "medicationId" | "quantity" | "takenAt" | "route"
 >;
 
 export function useNotifiedIntake() {
-  const { mutate } = useJournal();
+  const { data, mutate } = useJournal();
   return async (input: IntakeInput) => {
+    if (!data) throw new Error("The journal is still loading.");
     const saved = await mutate("intakes", input, "POST");
-    // Success and Undo follow the confirmed response, never an optimistic guess.
+    const record = savedNotificationRecord(
+      data.intakes, saved.data.intakes, saved.entityId,
+    );
+    const medication = saved.data.medications.find(
+      (item) => item.id === record?.medicationId,
+    );
+    // Preview and Undo follow the confirmed response, never an optimistic guess.
     toast.success("Your intake is saved in the journal.", {
       heading: "Intake saved",
       variant: "intake-saved",
       details: {
+        ...(record ? {
+          preview: {
+            after: intakeNotificationSnapshot(
+              record, medication, saved.data.settings.timezone,
+            ),
+          },
+        } : {}),
         paragraphs: ["Undo removes only this newly saved intake."],
         links: [{ label: "Open Daily Log", href: "/" }],
         footer: "Other entries stay as they are.",
@@ -76,6 +96,29 @@ export function useNotifiedIntake() {
       } : {}),
     });
     return saved;
+  };
+}`;
+
+const preview = `import type { Medication } from "@/lib/domain";
+import {
+  medicationNotificationSnapshot,
+  type NotificationChangePreview,
+} from "@/lib/notification-change-preview";
+
+// confirmedAfter comes from saved.data, not an optimistic form value.
+export function medicationEditPreview(
+  before: Medication,
+  confirmedAfter: Medication,
+): NotificationChangePreview {
+  return {
+    before: {
+      kind: "medication",
+      medication: medicationNotificationSnapshot(before),
+    },
+    after: {
+      kind: "medication",
+      medication: medicationNotificationSnapshot(confirmedAfter),
+    },
   };
 }`;
 
@@ -228,8 +271,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p className={styles.intro}>
         Notifications keep a short result in view and put the explanation one
         tap away. The collapsed card contains its summary and countdown;
-        expanding reveals context, links and actions. Use the shared journal
-        facade for every application notice.
+        expanding reveals a saved-change preview or explanatory context, plus
+        links and actions. A real Undo is directly available in the card header.
+        Use the shared journal facade for every application notice.
       </p>
       <dl className={styles.overview}>
         <div>
@@ -241,7 +285,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <div>
           <dt>Reading Time</dt>
           <dd>
-            <strong>5.5s</strong> active countdown
+            <strong>11s</strong> active countdown
           </dd>
         </div>
         <div>
@@ -276,7 +320,19 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
               key="content"
               path="src/components/ui/journal-notification.tsx"
             />,
-            "Summary, labelled details, countdown, actions and asynchronous Undo outcomes.",
+            "Summary, labelled details, change previews, countdown, actions and asynchronous Undo outcomes.",
+          ],
+          [
+            <span key="preview">
+              <Source path="src/lib/notification-change-preview.ts">
+                Snapshot helpers
+              </Source>
+              {" + "}
+              <Source path="src/components/notification-change-preview.tsx">
+                Preview renderer
+              </Source>
+            </span>,
+            "Typed, immutable display snapshots and noninteractive before/after records; no receipt tokens or journal prose.",
           ],
           [
             <Source
@@ -322,22 +378,22 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="success">toast.success</code>,
             "Change saved",
-            "5,500ms · CheckCheck; Star Check only for intake-saved.",
+            "11,000ms · BellCheck.",
           ],
           [
             <code key="error">toast.error</code>,
             "Action failed",
-            "5,500ms · X.",
+            "11,000ms · CircleAlert.",
           ],
           [
             <code key="info">toast.info</code>,
             "Journal notice",
-            "5,500ms · Lightbulb.",
+            "11,000ms · Lightbulb.",
           ],
           [
             <code key="warning">toast.warning</code>,
             "Please review",
-            "5,500ms · TriangleAlert.",
+            "11,000ms · TriangleAlert.",
           ],
           [
             <code key="loading">toast.loading</code>,
@@ -347,7 +403,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="update">toast.update</code>,
             "Update available",
-            "5,500ms unless overridden · Sparkles.",
+            "11,000ms unless overridden · Sparkles.",
           ],
         ]}
       />
@@ -362,12 +418,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         <code>heading</code> supplies the short title. The message supplies the
         summary unless <code>description</code> explicitly overrides it. Missing
-        paragraphs use kind-specific context. Footer copy and all actions appear
-        inside expanded details. <code>duration</code>, <code>id</code>,
-        styling, action/cancel and callbacks originate in{" "}
-        <code>ExternalToast</code>; the facade deliberately owns the native
-        timer, close-button and rendering fields. Loading ignores a finite
-        duration.
+        paragraphs use kind-specific context. Footer copy and action/cancel
+        controls appear inside expanded details. A supplied Undo is a separate,
+        centered icon button in the header; activating it never toggles
+        expansion. <code>duration</code>, <code>id</code>, styling,
+        action/cancel and callbacks originate in <code>ExternalToast</code>; the
+        facade deliberately owns the native timer, close-button and rendering
+        fields. Loading ignores a finite duration.
       </p>
       <ReferenceTable
         label="Option Behavior"
@@ -383,15 +440,19 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "details",
-            "Paragraphs → facts → links → error → footer/actions. Missing paragraphs use default context; [] opts out.",
+            "A typed preview replaces paragraphs/facts; links and actions remain. Otherwise the first paragraph plus facts is shown; missing paragraphs use default context and [] opts out.",
+          ],
+          [
+            "details.preview",
+            "A NotificationChangePreview with optional before/after records; omit either side when unavailable rather than inventing it.",
           ],
           [
             "undo",
-            "Await one attempt per click. Defaults: Undo → Undoing… → Undone; success rests 450ms. Failure stays inline or opens a detached error.",
+            "One attempt per click. Accessible defaults: Undo change → Undoing change → Change undone. Header glyphs show ready/pending/done; failure stays inline or opens a detached error.",
           ],
           [
             "variant",
-            "Only intake-saved is registered; it selects the saved-intake Star Check.",
+            "Only intake-saved is registered as saved-intake context. It shares the light-pink success BellCheck, without a separate green override; it is not an Undo guarantee.",
           ],
           [
             "id",
@@ -399,7 +460,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "duration",
-            "5,500ms active time by default; Infinity hides the line. Loading always forces Infinity.",
+            "11,000ms active time by default; explicit finite durations are honored. Infinity hides the rail. Loading always forces Infinity.",
           ],
           [
             "dismissible: false",
@@ -449,7 +510,72 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         JournalProvider. Keep the caller’s rejection handling and draft
         preservation. The provider already reports ordinary mutation errors;
         avoid adding a duplicate error notice. Reserve <code>intake-saved</code>{" "}
-        for a newly saved intake; edits use general Success.
+        for a newly saved intake; edits use general Success. The preview is
+        independently derived from the confirmed record, and Undo appears only
+        when the provider supplied its callback.
+      </p>
+
+      <Heading id="previews" level={3}>
+        Typed Change Previews, Without Private Prose
+      </Heading>
+      <p>
+        <Source path="src/lib/notification-change-preview.ts">
+          NotificationChangePreview
+        </Source>{" "}
+        is immutable presentation data with optional <code>before</code> and{" "}
+        <code>after</code> records. Edits can show both sides; additions show
+        the confirmed after-state, and removals show the captured before-state.
+        Omit a missing side instead of manufacturing a comparison. The renderer
+        is a static preview, never another form or an embedded live editor.
+      </p>
+      <ReferenceTable
+        label="Preview Record Kinds"
+        headings={["Kind", "Display Data"]}
+        rows={[
+          [
+            "intake",
+            "Saved medication name, quantity, strength, taken time, timezone, form/route and an optional medication display snapshot.",
+          ],
+          [
+            "medication",
+            "Name, optional ingredient, strength, default quantity, form, color, artwork/rotation, archived state and category labels.",
+          ],
+          [
+            "check-in",
+            "Tracking day/period, word count, moods, energy/stress values and scales, sleep duration and optional bedtime; no journal body.",
+          ],
+          [
+            "goal",
+            "Daily maximum and inclusive start/end dates, with optional medication display data.",
+          ],
+          ["timezone", "The saved IANA timezone identifier."],
+        ]}
+      />
+      <p>
+        Build after-state from the confirmed <code>saved.data</code>. A writing
+        acknowledgement containing only a note and timestamp cannot establish a
+        complete check-in snapshot on its own. Use{" "}
+        <code>savedNotificationRecord</code> with the response entity ID;
+        without one, it accepts only a single provably new record. Medication,
+        intake, check-in and goal helpers copy the supported display fields,
+        including fresh arrays for moods/categories. A preview must not contain
+        record IDs, receipt tokens, callbacks or raw journal prose. Never decode
+        an Undo receipt to populate a preview, and never pretend that a missing
+        response or a failed mutation produced a saved after-state.
+      </p>
+      <DeveloperCode
+        label="A Medication Edit Preview"
+        language="tsx"
+        code={preview}
+      />
+      <p>
+        Preview content occupies the labelled, inert-when-closed details region.
+        When present it replaces free-form paragraphs and facts, while relevant
+        links and action/cancel controls remain available. Its footer uses a
+        compact reading-paused hint rather than repeating a long explanation.
+        Non-graphic notices keep their first explanatory paragraph and facts.
+        The playground above constructs both sides from invented records and its
+        Undo only updates local React state; it never calls the journal API.
       </p>
 
       <Heading id="updates" level={3}>
@@ -507,13 +633,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <Heading id="clock">Reading Clock &amp; Interaction</Heading>
       <p>
         Finite notices spend only active reading time. The monotonic clock
-        samples every <strong>50ms</strong>; the line interpolates over{" "}
-        <strong>60ms</strong>. Expansion, focus, non-touch hover, a held
+        samples every <strong>50ms</strong>; the bar’s <code>inline-size</code>
+        interpolates over <strong>60ms</strong>. Width shrink preserves its
+        rounded endcaps instead of compressing them with a scale transform. Expansion, focus, non-touch hover, a held
         pointer, hidden document, rear position, invisible or unmounted host,
         swiping, removal, pending Undo and exit each pause independently. Every
-        active reason must clear before counting resumes. Infinite notices hide
-        the line. The clock starts with host readiness; it does not wait for
-        artwork to settle.
+        active reason must clear before counting resumes. These reading pauses
+        are independent of <code>data-motion-paused</code>: hidden documents,
+        rear position and unavailable host visibility pause decoration, while
+        hovering, focusing or expanding a readable front card need not freeze
+        its finite artwork. Infinite notices hide the line. The clock starts
+        with host readiness; it does not wait for artwork to settle.
       </p>
       <p>
         The real summary button supports Enter/Space and exposes expanded,
@@ -533,24 +663,34 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         headings={["State / Effect", "Timing", "Behavior"]}
         rows={[
           [
-            "Main artwork",
-            "1,320ms + 40ms delay",
-            "One spin/unfurl and settle; glyph fade 480ms + 100ms.",
+            "Card arrival / finish ring",
+            "860ms / 1,100ms + 350ms",
+            "One finite card entrance, followed by an independent expanding finish ring.",
           ],
           [
-            "Finish response",
-            "Ring 420ms + 900ms",
-            "Four sparks: 410ms, delayed 890ms + 12ms per index.",
+            "Main artwork / glyph",
+            "1,320ms + 90ms / 720ms + 160ms",
+            "The illustration unfurls and settles; a separate glyph transform keeps its reveal independent.",
           ],
           [
-            "Plate unfold",
-            "850ms + 100/130ms",
-            "Separate rear plates finish at their resting tilts.",
+            "Halo / echo / flash",
+            "760ms + 590ms / 900ms + 710ms / 620ms + 620ms",
+            "Coordinated finite rings and a soft central flash answer the landing.",
           ],
           [
-            "Idle loops",
-            "Bell 1s; Loading 2.4s",
-            "Bell rings for 0.5s, rests for 0.5s; pauses follow reading state.",
+            "Sparks / plate unfold",
+            "8 × 640ms + (640ms + 18ms/index) / 940ms + 120/180ms",
+            "Eight staggered glints and two independently tilted rear plates finish once.",
+          ],
+          [
+            "Status motion",
+            "Bell 3.6s after 1,380ms; Loading 2.4s",
+            "The damped success bell and loading loop follow data-motion-paused, independently of reading pauses.",
+          ],
+          [
+            "Undo feedback",
+            "Pending spin 1s; completed check 240ms",
+            "An in-flight reversal keeps its visible state; success holds the reading clock for the 450ms completed beat.",
           ],
           [
             <code key="collapse">collapsing</code>,
@@ -559,13 +699,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             <code key="anticipate">anticipate</code>,
-            "120ms",
-            "Move down 2px, grow to 1.008; begin 300ms icon reversal.",
+            "180ms",
+            "Pull down 12px and grow to 1.045 before the complete upward launch; artwork reverses over 300ms.",
           ],
           [
             <code key="depart">depart</code>,
-            "210ms",
-            "Move up 54px, shrink to .96 and fade; then dismiss native item.",
+            "360ms",
+            "Launch past the viewport top using the measured --notification-exit-y; fade, then dismiss the native item.",
           ],
           [
             "Reduced motion",
@@ -575,8 +715,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         ]}
       />
       <p>
-        Custom exit budgets total <strong>330ms collapsed</strong> or{" "}
-        <strong>610ms expanded</strong>, followed by Sonner’s own unmount
+        Custom exit budgets total <strong>540ms collapsed</strong> or{" "}
+        <strong>820ms expanded</strong>, followed by Sonner’s own unmount
         window. Native swipes use Sonner’s directional exit instead. Do not
         assert exact DOM-removal time from the custom budget. Hover styling is
         limited to desktop fine-hover pointers; mobile has none.
@@ -584,12 +724,15 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
 
       <Heading id="visuals">Visual Reference &amp; Alpha Math</Heading>
       <p>
-        The compact summary starts at <strong>69px</strong>; long copy may
-        increase it. The host is top-center,{" "}
+        The summary starts at <strong>77px</strong>; its independent Undo is
+        centered beside the content. Longer copy and expanded previews may
+        increase the card height. The host is top-center,{" "}
         <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
-        safe area. The opaque surface mixes the canvas with 24% black in light
-        mode or 24% white in dark mode, so rear content cannot leak through.
+        safe area. The glass base uses a strong backdrop blur with an 85%-alpha
+        Pink950 layer underneath an 18%-alpha Purple400 wash. These are separate
+        compositing layers, not an 85/18 solid color mix; their combined paint
+        alpha is 87.7% before the glass and backdrop are considered.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
@@ -597,7 +740,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "1.225×: 40→49px frame; 34→41.65px tile; 18→22.05px glyph.",
+            "49px illustration rail and 41.65px Mauve900 tile; the 27.5625px glyph is exactly 1.25× the former 22.05px size, with 2.8 stroke.",
           ],
           [
             "Main text / context",
@@ -605,27 +748,36 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Short secondary copy",
-            "Light: .78 × 7/12 = .455 alpha. Dark: .90 × 7/12 = .525 alpha.",
+            "Both modes use the bright #fff7fc ink at 70% color alpha, without another element-opacity multiplier.",
           ],
           [
             "Expanded details",
-            "Retain .78 light / .90 dark for longer reading.",
+            "Both modes use 88% ink alpha for longer reading.",
           ],
           [
             "Inward frame",
             "4px muted rim at 50%, over inset 6px Pink 500 at 56%; second band extends 2px inward.",
           ],
           [
+            "Glass / countdown",
+            "128px standard and Safari backdrop blur with 1.6 saturation; the 4px-high capped rail is inset 16px horizontally and 8px from the bottom.",
+          ],
+          [
+            "Header Undo",
+            "One 44px target with 13px corners and a 21px, 2.5-stroke state icon, centered vertically beside the independent expansion button.",
+          ],
+          [
             "Artwork / bell",
-            "Pure black/white tile and opposite glyph; intake-saved alone uses Emerald 400 Star Check. Bell Check is decorative.",
+            "Mauve900 tile, with #ffeaf6 BellCheck for all successful saves. The old corner bell, chevron, StarCheck shape and green intake override are absent.",
           ],
         ]}
       />
       <p>
-        Error, Warning and Update adjust their accent/rim variables.
-        AppearanceToaster follows the resolved appearance context. These values
-        describe the current presentation; they do not certify every
-        text/background combination for contrast.
+        Successful saves use BellCheck; Error, Info, Warning, Loading and Update
+        keep fitting status symbols on the same Mauve tile. Their accents retain
+        useful distinctions. AppearanceToaster follows the resolved appearance
+        context. These values describe the current presentation; they do not
+        certify every text/background combination for contrast.
       </p>
 
       <Heading id="undo">Safe Undo From Response To Server</Heading>
@@ -698,7 +850,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Undo success",
-            "Show Undone for 450ms, then exit. No second mutation runs automatically.",
+            "Hold the completed icon/accessible label for 450ms with the reading clock paused, then exit. No second mutation runs automatically.",
           ],
         ]}
       />

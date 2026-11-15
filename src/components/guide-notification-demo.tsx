@@ -14,6 +14,10 @@ import {
 } from "lucide-react";
 import { toast, type JournalToastKind } from "@/components/ui/journal-toast";
 import type { NotificationId } from "@/lib/journal-notification-lifecycle";
+import type {
+  NotificationMedicationSnapshot,
+  NotificationPreviewRecord,
+} from "@/lib/notification-change-preview";
 import { Button } from "@/components/ui/button";
 import styles from "./guide-notification-demo.module.css";
 
@@ -35,6 +39,35 @@ const summaries: Record<JournalToastKind, string> = {
   update: "A sample update, already dressed for the occasion.",
 };
 
+const sampleMedication: NotificationMedicationSnapshot = {
+  name: "Example Aurora",
+  activeIngredient: "Example ingredient",
+  strengthMg: 2,
+  defaultQuantity: 1,
+  form: "tablet",
+  color: "rose",
+  icon: "pill",
+  iconRotation: 15,
+  archived: false,
+  categories: [],
+};
+
+function sampleIntake(quantity: number): NotificationPreviewRecord {
+  return {
+    kind: "intake",
+    name: sampleMedication.name,
+    quantity,
+    strengthMg: sampleMedication.strengthMg,
+    form: "tablet",
+    takenAt: "2026-11-15T20:15:00.000Z",
+    timeZone: "Europe/Vienna",
+    medication: {
+      ...sampleMedication,
+      categories: [...sampleMedication.categories],
+    },
+  };
+}
+
 /** Explicit local demos use the real facade and the existing global Toaster. */
 export function GuideNotificationDemo() {
   const scope = useId();
@@ -43,6 +76,7 @@ export function GuideNotificationDemo() {
     new Map<NotificationId, ReturnType<typeof setTimeout>>(),
   );
   const [sample, setSample] = useState("No sample change yet");
+  const [sampleQuantity, setSampleQuantity] = useState(0.5);
   const [status, setStatus] = useState(
     "Choose an example to show a real notification.",
   );
@@ -76,7 +110,7 @@ export function GuideNotificationDemo() {
             ? "Loading has no countdown and cannot be swiped away. Clear demos removes it through the programmatic exit, just as a completed operation would replace or dismiss it."
             : kind === "update"
               ? "This update example is deliberately persistent. It remains until you clear the demo or dismiss it; it does not reload the app."
-              : "The normal reading time is 5.5 seconds. Focus, pointer interaction and a rear stack position also pause it. Swipe left, right or up to dismiss.",
+              : "The normal reading time is 11 seconds. Focus, pointer interaction and a rear stack position also pause it. Swipe left, right or up to dismiss.",
         ],
         facts: [
           { label: "Source", value: "Developer Guide" },
@@ -138,32 +172,34 @@ export function GuideNotificationDemo() {
   }
 
   function undoExample() {
-    setSample("Example saved");
-    toast.success("A sample intake, with a local Undo.", {
+    const beforeQuantity = sampleQuantity;
+    const afterQuantity = beforeQuantity === 1 ? 0.5 : 1;
+    const preview = {
+      before: sampleIntake(beforeQuantity),
+      after: sampleIntake(afterQuantity),
+    };
+    setSampleQuantity(afterQuantity);
+    setSample(
+      `Example changed from ${beforeQuantity} to ${afterQuantity} tablet`,
+    );
+    toast.success("An invented intake edit, with a local Undo.", {
       id: own("undo"),
-      heading: "Demo intake saved",
-      variant: "intake-saved",
+      heading: "Demo intake updated",
       details: {
-        paragraphs: [
-          "This example reserves the emerald Star Check for the saved-intake variant. Undo changes only the sample status displayed in this playground.",
-          "Real Undo uses a signed server receipt and checks for later edits. The guide never calls that endpoint or changes any journal record.",
-        ],
-        facts: [
-          { label: "Sample", value: "Invented intake" },
-          { label: "Scope", value: "This playground only" },
-        ],
+        preview,
         links: [{ label: "Real Undo Safeguards", href: "#notifications-undo" }],
-        footer:
-          "Expand this notice, then try Undo Demo. Watch it collapse before the snap exit.",
       },
       undo: {
         label: "Undo Demo",
         onUndo: () => {
-          setSample("Example undone");
+          setSampleQuantity(beforeQuantity);
+          setSample(`Example restored to ${beforeQuantity} tablet`);
         },
       },
     });
-    setStatus("Undo demo shown. Expand its card to reverse the local example.");
+    setStatus(
+      "Open the invented before/after preview, or use the centered Undo Demo icon. Only the local sample status changes; no server request runs.",
+    );
   }
 
   function clear() {
@@ -193,11 +229,19 @@ export function GuideNotificationDemo() {
       </div>
       <p className={styles.intro}>
         Show a notice, open its details, pause the countdown and swipe it away.
-        These controls use invented data and make no journal or network changes.
+        Intake &amp; Undo compares invented before/after records and reverses
+        only the sample status below. These controls use invented data and make
+        no journal or network changes.
       </p>
       <div className={styles.kinds} aria-label="Notification type examples">
         {kinds.map(({ kind, label, Icon }) => (
-          <Button variant="ghost" size="sm" type="button" key={kind} onClick={() => show(kind)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            key={kind}
+            onClick={() => show(kind)}
+          >
             <Icon size={15} strokeWidth={2.2} aria-hidden="true" />
             {label}
           </Button>
@@ -207,11 +251,21 @@ export function GuideNotificationDemo() {
         className={styles.actions}
         aria-label="Notification lifecycle examples"
       >
-        <Button variant="ghost" size="sm" type="button" onClick={() => flow(false)}>
+        <Button
+          variant="ghost"
+          size="sm"
+          type="button"
+          onClick={() => flow(false)}
+        >
           <RefreshCw size={14} aria-hidden="true" />
           Loading → Success
         </Button>
-        <Button variant="ghost" size="sm" type="button" onClick={() => flow(true)}>
+        <Button
+          variant="ghost"
+          size="sm"
+          type="button"
+          onClick={() => flow(true)}
+        >
           <CircleAlert size={14} aria-hidden="true" />
           Loading → Error
         </Button>
