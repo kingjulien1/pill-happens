@@ -770,6 +770,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "The success bell rings continuously with fast → slow → fast pacing and matched neutral seam velocities. Both loops follow data-motion-paused independently of reading pauses; there is no idle bell interval.",
           ],
           [
+            "BellRing accents",
+            "4.8s envelope / 200ms twitch after 1,660ms",
+            "Side curves are fully visible at 0–12% and 88–100%, fade at 12–18% and 82–88%, and stay hidden at 18–82%. Mirrored outward twitches add a small rotation and 0.7 → 1 → 0.7 opacity, exactly 24 times per bell cycle. They inherit the bell rotation, pause in phase when hidden/rear, and hide during reverse, static and reduced-motion states.",
+          ],
+          [
             "Undo feedback",
             "Pending spin 1s; completed check 240ms",
             "An in-flight reversal keeps its visible state; success holds the reading clock for the 450ms completed beat.",
@@ -856,7 +861,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Artwork / bell",
-            "All successful saves use Emerald600 BellCheck (oklch(59.6% 0.145 163.225)) on Fuchsia950 at 85% alpha (oklch(29.3% 0.136 325.661)). Other kinds retain the Mauve900 tile and their existing status glyphs. The old corner bell, chevron and StarCheck shape remain absent.",
+            "All successful saves use Emerald600 BellCheck (oklch(59.6% 0.145 163.225)) on Fuchsia950 at 85% alpha (oklch(29.3% 0.136 325.661)). Its two exact installed Lucide BellRing side curves share the same Emerald600 ink and 2.9 stroke. Other kinds retain the Mauve900 tile and their existing status glyphs. The old corner bell, chevron and StarCheck shape remain absent.",
           ],
         ]}
       />
