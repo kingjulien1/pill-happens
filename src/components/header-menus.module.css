@@ -28,6 +28,17 @@
   transform: translateY(-6px) scale(0.975);
 }
 .navigation {
+  --navigation-surface: var(--menu-surface);
+  --navigation-icon-surface: color-mix(
+    in srgb,
+    var(--palette-rose) 13%,
+    var(--navigation-surface)
+  );
+  --navigation-icon-ink: color-mix(
+    in srgb,
+    var(--menu-foreground) 60%,
+    var(--palette-rose)
+  );
   --navigation-item-height: 48px;
   --navigation-selected-opacity: 0.09;
   --navigation-active-hover-opacity: 0.12;
@@ -35,17 +46,17 @@
   --navigation-selected-fill: color-mix(
     in srgb,
     var(--palette-rose) 15%,
-    var(--menu-surface)
+    var(--navigation-surface)
   );
   --navigation-hover-fill: color-mix(
     in srgb,
     var(--palette-rose) 9%,
-    var(--menu-surface)
+    var(--navigation-surface)
   );
   --navigation-selected-focus-fill: color-mix(
     in srgb,
     var(--palette-rose) 22%,
-    var(--menu-surface)
+    var(--navigation-surface)
   );
   isolation: isolate;
   width: 350px;
@@ -60,11 +71,11 @@
       color-mix(in srgb, var(--palette-rose) 8%, transparent),
       transparent 65%
     ),
-    var(--menu-surface);
+    var(--navigation-surface);
 }
 .navigation .masthead {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
+  grid-template-columns: 43.2px minmax(0, 1fr) auto;
   grid-template-areas: "brand copy actions";
   align-items: center;
   column-gap: 8px;
@@ -135,29 +146,31 @@
   width: 23px;
   height: 23px;
 }
-/* The smaller navigation mark shares the refresh control's pink tablets. */
+/* The masthead mark shares the links' tonal tile, enlarged by one fifth. */
 .navigation .mastheadIcon {
   grid-area: brand;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--brand-surface);
-  color: var(--brand-copy);
+  width: 43.2px;
+  height: 43.2px;
+  border-radius: 13.5px;
+  background: var(--navigation-icon-surface);
+  color: var(--navigation-icon-ink);
 }
 .navigation .navigationLogo {
-  --brand-ink: var(--brand-copy);
-  width: 27px;
-  height: 27px;
+  width: 32.4px;
+  height: 32.4px;
+  color: var(--navigation-icon-ink);
 }
 .navigationLogo :global(.brand-tablet) {
   width: 100%;
   height: 100%;
+  color: var(--navigation-icon-ink);
+  stroke: var(--navigation-icon-ink);
 }
 .navigationLogo :global(.brand-tablet) circle {
-  fill: var(--brand-copy);
+  fill: var(--navigation-icon-ink);
 }
 .navigationLogo :global(.brand-tablet) path {
-  stroke: var(--brand-surface);
+  stroke: var(--navigation-icon-surface);
 }
 .mastheadCopy {
   min-width: 0;
@@ -408,8 +421,8 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--palette-rose) 13%, var(--menu-surface));
-  color: color-mix(in srgb, var(--menu-foreground) 60%, var(--palette-rose));
+  background: var(--navigation-icon-surface);
+  color: var(--navigation-icon-ink);
   box-shadow: none;
 }
 .navigation .iconTile > svg {
@@ -600,21 +613,23 @@
   border-top-color: var(--border);
 }
 .navigation .footerCopy {
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 9.5px;
   line-height: 1.5;
+  opacity: 0.7;
 }
-/* Extends behind half a link; decoration never covers or intercepts menu text. */
+/* The final trace of pigment meets the footer separator, rather than the links. */
 .navigation .footer::before {
   position: absolute;
   z-index: -1;
   inset-inline: -7px;
   bottom: -7px;
-  height: calc(100% + var(--navigation-item-height) / 2 + 15px);
+  height: calc(100% + 7px);
   border-radius: 0 0 19px 19px;
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--palette-rose) 14%, transparent) 0% 46%,
+    color-mix(in srgb, var(--palette-rose) 14%, transparent) 0% 55%,
+    color-mix(in srgb, var(--palette-rose) 6%, transparent) 82%,
     transparent 100%
   );
   content: "";
@@ -669,10 +684,61 @@
   white-space: nowrap;
 }
 .footerLink > svg {
-  width: 7.5px;
-  height: 7.5px;
+  width: 0.9em;
+  height: 0.9em;
   flex: none;
-  opacity: 0.5;
+  opacity: 1;
+}
+
+.navigationBody {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* A modal viewport on phones; the desktop menu keeps its anchor geometry. */
+.popup.navigation.mobileDialog {
+  --navigation-surface: color-mix(
+    in srgb,
+    var(--menu-surface) 68%,
+    var(--palette-black)
+  );
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  width: min(400px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: min(
+    740px,
+    calc(
+      100dvh -
+        max(24px, env(safe-area-inset-top) + env(safe-area-inset-bottom) + 24px)
+    )
+  );
+  gap: 0;
+  padding: 6px;
+  translate: -50% -50%;
+  transform: none;
+  animation: none;
+}
+
+.popup.navigation.mobileDialog:is([data-starting-style], [data-ending-style]) {
+  opacity: 0;
+  transform: translateY(8px) scale(0.975);
+}
+
+.mobileDialog .subtitle,
+.mobileDialog .description,
+.mobileDialog .detail,
+.mobileDialog .footerNote,
+.mobileDialog .footerCopy {
+  color: color-mix(
+    in srgb,
+    var(--menu-foreground) 90%,
+    var(--navigation-surface)
+  );
 }
 .footerLink[data-highlighted],
 .footerLink:focus-visible {
@@ -915,5 +981,8 @@
   .navigation .scrollArea {
     flex: none;
     overflow: visible;
+  }
+  .mobileDialog .navigationBody {
+    flex: none;
   }
 }
