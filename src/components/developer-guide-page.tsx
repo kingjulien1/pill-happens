@@ -884,48 +884,48 @@ export function DeveloperGuidePage() {
             >
               <p>
                 The journal directory contains Today, Journal, Past Days,
-                Medications, Goals and Getting Started Guide. The 420px panel
-                caps at viewport width minus 24px. Its Charcoal/Mint logo tile
-                is 48px with 15px corners and 36px artwork, exactly 75% of its
-                former dimensions. Tablet carriers and choreography use
-                percentages, so their travel and glyphs shrink proportionally
-                while the 4.8-second loop remains unchanged. Your Journal keeps
-                its 22px/700 title beside the logo, with the existing subtitle.
+                Medications, Goals and Getting Started Guide. From 768px it uses
+                an anchored 350px Base UI menu, capped at the viewport width
+                minus 24px, with arrow-key navigation and typeahead. Below 768px
+                it uses a real centered Dialog, up to 400px wide within the same
+                viewport clearance. Its native anchors retain ordinary link
+                behavior, while the modal owns focus containment, background
+                scroll locking, and real DialogTitle, DialogDescription and
+                DialogClose controls.
               </p>
               <p>
-                Appearance sits beside Close in the navigation masthead;
-                repository and installation shortcuts no longer occupy this row.
-                Both controls match the page navigation trigger: 46px squares,
-                23px glyphs and 14px corners at every breakpoint and in both
-                themes. One grid row places the logo, flexible title/subtitle
-                and right-aligned controls on the same top edge. Whole-word
-                wrapping keeps narrow copy readable; below 360px the title uses
-                19px and the grid gaps use 6px. Neighbor control gaps remain
-                4px, with another 4px before Close. Bottom padding is 16px, four
-                more than before. The inset introductory separator is 2px thick
-                with 28% foreground opacity, stronger than the shared menu edge.
-                Normally only destinations scroll between the masthead and
-                footer; at viewport heights of 560px or less, the complete menu
-                becomes one scroll area so controls cannot hide later links or
-                footer actions.
+                The panel masthead uses a 43.2px logo tile with 32.4px BrandMark
+                artwork and 13.5px corners, preserving the three-quarter artwork
+                proportion. Its surface and ink come from the same tonal
+                Rose/menu roles as the destination tiles. Tablet carriers retain
+                their percentage geometry and 4.8-second loop. Your Journal uses
+                17px/650 text, reducing to 16px below 360px, with 10px
+                supporting copy. Appearance and Close sit opposite it on the
+                same centered grid row with 44px targets, 17px glyphs, 12px
+                corners and a 4px gap. The inset introductory separator stays
+                inside the panel’s compact masthead.
               </p>
               <p>
-                Main links retain 44px Black/White navigation artwork and a 28px
-                trailing rail. Selected and hovered rows use the shared Indigo
-                menu family, with a restrained Lilac wash. Resting, hovered and
-                selected states remain distinct without a separate warning-like
-                stripe. Decorative fields stay behind text, preserve a complete
-                first paint and stop moving for reduced motion.
+                The mobile Dialog derives its own{" "}
+                <code>--navigation-surface</code> from 68% semantic menu surface
+                and 32% foundation Black in both modes. Destination tiles and
+                state fills derive from that darker base. This local recipe
+                leaves the canonical menu roles available to the separate
+                Appearance popup. Normally only destinations scroll between the
+                masthead and footer; at viewport heights of 560px or less, the
+                full navigation becomes one scroll owner so every destination
+                and footer action remains reachable.
               </p>
               <p>
-                Selected and hovered rows paint both rims inward on an absolute,
-                pointer-inert layer. Selection adds no layout border: width,
-                padding and the 68px link height stay unchanged. The outer band
-                is quieter than the thin inner edge. Keyboard focus remains
-                independently visible. ArrowUpRight is 19.5px at 65% visibility;
-                the current-page CircleCheck stays 26px with its draw animation.
-                Leading icon weight is consistent, and historical days select
-                Past Days.
+                Destination rows are 48px high with 12px corners, 32px leading
+                tiles and 20px artwork. Their 20px trailing rail holds a 16px
+                ArrowUpRight or an 18px current-page CircleCheck. Selected and
+                hovered rows use tonal Rose/Lilac fields above the resolved
+                navigation surface; hover uses half the active-hover field
+                opacity. These pointer-inert fields stay behind text, preserve
+                their first paint and add no layout border. Keyboard focus
+                remains independently visible, historical days select Past Days,
+                and reduced motion keeps decoration still.
               </p>
               <p>
                 Streaks is not listed in the navigation menu. The existing
@@ -938,26 +938,47 @@ export function DeveloperGuidePage() {
               <p>
                 The footer retains one nonwrapping link row: Backups &amp;
                 Export left, Report a Bug exactly centered and Developer Guide
-                right. Muted 9px copy uses 7.5px trailing arrows at 50%
-                visibility. Labels can truncate while accessible names remain
-                complete. The separator above these links uses the shared accent
-                at restrained opacity. The helper paragraph starts 10px below
-                and always clamps to two lines at every breakpoint. Its
-                decoration is a pointer-inert bottom theme wash, held through
-                46% of its height, then gradually fading to 0. The top reaches
-                halfway into the final 68px link: the footer’s measured CSS
-                height plus 34px and its existing 8px margin/7px gutter
-                determine the extension. The overlay sits behind content and
-                adds no hit target or layout height. The 352px Appearance popup
-                is a click-open Base UI submenu with its existing choices and
-                compact interior controls. Selecting a theme leaves both menus
-                open. Its Close or Escape dismisses only Appearance and returns
-                focus to its masthead trigger; another Escape closes navigation
-                and returns focus to the page trigger. Closing navigation or
-                pressing outside dismisses the submenu too. Base UI owns arrow
-                keys, typeahead, collision placement and focus return; native
-                links retain modified clicks and header actions follow DOM
-                order.
+                right. Their contextual CloudDownload, BugPlay and Braces glyphs
+                measure 0.9em and inherit the text’s full color with no extra
+                icon-opacity multiplier. Labels can truncate while accessible
+                names remain complete. The helper paragraph starts 12px below
+                the link row, uses 70% opacity and clamps to two lines. Its
+                pointer-inert bottom wash measures the footer height plus 7px
+                and ends 7px below it, so the transparent top meets the footer
+                separator instead of extending into the final destination. The
+                wash holds a 14% Rose tint through 55%, drops to 6% at 82% and
+                reaches zero at its top; it adds no hit target or layout height.
+              </p>
+              <p>
+                Navigation keys its host by pathname and responsive layout. A
+                route or breakpoint change therefore closes the old host, while
+                one shared trigger ref points focus return at the live page
+                control. Following a destination skips that return so it cannot
+                steal focus from the arriving page. Native links preserve
+                modified clicks; desktop menu items retain typeahead, and mobile
+                links use ordinary Tab navigation.
+              </p>
+              <p>
+                AppearanceMenu defaults to a desktop Menu.SubmenuRoot;
+                navigation passes <code>nested</code> false for a standalone
+                nonmodal Menu.Root inside the mobile Dialog. The default
+                Menu.Portal stays associated with the Dialog portal. The popup
+                is 320px wide within viewport clearance, with a 60px masthead,
+                52px option rows and 44px trigger/Close targets; Close keeps a
+                smaller 28px visible face. Its own semantic menu surface remains
+                separate from the darker mobile navigation recipe. Light, Dark
+                and Follow Your Device retain their radio checks, palette
+                samples and browser preference persistence.
+              </p>
+              <p>
+                Selecting a theme keeps Appearance and navigation open.
+                Appearance’s Close or Escape dismisses only that popup and
+                returns focus to its masthead trigger; another Escape closes the
+                parent menu or mobile Dialog and returns focus to the live page
+                trigger. Closing navigation or pressing outside dismisses the
+                Appearance popup too. Base UI retains radio arrow-key handling,
+                collision placement and the layered focus behavior in both
+                hosts.
               </p>
             </Detail>
             <Detail
@@ -1273,13 +1294,15 @@ export function DeveloperGuidePage() {
                 its layered background value. These scoped rules account for
                 BrandMark’s inline palette, so its nested artwork cannot retain
                 the old Pink by accident. The navigation glyph follows the same
-                mug foreground. Menu and sign-in branding keep their separate
-                palette; the loading core retains the main action’s face and
-                Purple 700 edge. The header mark measures 34.5px in its 46px
-                control, preserving the menu logo’s 48px/64px ratio. Orbit,
-                approach and spin still share the same base keyframes. A
-                7.2-second header cycle runs at two-thirds of the menu’s
-                4.8-second speed, with unchanged endpoint geometry.
+                mug foreground. The menu masthead uses its destination tiles’
+                surface and ink, while sign-in branding keeps its own palette;
+                the loading core retains the main action’s face and Purple 700
+                edge. The page header mark stays 34.5px in its 46px control. The
+                panel masthead’s separate 32.4px/43.2px pair keeps the same
+                three-quarter ratio. Orbit, approach and spin still share the
+                same base keyframes. A 7.2-second header cycle runs at
+                two-thirds of the menu’s 4.8-second speed, with unchanged
+                endpoint geometry.
               </p>
               <p>
                 Fine-pointer hover adds exactly 1/18 to the header tablet speed:
