@@ -481,9 +481,9 @@ export function DeveloperGuidePage() {
                 controls, toolbar actions, links and guide utilities do not
                 receive intake decoration. Primary, Accent and
                 DialogPrimaryButton explicitly select the intake appearance for
-                main actions, with its opaque Purple/canvas face, Violet inner
-                edge and quiet Pink/Purple/Fuchsia perimeter. Only that
-                appearance uses the coffee tile’s base pigment through
+                main actions, with its opaque Purple/canvas face, Purple 700
+                inner edge and quiet Pink/Purple/Fuchsia perimeter. Only that
+                appearance uses Purple 500 at 75% color alpha through
                 <code> --daily-action-secondary-ink</code>. SecondaryButton uses
                 a quiet tonal surface paired with its semantic foreground.
                 Standard filled actions use <code>--action-background</code> /{" "}
@@ -803,9 +803,9 @@ export function DeveloperGuidePage() {
                 with a 40% Purple 950 tint. Its solid surface omits decorative
                 background layers; the independent specular rim uses nearby
                 Pink, Purple and Fuchsia shades at 30% opacity for a quieter
-                moving edge. A Violet 700 inner band remains distinct beneath
+                moving edge. A Purple 700 inner band remains distinct beneath
                 it. Text follows the page foreground, while the icons and “Jot
-                it!” use the coffee tile’s base pigment in both modes. Native
+                it!” use Purple 500 at 75% color alpha in both modes. Native
                 behavior and the existing entry animation remain attached to the
                 same control. Primary, Accent and dialog submission adapters
                 explicitly opt into this main-action paint. Standard compact
@@ -1060,7 +1060,7 @@ export function DeveloperGuidePage() {
                 through
                 <code> --daily-action-face</code> without the old field, glaze
                 or tint components. The shared
-                <code> --daily-action-inner-edge</code> supplies Violet 700. Its
+                <code> --daily-action-inner-edge</code> supplies Purple 700. Its
                 crisp 2px band runs from 6.5px to 8.5px inside the face, leaving
                 a 1px gap after the moving 5.5px outer rim. That rim is about
                 83.3% thicker than its former 3px width; its 30% opacity and
@@ -1079,22 +1079,20 @@ export function DeveloperGuidePage() {
               <p>
                 The main label uses the page foreground. The Tablets mark, arrow
                 and aside use
-                <code> --daily-action-secondary-ink</code>: the coffee tile’s
-                base, mixed from #4e456e at 94% and Rose at 6%, approximately
-                #584b74. This is the tile’s base color, not its mug glyph or
-                radial reflections. The aside retains 94% visibility. The
-                optional pills variant of IntakeLogSymbol uses a 23px Lucide
-                Tablets glyph at 2.5 stroke, with no spark. Its 5px left shift
-                stays independent of the existing entry transforms. The same
-                button primitive retains the click action, focus and disabled
-                behavior. PrimaryButton and Accent explicitly request intake
-                paint through the shared Button host. SecondaryButton keeps its
-                supporting geometry with a quiet tonal surface and inherited
-                semantic ink; ordinary controls retain their own variants.
-                Desktop places the section 44px after the entries with 20px
-                bottom padding. Mobile uses{" "}
-                <code>max(0px, env(safe-area-inset-bottom))</code> for bottom
-                clearance, with a 4px minimum in short landscape windows.
+                <code> --daily-action-secondary-ink</code>: Purple 500 #ad46ff
+                with 75% alpha encoded in the color itself. The aside and icon
+                elements add no further opacity multiplier. The optional pills
+                variant of IntakeLogSymbol uses a 23px Lucide Tablets glyph at
+                2.5 stroke, with no spark. Its 5px left shift stays independent
+                of the existing entry transforms. The same button primitive
+                retains the click action, focus and disabled behavior.
+                PrimaryButton and Accent explicitly request intake paint through
+                the shared Button host. SecondaryButton keeps its supporting
+                geometry with a quiet tonal surface and inherited semantic ink;
+                ordinary controls retain their own variants. Desktop places the
+                section 44px after the entries with 20px bottom padding. Mobile
+                uses <code>max(0px, env(safe-area-inset-bottom))</code> for
+                bottom clearance, with a 4px minimum in short landscape windows.
               </p>
               <p>
                 IntakeAction reserves its final geometry before its own
@@ -1201,15 +1199,14 @@ export function DeveloperGuidePage() {
                 control or popover. Both page controls are 46px squares with
                 23px glyphs and 14px corners, about 39% larger than their former
                 33px / 16.5px geometry. The two controls anchor opposite edges
-                of the shared header. Both controls share the main action’s
-                <code> --daily-action-face</code>: an opaque canvas mixed with
-                40% Purple 950. Their icons and opaque 2.5px borders use
-                <code> --daily-action-inner-edge</code>, the same Violet 700 as
-                the action’s inner band. The 24px backdrop blur, faint
-                decorative rim and separate keyboard focus stay intact. Hover,
-                focus and open states keep this paint in both themes.
-                Menu-specific layouts determine each popup’s interior
-                dimensions.
+                of the shared header. Both controls use the coffee icon tile’s
+                full <code>--check-in-art-surface</code>: Rose and Iris radial
+                reflections over its solid base. Their icons and opaque 2.5px
+                borders share the mug’s <code>--check-in-mug-ink</code>,
+                #c1b6cc. The 24px backdrop blur, faint decorative rim and
+                separate keyboard focus stay intact. Hover, focus and open
+                states keep this paint in both themes. Menu-specific layouts
+                determine each popup’s interior dimensions.
               </p>
               <p>
                 After shared page-entry readiness, two separate layout wrappers
@@ -1226,15 +1223,16 @@ export function DeveloperGuidePage() {
                 transforms and tablet loops stay on their existing inner owners.
               </p>
               <p>
-                Header tablet circles use Violet 700 for both fill and stroke;
-                their scores use the shared action face. These scoped rules
-                account for BrandMark’s inline palette, so its nested artwork
-                cannot retain the old Pink by accident. The navigation glyph
-                follows the same Violet foreground. Menu branding keeps its
-                separate palette; the loading core now consumes the shared
-                daily-action face and edge too. The header mark measures 34.5px
-                in its 46px control, preserving the menu logo’s 48px/64px ratio.
-                Orbit, approach and spin still share the same base keyframes. A
+                Header tablet circles use the opaque mug ink for fill and
+                stroke; their scores use the solid coffee-tile base rather than
+                its layered background value. These scoped rules account for
+                BrandMark’s inline palette, so its nested artwork cannot retain
+                the old Pink by accident. The navigation glyph follows the same
+                mug foreground. Menu and sign-in branding keep their separate
+                palette; the loading core retains the main action’s face and
+                Purple 700 edge. The header mark measures 34.5px in its 46px
+                control, preserving the menu logo’s 48px/64px ratio. Orbit,
+                approach and spin still share the same base keyframes. A
                 7.2-second header cycle runs at two-thirds of the menu’s
                 4.8-second speed, with unchanged endpoint geometry.
               </p>
@@ -1267,7 +1265,7 @@ export function DeveloperGuidePage() {
                 timers.
               </p>
               <p>
-                Both page controls keep the same opaque Violet base edge while
+                Both page controls keep the same opaque mug-colored edge while
                 resting, hovered, focused, open or pulled. A separate inset edge
                 and outer halo provide the refresh control’s ready feedback. The
                 2.5px border geometry, 8% blurred decorative rim at 0.8px blur
@@ -1275,8 +1273,8 @@ export function DeveloperGuidePage() {
                 reads a local surface override in every interaction state,
                 keeping its background aligned with navigation without changing
                 the palette of other branding components. The coffee mug keeps
-                its separate <code> --check-in-mug-ink</code> token and original
-                literal fallback.
+                its unchanged <code> --check-in-mug-ink</code> token and
+                original literal fallback.
               </p>
               <p>
                 Visibility, reduced-motion, offscreen and refresh-unavailable
@@ -1351,9 +1349,9 @@ export function DeveloperGuidePage() {
                 ripples, a shockwave, eight individually colored rays and inner
                 pops retain their compact celebration choreography and existing
                 Pink reflection aliases. The page refresh glyph, filled pills
-                and base border use Violet 700, with the shared daily-action
-                face behind the pills and in their scores. Shared
-                getBrandThemeStyle() aliases continue to color the other
+                and base border use the mug’s #c1b6cc ink, with the coffee tile
+                surface behind the pills and its solid base in their scores.
+                Shared getBrandThemeStyle() aliases continue to color the other
                 branding contexts, including their glow, corona, sheen and
                 animated accents. The loading curtain has its own scoped Violet
                 spark palette. Opacity, geometry and every existing animation
@@ -1440,12 +1438,13 @@ export function DeveloperGuidePage() {
               <p>
                 The shared divider matches the topbar’s full padded width,
                 including both guides’ wider content caps. Its 2px thickness and
-                32%-opacity canvas foreground stay consistent across the middle;
-                a 0.35px blur softens the line over a 12px standard/Safari
-                backdrop blur. Only the first and last clamp(18px, 5%, 32px)
-                fade to transparent, preserving its quiet glass edge. Existing
-                16px vertical clearance increases to 20px from 640px, with
-                safe-area padding and guide sidebar offsets unchanged.
+                20.8%-opacity canvas foreground stay consistent across the
+                middle, a 35% relative visibility reduction from 32%; a 0.35px
+                blur softens the line over a 12px standard/Safari backdrop blur.
+                Only the first and last clamp(18px, 5%, 32px) fade to
+                transparent, preserving its quiet glass edge. Existing 16px
+                vertical clearance increases to 20px from 640px, with safe-area
+                padding and guide sidebar offsets unchanged.
               </p>
               <p>
                 Appearance is a browser preference, separate from journal data.
@@ -1478,9 +1477,9 @@ export function DeveloperGuidePage() {
                 starts with 57.5px artwork; the face’s 1.25× spring and nested
                 1.14× icon scale compound to 81.9375px in the charged pose. The
                 core face matches the main action’s 40% Purple 950 / opaque
-                canvas mix; its edge and tablet use Violet 700, with nearby
+                canvas mix; its edge and tablet use Purple 700, with nearby
                 Violet and Purple spark tones. Critical CSS supplies the exact
-                prepaint fallbacks: Purple 950 #3c0366, Violet 700 #7008e7,
+                prepaint fallbacks: Purple 950 #3c0366, Purple 700 #8200db,
                 light canvas #fbfafd and dark canvas #2b233e. The full-screen
                 paper follows the system canvas rather than the tinted core.
                 System and explicit appearance rules keep that paint stable
@@ -1980,13 +1979,13 @@ export function DeveloperGuidePage() {
                 AccentButton, explicitly selecting intake appearance on the
                 shared Button host and keeping 14.25px/700 foreground text and
                 matching 22px PencilSparkles/ArrowRight glyphs at a 2.5 stroke.
-                The label inherits the resolved foreground; its icons use
-                mug-base secondary ink. The wrapper multiplies actual responsive
-                Accent height by 0.74, then derives its corners from the fixed
-                21/80 design ratio. Heights therefore run from 53.28px to
-                56.055px and default radii from 13.986px to 14.7144375px. This
-                changes layout geometry rather than scaling a finished button.
-                Standalone Accent actions remain 72–75.75px high with
+                The label inherits the resolved foreground; its icons use Purple
+                500 secondary ink at 75% alpha. The wrapper multiplies actual
+                responsive Accent height by 0.74, then derives its corners from
+                the fixed 21/80 design ratio. Heights therefore run from 53.28px
+                to 56.055px and default radii from 13.986px to 14.7144375px.
+                This changes layout geometry rather than scaling a finished
+                button. Standalone Accent actions remain 72–75.75px high with
                 18.9–19.884375px corners; page-level Add a Medication instead
                 shares Today’s 74px height, 19.425px radius and internal
                 label/icon/arrow spacing. Save Medication retains the compact
@@ -2849,7 +2848,7 @@ export function DeveloperGuidePage() {
                   height retains the shared responsive increments and its 18px
                   radius. This supporting launcher uses a quiet semantic
                   secondary surface and paired foreground, without an animated
-                  perimeter, intake glow or mug-base action ink. Its layout and
+                  perimeter, intake glow or Purple action ink. Its layout and
                   writer behavior stay intact. Decorative journal-icon paint
                   keeps its earlier palette through a separate artwork helper.
                   The surrounding journal-panel backgrounds and decorations
