@@ -1,0 +1,69 @@
+.badge {
+  --status-tone: var(--color-emerald-400, #00d492);
+  --status-ink: var(--color-emerald-300, #5ee9b5);
+  --status-rim: color-mix(in srgb, var(--status-tone) 32%, transparent);
+  display: inline-flex;
+  width: fit-content;
+  height: 18px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--status-tone) 14%, transparent);
+  color: var(--status-ink);
+  box-shadow: inset 0 0 0 1px var(--status-rim);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: none;
+}
+
+.badge[data-notification-status="error"] {
+  --status-tone: var(--color-rose-400, #ff637e);
+  --status-ink: var(--color-rose-300, #ffa1ad);
+}
+
+.badge[data-notification-status="warning"] {
+  --status-tone: var(--color-amber-400, #ffb900);
+  --status-ink: var(--color-amber-200, #fee685);
+}
+
+.badge[data-notification-status="info"] {
+  --status-tone: var(--color-sky-400, #00bcff);
+  --status-ink: var(--color-sky-300, #74d4ff);
+}
+
+.badge[data-notification-status="loading"] {
+  --status-tone: var(--color-violet-400, #a684ff);
+  --status-ink: var(--color-violet-200, #ddd6ff);
+}
+
+.badge[data-notification-status="update"] {
+  --status-tone: var(--color-fuchsia-400, #ed6aff);
+  --status-ink: var(--color-fuchsia-200, #f6cfff);
+}
+
+/* The wrapper avoids Badge's direct-child SVG size rule without overriding it. */
+.glyph {
+  display: inline-flex;
+  width: 9.5px;
+  height: 9.5px;
+  flex: 0 0 9.5px;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.glyph > svg {
+  display: block;
+  width: 9.5px;
+  height: 9.5px;
+  flex-shrink: 0;
+  color: inherit;
+  pointer-events: none;
+}
