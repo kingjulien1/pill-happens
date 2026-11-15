@@ -3,6 +3,10 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { format } from "prettier";
 import {
+  APP_CANVAS_BASE,
+  APP_CANVAS_BACKGROUND,
+  APP_CANVAS_FOREGROUND,
+  APP_CANVAS_MUTED_FOREGROUND,
   APP_BACKGROUND_COLORS,
   APP_BACKGROUND_COLORS_BY_MODE,
   APP_FOUNDATION,
@@ -16,6 +20,7 @@ import {
   mixAppColors,
   renderAppThemeCss,
   withAppAlpha,
+  type AppThemeHex,
 } from "./app-theme";
 
 const channels = (hex: string) =>
@@ -82,6 +87,8 @@ test("the stable foundation and related harmony pigments supply unique paired se
 test("small copy clears 4.5:1 contrast on its intended solid surfaces in each mode", () => {
   const pairs = [
     ["background", "foreground"],
+    ["canvas-background", "canvas-foreground"],
+    ["canvas-background", "canvas-muted-foreground"],
     ["card", "card-foreground"],
     ["popover", "popover-foreground"],
     ["muted", "muted-foreground"],
@@ -188,6 +195,7 @@ const readingSurfaces = [
 test("Plum glass keeps opaque normal copy readable after alpha compositing in both modes", () => {
   for (const mode of ["light", "dark"] as const) {
     const backgrounds = [
+      APP_CANVAS_BASE,
       ...APP_BACKGROUND_COLORS_BY_MODE[mode],
       // Nested glass can also sit on either neutral or a chosen medication color.
       APP_FOUNDATION.black,
@@ -216,7 +224,10 @@ test("Plum glass keeps opaque normal copy readable after alpha compositing in bo
         );
       }
     }
-    for (const behind of APP_BACKGROUND_COLORS_BY_MODE[mode]) {
+    for (const behind of [
+      APP_CANVAS_BASE,
+      ...APP_BACKGROUND_COLORS_BY_MODE[mode],
+    ]) {
       for (const surface of [
         "empty-intake-wash",
         "empty-intake-hover",
@@ -344,69 +355,62 @@ test("generated application and offline CSS match the documented registry", asyn
     ] as const) {
       assert.ok(output.includes(`--${id}: ${APP_THEME_VALUES[mode][id]};`));
     }
-    assert.ok(
-      offline.includes(`content="${APP_THEME_VALUES[mode].background}"`),
-    );
+    assert.ok(offline.includes(`content="${APP_CANVAS_BASE}"`));
   }
 });
 
-test("mode-aware ramps and canvas copy remain readable throughout the moving field", () => {
+test("static canvas keeps both copy roles readable at the brightest possible highlight overlap", () => {
+  assert.equal(APP_CANVAS_BASE, "#29213b");
+  assert.equal(
+    APP_CANVAS_BASE,
+    mixAppColors(APP_FOUNDATION.plum, APP_FOUNDATION.black, 0.92),
+  );
+  assert.equal(
+    (APP_CANVAS_BACKGROUND.match(/radial-gradient/g) ?? []).length,
+    3,
+  );
+  assert.ok(APP_CANVAS_BACKGROUND.endsWith(APP_CANVAS_BASE));
+  // White is a conservative brightness bound for any of the three pigments.
+  let brightest: AppThemeHex = APP_CANVAS_BASE;
+  for (const alpha of [0.055, 0.045, 0.035])
+    brightest = mixAppColors(APP_FOUNDATION.white, brightest, alpha);
+  for (const mode of ["light", "dark"] as const) {
+    assert.equal(APP_THEME_VALUES[mode]["canvas-background"], APP_CANVAS_BASE);
+    assert.equal(
+      APP_THEME_VALUES[mode]["canvas-foreground"],
+      APP_CANVAS_FOREGROUND,
+    );
+    assert.equal(
+      APP_THEME_VALUES[mode]["canvas-muted-foreground"],
+      APP_CANVAS_MUTED_FOREGROUND,
+    );
+    for (const background of [APP_CANVAS_BASE, brightest])
+      for (const copy of [
+        "canvas-foreground",
+        "canvas-muted-foreground",
+      ] as const)
+        assert.ok(contrast(APP_THEME_VALUES[mode][copy], background) >= 4.5);
+  }
+});
+
+test("legacy optional Grainient ramps retain their mode-aware compatibility data", () => {
   assert.equal(APP_BACKGROUND_COLORS, APP_BACKGROUND_COLORS_BY_MODE.dark);
-  assert.equal(APP_THEME_VALUES.dark.background, APP_FOUNDATION.plum);
-  assert.equal(
-    APP_THEME_VALUES.light["canvas-foreground"],
-    APP_FOUNDATION.black,
-  );
-  assert.equal(
-    APP_THEME_VALUES.dark["canvas-foreground"],
-    APP_FOUNDATION.white,
-  );
   assert.notDeepEqual(
     APP_BACKGROUND_COLORS_BY_MODE.light,
     APP_BACKGROUND_COLORS_BY_MODE.dark,
   );
-  const rampRoles = [
+  const roles = [
     "ambient-edge",
     "ambient-far",
     "ambient-mid",
     "ambient-near",
     "ambient-center",
   ] as const;
-  for (const mode of ["light", "dark"] as const) {
-    const ramp = APP_BACKGROUND_COLORS_BY_MODE[mode];
-    assert.equal(ramp.length, 5);
+  for (const mode of ["light", "dark"] as const)
     assert.deepEqual(
-      ramp,
-      rampRoles.map((id) => APP_THEME_VALUES[mode][id]),
+      APP_BACKGROUND_COLORS_BY_MODE[mode],
+      roles.map((id) => APP_THEME_VALUES[mode][id]),
     );
-    // Test every blend of adjacent stops, not just endpoints. The overlay and
-    // center scrim must preserve the same text contrast when composed above it.
-    for (let segment = 0; segment < ramp.length - 1; segment++) {
-      for (let step = 0; step <= 10; step++) {
-        const base = mixAppColors(ramp[segment], ramp[segment + 1], step / 10);
-        const veil = composite(APP_THEME_VALUES[mode]["ambient-overlay"], base);
-        const scrim = composite(
-          APP_THEME_VALUES[mode]["ambient-center-scrim"],
-          veil,
-        );
-        for (const background of [base, veil, scrim]) {
-          for (const copy of [
-            "canvas-foreground",
-            "canvas-muted-foreground",
-          ] as const) {
-            const resolvedCopy = composite(
-              APP_THEME_VALUES[mode][copy],
-              background,
-            );
-            assert.ok(
-              contrast(resolvedCopy, background) >= 4.5,
-              `${mode} ${copy} on ${background}`,
-            );
-          }
-        }
-      }
-    }
-  }
 });
 
 test("palette mixtures and alpha export have stable, clamped endpoints", () => {

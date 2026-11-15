@@ -48,6 +48,7 @@
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-action-foreground: var(--action-foreground);
+  --color-canvas-background: var(--canvas-background);
   --color-canvas-foreground: var(--canvas-foreground);
   --color-canvas-muted-foreground: var(--canvas-muted-foreground);
   --radius-sm: calc(var(--radius) - 4px);
@@ -100,12 +101,13 @@
   html {
     /* Keep the viewport as Base UI's scroll-lock target, including in Safari. */
     overflow-y: auto;
-    background-color: var(--background);
+    background-color: var(--app-canvas-base);
     overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply font-sans text-foreground antialiased;
+    background-color: var(--app-canvas-base);
     position: relative;
     isolation: isolate;
     margin: 0;
@@ -170,126 +172,11 @@
 
 .ambient {
   position: fixed;
-  inset: 0 0 auto;
-  height: 100vh;
-  height: 100lvh;
+  inset: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  filter: brightness(1);
-  /* Exact shared ramp remains visible before hydration or without WebGL. */
-  background: radial-gradient(
-    ellipse at 50% 45%,
-    var(--ambient-center),
-    var(--ambient-near) 24%,
-    var(--ambient-mid) 45%,
-    var(--ambient-far) 70%,
-    var(--ambient-edge)
-  );
-}
-.ambient::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  /* Light-mode veils remain; dark-mode theme tokens are fully transparent. */
-  background:
-    radial-gradient(
-      ellipse at 50% 45%,
-      var(--ambient-center-scrim),
-      transparent 70%
-    ),
-    var(--ambient-overlay);
-}
-/* The clipped field never moves; only its overscanned color layers drift.
-   Dark mode below retains bright highlights without the Indigo/Plum veil. */
-.ambient-depth {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  overflow: hidden;
-  background: #1e1a4d;
-  opacity: 0.6;
-  pointer-events: none;
-}
-.ambient-depth::before {
-  content: "";
-  position: absolute;
-  inset: -18%;
-  background:
-    /* The diagonal echo is 45% quieter: 6% × 0.55 = 3.3%. */
-    radial-gradient(
-      ellipse at 32% 16%,
-      color-mix(in srgb, var(--palette-rose) 3.3%, transparent),
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse at 68% 84%,
-      color-mix(in srgb, var(--palette-rose) 6%, transparent),
-      transparent 68%
-    ),
-    radial-gradient(ellipse at 18% 24%, #2f0d68, #2f0d6800 62%),
-    radial-gradient(ellipse at 82% 76%, #2a212c, #2a212c00 66%),
-    radial-gradient(ellipse at 68% 12%, #1e1a4d, #1e1a4d00 58%),
-    conic-gradient(
-      from 35deg at 47% 52%,
-      #1e1a4d,
-      #2a212c 110deg,
-      #2f0d68 230deg,
-      #1e1a4d
-    );
-  transform: translate3d(-2%, 2%, 0) scale(1.04);
-}
-@media (prefers-color-scheme: dark) {
-  /* Reveal the original field; only the existing bright Rose echoes remain. */
-  .ambient::after {
-    content: none;
-  }
-  .ambient-depth {
-    background: transparent;
-  }
-  .ambient-depth::before {
-    background:
-      radial-gradient(
-        ellipse at 32% 16%,
-        color-mix(in srgb, var(--palette-rose) 3.3%, transparent),
-        transparent 68%
-      ),
-      radial-gradient(
-        ellipse at 68% 84%,
-        color-mix(in srgb, var(--palette-rose) 6%, transparent),
-        transparent 68%
-      );
-  }
-}
-@media (prefers-color-scheme: light) {
-  .ambient-depth {
-    /* Keep small canvas copy readable while staying close to the shared 60% veil. */
-    opacity: 0.56;
-  }
-  body {
-    /* Bare canvas copy uses opaque ink; cards keep their own semantic colors.
-       The guide retains its native copy above its separate reading veil. */
-    --canvas-foreground: #000000;
-    --canvas-muted-foreground: #000000;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ambient-depth::before {
-    animation: ambient-depth-drift 68s ease-in-out infinite;
-  }
-}
-@keyframes ambient-depth-drift {
-  0%,
-  100% {
-    transform: translate3d(-2%, 2%, 0) scale(1.04);
-  }
-  38% {
-    transform: translate3d(3%, -3%, 0) scale(1.09);
-  }
-  72% {
-    transform: translate3d(-3%, -1%, 0) scale(1.02);
-  }
+  background: var(--app-canvas-background);
 }
 @keyframes enter {
   from {
@@ -621,7 +508,8 @@
     animation-play-state: var(--page-entry-play-state, running);
     will-change: transform, opacity;
   }
-  .intake-stack-measure[data-entrance-state="running"] [data-medication-icon-motion] {
+  .intake-stack-measure[data-entrance-state="running"]
+    [data-medication-icon-motion] {
     animation: intake-icon-arrive 1320ms cubic-bezier(0.22, 1, 0.36, 1)
       calc(var(--intake-enter-delay, 0ms) + 98ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
@@ -3232,8 +3120,8 @@
   }
 
   .intake-dock {
-    --intake-dock-overlay-base: var(--background);
-    --intake-dock-overlay-accent: var(--palette-apricot);
+    --intake-dock-overlay-base: var(--app-canvas-base);
+    --intake-dock-overlay-accent: var(--app-canvas-base);
     --intake-dock-overlay-base-opacity: 0.66;
     --intake-dock-overlay-accent-opacity: 0.2;
     --intake-dock-overlay-height: 160%;
@@ -3305,11 +3193,11 @@
     height: calc(var(--intake-dock-overlay-height) * 0.65);
     background: linear-gradient(
       to top,
-      #0f172a 0%,
-      #0f172ae6 20%,
-      #0f172a99 48%,
-      #0f172a38 76%,
-      #0f172a00 100%
+      var(--app-canvas-base) 0%,
+      color-mix(in srgb, var(--app-canvas-base) 90%, transparent) 20%,
+      color-mix(in srgb, var(--app-canvas-base) 60%, transparent) 48%,
+      color-mix(in srgb, var(--app-canvas-base) 22%, transparent) 76%,
+      transparent 100%
     );
     opacity: 0.55;
   }
@@ -3319,28 +3207,17 @@
     height: calc(var(--intake-dock-overlay-height) * 0.45);
     background: linear-gradient(
       to top,
-      #030712 0%,
-      #030712d9 20%,
-      #0307128c 48%,
-      #03071229 78%,
-      #03071200 100%
+      var(--app-canvas-base) 0%,
+      color-mix(in srgb, var(--app-canvas-base) 85%, transparent) 20%,
+      color-mix(in srgb, var(--app-canvas-base) 55%, transparent) 48%,
+      color-mix(in srgb, var(--app-canvas-base) 16%, transparent) 78%,
+      transparent 100%
     );
     opacity: 0.6;
   }
 
   @media (prefers-color-scheme: dark) {
     .intake-dock {
-      --intake-dock-blue: #1e40af;
-      --intake-dock-overlay-base: color-mix(
-        in srgb,
-        var(--intake-dock-blue) 20%,
-        #000
-      );
-      --intake-dock-overlay-accent: color-mix(
-        in srgb,
-        var(--intake-dock-blue) 92%,
-        #fff
-      );
       --intake-dock-overlay-base-opacity: 0.84;
       --intake-dock-overlay-accent-opacity: 0.34;
     }

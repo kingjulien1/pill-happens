@@ -93,6 +93,27 @@ export function withAppAlpha(color: AppThemeHex, opacity: number): AppThemeHex {
     .padStart(2, "0")}`;
 }
 
+/** One opaque, stationary page canvas, including critical and offline paint. */
+export const APP_CANVAS_BASE = mixAppColors(
+  APP_FOUNDATION.plum,
+  APP_FOUNDATION.black,
+  0.92,
+);
+export const APP_CANVAS_FOREGROUND = "#ffffff";
+export const APP_CANVAS_MUTED_FOREGROUND = "#ded8ec";
+export const APP_CANVAS_BACKGROUND = [
+  "radial-gradient(ellipse at 8% 0%, oklch(70.2% 0.183 293.541 / 0.055), transparent 66%)",
+  "radial-gradient(ellipse at 100% 24%, oklch(67.3% 0.182 276.935 / 0.045), transparent 68%)",
+  "radial-gradient(ellipse at 50% 100%, oklch(74% 0.238 322.16 / 0.035), transparent 70%)",
+  APP_CANVAS_BASE,
+].join(", ");
+export const APP_CANVAS_CSS = `
+  --app-canvas-base: ${APP_CANVAS_BASE};
+  --app-canvas-background: ${APP_CANVAS_BACKGROUND};
+  --app-canvas-foreground: ${APP_CANVAS_FOREGROUND};
+  --app-canvas-muted-foreground: ${APP_CANVAS_MUTED_FOREGROUND};
+`;
+
 export const APP_THEME_GROUPS = [
   {
     id: "surfaces",
@@ -128,9 +149,9 @@ export const APP_THEME_GROUPS = [
   },
   {
     id: "ambient",
-    label: "Moving Background",
+    label: "Optional Gradient Pigments",
     description:
-      "Mode-aware Plum and Lilac fields, with a restrained Apricot accent.",
+      "Legacy Grainient pigments remain available for optional examples; the page canvas uses its own static Plum surface.",
   },
   {
     id: "feedback",
@@ -176,8 +197,8 @@ export const APP_THEME_TOKENS = [
   role(
     "surfaces",
     "background",
-    "Page Base",
-    "Off-white Lilac in light mode; the shared Plum foundation in dark mode.",
+    "Foundation Surface",
+    "Mode-aware foundation for controls and layered surfaces; the visible page uses canvas-background.",
     blend(white, lilac, 0.94),
     plum,
     ["foreground"],
@@ -319,21 +340,30 @@ export const APP_THEME_TOKENS = [
   ),
   role(
     "surfaces",
+    "canvas-background",
+    "Page Canvas",
+    "Opaque deeper Plum beneath three faint, stationary Violet, Indigo and Fuchsia edge reflections in both modes.",
+    APP_CANVAS_BASE,
+    APP_CANVAS_BASE,
+    ["canvas-foreground", "canvas-muted-foreground"],
+  ),
+  role(
+    "surfaces",
     "canvas-foreground",
     "Canvas Copy",
-    "Black on the light animated field; White on the dark Plum field.",
-    black,
-    white,
-    ["ambient-center"],
+    "Opaque light copy on the shared static dark page canvas in either appearance.",
+    APP_CANVAS_FOREGROUND,
+    APP_CANVAS_FOREGROUND,
+    ["canvas-background"],
   ),
   role(
     "surfaces",
     "canvas-muted-foreground",
     "Secondary Canvas Copy",
-    "Opaque, mode-aware secondary copy stays readable across the entire moving field.",
-    blend(plum, white, 0.76),
-    blend(white, lilac, 0.58),
-    ["ambient-center"],
+    "A readable pale Lilac counterpart for secondary copy on the static dark page canvas.",
+    APP_CANVAS_MUTED_FOREGROUND,
+    APP_CANVAS_MUTED_FOREGROUND,
+    ["canvas-background"],
   ),
   role(
     "menus",
@@ -787,6 +817,7 @@ export function renderAppThemeCss() {
   return `/* Generated from src/lib/app-theme.ts. Run npm run theme:generate. */
 :root {
   color-scheme: light;
+${APP_CANVAS_CSS}
 ${Object.entries(APP_FOUNDATION)
   .map(([id, color]) => `  --palette-${id}: ${color};`)
   .join("\n")}

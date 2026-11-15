@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { Pill, RefreshCw } from "lucide-react";
+import { APP_CANVAS_CSS } from "@/lib/app-theme";
 import { PAGE_REFRESH_BOOT_SCRIPT } from "@/lib/page-refresh-handoff";
 import {
   LOADING_SCREEN_COPY,
@@ -12,7 +13,8 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
    stationary600ms release. PAGE_REFRESH_SEQUENCE owns the handoff durations.
    The46px brand world is uniformly scaled2.5; only its native spring scales vary. */
 .page-refresh-screen {
-  /* The critical fallbacks match the daily controls before app CSS arrives. */
+  ${APP_CANVAS_CSS}
+  /* Artwork retains its semantic control canvas before app CSS arrives. */
   --refresh-canvas: var(--background, #fbfafd);
   --refresh-face: var(--daily-action-face, color-mix(in srgb, var(--color-purple-950, #3c0366) 40%, var(--refresh-canvas)));
   --refresh-edge: var(--daily-action-inner-edge, var(--color-purple-700, #8200db));
@@ -66,11 +68,9 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   --refresh-paint-tone-emerald-a43: color-mix( in srgb, var(--brand-tone-emerald) calc(100% * 43 / 255), transparent );
   --refresh-paint-tone-seafoam-a31: color-mix( in srgb, var(--brand-tone-seafoam) calc(100% * 31 / 255), transparent );
   --refresh-paint-tone-pale-a20: color-mix( in srgb, var(--brand-tone-pale) calc(100% * 20 / 255), transparent );
-  --refresh-paper: var(--refresh-canvas);
-  --refresh-ink: var(--foreground, #111014);
-  --refresh-muted: color-mix(in srgb, var(--refresh-ink) 40%, transparent);
+  --refresh-ink: var(--app-canvas-foreground);
+  --refresh-muted: var(--app-canvas-muted-foreground);
   --refresh-cameo: var(--refresh-edge);
-  --refresh-wash: color-mix(in srgb, var(--refresh-edge) 8%, transparent);
   --refresh-arrival: var(--page-refresh-elapsed, 0ms);
   --refresh-threshold: calc(var(--page-refresh-elapsed, 0ms) + 1200ms);
   --refresh-loop: calc(var(--page-refresh-elapsed, 0ms) + 2160ms);
@@ -82,9 +82,7 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   box-sizing: border-box;
   place-items: center;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 42%, var(--refresh-wash), transparent 68%),
-    var(--refresh-paper);
+  background: var(--app-canvas-background);
   color: var(--refresh-ink);
   color-scheme: light;
   font-family: ui-sans-serif, system-ui, sans-serif;
@@ -376,15 +374,11 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 @media (prefers-color-scheme: dark) {
   :where(html:not([data-color-mode])) .page-refresh-screen {
     --refresh-canvas: var(--background, #2b233e);
-    --refresh-ink: var(--foreground, #fff);
-    --refresh-wash: color-mix(in srgb, var(--refresh-edge) 7%, transparent);
     color-scheme: dark;
   }
 }
 :where(html[data-color-mode="dark"]) .page-refresh-screen {
   --refresh-canvas: var(--background, #2b233e);
-  --refresh-ink: var(--foreground, #fff);
-  --refresh-wash: color-mix(in srgb, var(--refresh-edge) 7%, transparent);
   color-scheme: dark;
 }
 

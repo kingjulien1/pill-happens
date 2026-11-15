@@ -2,8 +2,9 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 import {
+  APP_CANVAS_BASE,
+  APP_CANVAS_CSS,
   APP_THEME_TOKENS,
-  APP_THEME_VALUES,
   renderAppThemeCss,
 } from "../src/lib/app-theme";
 
@@ -31,7 +32,7 @@ function offlineTheme() {
     APP_THEME_TOKENS.filter((item) => offlineRoles.has(item.id))
       .map((item) => `${item.token}: ${item[mode]};`)
       .join("\n");
-  return `:root { color-scheme: light; ${values("light")} }
+  return `:root { color-scheme: light; ${APP_CANVAS_CSS} ${values("light")} }
   @media (prefers-color-scheme: dark) { :root { color-scheme: dark; ${values("dark")} } }`;
 }
 
@@ -46,11 +47,11 @@ async function main() {
       )
       .replace(
         /content="#[a-f\d]+"(\s+media="\(prefers-color-scheme: light\)")/i,
-        `content="${APP_THEME_VALUES.light.background}"$1`,
+        `content="${APP_CANVAS_BASE}"$1`,
       )
       .replace(
         /content="#[a-f\d]+"(\s+media="\(prefers-color-scheme: dark\)")/i,
-        `content="${APP_THEME_VALUES.dark.background}"$1`,
+        `content="${APP_CANVAS_BASE}"$1`,
       ),
     { parser: "html" },
   );

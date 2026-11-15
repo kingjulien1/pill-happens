@@ -9,12 +9,12 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="theme-color"
-      content="#fbfafd"
+      content="#29213b"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#2b233e"
+      content="#29213b"
       media="(prefers-color-scheme: dark)"
     />
     <title>Offline · Pill happens</title>
@@ -22,6 +22,26 @@
       /* BEGIN GENERATED APP THEME */
       :root {
         color-scheme: light;
+        --app-canvas-base: #29213b;
+        --app-canvas-background:
+          radial-gradient(
+            ellipse at 8% 0%,
+            oklch(70.2% 0.183 293.541 / 0.055),
+            transparent 66%
+          ),
+          radial-gradient(
+            ellipse at 100% 24%,
+            oklch(67.3% 0.182 276.935 / 0.045),
+            transparent 68%
+          ),
+          radial-gradient(
+            ellipse at 50% 100%,
+            oklch(74% 0.238 322.16 / 0.035),
+            transparent 70%
+          ),
+          #29213b;
+        --app-canvas-foreground: #ffffff;
+        --app-canvas-muted-foreground: #ded8ec;
         --background: #fbfafd;
         --foreground: #111014;
         --card: #fefdfe;
@@ -52,6 +72,9 @@
       * {
         box-sizing: border-box;
       }
+      html {
+        background: var(--app-canvas-base);
+      }
       body {
         margin: 0;
         min-height: 100dvh;
@@ -59,12 +82,8 @@
         place-items: center;
         padding: max(24px, env(safe-area-inset-top)) 24px
           max(24px, env(safe-area-inset-bottom));
-        background: radial-gradient(
-          ellipse at 50% 20%,
-          color-mix(in srgb, var(--glow) 35%, var(--background)),
-          var(--background) 70%
-        );
-        color: var(--foreground);
+        background: var(--app-canvas-background);
+        color: var(--app-canvas-foreground);
         font:
           15px/1.6 ui-sans-serif,
           system-ui,
@@ -88,6 +107,7 @@
         border: 1px solid var(--border);
         border-radius: 24px;
         background: var(--card);
+        color: var(--foreground);
         text-align: center;
         box-shadow: 0 12px 40px var(--shadow);
       }
@@ -131,6 +151,7 @@
       }
       .note {
         margin-top: 18px;
+        color: var(--app-canvas-muted-foreground);
         font-size: 11px;
         text-align: center;
       }

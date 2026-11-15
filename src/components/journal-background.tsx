@@ -1,67 +1,11 @@
-"use client";
-
-import { useSyncExternalStore } from "react";
-import Grainient from "@/components/grainient";
-import { APP_BACKGROUND_COLORS_BY_MODE } from "@/lib/app-theme";
-import { getAppearanceSnapshot, subscribeAppearance } from "@/lib/appearance";
-
-const subscribe = subscribeAppearance;
-const getSnapshot = () => getAppearanceSnapshot().resolved === "dark";
-const getServerSnapshot = () => null;
-const mobileQuery = "(max-width: 767px), (pointer: coarse)";
-const subscribeMobile = (onChange: () => void) => {
-  const media = window.matchMedia(mobileQuery);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-};
-const getMobileSnapshot = () => window.matchMedia(mobileQuery).matches;
-const getServerMobileSnapshot = () => false;
-
+/** CSS-only page paint is shared with pre-hydration, loading and offline views. */
 export function JournalBackground() {
-  const dark = useSyncExternalStore<boolean | null>(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
-  const mobile = useSyncExternalStore(
-    subscribeMobile,
-    getMobileSnapshot,
-    getServerMobileSnapshot,
-  );
-
   return (
     <div
       className="ambient"
-      data-background="grainient"
-      data-motion-profile="flowing"
-      data-render-profile={mobile ? "mobile" : "desktop"}
+      data-background="static-plum"
+      data-motion-profile="static"
       aria-hidden="true"
-    >
-      {dark !== null && (
-        <Grainient
-          colors={APP_BACKGROUND_COLORS_BY_MODE[dark ? "dark" : "light"]}
-          type="radial"
-          flow={1.4}
-          variation={16}
-          speed={mobile ? 5.4 : 3.6}
-          interactive={false}
-          saturation={1.01}
-          scale={0.3}
-          framing={mobile ? "portrait" : "native"}
-          contrast={dark ? 0.92 : 1}
-          silk={0.58}
-          softness={0.96}
-          grainAmount={dark ? 0.07 : 0.055}
-          grainSize={1.2}
-          grainAnimated={false}
-          clickSwirl={false}
-          intro={false}
-          lightMode={!dark}
-          maxDpr={mobile ? 1.25 : undefined}
-          maxPixels={mobile ? 750_000 : undefined}
-        />
-      )}
-      <div className="ambient-depth" data-ambient-depth="" />
-    </div>
+    />
   );
 }

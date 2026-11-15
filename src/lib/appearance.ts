@@ -1,4 +1,4 @@
-import { APP_THEME_VALUES } from "@/lib/app-theme";
+import { APP_CANVAS_BASE } from "@/lib/app-theme";
 
 /** Device-local appearance only; it is never part of journal data or backups. */
 export const APPEARANCE_STORAGE_KEY = "pill-happens:appearance:v1";
@@ -38,8 +38,8 @@ export function resolveAppearance(
 const BOOT_CONFIG = {
   key: APPEARANCE_STORAGE_KEY,
   event: APPEARANCE_CHANGE_EVENT,
-  light: APP_THEME_VALUES.light.background,
-  dark: APP_THEME_VALUES.dark.background,
+  light: APP_CANVAS_BASE,
+  dark: APP_CANVAS_BASE,
 } as const;
 
 /** Self-contained: the same implementation runs in HEAD and in the client. */
