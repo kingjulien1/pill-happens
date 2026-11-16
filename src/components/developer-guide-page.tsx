@@ -2129,21 +2129,25 @@ export function DeveloperGuidePage() {
                 unchanged.
               </p>
               <p>
-                Groups with at least two intakes have a quiet background wash
-                matching the Reveal/Collapse face: the semantic secondary color
-                mixed at 9% with transparent. A separate background-only layer
-                sits behind the cards; the existing border and measured label
-                notch remain independent. The old group blur and medication-color
-                gradient children stay hidden, so this wash adds no drifting
-                gradient or continuous animation. Single intakes and check-in
-                cards receive no additional tint. The wash inherits the existing
-                360ms frameGather entrance fade on the group’s current beat,
-                after its exposed faces’ reserved starts, without changing the
-                scheduler. Shared page-entry pauses hold that fade, and reduced
-                motion shows the settled wash immediately. Folded cards keep 90%
-                opacity. Frame geometry, click targets, disclosure fill and its
-                existing hover/press feedback stay unchanged; reduced motion
-                still removes the control’s paint and chevron transitions.
+                Every actual intake group and Past Days week group uses the
+                same full-face glass layer: 24px backdrop blur with 1.08
+                saturation at 78% effect opacity. A separate 11% tint of the
+                coffee icon tile’s shared --check-in-art-base pigment sits above
+                the blur and below the cards; the former 9% secondary wash is
+                replaced and medication-color gradients remain hidden. The rim
+                grows from 1.5px to 2px, a one-third increase, with its extra
+                0.5px entirely outward. A -0.5px inset and 21.5px outer radius
+                preserve the previous inner edge, 8px spacing and measured card
+                bounds. The glass wrapper permits overflow while its paint child
+                retains rounded clipping. The frame’s measured disclosure notch
+                stays independent of the blur/tint and the label’s own border
+                and 44px target remain unchanged. Both group contexts inherit
+                these tokens; standalone cards and form sections keep their own
+                surfaces. The existing 360ms frameGather entrance fades the
+                decorative shell together without changing its scheduler or
+                adding a background loop. Reduced transparency disables blur;
+                reduced motion shows the settled surface. Folded cards retain
+                90% opacity and controls retain their existing feedback.
                 Header actions and nested disclosures keep their own actions.
               </p>
               <p>
@@ -2759,7 +2763,12 @@ export function DeveloperGuidePage() {
                 </li>
                 <li>
                   MorningCoffee keeps its filled cup still while three thicker
-                  steam curls travel through separate horizontal lanes. The
+                  steam curls travel through separate horizontal lanes. Their
+                  vertical coordinates use y = 29 + 0.75 × (old y − 29), making
+                  the curves 25% shorter about the mug rim while preserving X
+                  coordinates and stroke thickness. Firework tips, warmth and
+                  reveal coordinates follow the same height mapping; particle
+                  sizes, one-second reveal and lane clocks stay unchanged. The
                   1.4px guide strokes support 2.1px travelling threads, with a
                   brighter fine highlight and soft halo. Each curl finishes in a
                   small firework at its swaying tip: a bright center, soft glow
