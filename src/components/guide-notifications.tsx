@@ -403,22 +403,22 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="success">toast.success</code>,
             "Change saved",
-            "8.633s bar + 0.5s active grace · BellCheck.",
+            "8.633s bar + 1s active grace · BellCheck.",
           ],
           [
             <code key="error">toast.error</code>,
             "Action failed",
-            "8.633s bar + 0.5s active grace · CircleAlert.",
+            "8.633s bar + 1s active grace · CircleAlert.",
           ],
           [
             <code key="info">toast.info</code>,
             "Journal notice",
-            "8.633s bar + 0.5s active grace · Lightbulb.",
+            "8.633s bar + 1s active grace · Lightbulb.",
           ],
           [
             <code key="warning">toast.warning</code>,
             "Please review",
-            "8.633s bar + 0.5s active grace · TriangleAlert.",
+            "8.633s bar + 1s active grace · TriangleAlert.",
           ],
           [
             <code key="loading">toast.loading</code>,
@@ -428,7 +428,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="update">toast.update</code>,
             "Update available",
-            "8.633s bar + 0.5s active grace unless overridden · Sparkles.",
+            "8.633s bar + 1s active grace unless overridden · Sparkles.",
           ],
         ]}
       />
@@ -523,7 +523,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "duration",
-            "Nominal full-speed budget: 22,000ms ÷ 3 by default. The progressive curve extends the default bar to about 8.633 active seconds, then adds 500ms of active grace before exit. Explicit finite budgets use the same curve; Infinity hides the rail and marker. Loading always forces Infinity.",
+            "Nominal full-speed budget: 22,000ms ÷ 3 by default. The progressive curve extends the default bar to about 8.633 active seconds, then adds 1,000ms of active grace before exit. Explicit finite budgets use the same curve; Infinity hides the rail and marker. Loading always forces Infinity.",
           ],
           [
             "dismissible: false",
@@ -770,8 +770,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         half; the final 10% remains at half speed. The exact elapsed-time
         mapping makes the default bar last about{" "}
         <strong>8.633 active seconds</strong>. A separate{" "}
-        <strong>500ms active grace</strong> keeps the card usable after the bar
-        empties, before its existing staged exit. Holding or opening details
+        <strong>1,000ms active grace</strong> keeps the card usable after the
+        bar empties, before its existing staged exit. Holding or opening details
         pauses that grace too.
       </p>
       <p>
@@ -790,16 +790,20 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         headings={["Remaining Bar", "Behavior"]}
         rows={[
           [
+            "50% → 0%",
+            "The bar and card begin a restrained pulse together. Its amplitude and phase-preserving playback rate rise continuously until the bar empties.",
+          ],
+          [
             "40% → 10%",
-            "The existing gradient gradually mixes toward Rose500. Its pulse accelerates without resetting phase.",
+            "The existing gradient gradually mixes toward Rose500, independently of the pulse clock.",
           ],
           [
             "30% → 10%",
-            "Speed eases from full to half, while a separate paint-only card glow begins a subtle breath.",
+            "Speed eases continuously from full to half; the shared bar/card pulse keeps accelerating on its separate halfway-to-empty ramp.",
           ],
           [
             "10% → 0%",
-            "Half-speed finish, full Rose urgency and the fastest restrained pulse.",
+            "Half-speed finish and full Rose color; pulse speed continues rising toward its fastest restrained cycle at zero.",
           ],
           [
             "Last 3 active seconds",
@@ -807,22 +811,24 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Bar empty",
-            "The marker spins/shrinks out; 500ms of active grace remains for a final action.",
+            "The marker spins/shrinks out; 1,000ms of active grace remains for a final action.",
           ],
         ]}
       />
       <p>
         The clock samples every <strong>50ms</strong>; the bar’s
         <code> inline-size</code> interpolates over <strong>60ms</strong>,
-        preserving rounded endcaps. Color urgency runs from 40% to 10%; the card
-        glow’s separate urgency starts at 30%. Their CSS animations keep a
-        1,400ms base duration and use phase-preserving
-        <code> updatePlaybackRate()</code> to reach an effective 520ms cycle.
-        Arrival, width, urgency and card-exit motion have separate owners.
-        Decorative visibility still pauses hidden or folded-rear effects;
-        opening the native fan lets visible rear decorations run. Actual reading
-        pauses also freeze urgency pulses and the tiny marker, while ordinary
-        finite artwork retains its separate visibility policy.
+        preserving rounded endcaps. Color urgency runs from 40% to 10%. A
+        separate shared pulse ramp starts at 50% remaining and increases all the
+        way to zero for both the bar and the paint-only card glow. Their CSS
+        animations keep a 1,400ms base duration and use phase-preserving
+        <code> updatePlaybackRate()</code> to reach an effective 450ms cycle
+        without restarting their phase. Arrival, width, urgency and card-exit
+        motion have separate owners. Decorative visibility still pauses hidden
+        or folded-rear effects; opening the native fan lets visible rear
+        decorations run. Actual reading pauses also freeze urgency pulses and
+        the tiny marker, while ordinary finite artwork retains its separate
+        visibility policy.
       </p>
       <p>
         Pointer-down pauses immediately, with each pointer ID tracked
@@ -873,8 +879,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Urgency pulse / tiny marker",
-            "1,400ms → 520ms effective; marker 320ms in / 200ms out",
-            "Phase-preserving pulse acceleration follows 40% → 10% urgency; the card’s paint-only breath begins at 30%. The last-three-seconds marker grows/fades in, then spins and shrinks away at zero. Reduced motion keeps a static rail and marker without pulses or rotation.",
+            "1,400ms → 450ms effective; marker 320ms in / 200ms out",
+            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. Playback speeds up gradually without restarting either animation. The last-three-seconds marker grows/fades in, then spins and shrinks away at zero. Reduced motion keeps a static rail and marker without pulses or rotation.",
           ],
           [
             "Main artwork / glyph",
@@ -889,12 +895,12 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Sparks / plate unfold",
             "8 × 640ms + (640ms + 18ms/index) / 940ms + 120/180ms",
-            "Eight staggered glints and separate rear-plate wrappers finish their entrance once; the inner plate faces own the later sway.",
+            "Eight staggered glints and separate rear-plate wrappers finish their entrance once; nested spin wrappers and inner plate faces own the later rotation and sway independently.",
           ],
           [
-            "Rear-card sway",
-            "8.8s loop after 1,660ms",
-            "Both 7/6-size plates start together 250ms after the 90ms + 1,320ms artwork entrance. Each plate follows its own complementary 33-pose curved path on a linear clock: about 0.9px horizontal travel, up to 1.6px vertical travel and roughly 4° twists around the −18°/+15° base tilts. Matching neutral endpoints and seam-adjacent velocities prevent a loop reset; the main tile remains stationary.",
+            "Rear-card rotation / sway",
+            "22s turns + 8.8s sway after 1,660ms",
+            "Rear plates are 80% of their previous dimensions. Both begin 250ms after the 90ms + 1,320ms artwork entrance, turning once every 22 seconds in opposite directions about their shared center. Nested faces keep complementary 33-pose, 8.8-second curved sways at two thirds of their previous amplitude: about 0.6px horizontal travel, up to 1.07px vertical travel and roughly 2.7° local twists. Separate owners prevent entrance, spin and sway transforms from overwriting one another. Neutral sway endpoints and matching seam velocities join smoothly; full-turn spin endpoints are equivalent. The front tile stays stationary.",
           ],
           [
             "Status motion",
@@ -957,9 +963,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         softened while the notification’s own text and controls stay sharp.
         Reduced transparency uses an opaque same-hue surface. Every icon tile
         adds a separate Fuchsia900 layer at 69% alpha over its original base.
-        There is no ambient background field; the late-countdown glow remains a
-        separate paint-only overlay. This translucent surface is separate from
-        the application canvas: opaque Plum/Black
+        The front tile alone adds a final Fuchsia950 glaze at 22% alpha for a
+        darker, quieter face. There is no ambient background field; the
+        late-countdown glow remains a separate paint-only overlay. This
+        translucent surface is separate from the application canvas: opaque
+        Plum/Black
         <code> #29213b</code> and three fixed, faint edge highlights beneath a
         uniform 45% Purple500 overlay. Semantic reading panels retain light/dark
         roles.
@@ -970,7 +978,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and 41.65px front tile; 48.5917px rear plates are exactly 7/6 of their former size, centered at approximately 0.2042px. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds.",
+            "49px illustration rail and unchanged 41.65px front tile. Rear plates shrink exactly 20% to 38.8733px, centered at 5.0633px, with proportionally scaled 11.4333px corners and 1.1433px inward strokes. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones, giving the rotating artwork 3px more breathing room without enlarging it.",
           ],
           [
             "Main text / context",
@@ -990,7 +998,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Card uses Fuchsia950 at 85% alpha above 64px standard/Safari backdrop blur, with an opaque same-hue reduced-transparency fallback. Icon tiles add Fuchsia900 at 69% over their original bases. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content. Its independent arrival wrapper preserves these final bounds.",
+            "Card uses Fuchsia950 at 85% alpha above 64px standard/Safari backdrop blur, with an opaque same-hue reduced-transparency fallback. Icon tiles add Fuchsia900 at 69% over their original bases; the front face alone adds a final Fuchsia950 glaze at 22%. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content. Its independent arrival wrapper preserves these final bounds.",
           ],
           [
             "Last-seconds marker",
@@ -1006,7 +1014,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Artwork / bell",
-            "Successful saves use a two-tone BellCheck: the bell, clapper and two installed Lucide BellRing curves use primary text ink; only .journal-toast-bell-check uses Emerald600 (oklch(59.6% 0.145 163.225)). The glyph retains 27.5625px sizing and 2.9 stroke. Its Fuchsia950 85% base now has a Fuchsia900 69% overlay. Other kinds keep their Mauve900 bases and status glyphs below the same overlay. The old corner bell, chevron and StarCheck shape remain absent.",
+            "Successful saves use a two-tone BellCheck: the bell, clapper and two installed Lucide BellRing curves use primary text ink; only .journal-toast-bell-check uses Emerald600 (oklch(59.6% 0.145 163.225)). The glyph retains 27.5625px sizing and 2.9 stroke. Its Fuchsia950 85% base has a Fuchsia900 69% overlay and a final Fuchsia950 22% glaze. Other kinds keep their Mauve900 bases and status glyphs below the same overlay. The old corner bell, chevron and StarCheck shape remain absent.",
           ],
         ]}
       />
