@@ -2770,13 +2770,11 @@ export function DeveloperGuidePage() {
                   9.3- or 8.9-second CSS clock and phase offset, igniting at 62%
                   of that cycle. The fireworks sit outside the steam mask, with
                   a one-second reveal gate that avoids showing a partial burst
-                  on arrival. Pink emission starts within the cup’s 23px top
-                  rim, then fans farther outward as it rises. The ambient light
-                  expands to five times its original linear size, softened by a
-                  feathered fan mask and an upward fade; its 32% layer opacity
-                  keeps the wider bloom gentle while the unscaled rim glow keeps
-                  its original strength. The mug, steam and firework paths retain
-                  their sizes and clocks. The glow fades in over 2.2 seconds
+                  on arrival. A small Pink light stays within the cup’s 23px
+                  top rim, clipped to a 23px by 5px area above its edge. The
+                  large rising glow plume and its gradient, feather filter and
+                  mask are removed. The mug, steam and firework paths retain
+                  their sizes and clocks. The rim light fades in over 2.2 seconds
                   after the shared ambient handoff, 300ms after the main-icon
                   entry finishes. The curved lines reveal upward over one
                   second. Dialog, offscreen and hidden-page

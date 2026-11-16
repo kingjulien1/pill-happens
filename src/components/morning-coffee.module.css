@@ -32,7 +32,7 @@
   fill: none;
 }
 
-/* Rim-anchored light rises above the cup and reveals after its entry settles. */
+/* Small rim light stays at the cup edge and reveals after its entry settles. */
 .glow {
   opacity: 1;
   pointer-events: none;
