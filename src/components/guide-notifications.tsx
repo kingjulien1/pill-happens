@@ -281,8 +281,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Notifications keep a short result in view and put the explanation one
         tap away. The collapsed card contains its summary and countdown;
         expanding reveals a saved-change preview or explanatory context, plus
-        links and actions. A real Undo is directly available in the card header.
-        Use the shared journal facade for every application notice.
+        links and actions. A real Undo is directly available in the collapsed
+        card header and moves to the action footer while details are open. Use
+        the shared journal facade for every application notice.
       </p>
       <dl className={styles.overview}>
         <div>
@@ -478,11 +479,12 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         summary unless <code>description</code> explicitly overrides it. Missing
         paragraphs use kind-specific context. Footer copy and action/cancel
         controls appear inside expanded details. A supplied Undo is a separate,
-        compact labelled control in the top-right corner; activating it never
-        toggles expansion. <code>duration</code>, <code>id</code>, styling,
-        action/cancel and callbacks originate in <code>ExternalToast</code>; the
-        facade deliberately owns the native timer, close-button and rendering
-        fields. Loading ignores a finite duration.
+        compact labelled control in the collapsed header or expanded footer;
+        activating it never toggles expansion. <code>duration</code>,{" "}
+        <code>id</code>, styling, action/cancel and callbacks originate in{" "}
+        <code>ExternalToast</code>; the facade deliberately owns the native
+        timer, close-button and rendering fields. Loading ignores a finite
+        duration.
       </p>
       <ReferenceTable
         label="Option Behavior"
@@ -498,7 +500,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "details",
-            "A typed preview replaces paragraphs/facts; links and actions remain. Otherwise the first paragraph plus facts is shown; missing paragraphs use default context and [] opts out.",
+            "A typed preview replaces paragraphs/facts and uses a short generated footer rather than caller prose. Otherwise show up to four compact facts, or one context paragraph when no facts exist; [] still opts out of paragraph fallback. Related links become labelled icon tools; caller-supplied footer context remains for notices without a preview, and action/cancel controls remain available.",
           ],
           [
             "details.preview",
@@ -506,7 +508,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "undo",
-            "One attempt per click. Accessible defaults: Undo change → Undoing change → Change undone. Header glyphs show ready/pending/done; failure stays inline or opens a detached error.",
+            "One attempt per click. Accessible defaults: Undo change → Undoing change → Change undone. The same ready/pending/done control is in the collapsed header or expanded footer; failure stays inline or opens a detached error.",
           ],
           [
             "variant",
@@ -585,6 +587,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         the confirmed after-state, and removals show the captured before-state.
         Omit a missing side instead of manufacturing a comparison. The renderer
         is a static preview, never another form or an embedded live editor.
+        Intake and medication snapshots reuse the actual MedicationCard,
+        MedicationCardDose, category marks and artwork, including the original
+        two-row layout and inward frame. The read-only base renders a plain
+        container instead of a disabled editor button; presentation-only
+        medication fields require no fabricated IDs or creation timestamps.
       </p>
       <ReferenceTable
         label="Preview Record Kinds"
@@ -629,11 +636,50 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         Preview content occupies the labelled, inert-when-closed details region.
         When present it replaces free-form paragraphs and facts, while relevant
-        links and action/cancel controls remain available. Its footer uses a
-        compact reading-paused hint rather than repeating a long explanation.
-        Non-graphic notices keep their first explanatory paragraph and facts.
-        The playground above constructs both sides from invented records and its
-        Undo only updates local React state; it never calls the journal API.
+        links and action/cancel controls remain available. A compact caption
+        distinguishes Before/After, Saved or Removed without duplicating the
+        notification message. Check-ins, goals and timezone changes use compact
+        visual summaries; journal prose stays out of previews. Non-graphic
+        notices show up to four facts, or one context paragraph when there are
+        no facts. The playground above constructs both sides from invented
+        records and its Undo only updates local React state; it never calls the
+        journal API.
+      </p>
+
+      <Heading id="expanded-tools" level={3}>
+        Expanded Actions &amp; Page Backdrop
+      </Heading>
+      <p>
+        A short, inset separator introduces a centered footer of small icon
+        tools. Existing destinations retain their native href and full
+        accessible label: Entry, Medication, Check-In, Day, Goals, Today,
+        Journal and Guide receive fitting symbols. Each tool has a 30px tonal
+        tile, a 17px glyph and an 8.5px caption within a 52px-wide, at least
+        47px-high target. Four usual intake actions fit a 320px viewport: Entry,
+        Medication, the real Undo and Collapse. Undo uses the original callback,
+        pending guard and failure handling; it is never inferred from a preview.
+        Collapse returns focus to the summary before its details become inert.
+        Following a normal destination link also collapses details without
+        cancelling navigation; modified clicks keep their native new-tab
+        behavior. A 9px footer at 50% ink alpha gives brief context. Typed
+        previews use short record-specific copy or explain the real Undo.
+        Notices without a preview may use caller-provided footer context. Caller
+        prose, facts and footer remain suppressed when a typed preview is
+        present; the old reading-paused filler is removed. Action/cancel
+        controls retain their original behavior in a separate centered row when
+        supplied.
+      </p>
+      <p>
+        While a mounted, visible front notification has expanded idle details,
+        one fixed, aria-hidden sibling behind the toaster softly blurs the page
+        by 4px and adds Mauve900 at 31% alpha. A scoped body :has selector reads
+        the inner notification state, independently of Sonner’s hover-expanded
+        stack state. The veil sits at z-index 999999998 below Sonner, fades over
+        220ms and never accumulates for multiple open notices. Rear, removed or
+        exiting cards cannot leave it active. It has no pointer events, focus
+        trap, scroll lock or modal semantics; the page and native toast gestures
+        remain usable. Reduced motion removes the fade. The root canvas and
+        notification surface colors are unchanged.
       </p>
 
       <Heading id="updates" level={3}>
@@ -813,8 +859,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         The summary starts at <strong>77px</strong>; finite notices add a 16px
         root reserve above it for the countdown. Indefinite notices have neither
-        a rail nor that reserve. Its independent Undo sits at the top right with
-        a quiet icon tile and a short label underneath. Longer copy and expanded
+        a rail nor that reserve. Its independent Undo sits at the top right
+        while collapsed and joins the centered footer while expanded, with a
+        quiet icon tile and a short label underneath. Longer copy and expanded
         previews may increase the card height. The host is top-center,{" "}
         <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
@@ -857,7 +904,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Header Undo",
-            "One transparent 44px target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon, with a 9px Undo / Undoing / Undone label below; desktop hover changes only color and fill.",
+            "While collapsed: one transparent 44px target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon and 9px label. While expanded: the same action moves to the centered 52px footer tool with a 30px tile and 8.5px caption; no duplicate header action.",
+          ],
+          [
+            "Expanded backdrop / footer",
+            "One pointer-free viewport veil: Mauve900 at 31%, 4px blur, 220ms fade. Footer divider uses 10% ink and stops 13px short of the card edges. Tools are centered with 12px gaps; the 9px footer uses 50% ink. No page lock or root-canvas change.",
           ],
           [
             "Artwork / bell",
