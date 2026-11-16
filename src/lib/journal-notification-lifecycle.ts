@@ -4,7 +4,7 @@ export type NotificationExitReason =
 
 /** Nominal full-speed budget; the progressive finish adds active reading time. */
 export const NOTIFICATION_DEFAULT_DURATION = 22_000 / 3;
-export const NOTIFICATION_COMPLETION_GRACE = 500;
+export const NOTIFICATION_COMPLETION_GRACE = 1_000;
 
 const SLOW_START = 0.3;
 const SLOW_END = 0.1;
@@ -29,6 +29,8 @@ export type NotificationClockSnapshot = {
   graceRemaining: number;
   speed: number;
   colorUrgency: number;
+  /** Shared bar/card pulse ramp from 50% remaining to empty, independent of color. */
+  pulseUrgency: number;
   cardUrgency: number;
 };
 
@@ -102,6 +104,9 @@ export class NotificationClock {
             Math.max(0, this.elapsed - this.completeAt),
         )
       : 0;
+    const pulseUrgency = finite
+      ? Math.max(0, Math.min(1, (0.5 - progress) / 0.5))
+      : 0;
     return {
       remaining: finite ? progress * this.nominalDuration : Infinity,
       progress,
@@ -115,7 +120,8 @@ export class NotificationClock {
           ? 0
           : Math.max(MINIMUM_SPEED, Math.min(1, 0.25 + MIDDLE_RATE * progress)),
       colorUrgency: finite ? urgency(progress, 0.4) : 0,
-      cardUrgency: finite ? urgency(progress, SLOW_START) : 0,
+      pulseUrgency,
+      cardUrgency: pulseUrgency,
     };
   }
 }

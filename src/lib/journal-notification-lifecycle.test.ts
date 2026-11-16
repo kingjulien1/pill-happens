@@ -22,10 +22,11 @@ function timeAtProgress(duration: number, progress: number) {
   return duration * (0.7 + middle + Math.max(0, 0.1 - progress) / 0.5);
 }
 
-test("default nominal budget is one third of 22 seconds, with a progressive finish and grace", () => {
+test("default nominal budget is one third of 22 seconds, with a progressive finish and one-second active grace", () => {
   let now = 0;
   const clock = new NotificationClock(NOTIFICATION_DEFAULT_DURATION, () => now);
   assert.equal(NOTIFICATION_DEFAULT_DURATION, 22_000 / 3);
+  assert.equal(NOTIFICATION_COMPLETION_GRACE, 1_000);
   const completeAt = timeAtProgress(NOTIFICATION_DEFAULT_DURATION, 0);
   close(clock.snapshot().timeUntilComplete, completeAt);
   now = NOTIFICATION_DEFAULT_DURATION / 2;
@@ -38,7 +39,12 @@ test("default nominal budget is one third of 22 seconds, with a progressive fini
   assert.equal(clock.snapshot().complete, true);
   assert.equal(clock.snapshot().expired, false);
   close(clock.snapshot().graceRemaining, NOTIFICATION_COMPLETION_GRACE);
-  now += NOTIFICATION_COMPLETION_GRACE;
+  now += 500;
+  assert.equal(clock.snapshot().expired, false);
+  close(clock.snapshot().graceRemaining, 500);
+  now += 499;
+  assert.equal(clock.snapshot().expired, false);
+  now += 1;
   assert.equal(clock.snapshot().expired, true);
 });
 
@@ -100,23 +106,51 @@ test("the final 10% takes twice its nominal time and the last-three-second value
   assert.equal(clock.snapshot().expired, false);
 });
 
-test("color and card urgency have independent bounded thresholds", () => {
+test("color urgency retains its independent 40% to 10% thresholds", () => {
   const duration = 10_000;
-  for (const [progress, color, card] of [
-    [1, 0, 0],
-    [0.4, 0, 0],
-    [0.3, 1 / 3, 0],
-    [0.25, 0.5, 0.25],
-    [0.2, 2 / 3, 0.5],
-    [0.1, 1, 1],
-    [0, 1, 1],
+  for (const [progress, color] of [
+    [1, 0],
+    [0.4, 0],
+    [0.3, 1 / 3],
+    [0.25, 0.5],
+    [0.2, 2 / 3],
+    [0.1, 1],
+    [0, 1],
   ]) {
     let now = 0;
     const clock = new NotificationClock(duration, () => now);
     now = timeAtProgress(duration, progress);
     close(clock.snapshot().colorUrgency, color);
-    close(clock.snapshot().cardUrgency, card);
   }
+});
+
+test("bar and card pulse urgency start halfway and increase monotonically through the final 10% to empty", () => {
+  let now = 0;
+  let previous = 0;
+  const duration = 10_000;
+  const clock = new NotificationClock(duration, () => now);
+  for (const [progress, pulse] of [
+    [1, 0],
+    [0.500001, 0],
+    [0.5, 0],
+    [0.4, 0.2],
+    [0.3, 0.4],
+    [0.25, 0.5],
+    [0.2, 0.6],
+    [0.1, 0.8],
+    [0.05, 0.9],
+    [0, 1],
+  ]) {
+    now = timeAtProgress(duration, progress);
+    const state = clock.snapshot();
+    close(state.pulseUrgency, pulse);
+    close(state.cardUrgency, state.pulseUrgency);
+    assert.ok(state.pulseUrgency >= previous && state.pulseUrgency <= 1);
+    previous = state.pulseUrgency;
+  }
+  now += 500;
+  assert.equal(clock.snapshot().pulseUrgency, 1);
+  assert.equal(clock.snapshot().expired, false);
 });
 
 test("large elapsed jumps and arbitrarily partitioned ticks produce the same snapshot", () => {
@@ -140,6 +174,7 @@ test("large elapsed jumps and arbitrarily partitioned ticks produce the same sna
       "graceRemaining",
       "speed",
       "colorUrgency",
+      "pulseUrgency",
       "cardUrgency",
     ] as const)
       close(actual[key], expected[key]);
@@ -196,9 +231,9 @@ test("overlapping holds, expansion and hidden pauses also freeze the completed g
   clock.pause("expanded", false);
   now += 20_000;
   assert.equal(clock.snapshot().expired, false);
-  close(clock.snapshot().graceRemaining, 400);
+  close(clock.snapshot().graceRemaining, 900);
   clock.pause("hidden", false);
-  now += 399;
+  now += 899;
   assert.equal(clock.snapshot().expired, false);
   now += 1;
   assert.equal(clock.snapshot().expired, true);
@@ -232,6 +267,7 @@ test("loading notifications remain indefinite, nonurgent and never enter grace",
     graceRemaining: 0,
     speed: 0,
     colorUrgency: 0,
+    pulseUrgency: 0,
     cardUrgency: 0,
   });
   clock.pause("hidden", true);
