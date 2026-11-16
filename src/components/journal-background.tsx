@@ -1,11 +1,15 @@
-/** CSS-only page paint is shared with pre-hydration, loading and offline views. */
+import { Iridescence } from "@/components/iridescence";
+
+/** The same tinted still remains beneath the passive live field and during SSR. */
 export function JournalBackground() {
   return (
     <div
       className="ambient"
-      data-background="static-plum"
-      data-motion-profile="static"
+      data-background="iridescence"
+      data-motion-profile="passive"
       aria-hidden="true"
-    />
+    >
+      <Iridescence />
+    </div>
   );
 }

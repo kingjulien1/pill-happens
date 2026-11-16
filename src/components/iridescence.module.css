@@ -1,0 +1,26 @@
+.field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.field[data-ready="true"] {
+  opacity: 1;
+}
+
+.canvas {
+  position: absolute;
+  inset: -12px;
+  display: block;
+  width: calc(100% + 24px);
+  height: calc(100% + 24px);
+  /* Only the light field blurs. Text, cards and the two tint layers stay crisp. */
+  filter: blur(var(--app-iridescence-blur, 4px));
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--app-canvas-overlay);
+}
