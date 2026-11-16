@@ -515,7 +515,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "variant",
-            "Only intake-saved is registered as saved-intake context. It shares the Emerald600 success BellCheck; it is not an Undo guarantee.",
+            "Only intake-saved is registered as saved-intake context. It shares the two-tone success BellCheck; it is not an Undo guarantee.",
           ],
           [
             "id",
@@ -891,7 +891,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Rear-card sway",
             "8.8s loop after 1,660ms",
-            "Both 7/6-size plates start together 250ms after the 90ms + 1,320ms artwork entrance. Opposing subpixel travel and approximately 3° arcs gently open and close the fan around −18°/+15° base tilts; identical endpoints prevent a reset jump.",
+            "Both 7/6-size plates start together 250ms after the 90ms + 1,320ms artwork entrance. Each plate follows its own complementary 33-pose curved path on a linear clock: about 0.9px horizontal travel, up to 1.6px vertical travel and roughly 4° twists around the −18°/+15° base tilts. Matching neutral endpoints and seam-adjacent velocities prevent a loop reset; the main tile remains stationary.",
           ],
           [
             "Status motion",
@@ -948,12 +948,15 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         previews may increase the card height. The host is top-center,{" "}
         <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
-        safe area. The whole card and success bell tile share{" "}
-        <code>--toast-fuchsia-surface</code>: Fuchsia950 at 85% color alpha in
-        both modes, with readable light ink. The base surface has no radial
-        highlights, ambient background field, backdrop blur or saturation; the
-        late-countdown glow is a separate paint-only overlay. This translucent
-        surface is separate from the application canvas: opaque Plum/Black
+        safe area. The entire card keeps
+        <code> --toast-fuchsia-surface</code>: Fuchsia950 at 85% color alpha
+        above a 64px standard/Safari backdrop blur. Page content behind it is
+        softened while the notification’s own text and controls stay sharp.
+        Reduced transparency uses an opaque same-hue surface. Every icon tile
+        adds a separate Fuchsia900 layer at 69% alpha over its original base.
+        There is no ambient background field; the late-countdown glow remains a
+        separate paint-only overlay. This translucent surface is separate from
+        the application canvas: opaque Plum/Black
         <code> #29213b</code> and three fixed, faint edge highlights beneath a
         uniform 45% Purple500 overlay. Semantic reading panels retain light/dark
         roles.
@@ -984,7 +987,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Card and success tile share Fuchsia950 at 85% alpha, with no notification radial highlights or backdrop blur/saturation. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content. Its independent arrival wrapper preserves these final bounds.",
+            "Card uses Fuchsia950 at 85% alpha above 64px standard/Safari backdrop blur, with an opaque same-hue reduced-transparency fallback. Icon tiles add Fuchsia900 at 69% over their original bases. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content. Its independent arrival wrapper preserves these final bounds.",
           ],
           [
             "Last-seconds marker",
@@ -1000,7 +1003,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Artwork / bell",
-            "All successful saves use Emerald600 BellCheck (oklch(59.6% 0.145 163.225)) on Fuchsia950 at 85% alpha (oklch(29.3% 0.136 325.661)). Its two exact installed Lucide BellRing side curves share the same Emerald600 ink and 2.9 stroke. Other kinds retain the Mauve900 tile and their existing status glyphs. The old corner bell, chevron and StarCheck shape remain absent.",
+            "Successful saves use a two-tone BellCheck: the bell, clapper and two installed Lucide BellRing curves use primary text ink; only .journal-toast-bell-check uses Emerald600 (oklch(59.6% 0.145 163.225)). The glyph retains 27.5625px sizing and 2.9 stroke. Its Fuchsia950 85% base now has a Fuchsia900 69% overlay. Other kinds keep their Mauve900 bases and status glyphs below the same overlay. The old corner bell, chevron and StarCheck shape remain absent.",
           ],
         ]}
       />
