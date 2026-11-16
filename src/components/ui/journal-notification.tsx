@@ -747,7 +747,7 @@ export function JournalNotification({
             </span>
           </span>
         </button>
-        {!expanded && renderUndo()}
+        {renderUndo()}
       </div>
       <div
         className="journal-notification-details"

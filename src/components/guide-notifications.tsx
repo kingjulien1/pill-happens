@@ -283,7 +283,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         details reveals a saved-change preview or explanatory context, plus
         links and actions. When several cards are folded together, the first
         activation only fans the stack open; activate a card again for its
-        details. A real Undo sits in the collapsed card header and moves to the
+        details. A real Undo stays in the card header and also appears in the
         action footer while details are open. Use the shared journal facade for
         every application notice.
       </p>
@@ -951,13 +951,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         The summary starts at <strong>77px</strong>; finite notices add a 16px
         root reserve above it for the countdown. Indefinite notices have neither
-        a rail nor that reserve. Its independent Undo sits at the top right
-        while collapsed and joins the centered footer while expanded, with a
-        quiet icon tile and a short label underneath. Longer copy and expanded
-        previews may increase the card height. The host is top-center,{" "}
-        <code>min(460px, 100vw − 32px)</code> wide, with three visible notices
-        and a 10px gap. Mobile side offsets are 16px and top offsets include the
-        safe area. The entire card keeps
+        a rail nor that reserve. Its independent Undo sits at the top right in
+        both collapsed and expanded states, and also appears in the centered
+        footer while expanded, with a quiet icon tile and a short label
+        underneath. Longer copy and expanded previews may increase the card
+        height. The host is top-center, <code>min(460px, 100vw − 32px)</code>{" "}
+        wide, with three visible notices and a 10px gap. Mobile side offsets are
+        16px and top offsets include the safe area. The entire card keeps
         <code> --toast-fuchsia-surface</code>: Fuchsia950 at 85% color alpha
         above a 64px standard/Safari backdrop blur. Page content behind it is
         softened while the notification’s own text and controls stay sharp.
@@ -1007,7 +1007,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Header / unavailable Undo",
-            "While collapsed: one transparent 44px target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon and 9px label. While expanded: the same action moves to the centered 52px footer tool with a 30px tile and 8.5px caption; no duplicate header action. Without a callback, both locations use native disabled semantics, Zinc300 ink at 38% and a 4% neutral tile, with no extra element-opacity multiplier. The caption stays Undo; the accessible label/title explain that it is unavailable. No handler or fabricated reversal is attached. Pending/done retain their existing feedback.",
+            "In both collapsed and expanded cards: one transparent 44px header target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon and 9px label. Expanded cards also retain the centered 52px footer tool with a 30px tile and 8.5px caption. Both locations share one confirmed callback and the same pending/done/unavailable state. Without a callback, both locations use native disabled semantics, Zinc300 ink at 38% and a 4% neutral tile, with no extra element-opacity multiplier. The caption stays Undo; the accessible label/title explain that it is unavailable. No handler or fabricated reversal is attached. Pending/done retain their existing feedback.",
           ],
           [
             "Expanded backdrop / footer",
