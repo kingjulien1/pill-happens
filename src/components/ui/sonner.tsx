@@ -90,10 +90,14 @@ export function ToastSymbol({
         <span className="journal-toast-halo journal-toast-halo-echo" />
         <span className="journal-toast-flash" />
         <span className="journal-toast-plate-arrival journal-toast-plate-arrival-back">
-          <span className="journal-toast-plate journal-toast-plate-back" />
+          <span className="journal-toast-plate-spin journal-toast-plate-spin-back">
+            <span className="journal-toast-plate journal-toast-plate-back" />
+          </span>
         </span>
         <span className="journal-toast-plate-arrival journal-toast-plate-arrival-middle">
-          <span className="journal-toast-plate journal-toast-plate-middle" />
+          <span className="journal-toast-plate-spin journal-toast-plate-spin-middle">
+            <span className="journal-toast-plate journal-toast-plate-middle" />
+          </span>
         </span>
         <span className="journal-toast-tile">
           <span className="journal-toast-glyph-enter">

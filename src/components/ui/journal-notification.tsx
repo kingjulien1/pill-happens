@@ -330,6 +330,10 @@ export function JournalNotification({
         String(snapshot.colorUrgency),
       );
       element.style.setProperty(
+        "--notification-pulse-urgency",
+        String(snapshot.pulseUrgency),
+      );
+      element.style.setProperty(
         "--notification-card-urgency",
         String(snapshot.cardUrgency),
       );
@@ -339,7 +343,7 @@ export function JournalNotification({
       // instances if motion is enabled again during this countdown.
       if (pulseAnimations.some((animation) => animation.playState === "idle"))
         pulseAnimations = [];
-      if (!pulseAnimations.length && snapshot.colorUrgency > 0)
+      if (!pulseAnimations.length && snapshot.pulseUrgency > 0)
         pulseAnimations = element
           .getAnimations({ subtree: true })
           .filter(
@@ -353,7 +357,7 @@ export function JournalNotification({
           );
       for (const animation of pulseAnimations)
         animation.updatePlaybackRate(
-          1 + snapshot.colorUrgency * (1400 / 520 - 1),
+          1 + snapshot.pulseUrgency * (1400 / 450 - 1),
         );
       if (
         !markerShown &&

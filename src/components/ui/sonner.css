@@ -45,6 +45,11 @@ body:has(
     var(--color-fuchsia-900, oklch(40.1% 0.17 325.612)) 69%,
     transparent
   );
+  --toast-tile-glaze: color-mix(
+    in srgb,
+    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 22%,
+    transparent
+  );
   --toast-glyph: #ffeaf6;
   --toast-accent: #fda5d5;
   --toast-bright: #fff1f8;
@@ -232,7 +237,8 @@ body:has(
   --toast-ambient-delay: calc(
     var(--toast-art-arrival-delay) + var(--toast-art-arrival-duration) + 250ms
   );
-  --toast-plate-size: calc(41.65px * 7 / 6);
+  /* Only rear plates shrink 20%; front tile and 49px rail stay fixed. */
+  --toast-plate-size: calc(41.65px * 7 / 6 * 0.8);
   position: relative;
   display: block;
   flex: none;
@@ -247,6 +253,7 @@ body:has(
   place-items: center;
 }
 .journal-toast-plate-arrival,
+.journal-toast-plate-spin,
 .journal-toast-plate,
 .journal-toast-tile {
   box-sizing: border-box;
@@ -263,13 +270,20 @@ body:has(
   left: calc((49px - var(--toast-plate-size)) / 2);
   width: var(--toast-plate-size);
   height: var(--toast-plate-size);
-  border-radius: calc(12.25px * 7 / 6);
+  border-radius: calc(12.25px * 7 / 6 * 0.8);
 }
 .journal-toast-plate-arrival-back {
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
 }
 .journal-toast-plate-arrival-middle {
   transform: translate(1.225px, 0) rotate(15deg);
+}
+/* Continuous turns never overwrite either the finite entrance or local sway. */
+.journal-toast-plate-spin {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform-origin: 50% 50%;
 }
 .journal-toast-plate {
   position: absolute;
@@ -278,7 +292,7 @@ body:has(
   height: 100%;
   border-radius: inherit;
   transform-origin: 50% 55%;
-  box-shadow: inset 0 0 0 calc(1.225px * 7 / 6) var(--toast-pink-edge);
+  box-shadow: inset 0 0 0 calc(1.225px * 7 / 6 * 0.8) var(--toast-pink-edge);
 }
 .journal-toast-plate-back {
   background: var(--toast-pink-edge);
@@ -301,7 +315,9 @@ body:has(
   position: relative;
   display: grid;
   place-items: center;
-  background: linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
+  background:
+    linear-gradient(var(--toast-tile-glaze) 0 0),
+    linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
   box-shadow:
     inset 0 1px 0 #fff7fc26,
     inset 0 0 0 1px color-mix(in srgb, var(--toast-accent) 35%, transparent),
@@ -453,7 +469,7 @@ body:has(
   gap: 10px;
   min-height: 77px;
   box-sizing: border-box;
-  padding: 12px 8px 16px 12px;
+  padding: 12px 8px 16px 15px;
 }
 .journal-notification-art {
   display: block;
@@ -1019,7 +1035,7 @@ body:has(
 }
 @media (max-width: 479px) {
   .journal-notification-summary-content {
-    padding-left: 11px;
+    padding-left: 14px;
     gap: 9px;
   }
   .journal-toaster[data-sonner-toaster]
@@ -1138,6 +1154,13 @@ body:has(
     animation: journal-toast-middle-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
       180ms backwards;
   }
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin {
+    animation: journal-toast-plate-turn 22s linear var(--toast-ambient-delay)
+      infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin-middle {
+    animation-direction: reverse;
+  }
   .journal-toaster [data-mounted="true"] .journal-toast-plate-back {
     animation: journal-toast-back-sway 8.8s linear var(--toast-ambient-delay)
       infinite;
@@ -1207,6 +1230,7 @@ body:has(
       .journal-toast-flash,
       .journal-toast-spark,
       .journal-toast-plate-arrival,
+      .journal-toast-plate-spin,
       .journal-toast-plate,
       .journal-notification-revert-symbol > svg
     ),
@@ -1251,6 +1275,7 @@ body:has(
       .journal-toast-bell-rings,
       .journal-toast-bell-ring-mark,
       .journal-toast-plate-arrival,
+      .journal-toast-plate-spin,
       .journal-toast-plate
     ) {
     animation-play-state: paused;
@@ -1330,8 +1355,8 @@ body:has(
     filter: brightness(1);
   }
   50% {
-    opacity: calc(1 - var(--notification-urgency, 0) * 0.24);
-    filter: brightness(calc(1 + var(--notification-urgency, 0) * 0.2));
+    opacity: calc(1 - var(--notification-pulse-urgency, 0) * 0.24);
+    filter: brightness(calc(1 + var(--notification-pulse-urgency, 0) * 0.2));
   }
 }
 @keyframes journal-notification-card-breathe {
@@ -1473,6 +1498,14 @@ body:has(
   }
 }
 /* Opposing small arcs gently open and close the fan; both meet at identity. */
+@keyframes journal-toast-plate-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 /* Independent small curved paths, sampled with a linear clock so there is
    no easing stop at each pose. The back plate rises and opens first; the
    middle plate lags through a lower arc. Neighboring seam samples share the
@@ -1483,97 +1516,97 @@ body:has(
     transform: translate(0px, 0px) rotate(0deg);
   }
   3.125% {
-    transform: translate(0.2211px, 0.0351px) rotate(0.9518deg);
+    transform: translate(0.1474px, 0.0234px) rotate(0.6345deg);
   }
   6.25% {
-    transform: translate(0.4258px, 0.0156px) rotate(1.8431deg);
+    transform: translate(0.2839px, 0.0104px) rotate(1.2287deg);
   }
   9.375% {
-    transform: translate(0.5996px, -0.018px) rotate(2.6193deg);
+    transform: translate(0.3997px, -0.012px) rotate(1.7462deg);
   }
   12.5% {
-    transform: translate(0.7315px, -0.0777px) rotate(3.237deg);
+    transform: translate(0.4877px, -0.0518px) rotate(2.158deg);
   }
   15.625% {
-    transform: translate(0.8148px, -0.1614px) rotate(3.6677deg);
+    transform: translate(0.5432px, -0.1076px) rotate(2.4451deg);
   }
   18.75% {
-    transform: translate(0.8479px, -0.2658px) rotate(3.8997deg);
+    transform: translate(0.5653px, -0.1772px) rotate(2.5998deg);
   }
   21.875% {
-    transform: translate(0.8339px, -0.3869px) rotate(3.9375deg);
+    transform: translate(0.5559px, -0.2579px) rotate(2.625deg);
   }
   25% {
-    transform: translate(0.78px, -0.52px) rotate(3.8deg);
+    transform: translate(0.52px, -0.3467px) rotate(2.5333deg);
   }
   28.125% {
-    transform: translate(0.6961px, -0.66px) rotate(3.5165deg);
+    transform: translate(0.4641px, -0.44px) rotate(2.3443deg);
   }
   31.25% {
-    transform: translate(0.5933px, -0.8016px) rotate(3.1218deg);
+    transform: translate(0.3955px, -0.5344px) rotate(2.0812deg);
   }
   34.375% {
-    transform: translate(0.4822px, -0.9392px) rotate(2.6515deg);
+    transform: translate(0.3215px, -0.6261px) rotate(1.7677deg);
   }
   37.5% {
-    transform: translate(0.3715px, -1.0677px) rotate(2.137deg);
+    transform: translate(0.2477px, -0.7118px) rotate(1.4247deg);
   }
   40.625% {
-    transform: translate(0.267px, -1.182px) rotate(1.603deg);
+    transform: translate(0.178px, -0.788px) rotate(1.0687deg);
   }
   43.75% {
-    transform: translate(0.1712px, -1.2778px) rotate(1.0653deg);
+    transform: translate(0.1141px, -0.8519px) rotate(0.7102deg);
   }
   46.875% {
-    transform: translate(0.0833px, -1.3514px) rotate(0.5309deg);
+    transform: translate(0.0555px, -0.9009px) rotate(0.3539deg);
   }
   50% {
-    transform: translate(0px, -1.4px) rotate(0deg);
+    transform: translate(0px, -0.9333px) rotate(0deg);
   }
   53.125% {
-    transform: translate(-0.0833px, -1.4217px) rotate(-0.5309deg);
+    transform: translate(-0.0555px, -0.9478px) rotate(-0.3539deg);
   }
   56.25% {
-    transform: translate(-0.1712px, -1.4156px) rotate(-1.0653deg);
+    transform: translate(-0.1141px, -0.9437px) rotate(-0.7102deg);
   }
   59.375% {
-    transform: translate(-0.267px, -1.382px) rotate(-1.603deg);
+    transform: translate(-0.178px, -0.9213px) rotate(-1.0687deg);
   }
   62.5% {
-    transform: translate(-0.3715px, -1.3223px) rotate(-2.137deg);
+    transform: translate(-0.2477px, -0.8815px) rotate(-1.4247deg);
   }
   65.625% {
-    transform: translate(-0.4822px, -1.2386px) rotate(-2.6515deg);
+    transform: translate(-0.3215px, -0.8257px) rotate(-1.7677deg);
   }
   68.75% {
-    transform: translate(-0.5933px, -1.1342px) rotate(-3.1218deg);
+    transform: translate(-0.3955px, -0.7561px) rotate(-2.0812deg);
   }
   71.875% {
-    transform: translate(-0.6961px, -1.0131px) rotate(-3.5165deg);
+    transform: translate(-0.4641px, -0.6754px) rotate(-2.3443deg);
   }
   75% {
-    transform: translate(-0.78px, -0.88px) rotate(-3.8deg);
+    transform: translate(-0.52px, -0.5867px) rotate(-2.5333deg);
   }
   78.125% {
-    transform: translate(-0.8339px, -0.74px) rotate(-3.9375deg);
+    transform: translate(-0.5559px, -0.4933px) rotate(-2.625deg);
   }
   81.25% {
-    transform: translate(-0.8479px, -0.5984px) rotate(-3.8997deg);
+    transform: translate(-0.5653px, -0.3989px) rotate(-2.5998deg);
   }
   84.375% {
-    transform: translate(-0.8148px, -0.4608px) rotate(-3.6677deg);
+    transform: translate(-0.5432px, -0.3072px) rotate(-2.4451deg);
   }
   87.5% {
-    transform: translate(-0.7315px, -0.3323px) rotate(-3.237deg);
+    transform: translate(-0.4877px, -0.2215px) rotate(-2.158deg);
   }
   90.625% {
-    transform: translate(-0.5996px, -0.218px) rotate(-2.6193deg);
+    transform: translate(-0.3997px, -0.1453px) rotate(-1.7462deg);
   }
   93.75% {
-    transform: translate(-0.4258px, -0.1222px) rotate(-1.8431deg);
+    transform: translate(-0.2839px, -0.0815px) rotate(-1.2287deg);
   }
   96.875% {
-    transform: translate(-0.2211px, -0.0351px) rotate(-0.9518deg);
+    transform: translate(-0.1474px, -0.0234px) rotate(-0.6345deg);
   }
 }
 @keyframes journal-toast-middle-sway {
@@ -1582,97 +1615,97 @@ body:has(
     transform: translate(0px, 0px) rotate(0deg);
   }
   3.125% {
-    transform: translate(-0.1268px, -0.0536px) rotate(-0.452deg);
+    transform: translate(-0.0845px, -0.0357px) rotate(-0.3013deg);
   }
   6.25% {
-    transform: translate(-0.2655px, -0.0396px) rotate(-0.9603deg);
+    transform: translate(-0.177px, -0.0264px) rotate(-0.6402deg);
   }
   9.375% {
-    transform: translate(-0.3982px, 0.0021px) rotate(-1.4746deg);
+    transform: translate(-0.2655px, 0.0014px) rotate(-0.9831deg);
   }
   12.5% {
-    transform: translate(-0.5241px, 0.0885px) rotate(-1.9985deg);
+    transform: translate(-0.3494px, 0.059px) rotate(-1.3323deg);
   }
   15.625% {
-    transform: translate(-0.6382px, 0.2173px) rotate(-2.5149deg);
+    transform: translate(-0.4255px, 0.1449px) rotate(-1.6766deg);
   }
   18.75% {
-    transform: translate(-0.7363px, 0.3825px) rotate(-3.001deg);
+    transform: translate(-0.4909px, 0.255px) rotate(-2.0007deg);
   }
   21.875% {
-    transform: translate(-0.8146px, 0.5743px) rotate(-3.4293deg);
+    transform: translate(-0.5431px, 0.3829px) rotate(-2.2862deg);
   }
   25% {
-    transform: translate(-0.87px, 0.78px) rotate(-3.7706deg);
+    transform: translate(-0.58px, 0.52px) rotate(-2.5137deg);
   }
   28.125% {
-    transform: translate(-0.9004px, 0.9857px) rotate(-3.9964deg);
+    transform: translate(-0.6003px, 0.6571px) rotate(-2.6643deg);
   }
   31.25% {
-    transform: translate(-0.9047px, 1.1775px) rotate(-4.0829deg);
+    transform: translate(-0.6031px, 0.785px) rotate(-2.7219deg);
   }
   34.375% {
-    transform: translate(-0.8827px, 1.3427px) rotate(-4.0138deg);
+    transform: translate(-0.5885px, 0.8951px) rotate(-2.6759deg);
   }
   37.5% {
-    transform: translate(-0.8352px, 1.4715px) rotate(-3.7832deg);
+    transform: translate(-0.5568px, 0.981px) rotate(-2.5221deg);
   }
   40.625% {
-    transform: translate(-0.764px, 1.5579px) rotate(-3.3967deg);
+    transform: translate(-0.5093px, 1.0386px) rotate(-2.2645deg);
   }
   43.75% {
-    transform: translate(-0.672px, 1.5996px) rotate(-2.8725deg);
+    transform: translate(-0.448px, 1.0664px) rotate(-1.915deg);
   }
   46.875% {
-    transform: translate(-0.5626px, 1.5986px) rotate(-2.2391deg);
+    transform: translate(-0.3751px, 1.0657px) rotate(-1.4927deg);
   }
   50% {
-    transform: translate(-0.44px, 1.56px) rotate(-1.5339deg);
+    transform: translate(-0.2933px, 1.04px) rotate(-1.0226deg);
   }
   53.125% {
-    transform: translate(-0.309px, 1.4914px) rotate(-0.7992deg);
+    transform: translate(-0.206px, 0.9943px) rotate(-0.5328deg);
   }
   56.25% {
-    transform: translate(-0.1745px, 1.4016px) rotate(-0.0786deg);
+    transform: translate(-0.1163px, 0.9344px) rotate(-0.0524deg);
   }
   59.375% {
-    transform: translate(-0.0418px, 1.2992px) rotate(0.5874deg);
+    transform: translate(-0.0279px, 0.8661px) rotate(0.3916deg);
   }
   62.5% {
-    transform: translate(0.0841px, 1.1915px) rotate(1.1646deg);
+    transform: translate(0.0561px, 0.7943px) rotate(0.7764deg);
   }
   65.625% {
-    transform: translate(0.1982px, 1.084px) rotate(1.6277deg);
+    transform: translate(0.1321px, 0.7227px) rotate(1.0851deg);
   }
   68.75% {
-    transform: translate(0.2963px, 0.9795px) rotate(1.962deg);
+    transform: translate(0.1975px, 0.653px) rotate(1.308deg);
   }
   71.875% {
-    transform: translate(0.3746px, 0.8786px) rotate(2.1633deg);
+    transform: translate(0.2497px, 0.5857px) rotate(1.4422deg);
   }
   75% {
-    transform: translate(0.43px, 0.78px) rotate(2.2367deg);
+    transform: translate(0.2867px, 0.52px) rotate(1.4911deg);
   }
   78.125% {
-    transform: translate(0.4604px, 0.6814px) rotate(2.1946deg);
+    transform: translate(0.3069px, 0.4543px) rotate(1.4631deg);
   }
   81.25% {
-    transform: translate(0.4647px, 0.5805px) rotate(2.0541deg);
+    transform: translate(0.3098px, 0.387px) rotate(1.3694deg);
   }
   84.375% {
-    transform: translate(0.4427px, 0.476px) rotate(1.8332deg);
+    transform: translate(0.2951px, 0.3173px) rotate(1.2221deg);
   }
   87.5% {
-    transform: translate(0.3952px, 0.3685px) rotate(1.5493deg);
+    transform: translate(0.2635px, 0.2457px) rotate(1.0329deg);
   }
   90.625% {
-    transform: translate(0.324px, 0.2608px) rotate(1.2161deg);
+    transform: translate(0.216px, 0.1739px) rotate(0.8107deg);
   }
   93.75% {
-    transform: translate(0.232px, 0.1584px) rotate(0.8436deg);
+    transform: translate(0.1547px, 0.1056px) rotate(0.5624deg);
   }
   96.875% {
-    transform: translate(0.1268px, 0.0536px) rotate(0.452deg);
+    transform: translate(0.0845px, 0.0357px) rotate(0.3013deg);
   }
 }
 @keyframes journal-toast-settle-ring {
