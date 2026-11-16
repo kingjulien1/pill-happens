@@ -40,6 +40,11 @@ body:has(
   --toast-surface: var(--toast-fuchsia-surface);
   --toast-surface-layers: linear-gradient(var(--toast-surface) 0 0);
   --toast-tile: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
+  --toast-tile-overlay: color-mix(
+    in srgb,
+    var(--color-fuchsia-900, oklch(40.1% 0.17 325.612)) 69%,
+    transparent
+  );
   --toast-glyph: #ffeaf6;
   --toast-accent: #fda5d5;
   --toast-bright: #fff1f8;
@@ -100,6 +105,9 @@ body:has(
   border: 0;
   border-radius: 18px;
   background: var(--toast-surface-layers);
+  /* Blur only the scene behind the glass; text, artwork and frames stay crisp. */
+  -webkit-backdrop-filter: blur(64px);
+  backdrop-filter: blur(64px);
   color: var(--toast-ink);
   /* Match intake cards: 4px at the edge, then 2px wholly inside it.
      A negative outline keeps the bands separate without taking Sonner's
@@ -111,6 +119,15 @@ body:has(
     0 12px 28px -16px var(--toast-shadow),
     0 3px 10px -5px var(--toast-shadow);
   text-align: left;
+}
+/* Reduced transparency substitutes opaque same-hue paper for the glass. */
+@media (prefers-reduced-transparency: reduce) {
+  .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"],
+  .journal-notification {
+    background: var(--color-fuchsia-950, oklch(29.3% 0.136 325.661));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
   display: grid;
@@ -270,7 +287,7 @@ body:has(
   background: color-mix(in srgb, var(--toast-soft) 60%, var(--toast-rim));
 }
 [data-toast-symbol="success"] {
-  --toast-glyph: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
+  --toast-glyph: var(--toast-ink);
   --toast-tile: var(
     --toast-fuchsia-surface,
     color-mix(
@@ -284,7 +301,7 @@ body:has(
   position: relative;
   display: grid;
   place-items: center;
-  background: var(--toast-tile);
+  background: linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
   box-shadow:
     inset 0 1px 0 #fff7fc26,
     inset 0 0 0 1px color-mix(in srgb, var(--toast-accent) 35%, transparent),
@@ -307,6 +324,9 @@ body:has(
 .journal-toaster [data-toast-symbol="success"] .journal-toast-glyph {
   overflow: visible;
   stroke-width: 2.9;
+}
+.journal-toaster [data-toast-symbol="success"] .journal-toast-bell-check {
+  stroke: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
 }
 .journal-toast-bell-rings {
   opacity: 0;
@@ -1091,12 +1111,12 @@ body:has(
       180ms backwards;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-plate-back {
-    animation: journal-toast-back-sway 8.8s cubic-bezier(0.45, 0, 0.55, 1)
-      var(--toast-ambient-delay) infinite;
+    animation: journal-toast-back-sway 8.8s linear var(--toast-ambient-delay)
+      infinite;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-plate-middle {
-    animation: journal-toast-middle-sway 8.8s cubic-bezier(0.45, 0, 0.55, 1)
-      var(--toast-ambient-delay) infinite;
+    animation: journal-toast-middle-sway 8.8s linear var(--toast-ambient-delay)
+      infinite;
   }
   .journal-toaster
     [data-mounted="true"]
@@ -1425,22 +1445,206 @@ body:has(
   }
 }
 /* Opposing small arcs gently open and close the fan; both meet at identity. */
+/* Independent small curved paths, sampled with a linear clock so there is
+   no easing stop at each pose. The back plate rises and opens first; the
+   middle plate lags through a lower arc. Neighboring seam samples share the
+   same velocity, while the parent wrappers retain their original base tilts. */
 @keyframes journal-toast-back-sway {
   0%,
   100% {
-    transform: translate(0, 0) rotate(0);
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+  3.125% {
+    transform: translate(0.2211px, 0.0351px) rotate(0.9518deg);
+  }
+  6.25% {
+    transform: translate(0.4258px, 0.0156px) rotate(1.8431deg);
+  }
+  9.375% {
+    transform: translate(0.5996px, -0.018px) rotate(2.6193deg);
+  }
+  12.5% {
+    transform: translate(0.7315px, -0.0777px) rotate(3.237deg);
+  }
+  15.625% {
+    transform: translate(0.8148px, -0.1614px) rotate(3.6677deg);
+  }
+  18.75% {
+    transform: translate(0.8479px, -0.2658px) rotate(3.8997deg);
+  }
+  21.875% {
+    transform: translate(0.8339px, -0.3869px) rotate(3.9375deg);
+  }
+  25% {
+    transform: translate(0.78px, -0.52px) rotate(3.8deg);
+  }
+  28.125% {
+    transform: translate(0.6961px, -0.66px) rotate(3.5165deg);
+  }
+  31.25% {
+    transform: translate(0.5933px, -0.8016px) rotate(3.1218deg);
+  }
+  34.375% {
+    transform: translate(0.4822px, -0.9392px) rotate(2.6515deg);
+  }
+  37.5% {
+    transform: translate(0.3715px, -1.0677px) rotate(2.137deg);
+  }
+  40.625% {
+    transform: translate(0.267px, -1.182px) rotate(1.603deg);
+  }
+  43.75% {
+    transform: translate(0.1712px, -1.2778px) rotate(1.0653deg);
+  }
+  46.875% {
+    transform: translate(0.0833px, -1.3514px) rotate(0.5309deg);
   }
   50% {
-    transform: translate(0.35px, -0.65px) rotate(3deg);
+    transform: translate(0px, -1.4px) rotate(0deg);
+  }
+  53.125% {
+    transform: translate(-0.0833px, -1.4217px) rotate(-0.5309deg);
+  }
+  56.25% {
+    transform: translate(-0.1712px, -1.4156px) rotate(-1.0653deg);
+  }
+  59.375% {
+    transform: translate(-0.267px, -1.382px) rotate(-1.603deg);
+  }
+  62.5% {
+    transform: translate(-0.3715px, -1.3223px) rotate(-2.137deg);
+  }
+  65.625% {
+    transform: translate(-0.4822px, -1.2386px) rotate(-2.6515deg);
+  }
+  68.75% {
+    transform: translate(-0.5933px, -1.1342px) rotate(-3.1218deg);
+  }
+  71.875% {
+    transform: translate(-0.6961px, -1.0131px) rotate(-3.5165deg);
+  }
+  75% {
+    transform: translate(-0.78px, -0.88px) rotate(-3.8deg);
+  }
+  78.125% {
+    transform: translate(-0.8339px, -0.74px) rotate(-3.9375deg);
+  }
+  81.25% {
+    transform: translate(-0.8479px, -0.5984px) rotate(-3.8997deg);
+  }
+  84.375% {
+    transform: translate(-0.8148px, -0.4608px) rotate(-3.6677deg);
+  }
+  87.5% {
+    transform: translate(-0.7315px, -0.3323px) rotate(-3.237deg);
+  }
+  90.625% {
+    transform: translate(-0.5996px, -0.218px) rotate(-2.6193deg);
+  }
+  93.75% {
+    transform: translate(-0.4258px, -0.1222px) rotate(-1.8431deg);
+  }
+  96.875% {
+    transform: translate(-0.2211px, -0.0351px) rotate(-0.9518deg);
   }
 }
 @keyframes journal-toast-middle-sway {
   0%,
   100% {
-    transform: translate(0, 0) rotate(0);
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+  3.125% {
+    transform: translate(-0.1268px, -0.0536px) rotate(-0.452deg);
+  }
+  6.25% {
+    transform: translate(-0.2655px, -0.0396px) rotate(-0.9603deg);
+  }
+  9.375% {
+    transform: translate(-0.3982px, 0.0021px) rotate(-1.4746deg);
+  }
+  12.5% {
+    transform: translate(-0.5241px, 0.0885px) rotate(-1.9985deg);
+  }
+  15.625% {
+    transform: translate(-0.6382px, 0.2173px) rotate(-2.5149deg);
+  }
+  18.75% {
+    transform: translate(-0.7363px, 0.3825px) rotate(-3.001deg);
+  }
+  21.875% {
+    transform: translate(-0.8146px, 0.5743px) rotate(-3.4293deg);
+  }
+  25% {
+    transform: translate(-0.87px, 0.78px) rotate(-3.7706deg);
+  }
+  28.125% {
+    transform: translate(-0.9004px, 0.9857px) rotate(-3.9964deg);
+  }
+  31.25% {
+    transform: translate(-0.9047px, 1.1775px) rotate(-4.0829deg);
+  }
+  34.375% {
+    transform: translate(-0.8827px, 1.3427px) rotate(-4.0138deg);
+  }
+  37.5% {
+    transform: translate(-0.8352px, 1.4715px) rotate(-3.7832deg);
+  }
+  40.625% {
+    transform: translate(-0.764px, 1.5579px) rotate(-3.3967deg);
+  }
+  43.75% {
+    transform: translate(-0.672px, 1.5996px) rotate(-2.8725deg);
+  }
+  46.875% {
+    transform: translate(-0.5626px, 1.5986px) rotate(-2.2391deg);
   }
   50% {
-    transform: translate(-0.35px, 0.5px) rotate(-2.7deg);
+    transform: translate(-0.44px, 1.56px) rotate(-1.5339deg);
+  }
+  53.125% {
+    transform: translate(-0.309px, 1.4914px) rotate(-0.7992deg);
+  }
+  56.25% {
+    transform: translate(-0.1745px, 1.4016px) rotate(-0.0786deg);
+  }
+  59.375% {
+    transform: translate(-0.0418px, 1.2992px) rotate(0.5874deg);
+  }
+  62.5% {
+    transform: translate(0.0841px, 1.1915px) rotate(1.1646deg);
+  }
+  65.625% {
+    transform: translate(0.1982px, 1.084px) rotate(1.6277deg);
+  }
+  68.75% {
+    transform: translate(0.2963px, 0.9795px) rotate(1.962deg);
+  }
+  71.875% {
+    transform: translate(0.3746px, 0.8786px) rotate(2.1633deg);
+  }
+  75% {
+    transform: translate(0.43px, 0.78px) rotate(2.2367deg);
+  }
+  78.125% {
+    transform: translate(0.4604px, 0.6814px) rotate(2.1946deg);
+  }
+  81.25% {
+    transform: translate(0.4647px, 0.5805px) rotate(2.0541deg);
+  }
+  84.375% {
+    transform: translate(0.4427px, 0.476px) rotate(1.8332deg);
+  }
+  87.5% {
+    transform: translate(0.3952px, 0.3685px) rotate(1.5493deg);
+  }
+  90.625% {
+    transform: translate(0.324px, 0.2608px) rotate(1.2161deg);
+  }
+  93.75% {
+    transform: translate(0.232px, 0.1584px) rotate(0.8436deg);
+  }
+  96.875% {
+    transform: translate(0.1268px, 0.0536px) rotate(0.452deg);
   }
 }
 @keyframes journal-toast-settle-ring {
