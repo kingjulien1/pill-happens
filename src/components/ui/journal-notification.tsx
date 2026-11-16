@@ -509,49 +509,54 @@ export function JournalNotification({
     }
   };
 
-  const renderUndo = (footer = false) =>
-    undo && (
-      <Button
-        variant="ghost"
-        size="icon"
-        type="button"
-        className={
-          footer
-            ? "journal-notification-tool journal-notification-footer-undo"
-            : "journal-notification-revert journal-notification-undo"
-        }
-        data-undo-state={undoState}
-        disabled={undoState !== "ready" || phase !== "idle"}
-        aria-busy={undoState === "pending"}
-        aria-label={
-          undoState === "pending"
+  const displayedUndoState = undo ? undoState : "unavailable";
+  const renderUndo = (footer = false) => (
+    <Button
+      variant="ghost"
+      size="icon"
+      type="button"
+      className={
+        footer
+          ? "journal-notification-tool journal-notification-footer-undo"
+          : "journal-notification-revert journal-notification-undo"
+      }
+      data-undo-state={displayedUndoState}
+      disabled={displayedUndoState !== "ready" || phase !== "idle"}
+      aria-busy={displayedUndoState === "pending"}
+      aria-label={
+        !undo
+          ? "Undo unavailable for this notice"
+          : undoState === "pending"
             ? (undo.pendingLabel ?? "Undoing change")
             : undoState === "done"
               ? (undo.successLabel ?? "Change undone")
               : (undo.label ?? "Undo change")
-        }
-        title={undo.label ?? "Undo change"}
-        onPointerDown={(event) => event.stopPropagation()}
-        onClick={runUndo}
-      >
-        <span className="journal-notification-revert-symbol" aria-hidden="true">
-          {undoState === "pending" ? (
-            <LoaderCircle />
-          ) : undoState === "done" ? (
-            <Check />
-          ) : (
-            <Undo2 />
-          )}
-        </span>
-        <span className="journal-notification-revert-label" aria-hidden="true">
-          {undoState === "pending"
-            ? "Undoing"
-            : undoState === "done"
-              ? "Undone"
-              : "Undo"}
-        </span>
-      </Button>
-    );
+      }
+      title={
+        undo?.label ??
+        (undo ? "Undo change" : "Undo unavailable for this notice")
+      }
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={undo ? runUndo : undefined}
+    >
+      <span className="journal-notification-revert-symbol" aria-hidden="true">
+        {displayedUndoState === "pending" ? (
+          <LoaderCircle />
+        ) : displayedUndoState === "done" ? (
+          <Check />
+        ) : (
+          <Undo2 />
+        )}
+      </span>
+      <span className="journal-notification-revert-label" aria-hidden="true">
+        {displayedUndoState === "pending"
+          ? "Undoing"
+          : displayedUndoState === "done"
+            ? "Undone"
+            : "Undo"}
+      </span>
+    </Button>
+  );
 
   const collapseDetails = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();

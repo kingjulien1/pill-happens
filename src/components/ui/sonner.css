@@ -748,6 +748,34 @@ body:has(
 .journal-notification .journal-notification-revert[data-undo-state="done"] {
   color: var(--color-emerald-300, #6ee7b7);
 }
+/* An absent reversal stays visible as a quiet native-disabled affordance.
+   Resolve its ink once instead of multiplying generic disabled opacity. */
+.journal-notification
+  :is(
+    .journal-notification-revert,
+    .journal-notification-footer-undo
+  )[data-undo-state="unavailable"] {
+  color: color-mix(in srgb, var(--color-zinc-300, #d4d4d8) 38%, transparent);
+  opacity: 1;
+  cursor: default;
+  background: transparent;
+  box-shadow: none;
+}
+.journal-notification
+  [data-undo-state="unavailable"]
+  .journal-notification-revert-symbol {
+  background: color-mix(
+    in srgb,
+    var(--color-zinc-300, #d4d4d8) 4%,
+    transparent
+  );
+  box-shadow: none;
+}
+.journal-notification
+  [data-undo-state="unavailable"]
+  .journal-notification-revert-label {
+  color: inherit;
+}
 :is(
     .journal-notification-revert,
     .journal-notification-footer-undo
