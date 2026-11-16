@@ -307,6 +307,21 @@ Earlier manual checks covered the logging and management flow, backdating, corre
 
 Daily check-ins allow a 1 MiB JSON body so valid full-length Unicode or escaped text can reach validation; other mutation bodies retain their 16 KiB cap.
 
+### Medication SVG Library
+
+The appearance picker includes **57 custom SVG choices**: 16 original symbols, 20 tablet/dispenser outlines and 21 flat-color variants. The latest four pairs are:
+
+| Name         | Simplified Shape / Imprint                        | Flat Color           |
+| ------------ | ------------------------------------------------- | -------------------- |
+| Xanax        | Horizontal oval; equal-height `UPJOHN` above `90` | Zinc 300 `#D4D4D8`   |
+| Iserlohn     | Upright capsule with a center seam                | Violet 300 `#c4b4ff` |
+| Desloratadin | Round tablet with a centered `5`                  | Sky 400 `#00bcff`    |
+| Atarax       | Slender scored tablet                             | Zinc 300 `#D4D4D8`   |
+
+Each pair lives in `public/icons/medications/tablets/outline/{name}.svg` and `color/{name}.svg`, generated from `src/lib/tablet-icons/geometry.ts` and `artwork.ts`. Assets use Lucide’s 24×24 viewport, default 2px currentColor stroke, no fill and rounded line caps/joins. Imprints use fine vector paths; the filled versions use a single flat pigment with transparent cutouts, without fonts, bitmaps, gradients, shadows or highlights. `Xanax`, `Iserlohn`, `Desloratadin` and `Atarax` are also exported as Lucide-compatible components from `src/components/tablet-icons.tsx`.
+
+Search by the medication name, component name, imprint, shape or color. Both `svg:{name}` and `svg:color:{name}` are allowlisted saved values. Outline icons follow the chosen appearance tint; filled artwork retains its palette color. Both support saved rotation and use the normal picker, medication and intake rendering paths. Generate with `npm run icons:tablets`, then check with `npm run icons:tablets:check`; all existing SVG assets and saved IDs remain stable.
+
 ### Theme maintenance
 
 `src/lib/app-theme.ts` is the single source for the five palette pigments, 69 semantic roles, descriptions, intended pairings, and exact light/dark HEX values, including alpha bytes. Its 19 Surfaces & Reading roles distinguish foundation, card, popover, raised, inset, inverse, reading and the fixed canvas with its copy. Generated `src/app/theme.css` supplies the application variables; the generator also updates the offline page’s inline colors and theme-color metadata. The guide reads the registry directly for previews, tables, inspection, and CSS/JSON exports, so it does not keep a separate list of values.

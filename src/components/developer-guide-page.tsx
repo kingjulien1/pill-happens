@@ -2590,24 +2590,47 @@ export function DeveloperGuidePage() {
               <p>
                 Local SVG selection uses the allowlisted catalog. The medication
                 icon field accepts a known symbol or a single supported emoji,
-                rather than arbitrary SVG markup or remote URLs. The 17 colored
-                variants render inline from the shared{" "}
-                <code>TABLET_SHAPES</code> geometry and fixed catalog palettes;
-                each rendered instance uses unique local SVG mask IDs and
-                luminance masks to preserve transparent cutouts. The original 12
-                tintable drawings also render inline from their exact checked-in
-                path geometry, with 2.5px strokes and their original filled
-                dots. The 16 outline tablets retain their inline renderer. All
-                existing 45 stored IDs, colors, filenames and search aliases
-                remain stable, so saved selections continue to work without
-                reselection. The assets are already vectors: their display uses
-                SVG geometry directly, with no bitmap conversion or
-                bitmap-quality settings.
+                rather than arbitrary SVG markup or remote URLs. There are 57
+                custom SVG choices: 16 original tintable drawings, 20 tablet or
+                dispenser outlines and 21 fixed-color variants. The colored
+                variants render inline from shared <code>TABLET_SHAPES</code>
+                geometry and fixed catalog palettes. Each instance owns unique
+                local SVG mask IDs and luminance masks for transparent imprints
+                and score lines. All 49 earlier stored IDs, colors, filenames
+                and aliases remain stable; the eight new choices are additive.
+                Every asset remains vector geometry, with no bitmap conversion
+                or font dependency.
               </p>
               <p>
-                Nose, Single Tablet and Angled Tablet bring the local catalog to
-                48: 31 tintable outlines and 17 colored variants. Nose’s
-                shortened bridge fits a square 24×24 viewport while keeping the
+                Xanax, Iserlohn, Desloratadin and Atarax each have an outline
+                and a colored SVG under their own name. Xanax is a horizontal
+                oval with equal-height UPJOHN and 90 vector imprints. Iserlohn
+                is a violet capsule with a center seam; Desloratadin is a blue
+                round tablet with a centered 5; Atarax is a slender, scored
+                white tablet. White artwork uses Zinc 300
+                <code> #D4D4D8</code>, violet uses Violet 300
+                <code> #c4b4ff</code>, and blue uses Sky 400
+                <code> #00bcff</code>. Color variants paint one flat pigment
+                with transparent details, without shading or highlights.
+              </p>
+              <p>
+                Stored values follow <code>svg:xanax</code> and
+                <code> svg:color:xanax</code>, with the same pattern for each
+                name. The named <code>Xanax</code>, <code>Iserlohn</code>,
+                <code> Desloratadin</code> and <code>Atarax</code> exports use
+                <code> createLucideIcon</code> and the same source geometry as
+                their assets: a 24×24 viewport, default 2px currentColor stroke,
+                no fill, and rounded caps and joins. Fine vector imprints retain
+                proportional strokes. UI callers keep their normal size and
+                stroke overrides. Search indexes both variants, their component
+                names and labels, imprints such as UPJOHN 90, and useful English
+                and German shape/color terms. Picker totals count each variant
+                separately; outline tint and saved icon rotation keep their
+                existing behavior.
+              </p>
+              <p>
+                Nose, Single Tablet and Angled Tablet retain their original
+                selectable geometry. Nose’s shortened bridge fits a square 24×24 viewport while keeping the
                 reference profile recognizable. Lucide-compatible defaults use a
                 2px currentColor stroke, no fill and rounded caps and joins. The
                 stored svg:nose key follows the existing allowlisted catalog and
