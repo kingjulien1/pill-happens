@@ -953,9 +953,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         both modes, with readable light ink. The base surface has no radial
         highlights, ambient background field, backdrop blur or saturation; the
         late-countdown glow is a separate paint-only overlay. This translucent
-        surface is separate from the unchanged application canvas: opaque
-        Plum/Black <code>#29213b</code> with its three fixed, faint edge
-        highlights. Semantic reading panels retain their separate light/dark
+        surface is separate from the application canvas: opaque Plum/Black
+        <code> #29213b</code> and three fixed, faint edge highlights beneath a
+        uniform 45% Purple500 overlay. Semantic reading panels retain light/dark
         roles.
       </p>
       <ReferenceTable

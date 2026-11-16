@@ -990,9 +990,13 @@ export function DeveloperGuidePage() {
                 opaque foundation in both appearance modes: 92% canonical Plum
                 and 8% Black, resolved to <code>#29213b</code>. Fixed edge
                 gradients add Violet400 at 5.5%, Indigo400 at 4.5% and
-                Fuchsia400 at 3.5%. This is the same restrained background
-                recipe used by notifications, with no moving field, uniform
-                wash, dimming veil, backdrop blur or saturation filter.
+                Fuchsia400 at 3.5%. A uniform Purple500 overlay at exactly
+                45% opacity sits above that paint. It is the first layer in
+                <code> APP_CANVAS_BACKGROUND</code>, shared by pre-hydration,
+                normal pages, loading and offline views. Content and interactive
+                surfaces stay above the background; no overlay element captures
+                input. The underlying edge gradients remain static, with no
+                moving field, backdrop blur or saturation filter.
               </p>
               <p>
                 The shared <code>--app-canvas-base</code>,
@@ -1567,8 +1571,8 @@ export function DeveloperGuidePage() {
                 on its own clipped layer; plain base and score colors remain
                 valid in SVG strokes and color-mix. The full-screen backdrop
                 instead shares the application’s fixed
-                <code> #29213b</code> canvas and three static edge gradients in
-                both modes. Header and loading artwork share the same paint
+                <code> #29213b</code> canvas and three static edge gradients
+                beneath the shared 45% Purple500 overlay in both modes. Header and loading artwork share the same paint
                 under system and explicit Appearance preferences; external
                 styles do not replace it with the old Purple action face.
                 Local artwork glow and particles retain their own choreography
