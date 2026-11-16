@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { getEveningMoonMotion } from "@/lib/evening-moon-motion";
 import styles from "./evening-moon.module.css";
 
 const STAR_POSITIONS = [
@@ -35,7 +36,7 @@ type EveningStar = {
   bright: boolean;
 };
 
-/** A quiet crescent rocks gently while a few short-lived stars find their light. */
+/** A pendulum crescent carries a soft lagging tilt through its small star field. */
 export function EveningMoon({
   dialogOpen = false,
   ambientReady = true,
@@ -44,11 +45,59 @@ export function EveningMoon({
   ambientReady?: boolean;
 }) {
   const rootRef = useRef<HTMLSpanElement>(null);
+  const orbitRef = useRef<HTMLSpanElement>(null);
+  const swayRef = useRef<HTMLSpanElement>(null);
+  const motion = useRef<Animation[]>([]);
   const nextStarId = useRef(0);
   const [view, setView] = useState({
     active: false,
     stars: [] as EveningStar[],
   });
+
+  // Native timelines survive activity-gate changes; only unmount cancels them.
+  useEffect(() => {
+    const orbit = orbitRef.current;
+    const sway = swayRef.current;
+    if (!orbit?.animate || !sway?.animate) return;
+    const model = getEveningMoonMotion();
+    const options: KeyframeAnimationOptions = {
+      duration: model.duration,
+      iterations: Infinity,
+      easing: "linear",
+      fill: "both",
+    };
+    const animations = [
+      orbit.animate(
+        model.frames.map(({ offset, x, y }) => ({
+          offset,
+          transform: `translate(${x}px, ${y}px)`,
+        })),
+        options,
+      ),
+      sway.animate(
+        model.frames.map(({ offset, rotation, scale }) => ({
+          offset,
+          transform: `rotate(${rotation}deg) scale(${scale})`,
+        })),
+        options,
+      ),
+    ];
+    for (const animation of animations) {
+      animation.pause();
+      animation.currentTime = 0;
+    }
+    motion.current = animations;
+    return () => {
+      motion.current = [];
+      for (const animation of animations) animation.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    for (const animation of motion.current)
+      if (view.active) animation.play();
+      else animation.pause();
+  }, [view.active]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -217,10 +266,16 @@ export function EveningMoon({
       data-lunar-star-count={view.stars.length}
       aria-hidden="true"
     >
-      <span className={styles.sway}>
-        <svg className={styles.moon} viewBox="0 0 24 24" data-evening-crescent>
-          <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401Z" />
-        </svg>
+      <span ref={orbitRef} className={styles.orbit} data-lunar-orbit>
+        <span ref={swayRef} className={styles.sway} data-lunar-sway>
+          <svg
+            className={styles.moon}
+            viewBox="0 0 24 24"
+            data-evening-crescent
+          >
+            <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401Z" />
+          </svg>
+        </span>
       </span>
       <span className={styles.sky}>
         {view.stars.map((star) => (
