@@ -8,7 +8,7 @@ import {
 const near = (actual: number, expected: number) =>
   assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} ≈ ${expected}`);
 
-test("positive quantities round upward without hiding any ordinary unit", () => {
+test("positive quantities retain their full count with at most three decorative frames", () => {
   for (const [quantity, count] of [
     [0.01, 1],
     [0.5, 1],
@@ -20,7 +20,7 @@ test("positive quantities round upward without hiding any ordinary unit", () => 
   ]) {
     const fan = getMedicationIconStack(quantity);
     assert.equal(fan.count, count);
-    assert.equal(fan.layers.length, count);
+    assert.equal(fan.layers.length, Math.min(count, 3));
   }
 });
 
@@ -81,7 +81,7 @@ test("huge quantities have bounded decoration while keeping their full count", (
     const fan = getMedicationIconStack(quantity);
     assert.equal(fan.count, quantity);
     assert.equal(fan.layers.length, MEDICATION_ICON_STACK.maxLayers);
-    assert.ok(fan.layers.at(-1)!.opacity < 0.02);
+    near(fan.layers.at(-1)!.opacity, 0.83 ** 2);
     for (const layer of fan.layers)
       for (const value of Object.values(layer))
         assert.ok(Number.isFinite(value));

@@ -1,7 +1,10 @@
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { ComponentProps, ReactNode } from "react";
 import { MedicationCardBase } from "@/components/medication-card-base";
-import { MedicationFormBadge } from "@/components/medication-card-icon";
+import {
+  MedicationFormBadge,
+  MedicationQuantityBadge,
+} from "@/components/medication-card-icon";
 import {
   getMedicationCategories,
   getMedicationCategory,
@@ -90,10 +93,16 @@ export function MedicationCard({
       decoration={decoration}
       artworkBadge={
         formPresentation === "icon" ? (
-          <MedicationFormBadge
-            form={form}
-            hasIndicators={indicators.length > 0}
-          />
+          <>
+            <MedicationFormBadge
+              form={form}
+              hasIndicators={indicators.length > 0}
+            />
+            <MedicationQuantityBadge
+              quantity={quantity}
+              hasIndicators={indicators.length > 0}
+            />
+          </>
         ) : undefined
       }
     >

@@ -6,9 +6,9 @@ export const MEDICATION_ICON_STACK = {
   sizeRatio: 0.92,
   padding: 8,
   rail: 56,
-  // The 24th layer is already below 1.4% opacity. Bound costly glyph rendering
-  // for large drops/pump quantities while retaining every ordinary 1–10 layer.
-  maxLayers: 24,
+  // Keep the front frame and at most two decorative copies. The quantity badge
+  // and dose retain the real amount independently of this visual limit.
+  maxLayers: 3,
 } as const;
 
 export type MedicationIconStackLayer = {

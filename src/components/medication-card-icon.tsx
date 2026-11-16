@@ -15,6 +15,7 @@ import {
   type MedicationType,
 } from "@/lib/medication-types";
 import { cn } from "@/lib/utils";
+import { formatDose } from "@/lib/domain";
 import styles from "./medication-card-icon.module.css";
 
 type MedicationArtworkProps = {
@@ -80,6 +81,38 @@ export function MedicationFormBadge({
         strokeWidth={2}
         className={styles.formGlyph}
       />
+    </span>
+  );
+}
+
+/** The amount beyond the front icon stays separate from decorative fan limits. */
+export function MedicationQuantityBadge({
+  quantity,
+  hasIndicators,
+}: {
+  quantity: number;
+  hasIndicators: boolean;
+}) {
+  if (!Number.isFinite(quantity) || quantity <= 1) return null;
+  const extra = quantity - 1;
+  const formatted = formatDose(extra);
+  // Preserve a positive legacy fraction even below the normal eight-digit
+  // display precision; a +0 badge would misrepresent it.
+  const label = `+${formatted === "0" ? String(extra) : formatted}`;
+  return (
+    <span
+      className={styles.quantityBadge}
+      aria-hidden="true"
+      title={`${formatDose(quantity)} total · ${label} beyond the front icon`}
+      data-intake-extra-quantity={extra}
+      data-has-indicators={hasIndicators}
+    >
+      <span
+        className={styles.quantityLabel}
+        data-long={label.length > 7 || undefined}
+      >
+        {label}
+      </span>
     </span>
   );
 }

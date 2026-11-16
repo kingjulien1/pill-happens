@@ -21,7 +21,8 @@
    category icon plus its 4px rail padding. Keep the small form badge on that
    centre line, with 40% outside the front mark's left edge.
    Its frame stays full size while rear exposure compresses inside the rail. */
-.formBadge {
+.formBadge,
+.quantityBadge {
   --form-badge-size: 16px;
   position: absolute;
   z-index: 6;
@@ -41,8 +42,44 @@
   pointer-events: none;
 }
 
-.formBadge[data-has-indicators="true"] {
+.formBadge[data-has-indicators="true"],
+.quantityBadge[data-has-indicators="true"] {
   --form-badge-row-height: 24px;
+}
+
+/* Mirror the form badge around the 48px front tile, never the fan's rear edge.
+   Long counters extend inward over the artwork rather than into the time. */
+.quantityBadge {
+  left: calc(var(--icon-front-left, 4px) + 48px - var(--form-badge-size) * 0.6);
+}
+
+.quantityLabel {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  display: block;
+  width: max-content;
+  min-width: var(--form-badge-size);
+  max-width: calc(48px - var(--form-badge-size) * 0.2 - 2px);
+  height: 12px;
+  padding: 0 3px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--card-foreground) 9%, var(--background));
+  color: color-mix(in srgb, var(--card-foreground) 65%, transparent);
+  font-size: 8px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  line-height: 12px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+.quantityLabel[data-long="true"] {
+  padding-inline: 1.5px;
+  font-size: 7px;
 }
 
 .formBadge > .formGlyph {
@@ -164,11 +201,13 @@
 }
 
 @media (min-width: 768px) {
-  .formBadge {
+  .formBadge,
+  .quantityBadge {
     --form-badge-size: 17.6px;
   }
 
-  .formBadge[data-has-indicators="true"] {
+  .formBadge[data-has-indicators="true"],
+  .quantityBadge[data-has-indicators="true"] {
     --form-badge-row-height: 26px;
   }
 
@@ -187,14 +226,17 @@
 /* The badge has its own quiet entry, with no scale or rotation from the artwork. */
 @media (prefers-reduced-motion: no-preference) {
   :global([data-card-entry-state="running"]) .formBadge,
-  :global(.intake-stack-measure[data-entrance-state="running"]) .formBadge {
+  :global(.intake-stack-measure[data-entrance-state="running"]) .formBadge,
+  :global([data-card-entry-state="running"]) .quantityBadge,
+  :global(.intake-stack-measure[data-entrance-state="running"]) .quantityBadge {
     animation: medication-form-arrive 520ms cubic-bezier(0.16, 0.7, 0.2, 1)
       calc(var(--intake-enter-delay, var(--card-entry-delay, 0ms)) + 320ms)
       backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
 
-  :global(.intake-stack-measure[data-entrance-kind="preview"]) .formBadge {
+  :global(.intake-stack-measure[data-entrance-kind="preview"]) .formBadge,
+  :global(.intake-stack-measure[data-entrance-kind="preview"]) .quantityBadge {
     animation: none;
   }
 }
