@@ -26,13 +26,25 @@
   );
 }
 
-/* Opaque canvas plus one selected-color tint keeps folded content hidden. */
+/* A quiet selected-color tint keeps identity on the artwork; the opaque face
+   still masks folded content below it. */
 .card:global(.intake-log-card[data-intake-card]) {
+  --entry-intake-base: var(--background);
   --entry-surface-base: color-mix(
     in srgb,
-    var(--entry-color) 13%,
-    var(--background)
+    var(--entry-color) 8%,
+    var(--entry-intake-base)
   );
+}
+
+@media (prefers-color-scheme: dark) {
+  .card:global(.intake-log-card[data-intake-card]) {
+    --entry-intake-base: color-mix(
+      in srgb,
+      var(--background) 88%,
+      var(--palette-lilac)
+    );
+  }
 }
 
 /* Keep keyboard focus as visible as before, inside the same compact footprint. */
