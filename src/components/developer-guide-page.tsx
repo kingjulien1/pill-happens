@@ -1203,8 +1203,10 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Actual intake cards composite their selected medication color
-                at 13% over the fully opaque <code>--background</code>
-                foundation surface. This single tint preserves the saved swatch
+                at 8% over a fully opaque foundation. Light mode keeps
+                <code> --background</code>; dark mode lifts that base with 12%
+                canonical Lilac and 88% background for a softer Plum face.
+                This single medication-color tint preserves the saved swatch
                 without introducing a second pink base layer. Text and artwork
                 keep their own full opacity. Folded cards cannot show through
                 the opaque face above them.
@@ -1675,8 +1677,10 @@ export function DeveloperGuidePage() {
                 before the ingredient. Library values come from saved defaults;
                 intake values come from the actual record. Both use the same
                 geometry and glyph frame. Actual intakes use the selected
-                palette swatch from <code>--entry-color</code> at 13% over the
-                opaque foundation color. The tint is independent of darker icon
+                palette swatch from <code>--entry-color</code> at 8% over the
+                opaque foundation color, lifted with 12% Lilac in dark mode.
+                Today, historical intakes and read-only notification intake
+                previews share that paint. The tint is independent of darker icon
                 ink and fixed-color SVG artwork. Their 4px neutral frame and 2px
                 identity band sit entirely inside the card, with the identity
                 pigment at 50% opacity. Check-ins use that same inward frame
