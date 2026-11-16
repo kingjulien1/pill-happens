@@ -511,7 +511,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "undo",
-            "One attempt per click. Accessible defaults: Undo change → Undoing change → Change undone. The same ready/pending/done control is in the collapsed header or expanded footer; failure stays inline or opens a detached error.",
+            "One attempt per click when a confirmed callback exists. Accessible defaults: Undo change → Undoing change → Change undone. Without a callback, the control remains visible and native-disabled with the label Undo unavailable for this notice. The same ready/pending/done/unavailable presentation appears in the collapsed header or expanded footer; failure stays inline or opens a detached error.",
           ],
           [
             "variant",
@@ -574,8 +574,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         preservation. The provider already reports ordinary mutation errors;
         avoid adding a duplicate error notice. Reserve <code>intake-saved</code>{" "}
         for a newly saved intake; edits use general Success. The preview is
-        independently derived from the confirmed record, and Undo appears only
-        when the provider supplied its callback.
+        independently derived from the confirmed record. Undo is always visible,
+        but only enabled when the provider supplies its callback. Other notices
+        retain a native-disabled gray control; absence of a receipt does not
+        imply that no data was changed.
       </p>
 
       <Heading id="previews" level={3}>
@@ -659,11 +661,12 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Journal and Guide receive fitting symbols. Each tool has a 30px tonal
         tile, a 17px glyph and an 8.5px caption within a 52px-wide, at least
         47px-high target. Four usual intake actions fit a 320px viewport: Entry,
-        Medication, the real Undo and Collapse. Undo uses the original callback,
-        pending guard and failure handling; it is never inferred from a preview.
-        Collapse returns focus to the summary before its details become inert.
-        Following a normal destination link also collapses details without
-        cancelling navigation; modified clicks keep their native new-tab
+        Medication, Undo and Collapse. The same Undo slot stays present without
+        a callback, native-disabled and gray. A real Undo uses the original
+        callback, pending guard and failure handling; it is never inferred from
+        a preview. Collapse returns focus to the summary before its details
+        become inert. Following a normal destination link also collapses details
+        without cancelling navigation; modified clicks keep their native new-tab
         behavior. A 9px footer at 50% ink alpha gives brief context. Typed
         previews use short record-specific copy or explain the real Undo.
         Notices without a preview may use caller-provided footer context. Caller
@@ -994,8 +997,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "19×14px, left11px/top−7px, 9px tabular secondary ink; no pointer events, layout growth or accessible countdown chatter. Hidden for infinite notices; its tiny glass base uses the existing Fuchsia surface.",
           ],
           [
-            "Header Undo",
-            "While collapsed: one transparent 44px target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon and 9px label. While expanded: the same action moves to the centered 52px footer tool with a 30px tile and 8.5px caption; no duplicate header action.",
+            "Header / unavailable Undo",
+            "While collapsed: one transparent 44px target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon and 9px label. While expanded: the same action moves to the centered 52px footer tool with a 30px tile and 8.5px caption; no duplicate header action. Without a callback, both locations use native disabled semantics, Zinc300 ink at 38% and a 4% neutral tile, with no extra element-opacity multiplier. The caption stays Undo; the accessible label/title explain that it is unavailable. No handler or fabricated reversal is attached. Pending/done retain their existing feedback.",
           ],
           [
             "Expanded backdrop / footer",
