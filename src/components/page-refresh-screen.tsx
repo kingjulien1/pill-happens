@@ -75,6 +75,12 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   --refresh-arrival: var(--page-refresh-elapsed, 0ms);
   --refresh-threshold: calc(var(--page-refresh-elapsed, 0ms) + 1200ms);
   --refresh-loop: calc(var(--page-refresh-elapsed, 0ms) + 2160ms);
+  --refresh-focus-x: 50%;
+  --refresh-focus-y: 44%;
+  --refresh-aperture-clear: 128px;
+  --refresh-aperture-outer: clamp(168px, 49vmin, 460px);
+  --refresh-aperture-feather: calc(var(--refresh-aperture-outer) - var(--refresh-aperture-clear));
+  --refresh-veil-color: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
   --page-refresh-motion: paused;
   position: fixed;
   z-index: 1000;
@@ -100,16 +106,49 @@ html[data-page-refresh-active] .page-refresh-screen {
   box-sizing: border-box;
   animation-play-state: var(--page-refresh-motion, paused) !important;
 }
+.page-refresh-veil {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  /* Direct alpha stops paint immediately, including before masks/app CSS exist.
+     The complete core sits in the clear aperture and above this separate layer. */
+  background: radial-gradient(circle at var(--refresh-focus-x) var(--refresh-focus-y),
+    transparent 0 var(--refresh-aperture-clear),
+    color-mix(in srgb, var(--refresh-veil-color) 12%, transparent) calc(var(--refresh-aperture-clear) + var(--refresh-aperture-feather) * .24),
+    color-mix(in srgb, var(--refresh-veil-color) 40%, transparent) calc(var(--refresh-aperture-clear) + var(--refresh-aperture-feather) * .56),
+    color-mix(in srgb, var(--refresh-veil-color) 68%, transparent) calc(var(--refresh-aperture-clear) + var(--refresh-aperture-feather) * .82),
+    color-mix(in srgb, var(--refresh-veil-color) 79%, transparent) var(--refresh-aperture-outer));
+}
+.page-refresh-veil::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* A soft reflected edge, rather than a visible ring; the center stays clear. */
+  background: radial-gradient(circle at var(--refresh-focus-x) var(--refresh-focus-y),
+    transparent 0 var(--refresh-aperture-clear),
+    color-mix(in srgb, var(--color-violet-300, #c4b4ff) 8%, transparent) calc(var(--refresh-aperture-clear) + var(--refresh-aperture-feather) * .34),
+    color-mix(in srgb, var(--color-pink-300, #fda5d5) 4.5%, transparent) calc(var(--refresh-aperture-clear) + var(--refresh-aperture-feather) * .66),
+    transparent var(--refresh-aperture-outer));
+  opacity: .68;
+  animation: refresh-aperture-breathe 8800ms ease-in-out var(--refresh-loop) infinite;
+}
+@keyframes refresh-aperture-breathe {
+  0%, 100% { opacity: .68; }
+  50% { opacity: 1; }
+}
 .page-refresh-atmosphere {
   position: absolute;
+  z-index: 1;
   inset: 0;
   pointer-events: none;
   animation: refresh-brand-atmosphere-enter 2160ms ease-out var(--refresh-arrival) both;
 }
 .page-refresh-aura {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: var(--refresh-focus-y);
+  left: var(--refresh-focus-x);
   width: min(100vw, 580px);
   height: min(85vh, 500px);
   border-radius: 50%;
@@ -124,8 +163,9 @@ html[data-page-refresh-active] .page-refresh-screen {
 }
 .page-refresh-scene {
   position: absolute;
-  top: 44%;
-  left: 50%;
+  z-index: 2;
+  top: var(--refresh-focus-y);
+  left: var(--refresh-focus-x);
   width: min(calc(100% - 48px), 320px);
   height: 115px;
   transform: translate(-50%, -50%);
@@ -337,12 +377,13 @@ html[data-page-refresh-pills-ready="true"] .page-refresh-wanderers { display: bl
 }
 @media (hover: hover) and (pointer: fine) { .page-refresh-footer a:hover { text-decoration: underline; } }
 @media (max-height: 700px) {
-  .page-refresh-scene { top: 39%; }
+  .page-refresh-screen { --refresh-focus-y: 39%; }
   .page-refresh-copy { top: calc(100% + 64px); }
   .page-refresh-footer { bottom: max(40px, calc(env(safe-area-inset-bottom) + 24px)); }
 }
 @media (max-height: 450px) and (min-width: 600px) {
-  .page-refresh-scene { top: 42%; left: 27%; width: 240px; }
+  .page-refresh-screen { --refresh-focus-x: 27%; --refresh-focus-y: 42%; }
+  .page-refresh-scene { width: 240px; }
   .page-refresh-copy { top: 28px; left: calc(100% + 16px); right: auto; width: 255px; text-align: left; }
   .page-refresh-footer { bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px)); }
 }
@@ -1048,6 +1089,7 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .page-refresh-veil::after { animation: none !important; opacity: .68; }
   .page-refresh-screen,
   .page-refresh-screen *,
   .page-refresh-screen *::before,
@@ -1101,6 +1143,7 @@ export function PageRefreshScreen() {
   ];
   return (
     <div className="page-refresh-screen" data-page-refresh-screen>
+      <div className="page-refresh-veil" aria-hidden="true" />
       <div className="page-refresh-atmosphere" aria-hidden="true">
         <span className="page-refresh-aura" />
       </div>

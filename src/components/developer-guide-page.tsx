@@ -1591,6 +1591,29 @@ export function DeveloperGuidePage() {
                 without changing the root field’s clock.
               </p>
               <p>
+                A loading-only Mauve900 veil reaches 79% opacity outside a
+                circular focus opening. The inner 128px radius is completely
+                clear; intermediate 12%, 40% and 68% alpha stops feather toward
+                an outer radius of <code>clamp(168px, 49vmin, 460px)</code>.
+                Phone edges become dark without sacrificing the core’s breathing
+                room, while larger screens retain a broader soft transition.
+                A second, faint Violet300 8% / Pink300 4.5% reflected halo
+                breathes between 68% and full layer opacity over 8.8 seconds,
+                beginning on the existing loop clock. Reduced motion settles it
+                and retains the dark veil.
+              </p>
+              <p>
+                Shared focus coordinates align the veil, existing aura and
+                scene: 50% / 44% normally, 50% / 39% on short screens, and
+                27% / 42% in short landscape. The veil is a separate passive
+                layer below all foreground artwork, copy and links, including
+                the charged face and particles. Direct radial alpha gradients
+                work in critical CSS before app styles arrive, without mask or
+                backdrop-filter support. The shade is present immediately;
+                neither its paint nor its decorative halo changes the original
+                loading, release, scroll or handoff clock.
+              </p>
+              <p>
                 The refresh symbol begins at zero size in the center and grows
                 while spinning rapidly clockwise: 540 degrees in the first
                 300ms, then a 250ms brake from 1800 to 1200 degrees per second.
