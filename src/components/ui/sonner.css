@@ -34,6 +34,12 @@ body:has(
   --toast-purple-400: var(--color-purple-400, oklch(71.4% 0.203 305.504));
   --toast-fuchsia-surface: color-mix(
     in srgb,
+    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 34%,
+    transparent
+  );
+  /* The artwork face keeps its depth independently of the lighter card glass. */
+  --toast-icon-surface: color-mix(
+    in srgb,
     var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
     transparent
   );
@@ -111,8 +117,8 @@ body:has(
   border-radius: 18px;
   background: var(--toast-surface-layers);
   /* Blur only the scene behind the glass; text, artwork and frames stay crisp. */
-  -webkit-backdrop-filter: blur(64px);
-  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(96px);
+  backdrop-filter: blur(96px);
   color: var(--toast-ink);
   /* Match intake cards: 4px at the edge, then 2px wholly inside it.
      A negative outline keeps the bands separate without taking Sonner's
@@ -303,7 +309,7 @@ body:has(
 [data-toast-symbol="success"] {
   --toast-glyph: var(--toast-ink);
   --toast-tile: var(
-    --toast-fuchsia-surface,
+    --toast-icon-surface,
     color-mix(
       in srgb,
       var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
