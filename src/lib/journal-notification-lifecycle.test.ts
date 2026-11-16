@@ -240,6 +240,28 @@ test("overlapping holds, expansion and hidden pauses also freeze the completed g
   close(clock.snapshot().graceRemaining, 0);
 });
 
+test("fractional completion deadlines expire after a notification's own held grace resumes", () => {
+  for (const duration of [400, 400.25]) {
+    let now = 0;
+    const clock = new NotificationClock(duration, () => now);
+    now = clock.snapshot().timeUntilComplete;
+    assert.equal(clock.snapshot().complete, true);
+    now += 100;
+    clock.pause("pointer", true);
+    now += 5_000;
+    assert.equal(clock.snapshot().expired, false);
+    close(clock.snapshot().graceRemaining, 900);
+    clock.pause("pointer", false);
+    now += 899;
+    assert.equal(clock.snapshot().expired, false);
+    now += 2;
+    assert.equal(clock.snapshot().expired, true);
+    assert.equal(clock.snapshot().graceRemaining, 0);
+    now += 10_000;
+    assert.equal(clock.snapshot().expired, true);
+  }
+});
+
 test("a single elapsed jump consumes bar time and grace without an extra frame", () => {
   let now = 0;
   const clock = new NotificationClock(100, () => now);

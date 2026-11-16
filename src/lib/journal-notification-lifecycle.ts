@@ -53,6 +53,7 @@ function progressAt(elapsed: number) {
 export class NotificationClock {
   private readonly nominalDuration: number;
   private readonly completeAt: number;
+  private readonly expiresAt: number;
   private elapsed = 0;
   private last: number;
   private pauses = new Set<string>();
@@ -65,6 +66,7 @@ export class NotificationClock {
       ? Math.max(0, duration)
       : Infinity;
     this.completeAt = this.nominalDuration * COMPLETE_TIME;
+    this.expiresAt = this.completeAt + NOTIFICATION_COMPLETION_GRACE;
     this.last = now();
   }
 
@@ -72,7 +74,7 @@ export class NotificationClock {
     const current = Math.max(this.last, this.now());
     if (this.pauses.size === 0 && Number.isFinite(this.completeAt))
       this.elapsed = Math.min(
-        this.completeAt + NOTIFICATION_COMPLETION_GRACE,
+        this.expiresAt,
         this.elapsed + (current - this.last),
       );
     this.last = current;
@@ -98,11 +100,9 @@ export class NotificationClock {
         ? 0
         : progressAt(this.elapsed / this.nominalDuration);
     const graceRemaining = finite
-      ? Math.max(
-          0,
-          NOTIFICATION_COMPLETION_GRACE -
-            Math.max(0, this.elapsed - this.completeAt),
-        )
+      ? complete
+        ? Math.max(0, this.expiresAt - this.elapsed)
+        : NOTIFICATION_COMPLETION_GRACE
       : 0;
     const pulseUrgency = finite
       ? Math.max(0, Math.min(1, (0.5 - progress) / 0.5))
@@ -111,7 +111,7 @@ export class NotificationClock {
       remaining: finite ? progress * this.nominalDuration : Infinity,
       progress,
       paused: this.pauses.size > 0,
-      expired: complete && graceRemaining === 0,
+      expired: finite && this.elapsed >= this.expiresAt,
       complete,
       timeUntilComplete,
       graceRemaining,
