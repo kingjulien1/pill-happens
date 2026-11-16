@@ -1750,12 +1750,14 @@ export function DeveloperGuidePage() {
                 text keeps both single-line rows and their reserved clearances.
               </p>
               <p>
-                Decorative rendering stops at 24 layers, whose last frame is
-                already below 1.4% opacity. This bounds unusually large drop or
-                pump values while normal quantities up to ten retain every
-                frame. The exact quantity remains in the dose and accessible
-                description. One inner entrance wrapper animates the complete
-                fan while its outer rail stays still. Keyed internal frames
+                Decorative rendering stops at three frames: one front and two
+                rear copies. Exact quantities remain in the dose and accessible
+                description. Actual intake cards add a compact +x counter for
+                the recorded quantity minus one, not the capped layer count:
+                2 becomes +1, 2.5 becomes +1.5 and 10 becomes +9. Quantities
+                at or below one and invalid values omit it. One inner entrance
+                wrapper animates the complete fan while its outer rail stays
+                still. Keyed internal frames
                 never replay entrance animations during
                 group disclosure. Invalid or missing decorative quantities use
                 one frame without rewriting any medication or intake.
@@ -1778,6 +1780,18 @@ export function DeveloperGuidePage() {
                 their existing sizes. Cards without category glyphs use the same
                 enlarged form badge. Reduced motion shows the settled artwork
                 and badge without response effects.
+                The quantity counter mirrors the form badge around the fixed
+                48px front artwork, on the same vertical center and with the same
+                16px/17.6px anchor box. Its quiet 12px-high face uses 8px tabular
+                numerals (7px for longer values), 65% foreground ink and a 9%
+                foreground/semantic-base surface, without a border. Long values
+                grow inward, keeping at least 2px before the form symbol and
+                the time column clear; the full count stays in the native title
+                and recorded dose. It follows the form badge’s separate fade/slide
+                and never spins or repeats on rear layers. Today, historical
+                intake cards and read-only notification intake previews share
+                the counter. Library defaults, appearance heroes, history
+                summaries and check-in artwork do not gain it.
               </p>
               <p>
                 Appearance groups the symbol search and compact rounded color
