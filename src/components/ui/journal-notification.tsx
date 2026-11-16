@@ -11,7 +11,19 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { ArrowUpRight, Check, LoaderCircle, Undo2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  BookOpenText,
+  CalendarDays,
+  Check,
+  Info,
+  LoaderCircle,
+  Minimize2,
+  MoonStar,
+  PillBottle,
+  Target,
+  Undo2,
+} from "lucide-react";
 import type { Action, ExternalToast } from "sonner";
 import { ToastSymbol } from "@/components/ui/sonner";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
@@ -69,17 +81,45 @@ export type JournalNotificationProps = {
 };
 
 const defaultContext: Record<JournalToastKind, string> = {
-  success: "Your journal has been updated. You can carry on from here.",
+  success: "The change is saved in your journal.",
   error:
-    "The change was not confirmed. Review the message, then try again when you’re ready. Unsaved form inputs stay in their draft.",
-  info: "A little context for your journal. Your saved entries stay as they are unless this notice says otherwise.",
-  warning:
-    "Take a moment to review this notice before continuing. Keeping it open pauses its timer.",
+    "The change wasn’t confirmed. Your unsaved inputs stay in their draft.",
+  info: "Review the notice above for the latest journal update.",
+  warning: "Review this notice before continuing.",
   loading:
-    "The current action is still running. This notice will update when a result is available; it has no countdown while you wait.",
-  update:
-    "A new version is ready. Reload after finishing your current entry; saved records and drafts remain in your journal.",
+    "The action is still running. This notice will update when it finishes.",
+  update: "Finish your current entry before reloading to the new version.",
 };
+
+const defaultFooter: Record<JournalToastKind, string> = {
+  success: "Saved in your journal.",
+  error: "Your unsaved draft stays available.",
+  info: "Your journal, at a glance.",
+  warning: "A moment to check the details.",
+  loading: "This notice updates when the action finishes.",
+  update: "Saved records and drafts stay in your journal.",
+};
+
+function linkPresentation(href: string, label: string) {
+  if (/^\/medications(?:[/?#]|$)/.test(href))
+    return { Icon: PillBottle, caption: "Medication" };
+  if (/^\/history\//.test(href)) {
+    if (/[?&]intake=/.test(href))
+      return { Icon: BookOpenText, caption: "Entry" };
+    if (/[?&]checkin=/.test(href))
+      return { Icon: MoonStar, caption: "Check-In" };
+    return { Icon: CalendarDays, caption: "Day" };
+  }
+  if (/^\/history(?:[?#]|$)/.test(href))
+    return { Icon: CalendarDays, caption: "Past Days" };
+  if (/^\/goals(?:[/?#]|$)/.test(href))
+    return { Icon: Target, caption: "Goals" };
+  if (/^\/(?:developer-guide|guide)(?:[/?#]|$)/.test(href))
+    return { Icon: BookOpenText, caption: "Guide" };
+  if (href === "/" || /^\/journal(?:[/?#]|$)/.test(href))
+    return { Icon: BookOpenText, caption: href === "/" ? "Today" : "Journal" };
+  return { Icon: ArrowUpRight, caption: label };
+}
 
 function isAction(value: ExternalToast["action"]): value is Action {
   return Boolean(
@@ -368,6 +408,18 @@ export function JournalNotification({
     if (!undo || undoState !== "ready" || leaving.current) return;
     pause("undo", true);
     setUndoError("");
+    // Native disabled buttons relinquish focus. Keep keyboard focus in this
+    // notification before either Undo control enters its pending state.
+    if (
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.matches(
+        ".journal-notification-undo, .journal-notification-footer-undo",
+      ) &&
+      root.current?.contains(document.activeElement)
+    )
+      root.current
+        .querySelector<HTMLButtonElement>(".journal-notification-summary")
+        ?.focus({ preventScroll: true });
     setUndoState("pending");
     try {
       await settleNotificationUndo({
@@ -402,6 +454,62 @@ export function JournalNotification({
     }
   };
 
+  const renderUndo = (footer = false) =>
+    undo && (
+      <Button
+        variant="ghost"
+        size="icon"
+        type="button"
+        className={
+          footer
+            ? "journal-notification-tool journal-notification-footer-undo"
+            : "journal-notification-revert journal-notification-undo"
+        }
+        data-undo-state={undoState}
+        disabled={undoState !== "ready" || phase !== "idle"}
+        aria-busy={undoState === "pending"}
+        aria-label={
+          undoState === "pending"
+            ? (undo.pendingLabel ?? "Undoing change")
+            : undoState === "done"
+              ? (undo.successLabel ?? "Change undone")
+              : (undo.label ?? "Undo change")
+        }
+        title={undo.label ?? "Undo change"}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={runUndo}
+      >
+        <span className="journal-notification-revert-symbol" aria-hidden="true">
+          {undoState === "pending" ? (
+            <LoaderCircle />
+          ) : undoState === "done" ? (
+            <Check />
+          ) : (
+            <Undo2 />
+          )}
+        </span>
+        <span className="journal-notification-revert-label" aria-hidden="true">
+          {undoState === "pending"
+            ? "Undoing"
+            : undoState === "done"
+              ? "Undone"
+              : "Undo"}
+        </span>
+      </Button>
+    );
+
+  const collapseDetails = (event: MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    if (phase !== "idle" || leaving.current) return;
+    // Move keyboard focus out before the details subtree becomes inert.
+    root.current
+      ?.querySelector<HTMLButtonElement>(".journal-notification-summary")
+      ?.focus({ preventScroll: true });
+    expandedRef.current = false;
+    pause("expanded", false);
+    setExpanded(false);
+  };
+
   const renderAction = (
     value: ExternalToast["action"],
     cancelAction = false,
@@ -434,6 +542,17 @@ export function JournalNotification({
   };
 
   const paragraphs = details?.paragraphs ?? [defaultContext[kind]];
+  const facts = details?.facts?.slice(0, 4) ?? [];
+  const previewRecord = details?.preview?.after ?? details?.preview?.before;
+  const footerCopy = previewRecord
+    ? undo
+      ? "Undo reverses this saved change."
+      : previewRecord.kind === "check-in"
+        ? "Your writing stays in the full check-in."
+        : previewRecord.kind === "medication"
+          ? "Medication settings apply to linked entries."
+          : "Tracking days begin at 06:00."
+    : (details?.footer ?? defaultFooter[kind]);
   return (
     <div
       ref={root}
@@ -532,50 +651,7 @@ export function JournalNotification({
             </span>
           </span>
         </button>
-        {undo && (
-          <Button
-            variant="ghost"
-            size="icon"
-            type="button"
-            className="journal-notification-revert journal-notification-undo"
-            data-undo-state={undoState}
-            disabled={undoState !== "ready" || phase !== "idle"}
-            aria-busy={undoState === "pending"}
-            aria-label={
-              undoState === "pending"
-                ? (undo.pendingLabel ?? "Undoing change")
-                : undoState === "done"
-                  ? (undo.successLabel ?? "Change undone")
-                  : (undo.label ?? "Undo change")
-            }
-            title={undo.label ?? "Undo change"}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={runUndo}
-          >
-            <span
-              className="journal-notification-revert-symbol"
-              aria-hidden="true"
-            >
-              {undoState === "pending" ? (
-                <LoaderCircle />
-              ) : undoState === "done" ? (
-                <Check />
-              ) : (
-                <Undo2 />
-              )}
-            </span>
-            <span
-              className="journal-notification-revert-label"
-              aria-hidden="true"
-            >
-              {undoState === "pending"
-                ? "Undoing"
-                : undoState === "done"
-                  ? "Undone"
-                  : "Undo"}
-            </span>
-          </Button>
-        )}
+        {!expanded && renderUndo()}
       </div>
       <div
         className="journal-notification-details"
@@ -587,57 +663,113 @@ export function JournalNotification({
         onPointerDown={(event) => event.stopPropagation()}
       >
         <div className="journal-notification-details-inner">
-          {details?.preview ? (
-            <NotificationChangePreview preview={details.preview} />
-          ) : (
-            paragraphs
-              .slice(0, 1)
-              .map((paragraph, index) => <p key={index}>{paragraph}</p>)
-          )}
-          {!details?.preview && Boolean(details?.facts?.length) && (
-            <dl className="journal-notification-facts">
-              {details?.facts?.map((fact, index) => (
-                <div key={index}>
-                  <dt>{fact.label}</dt>
-                  <dd>{fact.value}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-          {Boolean(details?.links?.length) && (
-            <div className="journal-notification-links">
-              {details?.links?.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  tabIndex={expanded ? 0 : -1}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  {link.label}
-                  <ArrowUpRight size={12} aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-          )}
+          <div className="journal-notification-main">
+            {details?.preview ? (
+              <NotificationChangePreview preview={details.preview} />
+            ) : facts.length ? (
+              <dl className="journal-notification-facts">
+                {facts.map((fact, index) => (
+                  <div key={index}>
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : paragraphs.length ? (
+              <div className="journal-notification-context">
+                <Info aria-hidden="true" />
+                <p>{paragraphs[0]}</p>
+              </div>
+            ) : null}
+          </div>
           {undoError && (
             <p className="journal-notification-error" role="alert">
               {undoError}
             </p>
           )}
           <div className="journal-notification-footer">
+            <div
+              className="journal-notification-tools"
+              role="group"
+              aria-label="Related Actions"
+            >
+              {details?.links?.map((link) => {
+                const { Icon: LinkIcon, caption } = linkPresentation(
+                  link.href,
+                  link.label,
+                );
+                return (
+                  <a
+                    key={link.href}
+                    className="journal-notification-tool"
+                    href={link.href}
+                    aria-label={link.label}
+                    title={link.label}
+                    tabIndex={expanded ? 0 : -1}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (
+                        !event.defaultPrevented &&
+                        event.button === 0 &&
+                        !event.metaKey &&
+                        !event.ctrlKey &&
+                        !event.altKey &&
+                        !event.shiftKey
+                      )
+                        collapseDetails(event);
+                    }}
+                  >
+                    <span
+                      className="journal-notification-tool-symbol"
+                      aria-hidden="true"
+                    >
+                      <LinkIcon />
+                    </span>
+                    <span
+                      className="journal-notification-tool-label"
+                      aria-hidden="true"
+                    >
+                      {caption}
+                    </span>
+                  </a>
+                );
+              })}
+              {renderUndo(true)}
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                className="journal-notification-tool"
+                aria-label="Collapse notification details"
+                title="Collapse details"
+                disabled={phase !== "idle"}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={collapseDetails}
+              >
+                <span
+                  className="journal-notification-tool-symbol"
+                  aria-hidden="true"
+                >
+                  <Minimize2 />
+                </span>
+                <span
+                  className="journal-notification-tool-label"
+                  aria-hidden="true"
+                >
+                  Collapse
+                </span>
+              </Button>
+            </div>
             <span className="journal-notification-footer-copy">
-              {(details?.preview ? undefined : details?.footer) ??
-                (expanded
-                  ? "A little reading time. The timer’s paused."
-                  : kind === "loading"
-                    ? "Still working. No disappearing act."
-                    : "Tap for context · Swipe to dismiss")}
+              {footerCopy}
             </span>
-            <span className="journal-notification-actions">
-              {renderAction(cancel, true)}
-              {renderAction(action)}
-            </span>
+            {(cancel || action) && (
+              <span className="journal-notification-actions">
+                {renderAction(cancel, true)}
+                {renderAction(action)}
+              </span>
+            )}
           </div>
         </div>
       </div>

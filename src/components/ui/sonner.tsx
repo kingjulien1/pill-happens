@@ -128,39 +128,44 @@ export function Toaster({
   ...props
 }: ToasterProps) {
   return (
-    <Sonner
-      position="top-center"
-      duration={NOTIFICATION_DEFAULT_DURATION}
-      gap={10}
-      visibleToasts={3}
-      offset={{ top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))" }}
-      mobileOffset={{
-        top: "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
-        left: 16,
-        right: 16,
-      }}
-      swipeDirections={["top", "left", "right"]}
-      containerAriaLabel="Journal notifications"
-      {...props}
-      closeButton={false}
-      className={cn("toaster group journal-toaster", className)}
-      icons={{ ...statusIcons, ...icons }}
-      style={
-        {
-          "--width": "min(460px, calc(100vw - 32px))",
-          ...style,
-        } as CSSProperties
-      }
-      toastOptions={{
-        ...toastOptions,
-        closeButton: false,
-        closeButtonAriaLabel:
-          toastOptions?.closeButtonAriaLabel ?? "Dismiss notification",
-        classNames: {
-          ...toastOptions?.classNames,
-          toast: cn("journal-toast", toastOptions?.classNames?.toast),
-        },
-      }}
-    />
+    <>
+      <div className="journal-notification-backdrop" aria-hidden="true" />
+      <Sonner
+        position="top-center"
+        duration={NOTIFICATION_DEFAULT_DURATION}
+        gap={10}
+        visibleToasts={3}
+        offset={{
+          top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))",
+        }}
+        mobileOffset={{
+          top: "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
+          left: 16,
+          right: 16,
+        }}
+        swipeDirections={["top", "left", "right"]}
+        containerAriaLabel="Journal notifications"
+        {...props}
+        closeButton={false}
+        className={cn("toaster group journal-toaster", className)}
+        icons={{ ...statusIcons, ...icons }}
+        style={
+          {
+            "--width": "min(460px, calc(100vw - 32px))",
+            ...style,
+          } as CSSProperties
+        }
+        toastOptions={{
+          ...toastOptions,
+          closeButton: false,
+          closeButtonAriaLabel:
+            toastOptions?.closeButtonAriaLabel ?? "Dismiss notification",
+          classNames: {
+            ...toastOptions?.classNames,
+            toast: cn("journal-toast", toastOptions?.classNames?.toast),
+          },
+        }}
+      />
+    </>
   );
 }
