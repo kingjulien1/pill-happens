@@ -1270,14 +1270,23 @@ export function DeveloperGuidePage() {
                 control or popover. Both page controls are 46px squares with
                 23px glyphs and 14px corners, about 39% larger than their former
                 33px / 16.5px geometry. The two controls anchor opposite edges
-                of the shared header. Both controls use the coffee icon tile’s
-                full <code>--check-in-art-surface</code>: Rose and Iris radial
-                reflections over its solid base. Their icons and opaque 2.5px
-                borders share the mug’s <code>--check-in-mug-ink</code>,
-                #c1b6cc. The 24px backdrop blur, faint decorative rim and
-                separate keyboard focus stay intact. Hover, focus and open
-                states keep this paint in both themes. Menu-specific layouts
-                determine each popup’s interior dimensions.
+                of the shared header. Both controls and the loading core use
+                <code> HEADER_CONTROL_PAINT</code>: Fuchsia 900 at 87% alpha
+                beneath the former coffee tile’s Rose/Iris surface on a
+                separate 31%-opacity layer. This preserves the whole gradient
+                composition while fading only that layer. A 24px backdrop blur
+                sits beneath the paint. Hover, focus and open states retain the
+                same face in both themes, with a separate keyboard focus ring.
+                Menu-specific layouts determine each popup’s interior dimensions.
+              </p>
+              <p>
+                Icon ink brightens the mug’s #c1b6cc with 20% White, then adds
+                Purple 400 at 67%. Both controls share a 2.5px main rim mixed
+                with 30% Pink 200, the blurred outer rim at 5⅓% alpha (one third
+                less than its former 8%), and a 1px inner rim in the mixed icon
+                color at 67%. These are decorative paint layers, so the 46px
+                control and its hit area do not grow. The resting rim is not
+                multiplied again by the gesture controller’s edge alpha.
               </p>
               <p>
                 After shared page-entry readiness, two separate layout wrappers
@@ -1294,15 +1303,16 @@ export function DeveloperGuidePage() {
                 transforms and tablet loops stay on their existing inner owners.
               </p>
               <p>
-                Header tablet circles use the opaque mug ink for fill and
-                stroke; their scores use the solid coffee-tile base rather than
-                its layered background value. These scoped rules account for
+                Header tablet circles use the new opaque mixed ink for fill
+                and stroke; their scores use the solid coffee-tile base rather
+                than its layered background value. These scoped rules account
+                for
                 BrandMark’s inline palette, so its nested artwork cannot retain
                 the old Pink by accident. The navigation glyph follows the same
-                mug foreground. The menu masthead uses its destination tiles’
-                surface and ink, while sign-in branding keeps its own palette;
-                the loading core retains the main action’s face and Purple 700
-                edge. The page header mark stays 34.5px in its 46px control. The
+                mixed foreground. The menu masthead uses its destination tiles’
+                surface and ink, while sign-in branding keeps its own palette.
+                The loading core shares the page controls’ new face and rims.
+                The page header mark stays 34.5px in its 46px control. The
                 panel masthead’s separate 32.4px/43.2px pair keeps the same
                 three-quarter ratio. Orbit, approach and spin still share the
                 same base keyframes. A 7.2-second header cycle runs at
@@ -1545,21 +1555,24 @@ export function DeveloperGuidePage() {
                 root. Critical head styles and a pre-paint handoff script cover
                 the page before external styles or React arrive. The new scene
                 translates the branding pull into a stationary 2.5× stage: its
-                46px internal world paints a 115px daily-action face, then
+                46px internal world paints a 115px shared header face, then
                 settles into the same 1.25× charged pose at 143.75px. RefreshCw
                 starts with 57.5px artwork; the face’s 1.25× spring and nested
                 1.14× icon scale compound to 81.9375px in the charged pose. The
-                core face matches the main action’s 40% Purple 950 / opaque
-                foundation mix; its edge and tablet use Purple 700, with nearby
-                Violet and Purple spark tones. Critical CSS supplies the exact
-                prepaint fallbacks: Purple 950 #3c0366, Purple 700 #8200db,
-                light foundation #fbfafd and dark foundation #2b233e. The
-                full-screen backdrop instead shares the application’s fixed
+                core uses the same 87%-alpha Fuchsia 900 foundation, 31% cup
+                surface, brighter Purple-mixed glyph and three-rim setup as the
+                live header. Critical declarations are generated from the same
+                frozen paint object, with literal fallbacks for every Tailwind
+                and palette color before app CSS arrives. The cup surface stays
+                on its own clipped layer; plain base and score colors remain
+                valid in SVG strokes and color-mix. The full-screen backdrop
+                instead shares the application’s fixed
                 <code> #29213b</code> canvas and three static edge gradients in
-                both modes. System and explicit Appearance rules still control
-                the tinted core before app styles arrive; old inline Pink
-                aliases no longer override it. Local artwork glow and particles
-                retain their own choreography without moving the page canvas.
+                both modes. Header and loading artwork share the same paint
+                under system and explicit Appearance preferences; external
+                styles do not replace it with the old Purple action face.
+                Local artwork glow and particles retain their own choreography
+                without moving the page canvas.
               </p>
               <p>
                 The refresh symbol begins at zero size in the center and grows
