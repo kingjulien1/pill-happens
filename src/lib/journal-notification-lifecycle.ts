@@ -2,11 +2,56 @@ export type NotificationId = string | number;
 export type NotificationExitReason =
   "dismiss" | "timeout" | "action" | "cancel";
 
-export const NOTIFICATION_DEFAULT_DURATION = 22_000;
+/** Nominal full-speed budget; the progressive finish adds active reading time. */
+export const NOTIFICATION_DEFAULT_DURATION = 22_000 / 3;
+export const NOTIFICATION_COMPLETION_GRACE = 500;
 
-/** A monotonic reading clock: every independent pause must clear before it runs. */
+const SLOW_START = 0.3;
+const SLOW_END = 0.1;
+const MINIMUM_SPEED = 0.5;
+const MIDDLE_RATE = 2.5;
+const MIDDLE_TIME = Math.log(2) / MIDDLE_RATE;
+const SLOW_START_TIME = 1 - SLOW_START;
+const SLOW_END_TIME = SLOW_START_TIME + MIDDLE_TIME;
+const COMPLETE_TIME = SLOW_END_TIME + SLOW_END / MINIMUM_SPEED;
+
+export type NotificationClockSnapshot = {
+  /** Nominal remaining milliseconds, matching duration × progress. */
+  remaining: number;
+  progress: number;
+  paused: boolean;
+  /** True after the empty bar's active grace period has also elapsed. */
+  expired: boolean;
+  complete: boolean;
+  /** Active milliseconds until the bar is empty, excluding its final grace. */
+  timeUntilComplete: number;
+  /** Full before completion; decreases only while the completed clock runs. */
+  graceRemaining: number;
+  speed: number;
+  colorUrgency: number;
+  cardUrgency: number;
+};
+
+function urgency(progress: number, start: number) {
+  return Math.max(0, Math.min(1, (start - progress) / (start - SLOW_END)));
+}
+
+/**
+ * Inverts the exact integrated speed curve, rather than advancing per frame.
+ * In the middle segment dp/dt = −(.25 + 2.5p) / duration, hence its exponential.
+ */
+function progressAt(elapsed: number) {
+  if (elapsed <= SLOW_START_TIME) return 1 - elapsed;
+  if (elapsed < SLOW_END_TIME)
+    return 0.4 * Math.exp(-MIDDLE_RATE * (elapsed - SLOW_START_TIME)) - 0.1;
+  return Math.max(0, SLOW_END - (elapsed - SLOW_END_TIME) * MINIMUM_SPEED);
+}
+
+/** Every clock integrates its own active time; all overlapping pauses must clear. */
 export class NotificationClock {
-  private remaining: number;
+  private readonly nominalDuration: number;
+  private readonly completeAt: number;
+  private elapsed = 0;
   private last: number;
   private pauses = new Set<string>();
 
@@ -14,16 +59,20 @@ export class NotificationClock {
     readonly duration: number,
     private readonly now: () => number = () => performance.now(),
   ) {
-    this.remaining = Number.isFinite(duration)
+    this.nominalDuration = Number.isFinite(duration)
       ? Math.max(0, duration)
       : Infinity;
+    this.completeAt = this.nominalDuration * COMPLETE_TIME;
     this.last = now();
   }
 
   private sample() {
     const current = Math.max(this.last, this.now());
-    if (this.pauses.size === 0 && Number.isFinite(this.remaining))
-      this.remaining = Math.max(0, this.remaining - (current - this.last));
+    if (this.pauses.size === 0 && Number.isFinite(this.completeAt))
+      this.elapsed = Math.min(
+        this.completeAt + NOTIFICATION_COMPLETION_GRACE,
+        this.elapsed + (current - this.last),
+      );
     this.last = current;
   }
 
@@ -34,17 +83,39 @@ export class NotificationClock {
     return this.snapshot();
   }
 
-  snapshot() {
+  snapshot(): NotificationClockSnapshot {
     this.sample();
+    const finite = Number.isFinite(this.nominalDuration);
+    const timeUntilComplete = finite
+      ? Math.max(0, this.completeAt - this.elapsed)
+      : Infinity;
+    const complete = timeUntilComplete === 0;
+    const progress = !finite
+      ? 1
+      : complete
+        ? 0
+        : progressAt(this.elapsed / this.nominalDuration);
+    const graceRemaining = finite
+      ? Math.max(
+          0,
+          NOTIFICATION_COMPLETION_GRACE -
+            Math.max(0, this.elapsed - this.completeAt),
+        )
+      : 0;
     return {
-      remaining: this.remaining,
-      progress: Number.isFinite(this.duration)
-        ? this.duration > 0
-          ? this.remaining / this.duration
-          : 0
-        : 1,
+      remaining: finite ? progress * this.nominalDuration : Infinity,
+      progress,
       paused: this.pauses.size > 0,
-      expired: this.remaining === 0,
+      expired: complete && graceRemaining === 0,
+      complete,
+      timeUntilComplete,
+      graceRemaining,
+      speed:
+        !finite || complete
+          ? 0
+          : Math.max(MINIMUM_SPEED, Math.min(1, 0.25 + MIDDLE_RATE * progress)),
+      colorUrgency: finite ? urgency(progress, 0.4) : 0,
+      cardUrgency: finite ? urgency(progress, SLOW_START) : 0,
     };
   }
 }
