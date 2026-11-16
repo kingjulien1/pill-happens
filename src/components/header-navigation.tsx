@@ -490,6 +490,7 @@ function NavigationMenu({
           {...triggerProps}
           render={<Button variant="ghost" size="icon" type="button" />}
         >
+          <span className="header-control-surface" aria-hidden="true" />
           <NavigationMenuMark open={open} />
         </DialogTrigger>
         <DialogContent
@@ -511,6 +512,7 @@ function NavigationMenu({
         {...triggerProps}
         render={<Button variant="ghost" size="icon" type="button" />}
       >
+        <span className="header-control-surface" aria-hidden="true" />
         <NavigationMenuMark open={open} />
       </Menu.Trigger>
       <Menu.Portal>

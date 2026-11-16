@@ -2849,16 +2849,19 @@
     transparent
   );
 }
-/* The two header controls borrow the coffee artwork's ink and layered surface. */
+/* Header controls and the critical loader share one layered paint contract.
+   Keep the old multi-gradient cup surface on its own 31% layer, rather than
+   fading either the Fuchsia foundation or the artwork along with it. */
 [data-page-topbar]
   .header-icon-button:is([data-brand-refresh], [data-navigation-trigger]) {
-  --header-button-pigment: var(--check-in-mug-ink);
-  --header-button-surface: var(--check-in-art-surface);
-  --header-button-edge: var(--header-button-pigment);
+  --header-button-pigment: var(--header-control-ink);
+  --header-button-surface: var(--header-control-base);
+  --header-button-edge: var(--header-control-thick-edge);
+  --header-button-soft-edge: var(--header-control-outer-edge);
   --header-button-active-edge: var(--header-button-edge);
   --header-button-hover-edge: var(--header-button-edge);
-  --header-button-active-fill: var(--check-in-art-base);
-  --header-button-hover-fill: var(--check-in-art-base);
+  --header-button-active-fill: var(--header-control-base);
+  --header-button-hover-fill: var(--header-control-base);
   --header-button-light: color-mix(
     in srgb,
     var(--header-button-pigment) 10%,
@@ -2866,10 +2869,11 @@
   );
   --header-button-shadow: color-mix(
     in srgb,
-    var(--check-in-art-base) 10%,
+    var(--header-control-cup-base) 10%,
     transparent
   );
   --brand-ink: var(--header-button-pigment);
+  /* The shared resting rim is not multiplied by the pull controller's alpha. */
   border-color: var(--header-button-edge);
   background: var(--header-button-surface);
   color: var(--header-button-pigment);
@@ -2877,9 +2881,32 @@
     inset 0 0.5625px 0 var(--header-button-light),
     0 1.6875px 6.75px var(--header-button-shadow);
 }
+[data-page-topbar] .header-control-surface {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: calc(14px - 2.5px);
+  background: var(--header-control-cup-surface);
+  opacity: var(--header-control-surface-opacity);
+  pointer-events: none;
+}
+[data-page-topbar]
+  .header-icon-button:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  )::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border: 1px solid var(--header-control-inner-edge);
+  border-radius: calc(14px - 2.5px);
+  pointer-events: none;
+}
 [data-page-topbar] [data-brand-refresh] {
-  --brand-copy: var(--check-in-mug-ink);
-  --brand-surface: var(--check-in-art-base);
+  --brand-copy: var(--header-control-ink);
+  --brand-surface: var(--header-control-cup-base);
 }
 [data-page-topbar] [data-brand-refresh] > .brand-mark {
   color: var(--header-button-pigment);
@@ -2889,7 +2916,7 @@
   stroke: var(--header-button-pigment);
 }
 [data-page-topbar] [data-brand-refresh] .brand-tablet path {
-  stroke: var(--check-in-art-base);
+  stroke: var(--header-control-cup-base);
 }
 .brand-menu {
   position: relative;

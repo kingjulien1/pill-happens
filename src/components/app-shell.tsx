@@ -12,6 +12,7 @@ import { useJournal } from "@/components/journal-provider";
 import { Button } from "@/components/ui/button";
 import { CompactRefreshBrand } from "@/components/page-refresh";
 import { HeaderNavigation } from "@/components/header-navigation";
+import { HEADER_CONTROL_PAINT } from "@/lib/header-control-paint";
 import { useJournalWorkspace } from "@/components/journal-drafts";
 import { CardEntrySequence } from "@/components/card-entry-sequence";
 import { JournalReferenceArrival } from "@/components/journal-reference-arrival";
@@ -98,6 +99,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             : topbarStyles.header
         }
         data-page-topbar
+        style={HEADER_CONTROL_PAINT}
         onPointerDownCapture={settleTopbarControl}
         onFocusCapture={settleTopbarControl}
         onAnimationEndCapture={finishTopbarControl}

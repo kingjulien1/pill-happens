@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { Pill, RefreshCw } from "lucide-react";
 import { APP_CANVAS_CSS } from "@/lib/app-theme";
+import { HEADER_CONTROL_PAINT_CSS } from "@/lib/header-control-paint";
 import { PAGE_REFRESH_BOOT_SCRIPT } from "@/lib/page-refresh-handoff";
 import {
   LOADING_SCREEN_COPY,
@@ -14,12 +15,12 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
    The46px brand world is uniformly scaled2.5; only its native spring scales vary. */
 .page-refresh-screen {
   ${APP_CANVAS_CSS}
-  /* Artwork retains its semantic control canvas before app CSS arrives. */
-  --refresh-canvas: var(--background, #fbfafd);
-  --refresh-face: var(--daily-action-face, color-mix(in srgb, var(--color-purple-950, #3c0366) 40%, var(--refresh-canvas)));
-  --refresh-edge: var(--daily-action-inner-edge, var(--color-purple-700, #8200db));
+  ${HEADER_CONTROL_PAINT_CSS}
+  /* Header paint remains identical before app CSS arrives. */
+  --refresh-face: var(--header-control-base);
+  --refresh-edge: var(--header-control-thick-edge);
   --brand-surface: var(--refresh-face);
-  --brand-copy: var(--refresh-edge);
+  --brand-copy: var(--header-control-ink);
   --brand-tone-ice: var(--color-violet-300, #c4b4ff);
   --brand-tone-teal: var(--color-violet-400, #a684ff);
   --brand-tone-pale: var(--color-violet-200, #ddd6ff);
@@ -70,7 +71,7 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   --refresh-paint-tone-pale-a20: color-mix( in srgb, var(--brand-tone-pale) calc(100% * 20 / 255), transparent );
   --refresh-ink: var(--app-canvas-foreground);
   --refresh-muted: var(--app-canvas-muted-foreground);
-  --refresh-cameo: var(--refresh-edge);
+  --refresh-cameo: var(--brand-copy);
   --refresh-arrival: var(--page-refresh-elapsed, 0ms);
   --refresh-threshold: calc(var(--page-refresh-elapsed, 0ms) + 1200ms);
   --refresh-loop: calc(var(--page-refresh-elapsed, 0ms) + 2160ms);
@@ -180,9 +181,12 @@ html[data-page-refresh-active] .page-refresh-screen {
 .page-refresh-arrival { animation: refresh-brand-face-arrive 1200ms linear var(--refresh-arrival) both; }
 .page-refresh-threshold { animation: refresh-brand-spring-core 960ms linear var(--refresh-threshold) both; }
 .page-refresh-core {
+  isolation: isolate;
   border: 2.5px solid var(--refresh-edge);
   border-radius: 14px;
   background: var(--brand-surface);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
   box-shadow: inset 0 .5625px 0 var(--refresh-paint-copy-p10), 0 1.6875px 6.75px var(--refresh-paint-surface-p10);
 }
 .page-refresh-core::before {
@@ -190,13 +194,33 @@ html[data-page-refresh-active] .page-refresh-screen {
   position: absolute;
   z-index: 0;
   inset: -2.5px;
-  border: 2.5px solid var(--refresh-paint-copy-p8);
+  border: 2.5px solid var(--header-control-outer-edge);
   border-radius: inherit;
   filter: blur(.8px);
   pointer-events: none;
 }
+.page-refresh-core::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: calc(14px - 2.5px);
+  box-shadow: inset 0 0 0 1px var(--header-control-inner-edge);
+  pointer-events: none;
+}
+.page-refresh-surface {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 11.5px;
+  background: var(--header-control-cup-surface);
+  opacity: var(--header-control-surface-opacity);
+  pointer-events: none;
+}
 .page-refresh-face {
   position: absolute;
+  z-index: 1;
   inset: 0;
   overflow: hidden;
   border-radius: inherit;
@@ -373,12 +397,10 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 @keyframes refresh-brand-copy-exit { 0%, 17% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.025); } 100% { opacity: 0; transform: scale(.9); } }
 @media (prefers-color-scheme: dark) {
   :where(html:not([data-color-mode])) .page-refresh-screen {
-    --refresh-canvas: var(--background, #2b233e);
     color-scheme: dark;
   }
 }
 :where(html[data-color-mode="dark"]) .page-refresh-screen {
-  --refresh-canvas: var(--background, #2b233e);
   color-scheme: dark;
 }
 
@@ -1134,6 +1156,7 @@ export function PageRefreshScreen() {
                 <div className="page-refresh-face-exit">
                   <div className="page-refresh-button-exit">
                     <div className="page-refresh-core" data-refresh-core>
+                      <span className="page-refresh-surface" />
                       <span className="page-refresh-face">
                         <span className="page-refresh-edge-exit">
                           <span className="page-refresh-edge" />

@@ -675,7 +675,13 @@ export function CompactRefreshBrand() {
     <div
       ref={surface}
       className={`brand-refresh relative flex items-center justify-center ${styles.root}`}
-      style={getBrandThemeStyle()}
+      style={
+        {
+          ...getBrandThemeStyle(),
+          "--brand-copy": "var(--header-control-ink)",
+          "--brand-surface": "var(--header-control-cup-base)",
+        } as CSSProperties
+      }
       data-rollback={burst?.kind === "home" || undefined}
       data-dragging={dragging}
       data-releasing={releasing}
@@ -781,6 +787,7 @@ export function CompactRefreshBrand() {
           suppressClick.current = false;
         }}
       >
+        <span className="header-control-surface" aria-hidden="true" />
         <BrandMark ref={mark} className={`size-6 ${styles.pills}`} />
         <span
           key={chargeSession}
