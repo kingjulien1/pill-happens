@@ -1,9 +1,9 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { ReactNode } from "react";
 import {
-  ArrowDown,
   BedDouble,
+  BookOpen,
   CalendarDays,
   Clock3,
   Coffee,
@@ -11,25 +11,21 @@ import {
   Target,
   Waves,
   Zap,
+  type LucideIcon,
 } from "lucide-react";
-import { MedicationCardIconStack } from "@/components/medication-card-icon";
+import { MedicationCard } from "@/components/medication-card";
+import { MedicationCardIcon } from "@/components/medication-card-icon";
 import { MedicationCardDose } from "@/components/medication-card-dose";
-import { MedicationFormGlyph } from "@/components/medication-form-glyph";
-import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
-import { getMedicationColor } from "@/lib/medication-appearance";
-import { getMedicationCategory } from "@/lib/medication-categories";
-import { getMedicationType } from "@/lib/medication-types";
 import { DAILY_MOODS } from "@/lib/daily-check-in";
 import { INTAKE_ROUTES } from "@/lib/intake-routes";
-import { formatDay, formatDose } from "@/lib/domain";
+import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
 import type {
   NotificationChangePreview as ChangePreview,
-  NotificationMedicationSnapshot,
   NotificationPreviewRecord,
 } from "@/lib/notification-change-preview";
 import styles from "./notification-change-preview.module.css";
 
-/** Read-only snapshots use the saved artwork, units and category components. */
+/** Actual card presentation, backed only by confirmed immutable display data. */
 export function NotificationChangePreview({
   preview,
 }: {
@@ -40,15 +36,28 @@ export function NotificationChangePreview({
   return (
     <div className={styles.root} data-notification-change-preview>
       {preview.before && (
-        <section aria-label={compared ? "Before change" : "Removed"}>
-          <p className={styles.caption}>{compared ? "Before" : "Removed"}</p>
+        <section
+          className={styles.snapshot}
+          aria-label={compared ? "Before change" : "Removed"}
+          data-notification-snapshot="before"
+        >
+          <SnapshotCaption
+            label={compared ? "Before" : "Removed"}
+            record={preview.before}
+          />
           <RecordPreview record={preview.before} />
         </section>
       )}
-      {compared && <ArrowDown className={styles.arrow} aria-hidden="true" />}
       {preview.after && (
-        <section aria-label={compared ? "After change" : "Saved"}>
-          <p className={styles.caption}>{compared ? "After" : "Saved"}</p>
+        <section
+          className={styles.snapshot}
+          aria-label={compared ? "After change" : "Saved"}
+          data-notification-snapshot="after"
+        >
+          <SnapshotCaption
+            label={compared ? "After" : "Saved"}
+            record={preview.after}
+          />
           <RecordPreview record={preview.after} />
         </section>
       )}
@@ -56,30 +65,48 @@ export function NotificationChangePreview({
   );
 }
 
-function Categories({
-  medication,
+function SnapshotCaption({
+  label,
+  record,
 }: {
-  medication?: NotificationMedicationSnapshot;
+  label: string;
+  record: NotificationPreviewRecord;
 }) {
-  const categories = medication?.categories ?? [];
-  if (!categories.length) return null;
+  let context: ReactNode = null;
+  let title: string | undefined;
+  if (record.kind === "intake") {
+    const localDay = toLocalInput(record.takenAt, record.timeZone).slice(0, 10);
+    const date = formatDay(localDay, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const route = INTAKE_ROUTES.find((item) => item.value === record.route);
+    title = [date, route?.label].filter(Boolean).join(" · ");
+    context = <span>{title}</span>;
+  } else if (record.kind === "medication") {
+    context = record.medication.archived ? "Archived" : "Active";
+  } else if (record.kind === "check-in") {
+    context = (
+      <time dateTime={record.day}>
+        {formatDay(record.day, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}
+      </time>
+    );
+  }
   return (
-    <span
-      className={styles.categories}
-      aria-label={categories
-        .map((category) => getMedicationCategory(category).label)
-        .join(", ")}
-    >
-      {categories.slice(0, 3).map((category) => (
-        <MedicationIndicatorMark
-          key={category}
-          kind={category}
-          size={18}
-          aria-hidden="true"
-        />
-      ))}
-      {categories.length > 3 && <span>+{categories.length - 3}</span>}
-    </span>
+    <div className={styles.caption}>
+      <span className={styles.stage}>{label}</span>
+      {context && (
+        <span className={styles.context} title={title}>
+          {context}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -88,85 +115,91 @@ function MedicationPreview({
 }: {
   record: Extract<NotificationPreviewRecord, { kind: "intake" | "medication" }>;
 }) {
-  const medication = record.medication;
   const intake = record.kind === "intake";
+  const medication = record.medication;
   const quantity = intake ? record.quantity : record.medication.defaultQuantity;
   const strength = intake ? record.strengthMg : record.medication.strengthMg;
   const form = intake ? record.form : record.medication.form;
   const name = intake ? record.name : record.medication.name;
-  const type = getMedicationType(form);
-  const color = getMedicationColor(medication?.color);
   const time = intake
-    ? new Intl.DateTimeFormat("en-GB", {
-        timeZone: record.timeZone,
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-      }).format(new Date(record.takenAt))
+    ? toLocalInput(record.takenAt, record.timeZone).slice(11)
     : null;
+
   return (
-    <article
-      className={styles.card}
-      style={{ "--entry-color": color.hex } as CSSProperties}
+    <MedicationCard
+      readOnly
+      medication={medication}
+      name={name}
+      form={form}
+      ingredient={medication?.activeIngredient}
+      quantity={quantity}
+      formPresentation={intake ? "icon" : "text"}
+      className={styles.medication}
       data-notification-record={record.kind}
-    >
-      <MedicationCardIconStack
-        color={medication?.color}
-        icon={medication?.icon}
-        iconRotation={medication?.iconRotation}
-        quantity={quantity}
-      />
-      <div className={styles.copy}>
-        <div className={styles.heading}>
-          <strong className={styles.name}>{name}</strong>
-          <Categories medication={medication} />
-        </div>
-        <div className={styles.meta}>
-          <MedicationFormGlyph
-            form={form ?? "other"}
-            size={13}
-            aria-hidden="true"
-          />
-          <span>{form ? type.label : "Medicine"}</span>
-          {time && (
-            <time
-              dateTime={record.kind === "intake" ? record.takenAt : undefined}
-            >
-              {time}
-            </time>
-          )}
-          {!intake && record.medication.archived && (
-            <span className={styles.status}>Archived</span>
-          )}
-          {!intake && !record.medication.archived && (
-            <span className={styles.status}>Active</span>
-          )}
-        </div>
-        <div className={styles.bottom}>
-          <span className={styles.ingredient}>
-            {medication?.activeIngredient?.trim() || "Unspecified"}
+      data-notification-snapshot-card
+      data-intake-card={intake ? "" : undefined}
+      data-medication-library-card={intake ? undefined : ""}
+      data-medication-archived={
+        !intake && record.medication.archived ? true : undefined
+      }
+      leading={
+        intake ? (
+          <time
+            className="intake-card-time"
+            dateTime={record.takenAt}
+            title={time + " · " + record.timeZone}
+            data-intake-time
+          >
+            {time}
+          </time>
+        ) : (
+          <span className="intake-card-time medication-library-default">
+            Default
           </span>
-          <MedicationCardDose
-            quantity={quantity}
-            strengthMg={strength}
-            form={form}
-            source={intake ? "recorded" : "default"}
-          />
-        </div>
-        {intake && (
-          <span className={styles.date}>
-            {new Intl.DateTimeFormat("en", {
-              timeZone: record.timeZone,
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-            }).format(new Date(record.takenAt))}{" "}
-            ·{" "}
-            {INTAKE_ROUTES.find((route) => route.value === record.route)
-              ?.label ?? "Route not recorded"}
-          </span>
-        )}
-      </div>
+        )
+      }
+      trailing={
+        <MedicationCardDose
+          quantity={quantity}
+          strengthMg={strength}
+          form={form}
+          source={intake ? "recorded" : "default"}
+        />
+      }
+    />
+  );
+}
+
+function Metric({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: LucideIcon;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <span className={styles.metric} role="img" title={label} aria-label={label}>
+      <Icon aria-hidden="true" />
+      <span aria-hidden="true">{children}</span>
+    </span>
+  );
+}
+
+function Panel({
+  kind,
+  artwork,
+  children,
+}: {
+  kind: "check-in" | "goal" | "timezone";
+  artwork: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <article className={styles.panel} data-notification-record={kind}>
+      {artwork}
+      <div className={styles.copy}>{children}</div>
     </article>
   );
 }
@@ -180,127 +213,135 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
     );
     const Icon = record.period === "morning" ? Coffee : MoonStar;
     return (
-      <article
-        className={styles.card + " " + styles.simple}
-        data-notification-record="check-in"
+      <Panel
+        kind="check-in"
+        artwork={
+          <span className={styles.symbol} aria-hidden="true">
+            <Icon />
+          </span>
+        }
       >
-        <span className={styles.symbol}>
-          <Icon aria-hidden="true" />
-        </span>
-        <div className={styles.copy}>
-          <div className={styles.heading}>
-            <strong>
-              {record.period === "morning" ? "Morning" : "Evening"} Check-In
-            </strong>
-            <span className={styles.words}>{record.words} words</span>
-          </div>
-          <p className={styles.meta}>
-            {formatDay(record.day, { month: "short", day: "numeric" })}
-          </p>
-          <div className={styles.metrics}>
+        <div className={styles.heading}>
+          <strong className={styles.name}>
+            {record.period === "morning" ? "Morning" : "Evening"} Check-In
+          </strong>
+          <span className={styles.moods}>
             {moods.map((mood) => (
-              <span key={mood.value}>
-                {mood.emoji} {mood.label}
+              <span
+                key={mood.value}
+                role="img"
+                aria-label={mood.label}
+                title={mood.label}
+              >
+                {mood.emoji}
               </span>
             ))}
-            {record.energy !== null && (
-              <span
-                className={styles.metric}
-                role="img"
-                aria-label={
-                  "Energy " + record.energy + " out of " + record.energyScale
-                }
-              >
-                <Zap aria-hidden="true" />
-                {record.energy}/{record.energyScale}
-              </span>
-            )}
-            {record.stress !== null && (
-              <span
-                className={styles.metric}
-                role="img"
-                aria-label={
-                  "Stress " + record.stress + " out of " + record.stressScale
-                }
-              >
-                <Waves aria-hidden="true" />
-                {record.stress}/{record.stressScale}
-              </span>
-            )}
-            {record.sleepHours !== null && (
-              <span
-                className={styles.metric}
-                role="img"
-                aria-label={formatDose(record.sleepHours) + " hours of sleep"}
-              >
-                <BedDouble aria-hidden="true" />
-                {formatDose(record.sleepHours)}h
-              </span>
-            )}
-            {record.bedtime && <span>Bed {record.bedtime}</span>}
-            {!moods.length &&
-              record.energy === null &&
-              record.stress === null &&
-              record.sleepHours === null &&
-              !record.bedtime && (
-                <span>
-                  {record.words
-                    ? "Journal writing saved"
-                    : "Check-in details saved"}
-                </span>
-              )}
-          </div>
+          </span>
         </div>
-      </article>
+        <div className={styles.metrics}>
+          <Metric icon={BookOpen} label={record.words + " words"}>
+            {record.words} words
+          </Metric>
+          {record.energy !== null && (
+            <Metric
+              icon={Zap}
+              label={
+                "Energy " + record.energy + " out of " + record.energyScale
+              }
+            >
+              {record.energy}/{record.energyScale}
+            </Metric>
+          )}
+          {record.stress !== null && (
+            <Metric
+              icon={Waves}
+              label={
+                "Stress " + record.stress + " out of " + record.stressScale
+              }
+            >
+              {record.stress}/{record.stressScale}
+            </Metric>
+          )}
+          {record.sleepHours !== null && (
+            <Metric
+              icon={BedDouble}
+              label={formatDose(record.sleepHours) + " hours of sleep"}
+            >
+              {formatDose(record.sleepHours)}h
+            </Metric>
+          )}
+          {record.bedtime && (
+            <Metric icon={MoonStar} label={"Bedtime " + record.bedtime}>
+              {record.bedtime}
+            </Metric>
+          )}
+        </div>
+      </Panel>
     );
   }
   if (record.kind === "goal")
     return (
-      <article
-        className={styles.card + " " + styles.simple}
-        data-notification-record="goal"
+      <Panel
+        kind="goal"
+        artwork={
+          record.medication ? (
+            <MedicationCardIcon
+              color={record.medication.color}
+              icon={record.medication.icon}
+              iconRotation={record.medication.iconRotation}
+              className={styles.goalIcon}
+            />
+          ) : (
+            <span className={styles.symbol} aria-hidden="true">
+              <Target />
+            </span>
+          )
+        }
       >
-        {record.medication ? (
-          <MedicationCardIconStack
-            color={record.medication.color}
-            icon={record.medication.icon}
-            iconRotation={record.medication.iconRotation}
-            quantity={1}
-          />
-        ) : (
-          <span className={styles.symbol}>
-            <Target aria-hidden="true" />
-          </span>
-        )}
-        <div className={styles.copy}>
-          <div className={styles.heading}>
-            <strong className={styles.name}>
-              {record.medication?.name ?? "Medication goal"}
-            </strong>
-            <strong className={styles.goalAmount}>
-              {formatDose(record.dailyLimitMg)} <small>mg/day</small>
-            </strong>
-          </div>
-          <p className={styles.meta}>
-            <CalendarDays size={13} aria-hidden="true" />
-            {record.startsOn}
-            {record.endsOn ? " → " + record.endsOn : " · Open-ended"}
-          </p>
+        <div className={styles.heading}>
+          <strong className={styles.name}>
+            {record.medication?.name ?? "Medication Goal"}
+          </strong>
+          <strong className={styles.goalAmount}>
+            {formatDose(record.dailyLimitMg)}
+            <small>mg/day</small>
+          </strong>
         </div>
-      </article>
+        <div className={styles.range}>
+          <CalendarDays aria-hidden="true" />
+          <time dateTime={record.startsOn}>
+            {formatDay(record.startsOn, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </time>
+          <span aria-hidden="true">→</span>
+          {record.endsOn ? (
+            <time dateTime={record.endsOn}>
+              {formatDay(record.endsOn, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </time>
+          ) : (
+            <span>Open-ended</span>
+          )}
+        </div>
+      </Panel>
     );
   return (
-    <article
-      className={styles.card + " " + styles.simple}
-      data-notification-record="timezone"
+    <Panel
+      kind="timezone"
+      artwork={
+        <span className={styles.symbol} aria-hidden="true">
+          <Clock3 />
+        </span>
+      }
     >
-      <span className={styles.symbol}>
-        <Clock3 aria-hidden="true" />
-      </span>
-      <div className={styles.copy}>
-        <strong className={styles.name}>{record.timeZone}</strong>
-        <p className={styles.meta}>Journal Timezone · 06:00 day boundary</p>
-      </div>
-    </article>
+      <span className={styles.detailLabel}>Journal Timezone</span>
+      <strong className={styles.timezone}>{record.timeZone}</strong>
+    </Panel>
   );
 }

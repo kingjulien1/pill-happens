@@ -1,5 +1,9 @@
 /* An intake retains one measured card face while its badge disclosure is a
    sibling of the native editing action, never a control nested in a button. */
+.readOnly:global(.intake-log-card) {
+  cursor: default;
+}
+
 .separateAction {
   cursor: pointer;
 }

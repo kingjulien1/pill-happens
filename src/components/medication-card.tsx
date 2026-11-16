@@ -13,6 +13,20 @@ import {
   MEDICATION_TYPE_VALUES,
 } from "@/lib/medication-types";
 
+/** Display-only identity; snapshots need no record IDs or creation timestamps. */
+type MedicationCardIdentity = Pick<
+  Medication,
+  | "activeIngredient"
+  | "defaultQuantity"
+  | "form"
+  | "color"
+  | "icon"
+  | "iconRotation"
+  | "categories"
+  | "isBenzodiazepine"
+  | "isOpioid"
+>;
+
 type MedicationCardProps = Omit<
   ComponentProps<typeof MedicationCardBase>,
   | "children"
@@ -25,7 +39,7 @@ type MedicationCardProps = Omit<
   | "artworkBadge"
   | "artworkControls"
 > & {
-  medication?: Medication;
+  medication?: MedicationCardIdentity;
   name: string;
   form?: Medication["form"];
   ingredient?: string;

@@ -13,6 +13,8 @@ import layoutStyles from "./card-layout.module.css";
 export { MedicationCardIcon } from "@/components/medication-card-icon";
 
 type MedicationCardBaseProps = Omit<ComponentProps<"button">, "color"> & {
+  /** Render the identical presentation as a noninteractive snapshot group. */
+  readOnly?: boolean;
   color?: string;
   icon?: string;
   iconRotation?: number;
@@ -56,6 +58,7 @@ export function MedicationCardBase({
   className,
   style,
   type = "button",
+  readOnly = false,
   ...props
 }: MedicationCardBaseProps) {
   const color = getMedicationColor(value);
@@ -97,6 +100,38 @@ export function MedicationCardBase({
       </div>
     </>
   );
+
+  if (readOnly) {
+    const presentationAttributes = Object.fromEntries(
+      Object.entries(props).filter(
+        ([name]) =>
+          name.startsWith("data-") ||
+          name.startsWith("aria-") ||
+          name === "id" ||
+          name === "title",
+      ),
+    );
+    return (
+      <div
+        {...presentationAttributes}
+        className={cn(
+          "medication-card-base intake-log-card",
+          frameStyles.card,
+          layoutStyles.card,
+          styles.readOnly,
+          className,
+        )}
+        style={frameStyle}
+        role="group"
+        aria-label={actionLabel}
+        data-medication-card-base
+        data-read-only
+        data-card-empty={!hasContent || undefined}
+      >
+        {content}
+      </div>
+    );
+  }
 
   if (artworkControls !== undefined) {
     // Measurement, paint and reference hooks stay on the original direct card
