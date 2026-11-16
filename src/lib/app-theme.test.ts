@@ -374,6 +374,8 @@ test("static canvas keeps both copy roles readable at the brightest possible hig
   let brightest: AppThemeHex = APP_CANVAS_BASE;
   for (const alpha of [0.055, 0.045, 0.035])
     brightest = mixAppColors(APP_FOUNDATION.white, brightest, alpha);
+  // The shared Purple500 wash sits above all three possible edge reflections.
+  brightest = mixAppColors("#ad46ff", brightest, 0.45);
   for (const mode of ["light", "dark"] as const) {
     assert.equal(APP_THEME_VALUES[mode]["canvas-background"], APP_CANVAS_BASE);
     assert.equal(

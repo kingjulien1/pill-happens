@@ -102,6 +102,8 @@ export const APP_CANVAS_BASE = mixAppColors(
 export const APP_CANVAS_FOREGROUND = "#ffffff";
 export const APP_CANVAS_MUTED_FOREGROUND = "#ded8ec";
 export const APP_CANVAS_BACKGROUND = [
+  // Tailwind Purple500 at exactly 45%, above the existing static canvas paint.
+  "linear-gradient(oklch(62.7% 0.265 303.9 / 0.45) 0 0)",
   "radial-gradient(ellipse at 8% 0%, oklch(70.2% 0.183 293.541 / 0.055), transparent 66%)",
   "radial-gradient(ellipse at 100% 24%, oklch(67.3% 0.182 276.935 / 0.045), transparent 68%)",
   "radial-gradient(ellipse at 50% 100%, oklch(74% 0.238 322.16 / 0.035), transparent 70%)",
