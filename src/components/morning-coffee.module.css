@@ -44,7 +44,7 @@
 
 /* A tall gradient mask moves upward, feathering the steam in from the rim. */
 .steamReveal {
-  transform: translateY(-41px);
+  transform: translateY(-30.75px);
 }
 
 .sway {
@@ -187,10 +187,10 @@
 
 @keyframes coffee-steam-reveal {
   from {
-    transform: translateY(41px);
+    transform: translateY(30.75px);
   }
   to {
-    transform: translateY(-41px);
+    transform: translateY(-30.75px);
   }
 }
 

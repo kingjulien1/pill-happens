@@ -5,24 +5,24 @@ import styles from "./morning-coffee.module.css";
 
 const WISPS = [
   {
-    path: "M17 28C13 24 19 21 17 17S14 9 18 2",
-    tip: [18, 2],
+    path: "M17 28.25C13 25.25 19 23 17 20S14 14 18 8.75",
+    tip: [18, 8.75],
     delay: "-1.1s",
     duration: "8.6s",
     sway: "11.4s",
     color: "var(--color-pink-300, #f9a8d4)",
   },
   {
-    path: "M25.5 27C29 23 23 20 25.5 15S28 6 25.5-3",
-    tip: [25.5, -3],
+    path: "M25.5 27.5C29 24.5 23 22.25 25.5 18.5S28 11.75 25.5 5",
+    tip: [25.5, 5],
     delay: "-4.1s",
     duration: "9.3s",
     sway: "13.2s",
     color: "var(--color-pink-200, #fbcfe8)",
   },
   {
-    path: "M34 28C38 24 32 21 34 17S37 9 33 2",
-    tip: [33, 2],
+    path: "M34 28.25C38 25.25 32 23 34 20S37 14 33 8.75",
+    tip: [33, 8.75],
     delay: "-6.6s",
     duration: "8.9s",
     sway: "12.1s",
@@ -257,7 +257,7 @@ export function MorningCoffee({
           <linearGradient
             id={`${id}-steam-reveal-gradient`}
             x1="0"
-            y1="-12"
+            y1="-1.75"
             x2="0"
             y2="29"
             gradientUnits="userSpaceOnUse"
@@ -269,16 +269,16 @@ export function MorningCoffee({
             id={`${id}-steam-reveal`}
             maskUnits="userSpaceOnUse"
             x="-4"
-            y="-12"
+            y="-1.75"
             width="64"
-            height="48"
+            height="36"
           >
             <rect
               className={styles.steamReveal}
               x="-4"
-              y="-200"
+              y="-142.75"
               width="64"
-              height="400"
+              height="300"
               fill={`url(#${id}-steam-reveal-gradient)`}
               data-coffee-steam-reveal
             />
@@ -291,7 +291,7 @@ export function MorningCoffee({
                 x1="26"
                 y1="29"
                 x2="26"
-                y2="-4"
+                y2="4.25"
                 gradientUnits="userSpaceOnUse"
               >
                 <stop stopColor={color} stopOpacity="0.48" />
