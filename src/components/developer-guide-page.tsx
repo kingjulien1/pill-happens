@@ -1222,14 +1222,19 @@ export function DeveloperGuidePage() {
                 the opaque face above them.
               </p>
               <p>
-                Intake and Morning/Evening check-in cards share one inward
-                frame: a 4px neutral band followed by a 2px identity band at
-                50% opacity. The second band starts 4px inside the measured
-                edge, and both follow the existing card radius. The neutral
-                band uses 10% foreground ink. This geometry adds no outside
-                border area and preserves the existing card size, stack layout,
-                keyboard focus and entry animation. Library and appearance
-                previews retain their own surface recipes.
+                Actual intake cards use a 5⅓px inward outer band, one third
+                thicker than the former 4px. Its pigment blends two thirds of
+                the existing neutral edge with one third of the inner identity
+                color. The 2px identity band keeps its 50% opacity and starts
+                immediately inside that wider band. A fine 1.5px ring sits
+                outside the face, using the mixed outer color at half its
+                opacity; it is 25% thinner than the inner band. A root
+                <code> box-shadow</code> owns this fine ring so the main rim’s
+                exclude mask cannot clip it. These are paint layers: measured
+                size, padding, stack placement and hit targets do not grow.
+                Morning/Evening check-ins retain their 4px neutral and 2px
+                identity inward frame. Library and appearance previews retain
+                their own surface recipes.
               </p>
               <p>
                 The Medications opening uses a 28px title, increasing to 32px
@@ -1714,10 +1719,12 @@ export function DeveloperGuidePage() {
                 opaque foundation color, lifted with 12% Lilac in dark mode.
                 Today, historical intakes and read-only notification intake
                 previews share that paint. The tint is independent of darker icon
-                ink and fixed-color SVG artwork. Their 4px neutral frame and 2px
-                identity band sit entirely inside the card, with the identity
-                pigment at 50% opacity. Check-ins use that same inward frame
-                with their own main artwork pigment;
+                ink and fixed-color SVG artwork. Their 5⅓px mixed neutral/color
+                frame and 2px identity band sit inside the card, with the
+                identity pigment at 50% opacity. An additional 1.5px fine edge
+                paints outside at half the mixed outer color’s opacity.
+                Check-ins keep their separate 4px/2px inward frame with their
+                own main artwork pigment;
                 library and journal surfaces retain their own paint. Their
                 native button opens the appropriate editor; Archive and Restore
                 live beside Reset Draft and Close in the medication header.

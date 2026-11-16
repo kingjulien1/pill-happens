@@ -1,4 +1,4 @@
-/* Shared rim geometry; saved intakes draw both bands within their footprint. */
+/* Shared inward rims; saved intakes add a separate fine outboard edge. */
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
   --entry-frame-outset: 0px;
   --entry-rim-width: 4px;
@@ -14,7 +14,7 @@
   overflow: visible;
 }
 
-/* A zero outset keeps the full rim inside the measured intake card. */
+/* A zero outset keeps the primary rim inside the measured card. */
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card]
@@ -29,6 +29,22 @@
 /* A quiet selected-color tint keeps identity on the artwork; the opaque face
    still masks folded content below it. */
 .card:global(.intake-log-card[data-intake-card]) {
+  --entry-rim-width: calc(4px * 4 / 3);
+  --entry-rim-color: color-mix(
+    in srgb,
+    var(--entry-edge-color) calc(100% * 2 / 3),
+    var(--entry-inner-rim-color)
+  );
+  --entry-rim-paint: var(--entry-rim-color);
+  --entry-fine-rim-width: calc(var(--entry-inner-rim-width) * 0.75);
+  --entry-fine-rim-color: color-mix(
+    in srgb,
+    var(--entry-rim-color) 50%,
+    transparent
+  );
+  /* This fine outboard stroke belongs to the root: the masked ::before ring
+     would clip an outside shadow. It paints without changing measured size. */
+  box-shadow: 0 0 0 var(--entry-fine-rim-width) var(--entry-fine-rim-color);
   --entry-intake-base: var(--background);
   --entry-surface-base: color-mix(
     in srgb,
