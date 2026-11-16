@@ -2425,8 +2425,9 @@ export function DeveloperGuidePage() {
                 <Link href="#notifications" className={styles.textLink}>
                   Notifications &amp; Undo
                 </Link>
-                . It covers the public API, six notification kinds, expandable
-                details, reading clocks, icon and exit motion, accessibility,
+                . It covers the public API, six notification kinds, stack reveal
+                separate from detail expansion, independent progressive clocks,
+                countdown urgency, icon and exit motion, accessibility,
                 server-checked Undo and the tests that protect those behaviors.
                 Try the real component with synthetic data, then copy the
                 integration examples into a client event handler.
@@ -2447,6 +2448,12 @@ export function DeveloperGuidePage() {
           context="Contract, Motion & Recovery"
           icon="sparkle"
         >
+          <p className={styles.sectionIntro}>
+            Reveal a notification stack first, then open the chosen card’s
+            details. Every notice keeps its own countdown, with an eased finish,
+            Rose urgency and a short final grace; the reference below separates
+            clock, stack, motion and server-checked recovery ownership.
+          </p>
           <GuideNotifications>
             <GuideNotificationDemo />
           </GuideNotifications>

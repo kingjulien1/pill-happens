@@ -279,11 +279,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
     >
       <p className={styles.intro}>
         Notifications keep a short result in view and put the explanation one
-        tap away. The collapsed card contains its summary and countdown;
-        expanding reveals a saved-change preview or explanatory context, plus
-        links and actions. A real Undo is directly available in the collapsed
-        card header and moves to the action footer while details are open. Use
-        the shared journal facade for every application notice.
+        tap away. The collapsed card contains its summary and countdown; opening
+        details reveals a saved-change preview or explanatory context, plus
+        links and actions. When several cards are folded together, the first
+        activation only fans the stack open; activate a card again for its
+        details. A real Undo sits in the collapsed card header and moves to the
+        action footer while details are open. Use the shared journal facade for
+        every application notice.
       </p>
       <dl className={styles.overview}>
         <div>
@@ -295,7 +297,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <div>
           <dt>Reading Time</dt>
           <dd>
-            <strong>22s</strong> active countdown
+            <strong>8.63s</strong> bar + 0.5s grace
           </dd>
         </div>
         <div>
@@ -313,9 +315,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           AppearanceToaster
         </Source>{" "}
         mounts the themed host once. Sonner owns its outer list items, stack
-        geometry and native swipes; the inner journal component owns reading
-        state and its staged exit. Keep those transform owners separate when
-        changing motion.
+        geometry and native swipes. The adapter’s NotificationStackContext owns
+        the explicit fan/reveal state; the inner journal component owns details,
+        its independent reading clock and its staged exit. Keep those state and
+        transform owners separate when changing motion.
       </p>
       <ReferenceTable
         label="Source Ownership"
@@ -349,14 +352,14 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
               key="clock"
               path="src/lib/journal-notification-lifecycle.ts"
             />,
-            "Monotonic clock, exit registry and one-attempt Undo settlement.",
+            "Independent monotonic clocks, exact progressive-speed integration, active completion grace, exit registry and one-attempt Undo settlement.",
           ],
           [
             <span key="art">
               <Source path="src/components/ui/sonner.tsx">sonner.tsx</Source> +{" "}
               <Source path="src/components/ui/sonner.css">sonner.css</Source>
             </span>,
-            "Host configuration, shared artwork, theme values and CSS phase hooks.",
+            "Host configuration, NotificationStackContext reveal/collapse policy, shared artwork, theme values, countdown paint and CSS phase hooks.",
           ],
           [
             <span key="badge">
@@ -400,22 +403,22 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="success">toast.success</code>,
             "Change saved",
-            "22,000ms · BellCheck.",
+            "8.633s bar + 0.5s active grace · BellCheck.",
           ],
           [
             <code key="error">toast.error</code>,
             "Action failed",
-            "22,000ms · CircleAlert.",
+            "8.633s bar + 0.5s active grace · CircleAlert.",
           ],
           [
             <code key="info">toast.info</code>,
             "Journal notice",
-            "22,000ms · Lightbulb.",
+            "8.633s bar + 0.5s active grace · Lightbulb.",
           ],
           [
             <code key="warning">toast.warning</code>,
             "Please review",
-            "22,000ms · TriangleAlert.",
+            "8.633s bar + 0.5s active grace · TriangleAlert.",
           ],
           [
             <code key="loading">toast.loading</code>,
@@ -425,7 +428,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="update">toast.update</code>,
             "Update available",
-            "22,000ms unless overridden · Sparkles.",
+            "8.633s bar + 0.5s active grace unless overridden · Sparkles.",
           ],
         ]}
       />
@@ -520,7 +523,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "duration",
-            "22,000ms active time by default; explicit finite durations are honored. Infinity hides the rail. Loading always forces Infinity.",
+            "Nominal full-speed budget: 22,000ms ÷ 3 by default. The progressive curve extends the default bar to about 8.633 active seconds, then adds 500ms of active grace before exit. Explicit finite budgets use the same curve; Infinity hides the rail and marker. Loading always forces Infinity.",
           ],
           [
             "dismissible: false",
@@ -670,16 +673,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         supplied.
       </p>
       <p>
-        While a mounted, visible front notification has expanded idle details,
-        one fixed, aria-hidden sibling behind the toaster softly blurs the page
-        by 4px and adds Mauve900 at 31% alpha. A scoped body :has selector reads
-        the inner notification state, independently of Sonner’s hover-expanded
-        stack state. The veil sits at z-index 999999998 below Sonner, fades over
-        220ms and never accumulates for multiple open notices. Rear, removed or
-        exiting cards cannot leave it active. It has no pointer events, focus
-        trap, scroll lock or modal semantics; the page and native toast gestures
-        remain usable. Reduced motion removes the fade. The root canvas and
-        notification surface colors are unchanged.
+        While a mounted, visible notification has expanded idle details and is
+        either frontmost or in the native fanned stack, one fixed, aria-hidden
+        sibling behind the toaster softly blurs the page by 4px and adds
+        Mauve900 at 31% alpha. A scoped body :has selector checks the inner
+        details state as well as the host’s front/fanned state; revealing a
+        stack alone never opens this veil. It sits at z-index 999999998 below
+        Sonner, fades over 220ms and never accumulates for multiple open
+        notices. Folded rear, removed or exiting cards cannot leave it active.
+        It has no pointer events, focus trap, scroll lock or modal semantics;
+        the page and native toast gestures remain usable. Reduced motion removes
+        the fade. The root canvas and notification surface colors are unchanged.
       </p>
 
       <Heading id="updates" level={3}>
@@ -734,29 +738,97 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Cancel and successful Undo call neither.
       </p>
 
-      <Heading id="clock">Reading Clock &amp; Interaction</Heading>
+      <Heading id="clock">
+        Independent Countdown &amp; Stack Interaction
+      </Heading>
       <p>
-        Finite notices spend only active reading time. The monotonic clock
-        samples every <strong>50ms</strong>; the bar’s <code>inline-size</code>
-        interpolates over <strong>60ms</strong>. Width shrink preserves its
-        rounded endcaps instead of compressing them with a scale transform. The
-        default budget is 22,000ms. Expansion, focus, non-touch hover, a held
-        pointer, hidden document, rear position, invisible or unmounted host,
-        removal, pending Undo and exit each pause independently. Every active
-        reason must clear before counting resumes. These reading pauses are
-        independent of <code>data-motion-paused</code>: hidden documents, rear
-        position and unavailable host visibility pause decoration, while
-        hovering, focusing or expanding a readable front card need not freeze
-        its finite artwork. Infinite notices hide the line. The clock starts
-        with host readiness; it does not wait for artwork to settle.
+        A folded stack and a card’s details are separate states. In a
+        multi-notification stack, the first click or keyboard activation on any
+        card is consumed by the capture handler and only reveals the fan. It
+        cannot also open details, follow a link or run Undo. The next activation
+        reaches the chosen card normally. Outside press or Escape closes the
+        fan; a count of one or zero clears its old reveal state. Sonner still
+        owns the actual stack geometry, hover fan and swipes.
+      </p>
+      <p>
+        Every finite notice runs its own monotonic clock from host readiness,
+        including rear cards and notices beyond the currently visible stack.
+        They never queue behind the front notice. Its own expanded details,
+        focus, non-touch hover, held pointer and pending Undo pause only that
+        notice; document hiding, unmounted/removal and exit guards also pause.
+        All active reasons must clear before counting resumes. Infinite notices
+        keep their existing persistent behavior and show neither rail nor
+        final-seconds marker.
+      </p>
+      <p>
+        The default nominal budget is <code>22_000 / 3</code> milliseconds,
+        about 7.33 seconds at full speed. Above 30% remaining, the bar runs at
+        full speed. Between 30% and 10%, speed decreases continuously to one
+        half; the final 10% remains at half speed. The exact elapsed-time
+        mapping makes the default bar last about{" "}
+        <strong>8.633 active seconds</strong>. A separate{" "}
+        <strong>500ms active grace</strong> keeps the card usable after the bar
+        empties, before its existing staged exit. Holding or opening details
+        pauses that grace too.
+      </p>
+      <p>
+        Explicit finite durations are nominal budgets under the same curve. Bar
+        time equals <code>duration × (0.9 + 0.4 × ln(2))</code>; grace is added
+        afterward. The clock inverts the integrated speed curve instead of
+        advancing progress by per-frame subtraction, so a long sample and many
+        short samples agree. Its snapshot separates nominal remaining time,
+        progress, true active time until the bar is empty, completion and grace
+        remaining. The tiny 3/2/1 marker uses that true remaining time,
+        excluding grace, so slowing the last segment never makes its numbers
+        misleading.
+      </p>
+      <ReferenceTable
+        label="Countdown Breakpoints"
+        headings={["Remaining Bar", "Behavior"]}
+        rows={[
+          [
+            "40% → 10%",
+            "The existing gradient gradually mixes toward Rose500. Its pulse accelerates without resetting phase.",
+          ],
+          [
+            "30% → 10%",
+            "Speed eases from full to half, while a separate paint-only card glow begins a subtle breath.",
+          ],
+          [
+            "10% → 0%",
+            "Half-speed finish, full Rose urgency and the fastest restrained pulse.",
+          ],
+          [
+            "Last 3 active seconds",
+            "A small, noninteractive 3/2/1 marker appears half outside the upper-left corner.",
+          ],
+          [
+            "Bar empty",
+            "The marker spins/shrinks out; 500ms of active grace remains for a final action.",
+          ],
+        ]}
+      />
+      <p>
+        The clock samples every <strong>50ms</strong>; the bar’s
+        <code> inline-size</code> interpolates over <strong>60ms</strong>,
+        preserving rounded endcaps. Color urgency runs from 40% to 10%; the card
+        glow’s separate urgency starts at 30%. Their CSS animations keep a
+        1,400ms base duration and use phase-preserving
+        <code> updatePlaybackRate()</code> to reach an effective 520ms cycle.
+        Arrival, width, urgency and card-exit motion have separate owners.
+        Decorative visibility still pauses hidden or folded-rear effects;
+        opening the native fan lets visible rear decorations run. Actual reading
+        pauses also freeze urgency pulses and the tiny marker, while ordinary
+        finite artwork retains its separate visibility policy.
       </p>
       <p>
         Pointer-down pauses immediately, with each pointer ID tracked
         separately. A hold of at least 350ms, movement beyond 8px or pointer
-        cancellation suppresses the following click; a short tap still opens
-        details. Window release and cancellation, window blur and page hiding
-        clear stranded holds. Releasing a held gesture clears non-keyboard focus
-        so its timer can resume; keyboard-visible focus remains a reading pause.
+        cancellation suppresses the following click; a short tap reveals a
+        folded stack first, or opens details when the stack is already revealed.
+        Window release and cancellation, window blur and page hiding clear
+        stranded holds. Releasing a held gesture clears non-keyboard focus so
+        its timer can resume; keyboard-visible focus remains a reading pause.
         The card and its descendants disable text selection and touch callouts,
         without removing their accessible text or normal keyboard interaction.
       </p>
@@ -775,8 +847,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         labelled region with a <code>min(55dvh, 340px)</code> scroll cap. Scroll
         reads vertically without starting a swipe. Sonner retains left/right/up
         dismissal and its Alt+T focus shortcut. Escape from focused content
+        first closes an explicitly revealed multi-card fan; otherwise it
         dismisses eligible notices. Pending Undo blocks pointer swipe starts and
-        Escape; it does not trap focus. Inline failure uses{" "}
+        dismissal; it does not trap focus. Inline failure uses{" "}
         <code>role=&quot;alert&quot;</code>.
       </p>
 
@@ -789,6 +862,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "Card arrival / finish ring",
             "860ms / 1,100ms + 350ms",
             "One finite card entrance, followed by an independent expanding finish ring.",
+          ],
+          [
+            "Countdown entry",
+            "780ms unfold + 140ms delay",
+            "A separate elastic rail grows into place after card entry starts. A 650ms ignition glow at 200ms and 760ms travelling thread at 270ms settle into its live bar without delaying the clock.",
+          ],
+          [
+            "Urgency pulse / tiny marker",
+            "1,400ms → 520ms effective; marker 320ms in / 200ms out",
+            "Phase-preserving pulse acceleration follows 40% → 10% urgency; the card’s paint-only breath begins at 30%. The last-three-seconds marker grows/fades in, then spins and shrinks away at zero. Reduced motion keeps a static rail and marker without pulses or rotation.",
           ],
           [
             "Main artwork / glyph",
@@ -818,7 +901,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "BellRing accents",
             "4.8s envelope / 200ms twitch after 1,660ms",
-            "Side curves are fully visible at 0–12% and 88–100%, fade at 12–18% and 82–88%, and stay hidden at 18–82%. Mirrored outward twitches add a small rotation and 0.7 → 1 → 0.7 opacity, exactly 24 times per bell cycle. They inherit the bell rotation, pause in phase when hidden/rear, and hide during reverse, static and reduced-motion states.",
+            "Side curves are fully visible at 0–12% and 88–100%, fade at 12–18% and 82–88%, and stay hidden at 18–82%. Mirrored outward twitches add a small rotation and 0.7 → 1 → 0.7 opacity, exactly 24 times per bell cycle. They inherit the bell rotation, pause in phase when hidden or folded behind another card, and hide during reverse, static and reduced-motion states.",
           ],
           [
             "Undo feedback",
@@ -867,10 +950,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         and a 10px gap. Mobile side offsets are 16px and top offsets include the
         safe area. The whole card and success bell tile share{" "}
         <code>--toast-fuchsia-surface</code>: Fuchsia950 at 85% color alpha in
-        both modes, with readable light ink. The notification has no radial
-        highlights, background animation, backdrop blur or saturation. This
-        translucent surface is separate from the unchanged application canvas:
-        opaque Plum/Black <code>#29213b</code> with its three fixed, faint edge
+        both modes, with readable light ink. The base surface has no radial
+        highlights, ambient background field, backdrop blur or saturation; the
+        late-countdown glow is a separate paint-only overlay. This translucent
+        surface is separate from the unchanged application canvas: opaque
+        Plum/Black <code>#29213b</code> with its three fixed, faint edge
         highlights. Semantic reading panels retain their separate light/dark
         roles.
       </p>
@@ -900,7 +984,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Card and success tile share Fuchsia950 at 85% alpha, with no notification radial highlights or backdrop blur/saturation. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content.",
+            "Card and success tile share Fuchsia950 at 85% alpha, with no notification radial highlights or backdrop blur/saturation. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content. Its independent arrival wrapper preserves these final bounds.",
+          ],
+          [
+            "Last-seconds marker",
+            "19×14px, left11px/top−7px, 9px tabular secondary ink; no pointer events, layout growth or accessible countdown chatter. Hidden for infinite notices; its tiny glass base uses the existing Fuchsia surface.",
           ],
           [
             "Header Undo",
@@ -1004,8 +1092,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <Source path="src/lib/journal-notification-lifecycle.test.ts">
           Lifecycle tests
         </Source>{" "}
-        cover overlapping pauses, monotonic/indefinite time, pre-mount
-        dismissal, stale generations and detached Undo outcomes.{" "}
+        cover exact speed breakpoints, long-vs-partitioned elapsed time,
+        independent clocks, overlapping pauses and completion grace,
+        monotonic/indefinite time, pre-mount dismissal, stale generations and
+        detached Undo outcomes.{" "}
         <Source path="src/lib/server/journal-undo.test.ts">Server tests</Source>{" "}
         cover record isolation, conflicts, signature/scope/expiry, check-in
         periods, dependency/payload limits, large Unicode writing and winning
@@ -1035,12 +1125,18 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           motion.
         </li>
         <li>
-          Test rear/hidden pauses and Undo failure during an exit, after
-          dismissal or after replacement.
+          Verify rear/invisible clocks continue independently, individual and
+          hidden-document pauses preserve grace, and Undo failure remains safe
+          during exit, after dismissal or after replacement.
         </li>
         <li>
-          Keep outer stack transforms, inner exit motion and artwork transforms
-          independent.
+          Check first-activation stack reveal without details, then independent
+          detail opening, outside/Escape collapse and reset after one card
+          remains.
+        </li>
+        <li>
+          Keep outer stack transforms, inner exit motion, countdown entry and
+          artwork transforms independent.
         </li>
       </ul>
     </article>
