@@ -2784,6 +2784,29 @@ export function DeveloperGuidePage() {
                   owns these flourishes.
                 </li>
                 <li>
+                  EveningMoon follows a 16.8-second native animation containing
+                  two 8.4-second nonlinear pendulum swings. A cached RK4 solver
+                  samples the 21-degree arc: the crescent accelerates through
+                  its low center and slows at the raised turning points. A
+                  damped 3.2-second torsion spring follows the angle, giving the
+                  body a small inertial lag instead of an independent eased
+                  wiggle. One slow lean and 2.2% depth change distinguish the
+                  two swings. The 225 sampled poses join at the same position,
+                  tilt, scale and momentum, with no rest or settling reset.
+                  Translation reaches about 4.12px to either side; the moon’s
+                  filled geometry, 30px stage and C1B6CC pigment stay intact.
+                  Two browser-native timelines are created once per mounted
+                  moon and only pause/play as the existing ambient, dialog,
+                  offscreen and hidden-page gates change. Their phase survives
+                  those pauses; unmount cancels both. Reduced motion presents
+                  the settled crescent and static stars. Existing short-lived
+                  colored stars retain their own bounded scheduler. Physics
+                  generation is cached, with no per-frame React work or new
+                  JavaScript animation loop. Unit checks compare the period
+                  with an independent pendulum integral and verify energy,
+                  lag, bounded motion and the periodic spring seam.
+                </li>
+                <li>
                   Check-in artwork keeps its 1560ms main entrance and a toned
                   down spin-and-settle response. A nonvisual CSS clock opens
                   the ambient gate only 300ms after that entrance ends; the
