@@ -1,9 +1,9 @@
-/* Check-ins share the plain base; the group's existing reflection stays separate. */
+/* Shared stack glass; check-in card faces keep their independent paint. */
 .base {
   --intake-group-base: transparent;
   --intake-group-blur: 24px;
   --intake-group-saturation: 1.08;
-  --intake-group-glass-opacity: 0.5;
+  --intake-group-glass-opacity: 0.78;
 }
 
 .group:global(.intake-group)[data-grouped="true"] {
@@ -19,13 +19,13 @@
 
 .group:global(.intake-group)[data-grouped="true"]
   > :global(.intake-group-glass)::before {
-  /* Share the disclosure's resting pigment and its existing surface entrance. */
+  /* A quiet cup-tile pigment sits above the full glass layer. */
   content: "";
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   inset: 0;
   border-radius: inherit;
-  background: color-mix(in srgb, var(--secondary) 9%, transparent);
+  background: color-mix(in srgb, var(--check-in-art-base) 11%, transparent);
   pointer-events: none;
 }
 
