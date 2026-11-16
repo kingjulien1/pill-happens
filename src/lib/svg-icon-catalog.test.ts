@@ -20,7 +20,7 @@ import {
 } from "./svg-icon-catalog";
 
 test("the local SVG catalog has unique stable IDs and corresponding checked-in assets", () => {
-  assert.equal(SVG_ICON_CATALOG.length, 49);
+  assert.equal(SVG_ICON_CATALOG.length, 57);
   assert.equal(
     new Set(SVG_ICON_CATALOG.map(({ value }) => value)).size,
     SVG_ICON_CATALOG.length,
@@ -144,7 +144,7 @@ test("all colored glyphs render inline vectors with independent transparent cuto
       /<svg\b(?=[^>]*data-tablet-variant="color")[\s\S]*?<\/svg>/g,
     ),
   ].map(([svg]) => svg);
-  assert.equal(colors.length, 17);
+  assert.equal(colors.length, 21);
   assert.equal(glyphs.length, entries.length);
   const maskIds = new Set<string>();
   glyphs.forEach((svg, index) => {
@@ -307,8 +307,8 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
   );
   const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
   assert.equal(outlines.length, Object.keys(TABLET_SHAPES).length);
-  assert.equal(outlines.length, 16);
-  assert.equal(colors.length, 17);
+  assert.equal(outlines.length, 20);
+  assert.equal(colors.length, 21);
   for (const [slug, label] of [
     ["bromazepam", "Bromazepam"],
     ["diazepam", "Diazepam"],
@@ -327,6 +327,10 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     ["tramal", "Tramal"],
     ["testavan", "Testavan"],
     ["levomethasan", "Levomethasan"],
+    ["xanax", "Xanax"],
+    ["iserlohn", "Iserlohn"],
+    ["desloratadin", "Desloratadin"],
+    ["atarax", "Atarax"],
   ])
     assert.equal(getSvgIcon(`svg:color:${slug}`)?.label, label);
   for (const slug of [
@@ -337,6 +341,8 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     "euthyrox",
     "testavan",
     "levomethasan",
+    "xanax",
+    "atarax",
   ])
     assert.equal(
       getSvgIcon(`svg:color:${slug}`)?.color?.hex.toLowerCase(),
@@ -387,12 +393,20 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
     ["TestavanColor", "svg:color:testavan"],
     ["Levomethasan", "svg:levomethasan"],
     ["LevomethasanColor", "svg:color:levomethasan"],
+    ["Xanax", "svg:xanax"],
+    ["XanaxColor", "svg:color:xanax"],
+    ["Iserlohn", "svg:iserlohn"],
+    ["IserlohnColor", "svg:color:iserlohn"],
+    ["Desloratadin", "svg:desloratadin"],
+    ["DesloratadinColor", "svg:color:desloratadin"],
+    ["Atarax", "svg:atarax"],
+    ["AtaraxColor", "svg:color:atarax"],
   ])
     assert.ok(
       searchSvgIcons(query).some((entry) => entry.value === value),
       query,
     );
-  assert.equal(searchSvgIcons("color").length, 17);
+  assert.equal(searchSvgIcons("color").length, 21);
   assert.ok(
     searchSvgIcons("colored").every(({ variant }) => variant === "color"),
   );
@@ -411,6 +425,10 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
     "tramal",
     "testavan",
     "levomethasan",
+    "xanax",
+    "iserlohn",
+    "desloratadin",
+    "atarax",
   ]) {
     assert.deepEqual(
       new Set(searchSvgIcons(slug).map(({ value }) => value)),
@@ -454,6 +472,14 @@ test("local SVG discovery supports English, German, direct IDs, and multiple wor
     ["3D tablet", "svg:tablet-angled"],
     ["tablette schräg", "svg:tablet-angled"],
     ["geneigte tablette", "svg:tablet-angled"],
+    ["UPJOHN 90", "svg:xanax"],
+    ["UPJOHN 90", "svg:color:xanax"],
+    ["iserlohn capsule", "svg:iserlohn"],
+    ["iserlohn violet", "svg:color:iserlohn"],
+    ["desloratadin 5", "svg:desloratadin"],
+    ["desloratadin blau", "svg:color:desloratadin"],
+    ["atarax scored", "svg:atarax"],
+    ["atarax weiss", "svg:color:atarax"],
   ]) {
     assert.ok(
       searchSvgIcons(query).some((entry) => entry.value === value),

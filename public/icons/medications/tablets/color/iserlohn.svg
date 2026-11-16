@@ -1,0 +1,40 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <defs>
+    <mask
+      id="iserlohn-cutouts"
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+    >
+      <rect
+        x="7"
+        y="2"
+        width="10"
+        height="20"
+        rx="5"
+        fill="white"
+        stroke="white"
+      />
+      <path d="M8 12h8" fill="none" stroke="black" />
+    </mask>
+  </defs>
+  <rect
+    width="24"
+    height="24"
+    fill="#c4b4ff"
+    stroke="none"
+    mask="url(#iserlohn-cutouts)"
+  />
+</svg>

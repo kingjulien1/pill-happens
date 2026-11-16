@@ -1,0 +1,45 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <defs>
+    <mask
+      id="xanax-cutouts"
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+    >
+      <ellipse cx="12" cy="12" rx="10" ry="6.5" fill="white" stroke="white" />
+      <path
+        d="M5.6 8.8v1.9a.9.9 0 0 0 1.8 0V8.8m.6 2.8V8.8h.9a.7.7 0 0 1 0 1.4H8m2.3-1.4h1.6m-.2 0v1.9a.9.9 0 0 1-1.8 0m3.2-1.9c-.6 0-.9.5-.9 1.4s.3 1.4.9 1.4.9-.5.9-1.4-.3-1.4-.9-1.4Zm1.5 0v2.8m1.8-2.8v2.8m-1.8-1.4h1.8m.6 1.4V8.8l1.8 2.8V8.8"
+        stroke-width="0.55"
+        transform="translate(-.2 0)"
+        fill="none"
+        stroke="black"
+      />
+      <path
+        d="M10.7 12.7a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8Zm.9.9c0 1.1-.5 1.9-1.6 1.9m3.6-2.8c-.6 0-.9.5-.9 1.4s.3 1.4.9 1.4.9-.5.9-1.4-.3-1.4-.9-1.4Z"
+        stroke-width="0.55"
+        transform="translate(-.15 0)"
+        fill="none"
+        stroke="black"
+      />
+    </mask>
+  </defs>
+  <rect
+    width="24"
+    height="24"
+    fill="#D4D4D8"
+    stroke="none"
+    mask="url(#xanax-cutouts)"
+  />
+</svg>

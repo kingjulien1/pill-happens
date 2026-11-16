@@ -197,6 +197,68 @@ export const TABLET_SHAPES = {
       ]),
     ],
   },
+  xanax: {
+    componentName: "Xanax",
+    aliases: ["xanax", "tablet-upjohn-ninety", "upjohn-90"],
+    nodes: [
+      ["ellipse", { cx: "12", cy: "12", rx: "10", ry: "6.5", key: "body" }],
+      [
+        "path",
+        {
+          d: "M5.6 8.8v1.9a.9.9 0 0 0 1.8 0V8.8m.6 2.8V8.8h.9a.7.7 0 0 1 0 1.4H8m2.3-1.4h1.6m-.2 0v1.9a.9.9 0 0 1-1.8 0m3.2-1.9c-.6 0-.9.5-.9 1.4s.3 1.4.9 1.4.9-.5.9-1.4-.3-1.4-.9-1.4Zm1.5 0v2.8m1.8-2.8v2.8m-1.8-1.4h1.8m.6 1.4V8.8l1.8 2.8V8.8",
+          strokeWidth: "0.55",
+          transform: "translate(-.2 0)",
+          key: "imprint-upjohn",
+        },
+      ],
+      [
+        "path",
+        {
+          d: "M10.7 12.7a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8Zm.9.9c0 1.1-.5 1.9-1.6 1.9m3.6-2.8c-.6 0-.9.5-.9 1.4s.3 1.4.9 1.4.9-.5.9-1.4-.3-1.4-.9-1.4Z",
+          strokeWidth: "0.55",
+          transform: "translate(-.15 0)",
+          key: "imprint-ninety",
+        },
+      ],
+    ],
+  },
+  iserlohn: {
+    componentName: "Iserlohn",
+    aliases: ["iserlohn", "capsule-center-seam"],
+    nodes: [
+      [
+        "rect",
+        { x: "7", y: "2", width: "10", height: "20", rx: "5", key: "body" },
+      ],
+      ["path", { d: "M8 12h8", key: "capsule-seam" }],
+    ],
+  },
+  desloratadin: {
+    componentName: "Desloratadin",
+    aliases: ["desloratadin", "round-tablet-five"],
+    nodes: [
+      ...round(9),
+      [
+        "path",
+        {
+          d: "M14.5 8h-5v3.5H12a2.25 2.25 0 0 1 0 4.5H9.5",
+          strokeWidth: "1.4",
+          key: "imprint-five",
+        },
+      ],
+    ],
+  },
+  atarax: {
+    componentName: "Atarax",
+    aliases: ["atarax", "oblong-scored-tablet"],
+    nodes: [
+      [
+        "rect",
+        { x: "8", y: "2", width: "8", height: "20", rx: "4", key: "body" },
+      ],
+      ["path", { d: "M9 12h6", key: "score" }],
+    ],
+  },
   ...DISPENSER_SHAPES,
 } satisfies Record<string, TabletShape>;
 
