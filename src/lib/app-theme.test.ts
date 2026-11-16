@@ -5,6 +5,8 @@ import { format } from "prettier";
 import {
   APP_CANVAS_BASE,
   APP_CANVAS_BACKGROUND,
+  APP_CANVAS_OVERLAY,
+  APP_IRIDESCENCE,
   APP_CANVAS_FOREGROUND,
   APP_CANVAS_MUTED_FOREGROUND,
   APP_BACKGROUND_COLORS,
@@ -359,23 +361,59 @@ test("generated application and offline CSS match the documented registry", asyn
   }
 });
 
-test("static canvas keeps both copy roles readable at the brightest possible highlight overlap", () => {
+test("Iridescence canvas keeps exact overlays and readable copy at its brightest bounded shader output", () => {
   assert.equal(APP_CANVAS_BASE, "#29213b");
   assert.equal(
     APP_CANVAS_BASE,
     mixAppColors(APP_FOUNDATION.plum, APP_FOUNDATION.black, 0.92),
   );
+  assert.equal(APP_IRIDESCENCE.color, "#7c3aed");
+  assert.equal(APP_IRIDESCENCE.blur, 4);
+  assert.equal(APP_IRIDESCENCE.brightness, 1.5);
+  assert.equal(APP_IRIDESCENCE.hueShift, 0);
+  assert.equal(APP_IRIDESCENCE.saturation, 1);
+  assert.equal(APP_IRIDESCENCE.contrast, 1);
+  assert.equal(APP_IRIDESCENCE.grain, 0);
+  assert.equal(APP_IRIDESCENCE.mouseReact, false);
+  assert.equal(APP_IRIDESCENCE.clickSwirl, false);
+  assert.equal(APP_IRIDESCENCE.pinkOpacity, 0.21);
+  assert.equal(APP_IRIDESCENCE.purpleOpacity, 0.69);
+  assert.ok(Object.isFrozen(APP_IRIDESCENCE));
+  assert.ok(Object.isFrozen(APP_IRIDESCENCE.colorRgb));
+  assert.deepEqual(APP_IRIDESCENCE.colorRgb, channels(APP_IRIDESCENCE.color));
   assert.equal(
-    (APP_CANVAS_BACKGROUND.match(/radial-gradient/g) ?? []).length,
-    3,
+    APP_CANVAS_OVERLAY,
+    "linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0), linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0)",
   );
+  assert.ok(APP_CANVAS_BACKGROUND.startsWith(APP_CANVAS_OVERLAY));
   assert.ok(APP_CANVAS_BACKGROUND.endsWith(APP_CANVAS_BASE));
-  // White is a conservative brightness bound for any of the three pigments.
-  let brightest: AppThemeHex = APP_CANVAS_BASE;
-  for (const alpha of [0.055, 0.045, 0.035])
-    brightest = mixAppColors(APP_FOUNDATION.white, brightest, alpha);
-  // The shared Purple500 wash sits above all three possible edge reflections.
-  brightest = mixAppColors("#ad46ff", brightest, 0.45);
+
+  // The official cosine field is bounded by 0..1 before its selected tint and
+  // default 1.5 brightness. Pointer sheen and swirl are disabled. Bound every
+  // channel independently; the blur is an average and cannot exceed this bound.
+  const shaderCeiling: AppThemeHex = `#${APP_IRIDESCENCE.colorRgb
+    .map((channel) =>
+      Math.min(255, Math.ceil(channel * APP_IRIDESCENCE.brightness * 255))
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
+  assert.equal(shaderCeiling, "#ba57ff");
+
+  // Tailwind's installed Pink300/Purple900 pigments expressed in sRGB. The
+  // upper Purple wash must be composited after Pink, just as CSS lists them.
+  const overlay = (background: AppThemeHex) =>
+    mixAppColors(
+      "#59168b",
+      mixAppColors("#fda5d5", background, APP_IRIDESCENCE.pinkOpacity),
+      APP_IRIDESCENCE.purpleOpacity,
+    );
+  const backgrounds = [
+    APP_CANVAS_BASE,
+    overlay("#000000"),
+    overlay(APP_IRIDESCENCE.color),
+    overlay(shaderCeiling),
+  ];
   for (const mode of ["light", "dark"] as const) {
     assert.equal(APP_THEME_VALUES[mode]["canvas-background"], APP_CANVAS_BASE);
     assert.equal(
@@ -386,7 +424,7 @@ test("static canvas keeps both copy roles readable at the brightest possible hig
       APP_THEME_VALUES[mode]["canvas-muted-foreground"],
       APP_CANVAS_MUTED_FOREGROUND,
     );
-    for (const background of [APP_CANVAS_BASE, brightest])
+    for (const background of backgrounds)
       for (const copy of [
         "canvas-foreground",
         "canvas-muted-foreground",

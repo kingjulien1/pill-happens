@@ -4,23 +4,21 @@
 
   --app-canvas-base: #29213b;
   --app-canvas-background:
-    linear-gradient(oklch(62.7% 0.265 303.9 / 0.45) 0 0),
+    linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
+    linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0),
     radial-gradient(
-      ellipse at 8% 0%,
-      oklch(70.2% 0.183 293.541 / 0.055),
-      transparent 66%
-    ),
-    radial-gradient(
-      ellipse at 100% 24%,
-      oklch(67.3% 0.182 276.935 / 0.045),
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse at 50% 100%,
-      oklch(74% 0.238 322.16 / 0.035),
-      transparent 70%
+      ellipse at 42% 36%,
+      #7c3aed 0%,
+      #5829a2 42%,
+      #332047 82%,
+      #29213b 100%
     ),
     #29213b;
+  --app-canvas-overlay:
+    linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
+    linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0);
+  --app-iridescence-color: #7c3aed;
+  --app-iridescence-blur: 4px;
   --app-canvas-foreground: #ffffff;
   --app-canvas-muted-foreground: #ded8ec;
 

@@ -93,7 +93,7 @@ export function withAppAlpha(color: AppThemeHex, opacity: number): AppThemeHex {
     .padStart(2, "0")}`;
 }
 
-/** One opaque, stationary page canvas, including critical and offline paint. */
+/** Stable opaque foundation beneath the live shader and static fallback paint. */
 export const APP_CANVAS_BASE = mixAppColors(
   APP_FOUNDATION.plum,
   APP_FOUNDATION.black,
@@ -101,17 +101,49 @@ export const APP_CANVAS_BASE = mixAppColors(
 );
 export const APP_CANVAS_FOREGROUND = "#ffffff";
 export const APP_CANVAS_MUTED_FOREGROUND = "#ded8ec";
+
+/** Shared rendering settings for the noninteractive React Bits Iridescence field. */
+export const APP_IRIDESCENCE = Object.freeze({
+  color: "#7c3aed",
+  colorRgb: Object.freeze([124 / 255, 58 / 255, 237 / 255] as const),
+  speed: 1,
+  amplitude: 0.1,
+  scale: 1,
+  detail: 8,
+  rotation: 0,
+  warp: 1,
+  hueShift: 0,
+  saturation: 1,
+  brightness: 1.5,
+  contrast: 1,
+  grain: 0,
+  fade: 0,
+  opacity: 1,
+  mouseReact: false,
+  clickSwirl: false,
+  blur: 4,
+  pinkOpacity: 0.21,
+  purpleOpacity: 0.69,
+});
+
+/** CSS backgrounds list the uppermost Purple900 wash before the Pink300 wash. */
+export const APP_CANVAS_OVERLAY = [
+  `linear-gradient(oklch(38.1% 0.176 304.987 / ${APP_IRIDESCENCE.purpleOpacity}) 0 0)`,
+  `linear-gradient(oklch(82.3% 0.12 346.018 / ${APP_IRIDESCENCE.pinkOpacity}) 0 0)`,
+].join(", ");
+
+/** A smooth violet still keeps critical, offline and unsupported-WebGL views coherent. */
 export const APP_CANVAS_BACKGROUND = [
-  // Tailwind Purple500 at exactly 45%, above the existing static canvas paint.
-  "linear-gradient(oklch(62.7% 0.265 303.9 / 0.45) 0 0)",
-  "radial-gradient(ellipse at 8% 0%, oklch(70.2% 0.183 293.541 / 0.055), transparent 66%)",
-  "radial-gradient(ellipse at 100% 24%, oklch(67.3% 0.182 276.935 / 0.045), transparent 68%)",
-  "radial-gradient(ellipse at 50% 100%, oklch(74% 0.238 322.16 / 0.035), transparent 70%)",
+  APP_CANVAS_OVERLAY,
+  "radial-gradient(ellipse at 42% 36%, #7c3aed 0%, #5829a2 42%, #332047 82%, #29213b 100%)",
   APP_CANVAS_BASE,
 ].join(", ");
 export const APP_CANVAS_CSS = `
   --app-canvas-base: ${APP_CANVAS_BASE};
   --app-canvas-background: ${APP_CANVAS_BACKGROUND};
+  --app-canvas-overlay: ${APP_CANVAS_OVERLAY};
+  --app-iridescence-color: ${APP_IRIDESCENCE.color};
+  --app-iridescence-blur: ${APP_IRIDESCENCE.blur}px;
   --app-canvas-foreground: ${APP_CANVAS_FOREGROUND};
   --app-canvas-muted-foreground: ${APP_CANVAS_MUTED_FOREGROUND};
 `;
@@ -153,7 +185,7 @@ export const APP_THEME_GROUPS = [
     id: "ambient",
     label: "Optional Gradient Pigments",
     description:
-      "Legacy Grainient pigments remain available for optional examples; the page canvas uses its own static Plum surface.",
+      "Legacy Grainient pigments remain available for optional examples; the page canvas uses a separate violet Iridescence field and its own static fallback.",
   },
   {
     id: "feedback",
@@ -344,7 +376,7 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "canvas-background",
     "Page Canvas",
-    "Opaque deeper Plum beneath three faint, stationary Violet, Indigo and Fuchsia edge reflections in both modes.",
+    "Opaque deeper Plum foundation beneath the violet Iridescence field, lightly blurred before Pink300 at 21% and Purple900 at 69% in both modes. Critical and offline views use a matching static violet fallback.",
     APP_CANVAS_BASE,
     APP_CANVAS_BASE,
     ["canvas-foreground", "canvas-muted-foreground"],
@@ -353,7 +385,7 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "canvas-foreground",
     "Canvas Copy",
-    "Opaque light copy on the shared static dark page canvas in either appearance.",
+    "Opaque light copy on the shared violet page canvas in either appearance.",
     APP_CANVAS_FOREGROUND,
     APP_CANVAS_FOREGROUND,
     ["canvas-background"],
@@ -362,7 +394,7 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "canvas-muted-foreground",
     "Secondary Canvas Copy",
-    "A readable pale Lilac counterpart for secondary copy on the static dark page canvas.",
+    "A readable pale Lilac counterpart for secondary copy on the violet page canvas.",
     APP_CANVAS_MUTED_FOREGROUND,
     APP_CANVAS_MUTED_FOREGROUND,
     ["canvas-background"],
