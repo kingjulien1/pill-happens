@@ -506,7 +506,7 @@ export function DeveloperGuidePage() {
               <p>
                 An eight-digit hex value includes alpha: the last pair controls
                 opacity. The same wash will look different on White, Plum, a
-                card, or the static canvas. The inspector displays the exact
+                card, or the root canvas. The inspector displays the exact
                 value and opacity rather than replacing it with an opaque
                 approximation.
               </p>
@@ -982,48 +982,58 @@ export function DeveloperGuidePage() {
               </p>
             </Detail>
             <Detail
-              title="The Fixed Background"
-              context="Static Color & Gentle Edges"
+              title="The Iridescence Background"
+              context="Violet Field &amp; Layered Tints"
             >
               <p>
-                <code>JournalBackground</code> fills the viewport with the same
-                opaque foundation in both appearance modes: 92% canonical Plum
-                and 8% Black, resolved to <code>#29213b</code>. Fixed edge
-                gradients add Violet400 at 5.5%, Indigo400 at 4.5% and
-                Fuchsia400 at 3.5%. A uniform Purple500 overlay at exactly
-                45% opacity sits above that paint. It is the first layer in
-                <code> APP_CANVAS_BACKGROUND</code>, shared by pre-hydration,
-                normal pages, loading and offline views. Content and interactive
-                surfaces stay above the background; no overlay element captures
-                input. The underlying edge gradients remain static, with no
-                moving field, backdrop blur or saturation filter.
+                <code>JournalBackground</code> mounts one passive React Bits
+                Iridescence field at the root, shared across every route and
+                appearance mode. The native WebGL2 shader uses
+                <code> #7c3aed</code> with the upstream speed 1, detail 8 and
+                brightness 1.5. Mouse reaction and click swirls are disabled;
+                there are no pointer listeners or interaction textures. Source
+                is pinned to revision <code>d01aa91</code>, with its David Haz
+                attribution and MIT + Commons Clause notice preserved at
+                <code> public/licenses/react-bits.txt</code>.
               </p>
               <p>
-                The shared <code>--app-canvas-base</code>,
-                <code> --app-canvas-background</code>,
-                <code> --app-canvas-foreground</code> and
-                <code> --app-canvas-muted-foreground</code> roles separate this
-                dark page foundation from semantic reading surfaces. CSS paints
-                it before hydration without a WebGL context, animation frame
-                loop or random placement. White <code>#ffffff</code> primary
-                copy and Lilac <code>#ded8ec</code> secondary copy remain paired
-                with that canvas in either mode. The semantic
-                <code> --background</code> token remains a foundation surface,
-                distinct from the visible page canvas. System and saved
-                Appearance choices still control cards, dialogs, menus and
-                readers. The earlier Grainient component remains available as an
-                optional renderer; the application no longer mounts it for the
-                page background.
+                Paint order is deliberate: the field first receives a light
+                <strong> 4px blur</strong>, then Pink300 at exactly
+                <strong> 21% opacity</strong>, then Purple900 at exactly
+                <strong> 69% opacity</strong>. Only the canvas blurs; text,
+                cards and controls remain sharp. A 12px overscan keeps blurred
+                edges outside the viewport. The frozen
+                <code> APP_IRIDESCENCE</code> settings and shared
+                <code> APP_CANVAS_OVERLAY</code> keep the live field and fallback
+                washes in agreement. The ready layer contains both the opaque
+                shader and its washes, preventing an extra tint over the still
+                when WebGL is unavailable.
               </p>
               <p>
-                Both guides share this backdrop beneath their reading surfaces.
-                Neither mode adds a fullscreen guide veil. Unboxed headings,
-                guidance and the contents rail use the light canvas copy pair;
-                actual panels and specimens keep their own mode-specific
-                foregrounds. Intake cards and the main action retain their
-                opaque component bases and local color tints, keeping stacked
-                content covered. The mobile dock fades, medication artwork and
-                check-in animations remain independent of the static canvas.
+                Hidden documents and offscreen backgrounds pause their animation
+                clock without consuming hidden time. Live reduced-motion changes
+                settle on a still frame; disabling the preference resumes the
+                field without a jump. Context loss immediately reveals the CSS
+                fallback, and restoration rebuilds GPU resources. Unmounting
+                cancels frames, disconnects observers and releases the context.
+                Mobile rendering is capped at DPR 1.25 and 750,000 backing-store
+                pixels; desktop uses DPR 1.5 and 1,800,000 pixels. This limits
+                GPU work without changing the shader’s aspect ratio or motion
+                speed on slower devices.
+              </p>
+              <p>
+                A smooth violet still beneath the same two washes is shared by
+                pre-hydration, loading, offline and unsupported-WebGL views.
+                <code> --app-canvas-base</code> stays at Plum/Black
+                <code> #29213b</code> for the underlying foundation and browser
+                chrome; <code>--app-canvas-background</code> contains that full
+                fallback and <code>--app-canvas-overlay</code> the two washes.
+                White <code>#ffffff</code> primary copy and Lilac
+                <code> #ded8ec</code> secondary copy retain tested contrast even
+                at the shader’s brightest possible output. Semantic cards,
+                dialogs, menus and reading panels continue to follow Appearance.
+                Mobile dock fades, medication artwork, check-in motion and the
+                notification surface remain independent of the root field.
               </p>
             </Detail>
             <Detail title="A Dock That Leaves Room" context="Mobile Actions">
@@ -1572,13 +1582,13 @@ export function DeveloperGuidePage() {
                 and palette color before app CSS arrives. The cup surface stays
                 on its own clipped layer; plain base and score colors remain
                 valid in SVG strokes and color-mix. The full-screen backdrop
-                instead shares the application’s fixed
-                <code> #29213b</code> canvas and three static edge gradients
-                beneath the shared 45% Purple500 overlay in both modes. Header and loading artwork share the same paint
+                instead shares the application’s violet Iridescence fallback
+                beneath Pink300 at 21% and Purple900 at 69% in both modes.
+                Header and loading artwork share the same paint
                 under system and explicit Appearance preferences; external
                 styles do not replace it with the old Purple action face.
                 Local artwork glow and particles retain their own choreography
-                without moving the page canvas.
+                without changing the root field’s clock.
               </p>
               <p>
                 The refresh symbol begins at zero size in the center and grows
@@ -4216,8 +4226,11 @@ export function DeveloperGuidePage() {
                 <ExternalLink href="https://ui.shadcn.com/docs/components/base/drawer">
                   shadcn Drawer
                 </ExternalLink>
+                <ExternalLink href="https://reactbits.dev/backgrounds/iridescence">
+                  Iridescence
+                </ExternalLink>
                 <ExternalLink href="https://reactbits.dev/backgrounds/grainient">
-                  Grainient
+                  Grainient (Optional)
                 </ExternalLink>
                 <ExternalLink href="https://reactbits.dev/components/specular-button">
                   Specular Button

@@ -139,9 +139,17 @@ export const SOURCE_GROUPS = [
     files: [
       [
         "src/components/journal-background.tsx",
-        "System mode and mobile background profile",
+        "Root field, static fallback and input-inert host",
       ],
-      ["src/components/grainient.tsx", "Grainient rendering and lifecycle"],
+      [
+        "src/components/iridescence.tsx",
+        "Passive Iridescence shader and lifecycle",
+      ],
+      [
+        "src/components/iridescence.module.css",
+        "Background-only blur and tint layers",
+      ],
+      ["src/components/grainient.tsx", "Optional legacy Grainient renderer"],
       [
         "src/components/intake-action.tsx",
         "Daily action content and mobile dock",

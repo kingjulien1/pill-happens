@@ -968,9 +968,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         late-countdown glow remains a separate paint-only overlay. This
         translucent surface is separate from the application canvas: opaque
         Plum/Black
-        <code> #29213b</code> and three fixed, faint edge highlights beneath a
-        uniform 45% Purple500 overlay. Semantic reading panels retain light/dark
-        roles.
+        <code> #29213b</code> beneath the violet Iridescence field, a light 4px
+        field blur, Pink300 at 21% and Purple900 at 69%. Loading and fallback
+        views share a violet still with those same washes. Semantic reading
+        panels retain light/dark roles.
       </p>
       <ReferenceTable
         label="Exact Presentation Values"
