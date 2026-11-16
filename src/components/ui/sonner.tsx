@@ -1,7 +1,17 @@
 "use client";
 
-import type { CSSProperties, SVGProps } from "react";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type SVGProps,
+} from "react";
+import { Toaster as Sonner, useSonner, type ToasterProps } from "sonner";
 import {
   CircleAlert,
   Lightbulb,
@@ -119,6 +129,16 @@ const statusIcons = {
   loading: <ToastSymbol key="loading" kind="loading" />,
 };
 
+/** A stack reveal is a separate action from any notification's details. */
+const NotificationStackContext = createContext({
+  expanded: false,
+  count: 0,
+  reveal: () => {},
+  collapse: () => {},
+});
+
+export const useNotificationStack = () => useContext(NotificationStackContext);
+
 /** The shadcn Sonner adapter, themed through the app's existing appearance owner. */
 export function Toaster({
   className,
@@ -127,45 +147,101 @@ export function Toaster({
   toastOptions,
   ...props
 }: ToasterProps) {
+  const region = useRef<HTMLDivElement>(null);
+  const [stackOpen, setStackOpen] = useState(false);
+  const { toasts } = useSonner();
+  const count = toasts.filter(
+    (entry) => !entry.delete && entry.toasterId === props.id,
+  ).length;
+  const [previousCount, setPreviousCount] = useState(count);
+  // Sonner's external store shrinking to one ends this explicit reveal. Adjust
+  // only on a changed snapshot, before rendering a subsequent new stack.
+  if (count !== previousCount) {
+    setPreviousCount(count);
+    if (count <= 1 && stackOpen) setStackOpen(false);
+  }
+  const collapse = useCallback(() => {
+    setStackOpen(false);
+    // Also clear Sonner's native hover fan through its existing drag-end bridge.
+    region.current
+      ?.querySelectorAll<HTMLElement>("[data-sonner-toaster]")
+      .forEach((list) =>
+        list.dispatchEvent(new Event("dragend", { bubbles: true })),
+      );
+  }, []);
+  const reveal = useCallback(() => setStackOpen(true), []);
+  const stack = useMemo(
+    () => ({
+      expanded: Boolean(props.expand || (stackOpen && count > 1)),
+      count,
+      reveal,
+      collapse,
+    }),
+    [props.expand, stackOpen, count, reveal, collapse],
+  );
+
+  useEffect(() => {
+    if (!stackOpen) return;
+    const outside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !region.current?.contains(event.target)
+      )
+        collapse();
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") collapse();
+    };
+    document.addEventListener("pointerdown", outside, true);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside, true);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [stackOpen, collapse]);
+
   return (
-    <>
-      <div className="journal-notification-backdrop" aria-hidden="true" />
-      <Sonner
-        position="top-center"
-        duration={NOTIFICATION_DEFAULT_DURATION}
-        gap={10}
-        visibleToasts={3}
-        offset={{
-          top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))",
-        }}
-        mobileOffset={{
-          top: "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
-          left: 16,
-          right: 16,
-        }}
-        swipeDirections={["top", "left", "right"]}
-        containerAriaLabel="Journal notifications"
-        {...props}
-        closeButton={false}
-        className={cn("toaster group journal-toaster", className)}
-        icons={{ ...statusIcons, ...icons }}
-        style={
-          {
-            "--width": "min(460px, calc(100vw - 32px))",
-            ...style,
-          } as CSSProperties
-        }
-        toastOptions={{
-          ...toastOptions,
-          closeButton: false,
-          closeButtonAriaLabel:
-            toastOptions?.closeButtonAriaLabel ?? "Dismiss notification",
-          classNames: {
-            ...toastOptions?.classNames,
-            toast: cn("journal-toast", toastOptions?.classNames?.toast),
-          },
-        }}
-      />
-    </>
+    <NotificationStackContext.Provider value={stack}>
+      <div ref={region} style={{ display: "contents" }}>
+        <div className="journal-notification-backdrop" aria-hidden="true" />
+        <Sonner
+          position="top-center"
+          duration={NOTIFICATION_DEFAULT_DURATION}
+          gap={10}
+          visibleToasts={3}
+          offset={{
+            top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))",
+          }}
+          mobileOffset={{
+            top: "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
+            left: 16,
+            right: 16,
+          }}
+          swipeDirections={["top", "left", "right"]}
+          containerAriaLabel="Journal notifications"
+          {...props}
+          expand={stack.expanded}
+          closeButton={false}
+          className={cn("toaster group journal-toaster", className)}
+          icons={{ ...statusIcons, ...icons }}
+          style={
+            {
+              "--width": "min(460px, calc(100vw - 32px))",
+              ...style,
+            } as CSSProperties
+          }
+          toastOptions={{
+            ...toastOptions,
+            closeButton: false,
+            closeButtonAriaLabel:
+              toastOptions?.closeButtonAriaLabel ?? "Dismiss notification",
+            classNames: {
+              ...toastOptions?.classNames,
+              toast: cn("journal-toast", toastOptions?.classNames?.toast),
+            },
+          }}
+        />
+      </div>
+    </NotificationStackContext.Provider>
   );
 }

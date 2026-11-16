@@ -25,7 +25,7 @@ import {
   Undo2,
 } from "lucide-react";
 import type { Action, ExternalToast } from "sonner";
-import { ToastSymbol } from "@/components/ui/sonner";
+import { ToastSymbol, useNotificationStack } from "@/components/ui/sonner";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
 import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
@@ -154,6 +154,8 @@ export function JournalNotification({
 }: JournalNotificationProps) {
   const root = useRef<HTMLDivElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
+  const lastSeconds = useRef<HTMLSpanElement>(null);
+  const secondsValue = useRef<HTMLSpanElement>(null);
   const clock = useRef<NotificationClock | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const alive = useRef(false);
@@ -179,6 +181,8 @@ export function JournalNotification({
   const detailsId = useId();
   const headingId = useId();
   const messageId = useId();
+  const stack = useNotificationStack();
+  const needsStackReveal = stack.count > 1 && !stack.expanded;
 
   const pause = useCallback((reason: string, value: boolean) => {
     if (value) pauseReasons.current.add(reason);
@@ -279,15 +283,15 @@ export function JournalNotification({
     const syncNative = () => {
       element.dataset.motionPaused = String(
         document.hidden ||
-          outer?.dataset.front === "false" ||
+          (outer?.dataset.front === "false" &&
+            outer?.dataset.expanded === "false") ||
           outer?.dataset.mounted === "false" ||
           outer?.dataset.visible === "false",
       );
       setPause("hidden", document.hidden);
       if (document.hidden) clearPointers();
-      setPause("rear", outer?.dataset.front === "false");
+      // Each mounted notice owns its lifetime, even behind the visible stack.
       setPause("unmounted", outer?.dataset.mounted === "false");
-      setPause("invisible", outer?.dataset.visible === "false");
       if (outer?.dataset.removed === "true") {
         setPause("removed", true);
         setReversed(true);
@@ -299,6 +303,7 @@ export function JournalNotification({
         attributes: true,
         attributeFilter: [
           "data-front",
+          "data-expanded",
           "data-mounted",
           "data-visible",
           "data-removed",
@@ -309,6 +314,9 @@ export function JournalNotification({
     window.addEventListener("pointercancel", releasePointer);
     window.addEventListener("blur", clearPointers);
     syncNative();
+    let markerShown = false;
+    let markerFinished = false;
+    let pulseAnimations: CSSAnimation[] = [];
     const tick = () => {
       const snapshot = readingClock.snapshot();
       element.style.setProperty(
@@ -316,6 +324,53 @@ export function JournalNotification({
         String(snapshot.progress),
       );
       element.dataset.paused = String(snapshot.paused);
+      element.dataset.countdownComplete = String(snapshot.complete);
+      element.style.setProperty(
+        "--notification-urgency",
+        String(snapshot.colorUrgency),
+      );
+      element.style.setProperty(
+        "--notification-card-urgency",
+        String(snapshot.cardUrgency),
+      );
+      // Keep pulse phase intact while urgency accelerates, rather than repeatedly
+      // changing CSS duration and jumping its current pose.
+      // A live reduced-motion change cancels CSS animations; rediscover the new
+      // instances if motion is enabled again during this countdown.
+      if (pulseAnimations.some((animation) => animation.playState === "idle"))
+        pulseAnimations = [];
+      if (!pulseAnimations.length && snapshot.colorUrgency > 0)
+        pulseAnimations = element
+          .getAnimations({ subtree: true })
+          .filter(
+            (animation): animation is CSSAnimation =>
+              typeof CSSAnimation !== "undefined" &&
+              animation instanceof CSSAnimation &&
+              [
+                "journal-notification-countdown-pulse",
+                "journal-notification-card-breathe",
+              ].includes(animation.animationName),
+          );
+      for (const animation of pulseAnimations)
+        animation.updatePlaybackRate(
+          1 + snapshot.colorUrgency * (1400 / 520 - 1),
+        );
+      if (
+        !markerShown &&
+        snapshot.timeUntilComplete <= 3_000 &&
+        !snapshot.complete
+      ) {
+        markerShown = true;
+        if (lastSeconds.current) lastSeconds.current.dataset.state = "enter";
+      }
+      if (markerShown && !snapshot.complete && secondsValue.current)
+        secondsValue.current.textContent = String(
+          Math.max(1, Math.ceil(snapshot.timeUntilComplete / 1_000)),
+        );
+      if (markerShown && snapshot.complete && !markerFinished) {
+        markerFinished = true;
+        if (lastSeconds.current) lastSeconds.current.dataset.state = "exit";
+      }
       if (progress.current)
         progress.current.style.inlineSize = `${snapshot.progress * 100}%`;
       if (snapshot.expired && !leaving.current && isCurrent()) {
@@ -590,6 +645,15 @@ export function JournalNotification({
           event.preventDefault();
           event.stopPropagation();
           suppressClick.current = false;
+          return;
+        }
+        // Consume the reveal click before it reaches a summary, Undo or link.
+        // Sonner's native hover fan and this explicit reveal are independent of
+        // the details panel, so one activation cannot open both at once.
+        if (phase === "idle" && needsStackReveal) {
+          event.preventDefault();
+          event.stopPropagation();
+          stack.reveal();
         }
       }}
       onFocusCapture={() => pause("focus", true)}
@@ -600,6 +664,11 @@ export function JournalNotification({
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ")
           suppressClick.current = false;
+        if (event.key === "Escape" && stack.expanded && stack.count > 1) {
+          event.preventDefault();
+          stack.collapse();
+          return;
+        }
         if (
           event.key === "Escape" &&
           dismissible &&
@@ -611,20 +680,38 @@ export function JournalNotification({
         }
       }}
     >
-      <div className="journal-notification-countdown" aria-hidden="true">
-        <span
-          ref={progress}
-          className="journal-notification-countdown-bar"
-          style={{ inlineSize: "100%" }}
-        />
+      <div
+        className="journal-notification-countdown-arrival"
+        aria-hidden="true"
+      >
+        <div className="journal-notification-countdown">
+          <span
+            ref={progress}
+            className="journal-notification-countdown-bar"
+            style={{ inlineSize: "100%" }}
+          />
+          <span className="journal-notification-countdown-sheen" />
+        </div>
       </div>
+      <span
+        ref={lastSeconds}
+        className="journal-notification-last-seconds"
+        data-state="hidden"
+        aria-hidden="true"
+      >
+        <span ref={secondsValue} className="journal-notification-seconds-value">
+          3
+        </span>
+      </span>
+      <span className="journal-notification-urgency-glow" aria-hidden="true" />
       <div className="journal-notification-header">
         <button
           type="button"
           className="journal-notification-summary"
           aria-expanded={expanded}
-          aria-controls={detailsId}
-          aria-labelledby={headingId}
+          aria-controls={needsStackReveal ? undefined : detailsId}
+          aria-label={needsStackReveal ? "Show notification stack" : undefined}
+          aria-labelledby={needsStackReveal ? undefined : headingId}
           aria-describedby={messageId}
           onClick={toggle}
         >

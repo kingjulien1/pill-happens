@@ -18,9 +18,10 @@
 /* One visual-only viewport veil; native Sonner stack expansion is unrelated. */
 body:has(
     .journal-toaster
-      [data-sonner-toast][data-mounted="true"][data-visible="true"][data-front="true"]:not(
-        [data-removed="true"]
-      )
+      [data-sonner-toast][data-mounted="true"][data-visible="true"]:is(
+        [data-front="true"],
+        [data-expanded="true"]
+      ):not([data-removed="true"])
       .journal-notification[data-expanded="true"][data-phase="idle"]
   )
   .journal-notification-backdrop {
@@ -761,35 +762,156 @@ body:has(
   background: var(--toast-quiet-fill);
   color: var(--toast-detail-muted);
 }
-.journal-notification-countdown {
+/* The entry rail, remaining width and urgency pulse have separate owners.
+   Its 140ms lead-in follows the card without delaying the independent clock. */
+.journal-notification-countdown-arrival {
   position: absolute;
-  right: 16px;
+  z-index: 2;
   top: 10px;
+  right: 16px;
   left: 16px;
   height: 4px;
   border-radius: 999px;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.journal-notification-countdown-arrival::before {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--toast-bright),
+    color-mix(in srgb, var(--toast-soft) 40%, transparent) 35%,
+    transparent 72%
+  );
+  opacity: 0;
+  content: "";
+}
+.journal-notification-countdown {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   overflow: hidden;
   background: color-mix(in srgb, var(--toast-soft) 20%, transparent);
   box-shadow: inset 0 0 0 0.75px #fff7fc1f;
   pointer-events: none;
 }
 .journal-notification-countdown-bar {
+  --countdown-rose: var(--color-rose-500, oklch(64.5% 0.246 16.439));
+  --countdown-start: color-mix(
+    in srgb,
+    var(--countdown-rose) calc(var(--notification-urgency, 0) * 100%),
+    var(--toast-soft)
+  );
+  --countdown-center: color-mix(
+    in srgb,
+    var(--countdown-rose) calc(var(--notification-urgency, 0) * 100%),
+    var(--toast-bright)
+  );
+  --countdown-end: color-mix(
+    in srgb,
+    var(--countdown-rose) calc(var(--notification-urgency, 0) * 100%),
+    var(--toast-accent)
+  );
   display: block;
   inline-size: calc(var(--notification-remaining, 1) * 100%);
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    var(--toast-soft),
-    var(--toast-bright) 55%,
-    var(--toast-accent)
+    var(--countdown-start),
+    var(--countdown-center) 55%,
+    var(--countdown-end)
   );
-  box-shadow: 0 0 8px color-mix(in srgb, var(--toast-bright) 45%, transparent);
+  box-shadow: 0 0 8px
+    color-mix(in srgb, var(--countdown-center) 45%, transparent);
   transition: inline-size 60ms linear;
 }
+.journal-notification-countdown-sheen {
+  position: absolute;
+  inset: -2px auto -2px -20%;
+  width: 20%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--toast-soft) 55%, transparent) 36%,
+    var(--toast-bright) 63%,
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+/* A paint-only urgency breath never competes with the card's entry/exit pose. */
+.journal-notification-urgency-glow {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(
+    in srgb,
+    var(--color-rose-500, oklch(64.5% 0.246 16.439)) 5%,
+    transparent
+  );
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--color-rose-500, #f43f5e) 36%, transparent),
+    inset 0 0 18px -8px
+      color-mix(in srgb, var(--color-rose-500, #f43f5e) 22%, transparent),
+    0 0 14px -6px
+      color-mix(in srgb, var(--color-rose-500, #f43f5e) 32%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+.journal-notification-last-seconds {
+  position: absolute;
+  z-index: 4;
+  top: -7px;
+  left: 11px;
+  display: inline-flex;
+  min-width: 19px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 4px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--toast-fuchsia-surface) 76%, transparent);
+  color: color-mix(in srgb, var(--toast-ink) 48%, transparent);
+  box-shadow: inset 0 0 0 0.6px
+    color-mix(in srgb, var(--toast-soft) 18%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-size: 9px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transform-origin: center;
+  pointer-events: none;
+}
+.journal-notification-last-seconds[data-state="hidden"] {
+  visibility: hidden;
+  opacity: 0;
+}
+.journal-notification-seconds-value {
+  display: inline-block;
+}
 .journal-notification[data-timer-mode="indefinite"]
-  .journal-notification-countdown {
+  :is(
+    .journal-notification-countdown-arrival,
+    .journal-notification-last-seconds,
+    .journal-notification-urgency-glow
+  ) {
   display: none;
+}
+.journal-notification[data-countdown-complete="true"]
+  .journal-notification-countdown {
+  opacity: 0.45;
+  transition: opacity 180ms ease;
 }
 .journal-notification-error {
   color: var(--toast-ink);
@@ -860,12 +982,9 @@ body:has(
 
 /* The reading clock may pause for focus/hover; decoration has its own visibility gate. */
 .journal-notification[data-motion-paused="true"],
+.journal-toaster [data-sonner-toast][data-front="false"][data-expanded="false"],
 .journal-toaster
-  [data-sonner-toast]:is(
-    [data-front="false"],
-    [data-visible="false"],
-    [data-mounted="false"]
-  ) {
+  [data-sonner-toast]:is([data-visible="false"], [data-mounted="false"]) {
   --notification-motion-play-state: paused;
 }
 .journal-notification::after {
@@ -889,6 +1008,57 @@ body:has(
     [data-mounted="true"]
     .journal-notification[data-phase="idle"]::after {
     animation: journal-notification-threshold-ring 1100ms ease-out 350ms both;
+  }
+  .journal-toaster
+    [data-mounted="true"]
+    .journal-notification-countdown-arrival {
+    animation: journal-notification-countdown-unfold 780ms
+      cubic-bezier(0.16, 0.9, 0.23, 1) 140ms both;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-toaster
+    [data-mounted="true"]
+    .journal-notification-countdown-arrival::before {
+    animation: journal-notification-countdown-ignite 650ms ease-out 200ms both;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-toaster [data-mounted="true"] .journal-notification-countdown-sheen {
+    animation: journal-notification-countdown-thread 760ms
+      cubic-bezier(0.2, 0.7, 0.2, 1) 270ms both;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-notification-countdown-bar {
+    animation: journal-notification-countdown-pulse
+      var(--notification-pulse-duration, 1400ms) ease-in-out infinite;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-notification-urgency-glow {
+    animation: journal-notification-card-breathe
+      var(--notification-pulse-duration, 1400ms) ease-in-out infinite;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-notification-last-seconds[data-state="enter"] {
+    animation: journal-notification-seconds-arrive 320ms
+      cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-notification-last-seconds[data-state="exit"] {
+    animation: journal-notification-seconds-depart 200ms
+      cubic-bezier(0.55, 0, 0.8, 0.35) both;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-notification[data-paused="true"]
+    :is(
+      .journal-notification-countdown-bar,
+      .journal-notification-urgency-glow,
+      .journal-notification-last-seconds
+    ) {
+    animation-play-state: paused;
+  }
+  .journal-notification:not([data-phase="idle"])
+    .journal-notification-urgency-glow {
+    animation: none;
+    opacity: 0;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-art-arrival {
     animation: journal-toast-art-arrive var(--toast-art-arrival-duration)
@@ -1052,6 +1222,105 @@ body:has(
     [data-removed="true"]
     .journal-toast-symbol:not([data-toast-reversed="true"]) {
     animation: journal-toast-art-reverse 180ms ease-in both;
+  }
+}
+@keyframes journal-notification-countdown-unfold {
+  0% {
+    opacity: 0;
+    transform: translateX(3px) scaleX(0.045) scaleY(0.45);
+  }
+  24% {
+    opacity: 1;
+    transform: translateX(0) scaleX(0.64) scaleY(1.3);
+  }
+  58% {
+    transform: scaleX(1.016) scaleY(0.94);
+  }
+  78% {
+    transform: scaleX(0.995) scaleY(1.035);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes journal-notification-countdown-ignite {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  28% {
+    opacity: 0.85;
+    transform: scale(1.15);
+  }
+  56% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+}
+@keyframes journal-notification-countdown-thread {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  18% {
+    opacity: 0.9;
+  }
+  68% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(650%);
+  }
+}
+@keyframes journal-notification-countdown-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: calc(1 - var(--notification-urgency, 0) * 0.24);
+    filter: brightness(calc(1 + var(--notification-urgency, 0) * 0.2));
+  }
+}
+@keyframes journal-notification-card-breathe {
+  0%,
+  100% {
+    opacity: calc(var(--notification-card-urgency, 0) * 0.12);
+  }
+  50% {
+    opacity: calc(var(--notification-card-urgency, 0) * 0.36);
+  }
+}
+@keyframes journal-notification-seconds-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(2px) rotate(-16deg) scale(0.14);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-0.7px) rotate(3deg) scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes journal-notification-seconds-depart {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  28% {
+    opacity: 0.8;
+    transform: translateY(-0.7px) rotate(-38deg) scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-2px) rotate(-320deg) scale(0.04);
   }
 }
 @keyframes journal-notification-card-arrive {
@@ -1352,6 +1621,13 @@ body:has(
 @media (prefers-reduced-motion: reduce) {
   .journal-notification-backdrop {
     transition: none;
+  }
+  .journal-notification-last-seconds[data-state="exit"] {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .journal-notification-urgency-glow {
+    opacity: 0;
   }
   .journal-toaster[data-sonner-toaster] [data-sonner-toast],
   .journal-toaster[data-sonner-toaster] [data-sonner-toast] *,
