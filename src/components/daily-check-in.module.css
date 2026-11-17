@@ -209,6 +209,8 @@
 }
 
 .feelingsSection {
+  --feelings-pink: var(--color-pink-300, #f9a8d4);
+  --feelings-purple: var(--color-purple-300, #d8b4fe);
   position: relative;
   isolation: isolate;
   display: flex;
@@ -221,19 +223,20 @@
   background:
     radial-gradient(
       ellipse at 2% 0%,
-      color-mix(in srgb, var(--palette-rose) 7%, transparent),
+      color-mix(in srgb, var(--feelings-pink) 10%, transparent),
       transparent 62%
     ),
     radial-gradient(
       ellipse at 100% 80%,
-      color-mix(in srgb, var(--palette-lilac) 5%, transparent),
+      color-mix(in srgb, var(--feelings-purple) 9%, transparent),
       transparent 65%
     ),
-    color-mix(in srgb, var(--surface-reading) 94%, var(--palette-rose));
+    color-mix(in srgb, var(--surface-reading) 92%, var(--feelings-pink));
   color: var(--surface-reading-foreground);
   box-shadow:
-    inset 0 0 0 3px color-mix(in srgb, var(--palette-rose) 12%, transparent),
-    inset 0 0 0 4px color-mix(in srgb, var(--palette-lilac) 10%, transparent);
+    inset 0 0 0 3px color-mix(in srgb, var(--feelings-pink) 19%, transparent),
+    inset 0 0 0 4px color-mix(in srgb, var(--feelings-purple) 16%, transparent),
+    0 7px 24px color-mix(in srgb, var(--feelings-purple) 6%, transparent);
 }
 .feelingsHeading {
   display: flex;
@@ -241,12 +244,16 @@
   align-items: center;
   gap: 9px;
 }
+.feelingsHeading > div {
+  min-width: 0;
+}
 .feelingsHeading h3 {
   margin: 0;
   color: var(--foreground);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 650;
   line-height: 1.4;
+  letter-spacing: -0.025em;
 }
 .feelingsHeading p {
   margin: 4px 0 0;
@@ -255,25 +262,69 @@
   line-height: 1.6;
 }
 .feelingsMark {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  width: 31px;
-  height: 31px;
+  width: 40px;
+  height: 40px;
   flex: none;
   place-items: center;
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--palette-rose) 14%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--feelings-pink) 14%, transparent);
   color: var(--foreground);
   box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--palette-rose) 27%, transparent);
+    color-mix(in srgb, var(--feelings-pink) 30%, transparent);
+}
+.feelingsMark::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  rotate: -9deg;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--feelings-purple) 14%, transparent);
+  content: "";
+}
+.feelingsSection .moodLegend {
+  align-items: center;
+  margin-block-end: 6px;
+}
+.feelingsSection .optional {
+  padding: 5px 7px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--feelings-purple) 10%, transparent);
+  color: var(--foreground);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.feelingsSection .sectionHeading {
+  align-items: center;
+}
+.feelingsSection .sectionHeading h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+}
+.feelingsSection .sectionHeading h3 > svg {
+  flex: none;
+  color: var(--feelings-purple);
+}
+.feelingsSection .fieldHint {
+  font-size: 10.5px;
+}
+.feelingsSection .ratingRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 .feelingsSection > .formSection {
   gap: 11px;
   padding: 13px 11px;
-  background: color-mix(in srgb, var(--palette-lilac) 4%, transparent);
+  background: color-mix(in srgb, var(--feelings-purple) 5%, transparent);
 }
 .feelingsSection > .formSection::before {
   border-width: 2px;
-  border-color: color-mix(in srgb, var(--palette-lilac) 11%, transparent);
+  border-color: color-mix(in srgb, var(--feelings-purple) 18%, transparent);
   box-shadow: none;
 }
 
@@ -470,6 +521,10 @@
 }
 
 @media (prefers-color-scheme: light) {
+  .feelingsSection {
+    --feelings-pink: var(--color-pink-600, #db2777);
+    --feelings-purple: var(--color-purple-600, #9333ea);
+  }
   .formSection {
     background: color-mix(in srgb, var(--surface-sunken) 38%, var(--popover));
   }
@@ -486,11 +541,27 @@
   .feelingsSection > .formSection {
     background: color-mix(
       in srgb,
-      var(--surface-sunken) 30%,
+      var(--feelings-purple) 4%,
       var(--surface-reading)
     );
   }
   .feelingsSection > .formSection::before {
-    border-color: color-mix(in srgb, var(--primary) 9%, transparent);
+    border-color: color-mix(in srgb, var(--feelings-purple) 16%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .feelingsSection {
+    animation: feelings-arrive 550ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+@keyframes feelings-arrive {
+  from {
+    opacity: 0;
+    translate: 0 5px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
   }
 }

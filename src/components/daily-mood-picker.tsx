@@ -1,7 +1,7 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
-import { Search, Sparkles, X } from "lucide-react";
+import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Search, Shuffle, Sparkles, X } from "lucide-react";
 import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,17 +30,22 @@ export function DailyMoodPicker({
   disabled?: boolean;
 }) {
   const id = useId();
+  const viewport = useRef<HTMLDivElement>(null);
+  const [mix, setMix] = useState(0);
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState<DailyMoodFamily | "all">("all");
   const ranked = useMemo(
-    () => rankDailyMoods(checkIns, seed),
-    [checkIns, seed],
+    () => rankDailyMoods(checkIns, `${seed}:${mix}`),
+    [checkIns, seed, mix],
   );
   const results = ranked.filter(
     (mood) =>
       (family === "all" || mood.family === family) &&
       matchesDailyMood(mood, query),
   );
+  useLayoutEffect(() => {
+    if (viewport.current) viewport.current.scrollTop = 0;
+  }, [query, family, mix]);
   const toggle = (mood: DailyMood) => {
     if (disabled) return;
     if (value.includes(mood)) onChange(value.filter((entry) => entry !== mood));
@@ -48,21 +53,45 @@ export function DailyMoodPicker({
   };
 
   return (
-    <div className={styles.picker}>
-      <div className={styles.search}>
-        <Search size={15} strokeWidth={2} aria-hidden="true" />
-        <Input
-          id={`${id}-search`}
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Find the words for today…"
-          aria-label="Find a mood"
-          aria-controls={`${id}-results`}
+    <div className={styles.picker} data-mood-library>
+      <div className={styles.searchRow}>
+        <div className={styles.search}>
+          <Search size={16} strokeWidth={2.1} aria-hidden="true" />
+          <Input
+            id={`${id}-search`}
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Find a feeling…"
+            aria-label="Find a mood"
+            aria-controls={`${id}-results`}
+            disabled={disabled}
+            autoComplete="off"
+            className={styles.searchInput}
+          />
+          {query && (
+            <button
+              type="button"
+              className={styles.clearSearch}
+              aria-label="Clear mood search"
+              disabled={disabled}
+              onClick={() => setQuery("")}
+            >
+              <X size={13} strokeWidth={2.1} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+        <button
+          type="button"
+          className={styles.shuffle}
           disabled={disabled}
-          autoComplete="off"
-          className={styles.searchInput}
-        />
+          onClick={() => setMix((current) => current + 1)}
+          aria-label="Shuffle feelings with equal usage"
+          title="A fresh mix. Your most-used feelings still come first."
+          data-mood-shuffle
+        >
+          <Shuffle size={17} strokeWidth={2.1} aria-hidden="true" />
+        </button>
       </div>
       <div className={styles.families} role="group" aria-label="Mood families">
         <button
@@ -86,18 +115,23 @@ export function DailyMoodPicker({
         ))}
       </div>
       <div className={styles.caption}>
-        <span>Your regulars first</span>
+        <span id={`${id}-sort`}>
+          Your Regulars First <span aria-hidden="true">·</span> Then A Fresh Mix
+        </span>
         <span aria-live="polite">
           <strong>{results.length}</strong>{" "}
           {results.length === 1 ? "feeling" : "feelings"}
         </span>
       </div>
       <div
+        ref={viewport}
         id={`${id}-results`}
         className={styles.viewport}
         role="group"
         aria-label="Choose up to four moods"
-        tabIndex={0}
+        aria-describedby={`${id}-sort`}
+        data-mood-viewport
+        tabIndex={disabled ? -1 : 0}
       >
         {results.length ? (
           <div className={styles.grid}>
@@ -113,6 +147,7 @@ export function DailyMoodPicker({
                   disabled={disabled || (!selected && value.length >= 4)}
                   onClick={() => toggle(mood.value)}
                   title={mood.label}
+                  data-mood-value={mood.value}
                 >
                   <DailyMoodIcon mood={mood.value} />
                   <span>{mood.label}</span>
@@ -137,7 +172,11 @@ export function DailyMoodPicker({
           </div>
         )}
       </div>
-      <div className={styles.selection} aria-label="Selected moods">
+      <div
+        className={styles.selection}
+        role="group"
+        aria-label="Selected moods"
+      >
         {value.length ? (
           value.map((selected) => {
             const mood = DAILY_MOODS.find((entry) => entry.value === selected);
@@ -149,15 +188,15 @@ export function DailyMoodPicker({
                 disabled={disabled}
                 aria-label={`Remove ${mood.label}`}
               >
-                <DailyMoodIcon mood={selected} size={12} />
+                <DailyMoodIcon mood={selected} size={14} />
                 <span>{mood.label}</span>
-                <X size={10} aria-hidden="true" />
+                <X size={12} aria-hidden="true" />
               </button>
             ) : null;
           })
         ) : (
           <span className={styles.selectionHint}>
-            No right answer. Just what fits.
+            Your picks stay here, even while you search.
           </span>
         )}
       </div>

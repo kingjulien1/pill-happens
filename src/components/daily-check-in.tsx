@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, useSyncExternalStore } from "react";
+import { Flower2, HeartHandshake, SlidersHorizontal } from "lucide-react";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
 import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
 import { toast } from "@/components/ui/journal-toast";
@@ -382,8 +383,6 @@ function CheckInForm({
     moods,
     energy,
     stress,
-    sleepHours,
-    bedtime = checkIn?.bedtime ?? "",
     helped,
     writingOpen = false,
   } = draft.value;
@@ -429,21 +428,11 @@ function CheckInForm({
     energy !== null ||
     stress !== null ||
     helped.trim() ||
-    (morning
-      ? hasMorningSleepContent(morningSleep)
-      : sleepHours !== "" || bedtime !== "");
+    (morning && hasMorningSleepContent(morningSleep));
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (locked) return;
-    if (
-      !morning &&
-      bedtime !== "" &&
-      !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(bedtime)
-    ) {
-      setError("Choose a valid bedtime, or leave it blank.");
-      return;
-    }
     const parsedMorning = morning ? parseMorningSleepDraft(morningSleep) : null;
     if (parsedMorning?.error) {
       setError(parsedMorning.error);
@@ -484,19 +473,16 @@ function CheckInForm({
         stress,
         energyScale: draft.value.energyScale ?? 5,
         stressScale: draft.value.stressScale ?? 5,
-        sleepHours: morning
-          ? parsedMorning?.value?.totalSleepMinutes == null
-            ? null
-            : parsedMorning.value.totalSleepMinutes / 60
-          : sleepHours === ""
-            ? null
-            : Number(sleepHours),
         helped,
         ...(morning
-          ? { morningSleep: parsedMorning?.value ?? null }
-          : draft.value.bedtime === undefined
-            ? {} // An older restored draft must not erase a newer saved clock.
-            : { bedtime: bedtime === "" ? null : bedtime }),
+          ? {
+              morningSleep: parsedMorning?.value ?? null,
+              sleepHours:
+                parsedMorning?.value?.totalSleepMinutes == null
+                  ? null
+                  : parsedMorning.value.totalSleepMinutes / 60,
+            }
+          : {}), // Removed Evening inputs never overwrite current saved sleep details.
       });
       const savedCheckIn = checkInForDay(
         result.data.dailyCheckIns,
@@ -618,15 +604,17 @@ function CheckInForm({
           <section
             className={styles.feelingsSection}
             aria-labelledby={`${id}-feelings-heading`}
+            data-evening-feelings
           >
             <div className={styles.feelingsHeading}>
               <span className={styles.feelingsMark} aria-hidden="true">
-                <ActionIcon name="flower" className="size-4" />
+                <HeartHandshake size={21} strokeWidth={2.1} />
               </span>
               <div>
                 <h3 id={`${id}-feelings-heading`}>Your Day, Your Mood</h3>
                 <p>
-                  A little nuance. A mix is welcome. Every answer is optional.
+                  A few shades of today. A mix is welcome; every part is
+                  optional.
                 </p>
               </div>
             </div>
@@ -637,13 +625,13 @@ function CheckInForm({
             >
               <legend className={styles.moodLegend}>
                 <span className={styles.fieldHeading}>
-                  <ActionIcon name="flower" className="size-4" />
+                  <Flower2 size={17} strokeWidth={2.1} />
                   Today Felt Like
                 </span>
                 <span className={styles.optional}>{moods.length} / 4</span>
               </legend>
               <p className={styles.fieldHint}>
-                A mix is okay. Pick up to four.
+                Choose up to four. There is room for mixed feelings.
               </p>
               <DailyMoodPicker
                 value={moods}
@@ -659,7 +647,14 @@ function CheckInForm({
               aria-labelledby={`${id}-ratings-heading`}
             >
               <div className={styles.sectionHeading}>
-                <h3 id={`${id}-ratings-heading`}>How Your Day Felt</h3>
+                <h3 id={`${id}-ratings-heading`}>
+                  <SlidersHorizontal
+                    size={17}
+                    strokeWidth={2.1}
+                    aria-hidden="true"
+                  />
+                  How Your Day Felt
+                </h3>
                 <span>1–10 · Optional</span>
               </div>
               <p className={styles.fieldHint}>

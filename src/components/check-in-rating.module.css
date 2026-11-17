@@ -175,3 +175,38 @@
     --check-in-rating-accent: var(--primary);
   }
 }
+
+/* Evening's two compact cards keep native rating behavior and legacy scales. */
+.rating[data-check-in-section] {
+  padding: 10px;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--check-in-rating-accent) 5%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--check-in-rating-accent) 17%, transparent);
+}
+.rating[data-check-in-section="energy"] {
+  --check-in-rating-accent: var(--feelings-purple, var(--palette-lilac));
+}
+.rating[data-check-in-section="stress"] {
+  --check-in-rating-accent: var(--feelings-pink, var(--palette-rose));
+}
+.rating[data-check-in-section] .ratingHeading {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 4px;
+}
+.rating[data-check-in-section] .ratingHeading label {
+  font-size: 12px;
+  font-weight: 600;
+}
+.rating[data-check-in-section] .ratingValue {
+  min-height: 26px;
+  justify-content: space-between;
+}
+.rating[data-check-in-section] .ratingValue strong {
+  font-size: 14px;
+  font-weight: 650;
+}
+.rating[data-check-in-section] .range {
+  height: 36px;
+}

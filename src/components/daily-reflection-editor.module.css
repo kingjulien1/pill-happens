@@ -1,13 +1,13 @@
 .editor {
-  --journal-peach: var(--palette-white);
-  --journal-flame: var(--palette-apricot);
-  --journal-rust: var(--palette-plum);
+  --journal-peach: var(--color-pink-200, #fccee8);
+  --journal-flame: var(--color-pink-400, #f472b6);
+  --journal-rust: var(--color-purple-400, #c084fc);
   --journal-ink-base: var(--palette-black);
-  --journal-violet: var(--palette-lilac);
+  --journal-violet: var(--color-purple-300, #d8b4fe);
   --journal-fill: color-mix(
     in srgb,
-    var(--surface-reading) 94%,
-    var(--palette-apricot)
+    var(--surface-reading) 92%,
+    var(--color-pink-300, #f9a8d4)
   );
   --journal-ink: var(--surface-reading-foreground);
   --journal-emphasis: color-mix(
@@ -19,17 +19,17 @@
   --journal-muted: color-mix(in srgb, var(--journal-ink) 55%, transparent);
   --journal-flame-wash: color-mix(
     in srgb,
-    var(--palette-apricot) 6%,
+    var(--color-pink-300, #f9a8d4) 8%,
     transparent
   );
   --journal-peach-wash: color-mix(
     in srgb,
-    var(--palette-white) 5%,
+    var(--color-pink-200, #fccee8) 5%,
     transparent
   );
   --journal-violet-wash: color-mix(
     in srgb,
-    var(--palette-lilac) 4%,
+    var(--color-purple-300, #d8b4fe) 6%,
     transparent
   );
   --journal-tile: color-mix(in srgb, var(--journal-ink) 5%, transparent);
