@@ -23,6 +23,7 @@ import {
   APP_THEME_TOKENS,
   APP_THEME_VALUES,
   APP_LIGHT_SURFACES,
+  APP_LIGHT_CANVAS,
   type AppThemeMode,
 } from "@/lib/app-theme";
 import {
@@ -471,10 +472,11 @@ export function DeveloperGuidePage() {
                 inverse surfaces each have their own foreground partner.
               </p>
               <p>
-                Text directly over the fixed dark canvas uses
+                Text directly over the page canvas uses
                 <code> --canvas-foreground</code> or
                 <code> --canvas-muted-foreground</code>. A general muted reading
-                color can disappear when moved from a card to the canvas.
+                color can disappear when moved from a card to a contrast island.
+                Canvas copy is deep Plum in Light Mode and White in Dark Mode.
               </p>
             </Detail>
             <Detail title="Actions, Focus & Feedback" context="Clear Intent">
@@ -482,9 +484,12 @@ export function DeveloperGuidePage() {
                 Button keeps standard semantic variants for ordinary controls,
                 toolbars, links and guide utilities. Primary, Accent and
                 DialogPrimaryButton explicitly select intake appearance for main
-                actions: the opaque dark-pink face, Pink600 inward edge and
-                restrained moving pink perimeter. Pink200 supplies its secondary
-                icons and copy through --daily-action-secondary-ink.
+                actions: a mode-aware Rose face, inward identity edge and
+                restrained moving pink perimeter. Supporting icons and copy use
+                the paired --daily-action-secondary-ink. Light actions use a
+                rich raspberry contrast surface with light copy; Dark Mode
+                keeps its existing paint. Today and Add Medication use their
+                separate satin adapter over the same native button host.
                 SecondaryButton keeps its quiet tonal surface and paired
                 semantic foreground. All paths preserve one Base UI host and
                 native behavior without making every small control look like the
@@ -512,12 +517,37 @@ export function DeveloperGuidePage() {
               <p>
                 Choose the surface and its paired foreground together. Input
                 boundaries and focus rings remain distinct on rose/lilac paper;
-                selected ratings use deep semantic primary ink. The root Violet
-                Iridescence composition stays the same in either mode, while
-                local surfaces follow Light, Dark or System. Editing the light
+                selected ratings use deep semantic primary ink. The root uses
+                <code> {APP_LIGHT_CANVAS.base}</code> Rose/Lilac paper with a
+                protective 90% glaze over the same passive violet shader.
+                Dark Mode keeps its original deeper field and exact overlays.
+                Local surfaces follow Light, Dark or System. Editing the light
                 registry does not recolor personal medication symbols or change
                 the dark role values. The live tables and inspectors below read
                 the registry directly, including every light/dark HEX value.
+              </p>
+              <p>
+                Light Mode is a full reading hierarchy: warm raised cards,
+                recessed field wells, an opaque writing surface and distinct
+                selected states. Primary copy and readable muted copy remain
+                opaque; shadows use Plum rather than gray or black haze.
+                Small labels, keyboard focus and input boundaries are tested
+                after compositing. The mug, moon and notification bell keep
+                deliberate dark artwork tiles with light ink, while page text,
+                timestamps, dose calculations and status badges adapt to the
+                lighter surroundings. Personal medication colors remain saved
+                identities rather than becoming a second application theme.
+              </p>
+              <p>
+                getAppCanvasCss supplies generated CSS, the prepaint head,
+                loading curtain and offline page from one mode registry. A
+                no-JavaScript OS fallback paints before hydration; the resolved
+                appearance flag then owns the same declarations. Browser
+                theme-color metadata follows the selected mode, including a
+                manual selection opposite to the device. Offline restores that
+                same device-local preference without reading journal data.
+                Mode changes retain the shader instance and phase without
+                modifying medication data, drafts or a notification timer.
               </p>
             </Detail>
             <Detail
@@ -821,12 +851,14 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Today’s Log Intake action matches the 80px/21px intake-card
-                reference. Its opaque #29131f dark-pink face stays readable in
-                both modes. A Pink600 inner band uses 74% alpha; Pink200 colors
-                the secondary icons and Jot it! copy. The independent 5.5px
-                specular rim keeps 30% opacity with a 28% Pink300 admixture in
-                its mode-aware pink stops. Primary, Accent and dialog submission
-                adapters opt into this finish. Small controls keep their
+                reference. Today and Add Medication use the satin face: rich
+                raspberry with light copy in Light Mode, and the established
+                pale Lilac/deep Plum pairing in Dark Mode. Dialog submissions
+                keep their shared specular adapter, with mode-aware Rose rim
+                stops and readable secondary ink. The inspectable button
+                reference below reports its source-defined layer values.
+                Primary, Accent and dialog submission adapters opt into the
+                main-action family. Small controls keep their
                 semantic variants, while SecondaryButton stays quiet and tonal.
               </p>
               <p>
@@ -887,7 +919,7 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Page-level guidance, dates and milestone labels use the canvas
-                copy pair above the fixed dark canvas. Text inside cards,
+                copy pair above the mode-aware page canvas. Text inside cards,
                 dialogs and readers keeps its own paired surface roles. This
                 distinction preserves readable light-mode labels without
                 flattening the hierarchy of the card content. Verify both
@@ -1010,7 +1042,7 @@ export function DeveloperGuidePage() {
                 <code> public/licenses/react-bits.txt</code>.
               </p>
               <p>
-                Paint order is deliberate: the field first receives a light
+                Dark Mode paint order is deliberate: the field first receives a light
                 <strong> 4px blur</strong>, then Pink300 at exactly
                 <strong> 21% opacity</strong>, then Purple900 at exactly
                 <strong> 69% opacity</strong>. Only the canvas blurs; text,
@@ -1035,16 +1067,20 @@ export function DeveloperGuidePage() {
                 speed on slower devices.
               </p>
               <p>
-                A smooth violet still beneath the same two washes is shared by
-                pre-hydration, loading, offline and unsupported-WebGL views.
-                <code> --app-canvas-base</code> stays at Plum/Black
-                <code> #29213b</code> for the underlying foundation and browser
-                chrome; <code>--app-canvas-background</code> contains that full
-                fallback and <code>--app-canvas-overlay</code> the two washes.
-                White <code>#ffffff</code> primary copy and Lilac
-                <code> #ded8ec</code> secondary copy retain tested contrast even
-                at the shader’s brightest possible output. Semantic cards,
-                dialogs, menus and reading panels continue to follow Appearance.
+                APP_CANVAS_BY_MODE pairs the live overlay, still, foundation and
+                reading inks for each appearance. Dark Mode retains its
+                Plum/Black <code>#29213b</code> base, White primary copy and
+                Lilac secondary copy. Light Mode uses
+                <code> {APP_LIGHT_CANVAS.base}</code> paper, Plum
+                <code> {APP_LIGHT_CANVAS.foreground}</code> copy and muted Plum
+                <code> {APP_LIGHT_CANVAS.mutedForeground}</code>. A 90% paper
+                glaze bounds the entire shader before quiet Rose/Lilac radial
+                reflections. Unit checks exhaust every independent RGB bound
+                and radial extreme for normal-copy contrast, including fallback
+                colors. The same registry supplies pre-hydration, loading,
+                offline and unsupported-WebGL views and mode-aware browser
+                chrome. No shader reinitialization is needed when mode changes.
+                Semantic cards, dialogs, menus and reading panels follow Appearance.
                 Mobile dock fades, medication artwork, check-in motion and the
                 notification surface remain independent of the root field.
               </p>
@@ -1574,15 +1610,18 @@ export function DeveloperGuidePage() {
                 settles into the same 1.25× charged pose at 143.75px. RefreshCw
                 starts with 57.5px artwork; the face’s 1.25× spring and nested
                 1.14× icon scale compound to 81.9375px in the charged pose. The
-                core uses the same 87%-alpha Fuchsia 900 foundation, 31% cup
-                surface, brighter Purple-mixed glyph and three-rim setup as the
-                live header. Critical declarations are generated from the same
+                core keeps its three-rim setup and mode-aware header palette.
+                Dark Mode retains the 87%-alpha Fuchsia900 foundation, 31% cup
+                surface and brighter Purple-mixed glyph. Light Mode uses pale
+                Rose glass with deeper raspberry artwork and soft reflected
+                light. Critical declarations are generated from the same
                 frozen paint object, with literal fallbacks for every Tailwind
                 and palette color before app CSS arrives. The cup surface stays
                 on its own clipped layer; plain base and score colors remain
                 valid in SVG strokes and color-mix. The full-screen backdrop
                 instead shares the application’s violet Iridescence fallback
-                beneath Pink300 at 21% and Purple900 at 69% in both modes.
+                beneath Pink300 at 21% and Purple900 at 69% in Dark Mode, and
+                the luminous paper glaze in Light Mode.
                 Header and loading artwork share the same paint
                 under system and explicit Appearance preferences; external
                 styles do not replace it with the old Purple action face.
@@ -1590,16 +1629,17 @@ export function DeveloperGuidePage() {
                 without changing the root field’s clock.
               </p>
               <p>
-                A loading-only Mauve900 veil reaches 79% opacity outside a
+                A loading-only veil reaches 79% opacity outside a
                 circular focus opening. The inner 128px radius is completely
                 clear; intermediate 12%, 40% and 68% alpha stops feather toward
                 an outer radius of <code>clamp(168px, 49vmin, 460px)</code>.
-                Phone edges become dark without sacrificing the core’s breathing
-                room, while larger screens retain a broader soft transition.
+                Dark Mode uses Mauve900 and Light Mode uses pale Rose/Lilac
+                paper, preserving the core’s breathing room while larger screens
+                retain a broader soft transition.
                 A second, faint Violet300 8% / Pink300 4.5% reflected halo
                 breathes between 68% and full layer opacity over 8.8 seconds,
                 beginning on the existing loop clock. Reduced motion settles it
-                and retains the dark veil.
+                and retains the mode-aware veil.
               </p>
               <p>
                 Shared focus coordinates align the veil, existing aura and
@@ -2434,7 +2474,18 @@ export function DeveloperGuidePage() {
             Reveal a notification stack first, then open the chosen card’s
             details. Every notice keeps its own countdown, with an eased finish,
             Rose urgency and a short final grace; the reference below separates
-            clock, stack, motion and server-checked recovery ownership. Journal-scoped browser storage preserves notices and their exact active-time countdown across reloads and app restarts, while confirmed logout clears the matching queue.
+            clock, stack, motion and server-checked recovery ownership.
+            Journal-scoped browser storage preserves notices and their exact
+            active-time countdown across reloads and app restarts, while
+            confirmed logout clears the matching queue.
+          </p>
+          <p className={styles.sectionIntro}>
+            Light Mode uses opaque reading paper with soft Rose/Lilac tints,
+            deep Plum text and stronger status colors. The bell keeps its dark
+            artwork tile and light outline; only its check uses the success
+            pigment. Expanded previews, footer actions and countdown badges
+            use the same paired reading roles. Surface changes never change
+            the stored timer, hold-to-pause behavior or Undo ownership.
           </p>
           <GuideNotifications>
             <GuideNotificationDemo />

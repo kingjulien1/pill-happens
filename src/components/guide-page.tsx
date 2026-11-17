@@ -944,6 +944,13 @@ export function GuidePage() {
                 the current visit. Your journal entries and saved medication
                 colors stay the same.
               </p>
+              <p>
+                Light &amp; Bright pairs lilac and blush paper with deep plum
+                text, rose actions and clear field edges. Cards and journal
+                pages have their own quiet reading surfaces; dark mug, moon and
+                bell tiles stay bright and easy to spot. The loading screen,
+                menus and offline page follow the same appearance too.
+              </p>
             </GuideDetail>
             <GuideDetail title="Refresh Or Open Medications" icon="retry">
               <p>

@@ -844,7 +844,7 @@
   }
 }
 
-/* Bare guide copy belongs to the fixed dark canvas; panels keep semantic ink. */
+/* Bare guide copy uses the mode-aware canvas pair; panels keep semantic ink. */
 .page,
 .page .intro,
 .page .sectionHeading,
