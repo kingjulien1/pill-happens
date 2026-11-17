@@ -277,7 +277,7 @@ export function IntakeAction({
               height: INTAKE_ACTION_GEOMETRY.height,
               minHeight: INTAKE_ACTION_GEOMETRY.height,
             }}
-            data-intake-paint="canvas-purple"
+            data-intake-paint="dark-pink"
             onClick={onClick}
             className="intake-primary-cta pointer-events-auto w-full"
           >

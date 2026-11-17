@@ -11,6 +11,7 @@ import {
   INTAKE_ACTION_GEOMETRY,
   INTAKE_ACTION_PAINT,
   INTAKE_ACTION_SUPPORTING_PAINT,
+  MAIN_ACTION_PINK,
   getAccentButtonDimensions,
   getAccentRadiusStyle,
   getButtonSizeStyle,
@@ -43,7 +44,7 @@ test("the 13% tint preserves readable white copy and pink icons at every pigment
   );
   for (const mode of ["light", "dark"] as const) {
     const paint = INTAKE_ACTION_PAINT[mode];
-    assert.equal(paint.base, "#1d161e");
+    assert.equal(paint.base, MAIN_ACTION_PINK.base);
     assert.equal(paint.text, "#ffffff");
     for (const color of [paint.base, ...paint.fieldColors]) {
       const surface = rgba(color);
@@ -109,7 +110,7 @@ test("every filled-action kind shares Today’s complete paint without changing 
     }
   }
   assert.deepEqual(getIntakeBrandStyle(), {
-    "--brand-surface": "#1d161e",
+    "--brand-surface": MAIN_ACTION_PINK.base,
     "--brand-copy": "#f9a8d4",
   });
   assert.equal(BUTTON_SYSTEM.primary.height, 62);
@@ -158,7 +159,11 @@ test("live branding shares the CTA’s charcoal, pink accent and rim reflections
       color("--brand-tone-ice"),
       color("--brand-tone-teal"),
     ],
-    INTAKE_ACTION_PAINT.light.rimColors,
+    [
+      INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"],
+      INTAKE_ACTION_PAINT.light.rimColors[1],
+      INTAKE_ACTION_PAINT.light.rimColors[2],
+    ],
   );
   // The pink modes have distinct second stops; Ice keeps its light-rim role.
   assert.equal(
@@ -205,9 +210,9 @@ test("CSS-first specular colors match both rendered button palettes before WebGL
   }
 });
 
-test("Today is shorter while Accent defaults retain the fixed shape reference across every band", () => {
+test("Today matches the intake card while Accent retains its proportional shape across every band", () => {
   assert.deepEqual(ACTION_BUTTON_SHAPE_REFERENCE, { height: 80, radius: 21 });
-  assert.deepEqual(INTAKE_ACTION_GEOMETRY, { height: 74, radius: 19.425 });
+  assert.deepEqual(INTAKE_ACTION_GEOMETRY, { height: 80, radius: 21 });
   assert.equal(ACCENT_RADIUS_RATIO, 0.2625);
   assert.equal(BUTTON_SYSTEM.accent.height, 72);
   assert.equal(BUTTON_SYSTEM.accent.radius, 18.9);

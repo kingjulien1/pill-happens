@@ -2,10 +2,10 @@
 .intake-log-action,
 .rimmed-action-button {
   --intake-rim-stop-1: #f9a8d4;
-  --intake-rim-stop-2: #fbcfe8;
-  --intake-rim-stop-3: #f472b6;
+  --intake-rim-stop-2: #fac4e2;
+  --intake-rim-stop-3: #f581be;
   --intake-rim-stop-4: #f9a8d4;
-  --intake-rim-stop-5: #fbcfe8;
+  --intake-rim-stop-5: #fac4e2;
   --intake-rim-line: var(--intake-rim-stop-1);
   --intake-rim-base: var(--intake-rim-stop-2);
   --intake-rim-guard: var(--intake-rim-stop-3);
@@ -14,10 +14,10 @@
 @media (prefers-color-scheme: dark) {
   .intake-log-action,
   .rimmed-action-button {
-    --intake-rim-stop-1: #fbcfe8;
-    --intake-rim-stop-2: #fce7f3;
-    --intake-rim-stop-3: #f472b6;
-    --intake-rim-stop-4: #fbcfe8;
-    --intake-rim-stop-5: #fce7f3;
+    --intake-rim-stop-1: #fac4e2;
+    --intake-rim-stop-2: #fbd5ea;
+    --intake-rim-stop-3: #f581be;
+    --intake-rim-stop-4: #fac4e2;
+    --intake-rim-stop-5: #fbd5ea;
   }
 }

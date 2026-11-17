@@ -29,12 +29,18 @@ export const ACTION_BUTTON_SHAPE_REFERENCE = {
 } as const;
 export const ACCENT_RADIUS_RATIO =
   ACTION_BUTTON_SHAPE_REFERENCE.radius / ACTION_BUTTON_SHAPE_REFERENCE.height;
-/** Today is slightly shorter while retaining the same rounded-rectangle proportions. */
+/** Today matches the full-size intake card rather than a smaller capsule. */
 export const INTAKE_ACTION_GEOMETRY = {
-  height: 74,
-  radius:
-    (74 * ACTION_BUTTON_SHAPE_REFERENCE.radius) /
-    ACTION_BUTTON_SHAPE_REFERENCE.height,
+  ...ACTION_BUTTON_SHAPE_REFERENCE,
+} as const;
+/** Only explicit main actions receive this pink finish; ordinary controls do not. */
+export const MAIN_ACTION_PINK = {
+  base: "#29131f",
+  outerTint: "#f9a8d4",
+  outerTintOpacity: 0.28,
+  innerEdge:
+    "color-mix(in srgb, var(--color-pink-600, #e60076) 74%, transparent)",
+  secondary: "var(--color-pink-200, #fccee8)",
 } as const;
 const accentBaseHeight = 72;
 const buttonHeightStep = 0.75;
@@ -69,16 +75,26 @@ export type ActionButtonPaint = {
   blur: number;
 };
 
-/** One charcoal face and mode-aware pink rim are shared by every filled action. */
+/** Materialized hex stops keep the CSS fallback and WebGL rim exactly aligned. */
+const tintMainActionRim = (color: AppThemeHex) =>
+  mixAppColors(
+    MAIN_ACTION_PINK.outerTint,
+    color,
+    MAIN_ACTION_PINK.outerTintOpacity,
+  );
+
+/** One dark pink face and mode-aware pink rim are shared by filled main actions. */
 const intakeActionField: ActionButtonPaint = {
-  base: "#1d161e",
-  fieldColors: ["#1d161e", "#302432", "#1d161e", "#241b2b"],
+  base: MAIN_ACTION_PINK.base,
+  fieldColors: ["#29131f", "#3b182b", "#29131f", "#311522"],
   fieldOpacity: 0.26,
-  diagonalColors: ["#1d161e", "#241b2b"],
+  diagonalColors: ["#29131f", "#311522"],
   diagonalOpacity: 0,
-  washColor: "#1d161e",
+  washColor: MAIN_ACTION_PINK.base,
   washOpacity: 0,
-  rimColors: ["#f9a8d4", "#fbcfe8", "#f472b6"],
+  rimColors: ["#f9a8d4", "#fbcfe8", "#f472b6"].map((color) =>
+    tintMainActionRim(color as AppThemeHex),
+  ),
   text: APP_FOUNDATION.white,
   blur: 0,
 };
@@ -88,7 +104,9 @@ export const INTAKE_ACTION_PAINT: Readonly<
   light: intakeActionField,
   dark: {
     ...intakeActionField,
-    rimColors: ["#fbcfe8", "#fce7f3", "#f472b6"],
+    rimColors: ["#fbcfe8", "#fce7f3", "#f472b6"].map((color) =>
+      tintMainActionRim(color as AppThemeHex),
+    ),
   },
 };
 
@@ -405,6 +423,11 @@ export function getButtonThemeStyle(
   };
   if (theme) result.colorScheme = theme;
   Object.assign(result, INTAKE_ACTION_SUPPORTING_PAINT, {
+    "--daily-action-face": MAIN_ACTION_PINK.base,
+    "--daily-action-inner-edge": MAIN_ACTION_PINK.innerEdge,
+    "--daily-action-secondary-ink": MAIN_ACTION_PINK.secondary,
+    "--action-rim-tint": MAIN_ACTION_PINK.outerTint,
+    "--action-rim-tint-opacity": MAIN_ACTION_PINK.outerTintOpacity,
     "--action-tint-opacity": ACTION_BUTTON_TINT.opacity,
     "--action-tint-emerald": ACTION_BUTTON_TINT.emerald,
   });

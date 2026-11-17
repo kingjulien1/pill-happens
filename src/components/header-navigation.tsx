@@ -33,16 +33,16 @@ import { journalDays } from "@/lib/daily-check-in";
 import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
-import styles from "./header-menus.module.css";
+import styles from "./navigation-panel.module.css";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 const links = [
   {
@@ -293,8 +293,8 @@ function NavigationMenu({
     if (next) followingLink.current = false;
     setOpen(next);
   };
-  const Title = mobile ? DialogTitle : "p";
-  const Description = mobile ? DialogDescription : "p";
+  const Title = mobile ? DrawerTitle : "p";
+  const Description = mobile ? DrawerDescription : "p";
   const Group = mobile ? "div" : Menu.Group;
   const Separator = mobile ? "div" : Menu.Separator;
   const contents = (
@@ -311,7 +311,7 @@ function NavigationMenu({
         <div className={styles.mastheadCopy}>
           <Title className={styles.title}>Your Journal</Title>
           <Description className={styles.subtitle}>
-            Your daily launchpad.
+            A little space for your everyday.
           </Description>
         </div>
         <div
@@ -322,15 +322,15 @@ function NavigationMenu({
         >
           <AppearanceMenu nested={!mobile} />
           {mobile ? (
-            <DialogClose
+            <DrawerClose
               render={<Button variant="ghost" size="icon" type="button" />}
               aria-label="Close navigation"
               title="Close navigation"
-              className={`${styles.headerAction} ${styles.navigationClose}`}
+              className={styles.headerAction}
               data-navigation-close
             >
               <X aria-hidden="true" strokeWidth={2.1} />
-            </DialogClose>
+            </DrawerClose>
           ) : (
             <Menu.Item
               render={<Button variant="ghost" size="icon" type="button" />}
@@ -339,7 +339,7 @@ function NavigationMenu({
               label="Close navigation"
               aria-label="Close navigation"
               title="Close navigation"
-              className={`${styles.headerAction} ${styles.navigationClose}`}
+              className={styles.headerAction}
               data-navigation-close
             >
               <X aria-hidden="true" strokeWidth={2.1} />
@@ -354,6 +354,12 @@ function NavigationMenu({
       />
       <div className={styles.scrollArea} data-navigation-scroll>
         <Group aria-label="Journal pages" data-navigation-section="daily">
+          <div className={styles.sectionHeading} aria-hidden="true">
+            <span>Your Pages</span>
+            <span>
+              <strong>{links.length}</strong> Places To Land
+            </span>
+          </div>
           <div className={styles.entries}>
             {links.map(({ href, label, page, icon, description, tone }) => {
               const active =
@@ -405,8 +411,8 @@ function NavigationMenu({
               className={styles.entry}
             >
               <MenuRow
-                label="Getting Started Guide"
-                description="Get started. Find your rhythm."
+                label="Getting Started"
+                description="A few pointers. Make yourself at home."
                 tone="sand"
                 active={pathname === "/guide"}
                 icon={<BookOpenText strokeWidth={2.1} />}
@@ -462,13 +468,8 @@ function NavigationMenu({
           </NavigationLink>
         </div>
         <p className={styles.footerCopy} data-navigation-footer-copy>
-          You can wander without losing your place. Past Days takes you back to
-          earlier entries, while Backups &amp; Export explains how to keep a
-          copy of your journal. The Developer Guide opens the workshop, with
-          design notes, setup steps and the code behind the app. If a button
-          misbehaves or something feels off, Report a Bug opens the project’s
-          bug form. Share what happened, what you expected and a simple way to
-          reproduce it; a useful little clue can make the next fix much easier.
+          Your place is remembered. Keep a backup, explore the workshop, or help
+          make the next little improvement.
         </p>
       </div>
     </>
@@ -485,16 +486,15 @@ function NavigationMenu({
   };
   if (mobile)
     return (
-      <Dialog open={open} onOpenChange={changeOpen}>
-        <DialogTrigger
+      <Drawer open={open} onOpenChange={changeOpen} showSwipeHandle>
+        <DrawerTrigger
           {...triggerProps}
           render={<Button variant="ghost" size="icon" type="button" />}
         >
           <span className="header-control-surface" aria-hidden="true" />
           <NavigationMenuMark open={open} />
-        </DialogTrigger>
-        <DialogContent
-          showCloseButton={false}
+        </DrawerTrigger>
+        <DrawerContent
           finalFocus={returnFocus}
           className={cn(styles.popup, styles.navigation, styles.mobileDialog)}
           data-navigation-menu
@@ -503,8 +503,8 @@ function NavigationMenu({
           <nav className={styles.navigationBody} aria-label="Main navigation">
             {contents}
           </nav>
-        </DialogContent>
-      </Dialog>
+        </DrawerContent>
+      </Drawer>
     );
   return (
     <Menu.Root open={open} onOpenChange={changeOpen} modal={false}>

@@ -167,3 +167,11 @@
     color: var(--foreground);
   }
 }
+
+/* A white-mixed track disappears on daylight paper. One semantic Fuchsia
+   pigment keeps the chosen score, thumb and filled track equally readable. */
+@media (prefers-color-scheme: light) {
+  .rating {
+    --check-in-rating-accent: var(--primary);
+  }
+}

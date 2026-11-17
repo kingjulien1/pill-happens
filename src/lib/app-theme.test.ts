@@ -7,6 +7,7 @@ import {
   APP_CANVAS_BACKGROUND,
   APP_CANVAS_OVERLAY,
   APP_IRIDESCENCE,
+  APP_LIGHT_SURFACES,
   APP_CANVAS_FOREGROUND,
   APP_CANVAS_MUTED_FOREGROUND,
   APP_BACKGROUND_COLORS,
@@ -368,6 +369,7 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
     mixAppColors(APP_FOUNDATION.plum, APP_FOUNDATION.black, 0.92),
   );
   assert.equal(APP_IRIDESCENCE.color, "#7c3aed");
+  assert.equal(APP_IRIDESCENCE.speed, 0.92);
   assert.equal(APP_IRIDESCENCE.blur, 4);
   assert.equal(APP_IRIDESCENCE.brightness, 1.5);
   assert.equal(APP_IRIDESCENCE.hueShift, 0);
@@ -475,4 +477,105 @@ test("palette mixtures and alpha export have stable, clamped endpoints", () => {
   assert.equal(withAppAlpha(APP_FOUNDATION.apricot, 0.5), "#f2b88f80");
   assert.equal(withAppAlpha(APP_FOUNDATION.lilac, -1), "#b7a4e500");
   assert.equal(withAppAlpha(APP_FOUNDATION.lilac, 2), "#b7a4e5ff");
+});
+
+test("daylight uses distinct Rose/Lilac papers instead of white or yellow panels", () => {
+  const values = APP_THEME_VALUES.light;
+  assert.ok(Object.isFrozen(APP_LIGHT_SURFACES));
+  const papers = [
+    "background",
+    "card",
+    "popover",
+    "muted",
+    "surface-raised",
+    "surface-sunken",
+    "surface-reading",
+    "secondary",
+    "accent",
+  ] as const;
+  for (const role of papers) {
+    const color = values[role];
+    const [r, g, b] = channels(color);
+    assert.equal(color.length, 7, `${role} is opaque`);
+    assert.notEqual(color, APP_FOUNDATION.white, `${role} is colored paper`);
+    assert.ok(b > g && r > g, `${role} stays in the Rose/Lilac family`);
+    assert.ok(luminance(color) < 0.96, `${role} avoids a whitewashed panel`);
+  }
+  assert.ok(luminance(values["surface-sunken"]) < luminance(values.background));
+  assert.ok(luminance(values.background) < luminance(values.card));
+  assert.ok(luminance(values.card) < luminance(values.popover));
+  assert.notEqual(values.accent, values.secondary);
+  for (const surface of ["card", "popover", "surface-reading"] as const)
+    assert.ok(
+      contrast(values["muted-foreground"], values[surface]) >= 7,
+      `daylight reading labels on ${surface} stay strong in glare`,
+    );
+});
+
+test("daylight input boundaries, selection and glass remain readable over the violet canvas", () => {
+  const values = APP_THEME_VALUES.light;
+  for (const surface of [
+    "background",
+    "card",
+    "popover",
+    "surface-raised",
+    "surface-sunken",
+    "surface-reading",
+    "accent",
+  ] as const) {
+    assert.ok(
+      contrast(composite(values.input, values[surface]), values[surface]) >= 3,
+      `daylight input edge on ${surface}`,
+    );
+    assert.ok(
+      contrast(values.ring, values[surface]) >= 3,
+      `daylight keyboard focus on ${surface}`,
+    );
+    assert.ok(
+      contrast(values.primary, values[surface]) >= 4.5,
+      `daylight slider score and thumb on ${surface}`,
+    );
+  }
+  const selectedText = composite(values.selection, values["surface-reading"]);
+  assert.ok(contrast(selectedText, values["surface-reading-foreground"]) >= 7);
+  for (const behind of [
+    APP_CANVAS_BASE,
+    "#ba57ff",
+    APP_FOUNDATION.black,
+    APP_FOUNDATION.white,
+  ] as const) {
+    const glass = composite(values["glass-background"], behind);
+    assert.ok(
+      contrast(glass, values.foreground) >= 7,
+      `daylight glass primary copy over ${behind}`,
+    );
+    assert.ok(
+      contrast(glass, values["muted-foreground"]) >= 4.5,
+      `daylight glass secondary copy over ${behind}`,
+    );
+  }
+});
+
+test("daylight changes preserve the established dark surface and ink pairs", () => {
+  const values = APP_THEME_VALUES.dark;
+  const existing = {
+    background: "#2b233e",
+    foreground: "#ffffff",
+    card: "#352a45",
+    "card-foreground": "#ffffff",
+    popover: "#3f334e",
+    "popover-foreground": "#ffffff",
+    muted: "#433655f0",
+    "muted-foreground": "#e1d9f4",
+    "surface-reading": "#352a44f0",
+    "canvas-background": "#29213b",
+    "canvas-foreground": "#ffffff",
+    "canvas-muted-foreground": "#ded8ec",
+  } as const;
+  for (const [role, color] of Object.entries(existing))
+    assert.equal(
+      values[role as keyof typeof values],
+      color,
+      `dark ${role} is preserved`,
+    );
 });
