@@ -1115,7 +1115,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last-seconds marker",
-            "30.625×30.625px circle, left/top −15.3125px: exactly half inside and half outside the upper-left corner. Full-opacity Pink200 text at 12.25px/750, an opaque deep-berry face, Pink200 rim and restrained glow. Borders, blur, shadows, flare and travel distances all use the 1.225 multiplier. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above the first card so its corner badge stays visible.",
+            "30.625×30.625px circle, left 13.475px/top −15.3125px: exactly half above the card’s top edge near its upper-left corner. Full-opacity Pink200 text at 12.25px/750, an opaque deep-berry face, Pink200 rim and restrained glow. Borders, blur, shadows, flare and travel distances all use the 1.225 multiplier. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above the first card so its corner badge stays visible.",
           ],
           [
             "Header / unavailable Undo",
