@@ -713,8 +713,11 @@ export function GuidePage() {
               <strong>Evening reflection.</strong> Five groups keep things
               simple: your journal, Moods, Energy, Stress and What Helped.
               Browse {DAILY_MOODS.length} feelings with Lucide symbols, search
-              for a word, or narrow the list to a family. Familiar choices rise
-              to the top; the rest get a little daily shuffle. Sleep is
+              for a word, or narrow the list to a family. Pick up to four;
+              selected feelings stay beneath the scrolling palette while you
+              browse. Familiar choices rise to the top; Shuffle offers a fresh
+              mix without moving them behind unused choices. Moods and the
+              optional Energy/Stress sliders share Your Day, Your Mood. Sleep is
               collected in Morning Check-In, while older saved sleep details
               stay intact.
             </p>

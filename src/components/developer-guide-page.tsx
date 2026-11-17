@@ -3729,28 +3729,46 @@ export function DeveloperGuidePage() {
                 feelings library contains {DAILY_MOODS.length} stable mood IDs
                 across {DAILY_MOOD_FAMILIES.length} families:{" "}
                 {DAILY_MOOD_FAMILIES.map((family) => family.label).join(", ")}.
-                The original ten IDs remain valid. DailyMoodIcon renders Lucide
+                All earlier mood IDs remain valid. DailyMoodIcon renders Lucide
                 symbols in the picker, saved previews, journals and summaries;
                 changing the renderer requires no emoji-to-ID data migration.
               </p>
               <p>
                 Search matches labels, IDs, keywords and family names
-                immediately. Family chips and selected removable chips stay
-                above a compact, three-row scrolling result panel. The selection
-                limit remains four. rankDailyMoods counts each mood once per
+                immediately. Family chips sit above a three-row, two-column
+                scrolling palette with 44px choices; removable selections stay
+                beneath it even when a filter hides their matching options.
+                The selection limit remains four. rankDailyMoods counts each mood once per
                 saved check-in, then sorts by descending usage. Equal and unused
                 choices use a deterministic day-seeded shuffle, so ordering
                 feels fresh across days without jumping while someone is
-                choosing or differing between server and client.
+                choosing or differing between server and client. Shuffle gives
+                equal-frequency choices a new seeded mix while retaining usage
+                priority; search, family changes and a fresh mix reset only the
+                results viewport, never the chosen moods or parent form scroll.
               </p>
               <p>
                 The default Evening completion catalog excludes Sleep, while an
                 explicit legacy sleep section remains queryable. Removing Sleep
                 &amp; Tonight from the form never deletes historical sleepHours
-                or bedtime values. Untouched saved/draft fields are preserved by
-                ordinary saves; Morning remains the place to add new sleep
+                or bedtime values. Evening saves omit both hidden fields;
+                the atomic server update retains their latest saved values,
+                including after a newer clock save in another session. Old
+                incomplete draft values cannot block saving or overwrite that
+                record. Explicit clears from legacy clients retain their
+                meaning. Morning remains the place to add new sleep
                 details. Optional Energy and Stress use 1–10 ratings, retaining
                 legacy five-point scale metadata until edited.
+              </p>
+              <p>
+                Your Day, Your Mood owns the mood picker and the two compact
+                Energy/Stress cards as one standalone root section. Its inward
+                Pink/Purple frame and soft wash echo Your Day, Your Words,
+                whose base and moving rim now use the same palette. Family
+                colors stay related rather than marking any feeling as good or
+                bad. Choice feedback and a restrained section entrance respect
+                reduced motion; hover is limited to desktop fine pointers.
+                The Morning ratings and sleep form keep their existing layout.
               </p>
             </Detail>
             <Detail
