@@ -83,3 +83,17 @@
 .card:global([data-intake-card]) :global(.intake-card-indicator) svg * {
   fill: none;
 }
+
+/* The outline rail follows the dark reading ink on pale Light Mode cards. */
+@media (prefers-color-scheme: light) {
+  .card:global(.intake-log-card)
+    :global(.intake-card-ingredient[data-unset="true"]) {
+    color: var(--muted-foreground);
+    opacity: 1;
+  }
+
+  .card:global([data-intake-card]) :global(.intake-card-indicator),
+  .card:global([data-intake-card]) :global(.intake-card-indicator) svg {
+    color: var(--card-foreground) !important;
+  }
+}

@@ -270,3 +270,51 @@
     transition: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .card:global(.intake-log-card) {
+    --entry-rim-color: color-mix(
+      in srgb,
+      var(--journal-accent) 16%,
+      var(--foreground) 7%
+    );
+    box-shadow: 0 5px 18px color-mix(in srgb, var(--foreground) 5%, transparent);
+  }
+
+  .background {
+    background:
+      radial-gradient(
+        ellipse at 2% 0%,
+        color-mix(in srgb, var(--journal-accent) 11%, transparent),
+        transparent 70%
+      ),
+      color-mix(in srgb, var(--surface-reading) 94%, transparent);
+  }
+
+  .open,
+  .metadata,
+  .referenceDetail {
+    color: var(--muted-foreground);
+  }
+
+  .referenceHeading {
+    color: var(--muted-foreground);
+  }
+
+  .references {
+    border-top-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+  }
+
+  .reference {
+    --reference-rim: color-mix(
+      in srgb,
+      var(--reference-color) 20%,
+      var(--foreground) 5%
+    );
+    background: color-mix(
+      in srgb,
+      var(--reference-color) 7%,
+      var(--surface-raised)
+    );
+  }
+}

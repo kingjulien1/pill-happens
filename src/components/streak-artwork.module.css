@@ -170,3 +170,22 @@
     display: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .glow {
+    opacity: 0.4;
+  }
+
+  .pattern {
+    opacity: 0.06;
+  }
+
+  .waves {
+    opacity: 0.18;
+  }
+
+  .star {
+    color: #b45309;
+    filter: drop-shadow(0 0 6px #facc1533);
+  }
+}

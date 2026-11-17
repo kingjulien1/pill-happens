@@ -197,3 +197,56 @@
   overflow: hidden;
   border-radius: var(--entry-card-radius);
 }
+
+/* Light glass has a quiet reading veil so color identity never competes with copy. */
+@media (prefers-color-scheme: light) {
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    ) {
+    --card-foreground: var(--foreground);
+    --entry-intake-base: var(--surface-reading);
+    --entry-edge-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+    --entry-inner-rim-color: color-mix(
+      in srgb,
+      var(--entry-color) 34%,
+      transparent
+    );
+    --entry-surface-base: color-mix(
+      in srgb,
+      var(--entry-color) 5%,
+      var(--card)
+    );
+    box-shadow:
+      0 0 0 var(--entry-fine-rim-width) var(--entry-fine-rim-color),
+      0 5px 18px color-mix(in srgb, var(--foreground) 5%, transparent);
+  }
+
+  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+    --entry-surface-base: color-mix(
+      in srgb,
+      var(--entry-color) 5%,
+      transparent
+    );
+    --entry-glass-pink: color-mix(
+      in srgb,
+      var(--color-pink-200, #fbcfe8) 5%,
+      transparent
+    );
+  }
+
+  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+    :global(.intake-card-glass) {
+    background:
+      linear-gradient(var(--entry-surface-base) 0 0),
+      linear-gradient(var(--entry-glass-pink) 0 0),
+      color-mix(in srgb, var(--surface-reading) 82%, transparent);
+  }
+
+  .card:global(.intake-log-card[data-history-day-link])
+    :global(.history-card-color-overlay) {
+    opacity: 0.12;
+  }
+}

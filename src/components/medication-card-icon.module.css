@@ -321,3 +321,47 @@
     transform: translate(0, 0);
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .mark:global(.intake-card-mark) {
+    box-shadow:
+      inset 0 0 0 3.5px
+        color-mix(in srgb, var(--entry-color) 16%, var(--foreground) 5%),
+      inset 0 1px 0 color-mix(in srgb, var(--palette-white) 72%, transparent);
+  }
+
+  :global(:is([data-intake-card], [data-check-in-card]))
+    .mark:global(.intake-card-mark) {
+    --intake-artwork-rim: color-mix(
+      in srgb,
+      var(--entry-color) 15%,
+      var(--foreground) 5%
+    );
+    --intake-artwork-inner-rim: color-mix(
+      in srgb,
+      var(--medication-frame-pigment) 68%,
+      transparent
+    );
+    box-shadow: inset 0 0 0 6px var(--intake-artwork-rim);
+  }
+
+  .formBadge {
+    color: var(--card-foreground);
+  }
+
+  .pairedBadge {
+    background: color-mix(
+      in srgb,
+      var(--entry-color) 9%,
+      var(--surface-raised)
+    );
+    color: var(--foreground);
+    box-shadow: inset 0 0 0 1.25px
+      color-mix(in srgb, var(--entry-color) 30%, var(--foreground) 12%);
+  }
+
+  .badgePair:focus-visible {
+    outline-color: var(--ring);
+    box-shadow: none;
+  }
+}

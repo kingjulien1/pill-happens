@@ -137,3 +137,44 @@
     transform: scale(0.9) rotate(0);
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .artwork[data-journal-preview-artwork] {
+    --art-rim: color-mix(
+      in srgb,
+      var(--journal-accent) 42%,
+      var(--foreground) 6%
+    );
+  }
+
+  /* The book owns its square tile instead of depending on retired scene paint. */
+  .artwork .tile {
+    --journal-top-shine: color-mix(
+      in srgb,
+      var(--palette-white) 70%,
+      transparent
+    );
+    position: relative;
+    display: inline-flex;
+    width: 48px;
+    height: 48px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: var(--check-in-art-surface);
+  }
+
+  .artwork .tile > svg[viewBox="0 0 48 48"] {
+    position: absolute;
+    inset: 0;
+    width: 48px;
+    height: 48px;
+    stroke-width: 1.25;
+    pointer-events: none;
+  }
+
+  .sparkle {
+    color: color-mix(in srgb, var(--journal-complement) 65%, var(--foreground));
+  }
+}

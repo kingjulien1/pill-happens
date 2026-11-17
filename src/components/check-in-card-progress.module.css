@@ -331,3 +331,17 @@
     opacity: 0;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .progress[data-progress-dormant="true"] {
+    opacity: 0.68;
+  }
+
+  .halo {
+    border-color: color-mix(
+      in srgb,
+      var(--color-pink-600, #db2777) 38%,
+      transparent
+    );
+  }
+}

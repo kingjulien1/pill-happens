@@ -250,3 +250,28 @@
     transition: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .popup {
+    background: var(--popover);
+    color: var(--popover-foreground);
+  }
+
+  .popup[data-streak-active="true"] {
+    border-color: color-mix(in srgb, var(--primary) 32%, var(--border));
+    box-shadow:
+      var(--menu-depth),
+      0 0 24px color-mix(in srgb, var(--party-accent) 14%, transparent),
+      inset 0 0 0 4px color-mix(in srgb, var(--palette-white) 52%, transparent);
+  }
+
+  .popup [data-streak-glow] {
+    opacity: 0.14;
+  }
+
+  .stats > div,
+  .link {
+    background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+    border-color: var(--border);
+  }
+}
