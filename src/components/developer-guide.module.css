@@ -2074,3 +2074,141 @@
     font-size: 14px;
   }
 }
+
+/* Keep the reference local to its phone-width reading column. */
+.page :is(.readingCard, .shapeCard, .detailBody, .codeBlock, .tableScroll) {
+  min-width: 0;
+  max-width: 100%;
+}
+.tableScroll {
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.codeBlock pre {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 639px) {
+  .intro > p,
+  .sectionIntro,
+  .readingCard > p,
+  .shapeCard > p,
+  .detailBody > p,
+  .orderedList,
+  .bulletList {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .section {
+    margin-top: 40px;
+  }
+  .sectionHeading {
+    gap: 6px 10px;
+    margin-bottom: 16px;
+  }
+  .sectionHeading h2 {
+    font-size: 22px;
+  }
+  .sectionHeading > span {
+    max-width: 100%;
+    font-size: 11px;
+  }
+  .contentsBox > summary {
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+  .contents {
+    gap: 6px;
+    padding: 0 12px 12px;
+  }
+  .contents a {
+    min-height: 44px;
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+  .readingCard,
+  .shapeCard,
+  .githubCard,
+  .colorReference {
+    padding: 20px 18px;
+  }
+  .detail > summary {
+    min-height: 54px;
+    padding: 15px 16px;
+    gap: 8px;
+  }
+  .detail > summary > small {
+    max-width: 28%;
+    font-size: 10px;
+  }
+  .detailBody {
+    padding: 0 18px 20px;
+  }
+  .detailBody > p + p {
+    margin-top: 12px;
+  }
+  .tableScroll {
+    margin-block: 16px;
+  }
+  .tableScroll table {
+    min-width: 28rem;
+    font-size: 13px;
+  }
+  .tableScroll th,
+  .tableScroll td {
+    padding: 10px;
+  }
+  .tableScroll th {
+    font-size: 12px;
+  }
+  .tableScroll th:first-child,
+  .tableScroll td:first-child {
+    position: sticky;
+    z-index: 1;
+    left: 0;
+    width: 8rem;
+    min-width: 7rem;
+    max-width: 9rem;
+    background: var(--surface-reading);
+    box-shadow: 1px 0 var(--border);
+    overflow-wrap: anywhere;
+  }
+  .codeHeading {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  .codeHeading > span {
+    min-width: 0;
+  }
+  .codeHeading strong {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .codeBlock pre {
+    padding: 14px 12px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .codeBlock pre code {
+    overflow-wrap: normal;
+    white-space: pre;
+  }
+  .copyButton {
+    flex: none;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .flow {
+    gap: 6px;
+    padding: 14px 10px;
+  }
+  .flow > span {
+    min-width: 0;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+}

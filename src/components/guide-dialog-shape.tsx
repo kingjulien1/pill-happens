@@ -381,13 +381,13 @@ export function GuideDialogShape() {
         Accent is the deliberate proportional exception for a larger action. Its
         fixed intake-card/action design reference is 80px high with 21px
         corners, so the shared ratio is <code>21 / 80 = 0.2625</code>. Today’s
-        shorter 74px action uses that ratio for its 19.425px corners; it does
-        not change Accent’s reference. Default Accent height grows from 72px
-        through 0.75px steps to a 75.75px cap; its radius follows{" "}
-        <code>actual height × 0.2625</code>, from 18.9px to 19.884375px. That
-        keeps the same silhouette as the action grows instead of introducing
-        another fixed radius tier. The outer frame, rim and aura use one
-        effective value, while the face inside a 1.5px inset uses
+        80px action uses the same 21px corners; the full-size library action
+        matches it. Default Accent height grows from 72px through 0.75px steps
+        to a 75.75px cap; its radius follows <code>actual height × 0.2625</code>
+        , from 18.9px to 19.884375px. That keeps the same silhouette as the
+        action grows instead of introducing another fixed radius tier. The outer
+        frame, rim and aura use one effective value, while the face inside a
+        1.5px inset uses
         <code> outer radius − 1.5px</code>. The explicit radius API remains
         available for a deliberate caller choice, with all layers following it.
         The inherited dialog surface token does not override this default.

@@ -284,8 +284,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         links and actions. When several cards are folded together, the first
         activation only fans the stack open; activate a card again for its
         details. A real Undo stays in the card header and also appears in the
-        action footer while details are open. Use the shared journal facade for
-        every application notice.
+        action footer while details are open. Notices without a reversal keep
+        the same slots disabled and quiet. An opened stack has no card-count cap
+        and scrolls within the viewport. Use the shared journal facade for every
+        application notice.
       </p>
       <dl className={styles.overview}>
         <div>
@@ -297,7 +299,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <div>
           <dt>Reading Time</dt>
           <dd>
-            <strong>8.63s</strong> bar + 0.5s grace
+            <strong>8.63s</strong> bar + 1s grace
           </dd>
         </div>
         <div>
@@ -436,13 +438,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Reusable Status Badges
       </Heading>
       <p>
-        The heading uses <code>NotificationStatusBadge</code> instead of a plain
-        kind label and separator dot. Its required <code>status</code> accepts
-        the six notice kinds; optional <code>label</code> and{" "}
-        <code>className</code> customize the display. Exported{" "}
-        <code>NOTIFICATION_STATUS_REGISTRY</code> supplies each default label
-        and Lucide symbol. A status describes the result; it never promises an
-        Undo action.
+        The heading uses <code>NotificationStatusBadge</code> with a spaced,
+        decorative dot separating it from the result title. Its required{" "}
+        <code>status</code> accepts the six notice kinds; optional{" "}
+        <code>label</code> and <code>className</code> customize the display.
+        Exported <code>NOTIFICATION_STATUS_REGISTRY</code> supplies each default
+        label and Lucide symbol. A status describes the result; it never
+        promises an Undo action.
       </p>
       <DeveloperCode
         label="Reusable Notification Status"
@@ -641,14 +643,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         Preview content occupies the labelled, inert-when-closed details region.
         When present it replaces free-form paragraphs and facts, while relevant
-        links and action/cancel controls remain available. A compact caption
-        distinguishes Before/After, Saved or Removed without duplicating the
-        notification message. Check-ins, goals and timezone changes use compact
-        visual summaries; journal prose stays out of previews. Non-graphic
-        notices show up to four facts, or one context paragraph when there are
-        no facts. The playground above constructs both sides from invented
-        records and its Undo only updates local React state; it never calls the
-        journal API.
+        links and action/cancel controls remain available. A short primary-ink
+        summary after the top separator explains the actual changed fields.
+        Centered captions pair Before/After, Saved or Removed with fitting
+        history/check icons; dates omit the year. Intake routes appear inside
+        their actual MedicationCard rail with form/category glyphs rather than
+        as a loose caption outside the card. Check-ins, goals and timezone
+        changes use compact visual summaries; journal prose stays out of
+        previews. Non-graphic notices show up to four facts, or one context
+        paragraph when there are no facts. The playground above constructs both
+        sides from invented records and its Undo only updates local React state;
+        it never calls the journal API.
       </p>
 
       <Heading id="expanded-tools" level={3}>
@@ -674,6 +679,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         present; the old reading-paused filler is removed. Action/cancel
         controls retain their original behavior in a separate centered row when
         supplied.
+      </p>
+      <p>
+        Expanded content uses inset separators with clear space on either side.
+        A four-layer footer wash starts with the longest, strongest dark
+        Fuchsia900 fade at 62%, then shorter Fuchsia600 at 12%, Pink400 at 6%
+        and Pink300 at 4%. The longest wash reaches 210px or 70% of the card,
+        whichever is smaller. All paint stays behind the live tools and text,
+        never changing their hit targets. Below the brief footer context, a
+        still quieter snapshot note includes relevant inline links to the live
+        record. This distinguishes an immutable before/after preview from the
+        entry someone can reopen and edit now.
       </p>
       <p>
         While a mounted, visible notification has expanded idle details and is
@@ -751,7 +767,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         cannot also open details, follow a link or run Undo. The next activation
         reaches the chosen card normally. Outside press or Escape closes the
         fan; a count of one or zero clears its old reveal state. Sonner still
-        owns the actual stack geometry, hover fan and swipes.
+        owns mounted toast IDs and swipe dismissal. An explicitly revealed fan
+        switches to normal-flow cards in a viewport-bounded scroll owner, with
+        no visible-notice cap. Native vertical scrolling takes priority there;
+        left/right dismissal remains available. Closing the fan restores the
+        compact stack without unmounting its live cards or restarting clocks.
       </p>
       <p>
         Every finite notice runs its own monotonic clock from host readiness,
@@ -853,8 +873,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         The real summary button supports Enter/Space and exposes expanded,
         controls, labelled-by and described-by relationships. Closed details are
         inert and hidden from accessibility APIs; expanded details form a
-        labelled region with a <code>min(55dvh, 340px)</code> scroll cap. Scroll
-        reads vertically without starting a swipe. Sonner retains left/right/up
+        labelled region with a <code>min(55dvh, 340px)</code> scroll cap for a
+        single card. Inside an opened stack, the shared viewport scroller owns
+        all vertical overflow and details lose their nested cap. Scroll reads
+        vertically without starting a swipe. Sonner retains left/right/up
         dismissal and its Alt+T focus shortcut. Escape from focused content
         first closes an explicitly revealed multi-card fan; otherwise it
         dismisses eligible notices. Pending Undo blocks pointer swipe starts and
@@ -879,8 +901,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Urgency pulse / tiny marker",
-            "1,400ms → 450ms effective; marker 320ms in / 200ms out",
-            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. Playback speeds up gradually without restarting either animation. The last-three-seconds marker grows/fades in, then spins and shrinks away at zero. Reduced motion keeps a static rail and marker without pulses or rotation.",
+            "1,400ms → 450ms effective; marker 520ms in / 590ms numeral / 200ms out",
+            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. The 25px circular marker flies in from a shrunken, rotated offset, overshoots and settles. Each changed numeral gets a separate 590ms rise/turn/pop, paired with a 720ms expanding flare; zero launches a fast spinning shrink. Its numbers follow true active time, including the slower finish. Holds pause the number/flare too; reduced motion keeps a static truthful value.",
           ],
           [
             "Main artwork / glyph",
@@ -900,7 +922,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Rear-card rotation / sway",
             "22s turns + 8.8s sway after 1,660ms",
-            "Rear plates are 80% of their previous dimensions. Both begin 250ms after the 90ms + 1,320ms artwork entrance, turning once every 22 seconds in opposite directions about their shared center. Nested faces keep complementary 33-pose, 8.8-second curved sways at two thirds of their previous amplitude: about 0.6px horizontal travel, up to 1.07px vertical travel and roughly 2.7° local twists. Separate owners prevent entrance, spin and sway transforms from overwriting one another. Neutral sway endpoints and matching seam velocities join smoothly; full-turn spin endpoints are equivalent. The front tile stays stationary.",
+            "Rear plates are 25% larger than their preceding 80%-scale design, with 39% less opacity (0.61). Their size is 41.65 × 7/6 × 0.8 × 1.25 pixels, about 48.59px. Both begin 250ms after the 90ms + 1,320ms artwork entrance, rotating once every 22 seconds in opposite directions. Nested faces retain complementary 33-pose, 8.8-second curved sways at two thirds of the older amplitude. Separate owners preserve entrance, spin and sway transforms, with matching loop seams. The front tile stays stationary.",
           ],
           [
             "Status motion",

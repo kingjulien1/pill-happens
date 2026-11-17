@@ -17,10 +17,11 @@ import {
   BUTTON_SYSTEM,
   getAccentButtonDimensions,
   getButtonSizeStyle,
+  INTAKE_ACTION_PAINT,
   type ActionButtonKind,
   type ActionButtonTheme,
 } from "@/lib/action-button-system";
-import { APP_THEME_VALUES, mixAppColors } from "@/lib/app-theme";
+import { APP_THEME_VALUES } from "@/lib/app-theme";
 import { GUIDE_LAYOUT_BANDS } from "@/lib/guide-responsive";
 import { guideHeadingId } from "@/lib/guide-outline";
 import guideStyles from "./developer-guide.module.css";
@@ -40,9 +41,9 @@ const number = (value: number) =>
   new Intl.NumberFormat("en", { maximumFractionDigits: 3 }).format(value);
 const percentage = (value: number) => `${number(value * 100)}%`;
 const MAIN_SECONDARY_INK = {
-  color: "#ad46ff",
-  opacity: 0.75,
-  encoded: "#ad46ffbf",
+  color: "#fccee8",
+  opacity: 1,
+  encoded: "#fccee8",
 } as const;
 
 type ButtonPaint = {
@@ -88,10 +89,10 @@ function buttonPaint(
     };
   }
   return {
-    base: mixAppColors("#3c0366", APP_THEME_VALUES[mode].background, 0.4),
-    innerEdge: "#8200db",
-    rimColors: ["#f9a8d4", "#d8b4fe", "#f0abfc"],
-    text: APP_THEME_VALUES[mode].foreground,
+    base: INTAKE_ACTION_PAINT[mode].base,
+    innerEdge: "#e60076bd",
+    rimColors: INTAKE_ACTION_PAINT[mode].rimColors,
+    text: INTAKE_ACTION_PAINT[mode].text,
     icon: MAIN_SECONDARY_INK.color,
   };
 }
@@ -119,7 +120,7 @@ function paintLayers(kind: ActionButtonKind, paint: ButtonPaint): PaintLayer[] {
         key: "icon",
         label: "Inherited supporting icon ink",
         description:
-          "Supporting icons inherit the same paired ink as the label, without the main action’s Purple secondary pigment.",
+          "Supporting icons inherit the same paired ink as the label, without the main action’s Pink secondary pigment.",
         colors: [paint.icon],
         opacity: 1,
       },
@@ -130,15 +131,15 @@ function paintLayers(kind: ActionButtonKind, paint: ButtonPaint): PaintLayer[] {
       key: "base",
       label: "Solid face",
       description:
-        "Purple 950 at a forty-percent share mixes with the mode’s opaque canvas. There is no rotating field, glaze or tint layer.",
+        "An opaque dark-pink #29131f face stays the same in both appearances. There is no rotating field, glaze or tint layer.",
       colors: [paint.base],
       opacity: 1,
     },
     {
       key: "innerEdge",
-      label: "Purple inner edge",
+      label: "Pink inner edge",
       description:
-        "A two-pixel Purple 700 band sits one pixel inside the moving outer rim. Both edges paint inward without enlarging the control.",
+        "A two-pixel Pink600 band at 74% alpha sits one pixel inside the moving outer rim. Both edges paint inward without enlarging the control; the copyable HEX rounds alpha to eight bits.",
       colors: paint.innerEdge ? [paint.innerEdge] : [],
       opacity: 1,
     },
@@ -146,7 +147,7 @@ function paintLayers(kind: ActionButtonKind, paint: ButtonPaint): PaintLayer[] {
       key: "rimColors",
       label: "Moving Pink rim",
       description:
-        "Pink 300, Purple 300 and Fuchsia 300 circulate at thirty-percent opacity on main actions. CSS supplies the rim by default; Today’s prominent action opts into its GPU equivalent.",
+        "Mode-aware pink stops contain a 28% Pink300 admixture and circulate at thirty-percent opacity. CSS supplies the default rim; Today and Add Medication use its GPU equivalent.",
       colors: paint.rimColors ?? [],
       opacity: 0.3,
     },
@@ -160,9 +161,9 @@ function paintLayers(kind: ActionButtonKind, paint: ButtonPaint): PaintLayer[] {
     },
     {
       key: "icon",
-      label: "Purple secondary ink",
+      label: "Pink secondary ink",
       description:
-        "Main-action icons and secondary CTA copy use Purple 500 at seventy-five percent color alpha, without another element-opacity multiplier. Standard controls and medication artwork retain their own ink.",
+        "Main-action icons and supporting CTA copy use full-opacity Pink200. Standard small controls and medication artwork retain their own ink.",
       colors: [paint.icon],
       opacity: MAIN_SECONDARY_INK.opacity,
     },
@@ -374,7 +375,7 @@ export function GuideButtons() {
       role: colorRole(kind, mode, layer, color, index),
       mode,
       usage: encodedInk
-        ? "The anatomy shows raw Purple 500 at 75% coverage. This copyable eight-bit token includes its own alpha, rounded to 191/255 (about 74.9%); the runtime color-mix uses exactly 75%, without additional element opacity."
+        ? "Main-action icons and supporting copy use Pink200 at full opacity. The copyable HEX has no extra alpha or element-opacity multiplier."
         : `${BUTTON_SYSTEM[kind].label}, ${mode} theme. ${layer.label} is painted at ${percentage(layer.opacity)} layer opacity. This is one raw color stop; the complete button combines the layers shown in the reference.`,
       layerOpacity: encodedInk ? 1 : layer.opacity,
     });
@@ -433,9 +434,9 @@ export function GuideButtons() {
           behavior stays available. Actions in this reference only update the
           preview feedback. Accent starts at 72px high with 14.25px, 700-weight
           foreground text. Its 22px PencilSparkles and ArrowRight glyphs use
-          Purple 500 at 75% color alpha and share a 2.5 stroke. Primary and
-          Accent use intake paint; Secondary uses its paired semantic surface
-          and ink. All retain native labels, focus and activation.
+          Pink200 at full opacity and share a 2.5 stroke. Primary and Accent use
+          intake paint; Secondary uses its paired semantic surface and ink. All
+          retain native labels, focus and activation.
         </p>
         <div className={styles.roleList}>
           {ACTION_BUTTON_KINDS.map((buttonKind, index) => {
@@ -639,13 +640,12 @@ export function GuideButtons() {
           <div>
             <Heading level={3}>Color, Opacity And Compositing</Heading>
             <p>
-              Main actions mix forty percent Purple 950 with sixty percent
-              opaque canvas; that is a color recipe, not forty-percent element
-              opacity. Their moving rim is a separate thirty-percent layer.
-              Primary copy and 75%-alpha Purple secondary ink stay above that
-              face. Secondary uses its semantic token directly, including any
-              alpha encoded in that value. Medication glyphs keep their own
-              pigments.
+              Main actions use an opaque dark-pink #29131f face in both modes.
+              Their moving rim is a separate thirty-percent layer with a 28%
+              Pink300 admixture in its color stops. Primary copy and Pink200
+              supporting ink stay above that face. Secondary uses its semantic
+              token directly, including any alpha encoded in that value.
+              Medication glyphs keep their own pigments.
             </p>
           </div>
           <div>
@@ -653,10 +653,11 @@ export function GuideButtons() {
             <p>
               The intake appearance needs no backdrop blur. Its default outer
               rim is 2px; Primary keeps a 3px default. Today uses 5.5px at the
-              same 74px height and 19.425px radius. A 1px face-colored gap
-              precedes the 2px Purple 700 band. CSS supplies this main-action
-              edge; only Today opts into its GPU equivalent. Secondary and
-              standard controls mount neither that perimeter nor its glow.
+              same 80px height and 21px radius as intake cards. A 1px
+              face-colored gap precedes the 2px Pink600 band at 74% alpha. CSS
+              supplies this main-action edge; Today and Add Medication use its
+              GPU equivalent. Secondary and standard controls mount neither that
+              perimeter nor its glow.
             </p>
           </div>
         </div>
@@ -682,8 +683,9 @@ export function GuideButtons() {
           <DeveloperCode
             label="Main Action Inner Edge And Secondary Ink"
             language="CSS"
-            code={`--daily-action-inner-edge: var(--color-purple-700, #8200db);
---daily-action-secondary-ink: rgb(173 70 255 / .75);`}
+            code={`--daily-action-inner-edge: color-mix(in srgb,
+  var(--color-pink-600, #e60076) 74%, transparent);
+--daily-action-secondary-ink: var(--color-pink-200, #fccee8);`}
           />
         )}
         <details className={styles.detail}>
@@ -818,11 +820,10 @@ export function GuideButtons() {
           Every row uses <code>getButtonSizeStyle(step)</code> to show that band
           inside this viewport. Type is sized directly with CSS variables. The
           examples use static paint so the comparison stays lightweight. The
-          app’s Today action is fixed at 74px high with a proportional 19.425px
-          radius; these specimens show the shared component sizes. Accent
-          retains the fixed 80px/21px design reference. Accent radius labels
-          round to three decimal places for display; the component keeps the
-          full calculation.
+          app’s Today action is fixed at 80px high with matching 21px radius;
+          these specimens show the shared component sizes. Accent retains the
+          fixed 80px/21px design reference. Accent radius labels round to three
+          decimal places for display; the component keeps the full calculation.
         </p>
         <DeveloperCode
           label="An explicit theme and size specimen"
@@ -1230,17 +1231,17 @@ export function GuideButtons() {
               meaning or availability of the action.
             </p>
             <p>
-              The explicit intake appearance owns the opaque Purple/canvas face,
-              Purple 700 inner band and thirty-percent Pink/Purple/Fuchsia
-              perimeter. Its CSS rim makes one turn every 6.8 seconds. Today
-              alone opts into SpecularRim for the equivalent GPU edge; when that
-              canvas renders, the adjacent CSS fallback becomes invisible. The
-              main CTA’s icons and “Jot it!” use Purple 500 at 75% color alpha,
-              independently of its primary label. Accent keeps its default icon
-              slots and pending spinner, but no separate aura, gradient field or
-              finish renderer. The paint-only AccentButtonSurface remains
-              available for journal artwork. Visual truncation never removes the
-              full accessible action text.
+              The explicit intake appearance owns the opaque dark-pink face,
+              Pink600 inner band at 74% and thirty-percent pink perimeter. Its
+              CSS rim makes one turn every 6.8 seconds. Today and Add Medication
+              opt into SpecularRim for the equivalent GPU edge; when that canvas
+              renders, the adjacent CSS fallback becomes invisible. The main
+              CTA’s icons and “Jot it!” use full-opacity Pink200, independently
+              of its primary label. Accent keeps its default icon slots and
+              pending spinner, but no separate aura, gradient field or finish
+              renderer. The paint-only AccentButtonSurface remains available for
+              journal artwork. Visual truncation never removes the full
+              accessible action text.
             </p>
             <p>
               Respect reduced motion and pause decoration for inactive states.
