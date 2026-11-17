@@ -4,13 +4,14 @@
 }
 
 .heading [data-page-heading-identity] {
-  flex: none;
+  flex: 0 1 auto;
   gap: 10px;
 }
 
 .heading [data-page-heading-title] {
-  font-size: 25px;
+  font-size: 24px;
   overflow-wrap: normal;
+  white-space: nowrap;
 }
 
 .heading [data-page-heading-icon] {
@@ -23,7 +24,7 @@
 
 .summary {
   display: inline-flex;
-  min-width: 0;
+  flex: none;
   min-height: 32px;
   flex-wrap: nowrap;
   align-items: center;
@@ -98,7 +99,7 @@
 
 @media (max-width: 359px) {
   .heading [data-page-heading-title] {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .swatch:nth-child(n + 3) {
@@ -110,7 +111,25 @@
   }
 }
 
-.filters {
+.listHeading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--canvas-foreground);
+}
+
+.listTitle {
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.statusSummary {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -121,30 +140,17 @@
   white-space: nowrap;
 }
 
-.filters button {
+.statusSummary > span {
   display: inline-flex;
-  min-height: 36px;
   align-items: center;
   gap: 3px;
-  padding: 0 2px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
 }
 
-.filters button[aria-pressed="true"] {
-  color: var(--canvas-foreground);
-}
-
-.filters strong {
+.statusSummary strong {
   font-weight: 650;
   font-variant-numeric: tabular-nums;
 }
 
-.filters button:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
+.historyNotice {
+  background-color: color-mix(in srgb, var(--card) 37%, transparent);
 }

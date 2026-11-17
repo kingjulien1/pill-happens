@@ -6,8 +6,16 @@ import {
   parseJournalMentionHref,
 } from "@/lib/journal-mentions";
 import mentionStyles from "./medication-mention-filter.module.css";
+import medicationOverviewStyles from "./medications-heading.module.css";
 
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FlaskConical, Leaf, Pill, X } from "lucide-react";
@@ -86,15 +94,6 @@ import {
   type Intake,
   type Medication,
 } from "@/lib/domain";
-
-function medicationView(value: unknown): value is { archived: boolean } {
-  return Boolean(
-    value &&
-    typeof value === "object" &&
-    "archived" in value &&
-    typeof value.archived === "boolean",
-  );
-}
 
 type HistoryView = { limit: number; expandedWeeks?: string[] };
 
@@ -528,12 +527,6 @@ export function MedicationsPage() {
     closeDialog,
     ready: workspaceReady,
   } = useJournalWorkspace();
-  const view = usePersistentDraft(
-    "view:medications",
-    () => ({ archived: false }),
-    medicationView,
-  );
-  const showArchived = view.value.archived;
   const medicationDialog =
     dialog?.kind === "medication-new" || dialog?.kind === "medication-edit"
       ? dialog
@@ -567,7 +560,7 @@ export function MedicationsPage() {
       closeDialog(medicationDialog);
   }, [data, medicationDialog, editing, closeDialog]);
   if (!data) return null;
-  const medications = sortMedicationsByUsage(
+  const rankedMedications = sortMedicationsByUsage(
     data.medications.filter((item) =>
       hasReference
         ? reference?.kind === "medication"
@@ -576,10 +569,16 @@ export function MedicationsPage() {
             ? normalizeJournalMentionText(item.activeIngredient ?? "") ===
               normalizeJournalMentionText(reference.ingredient)
             : false
-        : item.archived === showArchived,
+        : true,
     ),
     data.intakes,
   );
+  const medications = hasReference
+    ? rankedMedications
+    : [
+        ...rankedMedications.filter((item) => !item.archived),
+        ...rankedMedications.filter((item) => item.archived),
+      ];
   const referenceAvailable = medications.length > 0;
   const ReferenceIcon = reference?.kind === "ingredient" ? FlaskConical : Pill;
   const referenceTitle =
@@ -627,7 +626,7 @@ export function MedicationsPage() {
               medication.archived
                 ? "This medication is active again and available in the intake selector. Its existing settings and past entries have been kept."
                 : "This medication is now in your archive and is hidden from the selector for new intakes. Its past entries and totals remain in your journal.",
-              "You can switch between Active and Archive in the medication library whenever you need to review it.",
+              "Active and archived medications stay together in your library. Open an archived card whenever you want to restore it.",
             ],
             facts: [
               { label: "Medication", value: medication.name },
@@ -716,17 +715,18 @@ export function MedicationsPage() {
         </section>
       ) : (
         <MedicationListHeading
-          archived={showArchived}
           count={medications.length}
           activeCount={data.medications.filter((item) => !item.archived).length}
           archivedCount={
             data.medications.filter((item) => item.archived).length
           }
-          onArchivedChange={(archived) => view.setValue({ archived })}
         />
       )}
       <div
-        className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/37 px-3 py-2.5"
+        className={cn(
+          "mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 px-3 py-2.5",
+          medicationOverviewStyles.historyNotice,
+        )}
         data-medication-history-notice
       >
         <ActionIcon name="retry" className="mt-0.5 size-4 text-foreground/70" />
@@ -745,34 +745,43 @@ export function MedicationsPage() {
               Choose Show kit to return to your saved medication list.
             </p>
           ) : (
-            <EmptyState
-              icon="medications"
-              title={
-                showArchived
-                  ? "Nothing Archived."
-                  : "Start with Your Medication."
-              }
-            >
-              {showArchived
-                ? "Archived medications stay here, and their past entries stay in your journal."
-                : "Add the exact name and strength from the packaging. Your first log starts here."}
+            <EmptyState icon="medications" title="Start with Your Medication.">
+              Add the exact name and strength from the packaging. Your first log
+              starts here.
             </EmptyState>
           )
         ) : (
           <div className="space-y-3">
-            {medications.map((medication) => (
-              <MedicationLibraryCard
-                key={medication.id}
-                medication={medication}
-                disabled={busy}
-                onEdit={() => {
-                  medicationOpener.current =
-                    document.querySelector<HTMLElement>(
-                      `[data-medication-library-card="${CSS.escape(medication.id)}"]`,
-                    );
-                  openDialog({ kind: "medication-edit", id: medication.id });
-                }}
-              />
+            {medications.map((medication, index) => (
+              <Fragment key={medication.id}>
+                {!hasReference &&
+                  medication.archived &&
+                  !medications[index - 1]?.archived && (
+                    <div
+                      className="flex items-center gap-3 pt-3 text-muted-foreground"
+                      data-medications-archived-heading
+                    >
+                      <h3 className="shrink-0 text-[11px] font-medium">
+                        Archived
+                      </h3>
+                      <span
+                        className="h-px flex-1 bg-border/60"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  )}
+                <MedicationLibraryCard
+                  medication={medication}
+                  disabled={busy}
+                  onEdit={() => {
+                    medicationOpener.current =
+                      document.querySelector<HTMLElement>(
+                        `[data-medication-library-card="${CSS.escape(medication.id)}"]`,
+                      );
+                    openDialog({ kind: "medication-edit", id: medication.id });
+                  }}
+                />
+              </Fragment>
             ))}
           </div>
         )}
@@ -785,7 +794,7 @@ export function MedicationsPage() {
         scrollKey={editing ? `med:edit:${editing.id}` : "med:new"}
         returnFocus={() => {
           const opener = medicationOpener.current;
-          // Archive can remove its own list card; keep a stable keyboard target.
+          // Status changes can reorder a card; keep a stable keyboard target.
           return opener?.isConnected &&
             !opener.matches(":disabled, [aria-disabled='true']")
             ? opener

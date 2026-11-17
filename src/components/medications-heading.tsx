@@ -75,51 +75,28 @@ export function MedicationsHeading({
 }
 
 export function MedicationListHeading({
-  archived,
   count,
   activeCount,
   archivedCount,
-  onArchivedChange,
 }: {
-  archived: boolean;
   count: number;
   activeCount: number;
   archivedCount: number;
-  onArchivedChange: (archived: boolean) => void;
 }) {
   return (
-    <div
-      className="canvas-copy mb-4 flex min-w-0 items-center justify-between gap-3"
-      data-medications-list-heading
-    >
-      <div className="flex min-w-0 items-center gap-2 text-foreground">
-        <h2 className="text-sm font-medium">
-          <span className="tabular-nums">{count}</span>{" "}
-          {count === 1 ? "Medication" : "Medications"}
-        </h2>
-      </div>
-      <span className="sr-only" role="status">
-        {count} {archived ? "archived" : "active"}{" "}
-        {count === 1 ? "medication" : "medications"}.
-      </span>
-      <span className={styles.filters} data-medications-filter>
-        <button
-          type="button"
-          onClick={() => onArchivedChange(false)}
-          aria-pressed={!archived}
-          aria-controls="medication-library-list"
-        >
+    <div className={styles.listHeading} data-medications-list-heading>
+      <h2 className={styles.listTitle}>
+        <span className="tabular-nums">{count}</span>{" "}
+        {count === 1 ? "Medication" : "Medications"}
+      </h2>
+      <span className={styles.statusSummary} data-medications-status-summary>
+        <span>
           <strong>{activeCount}</strong> active
-        </button>
+        </span>
         <span aria-hidden="true">/</span>
-        <button
-          type="button"
-          onClick={() => onArchivedChange(true)}
-          aria-pressed={archived}
-          aria-controls="medication-library-list"
-        >
+        <span>
           <strong>{archivedCount}</strong> archived
-        </button>
+        </span>
       </span>
     </div>
   );
