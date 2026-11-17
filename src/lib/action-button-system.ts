@@ -103,7 +103,16 @@ const intakeActionField: ActionButtonPaint = {
 export const INTAKE_ACTION_PAINT: Readonly<
   Record<ActionButtonTheme, ActionButtonPaint>
 > = {
-  light: intakeActionField,
+  light: {
+    ...intakeActionField,
+    base: "#582447",
+    fieldColors: ["#582447", "#672852", "#51234f", "#6b2c60"],
+    diagonalColors: ["#582447", "#61254e"],
+    washColor: "#582447",
+    rimColors: ["#a9417d", "#df8fbd", "#77519a"].map((color) =>
+      tintMainActionRim(color as AppThemeHex),
+    ),
+  },
   dark: {
     ...intakeActionField,
     rimColors: ["#fbcfe8", "#fce7f3", "#f472b6"].map((color) =>
@@ -139,7 +148,7 @@ export const INTAKE_ACTION_SUPPORTING_PAINT = {
 /** Header branding uses the shared charcoal face and pink accent in both themes. */
 export function getIntakeBrandStyle(): CSSProperties {
   return {
-    "--brand-surface": INTAKE_ACTION_PAINT.light.base,
+    "--brand-surface": intakeActionField.base,
     "--brand-copy": INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"],
   } as CSSProperties;
 }
@@ -149,8 +158,8 @@ export function getBrandThemeStyle(): CSSProperties {
   return {
     ...getIntakeBrandStyle(),
     "--brand-ink": INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"],
-    "--brand-tone-ice": INTAKE_ACTION_PAINT.light.rimColors[1],
-    "--brand-tone-teal": INTAKE_ACTION_PAINT.light.rimColors[2],
+    "--brand-tone-ice": intakeActionField.rimColors[1],
+    "--brand-tone-teal": intakeActionField.rimColors[2],
     "--brand-tone-pale": INTAKE_ACTION_PAINT.dark.rimColors[0],
     "--brand-tone-seafoam": INTAKE_ACTION_PAINT.dark.rimColors[2],
     "--brand-tone-emerald": ACTION_BUTTON_TINT.emerald,

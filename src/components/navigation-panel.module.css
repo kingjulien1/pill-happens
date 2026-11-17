@@ -4,12 +4,12 @@
   outline: none;
 }
 .popup.navigation {
-  --nav-surface: #f7e7f0;
-  --nav-ink: #40243c;
-  --nav-muted: #785c73;
-  --nav-pink: #b52670;
+  --nav-surface: var(--menu-surface);
+  --nav-ink: var(--menu-foreground);
+  --nav-muted: var(--menu-muted-foreground);
+  --nav-pink: var(--primary);
   --nav-soft: #8051b2;
-  --nav-edge: #a3487526;
+  --nav-edge: var(--menu-edge);
   --nav-card: #7e3c6c07;
   --nav-selected: #d23b8b18;
   --nav-hover: #d23b8b0e;
@@ -580,6 +580,14 @@
     --nav-selected: #f472b61c;
     --nav-hover: #f472b613;
     --nav-icon-surface: #f472b61d;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .popup.navigation {
+    box-shadow:
+      inset 0 1px 0 #fff7fce6,
+      0 24px 60px -12px #64366626,
+      0 4px 14px #64366612;
   }
 }
 @media (max-width: 359px) {

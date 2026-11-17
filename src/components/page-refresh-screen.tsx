@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Pill, RefreshCw } from "lucide-react";
-import { APP_CANVAS_CSS } from "@/lib/app-theme";
+import { getAppCanvasCss } from "@/lib/app-theme";
 import {
   HEADER_CONTROL_DARK_CSS,
   HEADER_CONTROL_PAINT_CSS,
@@ -17,7 +17,7 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
    stationary600ms release. PAGE_REFRESH_SEQUENCE owns the handoff durations.
    The46px brand world is uniformly scaled2.5; only its native spring scales vary. */
 .page-refresh-screen {
-  ${APP_CANVAS_CSS}
+  ${getAppCanvasCss("light")}
   ${HEADER_CONTROL_PAINT_CSS}
   /* Header paint remains identical before app CSS arrives. */
   --refresh-face: var(--header-control-base);
@@ -437,13 +437,40 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 @keyframes refresh-brand-copy-exit { 0%, 17% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.025); } 100% { opacity: 0; transform: scale(.9); } }
 @media (prefers-color-scheme: dark) {
   :where(html:not([data-color-mode])) .page-refresh-screen {
+    ${getAppCanvasCss("dark")}
     ${HEADER_CONTROL_DARK_CSS}
     color-scheme: dark;
   }
 }
 :where(html[data-color-mode="dark"]) .page-refresh-screen {
+  ${getAppCanvasCss("dark")}
   ${HEADER_CONTROL_DARK_CSS}
   color-scheme: dark;
+}
+/* Raw critical CSS also follows a saved appearance before application CSS. */
+@media (prefers-color-scheme: light) {
+  :where(html:not([data-color-mode])) .page-refresh-screen {
+    --refresh-veil-color: #f7eef8;
+    --brand-tone-ice: #a855f7;
+    --brand-tone-teal: #db2777;
+    --brand-tone-pale: #9d174d;
+    --brand-tone-seafoam: #c084fc;
+    --brand-tone-emerald: #e879b1;
+  }
+  :where(html:not([data-color-mode])) .page-refresh-footer-copy > span:first-child {
+    color: var(--refresh-muted);
+  }
+}
+:where(html[data-color-mode="light"]) .page-refresh-screen {
+  --refresh-veil-color: #f7eef8;
+  --brand-tone-ice: #a855f7;
+  --brand-tone-teal: #db2777;
+  --brand-tone-pale: #9d174d;
+  --brand-tone-seafoam: #c084fc;
+  --brand-tone-emerald: #e879b1;
+}
+:where(html[data-color-mode="light"]) .page-refresh-footer-copy > span:first-child {
+  color: var(--refresh-muted);
 }
 
 @keyframes refresh-brand-spring-core {

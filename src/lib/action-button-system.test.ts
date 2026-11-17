@@ -44,7 +44,8 @@ test("the 13% tint preserves readable white copy and pink icons at every pigment
   );
   for (const mode of ["light", "dark"] as const) {
     const paint = INTAKE_ACTION_PAINT[mode];
-    assert.equal(paint.base, MAIN_ACTION_PINK.base);
+    if (mode === "dark") assert.equal(paint.base, MAIN_ACTION_PINK.base);
+    else assert.notEqual(paint.base, INTAKE_ACTION_PAINT.dark.base);
     assert.equal(paint.text, "#ffffff");
     for (const color of [paint.base, ...paint.fieldColors]) {
       const surface = rgba(color);
@@ -144,10 +145,10 @@ test("decorative journal pigments stay outside the filled-action paint update", 
   });
 });
 
-test("live branding shares the CTA’s charcoal, pink accent and rim reflections", () => {
+test("live branding retains its dark charcoal and original pink reflections", () => {
   const paint = getBrandThemeStyle();
   const color = (name: string) => paint[name as keyof typeof paint];
-  assert.equal(color("--brand-surface"), INTAKE_ACTION_PAINT.light.base);
+  assert.equal(color("--brand-surface"), INTAKE_ACTION_PAINT.dark.base);
   assert.equal(
     color("--brand-copy"),
     INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"],
@@ -161,8 +162,8 @@ test("live branding shares the CTA’s charcoal, pink accent and rim reflections
     ],
     [
       INTAKE_ACTION_SUPPORTING_PAINT["--intake-action-accent"],
-      INTAKE_ACTION_PAINT.light.rimColors[1],
-      INTAKE_ACTION_PAINT.light.rimColors[2],
+      INTAKE_ACTION_PAINT.dark.rimColors[0],
+      INTAKE_ACTION_PAINT.dark.rimColors[2],
     ],
   );
   // The pink modes have distinct second stops; Ice keeps its light-rim role.

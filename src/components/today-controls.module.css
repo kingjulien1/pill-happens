@@ -261,3 +261,46 @@
     background: var(--header-tool-surface);
   }
 }
+
+/* Daylight tools read as Rose ink on a luminous Lilac glass face. */
+@media (prefers-color-scheme: light) {
+  .headerButton.headerButton[data-slot="button"]:is(
+      [data-brand-refresh],
+      [data-navigation-trigger]
+    ) {
+    --header-tool-base: var(--control-tool-opaque-light);
+    --header-tool-mauve: #eadced;
+    --header-tool-ink: #9d174d;
+    --header-tool-overlay: color-mix(
+      in srgb,
+      var(--header-tool-mauve) 23%,
+      transparent
+    );
+    --header-tool-surface: color-mix(
+      in srgb,
+      var(--header-tool-mauve) 23%,
+      var(--header-tool-base) 77%
+    );
+    box-shadow:
+      inset 0 0 0 1px
+        color-mix(in srgb, var(--header-tool-ink) 42%, transparent),
+      0 4px 12px -4px var(--control-shadow);
+  }
+
+  .headerButton.headerButton[data-slot="button"]:is(
+      [data-brand-refresh],
+      [data-navigation-trigger]
+    )::before {
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--header-tool-ink) 38%, transparent);
+  }
+
+  .headerButton.headerButton[data-slot="button"]:is(
+      [data-brand-refresh],
+      [data-navigation-trigger]
+    ):focus-visible,
+  .action.action[data-slot="button"][data-button-system="daily"][data-control-style="satin"]:focus-visible {
+    outline-color: var(--ring);
+    box-shadow: 0 0 0 4px #f8e9f4;
+  }
+}
