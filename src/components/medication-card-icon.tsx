@@ -24,33 +24,62 @@ type MedicationArtworkProps = {
   iconRotation?: number;
 };
 
-/** Mark-only artwork lets every decorative fan layer share the saved identity. */
-function MedicationCardMark({
+/** The same selected-color glass frame hosts medication and check-in artwork. */
+export function MedicationCardIconFrame({
   color: value,
-  icon,
-  iconRotation = 0,
-}: MedicationArtworkProps) {
+  pigment,
+  children,
+  className,
+  style,
+  ...props
+}: Omit<ComponentProps<"span">, "color"> & {
+  color?: string;
+  pigment?: string;
+}) {
   const color = getMedicationColor(value);
   const scale = getMedicationColorScale(color.value);
-  const pigment = getMedicationIconPigment(color.value, icon);
+  const identity = pigment ?? getMedicationIconPigment(color.value);
 
   return (
     <span
-      className={cn("medication-card-mark intake-card-mark", styles.mark)}
-      data-medication-mark
+      {...props}
+      className={cn(
+        "medication-card-mark intake-card-mark",
+        styles.mark,
+        className,
+      )}
+      data-card-icon-frame
       data-medication-color={color.value}
       style={
         {
           color: scale.icon,
           backgroundColor:
-            getMedicationPreviewSurface(pigment) ?? "var(--popover)",
-          "--medication-rotation": `${iconRotation}deg`,
+            getMedicationPreviewSurface(identity) ?? "var(--popover)",
           "--medication-frame-pigment": getMedicationFramePigment(color.value),
+          ...style,
         } as CSSProperties
       }
     >
-      <MedicationGlyph icon={icon} className="size-[30px]" />
+      {children}
     </span>
+  );
+}
+
+/** Mark-only artwork lets every decorative fan layer share the saved identity. */
+function MedicationCardMark({
+  color,
+  icon,
+  iconRotation = 0,
+}: MedicationArtworkProps) {
+  return (
+    <MedicationCardIconFrame
+      color={color}
+      pigment={getMedicationIconPigment(color, icon)}
+      style={{ "--medication-rotation": `${iconRotation}deg` } as CSSProperties}
+      data-medication-mark
+    >
+      <MedicationGlyph icon={icon} className="size-[30px]" />
+    </MedicationCardIconFrame>
   );
 }
 

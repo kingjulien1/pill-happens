@@ -5,12 +5,6 @@
     var(--check-in-secondary, var(--action-background)) 76%,
     var(--palette-rose)
   );
-  --art-rim: color-mix(
-    in srgb,
-    var(--check-in-accent, var(--harmony-edge)) 48%,
-    transparent
-  );
-  --art-wash: color-mix(in srgb, var(--palette-rose) 17%, transparent);
   --art-return-delay: 180ms;
   --art-start: var(
     --check-in-art-delay,
@@ -43,21 +37,7 @@
   pointer-events: none;
 }
 
-.halo {
-  position: absolute;
-  inset: 3px;
-  z-index: -1;
-  border-radius: 19px;
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    var(--art-wash),
-    transparent 72%
-  );
-  opacity: 0.8;
-}
-
-.arrival,
-.tile {
+.arrival {
   position: relative;
   display: inline-flex;
   width: 48px;
@@ -69,41 +49,10 @@
 }
 
 .tile {
+  --check-in-art-copy: currentColor;
+  --check-in-mug-ink: currentColor;
   isolation: isolate;
-  overflow: hidden;
-  border: 1.25px solid var(--art-rim);
-  background: var(--check-in-art-surface, #4e456e);
-  box-shadow:
-    inset 0 1px 1px rgb(255 255 255 / 10%),
-    0 2px 5px color-mix(in srgb, var(--palette-black) 9%, transparent);
-}
-
-.wash {
-  position: absolute;
-  z-index: -1;
-  inset: -30%;
-  background:
-    radial-gradient(ellipse at 30% 20%, var(--art-wash), transparent 55%),
-    radial-gradient(ellipse at 80% 75%, var(--art-wash), transparent 55%);
-  opacity: 0.8;
-}
-
-.frame {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.frameTrace {
-  stroke-width: 0.8;
-  opacity: 0.32;
-  stroke-dasharray: 100;
-}
-
-.glints {
-  fill: var(--art-soft);
-  opacity: 0.65;
+  overflow: visible;
 }
 
 .symbolArrival,
@@ -114,22 +63,6 @@
   align-items: center;
   justify-content: center;
   transform-origin: center;
-}
-
-.symbol {
-  display: block;
-  width: 30px;
-  height: 30px;
-  overflow: visible;
-}
-
-.rays {
-  color: var(--art-soft);
-  transform-origin: 18px 5px;
-}
-
-.horizon {
-  opacity: 0.65;
 }
 
 .flourish {
@@ -145,25 +78,8 @@
   opacity: 0;
 }
 
-/* The evening crescent owns its quiet sway and short lunar transitions. */
-.stage[data-check-in-artwork="evening"] .symbolFloat,
-.stage[data-check-in-artwork="evening"] .wash,
-.stage[data-check-in-artwork="evening"] .halo,
-.stage[data-check-in-artwork="evening"] .glints {
-  animation: none;
-}
-
-/* Steam can drift above the tile while the existing artwork stays framed. */
-.stage[data-check-in-artwork="morning"] .tile {
-  overflow: visible;
-}
-
-.stage[data-check-in-artwork="morning"] .wash {
-  inset: 0;
-  border-radius: inherit;
-}
-
-.stage[data-check-in-artwork="morning"] .symbolFloat {
+/* The moon and steam own their ambient motion after the shared arrival. */
+.stage .symbolFloat {
   animation: none;
 }
 
@@ -197,44 +113,16 @@
       var(--art-start) backwards;
   }
 
-  .frameTrace {
-    animation: check-in-art-trace 1200ms ease-out calc(var(--art-start) + 180ms)
-      backwards;
-  }
-
   .flourish {
     animation: check-in-art-flourish 1200ms ease-out
       calc(var(--art-start) + 260ms) backwards;
   }
 
-  /* One duration and one start phase keep the quiet details in one choreography. */
-  .symbolFloat {
-    animation: check-in-art-float 7200ms ease-in-out var(--art-loop-start)
-      infinite;
-  }
-
-  .wash {
-    animation: check-in-art-wash 7200ms ease-in-out var(--art-loop-start)
-      infinite;
-  }
-
-  .halo,
-  .glints,
-  .rays {
-    animation: check-in-art-glimmer 7200ms ease-in-out var(--art-loop-start)
-      infinite;
-  }
-
   .ambientGate,
   .arrival,
   .symbolArrival,
-  .frameTrace,
   .flourish,
-  .symbolFloat,
-  .wash,
-  .halo,
-  .glints,
-  .rays {
+  .symbolFloat {
     animation-play-state: var(--art-play);
   }
 }
@@ -299,17 +187,6 @@
   }
 }
 
-@keyframes check-in-art-trace {
-  from {
-    stroke-dashoffset: 100;
-    opacity: 0;
-  }
-  to {
-    stroke-dashoffset: 0;
-    opacity: 0.32;
-  }
-}
-
 @keyframes check-in-art-flourish {
   0% {
     opacity: 0;
@@ -322,57 +199,5 @@
   100% {
     opacity: 0;
     transform: scale(1.05) rotate(8deg);
-  }
-}
-
-@keyframes check-in-art-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0);
-  }
-  28% {
-    transform: translateY(-0.8px) rotate(-3deg);
-  }
-  58% {
-    transform: translateY(0.3px) rotate(2deg);
-  }
-  80% {
-    transform: translateY(-0.25px) rotate(-0.6deg);
-  }
-}
-
-@keyframes check-in-art-wash {
-  0%,
-  100% {
-    transform: rotate(0) scale(1);
-    opacity: 0.8;
-  }
-  28% {
-    transform: rotate(30deg) scale(1.06);
-    opacity: 1;
-  }
-  58% {
-    transform: rotate(-16deg) scale(0.96);
-    opacity: 0.62;
-  }
-  80% {
-    transform: rotate(7deg) scale(1.02);
-    opacity: 0.88;
-  }
-}
-
-@keyframes check-in-art-glimmer {
-  0%,
-  100% {
-    opacity: 0.65;
-  }
-  28% {
-    opacity: 1;
-  }
-  58% {
-    opacity: 0.5;
-  }
-  80% {
-    opacity: 0.8;
   }
 }

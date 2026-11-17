@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useId,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-} from "react";
+import { useId, useState, useSyncExternalStore } from "react";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
 import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
 import { toast } from "@/components/ui/journal-toast";
@@ -71,7 +66,6 @@ import {
 import { cn } from "@/lib/utils";
 import styles from "./daily-check-in.module.css";
 import closeStyles from "./dialog-close.module.css";
-import groupStyles from "./intake-group-spacing.module.css";
 
 type CheckInProps = {
   day: string;
@@ -191,7 +185,7 @@ export function DailyCheckInSection({
     >
       {intakeSpacing === "before" && intakeSpacer}
       <MedicationCardBase
-        color="amber"
+        color="tw-purple-400"
         icon={morning ? "sun" : "moon-star"}
         leadingArtwork={
           <CheckInCardArtwork
@@ -201,20 +195,6 @@ export function DailyCheckInSection({
           />
         }
         className={cn(styles.card, "check-in-icon-theme")}
-        background={
-          <span
-            className={cn(styles.background, groupStyles.base)}
-            aria-hidden="true"
-            data-check-in-background
-            data-check-in-base
-          />
-        }
-        style={
-          {
-            "--entry-color": "var(--check-in-accent)",
-            "--intake-identity-color": "var(--check-in-art-base)",
-          } as CSSProperties
-        }
         data-check-in-card
         data-check-in-dialog-open={ownDialogOpen}
         data-filled={saved}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { CardIconSettle } from "@/components/card-icon-settle";
+import { MedicationCardIconFrame } from "@/components/medication-card-icon";
 import { EveningMoon } from "@/components/evening-moon";
 import { MorningCoffee } from "@/components/morning-coffee";
 import styles from "./check-in-card-artwork.module.css";
@@ -33,7 +34,6 @@ function ArtworkScene({
   period: "morning" | "evening";
   dialogOpen: boolean;
 }) {
-  const id = useId();
   const [ambientReady, setAmbientReady] = useState(false);
   const morning = period === "morning";
 
@@ -59,43 +59,12 @@ function ArtworkScene({
           if (event.target === event.currentTarget) setAmbientReady(true);
         }}
       />
-      <span className={styles.halo} />
       <span className={styles.arrival}>
-        <span className={styles.tile} data-check-in-icon-tile>
-          <span className={styles.wash} />
-          <svg className={styles.frame} viewBox="0 0 48 48" fill="none">
-            <defs>
-              <linearGradient
-                id={id}
-                x1="3"
-                y1="5"
-                x2="42"
-                y2="43"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="var(--check-in-secondary, var(--action-background))" />
-                <stop offset=".5" stopColor="var(--palette-lilac)" />
-                <stop
-                  offset="1"
-                  stopColor="var(--check-in-secondary, var(--action-background))"
-                />
-              </linearGradient>
-            </defs>
-            <rect
-              className={styles.frameTrace}
-              x="2.5"
-              y="2.5"
-              width="43"
-              height="43"
-              rx="14"
-              pathLength="100"
-              stroke={`url(#${id})`}
-            />
-            <g className={styles.glints}>
-              <circle cx="12" cy="3.8" r="1.35" />
-              <circle cx="44.2" cy="34" r="1.1" />
-            </g>
-          </svg>
+        <MedicationCardIconFrame
+          color="tw-purple-400"
+          className={styles.tile}
+          data-check-in-icon-tile
+        >
           <span className={styles.symbolArrival}>
             <span className={styles.symbolFloat}>
               {morning ? (
@@ -111,7 +80,7 @@ function ArtworkScene({
               )}
             </span>
           </span>
-        </span>
+        </MedicationCardIconFrame>
       </span>
       <CardIconSettle owner="check-in" />
       <svg className={styles.flourish} viewBox="0 0 56 56" fill="none">

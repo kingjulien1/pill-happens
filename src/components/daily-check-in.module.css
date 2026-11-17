@@ -11,49 +11,14 @@
   pointer-events: none;
 }
 
-/* Card faces share the group base; these pigments belong to the artwork only. */
+/* Purple400 flows through the same card and icon frames as recorded intakes. */
 .card:global(.intake-log-card) {
-  --check-in-secondary: var(--color-pink-300, #f9a8d4);
-  --check-in-accent: var(--color-pink-400, #f472b6);
-  --check-in-rim-dark: var(--color-pink-500, #ec4899);
-  --check-in-art-base: color-mix(
-    in srgb,
-    var(--color-pink-950, #500724) 84%,
-    var(--palette-black)
-  );
-  --check-in-art-copy: var(--palette-white);
-  --check-in-mug-ink: var(--check-in-art-copy);
-  --check-in-art-surface:
-    radial-gradient(
-      ellipse at 20% 0%,
-      color-mix(in srgb, var(--color-pink-600, #db2777) 12%, transparent),
-      transparent 72%
-    ),
-    var(--check-in-art-base);
+  --check-in-secondary: var(--color-purple-300, #d8b4fe);
+  --check-in-accent: var(--entry-color);
+  --check-in-rim-dark: var(--color-purple-500, #a855f7);
+  --check-in-art-copy: var(--card-foreground);
   color: var(--card-foreground);
-  box-shadow: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-.background {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  isolation: isolate;
-  overflow: hidden;
-  border-radius: inherit;
-  background: color-mix(in srgb, var(--check-in-accent) 5%, transparent);
-  opacity: 1;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .background {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .card:disabled {
@@ -505,11 +470,6 @@
 }
 
 @media (prefers-color-scheme: light) {
-  /* Unlike the dark card, daylight ink needs a paper face above the violet
-     page field. Keep the same small identity tint without translucent text. */
-  .background {
-    background: color-mix(in srgb, var(--check-in-accent) 5%, var(--card));
-  }
   .formSection {
     background: color-mix(in srgb, var(--surface-sunken) 38%, var(--popover));
   }

@@ -61,10 +61,11 @@
   pointer-events: none;
 }
 
-/* Only recorded intake artwork gets the wider glass frame. Clipping its
+/* Intake and check-in artwork share the same wider glass frame. Clipping its
    existing opaque fill exposes blur beneath the rim while keeping the glyph
    on its original contrast surface. All paint stays inside the 48px face. */
-:global([data-intake-card]) .mark:global(.intake-card-mark) {
+:global(:is([data-intake-card], [data-check-in-card]))
+  .mark:global(.intake-card-mark) {
   /* Resolve the pigments first so older Chromium retains shadow alpha. */
   --intake-artwork-rim: color-mix(
     in srgb,
@@ -84,7 +85,7 @@
   backdrop-filter: blur(96px) saturate(120%);
 }
 
-:global([data-intake-card]) .mark::after {
+:global(:is([data-intake-card], [data-check-in-card])) .mark::after {
   inset: 6.75px;
   border-radius: 9.25px;
   box-shadow: inset 0 0 0 1px var(--intake-artwork-inner-rim);

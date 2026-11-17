@@ -1773,21 +1773,32 @@ export function DeveloperGuidePage() {
                 Non-unit positive fractions are also represented; an ordinary
                 quantity of one needs no extra label, and invalid/nonpositive
                 values omit it. The old top-left form overlay moves into the
-                heading rail. Actual intake artwork uses a 6px inward glass rim
+                heading rail. MedicationCardIconFrame now hosts both medication
+                glyphs and the animated coffee/moon artwork. Intake and check-in
+                artwork use a 6px inward glass rim
                 at 28% combined alpha (20% selected color plus 8% primary ink),
                 with 96px standard/Safari backdrop blur. Its opaque face is
                 clipped to a 6px-padded content box to expose the glass ring.
                 The 1px saturated family-400/500 inner rim stays at 78%, inset
-                6.75px with a 9.25px radius and a 0.75px gap. Other artwork
+                6.75px with a 9.25px radius and a 0.75px gap. Morning and Evening
+                use the Purple400 palette selection through the same
+                MedicationCardBase, card-frame borders, 96px glass pane and
+                faint selected-color tint as a Purple400 intake. Both retain
+                the Pink200 wash at 8%, selected-color wash at 6% and the same
+                reduced-transparency fallback. Their former independent
+                background and drawn icon-frame overlays are removed; coffee
+                steam, moon movement and the delayed ambient handoff remain.
+                Other artwork
                 retains its 3.5px outer frame. These borders do not
                 enlarge the 48px tile. One inner entrance owner animates the
                 whole fan, while the quantity label enters separately and
                 grouped disclosure never remounts its frames.
               </p>
               <p>
-                The recorded-intake heading rail keeps a dot at the left,
-                followed by route, physical form and categories. Its 2px gaps
-                bring the icons closer, with 6px clearance after the dot.
+                The recorded-intake heading rail starts with an atomic route
+                and physical-form pair, using the normal 2px inter-icon gap.
+                A dot with balanced side spacing separates this pair from the
+                medication categories. Entries without categories omit the dot.
                 Every glyph uses a 13px viewport, primary ink, no fill and a
                 2.5px stroke, including custom route SVGs. The bounded rail
                 remains horizontally scrollable, preserving the name’s space.
