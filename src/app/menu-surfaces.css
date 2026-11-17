@@ -87,3 +87,29 @@
     transition: none;
   }
 }
+
+/* Light menus lift above the lilac canvas without borrowing a dark shadow. */
+@media (prefers-color-scheme: light) {
+  :is(
+    [data-menu-surface],
+    [data-navigation-menu],
+    [data-appearance-menu],
+    [data-slot="select-content"],
+    [data-choice-menu],
+    [data-journal-mention-menu],
+    [data-streak-popover],
+    .brand-menu
+  ) {
+    --menu-depth:
+      inset 0 0 0 1px color-mix(in srgb, var(--surface-raised) 80%, transparent),
+      0 18px 48px -15px color-mix(in srgb, var(--palette-plum) 22%, transparent),
+      0 3px 10px -4px color-mix(in srgb, var(--primary) 16%, transparent);
+    background:
+      radial-gradient(
+        ellipse at 0% 0%,
+        color-mix(in srgb, var(--palette-rose) 7%, transparent),
+        transparent 65%
+      ),
+      var(--menu-surface);
+  }
+}

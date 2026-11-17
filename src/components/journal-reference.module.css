@@ -298,3 +298,29 @@ a.reference:focus-visible {
     gap: 2px;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  a.reference {
+    background: color-mix(
+      in srgb,
+      var(--reference-pigment) 12%,
+      var(--surface-raised)
+    );
+    color: var(--foreground);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--reference-pigment) 23%, transparent);
+  }
+
+  .symbol:not([data-reference-category-symbol]) {
+    background: color-mix(
+      in srgb,
+      var(--reference-pigment) 18%,
+      var(--surface-reading)
+    );
+  }
+
+  .detail,
+  .count {
+    color: var(--muted-foreground);
+  }
+}

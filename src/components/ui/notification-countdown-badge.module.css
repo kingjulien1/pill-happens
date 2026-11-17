@@ -67,3 +67,24 @@
     backdrop-filter: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .badge {
+    background: var(--color-pink-100, #fce7f3);
+    color: var(--color-pink-800, #9d174d);
+    box-shadow:
+      inset 0 0 0 0.735px
+        color-mix(in srgb, var(--color-pink-600, #db2777) 35%, transparent),
+      0 2.45px 7.35px -2.45px
+        color-mix(in srgb, var(--palette-plum) 20%, transparent),
+      0 0 11.025px -3.675px
+        color-mix(in srgb, var(--palette-rose) 30%, transparent);
+  }
+
+  .flare {
+    box-shadow:
+      inset 0 0 0 1.47px
+        color-mix(in srgb, var(--color-pink-600, #db2777) 50%, transparent),
+      0 0 11.025px color-mix(in srgb, var(--palette-rose) 40%, transparent);
+  }
+}

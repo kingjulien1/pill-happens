@@ -477,3 +477,19 @@
     transition: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .mark,
+  .optionIcon {
+    background: color-mix(in srgb, var(--primary) 8%, var(--menu-surface));
+    color: var(--primary);
+  }
+
+  .optionIcon[data-kind="ingredient"] {
+    background: color-mix(
+      in srgb,
+      var(--palette-lilac) 17%,
+      var(--menu-surface)
+    );
+  }
+}

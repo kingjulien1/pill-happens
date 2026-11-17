@@ -686,3 +686,35 @@
     transition: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .editor {
+    --journal-peach: var(--color-pink-100, #fce7f3);
+    --journal-flame: var(--color-pink-500, #ec4899);
+    --journal-rust: var(--color-purple-500, #a855f7);
+    --journal-secondary: var(--muted-foreground);
+    --journal-muted: color-mix(
+      in srgb,
+      var(--muted-foreground) 88%,
+      transparent
+    );
+    --journal-fill: color-mix(
+      in srgb,
+      var(--surface-reading) 96%,
+      var(--palette-rose)
+    );
+    --journal-tile: color-mix(in srgb, var(--primary) 6%, transparent);
+    --journal-focus: var(--ring);
+    --journal-shadow: color-mix(in srgb, var(--palette-plum) 8%, transparent);
+  }
+
+  .headingIcon::after {
+    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  .editor .launcher[data-slot="button"] {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--primary) 16%, transparent),
+      0 6px 18px -8px color-mix(in srgb, var(--palette-plum) 20%, transparent);
+  }
+}

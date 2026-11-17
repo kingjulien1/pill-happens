@@ -172,3 +172,21 @@
 .dialog[data-writing-help]::-webkit-scrollbar {
   display: none;
 }
+
+@media (prefers-color-scheme: light) {
+  .dialog[data-writing-help] {
+    border-color: color-mix(in srgb, var(--primary) 16%, transparent);
+  }
+
+  .examples {
+    background: color-mix(
+      in srgb,
+      var(--palette-lilac) 9%,
+      var(--surface-reading)
+    );
+  }
+
+  .tips li::marker {
+    color: var(--primary);
+  }
+}

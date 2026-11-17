@@ -177,3 +177,25 @@
     display: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .trigger {
+    background: color-mix(
+      in srgb,
+      var(--surface-reading) 90%,
+      var(--palette-rose)
+    );
+    border-color: var(--input);
+  }
+
+  .trigger:focus-visible {
+    background: var(--surface-reading);
+    border-color: var(--ring);
+  }
+
+  .clear,
+  .done {
+    background: color-mix(in srgb, var(--primary) 7%, var(--menu-surface));
+    color: var(--menu-foreground);
+  }
+}

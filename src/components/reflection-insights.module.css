@@ -129,3 +129,20 @@
     transform: rotate(360deg);
   }
 }
+
+@media (prefers-color-scheme: light) {
+  .panel {
+    background:
+      radial-gradient(
+        ellipse at 100% 0,
+        color-mix(in srgb, var(--palette-rose) 9%, transparent),
+        transparent 74%
+      ),
+      var(--surface-reading);
+    border-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+
+  .advice li::marker {
+    color: var(--primary);
+  }
+}

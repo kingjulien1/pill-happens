@@ -1182,3 +1182,66 @@
     transition: none;
   }
 }
+
+/* A writing desk: calm paper, compact rose tools, and a softer blush footer. */
+@media (prefers-color-scheme: light) {
+  .dialog[data-reflection-dialog] {
+    --writer-neutral: var(--surface-reading-foreground);
+    --writer-neutral-fill: color-mix(
+      in srgb,
+      var(--primary) 5%,
+      var(--surface-reading)
+    );
+    --writer-action-fill: color-mix(
+      in srgb,
+      var(--primary) 7%,
+      var(--surface-reading)
+    );
+    background: var(--surface-reading);
+  }
+
+  .controls {
+    background: var(--writer-neutral-fill);
+    border-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+
+  .iconControl {
+    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  .iconControl[aria-expanded="true"],
+  .iconControl[data-writing-split][aria-pressed="true"] {
+    background: color-mix(in srgb, var(--primary) 13%, var(--surface-raised));
+    color: var(--primary);
+  }
+
+  .toolbar button[aria-pressed="true"] {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .workspace[data-view="split"] .previewPane {
+    background: color-mix(
+      in srgb,
+      var(--surface-reading) 94%,
+      var(--palette-lilac)
+    );
+  }
+
+  .footer {
+    background: linear-gradient(
+      0deg,
+      color-mix(
+        in srgb,
+        var(--color-pink-200, #fbcfe8) 40%,
+        var(--surface-reading)
+      ),
+      color-mix(in srgb, var(--color-pink-200, #fbcfe8) 15%, transparent) 60%,
+      transparent
+    );
+  }
+
+  .footerHint {
+    color: var(--muted-foreground);
+  }
+}

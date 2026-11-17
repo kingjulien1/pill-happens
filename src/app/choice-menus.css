@@ -254,3 +254,25 @@
     transition: none;
   }
 }
+
+@media (prefers-color-scheme: light) {
+  [data-choice-menu] {
+    background: var(--menu-surface);
+    border-color: var(--menu-edge);
+  }
+
+  [data-compact-choice-trigger]:not([aria-invalid="true"]) {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-reading) 90%,
+      var(--palette-rose)
+    );
+    border-color: var(--input);
+  }
+
+  [data-choice-menu]
+    [data-choice-option][data-current="true"]
+    [data-choice-icon] {
+    color: var(--primary);
+  }
+}

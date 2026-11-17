@@ -2022,3 +2022,145 @@
     transition: none !important;
   }
 }
+
+/* Daylight notifications use rose paper; the animated bell remains a dark tile. */
+@media (prefers-color-scheme: light) {
+  .journal-toaster[data-sonner-toaster],
+  .journal-toaster[data-sonner-toaster][data-sonner-theme] {
+    --toast-ink: var(--foreground);
+    --toast-muted: var(--muted-foreground);
+    --toast-detail-muted: color-mix(
+      in srgb,
+      var(--foreground) 86%,
+      transparent
+    );
+    --toast-surface: var(--popover);
+    --toast-surface-layers:
+      radial-gradient(
+        ellipse at 0% 0%,
+        color-mix(in srgb, var(--palette-rose) 9%, transparent),
+        transparent 68%
+      ),
+      linear-gradient(var(--toast-surface) 0 0);
+    --toast-glyph: var(--palette-white);
+    --toast-accent: var(--color-pink-700, #be185d);
+    --toast-bright: var(--color-purple-600, #9333ea);
+    --toast-soft: var(--color-fuchsia-600, #c026d3);
+    --toast-rim: var(--color-purple-500, #a855f7);
+    --toast-pink-edge: color-mix(
+      in srgb,
+      var(--color-pink-600, #db2777) 38%,
+      transparent
+    );
+    --toast-shadow: color-mix(in srgb, var(--palette-plum) 18%, transparent);
+    --toast-quiet-fill: color-mix(in srgb, var(--primary) 7%, transparent);
+  }
+
+  .journal-toaster
+    :is(
+      [data-type="success"],
+      [data-kind="success"],
+      [data-type="loading"],
+      [data-kind="loading"]
+    ) {
+    --toast-accent: var(--color-pink-700, #be185d);
+    --toast-bright: var(--color-purple-600, #9333ea);
+    --toast-soft: var(--color-fuchsia-600, #c026d3);
+  }
+
+  .journal-toaster :is([data-type="error"], [data-kind="error"]) {
+    --toast-accent: var(--color-rose-700, #be123c);
+    --toast-bright: var(--color-rose-600, #e11d48);
+    --toast-soft: var(--color-pink-600, #db2777);
+    --toast-rim: var(--color-rose-500, #f43f5e);
+  }
+
+  .journal-toaster :is([data-type="warning"], [data-kind="warning"]) {
+    --toast-accent: var(--color-amber-800, #92400e);
+    --toast-bright: var(--color-amber-600, #d97706);
+    --toast-soft: var(--color-pink-600, #db2777);
+    --toast-rim: var(--color-amber-500, #f59e0b);
+  }
+
+  .journal-toaster
+    :is(
+      [data-type="info"],
+      [data-kind="info"],
+      .journal-toast--update,
+      [data-kind="update"]
+    ) {
+    --toast-accent: var(--color-purple-700, #7e22ce);
+    --toast-bright: var(--color-fuchsia-600, #c026d3);
+    --toast-soft: var(--color-pink-600, #db2777);
+    --toast-rim: var(--color-purple-500, #a855f7);
+  }
+
+  .journal-toaster [data-toast-symbol="success"] {
+    --toast-glyph: var(--palette-white);
+  }
+
+  .journal-notification-backdrop {
+    background: color-mix(in srgb, var(--palette-plum) 16%, transparent);
+  }
+
+  .journal-notification-countdown {
+    background: color-mix(in srgb, var(--toast-soft) 12%, transparent);
+    box-shadow: inset 0 0 0 0.75px
+      color-mix(in srgb, var(--toast-soft) 10%, transparent);
+  }
+
+  .journal-notification-footer-fade {
+    background:
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-pink-200, #fbcfe8) 26%, transparent),
+        transparent 45%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-purple-200, #e9d5ff) 26%, transparent),
+        transparent 72%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--surface-raised) 94%, transparent),
+        transparent
+      );
+  }
+
+  .journal-notification-footer-copy {
+    color: var(--toast-muted);
+  }
+
+  .journal-notification-footer-note {
+    color: color-mix(in srgb, var(--toast-ink) 72%, transparent);
+  }
+
+  .journal-notification
+    :is(
+      .journal-notification-revert,
+      .journal-notification-footer-undo
+    )[data-undo-state="unavailable"] {
+    color: color-mix(in srgb, var(--muted-foreground) 62%, transparent);
+  }
+
+  .journal-notification
+    [data-undo-state="unavailable"]
+    .journal-notification-revert-symbol {
+    background: color-mix(in srgb, var(--muted-foreground) 5%, transparent);
+  }
+
+  .journal-notification .journal-notification-revert[data-undo-state="done"] {
+    color: var(--color-emerald-700, #047857);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  @media (prefers-reduced-transparency: reduce) {
+    .journal-toaster[data-sonner-toaster]
+      [data-sonner-toast][data-styled="true"],
+    .journal-notification {
+      background: var(--popover);
+    }
+  }
+}

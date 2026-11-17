@@ -102,3 +102,19 @@
   width: 16.291667px;
   height: 16.291667px;
 }
+
+@media (prefers-color-scheme: light) {
+  .control {
+    color: var(--muted-foreground);
+  }
+
+  .control::before {
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
+  }
+
+  .control.medicationControl[data-slot="button"] {
+    --button-secondary: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-raised));
+    color: var(--primary);
+  }
+}

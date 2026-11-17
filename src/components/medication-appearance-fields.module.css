@@ -613,3 +613,65 @@
     animation: none;
   }
 }
+
+/* Selected medication colors stay expressive on light paper, with dark copy. */
+@media (prefers-color-scheme: light) {
+  .appearance {
+    background: color-mix(
+      in srgb,
+      var(--surface-sunken) 58%,
+      var(--surface-reading)
+    );
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--primary) 12%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 85%, transparent);
+  }
+
+  .appearance :global([data-appearance-results]),
+  .appearance :global([data-appearance-color-results]) {
+    background-color: var(--surface-reading);
+    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  .sourceFilter[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--primary) 11%, var(--surface-raised));
+    color: var(--primary);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--primary) 24%, transparent);
+  }
+
+  .showcase:global(.final-look-showcase) {
+    --final-look-copy: var(--foreground);
+    --final-look-muted: var(--muted-foreground);
+    background-color: var(--surface-reading);
+    border-color: color-mix(in srgb, var(--preview-accent) 30%, var(--border));
+    box-shadow: 0 8px 24px -14px
+      color-mix(in srgb, var(--preview-accent) 32%, transparent);
+  }
+
+  .showcase :global(.final-look-wash) {
+    background: var(--surface-reading);
+    opacity: 0.82;
+  }
+
+  .previewPattern {
+    color: var(--preview-color-ink);
+    opacity: 0.08;
+  }
+
+  .titlePill {
+    background: color-mix(
+      in srgb,
+      var(--preview-accent) 10%,
+      var(--surface-reading)
+    );
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--preview-accent) 16%, transparent);
+  }
+
+  .previewActionFace,
+  .motionToggle {
+    background: color-mix(in srgb, var(--primary) 7%, var(--surface-reading));
+    color: var(--muted-foreground);
+  }
+}

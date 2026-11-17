@@ -67,3 +67,36 @@
   color: inherit;
   pointer-events: none;
 }
+
+/* Feedback keeps its meaning with deeper text on daylight surfaces. */
+@media (prefers-color-scheme: light) {
+  .badge {
+    --status-tone: var(--color-emerald-600, #059669);
+    --status-ink: var(--color-emerald-800, #065f46);
+  }
+
+  .badge[data-notification-status="error"] {
+    --status-tone: var(--color-rose-600, #e11d48);
+    --status-ink: var(--color-rose-800, #9f1239);
+  }
+
+  .badge[data-notification-status="warning"] {
+    --status-tone: var(--color-amber-600, #d97706);
+    --status-ink: var(--color-amber-800, #92400e);
+  }
+
+  .badge[data-notification-status="info"] {
+    --status-tone: var(--color-sky-600, #0284c7);
+    --status-ink: var(--color-sky-800, #075985);
+  }
+
+  .badge[data-notification-status="loading"] {
+    --status-tone: var(--color-violet-600, #7c3aed);
+    --status-ink: var(--color-violet-800, #5b21b6);
+  }
+
+  .badge[data-notification-status="update"] {
+    --status-tone: var(--color-fuchsia-600, #c026d3);
+    --status-ink: var(--color-fuchsia-800, #86198f);
+  }
+}

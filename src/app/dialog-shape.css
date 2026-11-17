@@ -118,3 +118,51 @@
   [data-appearance-choice] {
   border-radius: var(--dialog-radius-compact);
 }
+
+/* Daylight dialogs use a clean paper surface and softly separated form wells. */
+@media (prefers-color-scheme: light) {
+  :is([data-slot="dialog-content"], [data-slot="drawer-popup"]) {
+    --drawer-bleed-background: var(--popover);
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--primary) 12%, transparent),
+      0 22px 70px -24px color-mix(in srgb, var(--palette-plum) 24%, transparent),
+      0 4px 14px -5px color-mix(in srgb, var(--palette-plum) 12%, transparent);
+  }
+
+  :is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+    :is(
+      [data-slot="input"],
+      [data-slot="textarea"],
+      [data-slot="select-trigger"]
+    ):not([data-dialog-canvas], [aria-invalid="true"]) {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-reading) 90%,
+      var(--palette-rose)
+    );
+    color: var(--foreground);
+    border-color: var(--input);
+  }
+
+  :is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+    :is(
+      [data-slot="input"],
+      [data-slot="textarea"],
+      [data-slot="select-trigger"]
+    ):focus-visible:not([data-dialog-canvas], [aria-invalid="true"]) {
+    background-color: var(--surface-reading);
+    border-color: var(--ring);
+  }
+
+  :is([data-slot="dialog-content"], [data-slot="drawer-popup"])
+    :is([data-slot="input"], [data-slot="textarea"])::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.85;
+  }
+
+  [data-slot="drawer-swipe-handle"]::after {
+    background-color: color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+}

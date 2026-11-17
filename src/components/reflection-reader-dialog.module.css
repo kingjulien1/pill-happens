@@ -134,3 +134,18 @@
 .dialog[data-reflection-reader]::-webkit-scrollbar {
   display: none;
 }
+
+@media (prefers-color-scheme: light) {
+  .dialog[data-reflection-reader] {
+    background:
+      radial-gradient(
+        ellipse at 0% 0%,
+        color-mix(in srgb, var(--palette-lilac) 10%, transparent),
+        transparent 65%
+      ),
+      var(--reader-paper);
+    border-color: color-mix(in srgb, var(--primary) 16%, transparent);
+    box-shadow: 0 22px 72px -22px
+      color-mix(in srgb, var(--palette-plum) 24%, transparent);
+  }
+}

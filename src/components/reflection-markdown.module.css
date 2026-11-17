@@ -172,3 +172,48 @@
   font-size: 0.85em;
   color: var(--muted-foreground);
 }
+
+@media (prefers-color-scheme: light) {
+  .prose a:not(:global([data-journal-reference])) {
+    color: var(--primary);
+    text-decoration-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+
+  .prose blockquote {
+    border-inline-start-color: color-mix(
+      in srgb,
+      var(--primary) 46%,
+      transparent
+    );
+    background: color-mix(
+      in srgb,
+      var(--palette-rose) 11%,
+      var(--surface-reading)
+    );
+    color: var(--muted-foreground);
+  }
+
+  .prose code {
+    background: color-mix(
+      in srgb,
+      var(--palette-lilac) 17%,
+      var(--surface-reading)
+    );
+  }
+
+  .prose pre {
+    background: color-mix(
+      in srgb,
+      var(--surface-sunken) 62%,
+      var(--surface-reading)
+    );
+  }
+
+  .prose pre code {
+    background: none;
+  }
+
+  .prose th {
+    background: color-mix(in srgb, var(--primary) 5%, var(--surface-reading));
+  }
+}
