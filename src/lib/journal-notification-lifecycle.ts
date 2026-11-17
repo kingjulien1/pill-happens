@@ -15,6 +15,41 @@ const SLOW_START_TIME = 1 - SLOW_START;
 const SLOW_END_TIME = SLOW_START_TIME + MIDDLE_TIME;
 const COMPLETE_TIME = SLOW_END_TIME + SLOW_END / MINIMUM_SPEED;
 
+/** JSON-safe active-time checkpoint; null is an indefinite notification. */
+export type NotificationClockCheckpoint = {
+  version: 1;
+  duration: number | null;
+  elapsedActive: number;
+};
+
+export function isNotificationClockCheckpoint(
+  value: unknown,
+): value is NotificationClockCheckpoint {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    Object.keys(value).length !== 3
+  )
+    return false;
+  const candidate = value as Partial<NotificationClockCheckpoint>;
+  if (
+    candidate.version !== 1 ||
+    typeof candidate.elapsedActive !== "number" ||
+    !Number.isFinite(candidate.elapsedActive) ||
+    candidate.elapsedActive < 0
+  )
+    return false;
+  if (candidate.duration === null) return candidate.elapsedActive === 0;
+  return (
+    typeof candidate.duration === "number" &&
+    Number.isFinite(candidate.duration) &&
+    candidate.duration >= 0 &&
+    candidate.elapsedActive <=
+      candidate.duration * COMPLETE_TIME + NOTIFICATION_COMPLETION_GRACE
+  );
+}
+
 export type NotificationClockSnapshot = {
   /** Nominal remaining milliseconds, matching duration × progress. */
   remaining: number;
@@ -68,6 +103,29 @@ export class NotificationClock {
     this.completeAt = this.nominalDuration * COMPLETE_TIME;
     this.expiresAt = this.completeAt + NOTIFICATION_COMPLETION_GRACE;
     this.last = now();
+  }
+
+  /** Closed/refresh time is deliberately free; interaction pauses are transient. */
+  static restore(
+    checkpoint: NotificationClockCheckpoint,
+    now: () => number = () => performance.now(),
+  ) {
+    if (!isNotificationClockCheckpoint(checkpoint))
+      throw new RangeError("Invalid notification clock checkpoint.");
+    const clock = new NotificationClock(checkpoint.duration ?? Infinity, now);
+    clock.elapsed = checkpoint.elapsedActive;
+    return clock;
+  }
+
+  checkpoint(): NotificationClockCheckpoint {
+    this.sample();
+    return {
+      version: 1,
+      duration: Number.isFinite(this.nominalDuration)
+        ? this.nominalDuration
+        : null,
+      elapsedActive: this.elapsed,
+    };
   }
 
   private sample() {

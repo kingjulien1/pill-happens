@@ -5,6 +5,7 @@ import {
   NOTIFICATION_DEFAULT_DURATION,
   NotificationClock,
   NotificationExitRegistry,
+  isNotificationClockCheckpoint,
   settleNotificationUndo,
 } from "./journal-notification-lifecycle";
 
@@ -296,6 +297,98 @@ test("loading notifications remain indefinite, nonurgent and never enter grace",
   now += 1_000_000;
   clock.pause("hidden", false);
   assert.equal(clock.snapshot().expired, false);
+});
+
+test("JSON clock checkpoints resume exact progress at a fresh time origin through early, slow, late and grace phases", () => {
+  const duration = 10_000;
+  const completeAt = timeAtProgress(duration, 0);
+  for (const elapsed of [
+    0,
+    4_800,
+    timeAtProgress(duration, 0.2),
+    timeAtProgress(duration, 0.04),
+    completeAt,
+    completeAt + 640,
+    completeAt + NOTIFICATION_COMPLETION_GRACE,
+  ]) {
+    let beforeNow = 91_000;
+    const before = new NotificationClock(duration, () => beforeNow);
+    beforeNow += elapsed;
+    const checkpoint = JSON.parse(JSON.stringify(before.checkpoint()));
+    let afterNow = 12;
+    const after = NotificationClock.restore(checkpoint, () => afterNow);
+    assert.deepEqual(after.snapshot(), before.snapshot());
+    beforeNow += 241;
+    afterNow += 241;
+    assert.deepEqual(after.snapshot(), before.snapshot());
+  }
+});
+
+test("saving a paused clock preserves only its active budget, never its stale interaction pauses or closed-app time", () => {
+  let now = 10;
+  const clock = new NotificationClock(10_000, () => now);
+  now += 7_300;
+  clock.pause("pointer", true);
+  clock.pause("focus", true);
+  now += 8_000_000;
+  const checkpoint = clock.checkpoint();
+  close(checkpoint.elapsedActive, 7_300);
+  let reloadNow = 30;
+  const restored = NotificationClock.restore(checkpoint, () => reloadNow);
+  assert.equal(restored.snapshot().paused, false);
+  close(restored.snapshot().remaining, clock.snapshot().remaining);
+  reloadNow += 400;
+  assert.ok(restored.snapshot().remaining < clock.snapshot().remaining);
+});
+
+test("checkpoints preserve indefinite clocks and paused completion grace without serializing Infinity", () => {
+  const indefinite = new NotificationClock(Infinity, () => 10);
+  assert.deepEqual(indefinite.checkpoint(), {
+    version: 1,
+    duration: null,
+    elapsedActive: 0,
+  });
+  const restored = NotificationClock.restore(
+    JSON.parse(JSON.stringify(indefinite.checkpoint())),
+    () => 9_000_000,
+  );
+  assert.deepEqual(restored.snapshot(), indefinite.snapshot());
+
+  let now = 0;
+  const clock = new NotificationClock(0, () => now);
+  now = 450;
+  clock.pause("expanded", true);
+  now = 900_000;
+  let reloadNow = 0;
+  const grace = NotificationClock.restore(clock.checkpoint(), () => reloadNow);
+  close(grace.snapshot().graceRemaining, 550);
+  reloadNow = 549;
+  assert.equal(grace.snapshot().expired, false);
+  reloadNow++;
+  assert.equal(grace.snapshot().expired, true);
+});
+
+test("invalid checkpoints cannot invent negative, nonfinite or excess active reading time", () => {
+  for (const checkpoint of [
+    null,
+    {},
+    { version: 2, duration: 10, elapsedActive: 0 },
+    { version: 1, duration: -1, elapsedActive: 0 },
+    { version: 1, duration: Infinity, elapsedActive: 0 },
+    { version: 1, duration: 10, elapsedActive: NaN },
+    { version: 1, duration: 10, elapsedActive: -1 },
+    { version: 1, duration: 10, elapsedActive: 10_000 },
+    { version: 1, duration: null, elapsedActive: 1 },
+  ]) {
+    assert.equal(isNotificationClockCheckpoint(checkpoint), false);
+    assert.throws(
+      () =>
+        NotificationClock.restore(
+          checkpoint as Parameters<typeof NotificationClock.restore>[0],
+        ),
+      RangeError,
+    );
+  }
 });
 
 test("the monotonic guard ignores backwards time without charging it twice", () => {
