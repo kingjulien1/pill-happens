@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   isValidElement,
   useCallback,
@@ -633,6 +634,19 @@ export function JournalNotification({
     setExpanded(false);
   };
 
+  const followRelatedLink = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.stopPropagation();
+    if (
+      !event.defaultPrevented &&
+      event.button === 0 &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !event.shiftKey
+    )
+      collapseDetails(event);
+  };
+
   const renderAction = (
     value: ExternalToast["action"],
     cancelAction = false,
@@ -873,18 +887,7 @@ export function JournalNotification({
                     title={link.label}
                     tabIndex={expanded ? 0 : -1}
                     onPointerDown={(event) => event.stopPropagation()}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      if (
-                        !event.defaultPrevented &&
-                        event.button === 0 &&
-                        !event.metaKey &&
-                        !event.ctrlKey &&
-                        !event.altKey &&
-                        !event.shiftKey
-                      )
-                        collapseDetails(event);
-                    }}
+                    onClick={followRelatedLink}
                   >
                     <span
                       className="journal-notification-tool-symbol"
@@ -930,36 +933,43 @@ export function JournalNotification({
             <span className="journal-notification-footer-copy">
               {footerCopy}
             </span>
-            {details?.preview && details.links?.length ? (
-              <span className="journal-notification-footer-note">
-                These are snapshots. Open{" "}
-                {details.links.slice(0, 2).map((link, index) => (
-                  <span key={link.href}>
-                    {index > 0 && " or "}
-                    <a
-                      href={link.href}
-                      tabIndex={expanded ? 0 : -1}
-                      onPointerDown={(event) => event.stopPropagation()}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        if (
-                          !event.defaultPrevented &&
-                          event.button === 0 &&
-                          !event.metaKey &&
-                          !event.ctrlKey &&
-                          !event.altKey &&
-                          !event.shiftKey
-                        )
-                          collapseDetails(event);
-                      }}
-                    >
-                      {link.label.toLowerCase()}
-                    </a>
-                  </span>
-                ))}{" "}
-                for the latest saved version.
-              </span>
-            ) : null}
+            <span className="journal-notification-footer-note">
+              {details?.preview ? "These cards capture this change. " : null}
+              {details?.links?.length ? (
+                <>
+                  Open{" "}
+                  {details.links.slice(0, 2).map((link, index) => (
+                    <span key={link.href}>
+                      {index > 0 && " or "}
+                      <a
+                        href={link.href}
+                        aria-label={link.label}
+                        tabIndex={expanded ? 0 : -1}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={followRelatedLink}
+                      >
+                        {linkPresentation(
+                          link.href,
+                          link.label,
+                        ).caption.toLowerCase()}
+                      </a>
+                    </span>
+                  ))}{" "}
+                  for the latest details.{" "}
+                </>
+              ) : null}
+              Find your entries and drafts in your{" "}
+              <Link
+                href="/"
+                prefetch={false}
+                tabIndex={expanded ? 0 : -1}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={followRelatedLink}
+              >
+                daily log
+              </Link>
+              .
+            </span>
             {(cancel || action) && (
               <span className="journal-notification-actions">
                 {renderAction(cancel, true)}

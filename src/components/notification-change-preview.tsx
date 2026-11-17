@@ -3,14 +3,15 @@
 import type { ReactNode } from "react";
 import {
   BedDouble,
+  ArrowRightLeft,
+  BadgeCheck,
   BookOpen,
   CalendarDays,
   Clock3,
   Coffee,
-  CheckCheck,
+  History,
   MoonStar,
   Target,
-  RotateCcw,
   Trash2,
   Waves,
   Zap,
@@ -37,10 +38,16 @@ export function NotificationChangePreview({
 }) {
   if (!preview.before && !preview.after) return null;
   const compared = Boolean(preview.before && preview.after);
+  const SummaryIcon = compared
+    ? ArrowRightLeft
+    : preview.before
+      ? Trash2
+      : BadgeCheck;
   return (
     <div className={styles.root} data-notification-change-preview>
       <p className={styles.summary} data-notification-change-summary>
-        {notificationChangeSummary(preview)}
+        <SummaryIcon aria-hidden="true" />
+        <span>{notificationChangeSummary(preview)}</span>
       </p>
       {preview.before && (
         <section
@@ -103,7 +110,7 @@ function SnapshotCaption({
     );
   }
   const StageIcon =
-    label === "Before" ? RotateCcw : label === "Removed" ? Trash2 : CheckCheck;
+    label === "Before" ? History : label === "Removed" ? Trash2 : BadgeCheck;
   return (
     <div className={styles.caption}>
       <span className={styles.stage}>

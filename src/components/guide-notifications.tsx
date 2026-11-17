@@ -644,16 +644,19 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Preview content occupies the labelled, inert-when-closed details region.
         When present it replaces free-form paragraphs and facts, while relevant
         links and action/cancel controls remain available. A short primary-ink
-        summary after the top separator explains the actual changed fields.
-        Centered captions pair Before/After, Saved or Removed with fitting
-        history/check icons; dates omit the year. Intake routes appear inside
-        their actual MedicationCard rail with form/category glyphs rather than
-        as a loose caption outside the card. Check-ins, goals and timezone
-        changes use compact visual summaries; journal prose stays out of
-        previews. Non-graphic notices show up to four facts, or one context
-        paragraph when there are no facts. The playground above constructs both
-        sides from invented records and its Undo only updates local React state;
-        it never calls the journal API.
+        13px, weight 700 summary after the top separator explains the actual
+        changed fields; the main notification heading stays 14px, weight 650.
+        Each caption uses three columns: its stage stays independently centered
+        above the card while the date or status sits to the right. Before uses
+        History, After and Saved use BadgeCheck, and Removed uses Trash2. Dates
+        omit the year. Intake routes appear inside their actual MedicationCard
+        rail with a dot and matching form/category glyphs rather than as a loose
+        caption outside the card. Check-ins, goals and timezone changes use
+        compact visual summaries; journal prose stays out of previews.
+        Non-graphic notices show up to four facts, or one context paragraph when
+        there are no facts. The playground above constructs both sides from
+        invented records and its Undo only updates local React state; it never
+        calls the journal API.
       </p>
 
       <Heading id="expanded-tools" level={3}>
@@ -681,23 +684,29 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         supplied.
       </p>
       <p>
-        Expanded content uses inset separators with clear space on either side.
-        A four-layer footer wash starts with the longest, strongest dark
-        Fuchsia900 fade at 62%, then shorter Fuchsia600 at 12%, Pink400 at 6%
-        and Pink300 at 4%. The longest wash reaches 210px or 70% of the card,
-        whichever is smaller. All paint stays behind the live tools and text,
-        never changing their hit targets. Below the brief footer context, a
-        still quieter snapshot note includes relevant inline links to the live
-        record. This distinguishes an immutable before/after preview from the
-        entry someone can reopen and edit now.
+        Expanded content uses inset separators: the first divider has 4px of
+        space above and 20px below, and the footer divider has 20px above and
+        below. Preview rows have a 16px gap. A four-layer footer wash reaches
+        250px or 74% of the card, whichever is smaller. Its longest, strongest
+        dark Fuchsia900 base fades from 70% alpha to 36% halfway up, then to
+        zero at the full height. Fuchsia600 starts at 18% and ends at 70% of
+        that height; Pink400 starts at 10% and ends at 45%; Pink300 starts at 7%
+        and ends at 28%. All paint stays behind the live tools and text, never
+        changing their hit targets. Below the brief footer context, an 8.5px
+        note at 39% ink alpha explains that snapshots may differ from later
+        edits. It names relevant destinations from the notice’s existing links
+        and offers a Daily Log link, without awkwardly turning action labels
+        into prose. Notices without a preview also receive a quiet Daily Log
+        note; it does not invent a saved result or comparison.
       </p>
       <p>
         While a mounted, visible notification has expanded idle details and is
         either frontmost or in the native fanned stack, one fixed, aria-hidden
         sibling behind the toaster softly blurs the page by 4px and adds
-        Mauve900 at 31% alpha. A scoped body :has selector checks the inner
-        details state as well as the host’s front/fanned state; revealing a
-        stack alone never opens this veil. It sits at z-index 999999998 below
+        Mauve900 at 31% alpha. A :has selector scoped to the owning notification
+        wrapper checks the inner details state as well as the host’s
+        front/fanned state; revealing a stack alone never opens this veil, and
+        another toaster cannot open it. It sits at z-index 999999998 below
         Sonner, fades over 220ms and never accumulates for multiple open
         notices. Folded rear, removed or exiting cards cannot leave it active.
         It has no pointer events, focus trap, scroll lock or modal semantics;
@@ -1002,11 +1011,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and unchanged 41.65px front tile. Rear plates shrink exactly 20% to 38.8733px, centered at 5.0633px, with proportionally scaled 11.4333px corners and 1.1433px inward strokes. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones, giving the rotating artwork 3px more breathing room without enlarging it.",
+            "49px illustration rail and unchanged 41.65px front tile. Rear plates are 25% larger than the preceding 80%-scale design: 41.65 × 7/6 × 0.8 × 1.25 = 48.5917px, centered at 0.2042px before their individual offsets. Their proportional corners are 14.2917px and inward strokes are 1.4292px; each plate uses 0.61 opacity. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones, giving the rotating artwork 3px more breathing room without enlarging the front tile.",
           ],
           [
             "Main text / context",
-            "14px, weight 650 heading beside an 18px status badge with 10px, weight 600 text and a 9.5px icon; 8px heading gap and 6px between heading and message.",
+            "14px, weight 650 heading beside an 18px status badge with 10px, weight 600 text and a 9.5px icon. The 3px dot has a 10px gap to the heading and another 10px to the badge; heading and message have 6px between them.",
           ],
           [
             "Short secondary copy",
@@ -1014,7 +1023,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Expanded details",
-            "Both modes use 88% ink alpha for longer reading.",
+            "General detail context uses 88% ink alpha in both modes. A generated change summary uses full primary ink at 13px, weight 700, immediately after the top divider. The preview grid has 16px gaps; three-column captions keep History/Before, BadgeCheck/After or Saved, and Trash2/Removed independently centered above their original shared cards, with yearless dates or status at the right.",
           ],
           [
             "Inward frame",
@@ -1026,7 +1035,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last-seconds marker",
-            "19×14px, left11px/top−7px, 9px tabular secondary ink; no pointer events, layout growth or accessible countdown chatter. Hidden for infinite notices; its tiny glass base uses the existing Fuchsia surface.",
+            "25×25px circle, left 11px/top −12px, with 10px, weight 650 tabular ink at 66% alpha. No pointer events, layout growth or accessible countdown chatter. Hidden for infinite notices; its glass base uses the existing Fuchsia surface at 76% of that surface’s alpha, with a 12px backdrop blur.",
           ],
           [
             "Header / unavailable Undo",
@@ -1034,7 +1043,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Expanded backdrop / footer",
-            "One pointer-free viewport veil: Mauve900 at 31%, 4px blur, 220ms fade. Footer divider uses 10% ink and stops 13px short of the card edges. Tools are centered with 12px gaps; the 9px footer uses 50% ink. No page lock or root-canvas change.",
+            "One pointer-free viewport veil per owning wrapper: Mauve900 at 31%, 4px blur, 220ms fade. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools are centered with 12px gaps; the 9px brief footer uses 50% ink, followed by an 8.5px note at 39% ink with contextual destination links and Daily Log. The bottom wash is min(250px, 74%): Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height. No page lock, fabricated result or root-canvas change.",
           ],
           [
             "Artwork / bell",

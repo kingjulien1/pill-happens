@@ -593,7 +593,7 @@
   content: "";
   display: block;
   height: 1px;
-  margin-bottom: 15px;
+  margin: 4px 0 20px;
   background: color-mix(in srgb, var(--toast-ink) 15%, transparent);
 }
 .journal-notification-details-inner::after {
@@ -677,9 +677,10 @@
 .journal-notification-footer {
   display: grid;
   justify-items: center;
-  gap: 10px;
+  gap: 11px;
   min-width: 0;
-  padding: 15px 4px 0;
+  margin-top: 5px;
+  padding: 20px 4px 2px;
   border-top: 1px solid color-mix(in srgb, var(--toast-ink) 10%, transparent);
 }
 .journal-notification-footer:empty {
@@ -720,13 +721,13 @@
   position: absolute;
   z-index: 0;
   inset: auto 0 0;
-  height: min(210px, 70%);
+  height: min(250px, 74%);
   border-radius: 0 0 18px 18px;
   background:
-    linear-gradient(to top, #f9a8d40b, #f9a8d400 30%),
-    linear-gradient(to top, #f472b610, #f472b600 44%),
-    linear-gradient(to top, #c026d31f, #c026d30b 35%, #c026d300 68%),
-    linear-gradient(to top, #701a759e, #701a7545 45%, #701a7500);
+    linear-gradient(to top, #f9a8d412, #f9a8d400 28%),
+    linear-gradient(to top, #f472b61a, #f472b600 45%),
+    linear-gradient(to top, #c026d32e, #c026d30f 36%, #c026d300 70%),
+    linear-gradient(to top, #701a75b3, #701a755c 50%, #701a7500);
   opacity: 0;
   transition: opacity 280ms ease;
   pointer-events: none;
