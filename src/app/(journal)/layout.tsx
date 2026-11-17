@@ -17,7 +17,7 @@ export default async function JournalLayout({
     .update(`pill-workspace-v1:${journalId}`)
     .digest("hex");
   return (
-    <JournalProvider>
+    <JournalProvider key={scope} notificationScope={scope}>
       <JournalDraftProvider key={scope} scope={scope}>
         <PageRefreshProvider>
           <AppShell>{children}</AppShell>

@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 import type { Action, ExternalToast } from "sonner";
 import { ToastSymbol, useNotificationStack } from "@/components/ui/sonner";
+import { NotificationCountdownBadge } from "@/components/ui/notification-countdown-badge";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
 import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
@@ -54,14 +56,20 @@ export type JournalNotificationUndo = {
   pendingLabel?: string;
   successLabel?: string;
   onUndo: () => Promise<void> | void;
+  /** Original server expiry; stored only in the current journal namespace. */
+  receipt?: { token: string; expiresAt: string };
 };
 
 export type JournalNotificationProps = {
   id: NotificationId;
+  nativeHostId?: string;
   kind: JournalToastKind;
   heading: ReactNode;
   message: ReactNode;
   duration: number;
+  readingClock?: NotificationClock;
+  onCheckpoint?: () => void;
+  onUndoPending?: (pending: boolean) => void;
   details?: JournalNotificationDetails;
   undo?: JournalNotificationUndo;
   variant?: "intake-saved";
@@ -134,10 +142,14 @@ function isAction(value: ExternalToast["action"]): value is Action {
 /** Content owns reading and exit choreography; the native Sonner li owns stacking/swipes. */
 export function JournalNotification({
   id,
+  nativeHostId,
   kind,
   heading,
   message,
   duration,
+  readingClock: suppliedClock,
+  onCheckpoint,
+  onUndoPending,
   details,
   undo,
   variant,
@@ -155,9 +167,21 @@ export function JournalNotification({
 }: JournalNotificationProps) {
   const root = useRef<HTMLDivElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
-  const lastSeconds = useRef<HTMLSpanElement>(null);
-  const secondsFlare = useRef<HTMLSpanElement>(null);
-  const secondsValue = useRef<HTMLSpanElement>(null);
+  const [initialReading] = useState(() =>
+    (suppliedClock ?? new NotificationClock(duration)).snapshot(),
+  );
+  const [counter, setCounter] = useState<{
+    seconds: number | null;
+    paused: boolean;
+    hidden: boolean;
+  }>({
+    seconds:
+      !initialReading.complete && initialReading.timeUntilComplete <= 3_000
+        ? Math.max(1, Math.ceil(initialReading.timeUntilComplete / 1_000))
+        : null,
+    paused: true,
+    hidden: true,
+  });
   const clock = useRef<NotificationClock | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const alive = useRef(false);
@@ -185,6 +209,14 @@ export function JournalNotification({
   const messageId = useId();
   const stack = useNotificationStack();
   const needsStackReveal = stack.count > 1 && !stack.expanded;
+
+  useLayoutEffect(() => {
+    // StrictMode can retire a native host before its custom child ever mounts.
+    // Fence that late child before paint as well as hiding already-mounted ones.
+    if (isCurrent() || !root.current) return;
+    root.current.style.visibility = "hidden";
+    root.current.inert = true;
+  }, [isCurrent]);
 
   const pause = useCallback((reason: string, value: boolean) => {
     if (value) pauseReasons.current.add(reason);
@@ -274,7 +306,7 @@ export function JournalNotification({
     const element = root.current;
     const outer = element?.closest<HTMLElement>("[data-sonner-toast]");
     if (!element) return;
-    const readingClock = new NotificationClock(duration);
+    const readingClock = suppliedClock ?? new NotificationClock(duration);
     clock.current = readingClock;
     for (const reason of pauseReasons.current) readingClock.pause(reason, true);
     const setPause = (reason: string, value: boolean) => {
@@ -316,10 +348,6 @@ export function JournalNotification({
     window.addEventListener("pointercancel", releasePointer);
     window.addEventListener("blur", clearPointers);
     syncNative();
-    let markerShown = false;
-    let markerFinished = false;
-    let previousSecond: number | null = null;
-    let markerAnimations: Animation[] = [];
     let pulseAnimations: CSSAnimation[] = [];
     const tick = () => {
       const snapshot = readingClock.snapshot();
@@ -363,77 +391,26 @@ export function JournalNotification({
         animation.updatePlaybackRate(
           1 + snapshot.pulseUrgency * (1400 / 450 - 1),
         );
-      if (
-        !markerShown &&
-        snapshot.timeUntilComplete <= 3_000 &&
-        !snapshot.complete
-      ) {
-        markerShown = true;
-        if (lastSeconds.current) lastSeconds.current.dataset.state = "enter";
-      }
-      if (markerShown && !snapshot.complete && secondsValue.current) {
-        const second = Math.max(
-          1,
-          Math.ceil(snapshot.timeUntilComplete / 1_000),
-        );
-        if (second !== previousSecond) {
-          secondsValue.current.textContent = String(second);
-          for (const animation of markerAnimations) animation.cancel();
-          markerAnimations = [];
-          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            markerAnimations.push(
-              secondsValue.current.animate(
-                [
-                  {
-                    opacity: 0,
-                    transform: "translateY(7px) rotate(-28deg) scale(.35)",
-                  },
-                  {
-                    opacity: 1,
-                    transform: "translateY(-2px) rotate(9deg) scale(1.7)",
-                    offset: 0.38,
-                  },
-                  {
-                    opacity: 1,
-                    transform: "translateY(1px) rotate(-4deg) scale(.87)",
-                    offset: 0.68,
-                  },
-                  { opacity: 1, transform: "none" },
-                ],
-                { duration: 590, easing: "cubic-bezier(.16,1,.3,1)" },
-              ),
-            );
-            if (secondsFlare.current)
-              markerAnimations.push(
-                secondsFlare.current.animate(
-                  [
-                    { opacity: 0, transform: "scale(.65) rotate(-35deg)" },
-                    {
-                      opacity: 0.8,
-                      transform: "scale(1.08) rotate(0deg)",
-                      offset: 0.25,
-                    },
-                    { opacity: 0, transform: "scale(2.15) rotate(45deg)" },
-                  ],
-                  { duration: 720, easing: "cubic-bezier(.22,1,.36,1)" },
-                ),
-              );
-          }
-          previousSecond = second;
-        }
-      }
-      for (const animation of markerAnimations) {
-        if (snapshot.paused && animation.playState === "running")
-          animation.pause();
-        else if (!snapshot.paused && animation.playState === "paused")
-          animation.play();
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-          animation.cancel();
-      }
-      if (markerShown && snapshot.complete && !markerFinished) {
-        markerFinished = true;
-        if (lastSeconds.current) lastSeconds.current.dataset.state = "exit";
-      }
+      element.dataset.progressPhase = snapshot.complete
+        ? "complete"
+        : snapshot.timeUntilComplete <= 3_000
+          ? "final"
+          : snapshot.progress > 0.6
+            ? "start"
+            : "middle";
+      const seconds =
+        !snapshot.complete && snapshot.timeUntilComplete <= 3_000
+          ? Math.max(1, Math.ceil(snapshot.timeUntilComplete / 1_000))
+          : null;
+      const hidden = element.dataset.motionPaused === "true";
+      setCounter((previous) =>
+        previous.seconds === seconds &&
+        previous.paused === snapshot.paused &&
+        previous.hidden === hidden
+          ? previous
+          : { seconds, paused: snapshot.paused, hidden },
+      );
+      onCheckpoint?.();
       if (progress.current)
         progress.current.style.inlineSize = `${snapshot.progress * 100}%`;
       if (snapshot.expired && !leaving.current && isCurrent()) {
@@ -451,12 +428,19 @@ export function JournalNotification({
       window.removeEventListener("pointercancel", releasePointer);
       window.removeEventListener("blur", clearPointers);
       clearInterval(interval);
-      for (const animation of markerAnimations) animation.cancel();
       for (const timer of timers.current) clearTimeout(timer);
       timers.current = [];
       clock.current = null;
     };
-  }, [duration, isCurrent, onRequestDismiss, releasePointer, clearPointers]);
+  }, [
+    duration,
+    suppliedClock,
+    onCheckpoint,
+    isCurrent,
+    onRequestDismiss,
+    releasePointer,
+    clearPointers,
+  ]);
 
   useEffect(() => {
     const clear = () => {
@@ -540,6 +524,7 @@ export function JournalNotification({
         .querySelector<HTMLButtonElement>(".journal-notification-summary")
         ?.focus({ preventScroll: true });
     setUndoState("pending");
+    onUndoPending?.(true);
     try {
       await settleNotificationUndo({
         undo: undo.onUndo,
@@ -557,6 +542,7 @@ export function JournalNotification({
         },
         onFailure: (error) => {
           setUndoState("ready");
+          onUndoPending?.(false);
           setUndoError(
             error instanceof Error
               ? error.message
@@ -695,6 +681,7 @@ export function JournalNotification({
       ref={root}
       className="journal-notification"
       data-notification-id={id}
+      data-notification-host-id={nativeHostId}
       data-kind={kind}
       data-variant={variant}
       data-expanded={expanded}
@@ -703,7 +690,9 @@ export function JournalNotification({
       data-paused="true"
       data-motion-paused="true"
       data-timer-mode={Number.isFinite(duration) ? "countdown" : "indefinite"}
-      style={{ "--notification-remaining": 1 } as CSSProperties}
+      style={
+        { "--notification-remaining": initialReading.progress } as CSSProperties
+      }
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") pause("hover", true);
       }}
@@ -770,25 +759,16 @@ export function JournalNotification({
           <span
             ref={progress}
             className="journal-notification-countdown-bar"
-            style={{ inlineSize: "100%" }}
+            style={{ inlineSize: `${initialReading.progress * 100}%` }}
           />
           <span className="journal-notification-countdown-sheen" />
         </div>
       </div>
-      <span
-        ref={lastSeconds}
-        className="journal-notification-last-seconds"
-        data-state="hidden"
-        aria-hidden="true"
-      >
-        <span
-          ref={secondsFlare}
-          className="journal-notification-seconds-flare"
-        />
-        <span ref={secondsValue} className="journal-notification-seconds-value">
-          3
-        </span>
-      </span>
+      <NotificationCountdownBadge
+        seconds={counter.seconds}
+        paused={counter.paused}
+        hidden={counter.hidden}
+      />
       <span className="journal-notification-urgency-glow" aria-hidden="true" />
       <span className="journal-notification-footer-fade" aria-hidden="true" />
       <div className="journal-notification-header">

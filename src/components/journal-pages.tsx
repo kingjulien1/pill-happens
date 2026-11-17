@@ -173,6 +173,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       const saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE");
       store.clearDraft(`intake:edit:${intake.id}`);
       toast.success("Entry removed from your daily log.", {
+        journalScope: saved.notificationScope,
         heading: "Intake removed",
         details: {
           ...(beforePreview ? { preview: { before: beforePreview } } : {}),
@@ -191,7 +192,13 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
           footer: "Your other entries and medication settings are unchanged.",
         },
         ...(saved.undo
-          ? { undo: { label: "Restore Entry", onUndo: saved.undo } }
+          ? {
+              undo: {
+                label: "Restore Entry",
+                onUndo: saved.undo,
+                receipt: saved.receipt,
+              },
+            }
           : {}),
       });
       close();
@@ -601,6 +608,7 @@ export function MedicationsPage() {
           ? "Medication restored."
           : "Medication archived. Past entries are saved.",
         {
+          journalScope: saved.notificationScope,
           heading: "Medication library",
           details: {
             ...(updatedMedication
@@ -632,7 +640,13 @@ export function MedicationsPage() {
             footer: "Undo returns this medication to its previous status.",
           },
           ...(saved.undo
-            ? { undo: { label: "Undo Status Change", onUndo: saved.undo } }
+            ? {
+                undo: {
+                  label: "Undo Status Change",
+                  onUndo: saved.undo,
+                  receipt: saved.receipt,
+                },
+              }
             : {}),
         },
       );
@@ -842,6 +856,7 @@ export function GoalsPage() {
       const saved = await mutate(`goals/${deleting}`, undefined, "DELETE");
       setDeleting(null);
       toast.success("Goal removed. Your entries stay saved.", {
+        journalScope: saved.notificationScope,
         heading: "Goal removed",
         details: {
           ...(beforePreview ? { preview: { before: beforePreview } } : {}),
@@ -864,7 +879,13 @@ export function GoalsPage() {
             "Undo restores the removed goal with its original date range.",
         },
         ...(saved.undo
-          ? { undo: { label: "Restore Goal", onUndo: saved.undo } }
+          ? {
+              undo: {
+                label: "Restore Goal",
+                onUndo: saved.undo,
+                receipt: saved.receipt,
+              },
+            }
           : {}),
       });
     } catch {
@@ -1078,6 +1099,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           );
           draft.clearDraft();
           toast.success("Timezone updated for your journal.", {
+            journalScope: saved.notificationScope,
             heading: "Journal settings",
             details: {
               preview: {
@@ -1100,7 +1122,13 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
               footer: "Undo restores the timezone used before this change.",
             },
             ...(saved.undo
-              ? { undo: { label: "Undo Timezone", onUndo: saved.undo } }
+              ? {
+                  undo: {
+                    label: "Undo Timezone",
+                    onUndo: saved.undo,
+                    receipt: saved.receipt,
+                  },
+                }
               : {}),
           });
           onSaved();
@@ -1166,7 +1194,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
 }
 
 function JournalPreferences() {
-  const { signOut, busy } = useJournal();
+  const { signOut, busy, notificationScope } = useJournal();
   const { dialog, openDialog, closeDialog } = useJournalWorkspace();
   const open = dialog?.kind === "preferences";
   const [saving, setSaving] = useState(false);
@@ -1176,6 +1204,7 @@ function JournalPreferences() {
       await signOut();
     } catch {
       toast.error("Unable to sign out. Please try again.", {
+        journalScope: notificationScope,
         heading: "Sign-out unsuccessful",
       });
     } finally {

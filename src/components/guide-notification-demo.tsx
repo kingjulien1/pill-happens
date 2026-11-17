@@ -100,6 +100,7 @@ export function GuideNotificationDemo() {
 
   function show(kind: JournalToastKind) {
     toast[kind](summaries[kind], {
+      persistence: false,
       id: own(kind),
       heading: `Demo ${kind}`,
       ...(kind === "update" ? { duration: Infinity } : {}),
@@ -132,6 +133,7 @@ export function GuideNotificationDemo() {
     const pending = timers.current.get(id);
     if (pending) clearTimeout(pending);
     toast.loading("A local timer is standing in for a request.", {
+      persistence: false,
       id,
       heading: "Demo request",
       details: {
@@ -153,6 +155,7 @@ export function GuideNotificationDemo() {
             : "The pretend request has finished.",
           {
             id,
+            persistence: false,
             heading: fail ? "Demo request failed" : "Demo request finished",
             details: {
               paragraphs: [
@@ -183,6 +186,7 @@ export function GuideNotificationDemo() {
       `Example changed from ${beforeQuantity} to ${afterQuantity} tablet`,
     );
     toast.success("An invented intake edit, with a local Undo.", {
+      persistence: false,
       id: own("undo"),
       heading: "Demo intake updated",
       details: {

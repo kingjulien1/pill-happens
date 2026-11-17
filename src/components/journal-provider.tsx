@@ -8,7 +8,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { toast } from "@/components/ui/journal-toast";
+import {
+  bindJournalNotifications,
+  clearJournalNotifications,
+  toast,
+} from "@/components/ui/journal-toast";
 import type { AppData } from "@/lib/domain";
 import { probeSession, recoverSession } from "@/lib/session-recovery";
 import { checkInForDay } from "@/lib/daily-check-in";
@@ -21,13 +25,18 @@ import {
 } from "@/lib/reflection-save";
 
 export type JournalMutationResult = {
+  /** Fence notices from async results to the journal that started the request. */
+  notificationScope: string;
   data: AppData;
   entityId?: string;
+  /** Sensitive, journal-scoped receipt; its original server expiry is retained. */
+  receipt?: { token: string; expiresAt: string };
   /** A short-lived, server-checked reversal of this exact successful change. */
   undo?: () => Promise<void>;
 };
 
 type JournalContext = {
+  notificationScope: string;
   data: AppData | null;
   now: Date | null;
   error: string | null;
@@ -45,7 +54,13 @@ type JournalContext = {
 };
 const Context = createContext<JournalContext | null>(null);
 
-export function JournalProvider({ children }: { children: React.ReactNode }) {
+export function JournalProvider({
+  children,
+  notificationScope,
+}: {
+  children: React.ReactNode;
+  notificationScope: string;
+}) {
   const [data, setData] = useState<AppData | null>(null);
   const [now, setNow] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +78,18 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
   } | null>(null);
   const heartbeat = useRef<AbortController | null>(null);
   const mutationRecovery = useRef<AbortController | null>(null);
+  const notificationBinding = useRef<(() => void) | null>(null);
+
+  const unbindNotifications = useCallback(() => {
+    const unbind = notificationBinding.current;
+    notificationBinding.current = null;
+    unbind?.();
+  }, []);
+  const clearNotifications = useCallback(() => {
+    // Finish any pending checkpoint before deleting this journal's queue.
+    unbindNotifications();
+    clearJournalNotifications(notificationScope);
+  }, [notificationScope, unbindNotifications]);
 
   const refresh = useCallback(() => {
     if (signingOut.current) return Promise.resolve();
@@ -88,6 +115,7 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
           if (controller.signal.aborted || signingOut.current) return;
           if (session === "unauthenticated") {
             if (!pending.current && startedAtRevision === revision.current) {
+              clearNotifications();
               setData(null);
               window.location.replace("/login");
             }
@@ -122,7 +150,7 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
     })();
     refreshRequest.current = { controller, promise };
     return promise;
-  }, []);
+  }, [clearNotifications]);
 
   useEffect(() => {
     const update = () => setNow(new Date());
@@ -191,98 +219,123 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
     };
   }, [refresh]);
 
-  const mutate = async (
-    path: string,
-    body?: unknown,
-    method = "POST",
-    reportError = true,
-  ): Promise<JournalMutationResult> => {
-    if (
-      manualPending.current ||
-      (pending.current && !reflectionRequest.current) ||
-      signingOut.current
-    )
-      throw new Error("Please wait for your last change to save.");
-    manualPending.current = true;
-    setBusy(true);
-    try {
-      // Foreground saves never race a background response or lose the user's next click.
-      await reflectionRequest.current?.catch(() => {});
-      pending.current = true;
-      revision.current += 1;
-      const res = await fetch(`/api/${path}`, {
-        method,
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: body === undefined ? undefined : JSON.stringify(body),
-      });
-      const result = await res.json();
-      if (res.status === 401) {
-        const controller = new AbortController();
-        mutationRecovery.current = controller;
-        let session;
-        try {
-          session = await recoverSession({ signal: controller.signal });
-        } finally {
-          if (mutationRecovery.current === controller)
-            mutationRecovery.current = null;
-        }
-        if (session === "unauthenticated") {
-          setData(null);
-          window.location.replace("/login");
-          throw new Error("Please sign in again.");
-        }
-        // Never replay a save automatically, even after restoring its session.
-        throw new Error(
-          session === "authenticated"
-            ? "Your sign-in is restored. Please save your entry again."
-            : "We couldn't confirm your sign-in. Check your connection and try again.",
-        );
-      }
-      if (!res.ok)
-        throw new Error(result.error || "Your change couldn't be saved.");
-      const { _undo: receipt, ...nextData } = result;
-      setData(nextData);
-      // New intake timestamps can be later than the last minute tick.
-      setNow(new Date());
-      setError(null);
-      return {
-        data: nextData as AppData,
-        ...(typeof receipt?.entityId === "string"
-          ? { entityId: receipt.entityId }
-          : {}),
-        ...(typeof receipt?.token === "string"
-          ? {
-              undo: async () => {
-                // Errors stay in the expanded notification; never retry a write.
-                await mutate("undo", { token: receipt.token }, "POST", false);
-              },
-            }
-          : {}),
-      };
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Your change couldn't be saved. Please try again.";
-      if (reportError)
-        toast.error(message, {
-          heading: "Journal change unsuccessful",
-          details: {
-            paragraphs: [
-              "The server could not confirm this change. Any open form keeps its draft so you can review the inputs and try again.",
-              "Check your connection and sign-in before saving again. A failed request is never replayed automatically.",
-            ],
-            links: [{ label: "Open Daily Log", href: "/" }],
-          },
+  const mutate = useCallback(
+    async function mutate(
+      path: string,
+      body?: unknown,
+      method = "POST",
+      reportError = true,
+    ): Promise<JournalMutationResult> {
+      if (
+        manualPending.current ||
+        (pending.current && !reflectionRequest.current) ||
+        signingOut.current
+      )
+        throw new Error("Please wait for your last change to save.");
+      manualPending.current = true;
+      setBusy(true);
+      try {
+        // Foreground saves never race a background response or lose the user's next click.
+        await reflectionRequest.current?.catch(() => {});
+        pending.current = true;
+        revision.current += 1;
+        const res = await fetch(`/api/${path}`, {
+          method,
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: body === undefined ? undefined : JSON.stringify(body),
         });
-      throw err;
-    } finally {
-      pending.current = false;
-      manualPending.current = false;
-      setBusy(false);
-    }
-  };
+        const result = await res.json();
+        if (res.status === 401) {
+          const controller = new AbortController();
+          mutationRecovery.current = controller;
+          let session;
+          try {
+            session = await recoverSession({ signal: controller.signal });
+          } finally {
+            if (mutationRecovery.current === controller)
+              mutationRecovery.current = null;
+          }
+          if (session === "unauthenticated") {
+            clearNotifications();
+            setData(null);
+            window.location.replace("/login");
+            throw new Error("Please sign in again.");
+          }
+          // Never replay a save automatically, even after restoring its session.
+          throw new Error(
+            session === "authenticated"
+              ? "Your sign-in is restored. Please save your entry again."
+              : "We couldn't confirm your sign-in. Check your connection and try again.",
+          );
+        }
+        if (!res.ok)
+          throw new Error(result.error || "Your change couldn't be saved.");
+        const { _undo: receipt, ...nextData } = result;
+        setData(nextData);
+        // New intake timestamps can be later than the last minute tick.
+        setNow(new Date());
+        setError(null);
+        return {
+          notificationScope,
+          data: nextData as AppData,
+          ...(typeof receipt?.token === "string" &&
+          typeof receipt?.expiresAt === "string"
+            ? {
+                receipt: { token: receipt.token, expiresAt: receipt.expiresAt },
+              }
+            : {}),
+          ...(typeof receipt?.entityId === "string"
+            ? { entityId: receipt.entityId }
+            : {}),
+          ...(typeof receipt?.token === "string"
+            ? {
+                undo: async () => {
+                  // Errors stay in the expanded notification; never retry a write.
+                  await mutate("undo", { token: receipt.token }, "POST", false);
+                },
+              }
+            : {}),
+        };
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Your change couldn't be saved. Please try again.";
+        if (reportError)
+          toast.error(message, {
+            journalScope: notificationScope,
+            heading: "Journal change unsuccessful",
+            details: {
+              paragraphs: [
+                "The server could not confirm this change. Any open form keeps its draft so you can review the inputs and try again.",
+                "Check your connection and sign-in before saving again. A failed request is never replayed automatically.",
+              ],
+              links: [{ label: "Open Daily Log", href: "/" }],
+            },
+          });
+        throw err;
+      } finally {
+        pending.current = false;
+        manualPending.current = false;
+        setBusy(false);
+      }
+    },
+    [clearNotifications, notificationScope],
+  );
+
+  useEffect(() => {
+    unbindNotifications();
+    notificationBinding.current = bindJournalNotifications(
+      notificationScope,
+      async (token) => {
+        // Reuse the current provider's state updates, session checks and quiet
+        // errors. Restoring a notice never automatically replays this write.
+        await mutate("undo", { token }, "POST", false);
+      },
+    );
+    return unbindNotifications;
+  }, [notificationScope, mutate, unbindNotifications]);
 
   const saveReflection = useCallback(
     (input: ReflectionSaveInput): Promise<ReflectionSaveAcknowledgement> => {
@@ -396,6 +449,7 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Unable to sign out.");
+      clearNotifications();
       setData(null);
       window.location.replace("/login");
     } catch (error) {
@@ -407,6 +461,7 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
   return (
     <Context.Provider
       value={{
+        notificationScope,
         data,
         now,
         error,

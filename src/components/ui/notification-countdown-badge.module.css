@@ -1,0 +1,69 @@
+.badge {
+  /* Every former 25px badge measure is scaled by the same 1.225 ratio. */
+  --countdown-badge-size: 30.625px;
+  position: absolute;
+  z-index: 4;
+  top: calc(var(--countdown-badge-size) / -2);
+  left: 13.475px;
+  display: inline-grid;
+  width: var(--countdown-badge-size);
+  height: var(--countdown-badge-size);
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(rgb(252 206 232 / 0.08) 0 0), #351325;
+  color: var(--color-pink-200, #fccee8);
+  box-shadow:
+    inset 0 0 0 0.735px rgb(252 206 232 / 0.7),
+    0 2.45px 7.35px -2.45px rgb(53 19 37 / 0.55),
+    0 0 11.025px -3.675px rgb(249 168 212 / 0.36);
+  -webkit-backdrop-filter: blur(14.7px);
+  backdrop-filter: blur(14.7px);
+  font-size: 12.25px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0.01225em;
+  opacity: 1;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.badge[data-state="hidden"],
+.badge[data-hidden="true"] {
+  visibility: hidden;
+}
+
+.badge[data-state="hidden"] {
+  opacity: 0;
+}
+
+.value,
+.outgoing {
+  grid-area: 1 / 1;
+  display: inline-block;
+  transform-origin: center;
+}
+
+.outgoing {
+  opacity: 0;
+}
+
+.flare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1.47px rgb(252 206 232 / 0.65),
+    0 0 11.025px rgb(249 168 212 / 0.32);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .badge {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

@@ -343,7 +343,7 @@ export function Toaster({
             top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))",
           }}
           mobileOffset={{
-            top: "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
+            top: "max(18px, calc(env(safe-area-inset-top, 0px) + 12px))",
             left: 16,
             right: 16,
           }}

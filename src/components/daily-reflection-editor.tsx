@@ -109,7 +109,12 @@ export function DailyReflectionEditor({
   const refreshToast = useRef<string | number | null>(null);
   const refreshReset = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(false);
-  const { refresh, error: journalError, busy } = useJournal();
+  const {
+    refresh,
+    error: journalError,
+    busy,
+    notificationScope,
+  } = useJournal();
   const stats = useMemo(() => reflectionStats(value), [value]);
   const hasWriting = Boolean(value.trim());
   const refreshLocked =
@@ -174,6 +179,7 @@ export function DailyReflectionEditor({
     refreshToast.current = null;
     if (refreshError)
       toast.error("Couldn't refresh your journal. Your writing is unchanged.", {
+        journalScope: notificationScope,
         id: toastId,
         heading: "Refresh unsuccessful",
         details: {
@@ -189,6 +195,7 @@ export function DailyReflectionEditor({
       toast.success(
         "Journal refreshed. Your writing is right where you left it.",
         {
+          journalScope: notificationScope,
           id: toastId,
           heading: "Journal refreshed",
           details: {
@@ -204,7 +211,7 @@ export function DailyReflectionEditor({
           },
         },
       );
-  }, [refreshFinished, refreshError]);
+  }, [refreshFinished, refreshError, notificationScope]);
 
   const refreshJournal = async () => {
     if (refreshLocked || refreshPending.current) return;
@@ -214,6 +221,8 @@ export function DailyReflectionEditor({
     setRefreshFinished(false);
     setRefreshFailed(false);
     refreshToast.current = toast.loading("Refreshing your journal…", {
+      journalScope: notificationScope,
+      persistence: false,
       heading: "Checking for updates",
       details: {
         paragraphs: [

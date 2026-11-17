@@ -116,6 +116,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
       announced = waiting;
       updateToastVisible = true;
       toast.update("Reload when you’ve finished your current entry.", {
+        persistence: false,
         heading: "App update ready",
         id: "pwa-update",
         duration: Infinity,

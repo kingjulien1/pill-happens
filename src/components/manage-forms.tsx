@@ -297,6 +297,7 @@ export function MedicationForm({
       );
       draft.clearDraft();
       toast.success(medication ? "Medication updated." : "Medication added.", {
+        journalScope: saved.notificationScope,
         heading: "Medication library",
         details: {
           ...(savedMedication
@@ -341,6 +342,7 @@ export function MedicationForm({
               undo: {
                 label: medication ? "Undo Edit" : "Undo Addition",
                 onUndo: saved.undo,
+                receipt: saved.receipt,
               },
             }
           : {}),
@@ -603,6 +605,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       );
       draft.clearDraft();
       toast.success("Your goal has been saved.", {
+        journalScope: saved.notificationScope,
         heading: "Daily goal",
         details: {
           ...(savedGoal
@@ -634,7 +637,13 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           footer: "Undo removes only this newly saved goal.",
         },
         ...(saved.undo
-          ? { undo: { label: "Undo Goal", onUndo: saved.undo } }
+          ? {
+              undo: {
+                label: "Undo Goal",
+                onUndo: saved.undo,
+                receipt: saved.receipt,
+              },
+            }
           : {}),
       });
       onSaved();

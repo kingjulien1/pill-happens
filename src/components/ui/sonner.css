@@ -92,7 +92,8 @@
         env(safe-area-inset-bottom, 0px) + 8px
       )
   );
-  padding: 10px;
+  /* Leave room for the last-seconds badge, centered on the card top edge. */
+  padding: 18px 10px 10px;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
@@ -961,7 +962,8 @@
   top: 10px;
   right: 16px;
   left: 16px;
-  height: 4px;
+  /* Four pixels increased by the midpoint of one third and one half. */
+  height: calc(4px * 17 / 12);
   border-radius: 999px;
   transform-origin: left center;
   pointer-events: none;
@@ -1008,7 +1010,9 @@
     var(--countdown-rose) calc(var(--notification-urgency, 0) * 100%),
     var(--toast-accent)
   );
+  position: relative;
   display: block;
+  overflow: hidden;
   inline-size: calc(var(--notification-remaining, 1) * 100%);
   height: 100%;
   border-radius: inherit;
@@ -1021,6 +1025,33 @@
   box-shadow: 0 0 8px
     color-mix(in srgb, var(--countdown-center) 45%, transparent);
   transition: inline-size 60ms linear;
+}
+/* The middle phase carries one quiet thread inside the remaining segment.
+   The final phase lets the existing clock-driven rose pulse own the emphasis. */
+.journal-notification-countdown-bar::before {
+  position: absolute;
+  inset: 0 auto 0 -32%;
+  width: 28%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--toast-bright) 48%, transparent),
+    transparent
+  );
+  opacity: 0;
+  content: "";
+  pointer-events: none;
+}
+.journal-notification-countdown-bar::after {
+  position: absolute;
+  inset: 1px 1px 1px auto;
+  width: min(12px, 55%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--toast-bright));
+  opacity: calc(0.18 + var(--notification-urgency, 0) * 0.36);
+  content: "";
+  pointer-events: none;
 }
 .journal-notification-countdown-sheen {
   position: absolute;
@@ -1057,48 +1088,6 @@
       color-mix(in srgb, var(--color-rose-500, #f43f5e) 32%, transparent);
   opacity: 0;
   pointer-events: none;
-}
-.journal-notification-last-seconds {
-  position: absolute;
-  z-index: 4;
-  top: -12px;
-  left: 11px;
-  display: inline-flex;
-  width: 25px;
-  height: 25px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--toast-fuchsia-surface) 76%, transparent);
-  color: color-mix(in srgb, var(--toast-ink) 66%, transparent);
-  box-shadow: inset 0 0 0 0.6px
-    color-mix(in srgb, var(--toast-soft) 18%, transparent);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  font-size: 10px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  transform-origin: center;
-  pointer-events: none;
-}
-.journal-notification-last-seconds[data-state="hidden"] {
-  visibility: hidden;
-  opacity: 0;
-}
-.journal-notification-seconds-value {
-  display: inline-block;
-}
-.journal-notification-seconds-flare {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow:
-    inset 0 0 0 1.2px var(--toast-soft),
-    0 0 9px color-mix(in srgb, var(--toast-accent) 38%, transparent);
-  opacity: 0;
 }
 .journal-notification[data-timer-mode="indefinite"]
   :is(
@@ -1232,19 +1221,20 @@
       var(--notification-pulse-duration, 1400ms) ease-in-out infinite;
     animation-play-state: var(--notification-motion-play-state, running);
   }
+  .journal-notification[data-progress-phase="middle"]
+    .journal-notification-countdown-bar::before {
+    animation: journal-notification-countdown-drift 5200ms
+      cubic-bezier(0.45, 0, 0.25, 1) infinite;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-notification[data-progress-phase="final"]
+    .journal-notification-countdown-bar::after {
+    box-shadow: 0 0 6px
+      color-mix(in srgb, var(--countdown-rose) 40%, transparent);
+  }
   .journal-notification-urgency-glow {
     animation: journal-notification-card-breathe
       var(--notification-pulse-duration, 1400ms) ease-in-out infinite;
-    animation-play-state: var(--notification-motion-play-state, running);
-  }
-  .journal-notification-last-seconds[data-state="enter"] {
-    animation: journal-notification-seconds-arrive 520ms
-      cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-play-state: var(--notification-motion-play-state, running);
-  }
-  .journal-notification-last-seconds[data-state="exit"] {
-    animation: journal-notification-seconds-depart 200ms
-      cubic-bezier(0.55, 0, 0.8, 0.35) both;
     animation-play-state: var(--notification-motion-play-state, running);
   }
   .journal-notification[data-paused="true"]
@@ -1253,6 +1243,17 @@
       .journal-notification-urgency-glow,
       .journal-notification-last-seconds
     ) {
+    animation-play-state: paused;
+  }
+  .journal-notification[data-paused="true"]
+    :is(
+      .journal-notification-countdown-arrival,
+      .journal-notification-countdown-sheen
+    ),
+  .journal-notification[data-paused="true"]
+    .journal-notification-countdown-arrival::before,
+  .journal-notification[data-paused="true"]
+    .journal-notification-countdown-bar::before {
     animation-play-state: paused;
   }
   .journal-notification:not([data-phase="idle"])
@@ -1484,6 +1485,21 @@
     transform: translateX(650%);
   }
 }
+@keyframes journal-notification-countdown-drift {
+  0%,
+  26% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  42% {
+    opacity: 0.22;
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: translateX(480%);
+  }
+}
 @keyframes journal-notification-countdown-pulse {
   0%,
   100% {
@@ -1502,37 +1518,6 @@
   }
   50% {
     opacity: calc(var(--notification-card-urgency, 0) * 0.36);
-  }
-}
-@keyframes journal-notification-seconds-arrive {
-  0% {
-    opacity: 0;
-    transform: translate(-9px, 10px) rotate(-140deg) scale(0.08);
-  }
-  62% {
-    opacity: 1;
-    transform: translate(1px, -3px) rotate(12deg) scale(1.24);
-  }
-  82% {
-    transform: translateY(1px) rotate(-5deg) scale(0.91);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes journal-notification-seconds-depart {
-  0% {
-    opacity: 1;
-    transform: none;
-  }
-  28% {
-    opacity: 0.8;
-    transform: translateY(-0.7px) rotate(-38deg) scale(0.92);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-2px) rotate(-320deg) scale(0.04);
   }
 }
 @keyframes journal-notification-card-arrive {
@@ -2025,10 +2010,6 @@
 @media (prefers-reduced-motion: reduce) {
   .journal-notification-backdrop {
     transition: none;
-  }
-  .journal-notification-last-seconds[data-state="exit"] {
-    visibility: hidden;
-    opacity: 0;
   }
   .journal-notification-urgency-glow {
     opacity: 0;

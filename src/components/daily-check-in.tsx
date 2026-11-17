@@ -521,8 +521,11 @@ function CheckInForm({
             ? "Your morning, saved."
             : "Your day, saved.",
         {
+          journalScope: result.notificationScope,
           heading: `${period === "morning" ? "Morning" : "Evening"} check-in`,
-          undo: result.undo ? { onUndo: result.undo } : undefined,
+          undo: result.undo
+            ? { onUndo: result.undo, receipt: result.receipt }
+            : undefined,
           details: {
             ...(savedCheckIn
               ? {

@@ -235,6 +235,7 @@ export function IntakeForm({
           ? "Your entry is updated and back in place."
           : "Intake saved. A little more awareness, nicely logged.",
         {
+          journalScope: saved.notificationScope,
           heading: intake ? "Intake updated" : "Intake saved",
           ...(!intake ? { variant: "intake-saved" as const } : {}),
           details: {
@@ -289,6 +290,7 @@ export function IntakeForm({
                 undo: {
                   label: intake ? "Undo Edit" : "Undo Intake",
                   onUndo: saved.undo,
+                  receipt: saved.receipt,
                 },
               }
             : {}),

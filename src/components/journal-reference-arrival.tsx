@@ -29,7 +29,7 @@ export function JournalReferenceArrival() {
   const path = usePathname();
   const params = useSearchParams();
   const router = useRouter();
-  const { data, now } = useJournal();
+  const { data, now, notificationScope } = useJournal();
   const { ready, dialog, closeDialog, openDialog } = useJournalWorkspace();
   const entryReady = useSyncExternalStore(
     subscribePageEntryReadiness,
@@ -97,6 +97,7 @@ export function JournalReferenceArrival() {
       processed.current = visit;
       if (status.current) status.current.textContent = message;
       toast.info(message, {
+        journalScope: notificationScope,
         heading: intake
           ? "Linked intake"
           : medication
@@ -268,6 +269,7 @@ export function JournalReferenceArrival() {
     };
   }, [
     data,
+    notificationScope,
     ready,
     entryReady,
     intake,
