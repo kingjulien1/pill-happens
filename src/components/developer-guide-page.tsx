@@ -1748,29 +1748,43 @@ export function DeveloperGuidePage() {
                 shrinks. Rear frames begin with 20% exposure of their own
                 smaller widths, then compress only those exposed edges into the
                 remaining 4px of rail. This bounds the fan without scaling its
-                main artwork. Cards keep an 80px baseline; a quantity caption
-                adds only the in-flow room it needs, preserving both text rows
-                and their reserved clearances.
+                main artwork. Cards keep an 80px baseline; only an unusually
+                long quantity adds headroom above the artwork, preserving both
+                text rows and their reserved clearances.
               </p>
               <p>
                 Decorative artwork stops at three frames, independently of the
                 recorded amount. MedicationQuantityBadge now displays the total
-                as × n in primary ink beneath the artwork, without a badge
+                as × n in primary ink at the artwork’s top-left, without a badge
                 background: 2.5 units reads × 2.5, not +1.5. Its 10px caption
                 uses the stored number directly; long legacy values wrap
                 instead of shrinking to 7px, rounding or being ellipsized.
-                A separate tooltip uses that same exact number. The artwork
-                stays 48px within the fixed 56px rail, and its settle response
-                remains centered on the artwork rather than the caption.
+                A separate tooltip uses that same exact number. Ordinary labels
+                sit at top 1px/left 0 within the 56px rail, clear of the pill’s
+                glyph. Labels longer than nine characters get an in-flow strip
+                above the 48px artwork; the settle response follows the glyph’s
+                center rather than the enlarged rail.
                 Non-unit positive fractions are also represented; an ordinary
                 quantity of one needs no extra label, and invalid/nonpositive
                 values omit it. The old top-left form overlay moves into the
-                heading rail. The front artwork keeps a thick, quieter 3.5px
-                inward glass rim and a second 1px saturated family-400/500 rim
-                at 78% opacity, separated by a small gap. These borders do not
+                heading rail. Actual intake artwork uses a 6px inward glass rim
+                at 28% combined alpha (20% selected color plus 8% primary ink),
+                with 96px standard/Safari backdrop blur. Its opaque face is
+                clipped to a 6px-padded content box to expose the glass ring.
+                The 1px saturated family-400/500 inner rim stays at 78%, inset
+                6.75px with a 9.25px radius and a 0.75px gap. Other artwork
+                retains its 3.5px outer frame. These borders do not
                 enlarge the 48px tile. One inner entrance owner animates the
                 whole fan, while the quantity label enters separately and
                 grouped disclosure never remounts its frames.
+              </p>
+              <p>
+                The recorded-intake heading rail keeps a dot at the left,
+                followed by route, physical form and categories. Its 2px gaps
+                bring the icons closer, with 6px clearance after the dot.
+                Every glyph uses a 13px viewport, primary ink, no fill and a
+                2.5px stroke, including custom route SVGs. The bounded rail
+                remains horizontally scrollable, preserving the name’s space.
               </p>
               <p>
                 Card artwork uses a brief spin, full-size rebound and restrained

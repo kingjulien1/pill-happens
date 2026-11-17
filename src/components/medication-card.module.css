@@ -10,6 +10,31 @@
   direction: ltr;
 }
 
+.card:global([data-intake-card]) .rail:global(.intake-card-tags) {
+  gap: 2px;
+}
+
+.card:global([data-intake-card]) .railDot {
+  margin-inline-end: 4px;
+}
+
+/* Recorded route, physical form and category marks share one outline weight. */
+.card:global([data-intake-card]) .rail:global(.intake-card-tags) svg {
+  width: 13px;
+  height: 13px;
+  color: var(--card-foreground) !important;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+}
+
+.card:global([data-intake-card])
+  .rail:global(.intake-card-tags)
+  svg
+  [stroke-width] {
+  stroke-width: 2.5;
+}
+
 .card .rail :global(.intake-card-indicator) {
   margin-inline-start: 0;
   background: none !important;

@@ -106,7 +106,12 @@ export function MedicationQuantityBadge({
       data-intake-quantity={quantity}
       data-has-indicators={hasIndicators}
     >
-      <span className={styles.quantityLabel}>{label}</span>
+      <span
+        className={styles.quantityLabel}
+        data-long={label.length > 9 || undefined}
+      >
+        {label}
+      </span>
     </span>
   );
 }
