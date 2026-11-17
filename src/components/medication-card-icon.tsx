@@ -16,7 +16,6 @@ import {
   type MedicationType,
 } from "@/lib/medication-types";
 import { cn } from "@/lib/utils";
-import { formatDose } from "@/lib/domain";
 import styles from "./medication-card-icon.module.css";
 
 type MedicationArtworkProps = {
@@ -97,22 +96,17 @@ export function MedicationQuantityBadge({
 }) {
   if (!Number.isFinite(quantity) || quantity <= 0 || quantity === 1)
     return null;
-  const formatted = formatDose(quantity);
-  const label = `× ${formatted === "0" ? String(quantity) : formatted}`;
+  const amount = String(quantity);
+  const label = `×\u00a0${amount}`;
   return (
     <span
       className={styles.quantityBadge}
       aria-hidden="true"
-      title={`${formatDose(quantity)} total units`}
+      title={`${amount} total units`}
       data-intake-quantity={quantity}
       data-has-indicators={hasIndicators}
     >
-      <span
-        className={styles.quantityLabel}
-        data-long={label.length > 7 || undefined}
-      >
-        {label}
-      </span>
+      <span className={styles.quantityLabel}>{label}</span>
     </span>
   );
 }

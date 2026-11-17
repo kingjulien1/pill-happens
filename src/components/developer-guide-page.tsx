@@ -1748,14 +1748,20 @@ export function DeveloperGuidePage() {
                 shrinks. Rear frames begin with 20% exposure of their own
                 smaller widths, then compress only those exposed edges into the
                 remaining 4px of rail. This bounds the fan without scaling its
-                main artwork or moving badge anchors. Card height stays 80px;
-                text keeps both single-line rows and their reserved clearances.
+                main artwork. Cards keep an 80px baseline; a quantity caption
+                adds only the in-flow room it needs, preserving both text rows
+                and their reserved clearances.
               </p>
               <p>
                 Decorative artwork stops at three frames, independently of the
                 recorded amount. MedicationQuantityBadge now displays the total
-                as × n in primary ink at the artwork’s top-left, without a
-                colored badge container: 2.5 units reads × 2.5, not +1.5.
+                as × n in primary ink beneath the artwork, without a badge
+                background: 2.5 units reads × 2.5, not +1.5. Its 10px caption
+                uses the stored number directly; long legacy values wrap
+                instead of shrinking to 7px, rounding or being ellipsized.
+                A separate tooltip uses that same exact number. The artwork
+                stays 48px within the fixed 56px rail, and its settle response
+                remains centered on the artwork rather than the caption.
                 Non-unit positive fractions are also represented; an ordinary
                 quantity of one needs no extra label, and invalid/nonpositive
                 values omit it. The old top-left form overlay moves into the

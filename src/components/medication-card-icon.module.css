@@ -5,6 +5,24 @@
   width: var(--icon-stack-rail-width, 56px);
 }
 
+/* A plain, in-flow caption never covers or spins with the medication artwork.
+   Longer saved amounts can wrap at a readable size instead of being clipped. */
+.stack:has(.quantityBadge) {
+  height: auto;
+  min-height: 56px;
+  flex-direction: column;
+  row-gap: 2px;
+}
+
+.stack:has(.quantityBadge) > .motion {
+  height: 48px;
+  flex: 0 0 48px;
+}
+
+.stack:has(.quantityBadge) > :global([data-card-icon-response]) {
+  top: 24px;
+}
+
 .motion {
   position: relative;
   z-index: 1;
@@ -40,8 +58,7 @@
    category icon plus its 4px rail padding. Keep the small form badge on that
    centre line, with 40% outside the front mark's left edge.
    Its frame stays full size while rear exposure compresses inside the rail. */
-.formBadge,
-.quantityBadge {
+.formBadge {
   --form-badge-size: 16px;
   position: absolute;
   z-index: 6;
@@ -61,45 +78,41 @@
   pointer-events: none;
 }
 
-.formBadge[data-has-indicators="true"],
-.quantityBadge[data-has-indicators="true"] {
+.formBadge[data-has-indicators="true"] {
   --form-badge-row-height: 24px;
 }
 
-/* The total occupies the old form anchor, independent of the rotating artwork. */
+/* Quantity is typography, with no badge face, border or inset overlay. */
 .quantityBadge {
-  left: calc(var(--icon-front-left, 4px) - 3px);
-  width: max-content;
+  position: relative;
+  z-index: 6;
+  display: flex;
+  width: 100%;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--card-foreground);
+  line-height: 10px;
+  pointer-events: none;
 }
 
 .quantityLabel {
-  position: absolute;
-  left: 0;
-  top: 50%;
   display: block;
-  width: max-content;
-  min-width: var(--form-badge-size);
-  max-width: calc(48px - var(--form-badge-size) * 0.2 - 2px);
-  height: 12px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0;
-  overflow: hidden;
-  border-radius: 0;
   background: none;
   color: var(--card-foreground);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
-  line-height: 12px;
+  line-height: 10px;
   text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transform: translateY(-50%);
-}
-
-.quantityLabel[data-long="true"] {
-  padding-inline: 1.5px;
-  font-size: 7px;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .formBadge > .formGlyph {
@@ -221,13 +234,11 @@
 }
 
 @media (min-width: 768px) {
-  .formBadge,
-  .quantityBadge {
+  .formBadge {
     --form-badge-size: 17.6px;
   }
 
-  .formBadge[data-has-indicators="true"],
-  .quantityBadge[data-has-indicators="true"] {
+  .formBadge[data-has-indicators="true"] {
     --form-badge-row-height: 26px;
   }
 
