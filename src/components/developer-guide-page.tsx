@@ -2832,13 +2832,20 @@ export function DeveloperGuidePage() {
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
-                  flowing page background. A shared 4px neutral frame and a 2px
-                  identity band at 50% opacity paint entirely inward. Filled
-                  coffee and crescent artwork distinguish the periods; their
-                  colors, entry motion, ambient loops and progress replay stay
-                  independent of this plain card face. Section dots retain the
-                  deeper Plum pigment. Details and icon stages remain 56px, the
-                  tile 48px and symbol holder 30px, with 11px artwork-to-copy
+                  flowing page background with a Pink400 identity. A shared 4px
+                  neutral frame and a 2px identity band at 50% opacity paint
+                  entirely inward. Filled coffee and crescent artwork
+                  distinguish the periods; their
+                  base and completion-meter surfaces share an opaque, very dark
+                  Pink/Plum mix (88% #210F25 with 12% Pink950). Both main symbols
+                  and the completion number use the primary light ink on those
+                  dark surfaces in either appearance; page headings retain their
+                  adaptive reading color. The Pink identity and artwork
+                  overrides are local to these cards, leaving medication and
+                  topbar colors independent. Steam, stars, entry motion, ambient loops and
+                  progress replay keep their existing timing. Section dots use
+                  Pink500. Details and icon stages remain 56px, the tile 48px
+                  and symbol holder 30px, with 11px artwork-to-copy
                   clearance (7px below 360px) and 8px trailing inset.
                   SavedCheckInHeading now separates opening history from save
                   history. Its primary HH:mm is the first recorded opening on
@@ -2859,18 +2866,17 @@ export function DeveloperGuidePage() {
                   response excerpt or claims that a local edit has been saved.
                   Both content rows remain single-line and truncate before the
                   completion meter. The meter uses a 40px ring with rounded
-                  whole number centered alone in 9.208333px/625 type at 94%
-                  opacity, using the primary foreground and a single-line
-                  height. There is no percent sign, caption or separate outside
-                  percentage. The background measures 40px across: the original
-                  17px radius plus one third of the former 9px increase gives a
+                  whole number centered alone in 9.208333px/625 type at full
+                  primary-ink opacity and a single-line height. There is no
+                  percent sign, caption or separate outside percentage. This remains a 29.1667% reduction from its 13px
+                  reference size, applied once. The background measures 40px
+                  across: the original 17px radius plus one third of the former 9px increase gives a
                   20px radius. The right component now uses{" "}
                   <code>align-self: center</code> with zero top margin, placing
                   that footprint 20px below the 80px card’s top edge; the
-                  heading retains its 15px inset. The Lilac/Fuchsia arc follows
-                  a quiet foreground track. Section dots use the shared deepest
-                  Plum pigment, at 50% opacity while unfinished and 100% when
-                  complete. This single number replaces the old center
+                  heading retains its 15px inset. The Pink100–400 arc follows a
+                  quiet foreground track. Section dots use Pink500 pigment,
+                  at 50% opacity while unfinished and 100% when complete. This single number replaces the old center
                   spark/check. The meter is always present. With no saved
                   record, no genuine draft change and no valid first-opening
                   observation, the entire meter uses exactly opacity: calc(1 /
