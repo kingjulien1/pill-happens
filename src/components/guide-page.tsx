@@ -588,12 +588,12 @@ export function GuidePage() {
             </GuideDetail>
             <GuideDetail title="Archive &amp; Restore" icon="archive">
               <p>
-                Tap anywhere on a medication card to open its editor. Archive
-                Medication is below the form when you no longer want it offered
-                for new intakes; its earlier records stay in the journal. Use
-                the Active/Archive toggle to find archived items, open their
-                card, and choose Restore Medication whenever you need them
-                again.
+                Tap anywhere on a medication card to open its editor. Choose
+                Archive Medication when you no longer want it offered for new
+                intakes; its earlier records stay in the journal. Use
+                the Archived group below your active medications to find them,
+                open their card, and choose Restore Medication whenever you
+                need them again. The counts above the list show both statuses.
               </p>
             </GuideDetail>
           </div>

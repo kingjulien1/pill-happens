@@ -1236,14 +1236,20 @@ export function DeveloperGuidePage() {
                 do not receive the additional copied line.
               </p>
               <p>
-                The Medications opening uses a compact 25px title on phones,
-                22px below 360px, and 32px from 640px. Its 44px/48px artwork
+                The Medications opening uses a compact 24px title on phones,
+                21px below 360px, and 32px from 640px. Its 44px/48px artwork
                 stage and saved-count summary align on the same centered row.
-                Below it, the library heading states the displayed medication
-                count. Small active and archived counts act as unobtrusive list
-                filters; they replace the old Active heading and separate toggle
-                without removing archive access. The notice that edits update
-                all past logs uses a 37%-opacity card surface.
+                Below it, the 14px/500 library heading states the total
+                medication count, opposite a centered, noninteractive summary
+                of active and archived counts. There is no Active button or
+                saved archive-view filter: all definitions remain visible,
+                active first and usage-ranked within each status. A compact
+                Archived divider identifies the later group; its cards remain
+                editable and can be restored from the usual editor. Explicit
+                medication and ingredient journal references keep their own
+                query filtering. The notice that edits update all past logs
+                uses an explicit 37%-opacity card surface without dimming its
+                icon or text.
               </p>
               <p>
                 After page-entry readiness, the artwork tile grows and fades
