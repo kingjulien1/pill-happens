@@ -33,8 +33,7 @@
   );
 }
 
-/* A quiet selected-color tint keeps identity on the artwork; the opaque face
-   still masks folded content below it. */
+/* Library and history surfaces retain their opaque, paired reading base. */
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-medication-library-card],
@@ -75,6 +74,51 @@
       var(--background) 88%,
       var(--palette-lilac)
     );
+  }
+}
+
+/* Intake glass owns the blur and both alpha washes on one clipped pane.
+   Background images paint front-to-back: medication tint, pink, then glass. */
+.card:global(.intake-log-card)[data-intake-card] {
+  --entry-edge-color: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --card-foreground: var(--canvas-foreground);
+  --entry-surface-base: color-mix(in srgb, var(--entry-color) 6%, transparent);
+  --entry-glass-pink: color-mix(
+    in srgb,
+    var(--color-pink-200, #fccee8) 8%,
+    transparent
+  );
+}
+
+.card:global(.intake-log-card)[data-intake-card] :global(.intake-card-glass) {
+  background:
+    linear-gradient(var(--entry-surface-base) 0 0),
+    linear-gradient(var(--entry-glass-pink) 0 0), transparent;
+  -webkit-backdrop-filter: blur(96px);
+  backdrop-filter: blur(96px);
+}
+
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .card:global(.intake-log-card)[data-intake-card] {
+    --card-foreground: var(--foreground);
+  }
+
+  .card:global(.intake-log-card)[data-intake-card] :global(.intake-card-glass) {
+    background-color: var(--entry-intake-base);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .card:global(.intake-log-card)[data-intake-card] {
+    --card-foreground: var(--foreground);
+  }
+
+  .card:global(.intake-log-card)[data-intake-card] :global(.intake-card-glass) {
+    background-color: var(--entry-intake-base);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 

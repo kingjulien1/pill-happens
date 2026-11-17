@@ -54,7 +54,7 @@
 }
 /* The original shared frame, two rows, quantity artwork and dose own this card.
    Its semantic base keeps library copy readable over the notification surface. */
-.medication:global(.medication-card-base) {
+.medication:global(.medication-card-base):not([data-intake-card]) {
   background: var(--background);
 }
 .panel {

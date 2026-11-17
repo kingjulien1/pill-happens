@@ -1205,14 +1205,16 @@ export function DeveloperGuidePage() {
               context="Intake Cards"
             >
               <p>
-                Actual intake cards composite their selected medication color
-                at 8% over a fully opaque foundation. Light mode keeps
-                <code> --background</code>; dark mode lifts that base with 12%
-                canonical Lilac and 88% background for a softer Plum face.
-                This single medication-color tint preserves the saved swatch
-                without introducing a second pink base layer. Text and artwork
-                keep their own full opacity. Folded cards cannot show through
-                the opaque face above them.
+                Actual intake cards use one clipped glass pane with 96px
+                standard/Safari backdrop blur. An 8% Pink200 wash sits above
+                the glass, followed by a faint 6% selected-medication tint.
+                There is no opaque foundation in the normal glass treatment;
+                canvas-paired ink keeps the text clear in both appearances.
+                Folded rear copy remains hidden by its existing stack state.
+                Reduced transparency and browsers without backdrop filtering
+                use the paired opaque reading base beneath the same washes.
+                Medication-library and Past Days cards retain their established
+                reading surfaces and share the frame geometry.
               </p>
               <p>
                 Actual intake cards use a 5⅓px inward outer band, one third
