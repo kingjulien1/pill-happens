@@ -59,7 +59,11 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
       entry.value === "svg:color:levomethasan";
     assert.equal(
       getSvgIconAssetUrl(entry),
-      revisedLevomethasan ? `${entry.src}?v=facets-2` : entry.src,
+      revisedLevomethasan
+        ? `${entry.src}?v=facets-2`
+        : entry.value === "svg:viagra" || entry.value === "svg:color:viagra"
+          ? `${entry.src}?v=imprint-2`
+          : entry.src,
       `${entry.value}: runtime URL revisions must preserve canonical paths and IDs`,
     );
     assert.ok(entry.label.length > 0);
