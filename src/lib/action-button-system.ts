@@ -38,6 +38,8 @@ export const MAIN_ACTION_PINK = {
   base: "#29131f",
   outerTint: "#f9a8d4",
   outerTintOpacity: 0.28,
+  outerEdge:
+    "color-mix(in srgb, var(--color-pink-300, #f9a8d4) 28%, transparent)",
   innerEdge:
     "color-mix(in srgb, var(--color-pink-600, #e60076) 74%, transparent)",
   secondary: "var(--color-pink-200, #fccee8)",
@@ -301,10 +303,10 @@ export const BUTTON_SYSTEM = {
       "The main Log Intake action and the single strongest next step on a page.",
     avoidFor:
       "Repeating beside every row, dismissing a dialog, or destructive actions.",
-    height: 62,
+    height: ACTION_BUTTON_SHAPE_REFERENCE.height,
     fontSize: 15,
     padding: 19,
-    radius: 22,
+    radius: ACTION_BUTTON_SHAPE_REFERENCE.radius,
     themes: INTAKE_ACTION_PAINT,
   },
   secondary: {
@@ -424,6 +426,7 @@ export function getButtonThemeStyle(
   if (theme) result.colorScheme = theme;
   Object.assign(result, INTAKE_ACTION_SUPPORTING_PAINT, {
     "--daily-action-face": MAIN_ACTION_PINK.base,
+    "--daily-action-outer-edge": MAIN_ACTION_PINK.outerEdge,
     "--daily-action-inner-edge": MAIN_ACTION_PINK.innerEdge,
     "--daily-action-secondary-ink": MAIN_ACTION_PINK.secondary,
     "--action-rim-tint": MAIN_ACTION_PINK.outerTint,

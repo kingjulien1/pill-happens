@@ -1112,13 +1112,19 @@ export function DeveloperGuidePage() {
                 Their explicit intake appearance uses an opaque dark-pink face,
                 #29131f, in both modes. MAIN_ACTION_PINK centralizes the finish:
                 Pink600 at 74% alpha for the crisp 2px inner band, Pink200 for
-                secondary icons/text, and a 28% Pink300 admixture in the moving
-                rim colors. The outer rim remains 5.5px at 30% alpha, separated
-                from the inner band by a 1px face-colored gap. GPU and CSS
+                secondary icons/text, and a 28% Pink300 wash on the thick outer
+                rim. The moving rim remains 5.5px at 30% alpha over that wash;
+                its precomputed color stops also include the Pink300 admixture.
+                A 0.25px face-colored gap separates it from the inner band,
+                keeping more of the dark face visible. A 1.5px fine outer edge
+                at half the wash opacity matches the intake cards’ visible
+                frame without shrinking the hit target. GPU and CSS
                 fallback consume the same geometry and precomputed hex stops;
                 only one renderer paints after successful initialization. Soft
                 exterior glow does not change the hit target or measured
-                footprint.
+                footprint. Bare PrimaryButton also starts from the same 80px
+                height and 21px corners; dialog submissions retain their own
+                compact geometry.
               </p>
               <p>
                 MedicationActionButton composes the same PrimaryButton

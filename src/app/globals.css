@@ -2779,19 +2779,20 @@
 .header-refresh-button.header-icon-button:disabled {
   cursor: default;
 }
-/* Main actions share one face, Purple edge and translucent secondary ink. */
+/* Main actions share a dark pink face, Pink600 edge and Pink200 support ink. */
 :root {
-  --daily-action-face: color-mix(
+  --daily-action-face: #29131f;
+  --daily-action-outer-edge: color-mix(
     in srgb,
-    var(--color-purple-950, #3c0366) 40%,
-    var(--background)
-  );
-  --daily-action-inner-edge: var(--color-purple-700, #8200db);
-  --daily-action-secondary-ink: color-mix(
-    in srgb,
-    var(--color-purple-500, #ad46ff) 75%,
+    var(--color-pink-300, #f9a8d4) 28%,
     transparent
   );
+  --daily-action-inner-edge: color-mix(
+    in srgb,
+    var(--color-pink-600, #e60076) 74%,
+    transparent
+  );
+  --daily-action-secondary-ink: var(--color-pink-200, #fccee8);
 }
 /* Header controls and the critical loader share one layered paint contract.
    Keep the old multi-gradient cup surface on its own 31% layer, rather than
@@ -3325,9 +3326,11 @@ input[type="time"] {
   width: 23px;
   height: 23px;
 }
-.intake-action-shell .intake-primary-cta[data-slot="button"] {
-  height: 74px;
-  min-height: 74px;
+.intake-primary-cta[data-slot="button"] {
+  /* Match the cards' visible frame as well as their measured 80px footprint. */
+  --action-inner-gap: 0.25px;
+  --action-frame-fine-width: 1.5px;
+  border-radius: var(--intake-card-radius);
 }
 .intake-primary-cta .intake-primary-aside {
   color: var(--daily-action-secondary-ink);

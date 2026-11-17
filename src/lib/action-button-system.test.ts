@@ -113,7 +113,7 @@ test("every filled-action kind shares Today’s complete paint without changing 
     "--brand-surface": MAIN_ACTION_PINK.base,
     "--brand-copy": "#f9a8d4",
   });
-  assert.equal(BUTTON_SYSTEM.primary.height, 62);
+  assert.equal(BUTTON_SYSTEM.primary.height, 80);
   assert.equal(BUTTON_SYSTEM.secondary.height, 48);
   assert.deepEqual(BUTTON_SYSTEM, before);
 });

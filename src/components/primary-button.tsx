@@ -3,6 +3,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  BUTTON_SYSTEM,
   getButtonThemeStyle,
   type ActionButtonTheme,
 } from "@/lib/action-button-system";
@@ -39,7 +40,7 @@ export function LayeredActionButton({
   const rimWidth = Number.isFinite(rimThickness)
     ? Math.max(0.5, rimThickness)
     : 3;
-  const corner = radius ?? (kind === "primary" ? 22 : 16);
+  const corner = radius ?? BUTTON_SYSTEM[kind].radius;
   const baseStyle = {
     ...getButtonThemeStyle(kind, theme, surface === "accent" ? "accent" : kind),
     borderRadius: corner,

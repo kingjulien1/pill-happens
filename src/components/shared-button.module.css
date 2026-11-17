@@ -7,6 +7,11 @@
 /* Only explicit main actions use the daily intake face, moving rim and glow. */
 .button[data-slot="button"][data-button-system="daily"] {
   --daily-action-face: #29131f;
+  --daily-action-outer-edge: color-mix(
+    in srgb,
+    var(--color-pink-300, #f9a8d4) 28%,
+    transparent
+  );
   --daily-action-inner-edge: color-mix(
     in srgb,
     var(--color-pink-600, #e60076) 74%,
@@ -17,6 +22,12 @@
   --button-copy: #fdf1f7;
   --button-face: var(--daily-action-face, #29131f);
   --button-edge: var(--daily-action-inner-edge, #e60076bd);
+  --button-outer-edge: var(--daily-action-outer-edge);
+  --button-fine-edge: color-mix(
+    in srgb,
+    var(--button-outer-edge) 50%,
+    transparent
+  );
   --button-quiet-edge: color-mix(in srgb, var(--button-edge) 60%, transparent);
   --button-contact-shadow: color-mix(
     in srgb,
@@ -44,8 +55,13 @@
   background: var(--button-face);
   color: var(--button-copy);
   box-shadow:
-    inset 0 0 0 calc(var(--action-rim-thickness) + 1px) var(--button-face),
-    inset 0 0 0 calc(var(--action-rim-thickness) + 3px) var(--button-edge),
+    inset 0 0 0 var(--action-rim-thickness) var(--button-outer-edge),
+    inset 0 0 0 calc(var(--action-rim-thickness) + var(--action-inner-gap, 1px))
+      var(--button-face),
+    inset 0 0 0
+      calc(var(--action-rim-thickness) + var(--action-inner-gap, 1px) + 2px)
+      var(--button-edge),
+    0 0 0 var(--action-frame-fine-width, 0px) var(--button-fine-edge),
     0 0 20px rgb(249 168 212 / 17%),
     0 0 42px rgb(216 180 254 / 12%),
     0 10px 42px rgb(240 171 252 / 16%),
