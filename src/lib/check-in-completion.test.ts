@@ -27,29 +27,28 @@ function saved(overrides: Partial<DailyCheckIn> = {}): DailyCheckIn {
   };
 }
 
-test("no saved check-in leaves all six optional sections open by default", () => {
+test("no saved check-in leaves all five visible optional sections open by default", () => {
   const result = getCheckInCompletion();
   assert.deepEqual(result.sections, [
     { id: "mood", label: "Mood", complete: false },
     { id: "energy", label: "Energy", complete: false },
     { id: "stress", label: "Stress", complete: false },
-    { id: "sleep", label: "Sleep", complete: false },
     { id: "notes", label: "Notes", complete: false },
     { id: "helped", label: "What Helped", complete: false },
   ]);
   assert.equal(result.completedCount, 0);
-  assert.equal(result.totalCount, 6);
+  assert.equal(result.totalCount, 5);
   assert.equal(result.complete, false);
   assert.deepEqual(result.missing, result.sections);
   assert.equal(result.missing[0], result.sections[0]);
   assert.equal(getCheckInCompletion(undefined, allSections).completedCount, 0);
 });
 
-test("zero sleep is a saved response while null remains missing", () => {
+test("legacy sleep stays queryable without counting toward the visible Evening sections", () => {
   const partial = getCheckInCompletion(
     saved({ moods: ["okay"], sleepHours: 0 }),
   );
-  assert.equal(partial.completedCount, 2);
+  assert.equal(partial.completedCount, 1);
   assert.deepEqual(
     partial.missing.map(({ id }) => id),
     ["energy", "stress", "notes", "helped"],
@@ -117,7 +116,7 @@ test("only valid whole ratings and known moods complete their sections", () => {
   );
 });
 
-test("the default needs all six responses while an explicit core-three override stays supported", () => {
+test("the default needs all five visible responses while an explicit core-three override stays supported", () => {
   const checkIn = saved({ moods: ["okay"], sleepHours: 0, note: "---" });
   const core = getCheckInCompletion(checkIn, ["mood", "sleep", "notes"]);
   assert.equal(core.complete, true);
@@ -126,8 +125,8 @@ test("the default needs all six responses while an explicit core-three override 
   assert.deepEqual(core.missing, []);
   const all = getCheckInCompletion(checkIn);
   assert.equal(all.complete, false);
-  assert.equal(all.completedCount, 3);
-  assert.equal(all.totalCount, 6);
+  assert.equal(all.completedCount, 2);
+  assert.equal(all.totalCount, 5);
   assert.deepEqual(
     all.missing.map(({ id }) => id),
     ["energy", "stress", "helped"],
@@ -175,7 +174,7 @@ test("completion never mutates the saved response or tracked section list", () =
   assert.deepEqual(tracked, allSections);
 });
 
-test("Morning has five independent groups without changing the six Evening defaults", () => {
+test("Morning has five independent groups alongside the five visible Evening sections", () => {
   const morning = getMorningCheckInCompletion();
   assert.deepEqual(
     morning.sections.map(({ id }) => id),
@@ -189,7 +188,7 @@ test("Morning has five independent groups without changing the six Evening defau
   );
   assert.equal(morning.totalCount, 5);
   assert.equal(morning.completedCount, 0);
-  assert.equal(getCheckInCompletion().totalCount, 6);
+  assert.equal(getCheckInCompletion().totalCount, 5);
   for (const { id } of MORNING_CHECK_IN_SECTIONS)
     assert.equal(isCheckInSection(id), true);
 });
@@ -223,7 +222,7 @@ test("Morning groups require their full saved answers, with explicit zeros count
   assert.equal(getMorningCheckInCompletion(all).completedCount, 5);
   assert.equal(
     getCheckInCompletion(all).totalCount,
-    6,
+    5,
     "Evening helper retains its own catalog even for a Morning record",
   );
   const missingExtra = {
@@ -334,10 +333,7 @@ test("both card periods format progress as sections complete and keep Saved afte
         : getCheckInCompletion(saved({ note: "Words" }));
     const base = { period, saved: true, hasChanges: false, deviceSaved: true };
     const partial = getCheckInCardFeedback({ ...base, completion });
-    assert.equal(
-      partial.preview,
-      `1 of ${period === "morning" ? 5 : 6} sections complete · All optional`,
-    );
+    assert.equal(partial.preview, "1 of 5 sections complete · All optional");
     assert.match(partial.description, /Still to finish:/);
     const finished = getCheckInCardFeedback({
       ...base,

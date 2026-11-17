@@ -16,7 +16,7 @@
   transition: opacity 220ms ease;
 }
 /* One visual-only viewport veil; native Sonner stack expansion is unrelated. */
-body:has(
+[data-notification-stack-expanded]:has(
     .journal-toaster
       [data-sonner-toast][data-mounted="true"][data-visible="true"]:is(
         [data-front="true"],
@@ -24,7 +24,7 @@ body:has(
       ):not([data-removed="true"])
       .journal-notification[data-expanded="true"][data-phase="idle"]
   )
-  .journal-notification-backdrop {
+  > .journal-notification-backdrop {
   opacity: 1;
 }
 .journal-toaster[data-sonner-toaster] {
@@ -73,6 +73,64 @@ body:has(
 }
 .journal-toaster[data-sonner-toaster][data-sonner-theme="dark"] {
   --toast-shadow: #100b2199;
+}
+
+/* Keep Sonner's mounted nodes, but let an explicitly opened fan flow naturally.
+   Internal detail panels can grow without relying on native cached offsets. */
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster] {
+  --notification-viewport-top: var(--offset-top);
+  --notification-viewport-bottom: var(--offset-bottom);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  width: calc(var(--width) + 20px);
+  height: auto;
+  max-height: calc(
+    100dvh - var(--notification-viewport-top) -
+      max(
+        var(--notification-viewport-bottom),
+        env(safe-area-inset-bottom, 0px) + 8px
+      )
+  );
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--toast-soft) 35%, transparent)
+    transparent;
+}
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster]
+  > [data-sonner-toast][data-mounted][data-styled] {
+  --y: translateY(0px);
+  position: relative;
+  inset: auto;
+  flex: none;
+  width: 100%;
+  height: auto;
+  touch-action: pan-y;
+}
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster]
+  > [data-sonner-toast][data-mounted][data-styled][data-removed="true"][data-swipe-out="false"] {
+  --y: translateY(-12px);
+}
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster][data-x-position="center"] {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster]
+  .journal-notification-details-inner {
+  max-height: none;
+  overflow: visible;
+  overscroll-behavior: auto;
+}
+@media (max-width: 600px) {
+  .journal-toaster.journal-toaster-scroll[data-sonner-toaster] {
+    --notification-viewport-top: var(--mobile-offset-top);
+    --notification-viewport-bottom: var(--mobile-offset-bottom);
+  }
 }
 .journal-toaster :is([data-type="success"], [data-kind="success"]) {
   --toast-accent: #fda5d5;
@@ -219,7 +277,21 @@ body:has(
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1px 8px;
+  gap: 4px 10px;
+}
+.journal-toast-heading-status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+  white-space: nowrap;
+}
+.journal-toast-heading-dot {
+  width: 3px;
+  height: 3px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--toast-muted);
 }
 .journal-toast-heading-text {
   min-width: 0;
@@ -243,8 +315,8 @@ body:has(
   --toast-ambient-delay: calc(
     var(--toast-art-arrival-delay) + var(--toast-art-arrival-duration) + 250ms
   );
-  /* Only rear plates shrink 20%; front tile and 49px rail stay fixed. */
-  --toast-plate-size: calc(41.65px * 7 / 6 * 0.8);
+  /* Rear plates grow 25% from the previous size; the front tile stays fixed. */
+  --toast-plate-size: calc(41.65px * 7 / 6 * 0.8 * 1.25);
   position: relative;
   display: block;
   flex: none;
@@ -276,7 +348,7 @@ body:has(
   left: calc((49px - var(--toast-plate-size)) / 2);
   width: var(--toast-plate-size);
   height: var(--toast-plate-size);
-  border-radius: calc(12.25px * 7 / 6 * 0.8);
+  border-radius: calc(12.25px * 7 / 6 * 0.8 * 1.25);
 }
 .journal-toast-plate-arrival-back {
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
@@ -297,8 +369,10 @@ body:has(
   width: 100%;
   height: 100%;
   border-radius: inherit;
+  opacity: 0.61;
   transform-origin: 50% 55%;
-  box-shadow: inset 0 0 0 calc(1.225px * 7 / 6 * 0.8) var(--toast-pink-edge);
+  box-shadow: inset 0 0 0 calc(1.225px * 7 / 6 * 0.8 * 1.25)
+    var(--toast-pink-edge);
 }
 .journal-toast-plate-back {
   background: var(--toast-pink-edge);
@@ -491,6 +565,8 @@ body:has(
   display: block;
 }
 .journal-notification-details {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
@@ -517,7 +593,7 @@ body:has(
   content: "";
   display: block;
   height: 1px;
-  margin-bottom: 9px;
+  margin-bottom: 15px;
   background: color-mix(in srgb, var(--toast-ink) 15%, transparent);
 }
 .journal-notification-details-inner::after {
@@ -548,7 +624,7 @@ body:has(
 }
 .journal-notification-main {
   min-width: 0;
-  padding: 2px 0 10px;
+  padding: 2px 0 15px;
 }
 .journal-notification-main:empty {
   display: none;
@@ -601,9 +677,9 @@ body:has(
 .journal-notification-footer {
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  padding: 10px 4px 0;
+  padding: 15px 4px 0;
   border-top: 1px solid color-mix(in srgb, var(--toast-ink) 10%, transparent);
 }
 .journal-notification-footer:empty {
@@ -617,6 +693,50 @@ body:has(
   font-weight: 450;
   line-height: 1.4;
   text-align: center;
+}
+.journal-notification-footer-note {
+  max-width: 45ch;
+  color: color-mix(in srgb, var(--toast-ink) 39%, transparent);
+  font-size: 8.5px;
+  font-weight: 450;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: pretty;
+}
+.journal-notification-footer-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
+  text-underline-offset: 2px;
+}
+.journal-notification-footer-note a:focus-visible {
+  outline: 2px solid var(--toast-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* Each shorter wash lifts the footer from the strongest, longest dark base.
+   Paint stays behind the live cards/text and never intercepts a gesture. */
+.journal-notification-footer-fade {
+  position: absolute;
+  z-index: 0;
+  inset: auto 0 0;
+  height: min(210px, 70%);
+  border-radius: 0 0 18px 18px;
+  background:
+    linear-gradient(to top, #f9a8d40b, #f9a8d400 30%),
+    linear-gradient(to top, #f472b610, #f472b600 44%),
+    linear-gradient(to top, #c026d31f, #c026d30b 35%, #c026d300 68%),
+    linear-gradient(to top, #701a759e, #701a7545 45%, #701a7500);
+  opacity: 0;
+  transition: opacity 280ms ease;
+  pointer-events: none;
+}
+.journal-notification[data-expanded="true"] .journal-notification-footer-fade {
+  opacity: 1;
+}
+.journal-notification-header {
+  position: relative;
+  z-index: 1;
 }
 .journal-notification-tools {
   display: flex;
@@ -940,23 +1060,23 @@ body:has(
 .journal-notification-last-seconds {
   position: absolute;
   z-index: 4;
-  top: -7px;
+  top: -12px;
   left: 11px;
   display: inline-flex;
-  min-width: 19px;
-  height: 14px;
+  width: 25px;
+  height: 25px;
   align-items: center;
   justify-content: center;
-  padding-inline: 4px;
-  border-radius: 5px;
+  padding: 0;
+  border-radius: 50%;
   background: color-mix(in srgb, var(--toast-fuchsia-surface) 76%, transparent);
-  color: color-mix(in srgb, var(--toast-ink) 48%, transparent);
+  color: color-mix(in srgb, var(--toast-ink) 66%, transparent);
   box-shadow: inset 0 0 0 0.6px
     color-mix(in srgb, var(--toast-soft) 18%, transparent);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  font-size: 9px;
-  font-weight: 550;
+  font-size: 10px;
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   letter-spacing: 0.01em;
@@ -969,6 +1089,15 @@ body:has(
 }
 .journal-notification-seconds-value {
   display: inline-block;
+}
+.journal-notification-seconds-flare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1.2px var(--toast-soft),
+    0 0 9px color-mix(in srgb, var(--toast-accent) 38%, transparent);
+  opacity: 0;
 }
 .journal-notification[data-timer-mode="indefinite"]
   :is(
@@ -1108,7 +1237,7 @@ body:has(
     animation-play-state: var(--notification-motion-play-state, running);
   }
   .journal-notification-last-seconds[data-state="enter"] {
-    animation: journal-notification-seconds-arrive 320ms
+    animation: journal-notification-seconds-arrive 520ms
       cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-play-state: var(--notification-motion-play-state, running);
   }
@@ -1377,11 +1506,14 @@ body:has(
 @keyframes journal-notification-seconds-arrive {
   0% {
     opacity: 0;
-    transform: translateY(2px) rotate(-16deg) scale(0.14);
+    transform: translate(-9px, 10px) rotate(-140deg) scale(0.08);
   }
   62% {
     opacity: 1;
-    transform: translateY(-0.7px) rotate(3deg) scale(1.12);
+    transform: translate(1px, -3px) rotate(12deg) scale(1.24);
+  }
+  82% {
+    transform: translateY(1px) rotate(-5deg) scale(0.91);
   }
   100% {
     opacity: 1;

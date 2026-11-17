@@ -14,6 +14,7 @@ import { TrendUpIcon } from "@phosphor-icons/react/dist/ssr/TrendUp";
 import { TrendDownIcon } from "@phosphor-icons/react/dist/ssr/TrendDown";
 import { EqualsIcon } from "@phosphor-icons/react/dist/ssr/Equals";
 import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
+import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationClassBadges } from "@/components/medication-class-badge";
 import { Button } from "@/components/ui/button";
@@ -652,7 +653,7 @@ function CheckInMemories({ analytics }: { analytics: MilestoneAnalytics }) {
         >
           {analytics.current.moods.map((mood) => (
             <span key={mood.value}>
-              <span aria-hidden="true">{mood.emoji}</span>
+              <DailyMoodIcon mood={mood.value} size={14} />
               {mood.label}
               <strong>{mood.count}</strong>
             </span>

@@ -7,8 +7,11 @@ import {
   CalendarDays,
   Clock3,
   Coffee,
+  CheckCheck,
   MoonStar,
   Target,
+  RotateCcw,
+  Trash2,
   Waves,
   Zap,
   type LucideIcon,
@@ -16,13 +19,14 @@ import {
 import { MedicationCard } from "@/components/medication-card";
 import { MedicationCardIcon } from "@/components/medication-card-icon";
 import { MedicationCardDose } from "@/components/medication-card-dose";
+import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { DAILY_MOODS } from "@/lib/daily-check-in";
-import { INTAKE_ROUTES } from "@/lib/intake-routes";
 import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
 import type {
   NotificationChangePreview as ChangePreview,
   NotificationPreviewRecord,
 } from "@/lib/notification-change-preview";
+import { notificationChangeSummary } from "@/lib/notification-change-preview";
 import styles from "./notification-change-preview.module.css";
 
 /** Actual card presentation, backed only by confirmed immutable display data. */
@@ -35,6 +39,9 @@ export function NotificationChangePreview({
   const compared = Boolean(preview.before && preview.after);
   return (
     <div className={styles.root} data-notification-change-preview>
+      <p className={styles.summary} data-notification-change-summary>
+        {notificationChangeSummary(preview)}
+      </p>
       {preview.before && (
         <section
           className={styles.snapshot}
@@ -80,11 +87,9 @@ function SnapshotCaption({
       weekday: "short",
       month: "short",
       day: "numeric",
-      year: "numeric",
     });
-    const route = INTAKE_ROUTES.find((item) => item.value === record.route);
-    title = [date, route?.label].filter(Boolean).join(" · ");
-    context = <span>{title}</span>;
+    title = date;
+    context = <time dateTime={localDay}>{date}</time>;
   } else if (record.kind === "medication") {
     context = record.medication.archived ? "Archived" : "Active";
   } else if (record.kind === "check-in") {
@@ -93,16 +98,21 @@ function SnapshotCaption({
         {formatDay(record.day, {
           month: "short",
           day: "numeric",
-          year: "numeric",
         })}
       </time>
     );
   }
+  const StageIcon =
+    label === "Before" ? RotateCcw : label === "Removed" ? Trash2 : CheckCheck;
   return (
     <div className={styles.caption}>
-      <span className={styles.stage}>{label}</span>
+      <span className={styles.stage}>
+        <StageIcon aria-hidden="true" />
+        {label}
+      </span>
       {context && (
         <span className={styles.context} title={title}>
+          {record.kind !== "medication" && <CalendarDays aria-hidden="true" />}
           {context}
         </span>
       )}
@@ -133,6 +143,7 @@ function MedicationPreview({
       form={form}
       ingredient={medication?.activeIngredient}
       quantity={quantity}
+      intakeRoute={intake ? record.route : undefined}
       formPresentation={intake ? "icon" : "text"}
       className={styles.medication}
       data-notification-record={record.kind}
@@ -152,11 +163,7 @@ function MedicationPreview({
           >
             {time}
           </time>
-        ) : (
-          <span className="intake-card-time medication-library-default">
-            Default
-          </span>
-        )
+        ) : undefined
       }
       trailing={
         <MedicationCardDose
@@ -233,7 +240,7 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
                 aria-label={mood.label}
                 title={mood.label}
               >
-                {mood.emoji}
+                <DailyMoodIcon mood={mood.value} size={14} />
               </span>
             ))}
           </span>
@@ -313,7 +320,6 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
             {formatDay(record.startsOn, {
               month: "short",
               day: "numeric",
-              year: "numeric",
             })}
           </time>
           <span aria-hidden="true">→</span>
@@ -322,7 +328,6 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
               {formatDay(record.endsOn, {
                 month: "short",
                 day: "numeric",
-                year: "numeric",
               })}
             </time>
           ) : (

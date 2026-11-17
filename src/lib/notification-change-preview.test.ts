@@ -5,6 +5,7 @@ import {
   intakeNotificationSnapshot,
   medicationNotificationSnapshot,
   savedNotificationRecord,
+  notificationChangeSummary,
 } from "./notification-change-preview";
 import type { Medication, Intake } from "./domain";
 import type { DailyCheckIn } from "./daily-check-in";
@@ -111,4 +112,69 @@ test("saved record selection uses actual server IDs and refuses ambiguous or mis
     undefined,
   );
   assert.equal(savedNotificationRecord(before, [after[0]]), undefined);
+});
+
+test("change summaries report actual dose changes without suggesting a target or copying notes", () => {
+  const before = intakeNotificationSnapshot(
+    intake,
+    medication,
+    "Europe/Vienna",
+  );
+  if (before.kind !== "intake") return;
+  assert.equal(
+    notificationChangeSummary({ before, after: { ...before, quantity: 1 } }),
+    "Dose changed from 0.625 to 2.5 mg.",
+  );
+  assert.equal(
+    notificationChangeSummary({ after: before }),
+    "0.625 mg recorded for Recorded Name.",
+  );
+  assert.equal(
+    notificationChangeSummary({ before }),
+    "Intake removed from your journal.",
+  );
+  assert.equal(
+    notificationChangeSummary({
+      before,
+      after: { ...before, quantity: 1, route: "oral" },
+    }),
+    "Quantity and intake method updated.",
+  );
+});
+
+test("summary comparisons normalize equivalent instants and unordered categories", () => {
+  const before = intakeNotificationSnapshot(
+    intake,
+    medication,
+    "Europe/Vienna",
+  );
+  if (before.kind !== "intake") return;
+  assert.equal(
+    notificationChangeSummary({
+      before,
+      after: { ...before, takenAt: "2026-11-15T05:30:00+01:00" },
+    }),
+    "Intake saved.",
+  );
+  const med = medicationNotificationSnapshot(medication);
+  assert.equal(
+    notificationChangeSummary({
+      before: { kind: "medication", medication: med },
+      after: {
+        kind: "medication",
+        medication: { ...med, categories: [...med.categories].reverse() },
+      },
+    }),
+    "Medication saved.",
+  );
+  assert.equal(
+    notificationChangeSummary({
+      before: { kind: "medication", medication: med },
+      after: {
+        kind: "medication",
+        medication: { ...med, name: "Renamed", archived: true },
+      },
+    }),
+    "Name and archive status updated.",
+  );
 });

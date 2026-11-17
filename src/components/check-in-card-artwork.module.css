@@ -5,8 +5,12 @@
     var(--check-in-secondary, var(--action-background)) 76%,
     var(--palette-rose)
   );
-  --art-rim: color-mix(in srgb, var(--harmony-edge) 35%, transparent);
-  --art-wash: color-mix(in srgb, var(--palette-iris) 20%, transparent);
+  --art-rim: color-mix(
+    in srgb,
+    var(--check-in-accent, var(--harmony-edge)) 48%,
+    transparent
+  );
+  --art-wash: color-mix(in srgb, var(--palette-rose) 17%, transparent);
   --art-return-delay: 180ms;
   --art-start: var(
     --check-in-art-delay,

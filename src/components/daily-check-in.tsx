@@ -6,7 +6,6 @@ import {
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
-import { MoonStarsIcon } from "@phosphor-icons/react/dist/ssr/MoonStars";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
 import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
 import { toast } from "@/components/ui/journal-toast";
@@ -33,6 +32,7 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import { useReflectionSave } from "@/components/use-reflection-save";
 import {
@@ -48,7 +48,6 @@ import {
   checkInForDay,
   type DailyCheckIn,
   type DailyCheckInPeriod,
-  type DailyMood,
 } from "@/lib/daily-check-in";
 import { formatDay } from "@/lib/domain";
 import {
@@ -383,7 +382,7 @@ function CheckInForm({
   checkIn?: DailyCheckIn;
   onSaved: () => void;
 }) {
-  const { mutate, busy } = useJournal();
+  const { data, mutate, busy } = useJournal();
   const [submitting, setSubmitting] = useState(false);
   const locked = busy || submitting;
   const morning = period === "morning";
@@ -427,20 +426,12 @@ function CheckInForm({
     setDraft: draft.setValue,
     disabled: locked,
   });
-  const setMoods = (
-    next: DailyMood[] | ((current: DailyMood[]) => DailyMood[]),
-  ) =>
-    draft.setValue((current) => ({
-      ...current,
-      moods: typeof next === "function" ? next(current.moods) : next,
-    }));
   const setRating = (field: "energy" | "stress", value: number | null) =>
     draft.setValue((current) => ({
       ...current,
       [field]: value,
       [`${field}Scale`]: 10,
     }));
-  const setSleepHours = (value: string) => setField("sleepHours", value);
   const setHelped = (value: string) => setField("helped", value);
   const [error, setError] = useState("");
   const reset = () => {
@@ -612,139 +603,81 @@ function CheckInForm({
         />
       ) : (
         <div className={styles.eveningFields} data-evening-check-in-fields>
-          <fieldset
-            className={styles.moodField}
-            disabled={locked}
-            data-check-in-section="mood"
+          <section
+            className={styles.feelingsSection}
+            aria-labelledby={`${id}-feelings-heading`}
           >
-            <legend className={styles.moodLegend}>
-              <span className={styles.fieldHeading}>
+            <div className={styles.feelingsHeading}>
+              <span className={styles.feelingsMark} aria-hidden="true">
                 <ActionIcon name="flower" className="size-4" />
-                Today Felt Like
               </span>
-              <span className={styles.optional}>{moods.length} / 4</span>
-            </legend>
-            <p className={styles.fieldHint}>A mix is okay. Pick up to four.</p>
-            <div className={styles.moodGrid}>
-              {DAILY_MOODS.map((mood) => {
-                const selected = moods.includes(mood.value);
-                return (
-                  <button
-                    key={mood.value}
-                    type="button"
-                    aria-pressed={selected}
-                    className={styles.mood}
-                    disabled={!selected && moods.length >= 4}
-                    onClick={() =>
-                      setMoods((current) =>
-                        current.includes(mood.value)
-                          ? current.filter((value) => value !== mood.value)
-                          : [...current, mood.value],
-                      )
-                    }
-                  >
-                    <span className={styles.moodEmoji} aria-hidden="true">
-                      {mood.emoji}
-                    </span>
-                    <span>{mood.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          <section
-            className={styles.formSection}
-            aria-labelledby={`${id}-ratings-heading`}
-          >
-            <div className={styles.sectionHeading}>
-              <h3 id={`${id}-ratings-heading`}>How your day felt</h3>
-              <span>1–10 · Optional</span>
-            </div>
-            <p className={styles.fieldHint}>
-              Slide or tap to rate. Leave anything blank.
-            </p>
-            <div className={styles.ratingRow}>
-              <RatingField
-                id={`${id}-energy`}
-                label="Energy"
-                scale={draft.value.energyScale}
-                icon="energy"
-                value={energy}
-                onChange={(value) => setRating("energy", value)}
-                disabled={locked}
-                low="Low"
-                high="Full"
-              />
-              <RatingField
-                id={`${id}-stress`}
-                label="Stress"
-                scale={draft.value.stressScale}
-                icon="stress"
-                value={stress}
-                onChange={(value) => setRating("stress", value)}
-                disabled={locked}
-                low="Low"
-                high="High"
-              />
-            </div>
-          </section>
-
-          <section
-            className={styles.formSection}
-            aria-labelledby={`${id}-sleep-heading`}
-          >
-            <div className={styles.sectionHeading}>
-              <h3 id={`${id}-sleep-heading`}>Sleep & tonight</h3>
-              <span>Optional</span>
-            </div>
-            <div className={styles.detailsRow}>
-              <div className={styles.field} data-check-in-section="sleep">
-                <Label htmlFor={`${id}-sleep`}>
-                  <MoonStarsIcon size={15} weight="bold" aria-hidden="true" />
-                  Last Night
-                </Label>
-                <div className={styles.sleepInput}>
-                  <Input
-                    id={`${id}-sleep`}
-                    type="number"
-                    min="0"
-                    max="24"
-                    step="0.5"
-                    inputMode="decimal"
-                    value={sleepHours}
-                    onChange={(event) => setSleepHours(event.target.value)}
-                    placeholder="—"
-                    disabled={locked}
-                    className={cn(styles.detailInput, styles.sleepHoursInput)}
-                    aria-label="Hours Slept Last Night"
-                    aria-describedby={`${id}-sleep-hint`}
-                  />
-                  <span aria-hidden="true">h</span>
-                </div>
-                <p id={`${id}-sleep-hint`} className={styles.bedtimeHint}>
-                  Hours you slept before today.
+              <div>
+                <h3 id={`${id}-feelings-heading`}>Your Day, Your Mood</h3>
+                <p>
+                  A little nuance. A mix is welcome. Every answer is optional.
                 </p>
               </div>
-              <div className={styles.field} data-check-in-field="bedtime">
-                <Label htmlFor={`${id}-bedtime`}>Tonight’s bedtime</Label>
-                <Input
-                  id={`${id}-bedtime`}
-                  name="bedtime"
-                  type="time"
-                  step={60}
-                  value={bedtime}
-                  onChange={(event) => setField("bedtime", event.target.value)}
+            </div>
+            <fieldset
+              className={styles.moodField}
+              disabled={locked}
+              data-check-in-section="mood"
+            >
+              <legend className={styles.moodLegend}>
+                <span className={styles.fieldHeading}>
+                  <ActionIcon name="flower" className="size-4" />
+                  Today Felt Like
+                </span>
+                <span className={styles.optional}>{moods.length} / 4</span>
+              </legend>
+              <p className={styles.fieldHint}>
+                A mix is okay. Pick up to four.
+              </p>
+              <DailyMoodPicker
+                value={moods}
+                onChange={(value) => setField("moods", value)}
+                checkIns={data?.dailyCheckIns}
+                seed={`${day}:${period}`}
+                disabled={locked}
+              />
+            </fieldset>
+
+            <section
+              className={styles.formSection}
+              aria-labelledby={`${id}-ratings-heading`}
+            >
+              <div className={styles.sectionHeading}>
+                <h3 id={`${id}-ratings-heading`}>How Your Day Felt</h3>
+                <span>1–10 · Optional</span>
+              </div>
+              <p className={styles.fieldHint}>
+                Slide or tap to rate. Leave anything blank.
+              </p>
+              <div className={styles.ratingRow}>
+                <RatingField
+                  id={`${id}-energy`}
+                  label="Energy"
+                  scale={draft.value.energyScale}
+                  icon="energy"
+                  value={energy}
+                  onChange={(value) => setRating("energy", value)}
                   disabled={locked}
-                  className={cn(styles.detailInput, styles.bedtimeInput)}
-                  aria-describedby={`${id}-bedtime-hint`}
-                  data-check-in-bedtime
+                  low="Low"
+                  high="Full"
                 />
-                <p id={`${id}-bedtime-hint`} className={styles.bedtimeHint}>
-                  Updates the end of your daily log.
-                </p>
+                <RatingField
+                  id={`${id}-stress`}
+                  label="Stress"
+                  scale={draft.value.stressScale}
+                  icon="stress"
+                  value={stress}
+                  onChange={(value) => setRating("stress", value)}
+                  disabled={locked}
+                  low="Low"
+                  high="High"
+                />
               </div>
-            </div>
+            </section>
           </section>
           <div
             className={cn(styles.field, styles.helpedField, styles.formSection)}

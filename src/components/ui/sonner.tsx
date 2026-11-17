@@ -143,19 +143,41 @@ const NotificationStackContext = createContext({
 
 export const useNotificationStack = () => useContext(NotificationStackContext);
 
+function focusNotificationFront(region: HTMLDivElement | null) {
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement) || !region?.contains(active)) return;
+  const current = active.closest<HTMLElement>("[data-sonner-toast]");
+  if (
+    !current ||
+    (current.dataset.front === "true" && current.dataset.removed !== "true")
+  )
+    return;
+  const front = region.querySelector<HTMLElement>(
+    '[data-sonner-toast]:not([data-removed="true"])',
+  );
+  const target = front?.querySelector<HTMLElement>(
+    ".journal-notification-summary, button:not(:disabled), a[href]",
+  );
+  (target ?? front)?.focus({ preventScroll: true });
+}
+
 /** The shadcn Sonner adapter, themed through the app's existing appearance owner. */
 export function Toaster({
   className,
   style,
   icons,
   toastOptions,
+  visibleToasts: collapsedVisibleToasts = 3,
+  swipeDirections = ["top", "left", "right"],
   ...props
 }: ToasterProps) {
   const region = useRef<HTMLDivElement>(null);
   const [stackOpen, setStackOpen] = useState(false);
   const { toasts } = useSonner();
   const count = toasts.filter(
-    (entry) => !entry.delete && entry.toasterId === props.id,
+    (entry) =>
+      !entry.delete &&
+      (props.id ? entry.toasterId === props.id : !entry.toasterId),
   ).length;
   const [previousCount, setPreviousCount] = useState(count);
   // Sonner's external store shrinking to one ends this explicit reveal. Adjust
@@ -165,6 +187,14 @@ export function Toaster({
     if (count <= 1 && stackOpen) setStackOpen(false);
   }
   const collapse = useCallback(() => {
+    // A lower card will become a folded/hidden rear face. Keep keyboard focus
+    // on a retained, visible control before restoring the native stack layout.
+    focusNotificationFront(region.current);
+    region.current
+      ?.querySelectorAll<HTMLElement>("[data-sonner-toaster]")
+      .forEach((list) => {
+        list.scrollTop = 0;
+      });
     setStackOpen(false);
     // Also clear Sonner's native hover fan through its existing drag-end bridge.
     region.current
@@ -174,14 +204,15 @@ export function Toaster({
       );
   }, []);
   const reveal = useCallback(() => setStackOpen(true), []);
+  const expanded = Boolean(props.expand || (stackOpen && count > 1));
   const stack = useMemo(
     () => ({
-      expanded: Boolean(props.expand || (stackOpen && count > 1)),
+      expanded,
       count,
       reveal,
       collapse,
     }),
-    [props.expand, stackOpen, count, reveal, collapse],
+    [expanded, count, reveal, collapse],
   );
 
   useEffect(() => {
@@ -204,15 +235,110 @@ export function Toaster({
     };
   }, [stackOpen, collapse]);
 
+  useEffect(() => {
+    const element = region.current;
+    if (!element) return;
+    const syncVisibility = () => {
+      element
+        .querySelectorAll<HTMLElement>("[data-sonner-toast]")
+        .forEach((host) => {
+          const hidden =
+            host.dataset.visible === "false" || host.dataset.removed === "true";
+          if (hidden && host.contains(document.activeElement))
+            focusNotificationFront(element);
+          host.inert = hidden;
+        });
+      if (!expanded)
+        element
+          .querySelectorAll<HTMLElement>("[data-sonner-toaster]")
+          .forEach((list) => {
+            list.scrollTop = 0;
+          });
+    };
+    const observer = new MutationObserver((records) => {
+      if (
+        records.some(
+          (record) =>
+            record.type === "attributes" ||
+            (record.target instanceof Element &&
+              record.target.matches("[data-sonner-toaster], section")),
+        )
+      )
+        syncVisibility();
+    });
+    observer.observe(element, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-visible", "data-removed"],
+    });
+    syncVisibility();
+    return () => observer.disconnect();
+  }, [expanded, count]);
+
   return (
     <NotificationStackContext.Provider value={stack}>
-      <div ref={region} style={{ display: "contents" }}>
+      <div
+        ref={region}
+        style={{ display: "contents" }}
+        data-notification-stack-expanded={expanded}
+        onFocusCapture={(event) => {
+          // The list hotkey and keyboard focus entering a folded rear face both
+          // need the uncapped view. Pointer focus still consumes just the first
+          // click in the card's existing reveal handler.
+          if (
+            count > 1 &&
+            event.target instanceof HTMLElement &&
+            (event.target.matches("[data-sonner-toaster]") ||
+              (event.target.matches(":focus-visible") &&
+                event.target.closest<HTMLElement>("[data-sonner-toast]")
+                  ?.dataset.front === "false"))
+          )
+            reveal();
+        }}
+        onClickCapture={(event) => {
+          if (expanded || count <= 1) return;
+          const host =
+            event.target instanceof Element
+              ? event.target.closest<HTMLElement>("[data-sonner-toast]")
+              : null;
+          // Managed cards already suppress held clicks before revealing the
+          // fan. Give third-party/native notices the same first-click rule.
+          if (host && !host.querySelector(".journal-notification")) {
+            event.preventDefault();
+            event.stopPropagation();
+            reveal();
+          }
+        }}
+        onPointerCancelCapture={(event) => {
+          const host =
+            event.target instanceof Element
+              ? event.target.closest<HTMLElement>("[data-sonner-toast]")
+              : null;
+          if (
+            !host ||
+            host.dataset.removed === "true" ||
+            host.dataset.swipeOut === "true"
+          )
+            return;
+          // A pan can start on the native host/gutter outside its managed card.
+          // Always clear Sonner too when the browser takes over vertical scroll.
+          host.style.setProperty("--swipe-amount-x", "0px");
+          host.style.setProperty("--swipe-amount-y", "0px");
+          host.dispatchEvent(new Event("dragend", { bubbles: true }));
+          host.closest("[data-sonner-toaster]")?.dispatchEvent(
+            new PointerEvent("pointerup", {
+              bubbles: true,
+              pointerId: event.pointerId,
+            }),
+          );
+        }}
+      >
         <div className="journal-notification-backdrop" aria-hidden="true" />
         <Sonner
           position="top-center"
           duration={NOTIFICATION_DEFAULT_DURATION}
           gap={10}
-          visibleToasts={3}
           offset={{
             top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))",
           }}
@@ -221,12 +347,23 @@ export function Toaster({
             left: 16,
             right: 16,
           }}
-          swipeDirections={["top", "left", "right"]}
           containerAriaLabel="Journal notifications"
           {...props}
-          expand={stack.expanded}
+          expand={expanded}
+          visibleToasts={expanded ? Infinity : collapsedVisibleToasts}
+          swipeDirections={
+            expanded
+              ? swipeDirections.filter(
+                  (direction) => direction === "left" || direction === "right",
+                )
+              : swipeDirections
+          }
           closeButton={false}
-          className={cn("toaster group journal-toaster", className)}
+          className={cn(
+            "toaster group journal-toaster",
+            expanded && "journal-toaster-scroll",
+            className,
+          )}
           icons={{ ...statusIcons, ...icons }}
           style={
             {

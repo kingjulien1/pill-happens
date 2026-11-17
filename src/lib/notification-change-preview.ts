@@ -5,6 +5,7 @@ import type { MedicationCategory } from "@/lib/medication-categories";
 import type { MedicationType } from "@/lib/medication-types";
 import type { IntakeRoute } from "@/lib/intake-routes";
 import { reflectionStats } from "@/lib/reflection-writing";
+import { formatDose } from "@/lib/domain";
 
 /** Immutable, serializable presentation data; never carries Undo tokens or callbacks. */
 export type NotificationMedicationSnapshot = {
@@ -60,6 +61,109 @@ export type NotificationChangePreview = {
   before?: NotificationPreviewRecord;
   after?: NotificationPreviewRecord;
 };
+
+/** Describe only differences carried by the confirmed, display-only snapshots. */
+export function notificationChangeSummary(
+  preview: NotificationChangePreview,
+): string {
+  const { before, after } = preview;
+  const record = after ?? before;
+  if (!record) return "";
+  const label = {
+    intake: "Intake",
+    medication: "Medication",
+    "check-in": "Check-in",
+    goal: "Goal",
+    timezone: "Timezone",
+  }[record.kind];
+  if (!after) return `${label} removed from your journal.`;
+  if (!before) {
+    if (after.kind === "intake")
+      return `${formatDose(after.quantity * after.strengthMg)} mg recorded for ${after.name}.`;
+    return `${label} saved in your journal.`;
+  }
+  const changes: string[] = [];
+  const changed = (condition: boolean, field: string) => {
+    if (condition) changes.push(field);
+  };
+  if (before.kind === "intake" && after.kind === "intake") {
+    const oldDose = before.quantity * before.strengthMg;
+    const newDose = after.quantity * after.strengthMg;
+    changed(before.quantity !== after.quantity, "quantity");
+    changed(before.strengthMg !== after.strengthMg, "strength");
+    changed(before.name !== after.name, "medication");
+    changed(before.form !== after.form, "medication type");
+    changed(
+      Date.parse(before.takenAt) !== Date.parse(after.takenAt),
+      "time taken",
+    );
+    changed(before.route !== after.route, "intake method");
+    if (
+      changes.length &&
+      changes.every((field) => field === "quantity" || field === "strength") &&
+      oldDose !== newDose
+    )
+      return `Dose changed from ${formatDose(oldDose)} to ${formatDose(newDose)} mg.`;
+  } else if (before.kind === "medication" && after.kind === "medication") {
+    const a = before.medication;
+    const b = after.medication;
+    changed(a.name !== b.name, "name");
+    changed(a.activeIngredient !== b.activeIngredient, "active substance");
+    changed(a.strengthMg !== b.strengthMg, "strength");
+    changed(a.defaultQuantity !== b.defaultQuantity, "default quantity");
+    changed(a.form !== b.form, "medication type");
+    changed(
+      a.archived !== b.archived,
+      b.archived ? "archive status" : "active status",
+    );
+    changed(
+      a.color !== b.color ||
+        a.icon !== b.icon ||
+        a.iconRotation !== b.iconRotation,
+      "appearance",
+    );
+    changed(
+      [...a.categories].sort().join() !== [...b.categories].sort().join(),
+      "categories",
+    );
+  } else if (before.kind === "check-in" && after.kind === "check-in") {
+    changed(before.words !== after.words, "journal writing");
+    changed(
+      [...before.moods].sort().join() !== [...after.moods].sort().join(),
+      "moods",
+    );
+    changed(
+      before.energy !== after.energy ||
+        before.energyScale !== after.energyScale,
+      "energy",
+    );
+    changed(
+      before.stress !== after.stress ||
+        before.stressScale !== after.stressScale,
+      "stress",
+    );
+    changed(
+      before.sleepHours !== after.sleepHours ||
+        before.bedtime !== after.bedtime,
+      "sleep details",
+    );
+  } else if (before.kind === "goal" && after.kind === "goal") {
+    changed(before.dailyLimitMg !== after.dailyLimitMg, "daily target");
+    changed(
+      before.startsOn !== after.startsOn || before.endsOn !== after.endsOn,
+      "goal dates",
+    );
+  } else if (before.kind === "timezone" && after.kind === "timezone") {
+    if (before.timeZone !== after.timeZone)
+      return `Journal timezone changed to ${after.timeZone.replaceAll("_", " ")}.`;
+  }
+  if (!changes.length) return `${label} saved.`;
+  const fields = new Intl.ListFormat("en", {
+    style: "long",
+    type: "conjunction",
+  }).format(changes);
+  return `${fields[0].toUpperCase()}${fields.slice(1)} updated.`;
+}
 
 export function medicationNotificationSnapshot(
   medication: Medication,

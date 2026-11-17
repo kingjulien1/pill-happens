@@ -25,8 +25,8 @@
   width: 30px;
   height: 30px;
   overflow: visible;
-  fill: #c1b6cc;
-  stroke: #c1b6cc;
+  fill: var(--check-in-art-copy, #fdf1f7);
+  stroke: var(--check-in-art-copy, #fdf1f7);
   stroke-width: 1.2;
   stroke-linecap: round;
   stroke-linejoin: round;

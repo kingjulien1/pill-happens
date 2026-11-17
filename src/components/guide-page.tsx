@@ -11,6 +11,7 @@ import { GuideStartLink } from "@/components/guide-onboarding";
 import { GuideOutline } from "@/components/guide-outline";
 import { guideHeadingId } from "@/lib/guide-outline";
 import { InstallAppButton } from "@/components/install-app-button";
+import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { DAILY_MOODS, DAILY_REFLECTION_MAX_LENGTH } from "@/lib/daily-check-in";
 import { MEDICATION_CATEGORIES } from "@/lib/medication-categories";
 import styles from "./guide-page.module.css";
@@ -133,7 +134,7 @@ export function GuidePage() {
             <BookOpenTextIcon size={20} weight="regular" aria-hidden="true" />
             Pill Happens / Your Journal
           </span>
-          <h1>Journal guide</h1>
+          <h1>Journal Guide</h1>
           <p>
             Start with the medications you use, then build a clear record of
             what you took and when. This guide walks through your first entry,
@@ -158,17 +159,21 @@ export function GuidePage() {
           </div>
         </header>
 
-        <nav
-          className={styles.contents}
-          aria-label="Guide Contents"
-          data-guide-inline-contents
-        >
-          {sections.map((section) => (
-            <a key={section.id} href={`#${section.id}`}>
-              {section.label}
-            </a>
-          ))}
-        </nav>
+        <details className={styles.contentsBox} data-guide-inline-contents>
+          <summary>
+            <ActionIcon name="discover" className="size-4" />
+            <strong>On This Page</strong>
+            <span>{sections.length} sections</span>
+            <ActionIcon name="expand" className="size-3.5" />
+          </summary>
+          <nav className={styles.contents} aria-label="Guide Contents">
+            {sections.map((section) => (
+              <a key={section.id} href={`#${section.id}`}>
+                {section.label}
+              </a>
+            ))}
+          </nav>
+        </details>
 
         <section
           id="start"
@@ -320,10 +325,10 @@ export function GuidePage() {
               open
             >
               <p>
-                The time beside the date follows your journal’s timezone. An
-                intake at 05:59 belongs to the previous tracking day; one at
-                06:00 belongs to the new day. Your old records stay in Past Days
-                when Today changes over.
+                Every recorded time follows your journal’s timezone. An intake
+                at 05:59 belongs to the previous tracking day; one at 06:00
+                belongs to the new day. Your old records stay in Past Days when
+                Today changes over.
               </p>
               <p>
                 Change the timezone under{" "}
@@ -352,6 +357,12 @@ export function GuidePage() {
                 calculated dose. A new entry suggests that medication’s
                 most-used recorded route, with Swallowed as the fallback. Leave
                 it as Not specified when you do not want to record a route.
+              </p>
+              <p>
+                On the saved card, route and medication-form symbols sit beside
+                the category icons. The artwork’s small <strong>× n</strong>
+                label shows your full quantity when it differs from one; the
+                decorative icon fan stops at three without changing that amount.
               </p>
               <p>
                 The default quantity is only a starting value: check the actual
@@ -533,12 +544,12 @@ export function GuidePage() {
                 categories automatically. Categories can be left empty.
               </p>
               <p>
-                Earlier Benzo and Opioid markings carry over. They keep their
-                pink and orange priority markers across intakes, history, goals,
-                and medication choices; both can remain selected together. Other
-                labels appear as compact badges in the medication library, with
-                an extra count when space is limited. Changing labels does not
-                change quantities, times, notes, or dose calculations.
+                Earlier Benzo and Opioid markings carry over. Their recognizable
+                symbols follow the saved labels across intakes, history, goals
+                and medication choices; both can remain selected together. Saved
+                cards keep category symbols together in a compact row, with
+                scrolling when needed. Changing labels does not change
+                quantities, times, notes, or dose calculations.
               </p>
             </GuideDetail>
             <GuideDetail title="Edits Apply To Past Logs" icon="retry">
@@ -680,15 +691,13 @@ export function GuidePage() {
               on a day without intakes.
             </p>
             <p>
-              Both cards share a warm theme and a large sun or moon icon. After
-              saving, the latest journal-update time appears before the title,
-              just like an intake’s time. Saved entries or unfinished content
-              show a larger percentage and colored ring at the right. A short
-              hint beneath the title points to the next missing section; when
-              complete, it reads “All sections added”. Local edits update this
-              progress without changing the saved journal time. Untouched cards
-              keep the simpler prompt. Tap the whole card to open your
-              reflection.
+              Both cards use a pink accent, a dark illustrated tile and a small
+              completion ring. Morning has a steaming cup; Evening has a gently
+              swaying moon. The time before the title remembers the first time
+              you opened that check-in on this device, even without pressing
+              Save. Your latest successful save is tracked separately. Drafts
+              can update the ring, but opening a card alone never marks a
+              section complete. Tap anywhere on the card to continue.
             </p>
             <p>
               <strong>Morning sleep journal.</strong> Rate dream recall,
@@ -701,17 +710,21 @@ export function GuidePage() {
               Ratings, Sleep Schedule, Night Interruptions and Sleep Duration.
             </p>
             <p>
-              <strong>Evening reflection.</strong> Keep the familiar fields
-              below: moods, Energy/Stress, sleep hours, What Helped and your
-              journal.
+              <strong>Evening reflection.</strong> Five groups keep things
+              simple: your journal, Moods, Energy, Stress and What Helped.
+              Browse {DAILY_MOODS.length} feelings with Lucide symbols, search
+              for a word, or narrow the list to a family. Familiar choices rise
+              to the top; the rest get a little daily shuffle. Sleep is
+              collected in Morning Check-In, while older saved sleep details
+              stay intact.
             </p>
             <div
               className={styles.moodList}
               aria-label="Available Check-In Moods"
             >
-              {DAILY_MOODS.map((mood) => (
+              {DAILY_MOODS.slice(0, 10).map((mood) => (
                 <span key={mood.value}>
-                  <span aria-hidden="true">{mood.emoji}</span>
+                  <DailyMoodIcon mood={mood.value} size={14} />
                   {mood.label}
                 </span>
               ))}
@@ -782,7 +795,11 @@ export function GuidePage() {
                 >
                   Moods
                 </dt>
-                <dd>Choose up to four. A mixed day is welcome.</dd>
+                <dd>
+                  Choose up to four. Search or scroll the compact library;
+                  selected feelings stay within reach and can be removed with
+                  another tap. A mixed day is welcome.
+                </dd>
               </div>
               <div>
                 <dt
@@ -793,19 +810,8 @@ export function GuidePage() {
                   Energy &amp; Stress
                 </dt>
                 <dd>
-                  Optional 1–5 ratings. Tap a selected number again to clear it.
-                </dd>
-              </div>
-              <div>
-                <dt
-                  id={guideHeadingId("guide-checkin", "Sleep")}
-                  data-guide-outline-level="2"
-                  data-guide-outline-label={"Sleep"}
-                >
-                  Sleep
-                </dt>
-                <dd>
-                  Hours slept last night, including zero or a fractional amount.
+                  Optional 1–10 sliders with a Clear action. Older five-point
+                  answers keep their original scale until you change them.
                 </dd>
               </div>
               <div>
@@ -854,15 +860,18 @@ export function GuidePage() {
           />
           <div className={styles.readingCard} data-card-entry>
             <p>
-              Past Days lists days with intake records or either check-in,
-              newest first. It starts with the latest 20;{" "}
-              <strong>Load More</strong> reveals another 20. A check-in-only day
-              stays accessible even when there were no intake entries.
+              Past Days gathers recorded days into weeks, newest first. It
+              starts with at least the latest 20 recorded days, including the
+              complete last week. <strong>Load More Weeks</strong> extends that
+              budget by another 20. Tap a folded week to reveal its days, then
+              open a day’s card. Check-in-only days stay in your history too.
             </p>
             <p>
-              Open a day for its timeline, medication totals, recorded goals,
-              and check-in. Previous Day and Next Day help you move between
-              dates; Add Missed Intake lets you catch up on an earlier record.
+              Open a day for its intake timeline and check-ins. Previous Day and
+              Next Day move between dates; Add Missed Intake lets you catch up.
+              Older card summaries are kept on this device to make repeat visits
+              lighter. The latest three days stay live, and relevant edits
+              refresh older summaries automatically.
             </p>
             <div className={styles.callout}>
               <ActionIcon name="export" className="size-4" />
@@ -914,10 +923,11 @@ export function GuidePage() {
                 Open the menu beside the animated tablets to move between Today,
                 Past Days, Medications and Goals. The page you’re on is
                 highlighted; small counts show what is already in your journal.
-                Getting Started Guide sits below the main pages. Developer Guide
-                is a small link in the footer beside Backups &amp; Export;
-                installation is available from the menu’s top icon row. On
-                smaller screens, scroll the list to find every page.
+                On phones, the menu opens as a bottom sheet with space to
+                scroll. Getting Started Guide sits below the main pages.
+                Developer Guide is a small link in the footer beside Backups
+                &amp; Export; installation is available from the menu’s top icon
+                row. On smaller screens, scroll the list to find every page.
               </p>
             </GuideDetail>
             <GuideDetail title="Find Your Light" icon="palette">
@@ -934,13 +944,13 @@ export function GuidePage() {
             </GuideDetail>
             <GuideDetail title="Refresh Or Open Medications" icon="retry">
               <p>
-                Tap the animated tablets to the left of the menu to refresh this
-                page. Or pull that button downward: its pills fade beneath a
-                warm berry surface and a refresh icon grows in their place. When
-                the button and icon rebound to full size, release to refresh. A
-                short pull cancels. One continuous loading screen stays in place
-                while the page reloads, your journal returns and the app
-                restores your drafts and position.
+                Tap the animated tablets to return to Today. Pull that button
+                downward to refresh: its pills fade beneath a warm berry surface
+                and a refresh icon grows in their place. When the button and
+                icon rebound to full size, release to refresh. A short pull
+                cancels. One continuous loading screen stays in place while the
+                page reloads, your journal returns and the app restores your
+                drafts and position.
               </p>
               <p>
                 Pull the same button to the right until it rebounds, then

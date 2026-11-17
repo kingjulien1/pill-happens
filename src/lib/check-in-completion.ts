@@ -36,11 +36,11 @@ export const DEFAULT_MORNING_CHECK_IN_SECTIONS = MORNING_CHECK_IN_SECTIONS.map(
   ({ id }) => id,
 );
 
+/** Evening no longer asks for sleep; the legacy ID remains queryable for saved history. */
 export const DEFAULT_CHECK_IN_SECTIONS = [
   "mood",
   "energy",
   "stress",
-  "sleep",
   "notes",
   "helped",
 ] as const satisfies readonly CheckInSectionId[];

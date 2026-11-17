@@ -155,6 +155,7 @@ export function JournalNotification({
   const root = useRef<HTMLDivElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
   const lastSeconds = useRef<HTMLSpanElement>(null);
+  const secondsFlare = useRef<HTMLSpanElement>(null);
   const secondsValue = useRef<HTMLSpanElement>(null);
   const clock = useRef<NotificationClock | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -316,6 +317,8 @@ export function JournalNotification({
     syncNative();
     let markerShown = false;
     let markerFinished = false;
+    let previousSecond: number | null = null;
+    let markerAnimations: Animation[] = [];
     let pulseAnimations: CSSAnimation[] = [];
     const tick = () => {
       const snapshot = readingClock.snapshot();
@@ -367,10 +370,65 @@ export function JournalNotification({
         markerShown = true;
         if (lastSeconds.current) lastSeconds.current.dataset.state = "enter";
       }
-      if (markerShown && !snapshot.complete && secondsValue.current)
-        secondsValue.current.textContent = String(
-          Math.max(1, Math.ceil(snapshot.timeUntilComplete / 1_000)),
+      if (markerShown && !snapshot.complete && secondsValue.current) {
+        const second = Math.max(
+          1,
+          Math.ceil(snapshot.timeUntilComplete / 1_000),
         );
+        if (second !== previousSecond) {
+          secondsValue.current.textContent = String(second);
+          for (const animation of markerAnimations) animation.cancel();
+          markerAnimations = [];
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            markerAnimations.push(
+              secondsValue.current.animate(
+                [
+                  {
+                    opacity: 0,
+                    transform: "translateY(7px) rotate(-28deg) scale(.35)",
+                  },
+                  {
+                    opacity: 1,
+                    transform: "translateY(-2px) rotate(9deg) scale(1.7)",
+                    offset: 0.38,
+                  },
+                  {
+                    opacity: 1,
+                    transform: "translateY(1px) rotate(-4deg) scale(.87)",
+                    offset: 0.68,
+                  },
+                  { opacity: 1, transform: "none" },
+                ],
+                { duration: 590, easing: "cubic-bezier(.16,1,.3,1)" },
+              ),
+            );
+            if (secondsFlare.current)
+              markerAnimations.push(
+                secondsFlare.current.animate(
+                  [
+                    { opacity: 0, transform: "scale(.65) rotate(-35deg)" },
+                    {
+                      opacity: 0.8,
+                      transform: "scale(1.08) rotate(0deg)",
+                      offset: 0.25,
+                    },
+                    { opacity: 0, transform: "scale(2.15) rotate(45deg)" },
+                  ],
+                  { duration: 720, easing: "cubic-bezier(.22,1,.36,1)" },
+                ),
+              );
+          }
+          previousSecond = second;
+        }
+      }
+      for (const animation of markerAnimations) {
+        if (snapshot.paused && animation.playState === "running")
+          animation.pause();
+        else if (!snapshot.paused && animation.playState === "paused")
+          animation.play();
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          animation.cancel();
+      }
       if (markerShown && snapshot.complete && !markerFinished) {
         markerFinished = true;
         if (lastSeconds.current) lastSeconds.current.dataset.state = "exit";
@@ -392,6 +450,7 @@ export function JournalNotification({
       window.removeEventListener("pointercancel", releasePointer);
       window.removeEventListener("blur", clearPointers);
       clearInterval(interval);
+      for (const animation of markerAnimations) animation.cancel();
       for (const timer of timers.current) clearTimeout(timer);
       timers.current = [];
       clock.current = null;
@@ -708,11 +767,16 @@ export function JournalNotification({
         data-state="hidden"
         aria-hidden="true"
       >
+        <span
+          ref={secondsFlare}
+          className="journal-notification-seconds-flare"
+        />
         <span ref={secondsValue} className="journal-notification-seconds-value">
           3
         </span>
       </span>
       <span className="journal-notification-urgency-glow" aria-hidden="true" />
+      <span className="journal-notification-footer-fade" aria-hidden="true" />
       <div className="journal-notification-header">
         <button
           type="button"
@@ -739,7 +803,13 @@ export function JournalNotification({
             <span className="journal-notification-copy">
               <span className="journal-toast-heading" id={headingId}>
                 <span className="journal-toast-heading-text">{heading}</span>
-                <NotificationStatusBadge status={kind} />
+                <span className="journal-toast-heading-status">
+                  <span
+                    className="journal-toast-heading-dot"
+                    aria-hidden="true"
+                  />
+                  <NotificationStatusBadge status={kind} />
+                </span>
               </span>
               <span className="journal-notification-description" id={messageId}>
                 {message}
@@ -860,6 +930,36 @@ export function JournalNotification({
             <span className="journal-notification-footer-copy">
               {footerCopy}
             </span>
+            {details?.preview && details.links?.length ? (
+              <span className="journal-notification-footer-note">
+                These are snapshots. Open{" "}
+                {details.links.slice(0, 2).map((link, index) => (
+                  <span key={link.href}>
+                    {index > 0 && " or "}
+                    <a
+                      href={link.href}
+                      tabIndex={expanded ? 0 : -1}
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        if (
+                          !event.defaultPrevented &&
+                          event.button === 0 &&
+                          !event.metaKey &&
+                          !event.ctrlKey &&
+                          !event.altKey &&
+                          !event.shiftKey
+                        )
+                          collapseDetails(event);
+                      }}
+                    >
+                      {link.label.toLowerCase()}
+                    </a>
+                  </span>
+                ))}{" "}
+                for the latest saved version.
+              </span>
+            ) : null}
             {(cancel || action) && (
               <span className="journal-notification-actions">
                 {renderAction(cancel, true)}

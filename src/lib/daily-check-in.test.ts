@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { dayKey } from "./domain";
 import {
+  DAILY_MOODS,
+  DAILY_MOOD_VALUES,
+  matchesDailyMood,
+  rankDailyMoods,
   canCheckIn,
   checkInForDay,
   getCheckInPeriod,
@@ -218,4 +222,63 @@ test("history includes reflection-only days and deduplicates intake days in desc
     ["2026-10-29", "2026-10-28"],
     "two periods on one day count as one historical day, including Morning-only days",
   );
+});
+
+test("the mood library preserves every original saved ID and adds unique searchable icon options", () => {
+  const oldIds = [
+    "calm",
+    "okay",
+    "hopeful",
+    "happy",
+    "tired",
+    "anxious",
+    "low",
+    "restless",
+    "irritable",
+    "overwhelmed",
+  ];
+  assert.ok(DAILY_MOODS.length >= 100);
+  assert.equal(new Set(DAILY_MOOD_VALUES).size, DAILY_MOODS.length);
+  for (const id of oldIds)
+    assert.ok(DAILY_MOODS.some((mood) => mood.value === id));
+  for (const mood of DAILY_MOODS) {
+    assert.ok(mood.icon.length > 0);
+    assert.ok(matchesDailyMood(mood, mood.label));
+    assert.ok(matchesDailyMood(mood, mood.value));
+  }
+  const tired = DAILY_MOODS.find((mood) => mood.value === "tired")!;
+  assert.equal(matchesDailyMood(tired, "FATIGUE"), true);
+  assert.equal(matchesDailyMood(tired, "sleepy exhausted"), true);
+  assert.equal(matchesDailyMood(tired, "sleepy happy"), false);
+});
+
+test("moods rank by usage then a stable shuffle without rewriting old check-ins", () => {
+  const entries = [
+    { moods: ["okay", "calm"] },
+    { moods: ["calm", "calm", "tired"] },
+  ] satisfies { moods: import("./daily-check-in").DailyMood[] }[];
+  const source = structuredClone(entries);
+  const ranked = rankDailyMoods(entries, "2026-11-17");
+  assert.equal(ranked[0].value, "calm");
+  assert.deepEqual(
+    new Set(ranked.slice(1, 3).map((mood) => mood.value)),
+    new Set(["okay", "tired"]),
+  );
+  assert.deepEqual(rankDailyMoods(entries, "2026-11-17"), ranked);
+  assert.notDeepEqual(
+    rankDailyMoods(entries, "2026-11-18").slice(3),
+    ranked.slice(3),
+  );
+  assert.deepEqual(entries, source);
+  assert.equal(
+    new Set(ranked.map((mood) => mood.value)).size,
+    DAILY_MOODS.length,
+  );
+  // Duplicate mood IDs in old records count once per entry rather than inflating use.
+  const duplicate = rankDailyMoods([
+    { moods: ["okay", "okay", "okay"] },
+    { moods: ["calm"] },
+    { moods: ["calm"] },
+  ]);
+  assert.equal(duplicate[0].value, "calm");
 });

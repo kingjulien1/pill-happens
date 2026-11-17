@@ -90,8 +90,8 @@ test("first additions show live drafts with each period's independent denominato
     const result = getCheckInCardProgress({ period, draft });
     assert.equal(result.visible, true);
     assert.equal(result.completion.completedCount, 1);
-    assert.equal(result.completion.totalCount, period === "morning" ? 5 : 6);
-    assert.equal(result.percent, period === "morning" ? 20 : 17);
+    assert.equal(result.completion.totalCount, 5);
+    assert.equal(result.percent, 20);
   }
 });
 
@@ -102,7 +102,7 @@ test("Evening drafts use valid current answers, including clears, zero sleep and
     checkIn: evening,
     draft: { ...defaults, note: "", energy: null },
   });
-  assert.equal(cleared.percent, 67);
+  assert.equal(cleared.percent, 60);
   assert.deepEqual(
     cleared.completion.missing.map(({ id }) => id),
     ["energy", "notes"],
@@ -120,10 +120,10 @@ test("Evening drafts use valid current answers, including clears, zero sleep and
     period: "evening",
     draft: { ...checkInDefaults(undefined, "evening"), sleepHours: "0" },
   });
-  assert.equal(zero.percent, 17);
+  assert.equal(zero.percent, 0);
   assert.equal(
-    zero.completion.sections.find(({ id }) => id === "sleep")?.complete,
-    true,
+    zero.completion.sections.find(({ id }) => id === "sleep"),
+    undefined,
   );
 });
 
@@ -307,7 +307,6 @@ test("Evening hints identify the first unfinished section from current draft ans
     [{ moods: [] }, "mood", "Next · Your mood"],
     [{ energy: null }, "energy", "Next · Energy"],
     [{ stress: null }, "stress", "Next · Stress"],
-    [{ sleepHours: "" }, "sleep", "Next · Sleep hours"],
     [{ note: "" }, "notes", "Next · Your words"],
     [{ helped: "" }, "helped", "Next · What helped"],
   ] as const) {
@@ -444,5 +443,5 @@ test("live ten-point draft ratings retain explicit scales in completion projecti
     true,
   );
   assert.equal(result.completion.completedCount, 2);
-  assert.equal(result.percent, 33);
+  assert.equal(result.percent, 40);
 });
