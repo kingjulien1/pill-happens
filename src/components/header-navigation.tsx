@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
   type RefObject,
@@ -28,7 +29,7 @@ import { BrandMark } from "@/components/brand";
 import { NavigationMenuMark } from "@/components/navigation-menu-mark";
 import { useJournal } from "@/components/journal-provider";
 import { useJournalWorkspace } from "@/components/journal-drafts";
-import { dayIntakes, dayKey, goalForDay } from "@/lib/domain";
+import { dayIntakes, dayKey, formatDay, goalForDay } from "@/lib/domain";
 import { journalDays } from "@/lib/daily-check-in";
 import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
@@ -51,7 +52,7 @@ const links = [
     label: "Today",
     page: "today",
     icon: "navToday",
-    description: "Your intakes and a little reflection",
+    description: "Your intakes and daily check-ins, together.",
     tone: "peach",
   },
   {
@@ -101,6 +102,7 @@ function MenuRow({
   detail,
   active = false,
   tone,
+  featured = false,
 }: {
   label: string;
   description: string;
@@ -108,6 +110,7 @@ function MenuRow({
   detail?: string;
   active?: boolean;
   tone: string;
+  featured?: boolean;
 }) {
   return (
     <>
@@ -117,17 +120,16 @@ function MenuRow({
       <span className={styles.copy}>
         <span className={styles.labelRow}>
           <span className={styles.label}>{label}</span>
-          {detail && (
+          {featured && detail && (
             <span className={styles.detail}>
-              <span className={styles.detailDot} aria-hidden="true">
-                ·
-              </span>
               <strong>{detail.split(" ")[0]}</strong>{" "}
               {detail.split(" ").slice(1).join(" ")}
             </span>
           )}
         </span>
-        <span className={styles.description}>{description}</span>
+        <span className={styles.description}>
+          {featured ? description : (detail ?? description)}
+        </span>
       </span>
       <span className={styles.trailing} aria-hidden="true">
         {active ? (
@@ -312,7 +314,7 @@ function NavigationMenu({
         <div className={styles.mastheadCopy}>
           <Title className={styles.title}>Your Journal</Title>
           <Description className={styles.subtitle}>
-            A little space for your everyday.
+            Your days, thoughts and little next steps.
           </Description>
         </div>
         <div
@@ -356,48 +358,62 @@ function NavigationMenu({
       <div className={styles.scrollArea} data-navigation-scroll>
         <Group aria-label="Journal pages" data-navigation-section="daily">
           <div className={styles.sectionHeading} aria-hidden="true">
-            <span>Your Pages</span>
-            <span>
-              <strong>{links.length}</strong> Places To Land
+            <span>Your Space</span>
+            <span data-navigation-tracking-date>
+              {today
+                ? formatDay(today, {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : `${links.length} Places To Land`}
             </span>
           </div>
           <div className={styles.entries}>
-            {links.map(({ href, label, page, icon, description, tone }) => {
-              const active =
-                pathname === href ||
-                (href !== "/" && pathname.startsWith(`${href}/`));
-              return (
-                <NavigationLink
-                  key={href}
-                  mobile={mobile}
-                  href={href}
-                  label={label}
-                  onFollow={followLink}
-                  onNavigate={
-                    page === "journal"
-                      ? () => workspace.rememberDestination(href)
-                      : undefined
-                  }
-                  aria-current={active ? "page" : undefined}
-                  data-active={active}
-                  data-page={page}
-                  data-navigation-link
-                  className={styles.entry}
-                >
-                  <MenuRow
+            {links.map(
+              ({ href, label, page, icon, description, tone }, index) => {
+                const active =
+                  pathname === href ||
+                  (href !== "/" && pathname.startsWith(`${href}/`));
+                return (
+                  <NavigationLink
+                    key={href}
+                    mobile={mobile}
+                    href={href}
                     label={label}
-                    description={description}
-                    tone={tone}
-                    active={active}
-                    detail={details?.[page]}
-                    icon={<ActionIcon name={icon} weight="fill" />}
-                  />
-                </NavigationLink>
-              );
-            })}
+                    onFollow={followLink}
+                    onNavigate={
+                      page === "journal"
+                        ? () => workspace.rememberDestination(href)
+                        : undefined
+                    }
+                    aria-current={active ? "page" : undefined}
+                    data-active={active}
+                    data-page={page}
+                    data-navigation-link
+                    style={{ "--nav-order": index } as CSSProperties}
+                    className={styles.entry}
+                  >
+                    <MenuRow
+                      label={label}
+                      description={description}
+                      tone={tone}
+                      active={active}
+                      detail={details?.[page]}
+                      featured={page === "today"}
+                      icon={<ActionIcon name={icon} weight="fill" />}
+                    />
+                  </NavigationLink>
+                );
+              },
+            )}
           </div>
         </Group>
         <Group data-navigation-section="resources" aria-label="Getting started">
+          <div className={styles.sectionHeading} aria-hidden="true">
+            <span>A Little Help</span>
+            <span>At Your Pace</span>
+          </div>
           <div className={styles.entries}>
             <NavigationLink
               mobile={mobile}
@@ -413,7 +429,7 @@ function NavigationMenu({
             >
               <MenuRow
                 label="Getting Started"
-                description="A few pointers. Make yourself at home."
+                description="Find your feet, then make it yours."
                 tone="sand"
                 active={pathname === "/guide"}
                 icon={<BookOpenText strokeWidth={2.1} />}
@@ -423,6 +439,12 @@ function NavigationMenu({
         </Group>
       </div>
       <div className={styles.footer} data-navigation-footer>
+        <div className={styles.toolsHeading} aria-hidden="true">
+          <span>Help &amp; Tools</span>
+          <span>
+            <strong>3</strong> Shortcuts
+          </span>
+        </div>
         <div className={styles.footerNote} data-navigation-footer-links>
           <NavigationLink
             mobile={mobile}
@@ -436,7 +458,7 @@ function NavigationMenu({
             data-navigation-backups
           >
             <CloudDownload aria-hidden="true" strokeWidth={2} />
-            <span className={styles.footerLinkLabel}>Backups &amp; Export</span>
+            <span className={styles.footerLinkLabel}>Backups</span>
           </NavigationLink>
           <NavigationLink
             mobile={mobile}
@@ -465,12 +487,11 @@ function NavigationMenu({
             data-navigation-developer-guide
           >
             <Braces aria-hidden="true" strokeWidth={2} />
-            <span className={styles.footerLinkLabel}>Developer Guide</span>
+            <span className={styles.footerLinkLabel}>Developer</span>
           </NavigationLink>
         </div>
         <p className={styles.footerCopy} data-navigation-footer-copy>
-          Your place is remembered. Keep a backup, explore the workshop, or help
-          make the next little improvement.
+          Your place is remembered on this device. Come and go at your pace.
         </p>
       </div>
     </>
