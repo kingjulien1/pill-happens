@@ -4,6 +4,7 @@ import { dayKey } from "./domain";
 import {
   DAILY_MOODS,
   DAILY_MOOD_VALUES,
+  DAILY_MOOD_FAMILIES,
   matchesDailyMood,
   rankDailyMoods,
   canCheckIn,
@@ -237,7 +238,7 @@ test("the mood library preserves every original saved ID and adds unique searcha
     "irritable",
     "overwhelmed",
   ];
-  assert.ok(DAILY_MOODS.length >= 100);
+  assert.ok(DAILY_MOODS.length >= 200);
   assert.equal(new Set(DAILY_MOOD_VALUES).size, DAILY_MOODS.length);
   for (const id of oldIds)
     assert.ok(DAILY_MOODS.some((mood) => mood.value === id));
@@ -281,4 +282,130 @@ test("moods rank by usage then a stable shuffle without rewriting old check-ins"
     { moods: ["calm"] },
   ]);
   assert.equal(duplicate[0].value, "calm");
+});
+
+test("the larger library retains every previously selectable mood ID and its original legacy labels", () => {
+  // These 105 IDs have shipped in saved check-ins; they must remain selectable.
+  const existingIds = `
+    calm okay hopeful happy tired anxious low restless irritable overwhelmed peaceful steady
+    safe present relieved patient balanced clear-headed comfortable accepting rested
+    unhurried content joyful excited playful proud grateful inspired optimistic curious
+    amused lighthearted encouraged refreshed connected loved supported understood close
+    compassionate social included tender lonely homesick withdrawn sad flat empty heavy
+    tearful foggy sluggish drained unmotivated bored disappointed wistful vulnerable fragile
+    energized motivated focused productive creative determined confident adventurous awake
+    ready restored resilient tense worried uneasy on-edge frustrated angry impatient
+    scattered uncertain stuck pressured rushed self-conscious regretful ashamed guilty
+    conflicted sensitive wired shaky spaced-out disconnected numb pensive nostalgic quiet
+    mixed surprised fulfilled warm brave hopeful-but-tired
+  `
+    .trim()
+    .split(/\s+/);
+  assert.equal(existingIds.length, 105);
+  for (const value of existingIds)
+    assert.ok(
+      DAILY_MOOD_VALUES.includes(value as (typeof DAILY_MOOD_VALUES)[number]),
+      value,
+    );
+  const originalLabels = {
+    calm: "Calm",
+    okay: "Okay",
+    hopeful: "Hopeful",
+    happy: "Happy",
+    tired: "Tired",
+    anxious: "Anxious",
+    low: "Low",
+    restless: "Restless",
+    irritable: "Irritable",
+    overwhelmed: "Overwhelmed",
+  };
+  for (const [value, label] of Object.entries(originalLabels)) {
+    const mood = DAILY_MOODS.find((entry) => entry.value === value);
+    assert.equal(mood?.label, label);
+    assert.ok(
+      mood?.emoji,
+      "legacy aliases remain available without changing saved IDs",
+    );
+  }
+});
+
+test("expanded choices cover each family with searchable ordinary and compound feeling names", () => {
+  assert.equal(
+    new Set(DAILY_MOODS.map((mood) => mood.label.toLowerCase())).size,
+    DAILY_MOODS.length,
+  );
+  for (const family of DAILY_MOOD_FAMILIES)
+    assert.ok(
+      DAILY_MOODS.filter((mood) => mood.family === family.value).length >= 30,
+      family.value,
+    );
+  for (const [value, query] of [
+    ["self-compassionate", "kind myself"],
+    ["in-the-flow", "immersed rhythm"],
+    ["pleasantly-surprised", "unexpected good"],
+    ["reconnected", "together again"],
+    ["grieving", "missing someone"],
+    ["panicky", "intense worry"],
+    ["stressed", "overloaded demanding"],
+  ]) {
+    const option = DAILY_MOODS.find((mood) => mood.value === value);
+    assert.ok(option, value);
+    assert.equal(matchesDailyMood(option, query), true, `${value}: ${query}`);
+    assert.equal(
+      matchesDailyMood(option, option.label.toUpperCase()),
+      true,
+      value,
+    );
+  }
+});
+
+test("new and original moods share frequency ranking across Morning and Evening records", () => {
+  const entries: DailyCheckIn[] = [
+    {
+      ...reflection("2026-11-17"),
+      period: "morning",
+      moods: ["panicky", "grounded"],
+    },
+    {
+      ...reflection("2026-11-17"),
+      period: "evening",
+      moods: ["panicky", "reconnected"],
+    },
+    {
+      ...reflection("2026-11-18"),
+      period: "morning",
+      moods: ["calm", "reconnected"],
+    },
+    {
+      ...reflection("2026-11-18"),
+      period: "evening",
+      moods: ["panicky", "calm", "committed"],
+    },
+  ];
+  const unchanged = structuredClone(entries);
+  const first = rankDailyMoods(entries, "opening-one");
+  const second = rankDailyMoods(entries, "opening-two");
+  assert.equal(first[0].value, "panicky");
+  assert.equal(second[0].value, "panicky");
+  assert.deepEqual(
+    new Set(first.slice(1, 3).map((mood) => mood.value)),
+    new Set(["calm", "reconnected"]),
+  );
+  assert.deepEqual(
+    new Set(second.slice(1, 3).map((mood) => mood.value)),
+    new Set(["calm", "reconnected"]),
+  );
+  assert.deepEqual(
+    new Set(first.slice(3, 5).map((mood) => mood.value)),
+    new Set(["grounded", "committed"]),
+  );
+  assert.notDeepEqual(
+    first.slice(5).map((mood) => mood.value),
+    second.slice(5).map((mood) => mood.value),
+  );
+  assert.deepEqual(entries, unchanged);
+  assert.equal(
+    new Set(first.map((mood) => mood.value)).size,
+    DAILY_MOODS.length,
+  );
 });
