@@ -2782,8 +2782,9 @@ export function DeveloperGuidePage() {
                 </li>
                 <li>
                   MorningCoffee keeps a filled primary-ink cup still beneath
-                  three bright Pink/Lilac steam curls. The paths are another
-                  quarter shorter about their mug-rim origin, with separated
+                  three bright Pink/Lilac steam curls. The latest pass shortens
+                  their remaining height by another quarter around the fixed
+                  y=29 mug rim, keeping separated
                   lanes, thicker guide strokes and travelling highlighted threads.
                   The threads fade naturally along their paths; there are no
                   fireworks, pouring pot or large rising glow plume. A restrained

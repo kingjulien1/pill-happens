@@ -3,23 +3,24 @@
 import { useEffect, useId, useRef, type CSSProperties } from "react";
 import styles from "./morning-coffee.module.css";
 
+// Shorten each curve another 25% about the stationary mug rim (y=29).
 const WISPS = [
   {
-    path: "M17 28.4375C13 26.1875 19 24.5 17 22.25S14 17.75 18 13.8125",
+    path: "M17 28.578125C13 26.890625 19 25.625 17 23.9375S14 20.5625 18 17.609375",
     delay: "-1.1s",
     duration: "8.6s",
     sway: "11.4s",
     color: "var(--color-pink-300, #f9a8d4)",
   },
   {
-    path: "M25.5 27.875C29 25.625 23 23.9375 25.5 21.125S28 16.0625 25.5 11",
+    path: "M25.5 28.15625C29 26.46875 23 25.203125 25.5 23.09375S28 19.296875 25.5 15.5",
     delay: "-4.1s",
     duration: "9.3s",
     sway: "13.2s",
     color: "var(--color-pink-200, #fbcfe8)",
   },
   {
-    path: "M34 28.4375C38 26.1875 32 24.5 34 22.25S37 17.75 33 13.8125",
+    path: "M34 28.578125C38 26.890625 32 25.625 34 23.9375S37 20.5625 33 17.609375",
     delay: "-6.6s",
     duration: "8.9s",
     sway: "12.1s",
@@ -161,7 +162,7 @@ export function MorningCoffee({
           <linearGradient
             id={`${id}-steam-reveal-gradient`}
             x1="0"
-            y1="5.9375"
+            y1="11.703125"
             x2="0"
             y2="29"
             gradientUnits="userSpaceOnUse"
@@ -173,9 +174,9 @@ export function MorningCoffee({
             id={`${id}-steam-reveal`}
             maskUnits="userSpaceOnUse"
             x="-4"
-            y="5.9375"
+            y="11.703125"
             width="64"
-            height="36"
+            height="27"
           >
             <rect
               className={styles.steamReveal}
@@ -195,7 +196,7 @@ export function MorningCoffee({
                 x1="26"
                 y1="29"
                 x2="26"
-                y2="10.4375"
+                y2="15.078125"
                 gradientUnits="userSpaceOnUse"
               >
                 <stop stopColor={color} stopOpacity="0.48" />
