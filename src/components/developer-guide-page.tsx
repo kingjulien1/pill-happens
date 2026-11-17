@@ -2426,7 +2426,7 @@ export function DeveloperGuidePage() {
             Reveal a notification stack first, then open the chosen card’s
             details. Every notice keeps its own countdown, with an eased finish,
             Rose urgency and a short final grace; the reference below separates
-            clock, stack, motion and server-checked recovery ownership.
+            clock, stack, motion and server-checked recovery ownership. Journal-scoped browser storage preserves notices and their exact active-time countdown across reloads and app restarts, while confirmed logout clears the matching queue.
           </p>
           <GuideNotifications>
             <GuideNotificationDemo />

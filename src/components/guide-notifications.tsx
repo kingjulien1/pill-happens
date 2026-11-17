@@ -24,10 +24,13 @@ export type JournalNotificationUndo = {
   label?: string;
   pendingLabel?: string;
   successLabel?: string;
+  receipt?: { token: string; expiresAt: string };
   onUndo: () => Promise<void> | void;
 };
 
 export type JournalToastOptions = ExternalToast & {
+  persistence?: false;
+  journalScope?: string;
   heading?: ReactNode;
   details?: JournalNotificationDetails;
   undo?: JournalNotificationUndo;
@@ -40,6 +43,7 @@ import { toast } from "@/components/ui/journal-toast";
 
 export function showJournalNotice() {
   return toast.info("Your saved entries are unchanged.", {
+    persistence: false,
     heading: "A quick note",
     details: {
       paragraphs: ["Open this notice whenever you need more context."],
@@ -77,6 +81,8 @@ export function useNotifiedIntake() {
     );
     // Preview and Undo follow the confirmed response, never an optimistic guess.
     toast.success("Your intake is saved in the journal.", {
+      persistence: false,
+      journalScope: saved.notificationScope,
       heading: "Intake saved",
       variant: "intake-saved",
       details: {
@@ -92,7 +98,7 @@ export function useNotifiedIntake() {
         footer: "Other entries stay as they are.",
       },
       ...(saved.undo ? {
-        undo: { label: "Undo Intake", onUndo: saved.undo },
+        undo: { label: "Undo Intake", onUndo: saved.undo, receipt: saved.receipt },
       } : {}),
     });
     return saved;
@@ -128,16 +134,19 @@ import { toast } from "@/components/ui/journal-toast";
 
 export async function runWithNotice(operation: () => Promise<void>) {
   const id = toast.loading("Waiting for the confirmed result…", {
+    persistence: false,
     heading: "Checking for updates",
   });
   try {
     await operation(); // This operation must reject on failure.
     toast.success("The latest result is ready.", {
+      persistence: false,
       id,
       heading: "All caught up",
     });
   } catch (error) {
     toast.error(error instanceof Error ? error.message : "Please try again.", {
+      persistence: false,
       id,
       heading: "Refresh unsuccessful",
     });
@@ -150,6 +159,7 @@ import { toast } from "@/components/ui/journal-toast";
 
 export function showUpdateNotice(reloadIfReady: () => boolean) {
   return toast.update("Finish your current entry before reloading.", {
+    persistence: false,
     id: "pwa-update",
     heading: "App update ready",
     duration: Infinity,
@@ -173,7 +183,7 @@ const dismissal = `"use client";
 import { toast } from "@/components/ui/journal-toast";
 
 export function showThenDismissNotice() {
-  const id = toast.info("A short-lived example.");
+  const id = toast.info("A short-lived example.", { persistence: false });
   toast.dismiss(id); // Safe even before the card mounts.
 }
 
@@ -328,7 +338,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             <Source key="facade" path="src/components/ui/journal-toast.tsx" />,
-            "Public methods, option translation, same-ID generations and dismissal routing.",
+            "Public methods, durable IDs, journal binding, saved queue replay, same-ID generations and dismissal routing.",
           ],
           [
             <Source
@@ -354,7 +364,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
               key="clock"
               path="src/lib/journal-notification-lifecycle.ts"
             />,
-            "Independent monotonic clocks, exact progressive-speed integration, active completion grace, exit registry and one-attempt Undo settlement.",
+            "Independent monotonic clocks, JSON-safe active-time checkpoints, exact progressive-speed integration, completion grace, exit registry and one-attempt Undo settlement.",
           ],
           [
             <span key="art">
@@ -732,6 +742,76 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         error state, so resolution alone is not proof of success.
       </p>
 
+      <Heading id="saved-queue" level={3}>
+        Refresh-Safe Notification Queue
+      </Heading>
+      <p>
+        Confirmed journal notices keep their IDs, display snapshots, related
+        links and exact remaining active countdown in this browser. Ordinary
+        navigation, a hard refresh and closing/reopening the installed app
+        restore that queue after the server-authenticated journal scope binds.
+        Time spent closed or hidden does not consume its reading budget. A
+        notice already in its final grace resumes the remaining grace; an
+        expired or dismissed notice stays dismissed.
+      </p>
+      <p>
+        Public IDs stay stable in storage and in <code>toast.dismiss(id)</code>.
+        Restored cards receive fresh native screen IDs, while a live same-ID
+        update keeps its current host. This prevents an old removal animation
+        from dismissing a restored card during a rapid journal switch. The old
+        journal’s painted content is hidden immediately before native cleanup.
+        Async journal producers pass their original acknowledgement’s
+        <code> notificationScope</code> as <code>journalScope</code>; a late
+        result from another journal is ignored before it can enter this queue.
+      </p>
+      <ReferenceTable
+        label="Saved Queue Contract"
+        headings={["Layer", "Behavior"]}
+        rows={[
+          [
+            "Namespace",
+            "JournalProvider binds the server-generated SHA256 workspace scope. Each journal has its own pill-happens:notifications:v1:<scope> localStorage envelope; passwords and session credentials are never stored here.",
+          ],
+          [
+            "Checkpoint",
+            "A versioned duration (null means Infinity) plus elapsed active milliseconds. The browser gets a fresh monotonic time origin after reload. Pointer, hover and focus pauses are transient and never replayed.",
+          ],
+          [
+            "Writes",
+            "Changed clocks checkpoint at most twice per second, plus pagehide, pageshow, beforeunload, visibility changes and provider cleanup. Abrupt process termination can lose up to one 500ms checkpoint interval. Paused/indefinite notices skip unchanged periodic writes. Browser storage must remain available; clearing website data removes the saved queue.",
+          ],
+          [
+            "Commands",
+            "Undo persists its original signed receipt and wall-clock expiry, then rebinds to the current provider. Restoration never performs a write. Expired or interrupted pending Undo is unavailable rather than replayed automatically.",
+          ],
+          [
+            "Isolation",
+            "Confirmed logout and definitive unauthenticated redirects clear only that journal. Failed logout, offline session checks and ordinary route cleanup retain the queue. Removal tombstones and namespace generations reject stale-tab checkpoints.",
+          ],
+          [
+            "Capacity",
+            "No notification-count cap or silent eviction. A 2MiB serialized byte budget and browser quota guard preserve the existing saved payload on failure; pending notices remain usable in memory.",
+          ],
+          [
+            "Live-only work",
+            "Use persistence:false for examples and callback-only notices. Loading requests and service-worker prompts stay live-only: they cannot resume an abandoned operation. The PWA provider reannounces an actual waiting worker.",
+          ],
+        ]}
+      />
+      <p>
+        <Source path="src/lib/journal-notification-persistence.ts">
+          The queue store
+        </Source>{" "}
+        validates version, scope, timestamps, JSON data and clock ranges.
+        <Source path="src/lib/journal-notification-descriptor.ts">
+          Display validation
+        </Source>{" "}
+        additionally checks preview records, medication appearance and local
+        destinations. Saved callbacks, arbitrary markup and external action URLs
+        are never executed. Guide examples opt out so they do not leave
+        demonstration notices in a real journal.
+      </p>
+
       <Heading id="persistent" level={3}>
         Persistent Update Actions
       </Heading>
@@ -836,11 +916,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last 3 active seconds",
-            "A small, noninteractive 3/2/1 marker appears half outside the upper-left corner.",
+            "A 30.625px, noninteractive Pink200 3/2/1 marker appears exactly half outside the top-left card corner.",
           ],
           [
             "Bar empty",
-            "The marker spins/shrinks out; 1,000ms of active grace remains for a final action.",
+            "The final 1 uses the same snap/turn/shrink departure as replaced digits; its shell then fades, leaving 1,000ms active grace for a final action.",
           ],
         ]}
       />
@@ -911,7 +991,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Urgency pulse / tiny marker",
             "1,400ms → 450ms effective; marker 520ms in / 590ms numeral / 200ms out",
-            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. The 25px circular marker flies in from a shrunken, rotated offset, overshoots and settles. Each changed numeral gets a separate 590ms rise/turn/pop, paired with a 720ms expanding flare; zero launches a fast spinning shrink. Its numbers follow true active time, including the slower finish. Holds pause the number/flare too; reduced motion keeps a static truthful value.",
+            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. The 30.625px circular marker (all spatial values scaled by 1.225) arrives with a controlled snap-and-settle. Separate outgoing/incoming numeral layers share a 340ms departure for 3→2, 2→1 and 1→completion; the shell fades after that final departure begins. Pink200 tabular text is 12.25px at weight 750 on an opaque berry face. Its values follow actual active time, including the slowed finish. Holds freeze numeral/flare motion; reduced motion keeps the truthful value with a short final fade.",
           ],
           [
             "Main artwork / glyph",
@@ -1031,11 +1111,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Card uses Fuchsia950 at 34% alpha (60% less opaque than 85%) above 96px standard/Safari backdrop blur, with an opaque same-hue reduced-transparency fallback. Icon tiles add Fuchsia900 at 69% over their original bases; the front face alone adds a final Fuchsia950 glaze at 22%. The 4px-high capped rail sits 10px from the top with 16px horizontal insets; only finite cards reserve 16px above their content. Its independent arrival wrapper preserves these final bounds.",
+            "Card uses Fuchsia950 at 34% alpha (60% less opaque than 85%) above 96px standard/Safari backdrop blur, with an opaque same-hue reduced-transparency fallback. Icon tiles add Fuchsia900 at 69% over their original bases; the front face alone adds a final Fuchsia950 glaze at 22%. The 5.666667px capped rail is 41⅔% thicker, retains its 10px top position and 16px horizontal insets, and reserves its own finite-card space. Separate owners control its arrival sweep, restrained middle-phase thread and clock-driven final rose pulse; pause and reduced-motion gates cover every layer.",
           ],
           [
             "Last-seconds marker",
-            "25×25px circle, left 11px/top −12px, with 10px, weight 650 tabular ink at 66% alpha. No pointer events, layout growth or accessible countdown chatter. Hidden for infinite notices; its glass base uses the existing Fuchsia surface at 76% of that surface’s alpha, with a 12px backdrop blur.",
+            "30.625×30.625px circle, left/top −15.3125px: exactly half inside and half outside the upper-left corner. Full-opacity Pink200 text at 12.25px/750, an opaque deep-berry face, Pink200 rim and restrained glow. Borders, blur, shadows, flare and travel distances all use the 1.225 multiplier. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above the first card so its corner badge stays visible.",
           ],
           [
             "Header / unavailable Undo",
@@ -1085,11 +1165,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Receipts last <strong>15 wall-clock minutes</strong>; reading pauses do
         not extend that expiry. They are HMAC-signed with a domain-separated key
         derived from SESSION_SECRET, not encrypted: base64url payloads can
-        contain record snapshots. Keep them out of URLs, analytics, logs and
-        persistent client storage. They never enter the stored journal JSON.
-        No-op changes, secrets shorter than 32 characters and oversized optional
-        receipts omit Undo without turning a committed save into a reported
-        failure.
+        contain record snapshots. Keep them out of URLs, analytics and logs. The
+        refresh-safe queue stores them only in this browser’s journal-scoped
+        envelope with their original expiry; that local data is sensitive and is
+        not encrypted. Confirmed logout clears the queue. They never enter the
+        stored journal JSON. No-op changes, secrets shorter than 32 characters
+        and oversized optional receipts omit Undo without turning a committed
+        save into a reported failure.
       </p>
       <p>
         Undo supports intake, medication, goal, settings and a
