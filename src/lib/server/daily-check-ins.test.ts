@@ -55,7 +55,6 @@ test("daily check-ins preserve reflection whitespace, trim short fields, and ign
       moods: [],
       energy: null,
       stress: null,
-      sleepHours: null,
     },
   );
 });
@@ -185,7 +184,12 @@ test("saving a legacy journal adds one check-in with server timing and a copied 
   const fields = input({ moods: ["okay", "hopeful"] });
   upsertDailyCheckIn(state, fields, now);
   assert.deepEqual(checkIns(state), [
-    { ...fields, createdAt: now.toISOString(), updatedAt: now.toISOString() },
+    {
+      ...fields,
+      sleepHours: null,
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    },
   ]);
   fields.moods.length = 0;
   assert.deepEqual(checkIns(state)[0].moods, ["okay", "hopeful"]);
@@ -377,6 +381,7 @@ test("editing replaces the tracking day's record, keeps creation time, and leave
   assert.deepEqual(state.dailyCheckIns![0], other);
   assert.deepEqual(state.dailyCheckIns![1], {
     ...input({ note: "Corrected.", stress: 3 }),
+    sleepHours: null,
     createdAt: now.toISOString(),
     updatedAt: updated.toISOString(),
   });
@@ -386,6 +391,7 @@ test("same-day Morning and legacy Evening saves preserve each other's content an
   const state = emptyData();
   const legacy: DailyCheckIn = {
     ...input({ note: "The existing Evening." }),
+    sleepHours: null,
     createdAt: "2026-10-30T19:45:00.000Z",
     updatedAt: "2026-10-30T20:00:00.000Z",
   };
@@ -456,6 +462,7 @@ test("the check-in limit blocks new days while allowing corrections to existing 
   const state = emptyData();
   const record: DailyCheckIn = {
     ...input(),
+    sleepHours: null,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   };
@@ -1211,4 +1218,101 @@ test("explicit rating scales permit ten-point answers and preserve mixed legacy 
     undefined,
     "old-client raw values must not inherit a newer scale",
   );
+});
+
+test("Evening omission stays distinct from a clear while Morning keeps its duration default", () => {
+  assert.equal(Object.hasOwn(input(), "sleepHours"), false);
+  assert.equal(
+    Object.hasOwn(input({ sleepHours: undefined }), "sleepHours"),
+    false,
+  );
+  assert.equal(input({ period: "morning" }).sleepHours, null);
+  assert.equal(input({ sleepHours: null }).sleepHours, null);
+  assert.equal(input({ sleepHours: 0 }).sleepHours, 0);
+  assert.equal(
+    dailyCheckInSchema.safeParse({ day: "2026-10-30", sleepHours: undefined })
+      .success,
+    false,
+    "omitting removed fields cannot manufacture a meaningful new check-in",
+  );
+});
+
+test("a new Evening without sleep inputs stores a complete null-duration record", () => {
+  const state = emptyData();
+  const fields = input({ note: "", moods: ["calm"] });
+  upsertDailyCheckIn(state, fields, now);
+  assert.equal(checkIns(state)[0].sleepHours, null);
+  assert.equal(Object.hasOwn(checkIns(state)[0], "bedtime"), false);
+  assert.equal(Object.hasOwn(fields, "sleepHours"), false);
+});
+
+test("an Evening form that omits hidden sleep fields preserves their current values inside the write", () => {
+  const state = emptyData();
+  upsertDailyCheckIn(
+    state,
+    input({ period: "morning", morningSleep: { totalSleepMinutes: 390 } }),
+    now,
+  );
+  const morning = structuredClone(checkIns(state)[0]);
+  upsertDailyCheckIn(state, input({ sleepHours: 8, bedtime: "23:00" }), now);
+  const preparedForm = input({ moods: ["hopeful"], energy: 4 });
+  const before = structuredClone(preparedForm);
+  upsertDailyCheckIn(
+    state,
+    input({ sleepHours: 7.25, bedtime: "00:10" }),
+    new Date("2026-10-30T21:05:00Z"),
+  );
+  upsertDailyCheckIn(state, preparedForm, new Date("2026-10-30T21:06:00Z"));
+  const evening = checkIns(state).find((entry) => entry.period === "evening")!;
+  assert.equal(evening.sleepHours, 7.25);
+  assert.equal(evening.bedtime, "00:10");
+  assert.deepEqual(evening.moods, ["hopeful"]);
+  assert.equal(evening.energy, 4);
+  assert.deepEqual(preparedForm, before, "the writer never mutates its input");
+  assert.deepEqual(
+    checkIns(state).find((entry) => entry.period === "morning"),
+    morning,
+  );
+});
+
+test("explicit legacy Evening sleep values and null clears remain supported", () => {
+  const state = emptyData();
+  upsertDailyCheckIn(state, input({ sleepHours: 8, bedtime: "23:00" }), now);
+  upsertDailyCheckIn(state, input({ sleepHours: 0, bedtime: "00:00" }), now);
+  assert.equal(checkIns(state)[0].sleepHours, 0);
+  assert.equal(checkIns(state)[0].bedtime, "00:00");
+  upsertDailyCheckIn(state, input({ sleepHours: null, bedtime: null }), now);
+  upsertDailyCheckIn(state, input({ moods: ["okay"] }), now);
+  assert.equal(checkIns(state)[0].sleepHours, null);
+  assert.equal(checkIns(state)[0].bedtime, null);
+});
+
+test("omitted Evening sleep does not bypass a changed-writing conflict or alter its latest data", () => {
+  const state = emptyData();
+  upsertDailyCheckIn(
+    state,
+    input({ note: "First note.", sleepHours: 7, bedtime: "23:00" }),
+    now,
+  );
+  const stale = input({
+    note: "An older editor.",
+    expectedUpdatedAt: checkIns(state)[0].updatedAt,
+  });
+  upsertDailyCheckIn(
+    state,
+    input({
+      note: "Latest writing.",
+      expectedUpdatedAt: checkIns(state)[0].updatedAt,
+      sleepHours: 6,
+      bedtime: "00:30",
+    }),
+    new Date("2026-10-30T21:05:00Z"),
+  );
+  const latest = structuredClone(state);
+  assert.throws(
+    () => upsertDailyCheckIn(state, stale, new Date("2026-10-30T21:06:00Z")),
+    (error: unknown) =>
+      error instanceof DailyCheckInSaveError && error.status === 409,
+  );
+  assert.deepEqual(state, latest);
 });

@@ -60,8 +60,24 @@ export function upsertDailyCheckIn(
   ).toISOString();
   const fields = { ...input };
   delete fields.expectedUpdatedAt;
+  // Hidden Evening fields are not a stale full-form snapshot. Resolve omission
+  // against the current record inside this atomic write; null still clears it.
+  let sleepHours =
+    input.sleepHours === undefined
+      ? (existing?.sleepHours ?? null)
+      : input.sleepHours;
+  if (
+    input.period === "morning" &&
+    input.morningSleep === undefined &&
+    existing?.morningSleep !== undefined
+  )
+    sleepHours =
+      existing.morningSleep?.totalSleepMinutes == null
+        ? null
+        : existing.morningSleep.totalSleepMinutes / 60;
   const saved: DailyCheckIn = {
     ...fields,
+    sleepHours,
     // An older full-form client cannot clear a newer Evening bedtime by omission.
     ...(input.period === "evening" &&
     input.bedtime === undefined &&
@@ -77,11 +93,6 @@ export function upsertDailyCheckIn(
             existing.morningSleep === null
               ? null
               : { ...existing.morningSleep },
-          // Retained canonical sleep remains authoritative for legacy summaries.
-          sleepHours:
-            existing.morningSleep?.totalSleepMinutes == null
-              ? null
-              : existing.morningSleep.totalSleepMinutes / 60,
         }
       : input.morningSleep === undefined
         ? {}

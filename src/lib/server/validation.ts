@@ -190,7 +190,8 @@ export const dailyCheckInSchema = z
     stress: checkInScale.default(null),
     energyScale: checkInRatingScale,
     stressScale: checkInRatingScale,
-    sleepHours: z.number().finite().min(0).max(24).nullable().default(null),
+    // Evening no longer edits sleep: omission must retain the saved duration.
+    sleepHours: z.number().finite().min(0).max(24).nullable().optional(),
     morningSleep: morningSleepSchema.nullable().optional(),
     bedtime: checkInClock.nullable().optional(),
     helped: z
@@ -224,6 +225,10 @@ export const dailyCheckInSchema = z
   .transform((entry) => {
     const result = { ...entry };
     const { morningSleep } = result;
+    if (entry.sleepHours === undefined) {
+      if (entry.period === "morning") result.sleepHours = null;
+      else delete result.sleepHours;
+    }
     // Missing old-client values stay absent; Morning never owns this field.
     if (entry.bedtime === undefined || entry.period !== "evening")
       delete result.bedtime;
@@ -241,7 +246,7 @@ export const dailyCheckInSchema = z
       Boolean(entry.note.trim() || entry.helped || entry.moods.length) ||
       entry.energy !== null ||
       entry.stress !== null ||
-      entry.sleepHours !== null ||
+      entry.sleepHours != null ||
       entry.bedtime != null ||
       hasMorningSleepData(
         "morningSleep" in entry ? entry.morningSleep : undefined,
