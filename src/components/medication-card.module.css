@@ -14,10 +14,6 @@
   gap: 2px;
 }
 
-.card:global([data-intake-card]) .railDot {
-  margin-inline-end: 4px;
-}
-
 /* Recorded route, physical form and category marks share one outline weight. */
 .card:global([data-intake-card]) .rail:global(.intake-card-tags) svg {
   width: 13px;
@@ -65,11 +61,18 @@
 .railDot {
   flex: none;
   width: 6px;
-  margin-inline-end: 2px;
+  margin-inline: 2px;
   color: var(--card-foreground);
   font-size: 15px;
   font-weight: 700;
   text-align: center;
+}
+
+.intakeTypes {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: inherit;
 }
 
 .route,

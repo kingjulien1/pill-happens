@@ -132,26 +132,30 @@ export function MedicationCard({
             >
               {formPresentation === "icon" && (
                 <>
-                  <span className={styles.railDot} aria-hidden="true">
-                    ·
+                  <span className={styles.intakeTypes}>
+                    <span
+                      className={styles.route}
+                      title={
+                        INTAKE_ROUTES.find(
+                          (route) =>
+                            route.value === (intakeRoute ?? "unspecified"),
+                        )?.label
+                      }
+                    >
+                      <IntakeRouteIcon route={intakeRoute} strokeWidth={2.5} />
+                    </span>
+                    <span className={styles.form} title={typeLabel}>
+                      <MedicationFormGlyph
+                        form={form ?? "other"}
+                        strokeWidth={2.5}
+                      />
+                    </span>
                   </span>
-                  <span
-                    className={styles.route}
-                    title={
-                      INTAKE_ROUTES.find(
-                        (route) =>
-                          route.value === (intakeRoute ?? "unspecified"),
-                      )?.label
-                    }
-                  >
-                    <IntakeRouteIcon route={intakeRoute} strokeWidth={2.5} />
-                  </span>
-                  <span className={styles.form} title={typeLabel}>
-                    <MedicationFormGlyph
-                      form={form ?? "other"}
-                      strokeWidth={2.5}
-                    />
-                  </span>
+                  {indicators.length > 0 && (
+                    <span className={styles.railDot} aria-hidden="true">
+                      ·
+                    </span>
+                  )}
                 </>
               )}
               {indicators.map((kind) => (
