@@ -39,7 +39,7 @@
   /* 13 × (1 − (1/3 + 1/4)/2): a 29.1667% reduction. */
   font-size: 9.208333px;
   font-weight: 625;
-  opacity: 0.94;
+  opacity: 1;
   letter-spacing: -0.04em;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -112,19 +112,19 @@
 }
 
 .orb stop:first-child {
-  stop-color: var(--palette-rose);
+  stop-color: var(--color-pink-200, #fbcfe8);
 }
 
 .orb stop:nth-child(2) {
-  stop-color: var(--palette-lilac);
+  stop-color: var(--color-pink-300, #f9a8d4);
 }
 
 .orb stop:nth-child(3) {
-  stop-color: var(--check-in-secondary, var(--action-background));
+  stop-color: var(--color-pink-400, #f472b6);
 }
 
 .orb stop:last-child {
-  stop-color: color-mix(in srgb, var(--palette-white) 80%, var(--palette-rose));
+  stop-color: var(--color-pink-100, #fce7f3);
 }
 
 .sectionDot {
@@ -146,7 +146,7 @@
 }
 
 .confetti path:first-child {
-  stroke: var(--palette-iris);
+  stroke: var(--color-pink-200, #fbcfe8);
 }
 
 .confetti path:nth-child(2) {

@@ -190,7 +190,7 @@ export function DailyCheckInSection({
     >
       {intakeSpacing === "before" && intakeSpacer}
       <MedicationCardBase
-        color="tw-purple-400"
+        color="tw-pink-400"
         icon={morning ? "sun" : "moon-star"}
         leadingArtwork={
           <CheckInCardArtwork

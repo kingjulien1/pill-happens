@@ -61,8 +61,12 @@ function ArtworkScene({
       />
       <span className={styles.arrival}>
         <MedicationCardIconFrame
-          color="tw-purple-400"
+          color="tw-pink-400"
           className={styles.tile}
+          style={{
+            color: "var(--art-ink)",
+            backgroundColor: "var(--check-in-art-base)",
+          }}
           data-check-in-icon-tile
         >
           <span className={styles.symbolArrival}>
