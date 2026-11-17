@@ -902,7 +902,7 @@ export function DeveloperGuidePage() {
               <p>
                 The directory contains Today, Journal, Past Days, Medications,
                 Goals and Getting Started Guide. From 768px, HeaderNavigation
-                uses a 376px anchored Base UI Menu with native links, arrow-key
+                uses a 420px anchored Base UI Menu with native links, arrow-key
                 navigation and typeahead. Below 768px it uses the same
                 responsive Drawer primitives as intake editing: a full-width
                 bottom sheet with a swipe handle, safe-area clearance, modal
@@ -912,33 +912,37 @@ export function DeveloperGuidePage() {
                 host and preserve focus return to the current trigger.
               </p>
               <p>
-                The masthead and destination links share pink-toned icon tiles,
-                clear primary copy and quieter supporting labels. Appearance and
-                Close retain at least 44px native targets with 32px visible
-                faces. The larger header artwork follows the same tile language
-                as the links. Pink and Lilac selection fields remain paint-only:
-                selected and hovered rows add no enclosing borders, and keyboard
-                focus stays independently visible.
+                Today is the featured destination, with a real intake count and
+                the current tracking date above it. On mobile, Journal, Past
+                Days, Medications and Goals form a two-column grid with generous
+                icon stages, 15–16px labels and 12px count captions. Loaded counts
+                replace generic descriptions; unavailable data keeps helpful
+                context instead of inventing zeroes. Appearance and Close retain
+                44px targets. A 50px layered brand tile ties the masthead to the
+                destinations. Pink and Lilac selection washes add no extra
+                borders, while keyboard focus remains independently visible.
               </p>
               <p>
                 Navigation owns its own scoped surface in
-                navigation-panel.module.css: dark mode starts from #241526 with
+                navigation-panel.module.css: dark mode starts from #211625 with
                 #fdf1f7 copy and Pink/Lilac accents; light mode uses rose paper
                 with deep Plum copy. This leaves the canonical menu roles
-                available to Appearance and form selectors. The mobile sheet has
-                30px upper corners and dedicated safe-area padding; its
-                scrolling content and footer remain separate from the page
-                below.
+                available to Appearance and form selectors. The mobile sheet
+                uses the intake forms’ shared dialog radius and bounded height,
+                with dedicated safe-area padding. One navigationBody scroll
+                owner contains its header, destinations and footer, so even
+                short windows can reach every control without nested scrolling.
               </p>
               <p>
-                Desktop destination rows are 57px high with 35px icon tiles;
-                mobile rows are 62px high with 38px tiles. This restores
-                breathing room without adding empty decoration. A protected
-                trailing rail holds the current-page check or destination arrow,
-                while long labels truncate. Current routes, historical-day
-                selection and native modified-click behavior remain unchanged.
-                Fine-pointer hover is gated away from touch devices, and reduced
-                motion leaves decorative details settled.
+                Desktop keeps a linear menu with a 99px featured Today row and
+                63px destination rows. Mobile uses a full-width 104px Today card
+                followed by four tiles at least 112px tall. A protected trailing
+                rail holds the current-page check or destination arrow. Long
+                labels truncate without moving that rail. Routes and modified
+                clicks keep their native semantics. Destinations enter with a
+                restrained 380ms rise, offset by 32ms per item; reduced motion
+                shows settled content. Hover remains limited to desktop fine
+                pointers and never moves the icons.
               </p>
               <p>
                 Streaks is not listed in the navigation menu. The existing
@@ -949,18 +953,16 @@ export function DeveloperGuidePage() {
                 milestone pages are unchanged.
               </p>
               <p>
-                The footer retains one nonwrapping link row: Backups &amp;
-                Export left, Report a Bug exactly centered and Developer Guide
-                right. Their contextual CloudDownload, BugPlay and Braces glyphs
-                measure 0.9em and inherit the text’s full color with no extra
-                icon-opacity multiplier. Labels can truncate while accessible
-                names remain complete. The helper paragraph starts 12px below
-                the link row, uses 70% opacity and clamps to two lines. Its
-                pointer-inert bottom wash measures the footer height plus 7px
-                and ends 7px below it, so the transparent top meets the footer
-                separator instead of extending into the final destination. The
-                wash holds a 14% Rose tint through 55%, drops to 6% at 82% and
-                reaches zero at its top; it adds no hit target or layout height.
+                Getting Started has its own supporting row beneath the main
+                destinations. A separated Help &amp; Tools footer contains three
+                shortcut tiles: Backups, Report a Bug and Developer. Mobile uses
+                62px stacked tiles; desktop uses 44px horizontal tools so every
+                main destination remains visible in a normal-height menu. Their
+                CloudDownload, BugPlay and Braces glyphs use the Pink accent;
+                accessible names retain their complete destinations. A quiet
+                two-line note explains that the current place is remembered on
+                this device. Every tool stays reachable through the sheet’s
+                existing scroll owner; no decorative wash overlaps the links.
               </p>
               <p>
                 Navigation keys its host by pathname and responsive layout. A

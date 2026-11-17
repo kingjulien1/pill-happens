@@ -904,7 +904,7 @@ export function GuidePage() {
                 <a href="https://pill-happens.vercel.app/">
                   pill-happens.vercel.app
                 </a>{" "}
-                and choose Install App in navigation. Supported browsers offer
+                and use the Install App button below. Supported browsers offer
                 their install prompt; otherwise the app shows instructions for
                 your device. On iPhone or iPad, these guide you through Safari’s
                 Share → Add to Home Screen action.
@@ -921,13 +921,13 @@ export function GuidePage() {
             <GuideDetail title="A Place For Everything" icon="menu">
               <p>
                 Open the menu beside the animated tablets to move between Today,
-                Past Days, Medications and Goals. The page you’re on is
-                highlighted; small counts show what is already in your journal.
-                On phones, the menu opens as a bottom sheet with space to
-                scroll. Getting Started Guide sits below the main pages.
-                Developer Guide is a small link in the footer beside Backups
-                &amp; Export; installation is available from the menu’s top icon
-                row. On smaller screens, scroll the list to find every page.
+                Journal, Past Days, Medications and Goals. Today has its own
+                featured card; the other places appear as roomy tiles on phones.
+                The current page is highlighted, and small counts show what is
+                already saved. The menu opens as a scrollable bottom sheet, just
+                like an intake form. Getting Started sits below the main pages;
+                Backups, Report a Bug and Developer are together under Help &amp;
+                Tools. Scroll down on smaller screens to reach every shortcut.
               </p>
             </GuideDetail>
             <GuideDetail title="Find Your Light" icon="palette">
