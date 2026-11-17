@@ -19,6 +19,7 @@ import { JournalReferenceArrival } from "@/components/journal-reference-arrival"
 import layoutStyles from "./page-layout.module.css";
 import guideStyles from "./guide-shell.module.css";
 import topbarStyles from "./page-topbar.module.css";
+import controlStyles from "./today-controls.module.css";
 
 /** An interacted control stays settled even after its menu closes or focus leaves. */
 function settleTopbarControl(event: SyntheticEvent<HTMLElement>) {
@@ -95,8 +96,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ref={topbar}
         className={
           guidePage
-            ? `${topbarStyles.header} ${topbarStyles.guideHeader}`
-            : topbarStyles.header
+            ? `${topbarStyles.header} ${topbarStyles.guideHeader} ${controlStyles.context}`
+            : `${topbarStyles.header} ${controlStyles.context}`
         }
         data-page-topbar
         style={HEADER_CONTROL_PAINT}

@@ -1,0 +1,246 @@
+/* These aliases resolve on the owner, before header paint is inherited. */
+.context,
+.action {
+  --control-face: var(--control-face-light);
+  --control-ink: var(--control-ink-light);
+  --control-secondary: var(--control-secondary-light);
+  --control-highlight: var(--control-highlight-light);
+  --control-blush: var(--control-blush-light);
+  --control-rim: var(--control-rim-light);
+  --control-edge: var(--control-edge-light);
+  --control-shadow: var(--control-shadow-light);
+  --control-well: var(--control-well-light);
+  --control-tool-face: var(--control-tool-face-light);
+  --control-tool-opaque: var(--control-tool-opaque-light);
+  --control-tool-ink: var(--control-tool-ink-light);
+  --control-tool-rim: var(--control-tool-rim-light);
+  --control-tool-edge: var(--control-tool-edge-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .context,
+  .action:not([data-button-theme="light"]) {
+    --control-face: var(--control-face-dark);
+    --control-ink: var(--control-ink-dark);
+    --control-secondary: var(--control-secondary-dark);
+    --control-highlight: var(--control-highlight-dark);
+    --control-blush: var(--control-blush-dark);
+    --control-rim: var(--control-rim-dark);
+    --control-edge: var(--control-edge-dark);
+    --control-shadow: var(--control-shadow-dark);
+    --control-well: var(--control-well-dark);
+    --control-tool-face: var(--control-tool-face-dark);
+    --control-tool-opaque: var(--control-tool-opaque-dark);
+    --control-tool-ink: var(--control-tool-ink-dark);
+    --control-tool-rim: var(--control-tool-rim-dark);
+    --control-tool-edge: var(--control-tool-edge-dark);
+  }
+}
+
+/* The frosted 5px surround and inset face are paint, never extra box size. */
+.action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
+  isolation: isolate;
+  border: 0;
+  border-radius: var(--intake-card-radius, 21px);
+  background: var(--control-rim);
+  color: var(--control-ink);
+  font-size: 15.5px;
+  font-weight: 675;
+  -webkit-backdrop-filter: blur(32px) saturate(115%);
+  backdrop-filter: blur(32px) saturate(115%);
+  box-shadow:
+    inset 0 0 0 1px var(--control-edge),
+    0 12px 30px -12px var(--control-shadow),
+    0 3px 8px var(--control-shadow);
+  transition:
+    box-shadow 240ms ease,
+    filter 240ms ease;
+}
+
+.action[data-control-style="satin"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 5px;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      ellipse 65% 140% at 2% -30%,
+      var(--control-highlight),
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 68% 160% at 100% 120%,
+      var(--control-blush),
+      transparent 78%
+    ),
+    var(--control-face);
+  box-shadow:
+    inset 0 0 0 1px var(--control-edge),
+    inset 0 1px 0 var(--control-highlight),
+    0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
+  pointer-events: none;
+}
+
+.action[data-control-style="satin"] :global(.intake-primary-row) {
+  grid-template-columns: minmax(0, 1fr) 23px;
+  column-gap: 12px;
+  padding-inline-end: 2px;
+}
+.action[data-control-style="satin"] :global(.intake-primary-copy) {
+  gap: 8px;
+}
+.action[data-control-style="satin"] :global(.intake-primary-label) {
+  gap: 11px;
+}
+.action[data-control-style="satin"] :global(.intake-primary-aside),
+.action[data-control-style="satin"] :global(.intake-primary-next) {
+  color: var(--control-secondary);
+  opacity: 1;
+}
+.action[data-control-style="satin"] :global(.intake-primary-dot) {
+  color: var(--control-secondary);
+  opacity: 0.55;
+}
+.action[data-control-style="satin"] :global(.intake-primary-aside) {
+  font-size: 0.86em;
+  font-weight: 550;
+}
+.action[data-control-style="satin"]
+  :global(.intake-primary-label)
+  > :global(.intake-log-symbol) {
+  left: 0;
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--control-well);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--control-ink) 11%, transparent);
+  color: var(--control-ink);
+}
+.action[data-control-style="satin"] :global(.intake-log-symbol-pill) {
+  position: static;
+  color: inherit;
+}
+
+/* Matching glass tools, with the same shallow bevel and no neon outlines. */
+.headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  ) {
+  --header-button-pigment: var(--control-tool-ink);
+  --header-button-edge: var(--control-tool-edge);
+  --header-button-hover-edge: var(--control-tool-edge);
+  --header-button-active-edge: var(--control-tool-edge);
+  --brand-copy: var(--control-tool-ink);
+  --brand-surface: var(--control-tool-face);
+  border: 0;
+  border-radius: 14px;
+  background: var(--control-tool-rim);
+  color: var(--control-tool-ink);
+  -webkit-backdrop-filter: blur(32px) saturate(115%);
+  backdrop-filter: blur(32px) saturate(115%);
+  box-shadow:
+    inset 0 0 0 1px var(--control-tool-edge),
+    0 4px 12px -4px var(--control-shadow);
+  transition: box-shadow 220ms ease;
+}
+.headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  )::before {
+  z-index: 0;
+  inset: 3px;
+  border: 0;
+  border-radius: 11px;
+  background:
+    radial-gradient(
+      ellipse at 10% 0%,
+      var(--control-tool-rim),
+      transparent 70%
+    ),
+    var(--control-tool-face);
+  box-shadow: inset 0 0 0 1px var(--control-tool-edge);
+  filter: none;
+}
+.headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  )::after {
+  content: none;
+}
+.headerButton :global(.header-control-surface) {
+  display: none;
+}
+.headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  ):focus-visible,
+.action.action[data-slot="button"][data-button-system="daily"][data-control-style="satin"]:focus-visible {
+  outline: 2px solid #f6e7ff;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px #392d49;
+}
+
+@media (max-width: 359px) {
+  .action[data-control-style="satin"] {
+    padding-inline: 15px;
+  }
+  .action[data-control-style="satin"] :global(.intake-primary-label) {
+    gap: 8px;
+  }
+  .action[data-control-style="satin"] :global(.intake-primary-copy) {
+    gap: 6px;
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .action[data-slot="button"][data-control-style="satin"]:not(
+      :disabled,
+      [aria-disabled="true"]
+    ):hover {
+    filter: brightness(1.035);
+    box-shadow:
+      inset 0 0 0 1px var(--control-edge),
+      0 14px 34px -10px var(--control-shadow),
+      0 4px 10px var(--control-shadow);
+  }
+  .headerButton.headerButton[data-slot="button"]:not(:disabled):hover,
+  .headerButton.headerButton[data-slot="button"][data-popup-open] {
+    box-shadow:
+      inset 0 0 0 1.5px var(--control-tool-ink),
+      0 5px 16px -4px var(--control-shadow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"],
+  .headerButton.headerButton[data-slot="button"]:is(
+      [data-brand-refresh],
+      [data-navigation-trigger]
+    ) {
+    transition: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"],
+  .headerButton.headerButton[data-slot="button"]:is(
+      [data-brand-refresh],
+      [data-navigation-trigger]
+    ) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
+    background-color: var(--control-face);
+  }
+  .headerButton.headerButton[data-slot="button"]:is(
+      [data-brand-refresh],
+      [data-navigation-trigger]
+    ) {
+    background-color: var(--control-tool-opaque);
+  }
+}

@@ -3,7 +3,7 @@
 import type { ComponentProps } from "react";
 import { LoaderCircle } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
-import { PrimaryButton } from "@/components/primary-button";
+import { TodayActionButton } from "@/components/today-action-button";
 import {
   getIntakeActionThemeStyle,
   INTAKE_ACTION_GEOMETRY,
@@ -31,12 +31,9 @@ export function MedicationActionButton({
       minHeight: INTAKE_ACTION_GEOMETRY.height,
     };
     return (
-      <PrimaryButton
+      <TodayActionButton
         {...props}
         surface="solid"
-        rim
-        rimThickness={5.5}
-        gpuRim
         radius={INTAKE_ACTION_GEOMETRY.radius}
         disabled={disabled || pending}
         pending={pending}
@@ -84,7 +81,7 @@ export function MedicationActionButton({
           </span>
           <ActionIcon name="next" className="intake-primary-next" />
         </span>
-      </PrimaryButton>
+      </TodayActionButton>
     );
   }
 

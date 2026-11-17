@@ -1107,45 +1107,37 @@ export function DeveloperGuidePage() {
                 the text color.
               </p>
               <p>
-                The Today action and library Add Medication action share an 80px
-                height and 21px radius, matching the intake-card reference.
-                Their explicit intake appearance uses an opaque dark-pink face,
-                #29131f, in both modes. MAIN_ACTION_PINK centralizes the finish:
-                Pink600 at 74% alpha for the crisp 2px inner band, Pink200 for
-                secondary icons/text, and a 28% Pink300 wash on the thick outer
-                rim. The moving rim remains 5.5px at 30% alpha over that wash;
-                its precomputed color stops also include the Pink300 admixture.
-                A 0.25px face-colored gap separates it from the inner band,
-                keeping more of the dark face visible. A 1.5px fine outer edge
-                at half the wash opacity matches the intake cards’ visible
-                frame without shrinking the hit target. GPU and CSS
-                fallback consume the same geometry and precomputed hex stops;
-                only one renderer paints after successful initialization. Soft
-                exterior glow does not change the hit target or measured
-                footprint. Bare PrimaryButton also starts from the same 80px
-                height and 21px corners; dialog submissions retain their own
-                compact geometry.
+                TodayActionButton gives Today and Add Medication a fresh satin
+                surface while retaining the native PrimaryButton host, 80px
+                height and intake-card 21px corners. The independent skin turns
+                off both old moving-rim renderers. A 5px inward frosted surround,
+                one fine inset catchlight and soft directional contact shadows
+                make a raised face without enlarging the measured hit target.
+                Two broad, asymmetrical radial reflections mix lilac and blush
+                across the face rather than forming another rotating outline.
               </p>
               <p>
-                MedicationActionButton composes the same PrimaryButton
-                configuration as Today for Add Medication: 80px high, 21px
-                corners, a solid dark-pink face and the same 5.5px GPU/CSS rim.
-                The creation symbol, main label, dot, Set Up aside and arrow use
-                the shared content layout. Save Medication and other dialog
-                submissions opt into the same pink main-action finish while
-                retaining their compact form geometry, pending labels, disabled
-                states and native submission behavior.
+                TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs.
+                Dark mode uses a pale lilac face with deep plum text; light mode
+                uses a rich plum face with pale lilac text. Supporting copy and
+                the arrow use a quieter, readable ink in the same family. The
+                original Tablets SVG, Log Intake label, dot, Jot it! aside and
+                directional arrow remain; the same 23px leading glyph now rests
+                in a 38px soft inset well. Its entrance and the content entrance
+                retain independent transform owners. Mobile keeps one centered
+                content row down to 320px and no hover feedback. Fine-pointer
+                desktop hover adjusts only luminance and shadow; reduced motion
+                removes those transitions, and reduced transparency replaces
+                the frosted base with opaque paint.
               </p>
               <p>
-                The main label keeps its readable foreground; secondary icons
-                and copy, including Jot it!, use the shared Pink200 ink without
-                another opacity multiplier. The IntakeLogSymbol and content
-                entrance retain independent transform owners. PrimaryButton,
-                Accent and DialogPrimaryButton explicitly request this
-                main-action appearance. Ordinary small controls keep their
-                semantic variants, and SecondaryButton remains a quiet tonal
-                action; the pink main-action finish is not a project-wide
-                replacement for all buttons.
+                MedicationActionButton reuses this exact component for Add
+                Medication with its existing creation symbol, label, dot,
+                Set Up aside and arrow. Save Medication and other compact
+                submissions retain their existing shared pink finish and form
+                geometry. Ordinary small controls and SecondaryButton keep
+                their semantic variants; the new surface is scoped to the
+                prominent page actions and the matching toolbar family.
               </p>
               <p>
                 IntakeAction reserves its final geometry before its own
@@ -1280,23 +1272,24 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 The two 46px page controls and loading core share
-                HEADER_CONTROL_PAINT. An opaque Pink950 base carries a separate
-                Mauve900 overlay at 67% opacity. Artwork and the main edge use
-                Pink400; a finer inward edge uses the same pigment at 67%. The
-                soft outer ring retains its reduced visibility, and a 24px
-                backdrop blur stays beneath the paint. Hover, focus and open
-                states keep this face in either appearance; the keyboard focus
-                ring remains separate. Header geometry, gesture thresholds and
-                entrance ownership are unchanged.
+                HEADER_CONTROL_PAINT, which aliases the same TODAY_CONTROL_PAINT
+                family. The toolbar uses quieter translucent lilac glass in
+                light mode and deep mauve glass with pale lilac artwork in dark
+                mode. A 3px inward bevel and fine catchlight echo the main
+                action, with 32px blur and restrained contact shadow. The old
+                Pink950 foundation and competing outlined layers are replaced.
+                Glyphs stay still during hover; navigation, Today links and
+                directional pull gestures retain their original behavior.
               </p>
               <p>
-                Icon ink brightens the mug’s #c1b6cc with 20% White, then adds
-                Purple 400 at 67%. Both controls share a 2.5px main rim mixed
-                with 30% Pink 200, the blurred outer rim at 5⅓% alpha (one third
-                less than its former 8%), and a 1px inner rim in the mixed icon
-                color at 67%. These are decorative paint layers, so the 46px
-                control and its hit area do not grow. The resting rim is not
-                multiplied again by the gesture controller’s edge alpha.
+                Mode aliases resolve on the toolbar context before its child
+                controls inherit their paint. The critical loading CSS includes
+                those same literal pigment pairs and system-preference aliases,
+                so it matches before application styles or hydration arrive.
+                Tablet score lines use an opaque matching face pigment to stay
+                crisp. Keyboard focus has its own offset ring; disabled states
+                retain native semantics. The 46px hit area, 14px corners, gesture
+                thresholds and animation ownership are unchanged.
               </p>
               <p>
                 After shared page-entry readiness, two separate layout wrappers

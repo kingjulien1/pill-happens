@@ -11,7 +11,7 @@ import { ActionIcon } from "@/components/action-icon";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
-import { PrimaryButton } from "@/components/primary-button";
+import { TodayActionButton } from "@/components/today-action-button";
 import {
   getIntakeActionThemeStyle,
   INTAKE_ACTION_GEOMETRY,
@@ -265,19 +265,16 @@ export function IntakeAction({
         data-intake-entry-part="button"
       >
         <div className="intake-action-shell">
-          <PrimaryButton
+          <TodayActionButton
             type="button"
             surface="solid"
-            rim
-            rimThickness={5.5}
-            gpuRim
             radius={INTAKE_ACTION_GEOMETRY.radius}
             style={{
               ...getIntakeActionThemeStyle(),
               height: INTAKE_ACTION_GEOMETRY.height,
               minHeight: INTAKE_ACTION_GEOMETRY.height,
             }}
-            data-intake-paint="dark-pink"
+            data-intake-paint="satin"
             onClick={onClick}
             className="intake-primary-cta pointer-events-auto w-full"
           >
@@ -294,7 +291,7 @@ export function IntakeAction({
               </span>
               <ActionIcon name="next" className="intake-primary-next" />
             </span>
-          </PrimaryButton>
+          </TodayActionButton>
         </div>
       </div>
       <p

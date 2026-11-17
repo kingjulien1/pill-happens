@@ -1,7 +1,10 @@
 import type { CSSProperties } from "react";
 import { Pill, RefreshCw } from "lucide-react";
 import { APP_CANVAS_CSS } from "@/lib/app-theme";
-import { HEADER_CONTROL_PAINT_CSS } from "@/lib/header-control-paint";
+import {
+  HEADER_CONTROL_DARK_CSS,
+  HEADER_CONTROL_PAINT_CSS,
+} from "@/lib/header-control-paint";
 import { PAGE_REFRESH_BOOT_SCRIPT } from "@/lib/page-refresh-handoff";
 import {
   LOADING_SCREEN_COPY,
@@ -19,7 +22,7 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   /* Header paint remains identical before app CSS arrives. */
   --refresh-face: var(--header-control-base);
   --refresh-edge: var(--header-control-thick-edge);
-  --brand-surface: var(--refresh-face);
+  --brand-surface: var(--header-control-cup-base);
   --brand-copy: var(--header-control-ink);
   --brand-tone-ice: var(--color-violet-300, #c4b4ff);
   --brand-tone-teal: var(--color-violet-400, #a684ff);
@@ -222,33 +225,29 @@ html[data-page-refresh-active] .page-refresh-screen {
 .page-refresh-threshold { animation: refresh-brand-spring-core 960ms linear var(--refresh-threshold) both; }
 .page-refresh-core {
   isolation: isolate;
-  border: 2.5px solid var(--refresh-edge);
+  border: 0;
   border-radius: 14px;
-  background: var(--brand-surface);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
-  box-shadow: inset 0 .5625px 0 var(--refresh-paint-copy-p10), 0 1.6875px 6.75px var(--refresh-paint-surface-p10);
+  background: var(--control-tool-rim);
+  -webkit-backdrop-filter: blur(32px) saturate(115%);
+  backdrop-filter: blur(32px) saturate(115%);
+  box-shadow: inset 0 0 0 1px var(--control-tool-edge), 0 4px 12px -4px var(--control-shadow);
 }
 .page-refresh-core::before {
   content: "";
   position: absolute;
   z-index: 0;
-  inset: -2.5px;
-  border: 2.5px solid var(--header-control-outer-edge);
-  border-radius: inherit;
-  filter: blur(.8px);
+  inset: 3px;
+  border: 0;
+  border-radius: 11px;
+  background: radial-gradient(ellipse at 10% 0%, var(--control-tool-rim), transparent 70%), var(--control-tool-face);
+  box-shadow: inset 0 0 0 1px var(--control-tool-edge);
   pointer-events: none;
 }
 .page-refresh-core::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  border-radius: calc(14px - 2.5px);
-  box-shadow: inset 0 0 0 1px var(--header-control-inner-edge);
-  pointer-events: none;
+  content: none;
 }
 .page-refresh-surface {
+  display: none;
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -438,10 +437,12 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
 @keyframes refresh-brand-copy-exit { 0%, 17% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.025); } 100% { opacity: 0; transform: scale(.9); } }
 @media (prefers-color-scheme: dark) {
   :where(html:not([data-color-mode])) .page-refresh-screen {
+    ${HEADER_CONTROL_DARK_CSS}
     color-scheme: dark;
   }
 }
 :where(html[data-color-mode="dark"]) .page-refresh-screen {
+  ${HEADER_CONTROL_DARK_CSS}
   color-scheme: dark;
 }
 

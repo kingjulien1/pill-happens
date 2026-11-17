@@ -34,6 +34,7 @@ import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
 import styles from "./navigation-panel.module.css";
+import controlStyles from "./today-controls.module.css";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -479,6 +480,7 @@ function NavigationMenu({
     "aria-label": "Open navigation",
     className: cn(
       "header-icon-button header-icon-button--compact header-brand-surface",
+      controlStyles.headerButton,
       className,
     ),
     style: getBrandThemeStyle(),

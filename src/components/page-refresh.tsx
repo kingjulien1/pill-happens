@@ -16,6 +16,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { RefreshCcw } from "lucide-react";
 import styles from "./page-refresh.module.css";
+import controlStyles from "./today-controls.module.css";
 import { BrandMark } from "@/components/brand";
 import { useJournal } from "@/components/journal-provider";
 import { useJournalWorkspace } from "@/components/journal-drafts";
@@ -764,7 +765,7 @@ export function CompactRefreshBrand() {
         render={<button type="button" />}
         ref={handle}
         type="button"
-        className={`header-icon-button header-icon-button--compact header-brand-surface header-refresh-button brand-refresh-handle ${styles.button}`}
+        className={`header-icon-button header-icon-button--compact header-brand-surface header-refresh-button brand-refresh-handle ${styles.button} ${controlStyles.headerButton}`}
         aria-label="Go to Today"
         title="Go to Today"
         aria-describedby={hintId}
