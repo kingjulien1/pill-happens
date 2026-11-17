@@ -168,6 +168,16 @@ export const dailyCheckInSchema = z
         "Keep your reflection to 100,000 characters or fewer.",
       )
       .default(""),
+    // Optional only for older clients: the writer still checks different notes.
+    expectedUpdatedAt: z
+      .string()
+      .max(64)
+      .refine(
+        (value) => Number.isFinite(Date.parse(value)),
+        "Invalid reflection version.",
+      )
+      .nullable()
+      .optional(),
     moods: z
       .array(z.enum(DAILY_MOOD_VALUES))
       .max(4, "Choose up to four moods.")

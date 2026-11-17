@@ -3420,6 +3420,20 @@ export function DeveloperGuidePage() {
                 </li>
               </ul>
               <p>
+                Full check-in submissions protect writing with the same
+                expectedUpdatedAt precondition inside the repository mutation.
+                Different existing prose needs an exact version match; older
+                clients can create a record or save unchanged writing, but
+                cannot replace newer text without review. A stale version cannot
+                revive a deleted record. Both writing and full-form saves advance
+                versions monotonically, including writes in the same millisecond.
+                Submissions drain their own autosave before reading its latest
+                acknowledged base, and successful cleanup retains any observed
+                newer local draft. This protects against stale full-form saves;
+                it does not provide an archive of historical notes or an atomic
+                transaction across browser tabs.
+              </p>
+              <p>
                 These rules bound background request frequency without promising
                 a particular hosting quota. Closing the writing space returns to
                 the same check-in; closing the entire form retains the local

@@ -4,7 +4,14 @@ import type { DailyCheckInInput } from "./validation";
 
 export const DAILY_CHECK_IN_LIMIT = 50_000;
 
-export class DailyCheckInSaveError extends Error {}
+export class DailyCheckInSaveError extends Error {
+  constructor(
+    message: string,
+    public status = 400,
+  ) {
+    super(message);
+  }
+}
 
 /**
  * Apply inside the journal's atomic mutation. The caller captures `now` once,
@@ -24,14 +31,37 @@ export function upsertDailyCheckIn(
   const matches = (entry: DailyCheckIn) =>
     entry.day === input.day && getCheckInPeriod(entry) === input.period;
   const existing = checkIns.find(matches);
+  // A full form must protect writing just like the reflection-only endpoint.
+  // Legacy clients may create a record or submit unchanged writing, but cannot
+  // replace a different existing note without naming the version they edited.
+  // Equal notes are safe after this client's own autosave advanced the version.
+  const sameNote = (existing?.note ?? "") === input.note;
+  const versionMatches = existing
+    ? input.expectedUpdatedAt !== undefined &&
+      input.expectedUpdatedAt === existing.updatedAt
+    : input.expectedUpdatedAt == null;
+  if (!versionMatches && (!existing || !sameNote))
+    throw new DailyCheckInSaveError(
+      "This check-in changed elsewhere. Your draft is still kept on this device. Review the latest writing before saving again.",
+      409,
+    );
   if (!existing && checkIns.length >= DAILY_CHECK_IN_LIMIT)
     throw new DailyCheckInSaveError(
       "Your journal has reached its check-in limit. Export a backup before continuing.",
     );
 
-  const timestamp = now.toISOString();
+  // Distinct saves must never share a version, including two writes in one ms.
+  const previousTime = Date.parse(existing?.updatedAt ?? "");
+  const timestamp = new Date(
+    Math.max(
+      now.getTime(),
+      Number.isFinite(previousTime) ? previousTime + 1 : 0,
+    ),
+  ).toISOString();
+  const fields = { ...input };
+  delete fields.expectedUpdatedAt;
   const saved: DailyCheckIn = {
-    ...input,
+    ...fields,
     // An older full-form client cannot clear a newer Evening bedtime by omission.
     ...(input.period === "evening" &&
     input.bedtime === undefined &&

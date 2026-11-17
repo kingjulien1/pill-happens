@@ -55,10 +55,13 @@ export function saveDailyReflection(
       409,
       "This check-in changed elsewhere. Your writing is still kept on this device. Review the latest journal before saving again.",
     );
-  const timestamp =
-    existing?.updatedAt === now.toISOString()
-      ? new Date(now.getTime() + 1).toISOString()
-      : now.toISOString();
+  const previousTime = Date.parse(existing?.updatedAt ?? "");
+  const timestamp = new Date(
+    Math.max(
+      now.getTime(),
+      Number.isFinite(previousTime) ? previousTime + 1 : 0,
+    ),
+  ).toISOString();
   if (existing) {
     const hasOtherContent =
       existing.moods.length > 0 ||

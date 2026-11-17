@@ -24,7 +24,7 @@ export function POST(request: Request) {
         );
       } catch (error) {
         if (error instanceof DailyCheckInSaveError)
-          throw new ApiError(400, error.message);
+          throw new ApiError(error.status, error.message);
         throw error;
       }
     },

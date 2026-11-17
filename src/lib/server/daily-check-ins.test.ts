@@ -24,6 +24,7 @@ import { createLocalJournalRepository } from "./local-journal-repository";
 import { createJournalService } from "./journal-service";
 import { mutateJournalState, readJournalState } from "./journal-state";
 import { dailyCheckInSchema } from "./validation";
+import { saveDailyReflection } from "./daily-reflection";
 
 const now = new Date("2026-10-30T21:00:00.000Z");
 const input = (fields: Record<string, unknown> = {}) =>
@@ -190,13 +191,188 @@ test("saving a legacy journal adds one check-in with server timing and a copied 
   assert.deepEqual(checkIns(state)[0].moods, ["okay", "hopeful"]);
 });
 
+test("full saves accept only valid optional writing versions and never store request metadata", () => {
+  for (const expectedUpdatedAt of [undefined, null, now.toISOString()])
+    assert.equal(
+      input({ expectedUpdatedAt }).expectedUpdatedAt,
+      expectedUpdatedAt,
+    );
+  for (const expectedUpdatedAt of ["", "not-a-date", 123, true, "x".repeat(65)])
+    assert.equal(
+      dailyCheckInSchema.safeParse({
+        day: "2026-10-30",
+        note: "Words",
+        expectedUpdatedAt,
+      }).success,
+      false,
+    );
+  const state = emptyData();
+  upsertDailyCheckIn(state, input({ expectedUpdatedAt: null }), now);
+  assert.equal(Object.hasOwn(checkIns(state)[0], "expectedUpdatedAt"), false);
+});
+
+test("full forms cannot replace newer writing with stale, null or missing versions", () => {
+  const state = emptyData();
+  upsertDailyCheckIn(state, input(), now);
+  const base = checkIns(state)[0].updatedAt;
+  const latest = new Date(now.getTime() + 15_000);
+  saveDailyReflection(
+    state,
+    {
+      day: "2026-10-30",
+      period: "evening",
+      note: "Original words.\n\n---\n\nNew paragraphs from the other device.",
+      expectedUpdatedAt: base,
+    },
+    latest,
+  );
+  const before = structuredClone(state);
+  for (const expectedUpdatedAt of [base, null, undefined]) {
+    assert.throws(
+      () =>
+        upsertDailyCheckIn(
+          state,
+          input({ note: "An older form's words.", expectedUpdatedAt }),
+          new Date(latest.getTime() + 1_000),
+        ),
+      (error) => error instanceof DailyCheckInSaveError && error.status === 409,
+    );
+    assert.deepEqual(state, before, "a conflict changes no journal fields");
+  }
+  assert.throws(
+    () =>
+      upsertDailyCheckIn(
+        state,
+        dailyCheckInSchema.parse({ day: "2026-10-30", moods: ["calm"] }),
+        latest,
+      ),
+    (error) => error instanceof DailyCheckInSaveError && error.status === 409,
+    "a legacy form omitting note cannot clear existing writing",
+  );
+  assert.deepEqual(state, before);
+});
+
+test("own autosave followed by a full save may retain identical writing with an older base", () => {
+  for (const expectedUpdatedAt of [null, undefined, now.toISOString()]) {
+    const state = emptyData();
+    upsertDailyCheckIn(state, input(), now);
+    const newer = new Date(now.getTime() + 2_000);
+    saveDailyReflection(
+      state,
+      {
+        day: "2026-10-30",
+        period: "evening",
+        note: "Autosaved writing including the newest paragraph.",
+        expectedUpdatedAt: now.toISOString(),
+      },
+      newer,
+    );
+    upsertDailyCheckIn(
+      state,
+      input({
+        note: "Autosaved writing including the newest paragraph.",
+        moods: ["hopeful"],
+        expectedUpdatedAt,
+      }),
+      new Date(newer.getTime() + 1_000),
+    );
+    assert.equal(
+      checkIns(state)[0].note,
+      "Autosaved writing including the newest paragraph.",
+    );
+    assert.deepEqual(checkIns(state)[0].moods, ["hopeful"]);
+  }
+});
+
+test("different full saves advance versions even in the same millisecond and cannot revive deleted writing", () => {
+  const state = emptyData();
+  upsertDailyCheckIn(state, input(), now);
+  const first = checkIns(state)[0].updatedAt;
+  upsertDailyCheckIn(
+    state,
+    input({ note: "A deliberate correction.", expectedUpdatedAt: first }),
+    now,
+  );
+  assert.equal(
+    checkIns(state)[0].updatedAt,
+    new Date(now.getTime() + 1).toISOString(),
+  );
+  assert.throws(
+    () =>
+      upsertDailyCheckIn(
+        state,
+        input({ note: "A stale correction.", expectedUpdatedAt: first }),
+        now,
+      ),
+    (error) => error instanceof DailyCheckInSaveError && error.status === 409,
+  );
+  state.dailyCheckIns = [];
+  assert.throws(
+    () => upsertDailyCheckIn(state, input({ expectedUpdatedAt: first }), now),
+    (error) => error instanceof DailyCheckInSaveError && error.status === 409,
+  );
+  assert.deepEqual(state.dailyCheckIns, []);
+  assert.throws(
+    () =>
+      upsertDailyCheckIn(
+        state,
+        input({ note: "", moods: ["calm"], expectedUpdatedAt: first }),
+        now,
+      ),
+    (error) => error instanceof DailyCheckInSaveError && error.status === 409,
+    "a stale details-only form must not recreate a deleted record either",
+  );
+  assert.deepEqual(state.dailyCheckIns, []);
+});
+
+test("alternating full and reflection saves never reuse a stale version when clocks match or move backwards", () => {
+  const state = emptyData();
+  upsertDailyCheckIn(state, input(), now);
+  const initial = checkIns(state)[0].updatedAt;
+  upsertDailyCheckIn(
+    state,
+    input({ note: "First full edit.", expectedUpdatedAt: initial }),
+    now,
+  );
+  const fullVersion = checkIns(state)[0].updatedAt;
+  saveDailyReflection(
+    state,
+    {
+      day: "2026-10-30",
+      period: "evening",
+      note: "Newest reflection paragraphs.",
+      expectedUpdatedAt: fullVersion,
+    },
+    new Date(now.getTime() - 1_000),
+  );
+  assert.equal(
+    checkIns(state)[0].updatedAt,
+    new Date(now.getTime() + 2).toISOString(),
+  );
+  const before = structuredClone(state);
+  for (const expectedUpdatedAt of [initial, fullVersion])
+    assert.throws(
+      () => upsertDailyCheckIn(state, input({ expectedUpdatedAt }), now),
+      (error) => error instanceof DailyCheckInSaveError && error.status === 409,
+    );
+  assert.deepEqual(state, before);
+});
+
 test("editing replaces the tracking day's record, keeps creation time, and leaves other days intact", () => {
   const state = emptyData();
   upsertDailyCheckIn(state, input({ day: "2026-10-29" }), now);
   const other = structuredClone(state.dailyCheckIns![0]);
   upsertDailyCheckIn(state, input({ moods: ["tired"], energy: 2 }), now);
   const updated = new Date("2026-10-31T01:00:00.000Z");
-  upsertDailyCheckIn(state, input({ note: "Corrected.", stress: 3 }), updated);
+  upsertDailyCheckIn(
+    state,
+    input({
+      note: "Corrected.",
+      stress: 3,
+      expectedUpdatedAt: now.toISOString(),
+    }),
+    updated,
+  );
   assert.equal(state.dailyCheckIns!.length, 2);
   assert.deepEqual(state.dailyCheckIns![0], other);
   assert.deepEqual(state.dailyCheckIns![1], {
@@ -224,7 +400,11 @@ test("same-day Morning and legacy Evening saves preserve each other's content an
   assert.equal(checkIns(state).length, 2);
   assert.deepEqual(checkIns(state)[0], legacy);
   const morning = structuredClone(checkIns(state)[1]);
-  upsertDailyCheckIn(state, input({ note: "Edited Evening." }), now);
+  upsertDailyCheckIn(
+    state,
+    input({ note: "Edited Evening.", expectedUpdatedAt: legacy.updatedAt }),
+    now,
+  );
   assert.equal(checkIns(state).length, 2);
   assert.deepEqual(checkIns(state)[0], morning);
   assert.equal(checkIns(state)[1].period, "evening");
@@ -232,7 +412,11 @@ test("same-day Morning and legacy Evening saves preserve each other's content an
   const evening = structuredClone(checkIns(state)[1]);
   upsertDailyCheckIn(
     state,
-    input({ period: "morning", note: "Edited Morning." }),
+    input({
+      period: "morning",
+      note: "Edited Morning.",
+      expectedUpdatedAt: morning.updatedAt,
+    }),
     new Date("2026-10-31T02:00:00.000Z"),
   );
   assert.deepEqual(checkIns(state)[0], evening);
@@ -289,7 +473,11 @@ test("the check-in limit blocks new days while allowing corrections to existing 
   assert.equal(state.dailyCheckIns.length, DAILY_CHECK_IN_LIMIT);
   upsertDailyCheckIn(
     state,
-    input({ day: "1800-01-01", note: "Corrected." }),
+    input({
+      day: "1800-01-01",
+      note: "Corrected.",
+      expectedUpdatedAt: record.updatedAt,
+    }),
     now,
   );
   assert.equal(state.dailyCheckIns.length, DAILY_CHECK_IN_LIMIT);
@@ -343,6 +531,54 @@ const repositories: {
 ];
 
 for (const fixture of repositories) {
+  test(`${fixture.name} rejects a stale full form when reflection and full save race`, async (t) => {
+    const { repository, reopen } = await fixture.create(t);
+    await mutateJournalState(repository, "personal", (state) => {
+      upsertDailyCheckIn(state, input(), now);
+    });
+    const savedAt = new Date(now.getTime() + 10_000);
+    const outcomes = await Promise.allSettled([
+      mutateJournalState(repository, "personal", (state) => {
+        upsertDailyCheckIn(
+          state,
+          input({
+            note: "The full form's deliberate new writing.",
+            expectedUpdatedAt: now.toISOString(),
+          }),
+          savedAt,
+        );
+      }),
+      mutateJournalState(reopen(), "personal", (state) => {
+        saveDailyReflection(
+          state,
+          {
+            day: "2026-10-30",
+            period: "evening",
+            note: "The other device's new paragraphs.",
+            expectedUpdatedAt: now.toISOString(),
+          },
+          savedAt,
+        );
+      }),
+    ]);
+    assert.equal(
+      outcomes.filter((item) => item.status === "fulfilled").length,
+      1,
+    );
+    const rejected = outcomes.find((item) => item.status === "rejected");
+    assert.equal(rejected?.status, "rejected");
+    if (rejected?.status === "rejected")
+      assert.equal(rejected.reason.status, 409);
+    const latest = await readJournalState(reopen(), "personal");
+    assert.equal(latest.dailyCheckIns?.length, 1);
+    assert.ok(
+      [
+        "The full form's deliberate new writing.",
+        "The other device's new paragraphs.",
+      ].includes(latest.dailyCheckIns![0].note),
+    );
+  });
+
   test(`${fixture.name} keeps concurrent Morning and Evening saves independent through reopening and export`, async (t) => {
     const { repository, reopen } = await fixture.create(t);
     const morningAt = new Date("2026-10-30T08:00:00.000Z");
@@ -396,13 +632,24 @@ for (const fixture of repositories) {
       mutateJournalState(repository, "personal", (state) => {
         upsertDailyCheckIn(
           state,
-          input({ period: "morning", note: "Morning edited." }),
+          input({
+            period: "morning",
+            note: "Morning edited.",
+            expectedUpdatedAt: morningAt.toISOString(),
+          }),
           editedAt,
         );
       }),
       mutateJournalState(reopen(), "personal", (state) => {
-        // This old-client payload omits the period and must still edit Evening.
-        upsertDailyCheckIn(state, input({ note: "Evening edited." }), editedAt);
+        // The legacy period omission still targets Evening with an explicit base.
+        upsertDailyCheckIn(
+          state,
+          input({
+            note: "Evening edited.",
+            expectedUpdatedAt: now.toISOString(),
+          }),
+          editedAt,
+        );
       }),
     ]);
     const edited = await readJournalState(reopen(), "personal");
@@ -517,7 +764,10 @@ for (const fixture of repositories) {
     await mutateJournalState(reopen(), "personal", (state) => {
       upsertDailyCheckIn(
         state,
-        input({ note: correctedReflection }),
+        input({
+          note: correctedReflection,
+          expectedUpdatedAt: now.toISOString(),
+        }),
         correctedAt,
       );
     });
@@ -661,7 +911,7 @@ test("old-client Evening saves preserve bedtime, explicit clocks replace it and 
   upsertDailyCheckIn(state, input({ bedtime: "23:30" }), now);
   const original = checkIns(state).find((entry) => entry.period === "evening")!;
   const later = new Date("2026-10-31T01:00:00.000Z");
-  const legacy = input({ note: "Legacy client’s updated note." });
+  const legacy = input();
   const before = structuredClone(legacy);
   upsertDailyCheckIn(state, legacy, later);
   assert.deepEqual(legacy, before);
@@ -875,7 +1125,7 @@ test("new Morning saves preserve explicitly carried legacy context and old-clien
   );
   upsertDailyCheckIn(
     state,
-    input({ ...first, note: "An old client's update." }),
+    input({ ...first }),
     new Date("2026-10-31T02:00:00Z"),
   );
   assert.deepEqual(checkIns(state)[0].morningSleep, nested);
@@ -886,7 +1136,7 @@ test("new Morning saves preserve explicitly carried legacy context and old-clien
   );
   upsertDailyCheckIn(
     state,
-    input({ period: "morning", note: "An old note-only save." }),
+    input({ period: "morning", note: first.note }),
     now,
   );
   assert.deepEqual(checkIns(state)[0].morningSleep, nested);
@@ -900,6 +1150,7 @@ test("new Morning saves preserve explicitly carried legacy context and old-clien
     input({
       period: "morning",
       note: "Explicitly cleared.",
+      expectedUpdatedAt: checkIns(state)[0].updatedAt,
       morningSleep: null,
     }),
     now,

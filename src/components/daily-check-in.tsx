@@ -54,6 +54,10 @@ import {
   type CheckInDraft,
 } from "@/lib/check-in-draft";
 import {
+  checkInSubmissionDraftUnchanged,
+  prepareCheckInSubmission,
+} from "@/lib/check-in-submit";
+import {
   getCheckInCompletion,
   getCheckInCardFeedback,
   getMorningCheckInCompletion,
@@ -363,6 +367,7 @@ function CheckInForm({
   onSaved: () => void;
 }) {
   const { data, mutate, busy } = useJournal();
+  const { store } = useJournalWorkspace();
   const [submitting, setSubmitting] = useState(false);
   const locked = busy || submitting;
   const morning = period === "morning";
@@ -456,7 +461,16 @@ function CheckInForm({
     setSubmitting(true);
     let saved = false;
     try {
+      const key = checkInDraftKey(day, period);
+      const hadDraft = Object.hasOwn(store.getSnapshot().drafts, key);
       await reflectionSave.pauseAndDrain();
+      store.synchronize();
+      const submittedRecord = store.getSnapshot().drafts[key];
+      const submission = prepareCheckInSubmission(
+        draft.value,
+        submittedRecord?.value,
+        hadDraft,
+      );
       const beforePreview = checkIn
         ? checkInNotificationSnapshot(checkIn)
         : undefined;
@@ -464,6 +478,7 @@ function CheckInForm({
         day,
         period,
         note,
+        expectedUpdatedAt: submission.reflectionBaseUpdatedAt,
         moods,
         energy,
         stress,
@@ -489,7 +504,16 @@ function CheckInForm({
         period,
       );
       saved = true;
-      draft.clearDraft();
+      // A different tab may have continued writing during this request. Import
+      // its latest record before clearing only the exact draft we submitted.
+      store.synchronize();
+      if (
+        checkInSubmissionDraftUnchanged(
+          submittedRecord,
+          store.getSnapshot().drafts[key],
+        )
+      )
+        draft.clearDraft();
       toast.success(
         checkIn
           ? "Check-in updated."
@@ -537,8 +561,13 @@ function CheckInForm({
         },
       );
       onSaved();
-    } catch {
-      // The provider shows the save error; keep the complete draft open.
+    } catch (error) {
+      // Server conflicts and concurrent local edits both keep the full draft.
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Your check-in could not be saved. Your draft is still kept here.",
+      );
     } finally {
       if (!saved) {
         reflectionSave.resume();
