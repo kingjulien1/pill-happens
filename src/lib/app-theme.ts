@@ -148,6 +148,72 @@ export const APP_CANVAS_CSS = `
   --app-canvas-muted-foreground: ${APP_CANVAS_MUTED_FOREGROUND};
 `;
 
+/** Daylight keeps the same violet motion beneath luminous Rose/Lilac paper. */
+export const APP_LIGHT_CANVAS = Object.freeze({
+  base: "#f1e5f4",
+  foreground: "#35233f",
+  mutedForeground: "#604668",
+  // The opaque glaze bounds every possible shader frame before small copy is painted.
+  glazeOpacity: 0.9,
+  glaze: "#f1e5f4e6",
+  rose: "#fbcfe84d",
+  lilac: "#ddd6fe42",
+});
+export const APP_LIGHT_CANVAS_OVERLAY = [
+  `radial-gradient(ellipse at 8% 8%, ${APP_LIGHT_CANVAS.rose}, transparent 64%)`,
+  `radial-gradient(ellipse at 94% 88%, ${APP_LIGHT_CANVAS.lilac}, transparent 62%)`,
+  `linear-gradient(${APP_LIGHT_CANVAS.glaze} 0 0)`,
+].join(", ");
+export const APP_LIGHT_CANVAS_BACKGROUND = [
+  "radial-gradient(ellipse at 10% 5%, #f5cee6, transparent 57%)",
+  "radial-gradient(ellipse at 95% 15%, #ddcef6, transparent 58%)",
+  "radial-gradient(ellipse at 48% 100%, #e5ddf8, transparent 62%)",
+  "linear-gradient(145deg, #f5ecf8, #e9daef 70%, #f3e3f0)",
+  APP_LIGHT_CANVAS.base,
+].join(", ");
+export const APP_CANVAS_BY_MODE = Object.freeze({
+  light: Object.freeze({
+    base: APP_LIGHT_CANVAS.base,
+    background: APP_LIGHT_CANVAS_BACKGROUND,
+    overlay: APP_LIGHT_CANVAS_OVERLAY,
+    foreground: APP_LIGHT_CANVAS.foreground,
+    mutedForeground: APP_LIGHT_CANVAS.mutedForeground,
+  }),
+  dark: Object.freeze({
+    base: APP_CANVAS_BASE,
+    background: APP_CANVAS_BACKGROUND,
+    overlay: APP_CANVAS_OVERLAY,
+    foreground: APP_CANVAS_FOREGROUND,
+    mutedForeground: APP_CANVAS_MUTED_FOREGROUND,
+  }),
+});
+
+/** Shared by generated CSS, the prepaint head, the refresh curtain and offline. */
+export function getAppCanvasCss(mode: AppThemeMode): string {
+  if (mode === "dark") return APP_CANVAS_CSS;
+  const canvas = APP_CANVAS_BY_MODE.light;
+  return `
+  --app-canvas-base: ${canvas.base};
+  --app-canvas-background: ${canvas.background};
+  --app-canvas-overlay: ${canvas.overlay};
+  --app-iridescence-color: ${APP_IRIDESCENCE.color};
+  --app-iridescence-blur: ${APP_IRIDESCENCE.blur}px;
+  --app-canvas-foreground: ${canvas.foreground};
+  --app-canvas-muted-foreground: ${canvas.mutedForeground};
+`;
+}
+
+/** Raw HEAD styles bypass PostCSS, so both resolved mode and no-JS OS fallback live here. */
+export function renderAppCanvasRules(): string {
+  return `
+    :root { ${getAppCanvasCss("light")} }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-color-mode]) { ${getAppCanvasCss("dark")} }
+    }
+    :root[data-color-mode="dark"] { ${getAppCanvasCss("dark")} }
+  `;
+}
+
 export const APP_THEME_GROUPS = [
   {
     id: "surfaces",
@@ -228,20 +294,19 @@ const roseApricot = blend(apricot, rose, 0.94);
 /**
  * Rose/Lilac paper tiers for daylight. These are opaque so small copy, nested
  * fields and stacked cards never inherit the violet canvas's moving contrast.
- * The dark palette and the shared Iridescence canvas remain independent.
+ * The dark palette remains independent; daylight canvas uses the same reading inks.
  */
-const lightPigment = blend(rose, lilac, 0.52);
 export const APP_LIGHT_SURFACES = Object.freeze({
-  foundation: blend(white, lightPigment, 0.64),
-  card: blend(white, lightPigment, 0.76),
-  floating: blend(white, lightPigment, 0.85),
-  raised: blend(white, rose, 0.81),
-  inset: blend(white, lightPigment, 0.48),
-  reading: blend(white, lightPigment, 0.8),
-  quiet: blend(white, blend(lilac, rose, 0.68), 0.6),
-  selected: blend(white, lightPigment, 0.43),
-  ink: blend(plum, APP_SECONDARY_COLOR, 0.9),
-  secondaryInk: blend(plum, rose, 0.79),
+  foundation: "#efe2f3",
+  card: "#f9eff9",
+  floating: "#fcf5fc",
+  raised: "#fceef7",
+  inset: "#e7d7ed",
+  reading: "#fbf3fb",
+  quiet: "#eee0f2",
+  selected: "#e3c9e8",
+  ink: APP_LIGHT_CANVAS.foreground,
+  secondaryInk: APP_LIGHT_CANVAS.mutedForeground,
 });
 
 // Dense Plum glass preserves readable text over every moving background stop.
@@ -396,8 +461,8 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "canvas-background",
     "Page Canvas",
-    "Opaque deeper Plum foundation beneath the violet Iridescence field, lightly blurred before Pink300 at 21% and Purple900 at 69% in both modes. Critical and offline views use a matching static violet fallback.",
-    APP_CANVAS_BASE,
+    "Luminous Rose/Lilac daylight paper or deeper Plum beneath the same violet motion. Light Mode has a protective paper glaze; Dark Mode retains Pink300 at 21% and Purple900 at 69%. Critical and offline views share matching stills.",
+    APP_LIGHT_CANVAS.base,
     APP_CANVAS_BASE,
     ["canvas-foreground", "canvas-muted-foreground"],
   ),
@@ -405,8 +470,8 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "canvas-foreground",
     "Canvas Copy",
-    "Opaque light copy on the shared violet page canvas in either appearance.",
-    APP_CANVAS_FOREGROUND,
+    "Deep Plum on the daylight canvas and opaque White on the dark violet canvas.",
+    APP_LIGHT_CANVAS.foreground,
     APP_CANVAS_FOREGROUND,
     ["canvas-background"],
   ),
@@ -414,8 +479,8 @@ export const APP_THEME_TOKENS = [
     "surfaces",
     "canvas-muted-foreground",
     "Secondary Canvas Copy",
-    "A readable pale Lilac counterpart for secondary copy on the violet page canvas.",
-    APP_CANVAS_MUTED_FOREGROUND,
+    "Readable muted Plum on daylight paper and pale Lilac on the dark violet canvas.",
+    APP_LIGHT_CANVAS.mutedForeground,
     APP_CANVAS_MUTED_FOREGROUND,
     ["canvas-background"],
   ),
@@ -510,7 +575,7 @@ export const APP_THEME_TOKENS = [
     "primary",
     "Primary Emphasis",
     "Fuchsia emphasizes compact daylight controls; Rose-inflected Lilac supplies dark-mode emphasis.",
-    APP_SECONDARY_COLOR,
+    "#9d174d",
     roseLilac,
     ["primary-foreground"],
   ),
@@ -527,7 +592,7 @@ export const APP_THEME_TOKENS = [
     "actions",
     "action-background",
     "Filled Action",
-    "Retained Fuchsia900 compatibility pigment for check-in and decorative surfaces; filled action components supply their own charcoal/mint paint.",
+    "Retained Fuchsia900 compatibility pigment for decorative surfaces; filled action components supply their own mode-aware Rose/Lilac paint.",
     APP_SECONDARY_COLOR,
     APP_SECONDARY_COLOR,
     ["action-foreground"],
@@ -606,7 +671,7 @@ export const APP_THEME_TOKENS = [
     "ring",
     "Keyboard Focus",
     "Solid Rose-Plum or Rose-Lilac makes keyboard focus clear against its surface.",
-    APP_SECONDARY_COLOR,
+    "#9d174d",
     roseLilac,
   ),
   role(
@@ -871,7 +936,7 @@ export function renderAppThemeCss() {
   return `/* Generated from src/lib/app-theme.ts. Run npm run theme:generate. */
 :root {
   color-scheme: light;
-${APP_CANVAS_CSS}
+${getAppCanvasCss("light")}
 ${Object.entries(APP_FOUNDATION)
   .map(([id, color]) => `  --palette-${id}: ${color};`)
   .join("\n")}
@@ -887,6 +952,7 @@ ${values("light", "  ")}
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+${getAppCanvasCss("dark")}
 ${values("dark", "    ")}
     --medication-symbol-mix: 55%;
   }

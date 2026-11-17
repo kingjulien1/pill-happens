@@ -9,7 +9,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="theme-color"
-      content="#29213b"
+      content="#f1e5f4"
       media="(prefers-color-scheme: light)"
     />
     <meta
@@ -22,6 +22,67 @@
       /* BEGIN GENERATED APP THEME */
       :root {
         color-scheme: light;
+        --app-canvas-base: #f1e5f4;
+        --app-canvas-background:
+          radial-gradient(ellipse at 10% 5%, #f5cee6, transparent 57%),
+          radial-gradient(ellipse at 95% 15%, #ddcef6, transparent 58%),
+          radial-gradient(ellipse at 48% 100%, #e5ddf8, transparent 62%),
+          linear-gradient(145deg, #f5ecf8, #e9daef 70%, #f3e3f0), #f1e5f4;
+        --app-canvas-overlay:
+          radial-gradient(ellipse at 8% 8%, #fbcfe84d, transparent 64%),
+          radial-gradient(ellipse at 94% 88%, #ddd6fe42, transparent 62%),
+          linear-gradient(#f1e5f4e6 0 0);
+        --app-iridescence-color: #7c3aed;
+        --app-iridescence-blur: 4px;
+        --app-canvas-foreground: #35233f;
+        --app-canvas-muted-foreground: #604668;
+        --background: #efe2f3;
+        --foreground: #35233f;
+        --card: #f9eff9;
+        --muted-foreground: #604668;
+        --primary: #9d174d;
+        --primary-foreground: #ffffff;
+        --border: #35233f3d;
+        --ring: #9d174d;
+        --shadow: #2b233e29;
+        --glow: #d9a6dc33;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-color-mode]) {
+          color-scheme: dark;
+          --app-canvas-base: #29213b;
+          --app-canvas-background:
+            linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
+            linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0),
+            radial-gradient(
+              ellipse at 42% 36%,
+              #7c3aed 0%,
+              #5829a2 42%,
+              #332047 82%,
+              #29213b 100%
+            ),
+            #29213b;
+          --app-canvas-overlay:
+            linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
+            linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0);
+          --app-iridescence-color: #7c3aed;
+          --app-iridescence-blur: 4px;
+          --app-canvas-foreground: #ffffff;
+          --app-canvas-muted-foreground: #ded8ec;
+          --background: #2b233e;
+          --foreground: #ffffff;
+          --card: #352a45;
+          --muted-foreground: #e1d9f4;
+          --primary: #bca4e4;
+          --primary-foreground: #111014;
+          --border: #bca4e445;
+          --ring: #bca4e4;
+          --shadow: #1110146b;
+          --glow: #bfa4e352;
+        }
+      }
+      :root[data-color-mode="dark"] {
+        color-scheme: dark;
         --app-canvas-base: #29213b;
         --app-canvas-background:
           linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
@@ -41,31 +102,16 @@
         --app-iridescence-blur: 4px;
         --app-canvas-foreground: #ffffff;
         --app-canvas-muted-foreground: #ded8ec;
-        --background: #f1dff2;
-        --foreground: #322244;
-        --card: #f6eaf7;
-        --muted-foreground: #563f5e;
-        --primary: #701a75;
-        --primary-foreground: #ffffff;
-        --border: #3222443d;
-        --ring: #701a75;
-        --shadow: #2b233e29;
-        --glow: #d9a6dc33;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          color-scheme: dark;
-          --background: #2b233e;
-          --foreground: #ffffff;
-          --card: #352a45;
-          --muted-foreground: #e1d9f4;
-          --primary: #bca4e4;
-          --primary-foreground: #111014;
-          --border: #bca4e445;
-          --ring: #bca4e4;
-          --shadow: #1110146b;
-          --glow: #bfa4e352;
-        }
+        --background: #2b233e;
+        --foreground: #ffffff;
+        --card: #352a45;
+        --muted-foreground: #e1d9f4;
+        --primary: #bca4e4;
+        --primary-foreground: #111014;
+        --border: #bca4e445;
+        --ring: #bca4e4;
+        --shadow: #1110146b;
+        --glow: #bfa4e352;
       }
       /* END GENERATED APP THEME */
       * {
@@ -155,6 +201,106 @@
         text-align: center;
       }
     </style>
+    <!-- BEGIN GENERATED APPEARANCE BOOT -->
+    <script>
+      (function () {
+        function __name(value) {
+          return value;
+        }
+        (function installAppearance(config) {
+          if (window.__pillAppearance?.version === 1) return;
+          const root = document.documentElement;
+          let media;
+          try {
+            media = window.matchMedia("(prefers-color-scheme: dark)");
+          } catch {}
+          const normalize = __name(
+            (value) =>
+              value === "light" || value === "dark" ? value : "system",
+            "normalize",
+          );
+          let preference = "system";
+          let persisted = true;
+          try {
+            preference = normalize(window.localStorage.getItem(config.key));
+          } catch {
+            persisted = false;
+          }
+          let snapshot;
+          const syncMeta = __name(() => {
+            if (!snapshot) return;
+            for (const meta of document.querySelectorAll(
+              'meta[name="theme-color"]',
+            ))
+              meta.content =
+                snapshot.resolved === "dark" ? config.dark : config.light;
+          }, "syncMeta");
+          const apply = __name(() => {
+            const resolved =
+              preference === "system"
+                ? media?.matches
+                  ? "dark"
+                  : "light"
+                : preference;
+            const changed =
+              !snapshot ||
+              snapshot.preference !== preference ||
+              snapshot.resolved !== resolved ||
+              snapshot.persisted !== persisted;
+            if (changed) snapshot = { preference, resolved, persisted };
+            root.dataset.colorMode = resolved;
+            root.dataset.colorPreference = preference;
+            root.style.colorScheme = resolved;
+            syncMeta();
+            if (changed) window.dispatchEvent(new Event(config.event));
+          }, "apply");
+          window.__pillAppearance = {
+            version: 1,
+            getSnapshot: __name(() => snapshot, "getSnapshot"),
+            setPreference: __name((value) => {
+              preference = normalize(value);
+              try {
+                window.localStorage.setItem(config.key, preference);
+                persisted = true;
+              } catch {
+                persisted = false;
+              }
+              apply();
+            }, "setPreference"),
+            sync: apply,
+          };
+          media?.addEventListener("change", () => {
+            if (preference === "system") apply();
+          });
+          window.addEventListener("storage", (event) => {
+            if (event.key !== config.key && event.key !== null) return;
+            try {
+              if (
+                event.storageArea &&
+                event.storageArea !== window.localStorage
+              )
+                return;
+            } catch {
+              return;
+            }
+            preference = normalize(event.newValue);
+            persisted = true;
+            apply();
+          });
+          apply();
+          if (document.readyState === "loading")
+            document.addEventListener("DOMContentLoaded", syncMeta, {
+              once: true,
+            });
+        })({
+          key: "pill-happens:appearance:v1",
+          event: "pill:appearance-change",
+          light: "#f1e5f4",
+          dark: "#29213b",
+        });
+      })();
+    </script>
+    <!-- END GENERATED APPEARANCE BOOT -->
   </head>
   <body>
     <main>

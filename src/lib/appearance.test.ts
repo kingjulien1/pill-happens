@@ -9,7 +9,7 @@ import {
   normalizeAppearance,
   resolveAppearance,
 } from "./appearance";
-import { APP_CANVAS_BASE } from "./app-theme";
+import { APP_CANVAS_BASE, APP_LIGHT_CANVAS } from "./app-theme";
 
 function browser({
   stored,
@@ -114,7 +114,7 @@ test("serialized prepaint bootstrap is self-contained and restores a manual choi
   assert.equal(b.root.dataset.colorPreference, "light");
   assert.equal(b.root.style.colorScheme, "light");
   assert.equal(b.root.dataset.pageRefreshActive, "reloading");
-  assert.ok(b.metas.every((m) => m.content === APP_CANVAS_BASE));
+  assert.ok(b.metas.every((m) => m.content === APP_LIGHT_CANVAS.base));
   b.set("dark");
   assert.equal(b.storage.get(APPEARANCE_STORAGE_KEY), "dark");
   assert.ok(b.metas.every((m) => m.content === APP_CANVAS_BASE));
@@ -131,8 +131,10 @@ test("system preference follows OS changes immediately while a manual preference
   const b = browser();
   b.os(true);
   assert.equal(b.state().resolved, "dark");
+  assert.ok(b.metas.every((m) => m.content === APP_CANVAS_BASE));
   b.os(false);
   assert.equal(b.state().resolved, "light");
+  assert.ok(b.metas.every((m) => m.content === APP_LIGHT_CANVAS.base));
   b.set("dark");
   const snapshot = b.state();
   b.os(true);
@@ -186,7 +188,7 @@ test("bootstrap is idempotent, keeps snapshot identity stable and synchronizes l
   assert.equal(events, 1);
   b.metas.push({ content: "late" });
   b.document.dispatchEvent(new Event("DOMContentLoaded"));
-  assert.ok(b.metas.every((m) => m.content === APP_CANVAS_BASE));
+  assert.ok(b.metas.every((m) => m.content === APP_LIGHT_CANVAS.base));
   assert.equal(browser({ noMedia: true }).state().resolved, "light");
 });
 

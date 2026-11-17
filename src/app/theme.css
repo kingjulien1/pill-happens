@@ -2,25 +2,20 @@
 :root {
   color-scheme: light;
 
-  --app-canvas-base: #29213b;
+  --app-canvas-base: #f1e5f4;
   --app-canvas-background:
-    linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
-    linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0),
-    radial-gradient(
-      ellipse at 42% 36%,
-      #7c3aed 0%,
-      #5829a2 42%,
-      #332047 82%,
-      #29213b 100%
-    ),
-    #29213b;
+    radial-gradient(ellipse at 10% 5%, #f5cee6, transparent 57%),
+    radial-gradient(ellipse at 95% 15%, #ddcef6, transparent 58%),
+    radial-gradient(ellipse at 48% 100%, #e5ddf8, transparent 62%),
+    linear-gradient(145deg, #f5ecf8, #e9daef 70%, #f3e3f0), #f1e5f4;
   --app-canvas-overlay:
-    linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
-    linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0);
+    radial-gradient(ellipse at 8% 8%, #fbcfe84d, transparent 64%),
+    radial-gradient(ellipse at 94% 88%, #ddd6fe42, transparent 62%),
+    linear-gradient(#f1e5f4e6 0 0);
   --app-iridescence-color: #7c3aed;
   --app-iridescence-blur: 4px;
-  --app-canvas-foreground: #ffffff;
-  --app-canvas-muted-foreground: #ded8ec;
+  --app-canvas-foreground: #35233f;
+  --app-canvas-muted-foreground: #604668;
 
   --palette-plum: #2b233e;
   --palette-lilac: #b7a4e5;
@@ -35,59 +30,59 @@
   --palette-rust: #2b233e;
   --palette-ink: #111014;
   --palette-violet: #b7a4e5;
-  --background: #f1dff2;
-  --foreground: #322244;
-  --card: #f6eaf7;
-  --card-foreground: #322244;
-  --popover: #f9f2fa;
-  --popover-foreground: #322244;
-  --muted: #ebdbf3;
-  --muted-foreground: #563f5e;
-  --surface-raised: #feeef7;
-  --surface-raised-foreground: #322244;
-  --surface-sunken: #ebd1ed;
-  --surface-sunken-foreground: #322244;
+  --background: #efe2f3;
+  --foreground: #35233f;
+  --card: #f9eff9;
+  --card-foreground: #35233f;
+  --popover: #fcf5fc;
+  --popover-foreground: #35233f;
+  --muted: #eee0f2;
+  --muted-foreground: #604668;
+  --surface-raised: #fceef7;
+  --surface-raised-foreground: #35233f;
+  --surface-sunken: #e7d7ed;
+  --surface-sunken-foreground: #35233f;
   --surface-inverse: #111014;
   --surface-inverse-foreground: #ffffff;
-  --surface-reading: #f7edf8;
-  --surface-reading-foreground: #322244;
-  --canvas-background: #29213b;
-  --canvas-foreground: #ffffff;
-  --canvas-muted-foreground: #ded8ec;
-  --menu-surface: #f1e9f7;
-  --menu-foreground: #322244;
-  --menu-muted-foreground: #563f5e;
-  --menu-edge: #d7c0ea;
-  --menu-inset-edge: #f9f2fa;
-  --menu-hover: #e6cdec;
-  --menu-selected: #e1c6ea;
-  --menu-selected-focus: #d8bee9;
+  --surface-reading: #fbf3fb;
+  --surface-reading-foreground: #35233f;
+  --canvas-background: #f1e5f4;
+  --canvas-foreground: #35233f;
+  --canvas-muted-foreground: #604668;
+  --menu-surface: #f4ebf9;
+  --menu-foreground: #35233f;
+  --menu-muted-foreground: #604668;
+  --menu-edge: #d5c4ea;
+  --menu-inset-edge: #fcf5fc;
+  --menu-hover: #e2d2ec;
+  --menu-selected: #dcc3e8;
+  --menu-selected-focus: #d4bce7;
   --menu-focus-ring: #701a75;
-  --primary: #701a75;
+  --primary: #9d174d;
   --primary-foreground: #ffffff;
   --action-background: #701a75;
   --action-foreground: #ffffff;
-  --secondary: #ebdbf3;
-  --secondary-foreground: #322244;
-  --accent: #e9cceb;
-  --accent-foreground: #322244;
+  --secondary: #eee0f2;
+  --secondary-foreground: #35233f;
+  --accent: #e3c9e8;
+  --accent-foreground: #35233f;
   --selection: #e2a7da75;
-  --border: #3222443d;
-  --input: #32224494;
-  --ring: #701a75;
+  --border: #35233f3d;
+  --input: #35233f94;
+  --ring: #9d174d;
   --ink: #111014;
-  --glass-background: #f9f2faf0;
-  --glass-border: #3222443b;
+  --glass-background: #fcf5fcf0;
+  --glass-border: #35233f3b;
   --shadow: #2b233e29;
   --glow: #d9a6dc33;
-  --empty-intake-wash: #f6eaf7f5;
-  --empty-intake-hover: #f6eaf7ff;
-  --empty-intake-copy: #563f5e;
-  --harmony-surface: #f6e2f3;
+  --empty-intake-wash: #f9eff9f5;
+  --empty-intake-hover: #f9eff9ff;
+  --empty-intake-copy: #604668;
+  --harmony-surface: #f9e6f5;
   --harmony-rose-wash: #f9a8d41a;
   --harmony-iris-wash: #b7c9f51a;
   --harmony-mint-wash: #a7e4cf0b;
-  --harmony-edge: #52375b;
+  --harmony-edge: #543857;
   --harmony-glow: #d1a5de2e;
   --ambient-overlay: #b7a4e514;
   --ambient-center-scrim: #2b233e24;
@@ -98,12 +93,12 @@
   --ambient-edge: #cca5e0;
   --destructive: #be123c;
   --destructive-foreground: #ffffff;
-  --success: #e5e9ee;
-  --success-foreground: #322244;
-  --warning: #f5dbd9;
-  --warning-foreground: #322244;
-  --info: #e5e1f6;
-  --info-foreground: #322244;
+  --success: #e7edf0;
+  --success-foreground: #35233f;
+  --warning: #f7deda;
+  --warning-foreground: #35233f;
+  --info: #e7e5f8;
+  --info-foreground: #35233f;
   --radius: 1rem;
   --medication-symbol-mix: 35%;
 }
@@ -111,6 +106,27 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+
+    --app-canvas-base: #29213b;
+    --app-canvas-background:
+      linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
+      linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0),
+      radial-gradient(
+        ellipse at 42% 36%,
+        #7c3aed 0%,
+        #5829a2 42%,
+        #332047 82%,
+        #29213b 100%
+      ),
+      #29213b;
+    --app-canvas-overlay:
+      linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
+      linear-gradient(oklch(82.3% 0.12 346.018 / 0.21) 0 0);
+    --app-iridescence-color: #7c3aed;
+    --app-iridescence-blur: 4px;
+    --app-canvas-foreground: #ffffff;
+    --app-canvas-muted-foreground: #ded8ec;
+
     --background: #2b233e;
     --foreground: #ffffff;
     --card: #352a45;

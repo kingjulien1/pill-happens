@@ -6,7 +6,7 @@ import {
   AppearanceProvider,
   AppearanceToaster,
 } from "@/components/appearance-provider";
-import { APP_CANVAS_BASE } from "@/lib/app-theme";
+import { APP_CANVAS_BY_MODE } from "@/lib/app-theme";
 import {
   PageRefreshHead,
   PageRefreshScreen,
@@ -47,11 +47,11 @@ export const viewport: Viewport = {
   themeColor: [
     {
       media: "(prefers-color-scheme: light)",
-      color: APP_CANVAS_BASE,
+      color: APP_CANVAS_BY_MODE.light.base,
     },
     {
       media: "(prefers-color-scheme: dark)",
-      color: APP_CANVAS_BASE,
+      color: APP_CANVAS_BY_MODE.dark.base,
     },
   ],
 };

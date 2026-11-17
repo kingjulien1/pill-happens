@@ -3695,6 +3695,44 @@ input[type="time"] {
   width: 7px;
   height: 7px;
 }
+
+/* Daylight uses paper and real reading ink, including the fixed mobile dock. */
+@media (prefers-color-scheme: light) {
+  .intake-dock {
+    --canvas-foreground: var(--foreground);
+    --canvas-muted-foreground: var(--muted-foreground);
+  }
+
+  .intake-action-summary {
+    background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
+    border-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--palette-white) 72%, transparent),
+      0 4px 16px color-mix(in srgb, var(--palette-plum) 5%, transparent);
+  }
+
+  .intake-group[data-grouped="true"] {
+    --intake-group-blur: 32px;
+    --intake-group-saturation: 1.04;
+  }
+
+  .intake-group-blur {
+    background: color-mix(in srgb, var(--card) 28%, transparent);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  @media (prefers-reduced-transparency: reduce) {
+    .intake-action-summary {
+      background: var(--surface-raised);
+    }
+
+    .intake-group-blur {
+      background: var(--background);
+      opacity: 1;
+    }
+  }
+}
 .intake-action-note {
   display: flex;
   flex-wrap: wrap;

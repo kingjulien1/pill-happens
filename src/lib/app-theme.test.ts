@@ -6,6 +6,10 @@ import {
   APP_CANVAS_BASE,
   APP_CANVAS_BACKGROUND,
   APP_CANVAS_OVERLAY,
+  APP_CANVAS_BY_MODE,
+  APP_LIGHT_CANVAS,
+  getAppCanvasCss,
+  renderAppCanvasRules,
   APP_IRIDESCENCE,
   APP_LIGHT_SURFACES,
   APP_CANVAS_FOREGROUND,
@@ -341,6 +345,9 @@ test("generated application and offline CSS match the documented registry", asyn
     new URL("../../public/offline.html", import.meta.url),
     "utf8",
   );
+  assert.ok(offline.includes('data-color-mode="dark"'));
+  assert.ok(offline.includes("pill-happens:appearance:v1"));
+  assert.ok(offline.includes("BEGIN GENERATED APPEARANCE BOOT"));
   const [offlineLight, offlineDark] = offline
     .split("@media (prefers-color-scheme: dark)")
     .slice(0, 2);
@@ -358,7 +365,7 @@ test("generated application and offline CSS match the documented registry", asyn
     ] as const) {
       assert.ok(output.includes(`--${id}: ${APP_THEME_VALUES[mode][id]};`));
     }
-    assert.ok(offline.includes(`content="${APP_CANVAS_BASE}"`));
+    assert.ok(offline.includes(`content="${APP_CANVAS_BY_MODE[mode].base}"`));
   }
 });
 
@@ -416,7 +423,7 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
     overlay(APP_IRIDESCENCE.color),
     overlay(shaderCeiling),
   ];
-  for (const mode of ["light", "dark"] as const) {
+  for (const mode of ["dark"] as const) {
     assert.equal(APP_THEME_VALUES[mode]["canvas-background"], APP_CANVAS_BASE);
     assert.equal(
       APP_THEME_VALUES[mode]["canvas-foreground"],
@@ -433,6 +440,57 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
       ] as const)
         assert.ok(contrast(APP_THEME_VALUES[mode][copy], background) >= 4.5);
   }
+});
+
+test("daylight canvas copy stays readable across all bounded shader channels and layered glazes", () => {
+  const values = APP_THEME_VALUES.light;
+  assert.equal(values["canvas-background"], APP_LIGHT_CANVAS.base);
+  assert.equal(values["canvas-foreground"], APP_LIGHT_CANVAS.foreground);
+  assert.equal(
+    values["canvas-muted-foreground"],
+    APP_LIGHT_CANVAS.mutedForeground,
+  );
+  // Exhaust the shader's independent RGB bounds, including impossible mixed
+  // extrema, and all extrema of the two radial overlays. Blur is an average.
+  for (const red of ["00", "ba"])
+    for (const green of ["00", "57"])
+      for (const blue of ["00", "ff"])
+        for (const rose of [0, 77 / 255])
+          for (const lilac of [0, 66 / 255]) {
+            const shader: AppThemeHex = `#${red}${green}${blue}`;
+            const glazed = composite(APP_LIGHT_CANVAS.glaze, shader);
+            const colored = mixAppColors(
+              "#fbcfe8",
+              mixAppColors("#ddd6fe", glazed, lilac),
+              rose,
+            );
+            for (const copy of [
+              "canvas-foreground",
+              "canvas-muted-foreground",
+            ] as const)
+              assert.ok(
+                contrast(values[copy], colored) >= 4.5,
+                `${copy} over ${colored}`,
+              );
+          }
+  for (const still of [
+    "#f5cee6",
+    "#ddcef6",
+    "#e5ddf8",
+    "#f5ecf8",
+    "#e9daef",
+    "#f3e3f0",
+    APP_LIGHT_CANVAS.base,
+  ] as const)
+    assert.ok(contrast(values["canvas-muted-foreground"], still) >= 4.5);
+  assert.ok(getAppCanvasCss("light").includes(APP_LIGHT_CANVAS.base));
+  assert.ok(getAppCanvasCss("dark").includes(APP_CANVAS_BASE));
+  const head = renderAppCanvasRules();
+  assert.ok(head.includes(":root:not([data-color-mode])"));
+  assert.ok(head.includes(':root[data-color-mode="dark"]'));
+  assert.ok(
+    head.includes(APP_LIGHT_CANVAS.base) && head.includes(APP_CANVAS_BASE),
+  );
 });
 
 test("legacy optional Grainient ramps retain their mode-aware compatibility data", () => {

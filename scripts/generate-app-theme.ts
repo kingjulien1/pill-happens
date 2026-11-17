@@ -2,11 +2,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 import {
-  APP_CANVAS_BASE,
-  APP_CANVAS_CSS,
+  APP_CANVAS_BY_MODE,
+  getAppCanvasCss,
   APP_THEME_TOKENS,
   renderAppThemeCss,
 } from "../src/lib/app-theme";
+import { APPEARANCE_BOOT_SCRIPT } from "../src/lib/appearance";
 
 const outputPath = fileURLToPath(
   new URL("../src/app/theme.css", import.meta.url),
@@ -32,8 +33,10 @@ function offlineTheme() {
     APP_THEME_TOKENS.filter((item) => offlineRoles.has(item.id))
       .map((item) => `${item.token}: ${item[mode]};`)
       .join("\n");
-  return `:root { color-scheme: light; ${APP_CANVAS_CSS} ${values("light")} }
-  @media (prefers-color-scheme: dark) { :root { color-scheme: dark; ${values("dark")} } }`;
+  const dark = `color-scheme: dark; ${getAppCanvasCss("dark")} ${values("dark")}`;
+  return `:root { color-scheme: light; ${getAppCanvasCss("light")} ${values("light")} }
+  @media (prefers-color-scheme: dark) { :root:not([data-color-mode]) { ${dark} } }
+  :root[data-color-mode="dark"] { ${dark} }`;
 }
 
 async function main() {
@@ -46,12 +49,17 @@ async function main() {
         `/* BEGIN GENERATED APP THEME */\n${offlineTheme()}\n/* END GENERATED APP THEME */`,
       )
       .replace(
+        /<!-- BEGIN GENERATED APPEARANCE BOOT -->[\s\S]*?<!-- END GENERATED APPEARANCE BOOT -->/,
+        () =>
+          `<!-- BEGIN GENERATED APPEARANCE BOOT -->\n<script>${APPEARANCE_BOOT_SCRIPT}</script>\n<!-- END GENERATED APPEARANCE BOOT -->`,
+      )
+      .replace(
         /content="#[a-f\d]+"(\s+media="\(prefers-color-scheme: light\)")/i,
-        `content="${APP_CANVAS_BASE}"$1`,
+        `content="${APP_CANVAS_BY_MODE.light.base}"$1`,
       )
       .replace(
         /content="#[a-f\d]+"(\s+media="\(prefers-color-scheme: dark\)")/i,
-        `content="${APP_CANVAS_BASE}"$1`,
+        `content="${APP_CANVAS_BY_MODE.dark.base}"$1`,
       ),
     { parser: "html" },
   );
