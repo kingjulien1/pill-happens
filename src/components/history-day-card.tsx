@@ -7,27 +7,11 @@ import {
   MedicationCardIcon,
 } from "@/components/medication-card-base";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
-import {
-  checkInForDay,
-  DAILY_MOODS,
-  getCheckInPeriod,
-} from "@/lib/daily-check-in";
-import {
-  getCheckInCompletion,
-  getMorningCheckInCompletion,
-} from "@/lib/check-in-completion";
-import {
-  dayIntakes,
-  formatDay,
-  formatDose,
-  type AppData,
-  type Intake,
-} from "@/lib/domain";
-import { getMedicationColor } from "@/lib/medication-appearance";
-import { countPills } from "@/lib/pill-counts";
-import { reflectionStats } from "@/lib/reflection-writing";
+import { formatDose, type AppData } from "@/lib/domain";
+import { useHistoryCardSummary } from "@/components/use-history-card-summary";
 import { cn } from "@/lib/utils";
 import styles from "./history-day-card.module.css";
+import frameStyles from "./card-frame.module.css";
 
 export function HistoryDayCard({
   data,
@@ -38,107 +22,25 @@ export function HistoryDayCard({
   day: string;
   entryAnimation?: boolean;
 }) {
-  const entries = dayIntakes(data, day);
-  // Keep artwork anchored to the first taken medication, never dose or catalog order.
-  const chronological = [...entries].sort(
-    (a, b) =>
-      Date.parse(a.takenAt) - Date.parse(b.takenAt) || a.id.localeCompare(b.id),
-  );
-  const unique = new Map<string, Intake>();
-  for (const entry of chronological) {
-    if (!unique.has(entry.medicationId)) unique.set(entry.medicationId, entry);
-  }
-  const uniqueEntries = [...unique.values()];
-  const medicationById = new Map(
-    data.medications.map((medication) => [medication.id, medication]),
-  );
-  const medicationNames = uniqueEntries.map(
-    (entry) =>
-      medicationById.get(entry.medicationId)?.name ?? entry.medicationName,
-  );
-  const counts = countPills(entries, data.medications);
-  const morning = checkInForDay(data.dailyCheckIns, day, "morning");
-  const evening = checkInForDay(data.dailyCheckIns, day);
-  // Retain Evening's accessible preview; Morning fills reflection-only mornings.
-  const checkIn = evening ?? morning;
-  const morningOnly = Boolean(morning && !evening);
-  const checkInTitle = morningOnly ? "Morning Check-In" : "Evening Check-In";
-  const completion =
-    checkIn && getCheckInPeriod(checkIn) === "morning"
-      ? getMorningCheckInCompletion(checkIn)
-      : getCheckInCompletion(checkIn);
-  const checkInSummary =
-    morning && evening
-      ? "Morning & evening saved"
-      : checkIn
-        ? `${morningOnly ? "Morning" : "Evening"} saved`
-        : "No check-in saved";
-  const excerpt = checkIn
-    ? reflectionStats(checkIn.note).excerpt ||
-      checkIn.moods
-        .map((value) => DAILY_MOODS.find((mood) => mood.value === value)?.label)
-        .filter(Boolean)
-        .join(" · ") ||
-      checkIn.helped ||
-      `${checkInTitle} Saved`
-    : "";
-  const fullDate = formatDay(day, { year: "numeric" });
-  const weekday = formatDay(day, {
-    weekday: "long",
-    month: undefined,
-    day: undefined,
-  });
-  const shortWeekday = formatDay(day, {
-    weekday: "short",
-    month: undefined,
-    day: undefined,
-  });
-  const shortDate = formatDay(day, {
-    weekday: undefined,
-    month: "short",
-    day: "numeric",
-  });
-  const recordSummary = `${entries.length} ${entries.length === 1 ? "log" : "logs"} · ${uniqueEntries.length} ${uniqueEntries.length === 1 ? "medication" : "medications"}`;
-  const pillSummary = `${formatDose(counts.pills)} ${counts.pills === 1 ? "pill" : "pills"} from recorded tablet and capsule quantities, including fractions; ${formatDose(counts.benzos)} of those pills marked as benzodiazepines`;
-  const first = chronological[0];
-  const last = chronological.at(-1);
-  const firstMedication = first && medicationById.get(first.medicationId);
-  const color = getMedicationColor(firstMedication?.color);
-  const sameInstant = Boolean(
-    first && last && Date.parse(first.takenAt) === Date.parse(last.takenAt),
-  );
-  const fullTime = (entry: Intake) =>
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: data.settings.timezone,
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hourCycle: "h23",
-      timeZoneName: "shortOffset",
-    }).format(new Date(entry.takenAt));
-  const timeDescription =
-    first && last
-      ? `${fullTime(first)}${sameInstant ? "" : ` – ${fullTime(last)}`} (${data.settings.timezone}). +1 means the next calendar day within this journal day.`
-      : "No intakes recorded.";
-  const checkInDescription = checkIn
-    ? `${checkInTitle}: ${completion.completedCount} of ${completion.totalCount} sections completed. ${excerpt}`
-    : "No Morning or Evening Check-In saved.";
-  const label = [
-    `View Daily Log for ${fullDate}`,
+  const {
+    fullDate,
+    label,
+    color,
+    first,
+    last,
+    firstMedication,
+    uniqueCount,
+    entryCount,
+    morningOnly,
+    checkInTitle,
+    checkInSummary,
+    counts,
     recordSummary,
     pillSummary,
-    medicationNames.length
-      ? `Medications: ${medicationNames.join(", ")}`
-      : null,
-    first ? timeDescription : null,
-    checkInSummary,
-    checkInDescription,
-  ]
-    .filter(Boolean)
-    .join(". ");
+    weekday,
+    shortWeekday,
+    shortDate,
+  } = useHistoryCardSummary(data, day);
 
   return (
     <article
@@ -158,7 +60,7 @@ export function HistoryDayCard({
     >
       <Link
         href={`/history/${day}`}
-        className={cn("intake-log-card", styles.dayLink)}
+        className={cn("intake-log-card", frameStyles.card, styles.dayLink)}
         aria-label={label}
         title={label}
         data-history-day-link
@@ -181,7 +83,7 @@ export function HistoryDayCard({
             }
             data-history-icon-entrance
             data-history-medication-stack
-            data-unique-medications={uniqueEntries.length}
+            data-unique-medications={uniqueCount}
             data-history-medication-id={first?.medicationId}
             data-history-missing-medication={
               (first && !firstMedication) || undefined
@@ -255,14 +157,14 @@ export function HistoryDayCard({
                 title={`${recordSummary} · ${checkInSummary}`}
               >
                 <span data-history-records>
-                  <strong data-history-log-count>{entries.length}</strong>{" "}
+                  <strong data-history-log-count>{entryCount}</strong>{" "}
                   <span data-history-record-label="logs">Logs</span>
                   <span className={styles.recordSeparator} aria-hidden="true">
                     {" "}
                     ·{" "}
                   </span>
                   <strong data-history-medication-count>
-                    {uniqueEntries.length}
+                    {uniqueCount}
                   </strong>{" "}
                   <span data-history-record-label="meds">Meds</span>
                 </span>

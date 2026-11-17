@@ -8,6 +8,7 @@ import {
   getMedicationColorScale,
   getMedicationIconPigment,
   getMedicationPreviewSurface,
+  getMedicationFramePigment,
 } from "@/lib/medication-preview-colors";
 import {
   getMedicationType,
@@ -36,7 +37,7 @@ function MedicationCardMark({
 
   return (
     <span
-      className="medication-card-mark intake-card-mark"
+      className={cn("medication-card-mark intake-card-mark", styles.mark)}
       data-medication-mark
       data-medication-color={color.value}
       style={
@@ -45,6 +46,7 @@ function MedicationCardMark({
           backgroundColor:
             getMedicationPreviewSurface(pigment) ?? "var(--popover)",
           "--medication-rotation": `${iconRotation}deg`,
+          "--medication-frame-pigment": getMedicationFramePigment(color.value),
         } as CSSProperties
       }
     >
@@ -85,7 +87,7 @@ export function MedicationFormBadge({
   );
 }
 
-/** The amount beyond the front icon stays separate from decorative fan limits. */
+/** The recorded total stays independent of the decorative three-icon fan. */
 export function MedicationQuantityBadge({
   quantity,
   hasIndicators,
@@ -93,18 +95,16 @@ export function MedicationQuantityBadge({
   quantity: number;
   hasIndicators: boolean;
 }) {
-  if (!Number.isFinite(quantity) || quantity <= 1) return null;
-  const extra = quantity - 1;
-  const formatted = formatDose(extra);
-  // Preserve a positive legacy fraction even below the normal eight-digit
-  // display precision; a +0 badge would misrepresent it.
-  const label = `+${formatted === "0" ? String(extra) : formatted}`;
+  if (!Number.isFinite(quantity) || quantity <= 0 || quantity === 1)
+    return null;
+  const formatted = formatDose(quantity);
+  const label = `× ${formatted === "0" ? String(quantity) : formatted}`;
   return (
     <span
       className={styles.quantityBadge}
       aria-hidden="true"
-      title={`${formatDose(quantity)} total · ${label} beyond the front icon`}
-      data-intake-extra-quantity={extra}
+      title={`${formatDose(quantity)} total units`}
+      data-intake-quantity={quantity}
       data-has-indicators={hasIndicators}
     >
       <span

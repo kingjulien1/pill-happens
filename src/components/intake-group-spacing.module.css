@@ -18,18 +18,6 @@
 }
 
 .group:global(.intake-group)[data-grouped="true"]
-  > :global(.intake-group-glass)::before {
-  /* A quiet cup-tile pigment sits above the full glass layer. */
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  border-radius: inherit;
-  background: color-mix(in srgb, var(--check-in-art-base) 11%, transparent);
-  pointer-events: none;
-}
-
-.group:global(.intake-group)[data-grouped="true"]
   > :global(.intake-group-footer) {
   /* The existing 44px target puts its visible 24px pill 6px below the footer.
      Reserve only the remaining space; preserve its touch area and border notch. */

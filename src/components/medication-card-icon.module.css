@@ -17,6 +17,25 @@
   transform-origin: center;
 }
 
+/* Inward glass framing never changes the measured 48px artwork footprint. */
+.mark:global(.intake-card-mark) {
+  border: 0;
+  box-shadow: inset 0 0 0 3.5px
+    color-mix(in srgb, var(--entry-color) 24%, var(--card-foreground) 10%);
+  -webkit-backdrop-filter: blur(40px) saturate(120%);
+  backdrop-filter: blur(40px) saturate(120%);
+}
+
+.mark::after {
+  content: "";
+  position: absolute;
+  inset: 4.75px;
+  border-radius: 11.25px;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--medication-frame-pigment) 78%, transparent);
+  pointer-events: none;
+}
+
 /* The first row starts 3px below the artwork stage, with 20px text or a
    category icon plus its 4px rail padding. Keep the small form badge on that
    centre line, with 40% outside the front mark's left edge.
@@ -47,28 +66,29 @@
   --form-badge-row-height: 24px;
 }
 
-/* Mirror the form badge around the 48px front tile, never the fan's rear edge.
-   Long counters extend inward over the artwork rather than into the time. */
+/* The total occupies the old form anchor, independent of the rotating artwork. */
 .quantityBadge {
-  left: calc(var(--icon-front-left, 4px) + 48px - var(--form-badge-size) * 0.6);
+  left: calc(var(--icon-front-left, 4px) - 3px);
+  width: max-content;
+  color: var(--card-foreground);
 }
 
 .quantityLabel {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 50%;
   display: block;
   width: max-content;
   min-width: var(--form-badge-size);
   max-width: calc(48px - var(--form-badge-size) * 0.2 - 2px);
   height: 12px;
-  padding: 0 3px;
+  padding: 0;
   overflow: hidden;
-  border-radius: 5px;
-  background: color-mix(in srgb, var(--card-foreground) 9%, var(--background));
-  color: color-mix(in srgb, var(--card-foreground) 65%, transparent);
-  font-size: 8px;
-  font-weight: 550;
+  border-radius: 0;
+  background: none;
+  color: var(--card-foreground);
+  font-size: 9px;
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
   line-height: 12px;
   text-align: center;

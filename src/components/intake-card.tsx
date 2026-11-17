@@ -66,6 +66,7 @@ export function IntakeCard({
       name={entry.medicationName}
       form={type}
       formPresentation="icon"
+      intakeRoute={entry.route}
       ingredient={ingredient}
       quantity={entry.quantity}
       onClick={onEdit}

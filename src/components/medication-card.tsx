@@ -1,10 +1,12 @@
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { ComponentProps, ReactNode } from "react";
 import { MedicationCardBase } from "@/components/medication-card-base";
-import {
-  MedicationFormBadge,
-  MedicationQuantityBadge,
-} from "@/components/medication-card-icon";
+import { MedicationQuantityBadge } from "@/components/medication-card-icon";
+import { MedicationFormGlyph } from "@/components/medication-form-glyph";
+import { IntakeRouteIcon } from "@/components/intake-route-icon";
+import { INTAKE_ROUTES, type IntakeRoute } from "@/lib/intake-routes";
+import { cn } from "@/lib/utils";
+import styles from "./medication-card.module.css";
 import {
   getMedicationCategories,
   getMedicationCategory,
@@ -51,7 +53,9 @@ type MedicationCardProps = Omit<
   /** A recorded or default dose in the shared second-row amount region. */
   trailing?: ReactNode;
   decoration?: ReactNode;
-  /** Intake forms use a compact artwork badge; library cards keep plain copy. */
+  /** Recorded routes remain distinct from a medication's physical form. */
+  intakeRoute?: IntakeRoute;
+  /** Library forms use a small label; recorded intakes use the outline rail. */
   formPresentation?: "text" | "icon";
 };
 
@@ -66,6 +70,8 @@ export function MedicationCard({
   trailing,
   decoration,
   formPresentation = "text",
+  intakeRoute,
+  className,
   ...props
 }: MedicationCardProps) {
   const indicators = getMedicationCategories(medication);
@@ -80,6 +86,7 @@ export function MedicationCard({
   return (
     <MedicationCardBase
       {...props}
+      className={cn(styles.card, className)}
       color={medication?.color}
       icon={medication?.icon}
       iconRotation={medication?.iconRotation}
@@ -93,16 +100,10 @@ export function MedicationCard({
       decoration={decoration}
       artworkBadge={
         formPresentation === "icon" ? (
-          <>
-            <MedicationFormBadge
-              form={form}
-              hasIndicators={indicators.length > 0}
-            />
-            <MedicationQuantityBadge
-              quantity={quantity}
-              hasIndicators={indicators.length > 0}
-            />
-          </>
+          <MedicationQuantityBadge
+            quantity={quantity}
+            hasIndicators={indicators.length > 0}
+          />
         ) : undefined
       }
     >
@@ -114,7 +115,9 @@ export function MedicationCard({
           className="medication-card-heading intake-card-heading"
           data-intake-heading
           data-has-leading={hasLeading}
-          data-has-indicators={indicators.length > 0}
+          data-has-indicators={
+            indicators.length > 0 || formPresentation === "icon"
+          }
         >
           {leading}
           <div className="intake-card-title-group" data-intake-title-group>
@@ -122,25 +125,43 @@ export function MedicationCard({
               {name}
             </h3>
           </div>
-          {indicators.length > 0 && (
+          {(indicators.length > 0 || formPresentation === "icon") && (
             <span
-              className="intake-card-tags"
+              className={cn("intake-card-tags", styles.rail)}
               data-medication-indicators
-              dir="rtl"
             >
-              {indicators.map((kind, index) => (
+              {formPresentation === "icon" && (
+                <>
+                  <span className={styles.railDot} aria-hidden="true">
+                    ·
+                  </span>
+                  <span
+                    className={styles.route}
+                    title={
+                      INTAKE_ROUTES.find(
+                        (route) =>
+                          route.value === (intakeRoute ?? "unspecified"),
+                      )?.label
+                    }
+                  >
+                    <IntakeRouteIcon route={intakeRoute} strokeWidth={2.5} />
+                  </span>
+                  <span className={styles.form} title={typeLabel}>
+                    <MedicationFormGlyph
+                      form={form ?? "other"}
+                      strokeWidth={2.5}
+                    />
+                  </span>
+                </>
+              )}
+              {indicators.map((kind) => (
                 <MedicationIndicatorMark
                   key={kind}
                   kind={kind}
                   title={getMedicationCategory(kind).label}
                   strokeWidth={2.5}
-                  outline={formPresentation === "icon"}
+                  outline
                   className="intake-card-indicator"
-                  style={
-                    formPresentation === "icon"
-                      ? undefined
-                      : { zIndex: indicators.length - index }
-                  }
                   data-medication-indicator-tile={kind}
                   data-intake-benzo-icon={
                     kind === "benzodiazepine" || undefined
@@ -162,10 +183,11 @@ export function MedicationCard({
           >
             {formPresentation === "text" && (
               <span
-                className="intake-card-type-text"
+                className={cn("intake-card-type-text", styles.typeBadge)}
                 title={hasType ? typeLabel : "Medication Type Not Set"}
                 data-intake-type
               >
+                <MedicationFormGlyph form={form ?? "other"} strokeWidth={2.2} />
                 {typeLabel}
               </span>
             )}

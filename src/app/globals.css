@@ -246,11 +246,15 @@
   min-width: 0;
 }
 .intake-group[data-grouped="true"] {
-  --intake-group-border-width: 2px;
-  --intake-group-border-outset: 0.5px;
+  --intake-group-border-width: calc(8px / 3);
+  --intake-group-border-pigment: color-mix(
+    in srgb,
+    var(--card-foreground) 84%,
+    var(--color-pink-400, #fb64b6) 16%
+  );
   --intake-group-border: color-mix(
     in srgb,
-    var(--card-foreground) 10%,
+    var(--intake-group-border-pigment) 22%,
     transparent
   );
   /* Extend the frame while keeping its cards aligned with single entries. */
@@ -268,14 +272,11 @@
   background: transparent;
   pointer-events: none;
 }
-/* Group glass spans the full rounded face; its rim may paint beyond it. */
+/* The glass and two quiet washes share the same inset rounded frame. */
 .intake-group-glass > .intake-group-blur {
   display: block;
   overflow: hidden;
   border-radius: inherit;
-}
-.intake-group-glass > .intake-group-gradient {
-  display: none;
 }
 .intake-group-blur {
   position: absolute;
@@ -288,34 +289,43 @@
   opacity: var(--intake-group-glass-opacity, 0.78);
   pointer-events: none;
 }
-.intake-group-gradient {
+.intake-group-wash {
   position: absolute;
   z-index: 1;
-  inset: -55% -30%;
-  background-image:
-    radial-gradient(
-      ellipse at 12% 20%,
-      color-mix(in srgb, var(--palette-lilac) 75%, var(--palette-rose)),
-      transparent 66%
-    ),
-    radial-gradient(ellipse at 88% 78%, var(--palette-iris), transparent 68%),
-    conic-gradient(
-      from 40deg,
-      var(--palette-lilac),
-      var(--palette-plum),
-      color-mix(in srgb, var(--palette-lilac) 82%, var(--palette-rose)),
-      var(--palette-lilac)
-    );
-  opacity: 0.2;
-  transform-origin: 50% 50%;
-  animation: intake-group-current 54s ease-in-out infinite paused;
+  inset: 0;
+  border-radius: inherit;
   pointer-events: none;
+}
+.intake-group-wash--pink {
+  --intake-group-wash-color: color-mix(
+    in srgb,
+    var(--color-pink-300, #fda5d5) 6%,
+    transparent
+  );
+  background: linear-gradient(
+    to bottom,
+    var(--intake-group-wash-color) 0,
+    var(--intake-group-wash-color)
+      var(--intake-group-pink-fade-start, calc(100% - 52px)),
+    transparent 100%
+  );
+}
+.intake-group-wash--purple {
+  --intake-group-wash-color: color-mix(
+    in srgb,
+    var(--color-purple-300, #d8b4fe) 8%,
+    transparent
+  );
+  background: linear-gradient(
+    to bottom,
+    var(--intake-group-wash-color) 0,
+    var(--intake-group-wash-color)
+      var(--intake-group-purple-fade-start, calc(100% - 62px)),
+    transparent var(--intake-group-purple-fade-end, calc(100% - 28px))
+  );
 }
 .intake-group[data-grouped="true"][data-expanded="false"] {
   cursor: pointer;
-}
-[data-surface-active="true"] .intake-group-gradient {
-  animation-play-state: running;
 }
 .intake-group[data-grouped="true"][data-expanded="false"]
   > .intake-group-cards {
@@ -327,40 +337,20 @@
   [data-intake-card] {
   pointer-events: none;
 }
-@media (prefers-reduced-motion: reduce) {
-  .intake-group-gradient {
-    animation-play-state: paused !important;
-  }
-}
-@keyframes intake-group-current {
-  0%,
-  100% {
-    transform: translate3d(-5%, 4%, 0) rotate(-12deg) scale(1.06);
-  }
-  36% {
-    transform: translate3d(6%, -5%, 0) rotate(12deg) scale(1.12);
-  }
-  72% {
-    transform: translate3d(-3%, -2%, 0) rotate(3deg) scale(1.03);
-  }
-}
 .intake-group-glass::after {
   content: "";
   position: absolute;
   z-index: 2;
   box-sizing: border-box;
-  inset: calc(-1 * var(--intake-group-border-outset));
-  border: var(--intake-group-border-width) solid var(--intake-group-border);
-  border-radius: calc(
-    var(--intake-card-radius) + var(--intake-group-border-outset)
-  );
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  /* Inset shadow preserves fractional thickness instead of pixel-snapping it. */
+  box-shadow: inset 0 0 0 var(--intake-group-border-width)
+    var(--intake-group-border);
   /* Only the border is interrupted. The actual glass remains translucent. */
   -webkit-mask-image:
-    linear-gradient(
-      to bottom,
-      #000 calc(100% - 4px - var(--intake-group-border-outset)),
-      transparent 0
-    ),
+    linear-gradient(to bottom, #000 calc(100% - 4px), transparent 0),
     linear-gradient(
       to right,
       #000 calc(50% - var(--intake-group-toggle-width, 144px) / 2),
@@ -368,11 +358,7 @@
       #000 0
     );
   mask-image:
-    linear-gradient(
-      to bottom,
-      #000 calc(100% - 4px - var(--intake-group-border-outset)),
-      transparent 0
-    ),
+    linear-gradient(to bottom, #000 calc(100% - 4px), transparent 0),
     linear-gradient(
       to right,
       #000 calc(50% - var(--intake-group-toggle-width, 144px) / 2),
@@ -696,7 +682,6 @@
 }
 /* Lift the 44px target with the shorter footer; its lower edge stays clear of the next group. */
 .intake-group-toggle {
-  --intake-group-control-fill: var(--secondary);
   position: relative;
   top: -6px;
   z-index: 5;
@@ -725,29 +710,15 @@
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .intake-group-toggle:hover {
-    --intake-group-control-fill: color-mix(
-      in srgb,
-      var(--secondary) 90%,
-      var(--palette-lilac)
-    );
     color: var(--canvas-foreground);
   }
   .intake-group-toggle:hover .intake-group-label {
-    box-shadow: inset 0 0 0 1px
-      color-mix(in srgb, var(--canvas-foreground) 9%, transparent);
+    box-shadow: inset 0 0 0 var(--intake-group-border-width)
+      color-mix(in srgb, var(--intake-group-border-pigment) 30%, transparent);
   }
 }
 .intake-group-toggle:active {
-  --intake-group-control-fill: color-mix(
-    in srgb,
-    var(--secondary) 80%,
-    var(--palette-lilac)
-  );
   color: var(--canvas-foreground);
-}
-.intake-group-toggle:active .intake-group-label {
-  box-shadow: inset 0 1px 3px
-    color-mix(in srgb, var(--palette-ink) 24%, transparent);
 }
 .intake-group-label {
   position: relative;
@@ -759,10 +730,12 @@
   justify-content: center;
   gap: 5px;
   padding: 3px 8px;
-  border: 1.5px solid var(--intake-group-border);
+  border: 0;
   border-radius: 9px;
   background: transparent;
   color: inherit;
+  box-shadow: inset 0 0 0 var(--intake-group-border-width)
+    var(--intake-group-border);
   font-size: 9.5px;
   font-weight: 500;
   line-height: 1;
@@ -773,40 +746,12 @@
     box-shadow 160ms ease;
 }
 .intake-group-copy {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35em;
-}
-/* Both verbs reserve the same intrinsic width, so neither the label nor its
-   measured border notch jumps when a stack opens or closes. */
-.intake-group-verb {
-  display: inline-grid;
-  align-items: center;
-  justify-items: center;
-}
-.intake-group-verb > span {
-  grid-area: 1 / 1;
-}
-.intake-group-verb > [data-current="false"] {
-  visibility: hidden;
+  display: inline;
 }
 .intake-group-label strong {
-  min-width: 2ch;
-  text-align: center;
   color: var(--canvas-foreground);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-}
-.intake-group-control-paint {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  isolation: isolate;
-  overflow: hidden;
-  border-radius: inherit;
-  background-color: var(--intake-group-control-fill);
-  transition: background-color 160ms ease;
-  pointer-events: none;
 }
 .intake-group-chevron-frame {
   display: inline-flex;
@@ -833,7 +778,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .intake-group-label,
-  .intake-group-control-paint,
   .intake-group-chevron {
     transition: none;
   }

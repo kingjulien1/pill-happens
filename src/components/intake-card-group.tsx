@@ -19,7 +19,6 @@ import { useIntakeStackGroupControl } from "@/components/intake-stack-controller
 import { usePersistentIntakeStackView } from "@/components/journal-drafts";
 import { toLocalInput, type Intake, type Medication } from "@/lib/domain";
 import type { IntakeGroup } from "@/lib/intake-groups";
-import { getIntakeGroupGradient } from "@/lib/intake-group-palette";
 import { getMedicationClasses } from "@/lib/medication-classification";
 import entranceStyles from "@/components/intake-group-entrance.module.css";
 import spacingStyles from "@/components/intake-group-spacing.module.css";
@@ -325,10 +324,6 @@ export function IntakeCardGroup({
         grouped
           ? ({
               "--intake-group-space": `${INTAKE_GROUP_SPACING_PX}px`,
-              "--intake-group-gradient": getIntakeGroupGradient(
-                group.entries,
-                medications,
-              ),
             } as CSSProperties)
           : undefined
       }
@@ -361,7 +356,8 @@ export function IntakeCardGroup({
           aria-hidden="true"
         >
           <div className="intake-group-blur" />
-          <div className="intake-group-gradient" />
+          <div className="intake-group-wash intake-group-wash--pink" />
+          <div className="intake-group-wash intake-group-wash--purple" />
         </div>
       )}
       <div
@@ -427,26 +423,19 @@ export function IntakeCardGroup({
               }}
             >
               <span ref={labelRef} className="intake-group-label">
-                <span className="intake-group-control-paint" aria-hidden="true">
-                  <span className="intake-group-blur" />
-                </span>
                 <span
                   className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
                   aria-hidden="true"
                 >
                   <ActionIcon
                     name="expand"
-                    weight="regular"
+                    weight="bold"
                     className="intake-group-chevron"
                   />
                 </span>
                 <span className="intake-group-copy" aria-hidden="true">
-                  <span className="intake-group-verb">
-                    <span data-current={!open}>Reveal</span>
-                    <span data-current={open}>Collapse</span>
-                  </span>
-                  <strong>{count}</strong>
-                  <span>intakes</span>
+                  {open ? "Collapse" : "Reveal"} <strong>{count}</strong>{" "}
+                  intakes
                 </span>
                 <span
                   className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
@@ -454,7 +443,7 @@ export function IntakeCardGroup({
                 >
                   <ActionIcon
                     name="expand"
-                    weight="regular"
+                    weight="bold"
                     className="intake-group-chevron"
                   />
                 </span>

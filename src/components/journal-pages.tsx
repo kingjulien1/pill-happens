@@ -704,15 +704,19 @@ export function MedicationsPage() {
         <MedicationListHeading
           archived={showArchived}
           count={medications.length}
+          activeCount={data.medications.filter((item) => !item.archived).length}
+          archivedCount={
+            data.medications.filter((item) => item.archived).length
+          }
           onArchivedChange={(archived) => view.setValue({ archived })}
         />
       )}
       <div
-        className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/90 px-3 py-2.5"
+        className="mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 bg-card/37 px-3 py-2.5"
         data-medication-history-notice
       >
         <ActionIcon name="retry" className="mt-0.5 size-4 text-foreground/70" />
-        <p className="text-[11px] leading-[1.7] text-muted-foreground">
+        <p className="text-[11px] leading-[1.7] text-foreground">
           <span className="font-medium text-foreground">
             Edits Update All Past Logs.
           </span>{" "}

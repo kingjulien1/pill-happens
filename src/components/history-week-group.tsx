@@ -304,7 +304,8 @@ export function HistoryWeekGroup({
         {grouped && (
           <div className="intake-group-glass" aria-hidden="true">
             <div className="intake-group-blur" />
-            <div className="intake-group-gradient" />
+            <div className="intake-group-wash intake-group-wash--pink" />
+            <div className="intake-group-wash intake-group-wash--purple" />
           </div>
         )}
         <div
@@ -361,28 +362,17 @@ export function HistoryWeekGroup({
               >
                 <span ref={labelRef} className="intake-group-label">
                   <span
-                    className="intake-group-control-paint"
-                    aria-hidden="true"
-                  >
-                    <span className="intake-group-blur" />
-                  </span>
-                  <span
                     className="intake-group-chevron-frame"
                     aria-hidden="true"
                   >
                     <ActionIcon
                       name="expand"
-                      weight="regular"
+                      weight="bold"
                       className="intake-group-chevron"
                     />
                   </span>
                   <span className="intake-group-copy" aria-hidden="true">
-                    <span className="intake-group-verb">
-                      <span data-current={!open}>Reveal</span>
-                      <span data-current={open}>Collapse</span>
-                    </span>
-                    <strong>{count}</strong>
-                    <span>days</span>
+                    {open ? "Collapse" : "Reveal"} <strong>{count}</strong> days
                   </span>
                   <span
                     className="intake-group-chevron-frame"
@@ -390,7 +380,7 @@ export function HistoryWeekGroup({
                   >
                     <ActionIcon
                       name="expand"
-                      weight="regular"
+                      weight="bold"
                       className="intake-group-chevron"
                     />
                   </span>

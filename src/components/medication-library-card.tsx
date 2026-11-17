@@ -52,14 +52,6 @@ export function MedicationLibraryCard({
       data-card-entry
       data-medication-library-card={medication.id}
       data-medication-archived={medication.archived || undefined}
-      leading={
-        <span
-          className="intake-card-time medication-library-default"
-          data-medication-default-label
-        >
-          Default
-        </span>
-      }
       trailing={
         <MedicationCardDose
           quantity={quantity}

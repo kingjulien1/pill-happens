@@ -109,6 +109,16 @@ export function getMedicationColorScale(value?: string): MedicationColorScale {
   };
 }
 
+/** A steady saturated family shade keeps a fine artwork rim readable at any tint. */
+export function getMedicationFramePigment(value?: string): string {
+  const selected = getMedicationColor(value);
+  const color =
+    colorsByValue.get(selected.value) ?? nearestRampColor(selected.hex);
+  return colorsByValue.get(
+    `tw-${color.family}-${color.shade <= 400 ? 400 : 500}`,
+  )!.hex;
+}
+
 /** Match the rendered glyph, including SVG artwork with its own saved pigment. */
 export function getMedicationIconPigment(
   value?: string,
