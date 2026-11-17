@@ -1275,24 +1275,24 @@ export function DeveloperGuidePage() {
                 before the footer.
               </p>
               <p>
-                The two 46px page controls and loading core share
-                HEADER_CONTROL_PAINT, which aliases the same TODAY_CONTROL_PAINT
-                family. The toolbar uses quieter translucent lilac glass in
-                light mode and deep mauve glass with pale lilac artwork in dark
-                mode. A 3px inward bevel and fine catchlight echo the main
-                action, with 32px blur and restrained contact shadow. The old
-                Pink950 foundation and competing outlined layers are replaced.
-                Glyphs stay still during hover; navigation, Today links and
-                directional pull gestures retain their original behavior.
+                The two 46px page icon controls use a Pink950 foundation with
+                a separate Mauve900 overlay at exactly 67% in both color modes.
+                Their icons and both inward edges use full-opacity Pink400.
+                The local headerButton paint preserves its 3px inward bevel,
+                14px corners, 32px glass blur and restrained contact shadow.
+                Hover, open and keyboard-focus edges retain the same Pink400
+                pigment. Glyphs stay still during hover; navigation, Today
+                links and directional pull gestures keep their original behavior.
               </p>
               <p>
-                Mode aliases resolve on the toolbar context before its child
-                controls inherit their paint. The critical loading CSS includes
-                those same literal pigment pairs and system-preference aliases,
-                so it matches before application styles or hydration arrive.
-                Tablet score lines use an opaque matching face pigment to stay
-                crisp. Keyboard focus has its own offset ring; disabled states
-                retain native semantics. The 46px hit area, 14px corners, gesture
+                These overrides live only in today-controls.module.css, so
+                the main action and critical loader keep their own paint. The
+                underlying HEADER_CONTROL_PAINT still aliases TODAY_CONTROL_PAINT
+                and supplies literal light/dark pigments before hydration.
+                Tablet score lines and pull feedback use the opaque composite
+                of 67% Mauve900 and 33% Pink950 to match their button face.
+                Keyboard focus retains its offset ring and dark backing;
+                disabled states retain native semantics. Hit areas, gesture
                 thresholds and animation ownership are unchanged.
               </p>
               <p>

@@ -126,25 +126,41 @@
   color: inherit;
 }
 
-/* Matching glass tools, with the same shallow bevel and no neon outlines. */
+/* Pink tools keep their original glass geometry; only their local paint changes. */
 .headerButton.headerButton[data-slot="button"]:is(
     [data-brand-refresh],
     [data-navigation-trigger]
   ) {
-  --header-button-pigment: var(--control-tool-ink);
-  --header-button-edge: var(--control-tool-edge);
-  --header-button-hover-edge: var(--control-tool-edge);
-  --header-button-active-edge: var(--control-tool-edge);
-  --brand-copy: var(--control-tool-ink);
-  --brand-surface: var(--control-tool-face);
+  --header-tool-base: var(--color-pink-950, oklch(28.4% 0.109 3.907));
+  --header-tool-mauve: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
+  --header-tool-ink: var(--color-pink-400, oklch(71.8% 0.202 349.761));
+  --header-tool-overlay: color-mix(
+    in srgb,
+    var(--header-tool-mauve) 67%,
+    transparent
+  );
+  --header-tool-surface: color-mix(
+    in srgb,
+    var(--header-tool-mauve) 67%,
+    var(--header-tool-base) 33%
+  );
+  --header-button-pigment: var(--header-tool-ink);
+  --header-button-surface: var(--header-tool-surface);
+  --header-button-edge: var(--header-tool-ink);
+  --header-button-hover-edge: var(--header-tool-ink);
+  --header-button-active-edge: var(--header-tool-ink);
+  --header-control-cup-base: var(--header-tool-surface);
+  --brand-copy: var(--header-tool-ink);
+  --brand-surface: var(--header-tool-surface);
   border: 0;
   border-radius: 14px;
-  background: var(--control-tool-rim);
-  color: var(--control-tool-ink);
+  background:
+    linear-gradient(var(--header-tool-overlay) 0 0), var(--header-tool-base);
+  color: var(--header-tool-ink);
   -webkit-backdrop-filter: blur(32px) saturate(115%);
   backdrop-filter: blur(32px) saturate(115%);
   box-shadow:
-    inset 0 0 0 1px var(--control-tool-edge),
+    inset 0 0 0 1px var(--header-tool-ink),
     0 4px 12px -4px var(--control-shadow);
   transition: box-shadow 220ms ease;
 }
@@ -157,13 +173,8 @@
   border: 0;
   border-radius: 11px;
   background:
-    radial-gradient(
-      ellipse at 10% 0%,
-      var(--control-tool-rim),
-      transparent 70%
-    ),
-    var(--control-tool-face);
-  box-shadow: inset 0 0 0 1px var(--control-tool-edge);
+    linear-gradient(var(--header-tool-overlay) 0 0), var(--header-tool-base);
+  box-shadow: inset 0 0 0 1px var(--header-tool-ink);
   filter: none;
 }
 .headerButton.headerButton[data-slot="button"]:is(
@@ -183,6 +194,12 @@
   outline: 2px solid #f6e7ff;
   outline-offset: 4px;
   box-shadow: 0 0 0 4px #392d49;
+}
+.headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  ):focus-visible {
+  outline-color: var(--header-tool-ink);
 }
 
 @media (max-width: 359px) {
@@ -211,7 +228,7 @@
   .headerButton.headerButton[data-slot="button"]:not(:disabled):hover,
   .headerButton.headerButton[data-slot="button"][data-popup-open] {
     box-shadow:
-      inset 0 0 0 1.5px var(--control-tool-ink),
+      inset 0 0 0 1.5px var(--header-tool-ink),
       0 5px 16px -4px var(--control-shadow);
   }
 }
@@ -241,6 +258,6 @@
       [data-brand-refresh],
       [data-navigation-trigger]
     ) {
-    background-color: var(--control-tool-opaque);
+    background: var(--header-tool-surface);
   }
 }
