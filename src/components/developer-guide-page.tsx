@@ -1215,19 +1215,23 @@ export function DeveloperGuidePage() {
                 reading surfaces and share the frame geometry.
               </p>
               <p>
-                Actual intake cards use a 5⅓px inward outer band, one third
-                thicker than the former 4px. Its pigment blends two thirds of
-                the existing neutral edge with one third of the inner identity
-                color. The 2px identity band keeps its 50% opacity and starts
-                immediately inside that wider band. A fine 1.5px ring sits
-                outside the face, using the mixed outer color at half its
-                opacity; it is 25% thinner than the inner band. A root
-                <code> box-shadow</code> owns this fine ring so the main rim’s
-                exclude mask cannot clip it. These are paint layers: measured
-                size, padding, stack placement and hit targets do not grow.
-                Morning/Evening check-ins retain their 4px neutral and 2px
-                identity inward frame. Library and history cards now opt into
-                the intake frame; the appearance hero retains its own scene.
+                Intake and Morning/Evening cards share the same 5⅓px inward
+                outer band. Its pigment mixes two thirds of the existing neutral
+                edge with one third of the inner identity color. Their identity
+                band is now 2⅔px, one third thicker than its former 2px, with
+                the same 50% opacity and a 0.4px tighter corner radius. A second
+                copy sits within the thick outer band: 22.5% wider than the inner
+                line (3.2667px), at half its alpha (25% selected color). Its center
+                is one third outward from the thick band’s inner edge, producing
+                an approximately 1.9222px inset from the card’s outside edge.
+                A decorative, pointer-transparent shadow layer preserves those
+                fractional dimensions; browser outlines round them to whole
+                pixels. The original fine outside edge remains 1.5px at half the
+                mixed outer pigment’s opacity, independently of the increased
+                inner width. These paint layers leave the 80px baseline, 21px
+                outer corners, padding, stack placement and hit targets intact.
+                Library and Past Days link cards retain their 2px inner band and
+                do not receive the additional copied line.
               </p>
               <p>
                 The Medications opening uses a compact 25px title on phones,
@@ -1698,7 +1702,9 @@ export function DeveloperGuidePage() {
                 with an 8% selected-color tint, lifted with 12% Lilac in dark
                 mode, a 5⅓px inward mixed rim, a 2px identity band at 50%, and a
                 1.5px fine outside edge at half the outer color opacity.
-                Check-ins retain their own 4px/2px frame. Paint remains
+                Today’s intakes and check-ins use their stronger 2⅔px identity
+                band and the faint copied rim; collection frames stay at 2px.
+                Paint remains
                 independent of the icon pigment or a fixed-color SVG, and native
                 full-card activation opens the appropriate editor.
               </p>

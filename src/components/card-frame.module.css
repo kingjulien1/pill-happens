@@ -82,6 +82,20 @@
 /* Intake glass owns the blur and both alpha washes on one clipped pane.
    Background images paint front-to-back: medication tint, pink, then glass. */
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+  --entry-inner-rim-width: calc(2px * 4 / 3);
+  /* The existing fine outer edge stays independent of the stronger inner rim. */
+  --entry-fine-rim-width: 1.5px;
+  --entry-inner-radius-trim: 0.4px;
+  --entry-detail-rim-width: calc(var(--entry-inner-rim-width) * 49 / 40);
+  --entry-detail-rim-center: calc(var(--entry-rim-width) * 2 / 3);
+  --entry-detail-rim-offset: calc(
+    var(--entry-detail-rim-center) - var(--entry-detail-rim-width) / 2
+  );
+  --entry-detail-rim-color: color-mix(
+    in srgb,
+    var(--entry-inner-rim-color) 50%,
+    transparent
+  );
   --entry-edge-color: color-mix(in srgb, var(--foreground) 10%, transparent);
   --card-foreground: var(--canvas-foreground);
   --entry-surface-base: color-mix(in srgb, var(--entry-color) 6%, transparent);
@@ -90,6 +104,21 @@
     var(--color-pink-200, #fccee8) 8%,
     transparent
   );
+}
+
+/* A shadow retains fractional widths that CSS borders/outlines round away.
+   Center the extra line one third outward from the thick rim's inner edge. */
+.detailRim {
+  position: absolute;
+  z-index: 3;
+  inset: var(--entry-detail-rim-offset);
+  border-radius: calc(
+    var(--entry-card-radius) - var(--entry-detail-rim-offset) -
+      var(--entry-inner-radius-trim)
+  );
+  box-shadow: inset 0 0 0 var(--entry-detail-rim-width)
+    var(--entry-detail-rim-color);
+  pointer-events: none;
 }
 
 .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
@@ -148,7 +177,10 @@
   z-index: 3;
   box-sizing: border-box;
   inset: var(--entry-inner-rim-offset);
-  border-radius: calc(var(--entry-card-radius) - var(--entry-inner-rim-offset));
+  border-radius: calc(
+    var(--entry-card-radius) - var(--entry-inner-rim-offset) -
+      var(--entry-inner-radius-trim, 0px)
+  );
   box-shadow: inset 0 0 0 var(--entry-inner-rim-width)
     var(--entry-inner-rim-color);
   pointer-events: none;

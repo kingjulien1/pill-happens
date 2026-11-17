@@ -13,6 +13,8 @@ import layoutStyles from "./card-layout.module.css";
 export { MedicationCardIcon } from "@/components/medication-card-icon";
 
 type MedicationCardBaseProps = Omit<ComponentProps<"button">, "color"> & {
+  "data-intake-card"?: string;
+  "data-check-in-card"?: boolean;
   /** Render the identical presentation as a noninteractive snapshot group. */
   readOnly?: boolean;
   color?: string;
@@ -63,6 +65,9 @@ export function MedicationCardBase({
 }: MedicationCardBaseProps) {
   const color = getMedicationColor(value);
   const hasContent = children !== null && children !== undefined;
+  const hasDetailRim =
+    props["data-intake-card"] !== undefined ||
+    props["data-check-in-card"] !== undefined;
 
   const frameStyle = {
     "--entry-color": color.hex,
@@ -76,6 +81,13 @@ export function MedicationCardBase({
     <>
       {background === undefined ? <MedicationCardBackground /> : background}
       {decoration}
+      {hasDetailRim && (
+        <span
+          className={frameStyles.detailRim}
+          data-card-rim-detail
+          aria-hidden="true"
+        />
+      )}
       {/* Legacy aliases keep intake measurement and entrance hooks unchanged. */}
       <div className="medication-card-content intake-card-content">
         {leadingArtwork !== undefined ? (
