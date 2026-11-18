@@ -46,7 +46,7 @@
   );
   --toast-deep-overlay: color-mix(
     in srgb,
-    var(--toast-deep-mix) 39%,
+    var(--toast-deep-mix) 67%,
     transparent
   );
   /* The artwork face keeps its depth independently of the lighter card glass. */
@@ -65,7 +65,6 @@
         )
         0 0
     ),
-    linear-gradient(var(--toast-deep-overlay) 0 0),
     linear-gradient(var(--toast-surface) 0 0);
   --toast-tile: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
   --toast-tile-overlay: color-mix(
@@ -196,7 +195,11 @@
   box-sizing: border-box;
   border: 0;
   border-radius: 18px;
-  background: var(--toast-surface-layers);
+  --toast-countdown-tint: transparent;
+  --toast-cover:
+    linear-gradient(var(--toast-countdown-tint) 0 0),
+    linear-gradient(var(--toast-deep-overlay) 0 0);
+  background: var(--toast-cover), var(--toast-surface-layers);
   /* Blur only the scene behind the glass; text, artwork and frames stay crisp. */
   -webkit-backdrop-filter: blur(96px);
   backdrop-filter: blur(96px);
@@ -218,11 +221,23 @@
     0 3px 10px -5px var(--toast-shadow);
   text-align: left;
 }
+.journal-notification[data-timer-mode="countdown"] {
+  --toast-countdown-tint: color-mix(
+    in srgb,
+    color-mix(
+        in srgb,
+        var(--color-pink-800, #9d174d),
+        var(--color-rose-800, #9f1239)
+      )
+      clamp(0%, calc(50% - var(--notification-remaining, 1) * 150%), 50%),
+    transparent
+  );
+}
 /* Reduced transparency substitutes opaque same-hue paper for the glass. */
 @media (prefers-reduced-transparency: reduce) {
   .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"],
   .journal-notification {
-    background: var(--color-fuchsia-950, oklch(29.3% 0.136 325.661));
+    background: var(--toast-cover), var(--color-fuchsia-950, #4a044e);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -2160,19 +2175,14 @@
 @media (prefers-color-scheme: light) {
   .journal-toaster[data-sonner-toaster],
   .journal-toaster[data-sonner-toaster][data-sonner-theme] {
-    --toast-ink: var(--foreground);
-    --toast-muted: var(--muted-foreground);
-    --toast-detail-muted: color-mix(
-      in srgb,
-      var(--foreground) 86%,
-      transparent
-    );
+    --toast-ink: #fff5fb;
+    --toast-muted: #eeddeb;
+    --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 86%, transparent);
     --toast-surface: var(--popover);
     --toast-surface-layers:
       linear-gradient(
         color-mix(in srgb, var(--color-pink-300, #f9a8d4) 11%, transparent) 0 0
       ),
-      linear-gradient(var(--toast-deep-overlay) 0 0),
       radial-gradient(
         ellipse at 0% 0%,
         color-mix(in srgb, var(--palette-rose) 9%, transparent),
@@ -2316,7 +2326,7 @@
     .journal-toaster[data-sonner-toaster]
       [data-sonner-toast][data-styled="true"],
     .journal-notification {
-      background: var(--popover);
+      background: var(--toast-cover), var(--popover);
     }
   }
 }

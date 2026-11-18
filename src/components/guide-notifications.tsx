@@ -1076,8 +1076,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         16px and top offsets include the safe area. The entire card keeps
         <code> --toast-fuchsia-surface</code>: Fuchsia950 at 47% color alpha
         above a strong 96px standard/Safari backdrop blur. A 50/50
-        Fuchsia950–Purple950 mix at 39% deepens that base below the existing
-        Pink300 11% highlight. Page content behind it is softened while the
+        Fuchsia950–Purple950 mix at 67% covers the Pink300 highlight. During the final third of the
+        countdown, a Pink800 and Rose800 wash rises from 0% to 50%. Page content behind it is softened while the
         notification’s own text and controls stay sharp. Reduced transparency
         uses an opaque same-hue surface. Every icon tile keeps its Fuchsia900
         layer at 69% alpha and adds the same deep Fuchsia/Purple mix at 78% on
@@ -1115,7 +1115,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Card uses Fuchsia950 at 47% alpha above 96px standard/Safari backdrop blur, a 39% Fuchsia950/Purple950 depth layer, then Pink300 at 11% as its highlight. Icon tiles add Fuchsia900 at 69% over their original bases; the front face adds the same mixed depth color at 78% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
+            "Card uses Fuchsia950 at 47% alpha above 96px standard/Safari backdrop blur, a Pink300 highlight at 11%, then a 67% Fuchsia950/Purple950 depth layer. Icon tiles add Fuchsia900 at 69% over their original bases; the front face adds the same mixed depth color at 78% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
           ],
           [
             "Last-seconds marker",
