@@ -68,9 +68,11 @@
     color-mix(in srgb, var(--checkin-line) 14%, transparent);
 }
 .frame::after {
-  inset: 7px;
-  border-radius: calc(var(--dialog-radius-surface) - 7px);
-  box-shadow: inset 0 0 0 var(--line-width) var(--color-violet-300, #c4b5fd);
+  opacity: 0.7;
+  inset: 6.5px;
+  border-radius: calc(var(--dialog-radius-surface) - 6.5px);
+  box-shadow: inset 0 0 0 calc(var(--line-width) * 1.225)
+    var(--color-violet-300, #c4b5fd);
 }
 @media (prefers-reduced-motion: no-preference) {
   .frame::after {
@@ -91,23 +93,23 @@
   0%,
   50%,
   100% {
-    inset: 7px;
+    inset: 6.5px;
     translate: 0 0;
   }
   12.5% {
-    inset: 6.75px;
+    inset: 6.25px;
     translate: -2.2px -2.2px;
   }
   37.5% {
-    inset: 6.75px;
+    inset: 6.25px;
     translate: 2.2px 2.2px;
   }
   62.5% {
-    inset: 6.75px;
+    inset: 6.25px;
     translate: 2.2px -2.2px;
   }
   87.5% {
-    inset: 6.75px;
+    inset: 6.25px;
     translate: -2.2px 2.2px;
   }
 }
