@@ -26,8 +26,10 @@ import controlStyles from "./today-controls.module.css";
 function settleTopbarControl(event: SyntheticEvent<HTMLElement>) {
   if (!(event.target instanceof Element)) return;
   const control = event.target.closest<HTMLElement>("[data-topbar-entry]");
-  if (control && event.currentTarget.contains(control))
+  if (control && event.currentTarget.contains(control)) {
     control.dataset.topbarSettled = "true";
+    control.dataset.brandEntryInterrupted = "true";
+  }
 }
 
 function finishTopbarControl(event: SyntheticEvent<HTMLElement>) {
@@ -57,6 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       topbar.current
         ?.querySelectorAll<HTMLElement>("[data-topbar-entry]")
         .forEach((control) => {
+          control.dataset.brandEntryInterrupted = "true";
           control.dataset.topbarSettled = "true";
         });
     };

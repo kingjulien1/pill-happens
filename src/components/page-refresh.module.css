@@ -264,14 +264,14 @@
   display: none;
 }
 @media (prefers-reduced-motion: no-preference) {
-  [data-today-topbar] [data-topbar-entry]:not([data-topbar-settled]) .pills {
+  [data-today-topbar] [data-topbar-entry]:not([data-brand-entry-interrupted]) .pills {
     /* Individual transforms compose with the pull controller's transform. */
-    animation: pills-arrive 650ms cubic-bezier(0.2, 0.76, 0.23, 1) 60ms
+    animation: pills-arrive 1800ms cubic-bezier(0.32, 0.08, 0.25, 1) 60ms
       backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   [data-today-topbar] .pills :global(.brand-tablet-orbit) {
-    animation: chargedRotor 8s linear 710ms infinite backwards;
+    animation: chargedRotor 8s linear 1860ms infinite backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
   [data-today-topbar]
@@ -297,16 +297,16 @@
     rotate: -310deg;
     scale: 0.25;
   }
-  45% {
+  84% {
     opacity: 1;
     rotate: 0deg;
     scale: 1;
   }
-  57% {
+  89% {
     rotate: 0deg;
     scale: 1.22;
   }
-  74% {
+  95% {
     rotate: 0deg;
     scale: 0.955;
   }
