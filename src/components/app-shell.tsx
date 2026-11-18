@@ -97,6 +97,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }
     >
       <header
+        key={path === "/" ? "today" : "shared"}
         ref={topbar}
         className={
           guidePage

@@ -260,6 +260,61 @@
 .root[data-ready="true"] .burst {
   scale: 1.25;
 }
+.burst[data-kind="arrival"] {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-today-topbar] [data-topbar-entry]:not([data-topbar-settled]) .pills {
+    /* Individual transforms compose with the pull controller's transform. */
+    animation: pills-arrive 650ms cubic-bezier(0.2, 0.76, 0.23, 1) 60ms
+      backwards;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+  [data-today-topbar] .pills :global(.brand-tablet-orbit) {
+    animation: chargedRotor 8s linear 710ms infinite backwards;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+  [data-today-topbar]
+    .pills[data-brand-paused="true"]
+    :global(.brand-tablet-orbit) {
+    animation-play-state: paused;
+  }
+  [data-today-topbar]
+    [data-topbar-entry]:not([data-topbar-settled])
+    .burst[data-kind="arrival"] {
+    display: block;
+    scale: 1.25;
+  }
+  .root .burst[data-kind="arrival"] > * {
+    animation-duration: 490ms;
+    animation-delay: calc(350ms + var(--particle-delay, 0ms));
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+}
+@keyframes pills-arrive {
+  0% {
+    opacity: 0;
+    rotate: -310deg;
+    scale: 0.25;
+  }
+  45% {
+    opacity: 1;
+    rotate: 0deg;
+    scale: 1;
+  }
+  57% {
+    rotate: 0deg;
+    scale: 1.22;
+  }
+  74% {
+    rotate: 0deg;
+    scale: 0.955;
+  }
+  100% {
+    rotate: 0deg;
+    scale: 1;
+  }
+}
 .wave,
 .echo,
 .shock {

@@ -90,13 +90,19 @@
 
 /* Entrance lives outside the trigger, pull gesture and the pills' looped motion. */
 @media (prefers-reduced-motion: no-preference) {
-  .control {
+  .header:not(.todayHeader) .control:not([data-topbar-settled]) {
     animation: topbar-control-arrive 1280ms cubic-bezier(0.22, 1, 0.36, 1)
       calc(var(--topbar-entry-order) * 200ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
   }
-  .control :global(.header-icon-button) > svg,
-  .control :global(.header-refresh-button) > :global(.brand-mark) {
+  .header:not(.todayHeader)
+    .control:not([data-topbar-settled])
+    :global(.header-icon-button)
+    > svg,
+  .header:not(.todayHeader)
+    .control:not([data-topbar-settled])
+    :global(.header-refresh-button)
+    > :global(.brand-mark) {
     animation: topbar-glyph-arrive 1080ms cubic-bezier(0.22, 1, 0.36, 1)
       calc(var(--topbar-entry-order) * 200ms + 120ms) backwards;
     animation-play-state: var(--page-entry-play-state, running);
@@ -118,6 +124,79 @@
     :global(.header-refresh-button)
     > :global(.brand-mark) {
     animation: none;
+  }
+
+  .todayHeader .control:not([data-topbar-settled]) {
+    animation: today-frame-arrive 940ms cubic-bezier(0.2, 0.82, 0.22, 1)
+      backwards;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+  .todayHeader
+    .control:not([data-topbar-settled])
+    :global(.header-icon-button)::before {
+    animation: today-rim-arrive 690ms cubic-bezier(0.2, 0.85, 0.18, 1) 75ms
+      backwards;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+  .todayHeader .control:not([data-topbar-settled]) [data-menu-mark] {
+    animation: today-menu-arrive 555ms cubic-bezier(0.22, 0.85, 0.2, 1) 100ms
+      backwards;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+}
+
+@keyframes today-frame-arrive {
+  0% {
+    opacity: 0;
+    scale: 0;
+  }
+  28% {
+    opacity: 1;
+    scale: 0.88;
+  }
+  48% {
+    scale: 1.105;
+  }
+  65% {
+    scale: 0.96;
+  }
+  82% {
+    scale: 1.014;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes today-rim-arrive {
+  0% {
+    opacity: 0;
+    scale: 0.36;
+  }
+  58% {
+    opacity: 1;
+    scale: 1.09;
+  }
+  78% {
+    scale: 0.976;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes today-menu-arrive {
+  0% {
+    opacity: 0;
+    scale: 0.1 0.32;
+  }
+  64% {
+    opacity: 1;
+    scale: 1.065 0.97;
+  }
+  83% {
+    scale: 0.988 1.012;
+  }
+  100% {
+    scale: 1;
   }
 }
 

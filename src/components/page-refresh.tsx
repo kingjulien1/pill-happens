@@ -632,6 +632,9 @@ export function CompactRefreshBrand() {
     }
   };
 
+  // Reuse the threshold's rings, rays and particles for Today's one-shot arrival.
+  const visibleBurst =
+    burst ?? (path === "/" ? { kind: "arrival", sequence: 1 } : null);
   const goToToday = () => {
     if (unavailable || pendingRelease.current) return;
     workspace.rememberDestination("/");
@@ -835,11 +838,11 @@ export function CompactRefreshBrand() {
           </svg>
         </span>
       </Button>
-      {burst && (
+      {visibleBurst && (
         <span
-          key={`${burst.kind}-${burst.sequence}`}
+          key={`${visibleBurst.kind}-${visibleBurst.sequence}`}
           className={styles.burst}
-          data-kind={burst.kind}
+          data-kind={visibleBurst.kind}
           data-brand-pull-burst
           aria-hidden="true"
         >
@@ -862,7 +865,8 @@ export function CompactRefreshBrand() {
             <path d="m17.2 46.8-5.7 5.7" />
           </svg>
           {Array.from({ length: 18 }, (_, index) => {
-            const angle = ((index * 20 + burst.sequence * 13) * Math.PI) / 180;
+            const angle =
+              ((index * 20 + visibleBurst.sequence * 13) * Math.PI) / 180;
             const reach = 44 + (index % 4) * 9;
             return (
               <span

@@ -319,18 +319,34 @@
     [data-brand-refresh],
     [data-navigation-trigger]
   ) {
-  --header-tool-ink: var(--control-ink);
+  --header-tool-ink: var(--control-secondary);
+  --today-rim-width: 1.42px;
+  --today-outer-line: color-mix(
+    in srgb,
+    var(--color-violet-200, #ddd6fe),
+    var(--color-violet-300, #c4b5fd)
+  );
+  --today-inner-line: color-mix(
+    in srgb,
+    color-mix(
+        in srgb,
+        var(--control-secondary),
+        var(--color-purple-800, #6b21a8)
+      )
+      76%,
+    transparent
+  );
   --header-tool-surface: var(--control-face);
   --header-button-surface: var(--control-rim);
-  --header-control-ink: var(--control-ink);
+  --header-control-ink: var(--control-secondary);
   --header-control-cup-base: var(--control-face);
   --header-control-score-ink: var(--control-face);
-  --brand-copy: var(--control-ink);
+  --brand-copy: var(--control-secondary);
   --brand-surface: var(--control-face);
   background: var(--control-rim);
-  color: var(--control-ink);
+  color: var(--control-secondary);
   box-shadow:
-    inset 0 0 0 1px var(--control-edge),
+    inset 0 0 0 var(--today-rim-width) var(--today-outer-line),
     0 6px 15px -6px var(--control-shadow),
     0 2px 4px var(--control-shadow);
   transition:
@@ -343,11 +359,12 @@
     [data-brand-refresh],
     [data-navigation-trigger]
   )::before {
-  inset: 5.75px;
-  border-radius: 8.25px;
+  /* Keep the face's inner boundary at its original 6.75px inset. */
+  inset: calc(6.75px - var(--today-rim-width));
+  border-radius: calc(14px - 6.75px + var(--today-rim-width));
   background: var(--control-face-paint);
   box-shadow:
-    inset 0 0 0 1px var(--control-face-edge),
+    inset 0 0 0 var(--today-rim-width) var(--today-inner-line),
     0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
 }
 
@@ -356,7 +373,7 @@
     .headerButton.headerButton[data-slot="button"]:not(:disabled):hover {
     filter: brightness(1.035);
     box-shadow:
-      inset 0 0 0 1px var(--control-edge),
+      inset 0 0 0 var(--today-rim-width) var(--today-outer-line),
       0 8px 18px -5px var(--control-shadow),
       0 3px 5px var(--control-shadow);
   }
