@@ -55,19 +55,34 @@
 }
 
 /* The doubled frosted surround remains paint within the original hit target. */
+.action[data-intake-paint="satin"] {
+  --action-outer-line: 1.333px;
+  --action-inner-line: 2px;
+  --action-surround: color-mix(
+    in srgb,
+    var(--color-pink-300, #f9a8d4) 32%,
+    var(--control-rim)
+  );
+  --control-face-edge: color-mix(
+    in srgb,
+    var(--control-secondary) 85%,
+    transparent
+  );
+}
+
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
   --control-surround-width: 10px;
   isolation: isolate;
   border: 0;
   border-radius: var(--intake-card-radius, 21px);
-  background: var(--control-rim);
+  background: var(--action-surround, var(--control-rim));
   color: var(--control-ink);
   font-size: 15.5px;
   font-weight: 675;
   -webkit-backdrop-filter: blur(32px) saturate(115%);
   backdrop-filter: blur(32px) saturate(115%);
   box-shadow:
-    inset 0 0 0 1px var(--control-edge),
+    inset 0 0 0 var(--action-outer-line, 1px) var(--control-edge),
     0 12px 30px -12px var(--control-shadow),
     0 3px 8px var(--control-shadow);
   transition:
@@ -85,7 +100,7 @@
   );
   background: var(--control-face-paint);
   box-shadow:
-    inset 0 0 0 1px var(--control-face-edge),
+    inset 0 0 0 var(--action-inner-line, 1px) var(--control-face-edge),
     0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
   pointer-events: none;
 }
@@ -229,7 +244,7 @@
     ):hover {
     filter: brightness(1.035);
     box-shadow:
-      inset 0 0 0 1px var(--control-edge),
+      inset 0 0 0 var(--action-outer-line, 1px) var(--control-edge),
       0 14px 34px -10px var(--control-shadow),
       0 4px 10px var(--control-shadow);
   }
