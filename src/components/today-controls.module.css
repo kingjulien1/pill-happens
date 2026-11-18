@@ -37,8 +37,14 @@
   }
 }
 
-/* The frosted 5px surround and inset face are paint, never extra box size. */
+/* The doubled frosted surround remains paint within the original hit target. */
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
+  --control-surround-width: 10px;
+  --control-face-edge: color-mix(
+    in srgb,
+    var(--color-pink-400, #f472b6) 29%,
+    transparent
+  );
   isolation: isolate;
   border: 0;
   border-radius: var(--intake-card-radius, 21px);
@@ -61,23 +67,24 @@
   content: "";
   position: absolute;
   z-index: -1;
-  inset: 5px;
-  border-radius: 16px;
+  inset: var(--control-surround-width);
+  border-radius: calc(
+    var(--intake-card-radius, 21px) - var(--control-surround-width)
+  );
   background:
     radial-gradient(
-      ellipse 65% 140% at 2% -30%,
-      var(--control-highlight),
+      ellipse 65% 140% at 0% 0%,
+      color-mix(in srgb, var(--color-violet-400, #a78bfa) 5%, transparent),
       transparent 74%
     ),
     radial-gradient(
-      ellipse 68% 160% at 100% 120%,
-      var(--control-blush),
+      ellipse 68% 160% at 100% 100%,
+      color-mix(in srgb, var(--color-pink-500, #ec4899) 6%, transparent),
       transparent 78%
     ),
     var(--control-face);
   box-shadow:
-    inset 0 0 0 1px var(--control-edge),
-    inset 0 1px 0 var(--control-highlight),
+    inset 0 0 0 1px var(--control-face-edge),
     0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
   pointer-events: none;
 }

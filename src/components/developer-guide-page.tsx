@@ -1265,11 +1265,13 @@ export function DeveloperGuidePage() {
                 TodayActionButton gives Today and Add Medication a fresh satin
                 surface while retaining the native PrimaryButton host, 80px
                 height and intake-card 21px corners. The independent skin turns
-                off both old moving-rim renderers. A 5px inward frosted surround,
-                one fine inset catchlight and soft directional contact shadows
-                make a raised face without enlarging the measured hit target.
-                Two broad, asymmetrical radial reflections mix lilac and blush
-                across the face rather than forming another rotating outline.
+                off both old moving-rim renderers. A 10px inward frosted
+                surround doubles the original 5px band without enlarging the
+                measured hit target. The inner face follows the outer curve
+                with an 11px radius and a fine Pink400 border at 29% opacity.
+                Its former bright reflections are replaced by restrained
+                Violet400 at 5% in the upper left and Pink500 at 6% in the lower
+                right. Soft directional contact shadows retain the raised face.
               </p>
               <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs.
