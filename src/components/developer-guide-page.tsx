@@ -2987,7 +2987,7 @@ export function DeveloperGuidePage() {
                   do not automatically classify a medication.
                 </li>
                 <li>
-                  MorningCoffee keeps a filled primary-ink cup still beneath
+                  MorningCoffee keeps a filled pale Rose200 cup still beneath
                   three bright Pink/Lilac steam curls. The latest pass shortens
                   their remaining height by another quarter around the fixed
                   y=29 mug rim, keeping separated
@@ -3001,38 +3001,34 @@ export function DeveloperGuidePage() {
                   reduced motion shows settled artwork without a particle loop.
                 </li>
                 <li>
-                  EveningMoon follows a 16.8-second native animation containing
-                  two 8.4-second nonlinear pendulum swings. A cached RK4 solver
-                  samples the 21-degree arc: the crescent accelerates through
-                  its low center and slows at the raised turning points. A
-                  damped 3.2-second torsion spring follows the angle, giving the
-                  body a small inertial lag instead of an independent eased
-                  wiggle. One slow lean and 2.2% depth change distinguish the
-                  two swings. The 225 sampled poses join at the same position,
-                  tilt, scale and momentum, with no rest or settling reset.
-                  Translation reaches about 4.12px to either side; the moon’s
-                  filled geometry and 30px stage stay intact; its primary ink
-                  follows the current appearance. Two browser-native timelines
-                  are created once per mounted moon and only pause/play as the
-                  existing ambient, dialog, offscreen and hidden-page gates
-                  change. Their phase survives those pauses; unmount cancels
-                  both. Reduced motion presents the settled crescent and static
-                  stars. Existing short-lived colored stars retain their own
-                  bounded scheduler. Physics generation is cached, with no
-                  per-frame React work or new JavaScript animation loop. Unit
-                  checks compare the period with an independent pendulum
-                  integral and verify energy, lag, bounded motion and the
-                  periodic spring seam.
+                  EveningMoon owns its entrance and permanent motion together.
+                  A 2.4-second curved approach grows and rolls into the first
+                  floating swing, with matching pose, velocity and acceleration
+                  at the handoff. The 10.8-second nonlinear loop slows near its
+                  raised turning points and
+                  gathers speed through the center; a small lagging tilt keeps
+                  the crescent from moving like a rigid metronome. Browser-native
+                  animation timelines preserve phase when the page is hidden,
+                  the card goes offscreen or a dialog opens, and are cancelled
+                  on unmount. The moon shares the mug’s pale Rose200 ink while
+                  retaining its Violet artwork frame. Short-lived colored stars
+                  keep their separate bounded scheduler and wait until the
+                  entrance has completed. Reduced motion shows a still crescent
+                  and static stars. No per-frame React render or JavaScript
+                  animation loop is needed. The sampled motion model is cached
+                  and immutable; focused unit checks protect the entrance
+                  handoff, loop seam, bounded travel and trailing tilt.
                 </li>
                 <li>
-                  Check-in artwork keeps its 1560ms main entrance and a toned
-                  down spin-and-settle response. A nonvisual CSS clock opens the
-                  ambient gate only 300ms after that entrance ends; the coffee
-                  animation and the EveningMoon JavaScript star queue both wait
-                  for it. A keyed scene resets the gate on replay, while
-                  page/dialog pauses hold the shared clock. The moon uses the
-                  physics-derived pendulum path described above, and stars keep
-                  their independent, bounded twinkle scheduler.
+                  Check-in tiles retain their 1560ms arrival. Morning keeps its
+                  spin-and-settle illustration response; its steam opens 300ms
+                  later through the existing nonvisual ambient clock. Evening
+                  receives a separate nonvisual entry signal at the tile’s
+                  start, so the moon’s own entrance flows directly into its
+                  loop instead of waiting for the older shared spin or ambient
+                  pause. Evening omits that shared symbol animation and settle
+                  flourish. A keyed scene replays both clocks, while page/dialog
+                  pauses hold their progress.
                 </li>
                 <li>
                   Morning and Evening check-ins share the same large-logo
@@ -3045,15 +3041,20 @@ export function DeveloperGuidePage() {
                   coffee and crescent artwork distinguish the periods; their
                   base and completion-meter surfaces share an opaque, very dark
                   Pink/Plum mix (88% #210F25 with 12% Pink950). Both main
-                  symbols and the completion number use the primary light ink on
-                  those dark surfaces in either appearance; page headings retain
+                  symbols share the mug’s pale Rose200 ink on their dark
+                  period-specific surfaces in either appearance; the completion
+                  number retains its primary light ink and page headings retain
                   their adaptive reading color. The Pink identity and artwork
                   overrides are local to these cards, leaving medication and
                   topbar colors independent. Steam, stars, entry motion, ambient
-                  loops and progress replay keep their existing timing. Section
+                  loops and progress replay retain their own timing. Section
                   dots use Pink500. Details and icon stages remain 56px, the
-                  tile 48px and symbol holder 30px, with 11px artwork-to-copy
-                  clearance (7px below 360px) and 8px trailing inset.
+                  tile 48px and symbol holder 30px. A single two-thirds scale
+                  on the illustration owner makes both scenes exactly one third
+                  smaller, including their steam, stars and motion travel. The
+                  moon’s 30px source becomes 20px visually without changing the
+                  shared tile, card measurements, 11px artwork-to-copy clearance
+                  (7px below 360px) or 8px trailing inset.
                   SavedCheckInHeading now separates opening history from save
                   history. Its primary HH:mm is the first recorded opening on
                   this device, using the intake time class: 13.5px/700
@@ -3842,8 +3843,10 @@ export function DeveloperGuidePage() {
                 followed by its five optional sleep ratings, schedule,
                 interruptions and duration fields. Its card keeps first opening
                 separate from latest saved update, with an em dash only when
-                opening history is unknown. Both period cards use a pink theme,
-                very dark Pink950 artwork tiles and primary-ink cup/moon glyphs.
+                opening history is unknown. Both period cards retain their
+                Rose/Violet identity frames and dark artwork tiles, with
+                matching pale Rose200 cup/moon illustrations at two-thirds of
+                their former size.
                 The small 40px completion ring centers a 9.208333px/625 number
                 without a percent suffix. A valid opening restores normal
                 presentation but earns no completion credit;

@@ -37,19 +37,21 @@ type EveningStar = {
   bright: boolean;
 };
 
-/** A compound hanging arc carries a softly lagging crescent through a quiet sky. */
+/** One captured arc continues directly into a gently suspended, travelling moon. */
 export function EveningMoon({
   dialogOpen = false,
   ambientReady = true,
+  entryReady = true,
 }: {
   dialogOpen?: boolean;
   ambientReady?: boolean;
+  entryReady?: boolean;
 }) {
   const rootRef = useRef<HTMLSpanElement>(null);
   const orbitRef = useRef<HTMLSpanElement>(null);
-  const swayRef = useRef<HTMLSpanElement>(null);
   const motion = useRef<Animation[]>([]);
   const nextStarId = useRef(0);
+  const [loopReady, setLoopReady] = useState(false);
   const [view, setView] = useState({
     active: false,
     stars: [] as EveningStar[],
@@ -58,31 +60,35 @@ export function EveningMoon({
   // Native timelines survive activity-gate changes; only unmount cancels them.
   useEffect(() => {
     const orbit = orbitRef.current;
-    const sway = swayRef.current;
-    if (!orbit?.animate || !sway?.animate) return;
+    if (!orbit?.animate) return;
     const model = getEveningMoonMotion();
-    const options: KeyframeAnimationOptions = {
-      duration: model.duration,
-      iterations: Infinity,
-      easing: "linear",
-      fill: "both",
-    };
+    const keyframes = (frames: typeof model.entry.frames): Keyframe[] =>
+      frames.map(({ offset, x, y, rotation, scale, opacity }) => ({
+        offset,
+        transform: `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})`,
+        opacity,
+      }));
+    // Both effects share one time origin. The delayed loop takes over on the
+    // compositor at the exact entry endpoint, without a finish-event restart.
     const animations = [
-      orbit.animate(
-        model.frames.map(({ offset, x, y }) => ({
-          offset,
-          transform: `translate(${x}px, ${y}px)`,
-        })),
-        options,
-      ),
-      sway.animate(
-        model.frames.map(({ offset, rotation, scale }) => ({
-          offset,
-          transform: `rotate(${rotation}deg) scale(${scale})`,
-        })),
-        options,
-      ),
+      orbit.animate(keyframes(model.entry.frames), {
+        id: "evening-moon-arrival",
+        duration: model.entry.duration,
+        easing: "linear",
+        fill: "both",
+      }),
+      orbit.animate(keyframes(model.loop.frames), {
+        id: "evening-moon-drift",
+        delay: model.entry.duration,
+        duration: model.loop.duration,
+        iterations: Infinity,
+        easing: "linear",
+        fill: "none",
+      }),
     ];
+    const entry = animations[0];
+    const entered = () => setLoopReady(true);
+    entry.addEventListener("finish", entered);
     for (const animation of animations) {
       animation.pause();
       animation.currentTime = 0;
@@ -90,14 +96,19 @@ export function EveningMoon({
     motion.current = animations;
     return () => {
       motion.current = [];
+      entry.removeEventListener("finish", entered);
       for (const animation of animations) animation.cancel();
     };
   }, []);
 
   useEffect(() => {
-    for (const animation of motion.current)
+    for (const animation of motion.current) {
+      // The completed capture keeps its fill; resuming a hidden/dialog-paused
+      // moon must never restart that finite animation behind the live drift.
+      if (animation.playState === "finished") continue;
       if (view.active) animation.play();
       else animation.pause();
+    }
   }, [view.active]);
 
   useEffect(() => {
@@ -116,6 +127,7 @@ export function EveningMoon({
     const live = new Map<number, EveningStar>();
     let visible = !("IntersectionObserver" in window);
     let active: boolean | null = null;
+    let moving: boolean | null = null;
     let disposed = false;
     let syncFrame: number | null = null;
     let lastSlot = -1;
@@ -184,8 +196,8 @@ export function EveningMoon({
 
     function syncActivity() {
       if (disposed) return;
-      const nextActive =
-        ambientReady &&
+      const nextMoving =
+        entryReady &&
         !dialogOpen &&
         !document.hidden &&
         !reducedMotion.matches &&
@@ -193,10 +205,15 @@ export function EveningMoon({
         card?.dataset.cardEntryState !== "pending" &&
         getComputedStyle(stage).getPropertyValue("--art-play").trim() !==
           "paused";
+      if (nextMoving !== moving) {
+        moving = nextMoving;
+        setView((current) => ({ ...current, active: nextMoving }));
+      }
+      const nextActive = nextMoving && ambientReady && loopReady;
       if (nextActive === active) return;
       active = nextActive;
       clearStars();
-      setView({ active: nextActive, stars: [] });
+      setView((current) => ({ ...current, stars: [] }));
       if (nextActive) queueStar(true);
     }
 
@@ -253,7 +270,7 @@ export function EveningMoon({
       document.removeEventListener("visibilitychange", syncActivity);
       reducedMotion.removeEventListener("change", syncActivity);
     };
-  }, [ambientReady, dialogOpen]);
+  }, [ambientReady, dialogOpen, entryReady, loopReady]);
 
   return (
     <span
@@ -262,11 +279,13 @@ export function EveningMoon({
       data-evening-moon
       data-lunar-active={view.active}
       data-lunar-ambient-ready={ambientReady}
+      data-lunar-entry-ready={entryReady}
+      data-lunar-phase={loopReady ? "drift" : "arrival"}
       data-lunar-star-count={view.stars.length}
       aria-hidden="true"
     >
       <span ref={orbitRef} className={styles.orbit} data-lunar-orbit>
-        <span ref={swayRef} className={styles.sway} data-lunar-sway>
+        <span className={styles.sway} data-lunar-sway>
           <svg
             className={styles.moon}
             viewBox="0 0 24 24"

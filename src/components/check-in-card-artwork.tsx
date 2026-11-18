@@ -35,12 +35,16 @@ function ArtworkScene({
   dialogOpen: boolean;
 }) {
   const [ambientReady, setAmbientReady] = useState(false);
+  const [entryReady, setEntryReady] = useState(false);
   const morning = period === "morning";
   const artworkColor = morning ? "tw-rose-400" : "tw-violet-400";
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const resetAmbient = () => setAmbientReady(false);
+    const resetAmbient = () => {
+      setAmbientReady(false);
+      setEntryReady(false);
+    };
     reduced.addEventListener("change", resetAmbient);
     return () => reduced.removeEventListener("change", resetAmbient);
   }, []);
@@ -53,6 +57,13 @@ function ArtworkScene({
       data-artwork-ambient-ready={ambientReady}
       aria-hidden="true"
     >
+      <span
+        className={styles.entryGate}
+        data-check-in-entry-gate
+        onAnimationEnd={(event) => {
+          if (event.target === event.currentTarget) setEntryReady(true);
+        }}
+      />
       <span
         className={styles.ambientGate}
         data-check-in-ambient-gate
@@ -81,18 +92,23 @@ function ArtworkScene({
                 <EveningMoon
                   dialogOpen={dialogOpen}
                   ambientReady={ambientReady}
+                  entryReady={entryReady}
                 />
               )}
             </span>
           </span>
         </MedicationCardIconFrame>
       </span>
-      <CardIconSettle owner="check-in" />
-      <svg className={styles.flourish} viewBox="0 0 56 56" fill="none">
-        <path d="M47 4v4m-2-2h4" />
-        <path d="M5 44v3m-1.5-1.5h3" />
-        <circle cx="49" cy="47" r="1.1" fill="currentColor" stroke="none" />
-      </svg>
+      {morning && (
+        <>
+          <CardIconSettle owner="check-in" />
+          <svg className={styles.flourish} viewBox="0 0 56 56" fill="none">
+            <path d="M47 4v4m-2-2h4" />
+            <path d="M5 44v3m-1.5-1.5h3" />
+            <circle cx="49" cy="47" r="1.1" fill="currentColor" stroke="none" />
+          </svg>
+        </>
+      )}
     </span>
   );
 }

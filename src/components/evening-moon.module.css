@@ -17,7 +17,7 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  transform-origin: 48% 54%;
+  transform-origin: 47% 46%;
 }
 
 .moon {
@@ -130,6 +130,7 @@
   .orbit,
   .sway {
     transform: none !important;
+    opacity: 1 !important;
   }
 
   .stillStars {
