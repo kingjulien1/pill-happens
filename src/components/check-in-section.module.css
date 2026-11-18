@@ -18,7 +18,8 @@
 .section .frame > :first-child {
   margin-block: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 var(--line-width) var(--checkin-line);
+  box-shadow: inset 0 0 0 2.125px
+    color-mix(in srgb, var(--color-purple-800, #6b21a8) 27%, transparent);
   border-radius: var(--dialog-radius-surface);
 }
 .caption {
@@ -61,8 +62,8 @@
 }
 .frame::before {
   --outer-width: calc(4.25 * var(--line-width));
-  inset: -2px;
-  border-radius: calc(var(--dialog-radius-surface) + 2px);
+  inset: -4px;
+  border-radius: calc(var(--dialog-radius-surface) + 4px);
   box-shadow: 0 0 0 var(--outer-width)
     color-mix(in srgb, var(--checkin-line) 14%, transparent);
 }
@@ -80,29 +81,34 @@
 }
 @keyframes rim-orbit {
   from {
-    transform: rotate(0turn) translateX(1.65px) rotate(0turn);
+    transform: rotate(0turn) translateX(1.9px) rotate(0turn);
   }
   to {
-    transform: rotate(1turn) translateX(1.65px) rotate(-1turn);
+    transform: rotate(1turn) translateX(1.9px) rotate(-1turn);
   }
 }
 @keyframes rim-diagonals {
   0%,
   50%,
   100% {
+    inset: 7px;
     translate: 0 0;
   }
   12.5% {
-    translate: -1.95px -1.95px;
+    inset: 6.75px;
+    translate: -2.2px -2.2px;
   }
   37.5% {
-    translate: 1.95px 1.95px;
+    inset: 6.75px;
+    translate: 2.2px 2.2px;
   }
   62.5% {
-    translate: 1.95px -1.95px;
+    inset: 6.75px;
+    translate: 2.2px -2.2px;
   }
   87.5% {
-    translate: -1.95px 1.95px;
+    inset: 6.75px;
+    translate: -2.2px 2.2px;
   }
 }
 

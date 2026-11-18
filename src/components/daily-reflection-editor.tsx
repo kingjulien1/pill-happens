@@ -33,6 +33,7 @@ import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { MarkdownMark } from "./markdown-mark";
 import { MorningCoffee } from "./morning-coffee";
 import styles from "./daily-reflection-editor.module.css";
+import closeStyles from "./dialog-close.module.css";
 import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
@@ -255,13 +256,14 @@ export function DailyReflectionEditor({
             <p className={styles.subtitle}>Room to reflect.</p>
           </div>
         </div>
-        <div className={styles.topActions}>
+        <div className={closeStyles.actions}>
           <Button
             variant="ghost"
             size="icon"
             ref={readerTrigger}
             type="button"
-            className={styles.iconButton}
+            rim={false}
+            className={closeStyles.control}
             aria-label="Read journal"
             title="Read this journal page"
             disabled={!hasWriting}
@@ -284,7 +286,8 @@ export function DailyReflectionEditor({
                 }}
               />
             }
-            className={styles.iconButton}
+            rim={false}
+            className={closeStyles.control}
             aria-label="Open journal library"
             title="Open journal library"
             data-journal-library

@@ -135,12 +135,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.topActions {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding-top: 0;
-}
 .iconButton {
   display: inline-grid;
   width: 28.3333px;
@@ -165,10 +159,6 @@
 .iconButton:disabled {
   opacity: 0.36;
   cursor: default;
-}
-.topActions .iconButton > svg {
-  width: 15.8333px;
-  height: 15.8333px;
 }
 .snapshotTitle {
   margin: 0;
@@ -300,9 +290,6 @@
   .headingGroup {
     gap: 8px;
   }
-  .topActions {
-    gap: 4px;
-  }
 }
 @container journal-doorway (max-width: 310px) {
   .headingRow,
@@ -313,31 +300,11 @@
     font-size: 13px;
     line-height: 18px;
   }
-  .topActions {
-    gap: 4px;
-  }
-  .topActions .iconButton {
-    width: 25px;
-    height: 25px;
-    border-radius: 8px;
-  }
-  .topActions .iconButton > svg {
-    width: 14px;
-    height: 14px;
-  }
 }
 @container journal-doorway (max-width: 260px) {
   .heading {
     font-size: 11.75px;
     line-height: 17px;
-  }
-  .topActions .iconButton {
-    width: 24px;
-    height: 24px;
-  }
-  .topActions .iconButton > svg {
-    width: 13.5px;
-    height: 13.5px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -391,16 +358,6 @@
   height: 40px;
   flex: none;
   color: var(--foreground);
-}
-.editor .topActions .iconButton {
-  width: 40px;
-  height: 40px;
-  background: color-mix(in srgb, var(--menu-surface) 78%, var(--journal-tile));
-  color: var(--menu-foreground);
-}
-.editor .topActions .iconButton > svg {
-  width: 21px;
-  height: 21px;
 }
 .editor .heading {
   white-space: normal;
