@@ -7,6 +7,8 @@ import { EveningMoon } from "@/components/evening-moon";
 import { MorningCoffee } from "@/components/morning-coffee";
 import styles from "./check-in-card-artwork.module.css";
 
+export const CHECK_IN_CARD_COLOR = "tw-violet-400";
+
 /** A small illustrated companion; the card remains the only interactive target. */
 export function CheckInCardArtwork({
   period,
@@ -37,7 +39,6 @@ function ArtworkScene({
   const [ambientReady, setAmbientReady] = useState(false);
   const [entryReady, setEntryReady] = useState(false);
   const morning = period === "morning";
-  const artworkColor = morning ? "tw-rose-400" : "tw-violet-400";
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -73,7 +74,7 @@ function ArtworkScene({
       />
       <span className={styles.arrival}>
         <MedicationCardIconFrame
-          color={artworkColor}
+          color={CHECK_IN_CARD_COLOR}
           className={styles.tile}
           style={{
             color: "var(--art-ink)",

@@ -1,9 +1,10 @@
 .stage {
-  --art-ink: var(--check-in-art-copy, #f3e8ff);
-  --art-soft: color-mix(
+  --art-ink: var(--color-rose-200, #fecdd3);
+  --art-soft: var(--color-violet-400, #a78bfa);
+  --check-in-art-base: color-mix(
     in srgb,
-    var(--check-in-secondary, var(--action-background)) 76%,
-    var(--palette-rose)
+    var(--color-violet-950, #2e1065) 88%,
+    var(--color-fuchsia-950, #4a044e)
   );
   --art-return-delay: 180ms;
   --art-start: var(
@@ -24,27 +25,6 @@
   justify-content: center;
   color: var(--art-ink);
   pointer-events: none;
-}
-
-/* Period-specific dark faces share the mug's pale Rose ink in either mode. */
-.stage[data-check-in-artwork="morning"] {
-  --art-ink: var(--color-rose-200, #fecdd3);
-  --art-soft: var(--color-rose-400, #fb7185);
-  --check-in-art-base: color-mix(
-    in srgb,
-    var(--color-rose-950, #4c0519) 88%,
-    var(--color-pink-950, #500724)
-  );
-}
-
-.stage[data-check-in-artwork="evening"] {
-  --art-ink: var(--color-rose-200, #fecdd3);
-  --art-soft: var(--color-violet-400, #a78bfa);
-  --check-in-art-base: color-mix(
-    in srgb,
-    var(--color-violet-950, #2e1065) 88%,
-    var(--color-fuchsia-950, #4a044e)
-  );
 }
 
 /* Nonvisual clocks synchronize moon entry and the later ambient handoff. */

@@ -10,7 +10,10 @@ import { ActionIcon } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
-import { CheckInCardArtwork } from "@/components/check-in-card-artwork";
+import {
+  CHECK_IN_CARD_COLOR,
+  CheckInCardArtwork,
+} from "@/components/check-in-card-artwork";
 import { CheckInCardProgress } from "@/components/check-in-card-progress";
 import { CheckInRating } from "@/components/check-in-rating";
 import {
@@ -90,7 +93,6 @@ export function DailyCheckInSection({
   const { data, busy } = useJournal();
   const workspace = useJournalWorkspace();
   const morning = period === "morning";
-  const artworkColor = morning ? "tw-rose-400" : "tw-violet-400";
   const title = `${morning ? "Morning" : "Evening"} Check-In`;
   const currentCheckIn = checkInForDay(data?.dailyCheckIns, day, period);
   // The current variant owns the portal, including a restored earlier-day dialog.
@@ -191,7 +193,7 @@ export function DailyCheckInSection({
     >
       {intakeSpacing === "before" && intakeSpacer}
       <MedicationCardBase
-        color={artworkColor}
+        color={CHECK_IN_CARD_COLOR}
         icon={morning ? "sun" : "moon-star"}
         leadingArtwork={
           <CheckInCardArtwork
