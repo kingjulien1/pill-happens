@@ -550,12 +550,15 @@
   height: 22.05px;
   overflow: visible;
   color: #fde68a;
+  stroke: #fde047;
+  filter: drop-shadow(0 0 1px #fde047bd) drop-shadow(0 0 4px #facc156b);
 }
 .journal-bulb-glass {
   fill: currentColor;
   fill-opacity: 0.7;
 }
 .journal-bulb-rays {
+  stroke: currentColor;
   stroke-dasharray: 1;
   opacity: 0.85;
 }
@@ -2141,7 +2144,7 @@
   95%,
   100% {
     transform: none;
-    color: var(--toast-glyph);
+    color: #fde68a;
   }
   7% {
     transform: rotate(-5deg) scale(0.94);
