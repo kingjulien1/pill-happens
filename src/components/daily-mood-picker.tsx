@@ -35,7 +35,7 @@ export function DailyMoodPicker({
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState<DailyMoodFamily | "all">("all");
   const ranked = useMemo(
-    () => rankDailyMoods(checkIns, `${seed}:${mix}`),
+    () => rankDailyMoods(checkIns, `${seed}:${mix}`).slice().reverse(),
     [checkIns, seed, mix],
   );
   const results = ranked.filter(
@@ -87,7 +87,7 @@ export function DailyMoodPicker({
           disabled={disabled}
           onClick={() => setMix((current) => current + 1)}
           aria-label="Shuffle feelings with equal usage"
-          title="A fresh mix. Your most-used feelings still come first."
+          title="Shuffle feelings used equally often."
           data-mood-shuffle
         >
           <Shuffle size={17} strokeWidth={2.1} aria-hidden="true" />
@@ -116,7 +116,7 @@ export function DailyMoodPicker({
       </div>
       <div className={styles.caption}>
         <span id={`${id}-sort`}>
-          Your Regulars First <span aria-hidden="true">·</span> Then A Fresh Mix
+          Least Used First <span aria-hidden="true">·</span> Regulars Last
         </span>
         <span aria-live="polite">
           <strong>{results.length}</strong>{" "}
