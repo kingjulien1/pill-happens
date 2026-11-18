@@ -347,17 +347,36 @@ export function SpecularRim({
     }
     if (!context) return;
     const gl = context;
-    const safeRadius = Number.isFinite(radius) ? Math.max(0, radius) : 22;
+    // An outboard frame owns its own rounded perimeter; the enclosing button
+    // still owns visibility, focus and disabled state.
+    const frameHost = canvas.closest<HTMLElement>("[data-specular-frame]");
+    const perimeter = frameHost ?? button;
+    let safeRadius = Number.isFinite(radius) ? Math.max(0, radius) : 22;
+    let bandWidth = physicalThickness;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sample = frameHost ? document.createElement("canvas") : null;
+    if (sample) sample.width = sample.height = 1;
+    const sampler = sample?.getContext("2d", { willReadFrequently: true });
     const readColor = (
       styles: CSSStyleDeclaration,
       property: string,
       fallback: string,
     ) => {
-      return readRimColor(styles.getPropertyValue(property), fallback);
+      const value = styles.getPropertyValue(property).trim();
+      if (sampler && value && !value.startsWith("#")) {
+        sampler.clearRect(0, 0, 1, 1);
+        sampler.fillStyle = fallback;
+        sampler.fillStyle = value;
+        sampler.fillRect(0, 0, 1, 1);
+        return Float32Array.from(
+          sampler.getImageData(0, 0, 1, 1).data,
+          (channel) => channel / 255,
+        );
+      }
+      return readRimColor(value, fallback);
     };
     const readPalette = () => {
-      const styles = getComputedStyle(button);
+      const styles = getComputedStyle(perimeter);
       return {
         line: readColor(styles, "--intake-rim-line", APP_COLORS.rust),
         base: readColor(styles, "--intake-rim-base", APP_COLORS.ink),
@@ -469,7 +488,7 @@ export function SpecularRim({
         // CSS transforms do not resize layout boxes. Refresh screen geometry
         // during the animation so its configured band keeps its CSS-pixel width.
         geometry = mapRimToCanvas({
-          button: button.getBoundingClientRect(),
+          button: perimeter.getBoundingClientRect(),
           canvas: canvas.getBoundingClientRect(),
           buttonWidth: view.width,
           buttonHeight: view.height,
@@ -513,7 +532,7 @@ export function SpecularRim({
           SETTINGS.shineSize / 360,
           SETTINGS.shineFade / 360 + 0.0001,
         );
-        gl.uniform1f(uniforms.uThickness, physicalThickness);
+        gl.uniform1f(uniforms.uThickness, bandWidth);
         gl.uniform1f(uniforms.uGlow, glow ? SETTINGS.glow : 0);
         gl.bindVertexArray(vao);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -557,18 +576,22 @@ export function SpecularRim({
     };
     const measure = (entry?: ResizeObserverEntry) => {
       const box = entry?.borderBoxSize?.[0];
-      const buttonStyle = getComputedStyle(button);
+      const buttonStyle = getComputedStyle(perimeter);
+      if (frameHost) {
+        safeRadius = parseFloat(buttonStyle.borderTopLeftRadius);
+        bandWidth = parseFloat(buttonStyle.paddingTop);
+      }
       view.width = Math.max(
         1,
         box
           ? box.inlineSize
-          : parseFloat(buttonStyle.width) || button.offsetWidth,
+          : parseFloat(buttonStyle.width) || perimeter.offsetWidth,
       );
       view.height = Math.max(
         1,
         box
           ? box.blockSize
-          : parseFloat(buttonStyle.height) || button.offsetHeight,
+          : parseFloat(buttonStyle.height) || perimeter.offsetHeight,
       );
       view.ratio = Math.min(window.devicePixelRatio || 1, 3);
       // Bitmap resolution uses layout size, not the dialog's animated scale.
@@ -585,7 +608,7 @@ export function SpecularRim({
       canvas.width = Math.max(1, Math.round(view.paintWidth * view.ratio));
       canvas.height = Math.max(1, Math.round(view.paintHeight * view.ratio));
       geometry = mapRimToCanvas({
-        button: button.getBoundingClientRect(),
+        button: perimeter.getBoundingClientRect(),
         canvas: paintBox,
         buttonWidth: view.width,
         buttonHeight: view.height,
@@ -624,9 +647,9 @@ export function SpecularRim({
       typeof ResizeObserver === "undefined"
         ? null
         : new ResizeObserver((entries) =>
-            measure(entries.find((entry) => entry.target === button)),
+            measure(entries.find((entry) => entry.target === perimeter)),
           );
-    resize?.observe(button);
+    resize?.observe(perimeter);
     resize?.observe(canvas);
     const intersection =
       typeof IntersectionObserver === "undefined"

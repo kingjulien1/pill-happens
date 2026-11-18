@@ -9,6 +9,7 @@ import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationCardBase } from "@/components/medication-card-base";
+import { SpecularRim } from "@/components/specular-rim";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
 import {
   CHECK_IN_CARD_COLOR,
@@ -194,6 +195,19 @@ export function DailyCheckInSection({
       {intakeSpacing === "before" && intakeSpacer}
       <MedicationCardBase
         color={CHECK_IN_CARD_COLOR}
+        decoration={
+          <span
+            className={styles.outerFrame}
+            data-specular-frame
+            aria-hidden="true"
+          >
+            <SpecularRim
+              palette="triad"
+              glow={false}
+              className={styles.outerLight}
+            />
+          </span>
+        }
         icon={morning ? "sun" : "moon-star"}
         leadingArtwork={
           <CheckInCardArtwork
@@ -217,7 +231,6 @@ export function DailyCheckInSection({
         aria-haspopup="dialog"
         disabled={busy}
       >
-        <span className={styles.outerFrame} aria-hidden="true" />
         <div
           className={cn(
             "medication-card-details intake-card-details",
