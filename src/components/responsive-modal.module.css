@@ -100,3 +100,8 @@
     --check-in-title-size: 24px;
   }
 }
+
+.checkInSurface[data-slot] {
+  background: var(--navigation-paint);
+  --drawer-bleed-background: var(--navigation-surface);
+}

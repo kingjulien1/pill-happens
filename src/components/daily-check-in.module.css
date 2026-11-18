@@ -623,8 +623,23 @@
 .form {
   padding-top: 24px;
 }
+.submitArea {
+  position: relative;
+}
 .submitArea::before {
   margin-bottom: 24px;
+}
+.submitArea::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 100%;
+  height: 20px;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--navigation-highlight) 17%, transparent),
+    transparent
+  );
 }
 .submitArea [data-morning-sleep-summary] {
   border-top: 0;

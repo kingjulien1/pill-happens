@@ -145,6 +145,7 @@ export function ResponsiveModal({
           className={cn(
             "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
             styles.dialog,
+            headerVariant === "check-in" && styles.checkInSurface,
             medicationHeader && styles.medicationDialog,
           )}
         >
@@ -172,7 +173,10 @@ export function ResponsiveModal({
   return (
     <Drawer open={open} onOpenChange={changeOpen} showSwipeHandle>
       <DrawerContent
-        className="rounded-t-[var(--dialog-radius-surface)]"
+        className={cn(
+          "rounded-t-[var(--dialog-radius-surface)]",
+          headerVariant === "check-in" && styles.checkInSurface,
+        )}
         finalFocus={returnFocus}
       >
         <div

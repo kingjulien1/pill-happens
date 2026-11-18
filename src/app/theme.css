@@ -69,6 +69,11 @@
   --canvas-foreground: #35233f;
   --canvas-muted-foreground: #604668;
   --menu-surface: #f4ebf9;
+  --navigation-surface: var(--menu-surface);
+  --navigation-highlight: #8051b2;
+  --navigation-paint:
+    radial-gradient(ellipse 90% 38% at 0% 0%, #ec48990b, transparent),
+    var(--navigation-surface);
   --menu-foreground: #35233f;
   --menu-muted-foreground: #604668;
   --menu-edge: #d5c4ea;
@@ -185,6 +190,8 @@
     --canvas-foreground: #ffffff;
     --canvas-muted-foreground: #ded8ec;
     --menu-surface: #28214b;
+    --navigation-surface: #211625;
+    --navigation-highlight: #c4b5fd;
     --menu-foreground: #fbfafd;
     --menu-muted-foreground: #d8d3ed;
     --menu-edge: #584f6d;

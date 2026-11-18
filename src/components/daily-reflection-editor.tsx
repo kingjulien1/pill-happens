@@ -41,7 +41,8 @@ import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
 const launcherPaint = {
-  "--control-face-paint": "var(--journal-fill)",
+  "--control-face-paint":
+    "color-mix(in srgb, var(--navigation-highlight) 39%, transparent)",
   "--control-ink": "var(--journal-ink)",
   "--control-edge": "var(--checkin-line)",
   "--control-face-edge": "var(--checkin-line)",

@@ -4,11 +4,11 @@
   outline: none;
 }
 .popup.navigation {
-  --nav-surface: var(--menu-surface);
+  --nav-surface: var(--navigation-surface);
   --nav-ink: var(--menu-foreground);
   --nav-muted: var(--menu-muted-foreground);
   --nav-pink: var(--primary);
-  --nav-soft: #8051b2;
+  --nav-soft: var(--navigation-highlight);
   --nav-edge: var(--menu-edge);
   --nav-card: #7e3c6c07;
   --nav-selected: #d23b8b18;
@@ -27,9 +27,7 @@
   border: 1px solid var(--nav-edge);
   border-radius: 26px;
   outline: none;
-  background:
-    radial-gradient(ellipse 90% 38% at 0% 0%, #ec48990b, transparent),
-    var(--nav-surface);
+  background: var(--navigation-paint);
   color: var(--nav-ink);
   box-shadow:
     inset 0 1px 0 #f9a8d425,
@@ -500,11 +498,9 @@
 }
 @media (prefers-color-scheme: dark) {
   .popup.navigation {
-    --nav-surface: #211625;
     --nav-ink: #fdf1f7;
     --nav-muted: #c5afc5;
     --nav-pink: #f9a8d4;
-    --nav-soft: #c4b5fd;
     --nav-edge: #f9a8d41c;
     --nav-card: #f9a8d408;
     --nav-selected: #f472b61c;
