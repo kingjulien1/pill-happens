@@ -15,7 +15,7 @@ export function CheckInSection({
   return (
     <div className={styles.section}>
       <p className={styles.caption}>{caption}</p>
-      {children}
+      <div className={styles.frame}>{children}</div>
       <div className={styles.foot}>
         <span>{left}</span>
         <span>{right}</span>

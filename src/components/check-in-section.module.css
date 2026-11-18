@@ -14,10 +14,17 @@
   min-width: 0;
   gap: 8px;
 }
-.section > :nth-child(2) {
+.frame {
+  --line-width: 1.5px;
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  border-radius: var(--dialog-radius-surface);
+}
+.section .frame > :first-child {
   margin-block: 0;
   background: var(--checkin-wash), var(--surface-reading);
-  box-shadow: inset 0 0 0 1.5px var(--checkin-line);
+  box-shadow: inset 0 0 0 var(--line-width) var(--checkin-line);
   border-radius: var(--dialog-radius-surface);
 }
 .caption,
@@ -40,6 +47,66 @@
   text-align: end;
 }
 
-.section > fieldset {
+.frame > fieldset {
   padding: 10px 12px 12px;
+}
+
+/* The shared frame owns the three outlines; each section keeps its own content. */
+.section .frame > :first-child::before,
+.section .frame > :first-child::after {
+  content: none;
+}
+.frame::before,
+.frame::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+.frame::before {
+  --outer-width: calc(3 * var(--line-width));
+  inset: -2px;
+  border-radius: calc(var(--dialog-radius-surface) + 2px);
+  box-shadow: 0 0 0 var(--outer-width)
+    color-mix(in srgb, var(--checkin-line) 60%, transparent);
+}
+.frame::after {
+  inset: 5px;
+  border-radius: calc(var(--dialog-radius-surface) - 5px);
+  box-shadow: inset 0 0 0 var(--line-width)
+    color-mix(in srgb, var(--color-violet-200, #ddd6fe) 38%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .frame::after {
+    animation:
+      rim-orbit 8s linear infinite,
+      rim-diagonals 16s ease-in-out infinite;
+  }
+}
+@keyframes rim-orbit {
+  from {
+    transform: rotate(0turn) translateX(0.55px) rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn) translateX(0.55px) rotate(-1turn);
+  }
+}
+@keyframes rim-diagonals {
+  0%,
+  50%,
+  100% {
+    translate: 0 0;
+  }
+  12.5% {
+    translate: -0.65px -0.65px;
+  }
+  37.5% {
+    translate: 0.65px 0.65px;
+  }
+  62.5% {
+    translate: 0.65px -0.65px;
+  }
+  87.5% {
+    translate: -0.65px 0.65px;
+  }
 }
