@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { emptyData, type AppData } from "./domain";
+import { emptyData, type AppData, type Medication } from "./domain";
 import {
   buildHistoryCardSummary,
   historyCardCacheable,
@@ -157,10 +157,17 @@ test("medication identity, strength and classification edits invalidate past sna
   );
   for (const change of [
     { name: "New name" },
+    { activeIngredient: "Updated ingredient" },
     { strengthMg: 5 },
+    { form: "capsule" },
     { color: "tw-violet-500" },
+    { icon: "sparkles" },
+    { iconRotation: 90 },
+    { categories: [] },
+    { categories: ["benzodiazepine", "opioid"] },
     { isBenzodiazepine: false },
-  ]) {
+    { isOpioid: true },
+  ] satisfies Partial<Medication>[]) {
     const changed = structuredClone(data);
     Object.assign(changed.medications[0], change);
     assert.equal(
@@ -182,6 +189,10 @@ test("intake time, quantity, route and check-in completion edits invalidate the 
     { quantity: 0.5 },
     { route: "nasal" },
     { takenAt: "2026-11-13T15:00:00Z" },
+    { takenAt: "2026-11-14T15:00:00Z" },
+    { medicationName: "Updated fallback" },
+    { medicationForm: "capsule" },
+    { strengthMg: 10 },
   ]) {
     const changed = structuredClone(data);
     Object.assign(changed.intakes[0], change);
@@ -264,4 +275,256 @@ test("invalid, obsolete and unavailable device storage always fall back to live 
     ),
   );
   assert.equal(historyCardCacheKey("../another journal", "2026-11-13"), null);
+});
+
+test("sparse and check-in-only history protects actual newest past rows, not calendar gaps", () => {
+  const data = journal();
+  data.intakes = data.intakes.filter((entry) =>
+    ["intake-13", "intake-17"].includes(entry.id),
+  );
+  data.dailyCheckIns = [14, 15, 16, 18].map((day) => ({
+    ...data.dailyCheckIns![0],
+    day: `2026-11-${day}`,
+    period: "morning",
+  }));
+  const now = new Date("2026-11-17T12:00:00Z");
+  for (const day of ["2026-11-14", "2026-11-15", "2026-11-16"])
+    assert.equal(historyCardCacheable(data, day, now), false, day);
+  assert.equal(historyCardCacheable(data, "2026-11-13", now), true);
+  for (const day of ["2026-11-12", "2026-11-17", "2026-11-18"])
+    assert.equal(historyCardCacheable(data, day, now), false, day);
+  assert.equal(
+    historyCardCacheable(data, "2026-11-13", "2026-11-17"),
+    true,
+    "the hook's stable tracking-day key has the same policy as the live clock",
+  );
+  assert.equal(historyCardCacheable(data, "2026-02-30", "2026-11-17"), false);
+  assert.equal(historyCardCacheable(data, "2026-11-13", "invalid"), false);
+  assert.equal(historyCardCacheKey("journal-a", "2026-02-30"), null);
+});
+
+test("unrelated history and writing retain a summary, while membership and completion changes invalidate it", () => {
+  const data = journal();
+  const original = historyCardSource(data, "2026-11-13").fingerprint;
+  const unchanged = structuredClone(data);
+  unchanged.intakes[1].quantity = 20;
+  unchanged.intakes[0].note = "different private intake writing";
+  unchanged.dailyCheckIns![0].note =
+    "different nonempty private journal writing";
+  unchanged.medications.push({
+    ...unchanged.medications[0],
+    id: "unrelated-medication",
+    name: "Unrelated catalog item",
+  });
+  assert.equal(
+    historyCardSource(unchanged, "2026-11-13").fingerprint,
+    original,
+  );
+
+  const withoutIntake = structuredClone(data);
+  withoutIntake.intakes = withoutIntake.intakes.slice(1);
+  assert.notEqual(
+    historyCardSource(withoutIntake, "2026-11-13").fingerprint,
+    original,
+  );
+  const emptyWriting = structuredClone(data);
+  emptyWriting.dailyCheckIns![0].note = "";
+  assert.notEqual(
+    historyCardSource(emptyWriting, "2026-11-13").fingerprint,
+    original,
+  );
+  const otherPeriod = structuredClone(data);
+  otherPeriod.dailyCheckIns!.push({
+    ...data.dailyCheckIns![0],
+    period: "morning",
+  });
+  assert.notEqual(
+    historyCardSource(otherPeriod, "2026-11-13").fingerprint,
+    original,
+  );
+  const anotherZone = structuredClone(data);
+  anotherZone.settings.timezone = "UTC";
+  assert.notEqual(
+    historyCardSource(anotherZone, "2026-11-13").fingerprint,
+    original,
+  );
+});
+
+test("changed and missing catalog artwork cannot reuse an older selected-medication snapshot", () => {
+  const { storage } = memory();
+  const data = journal();
+  const day = "2026-11-13";
+  const source = historyCardSource(data, day);
+  writeHistoryCardCache(
+    storage,
+    "journal-a",
+    day,
+    source.fingerprint,
+    buildHistoryCardSummary(data, day, source),
+  );
+  const changed = structuredClone(data);
+  Object.assign(changed.medications[0], {
+    name: "Changed medication",
+    color: "tw-blue-400",
+    icon: "heart",
+    iconRotation: 180,
+  });
+  const nextSource = historyCardSource(changed, day);
+  assert.equal(
+    readHistoryCardCache(storage, "journal-a", day, nextSource.fingerprint),
+    null,
+  );
+  const fresh = buildHistoryCardSummary(changed, day, nextSource);
+  assert.deepEqual(fresh.firstMedication, {
+    name: "Changed medication",
+    icon: "heart",
+    iconRotation: 180,
+  });
+  assert.equal(fresh.color.value, "tw-blue-400");
+  writeHistoryCardCache(
+    storage,
+    "journal-a",
+    day,
+    nextSource.fingerprint,
+    fresh,
+  );
+  assert.deepEqual(
+    readHistoryCardCache(storage, "journal-a", day, nextSource.fingerprint),
+    JSON.parse(JSON.stringify(fresh)),
+  );
+
+  changed.medications = [];
+  const missingSource = historyCardSource(changed, day);
+  assert.equal(
+    readHistoryCardCache(storage, "journal-a", day, missingSource.fingerprint),
+    null,
+  );
+  const missing = buildHistoryCardSummary(changed, day, missingSource);
+  assert.equal(missing.firstMedication, null);
+  writeHistoryCardCache(
+    storage,
+    "journal-a",
+    day,
+    missingSource.fingerprint,
+    missing,
+  );
+  assert.deepEqual(
+    readHistoryCardCache(storage, "journal-a", day, missingSource.fingerprint),
+    JSON.parse(JSON.stringify(missing)),
+  );
+});
+
+test("unchanged persistent summaries write only once, while changed values replace them", () => {
+  const { storage } = memory();
+  let writes = 0;
+  const observed: HistoryCardStorage = {
+    ...storage,
+    setItem(key, value) {
+      writes += 1;
+      storage.setItem(key, value);
+    },
+  };
+  const data = journal();
+  const day = "2026-11-13";
+  const source = historyCardSource(data, day);
+  const summary = buildHistoryCardSummary(data, day, source);
+  writeHistoryCardCache(
+    observed,
+    "journal-a",
+    day,
+    source.fingerprint,
+    summary,
+  );
+  writeHistoryCardCache(
+    observed,
+    "journal-a",
+    day,
+    source.fingerprint,
+    structuredClone(summary),
+  );
+  assert.equal(writes, 1);
+  data.intakes[0].quantity = 2;
+  const next = historyCardSource(data, day);
+  writeHistoryCardCache(
+    observed,
+    "journal-a",
+    day,
+    next.fingerprint,
+    buildHistoryCardSummary(data, day, next),
+  );
+  assert.equal(writes, 2);
+});
+
+test("malformed nested times, artwork and counts fall back instead of breaking a card", () => {
+  const { storage, records } = memory();
+  const data = journal();
+  const day = "2026-11-13";
+  const source = historyCardSource(data, day);
+  const summary = buildHistoryCardSummary(data, day, source);
+  const key = historyCardCacheKey("journal-a", day)!;
+  const invalid = [
+    { first: { ...summary.first, takenAt: "not a date" } },
+    { first: { takenAt: summary.first!.takenAt } },
+    { last: null },
+    { last: { takenAt: "2026-11-12T12:00:00Z" } },
+    { firstMedication: { name: "Medication", icon: {} } },
+    { firstMedication: { name: "Medication", iconRotation: "90" } },
+    { firstMedication: { icon: "pill" } },
+    { firstMedication: undefined },
+    { color: { ...summary.color, hex: "invalid" } },
+    { color: { ...summary.color, value: "unknown-color" } },
+    { counts: { pills: -1, benzos: 0 } },
+    { counts: { pills: 1, benzos: 2 } },
+    { entryCount: -1 },
+    { uniqueCount: summary.entryCount + 1 },
+    { morningOnly: "false" },
+  ];
+  for (const change of invalid) {
+    records.set(
+      key,
+      JSON.stringify({
+        version: 1,
+        scope: "journal-a",
+        fingerprint: source.fingerprint,
+        summary: { ...summary, ...change },
+      }),
+    );
+    assert.equal(
+      readHistoryCardCache(storage, "journal-a", day, source.fingerprint),
+      null,
+      JSON.stringify(change),
+    );
+  }
+});
+
+test("reflection-only cached dates stay bound to their own day even with identical fingerprints", () => {
+  const { storage, records } = memory();
+  const data = journal();
+  data.intakes = [];
+  data.dailyCheckIns = ["2026-11-12", "2026-11-13"].map((day) => ({
+    ...data.dailyCheckIns![0],
+    day,
+  }));
+  const first = historyCardSource(data, "2026-11-12");
+  const next = historyCardSource(data, "2026-11-13");
+  assert.equal(first.fingerprint, next.fingerprint);
+  const summary = buildHistoryCardSummary(data, "2026-11-12", first);
+  writeHistoryCardCache(
+    storage,
+    "journal-a",
+    "2026-11-12",
+    first.fingerprint,
+    summary,
+  );
+  const from = historyCardCacheKey("journal-a", "2026-11-12")!;
+  const to = historyCardCacheKey("journal-a", "2026-11-13")!;
+  records.set(to, records.get(from)!);
+  assert.equal(
+    readHistoryCardCache(storage, "journal-a", "2026-11-13", next.fingerprint),
+    null,
+  );
+  assert.deepEqual(
+    readHistoryCardCache(storage, "journal-a", "2026-11-12", first.fingerprint),
+    JSON.parse(JSON.stringify(summary)),
+  );
 });

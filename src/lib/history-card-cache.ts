@@ -8,6 +8,7 @@ import {
   dayKey,
   formatDay,
   formatDose,
+  isValidDayKey,
   type AppData,
 } from "./domain";
 import { getMedicationColor } from "./medication-appearance";
@@ -215,26 +216,95 @@ export type HistoryCardStorage = Pick<
 >;
 
 export function historyCardCacheKey(scope: string, day: string) {
-  if (
-    !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(scope) ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(day)
-  )
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(scope) || !isValidDayKey(day))
     return null;
   return `${namespace}:${scope}:${day}`;
 }
 
 /** The three newest recorded past days always derive directly from live state. */
-export function historyCardCacheable(data: AppData, day: string, now: Date) {
-  const today = dayKey(now, data.settings.timezone);
+export function historyCardCacheable(
+  data: AppData,
+  day: string,
+  now: Date | string,
+) {
+  // Hooks pass the stable tracking-day key, not a new Date on each clock tick.
+  const today =
+    typeof now === "string" ? now : dayKey(now, data.settings.timezone);
+  if (!isValidDayKey(day) || !isValidDayKey(today)) return false;
   const past = journalDays(
     data.intakes,
     data.dailyCheckIns,
     data.settings.timezone,
   )
     .filter((value) => value < today)
-    .sort()
-    .reverse();
+    .sort((a, b) => b.localeCompare(a));
   return day < today && past.includes(day) && !past.slice(0, 3).includes(day);
+}
+
+function record(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+const timestamp = (value: unknown): value is string =>
+  typeof value === "string" && Number.isFinite(Date.parse(value));
+const count = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0;
+
+/** A stale or incomplete device record must never supply broken artwork/time metadata. */
+function validHistorySummary(
+  value: unknown,
+  day: string,
+): value is HistoryCardSummary {
+  if (!record(value) || !record(value.color) || !record(value.counts))
+    return false;
+  const first = value.first;
+  const last = value.last;
+  const medication = value.firstMedication;
+  const color = getMedicationColor(
+    typeof value.color.value === "string" ? value.color.value : undefined,
+  );
+  return (
+    typeof value.fullDate === "string" &&
+    value.fullDate === formatDay(day, { year: "numeric" }) &&
+    typeof value.label === "string" &&
+    Number.isInteger(value.entryCount) &&
+    count(value.entryCount) &&
+    Number.isInteger(value.uniqueCount) &&
+    count(value.uniqueCount) &&
+    value.uniqueCount <= value.entryCount &&
+    typeof value.color.hex === "string" &&
+    value.color.hex.toLowerCase() === color.hex.toLowerCase() &&
+    value.color.value === color.value &&
+    typeof value.color.label === "string" &&
+    count(value.counts.pills) &&
+    count(value.counts.benzos) &&
+    value.counts.benzos <= value.counts.pills &&
+    typeof value.morningOnly === "boolean" &&
+    typeof value.checkInTitle === "string" &&
+    typeof value.shortDate === "string" &&
+    typeof value.weekday === "string" &&
+    typeof value.shortWeekday === "string" &&
+    typeof value.recordSummary === "string" &&
+    typeof value.checkInSummary === "string" &&
+    typeof value.pillSummary === "string" &&
+    (value.entryCount === 0
+      ? first === null && last === null && medication === null
+      : record(first) &&
+        typeof first.medicationId === "string" &&
+        typeof first.medicationName === "string" &&
+        timestamp(first.takenAt) &&
+        record(last) &&
+        timestamp(last.takenAt) &&
+        Date.parse(first.takenAt) <= Date.parse(last.takenAt) &&
+        (medication === null ||
+          (record(medication) &&
+            typeof medication.name === "string" &&
+            (medication.icon === undefined ||
+              typeof medication.icon === "string") &&
+            (medication.iconRotation === undefined ||
+              (typeof medication.iconRotation === "number" &&
+                Number.isFinite(medication.iconRotation))))))
+  );
 }
 
 export function readHistoryCardCache(
@@ -246,34 +316,15 @@ export function readHistoryCardCache(
   const key = historyCardCacheKey(scope, day);
   if (!storage || !key) return null;
   try {
-    const value = JSON.parse(storage.getItem(key) ?? "null");
+    const value: unknown = JSON.parse(storage.getItem(key) ?? "null");
     if (
-      !value ||
+      !record(value) ||
       value.version !== HISTORY_CARD_CACHE_VERSION ||
       value.scope !== scope ||
       value.fingerprint !== fingerprint
     )
       return null;
-    const summary = value.summary;
-    if (
-      !summary ||
-      typeof summary.fullDate !== "string" ||
-      typeof summary.label !== "string" ||
-      typeof summary.entryCount !== "number" ||
-      typeof summary.uniqueCount !== "number" ||
-      typeof summary.color?.hex !== "string" ||
-      typeof summary.color?.value !== "string" ||
-      typeof summary.counts?.pills !== "number" ||
-      typeof summary.counts?.benzos !== "number" ||
-      typeof summary.shortDate !== "string" ||
-      typeof summary.weekday !== "string" ||
-      typeof summary.shortWeekday !== "string" ||
-      typeof summary.recordSummary !== "string" ||
-      typeof summary.checkInSummary !== "string" ||
-      typeof summary.pillSummary !== "string"
-    )
-      return null;
-    return summary as HistoryCardSummary;
+    return validHistorySummary(value.summary, day) ? value.summary : null;
   } catch {
     return null;
   }
@@ -289,15 +340,13 @@ export function writeHistoryCardCache(
   const key = historyCardCacheKey(scope, day);
   if (!storage || !key) return;
   try {
-    storage.setItem(
-      key,
-      JSON.stringify({
-        version: HISTORY_CARD_CACHE_VERSION,
-        scope,
-        fingerprint,
-        summary,
-      }),
-    );
+    const serialized = JSON.stringify({
+      version: HISTORY_CARD_CACHE_VERSION,
+      scope,
+      fingerprint,
+      summary,
+    });
+    if (storage.getItem(key) !== serialized) storage.setItem(key, serialized);
   } catch {
     /* Cache failures never block a live card. */
   }

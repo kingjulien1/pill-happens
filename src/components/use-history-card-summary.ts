@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useJournal } from "@/components/journal-provider";
 import { useOptionalJournalWorkspace } from "@/components/journal-drafts";
-import type { AppData } from "@/lib/domain";
+import { dayKey, type AppData } from "@/lib/domain";
 import {
   buildHistoryCardSummary,
   historyCardCacheable,
@@ -26,11 +26,16 @@ export function useHistoryCardSummary(data: AppData, day: string) {
   const workspace = useOptionalJournalWorkspace();
   const { now } = useJournal();
   const scope = workspace?.store.getSnapshot().scope;
+  const trackingDay = now ? dayKey(now, data.settings.timezone) : null;
+  const source = useMemo(() => historyCardSource(data, day), [data, day]);
+  const cacheable = useMemo(
+    () =>
+      Boolean(
+        scope && trackingDay && historyCardCacheable(data, day, trackingDay),
+      ),
+    [data, day, scope, trackingDay],
+  );
   const cached = useMemo(() => {
-    const source = historyCardSource(data, day);
-    const cacheable = Boolean(
-      scope && now && historyCardCacheable(data, day, now),
-    );
     const summary = cacheable
       ? readHistoryCardCache(deviceStorage(), scope!, day, source.fingerprint)
       : null;
@@ -39,7 +44,7 @@ export function useHistoryCardSummary(data: AppData, day: string) {
       cacheable,
       summary: summary ?? buildHistoryCardSummary(data, day, source),
     };
-  }, [data, day, now, scope]);
+  }, [data, day, source, cacheable, scope]);
 
   useEffect(() => {
     if (!scope) return;
