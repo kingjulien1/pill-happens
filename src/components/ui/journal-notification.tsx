@@ -967,7 +967,10 @@ export function JournalNotification({
             <span className="journal-notification-copy">
               <span className="journal-toast-heading" id={headingId}>
                 <span className="journal-toast-heading-text">{heading}</span>
-                <span className="journal-toast-heading-status">
+                <span
+                  className="journal-toast-heading-status"
+                  data-notification-status={kind}
+                >
                   <span
                     className="journal-toast-heading-dot"
                     aria-hidden="true"

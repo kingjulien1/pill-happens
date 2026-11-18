@@ -39,6 +39,16 @@
     var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 47%,
     transparent
   );
+  --toast-deep-mix: color-mix(
+    in srgb,
+    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 50%,
+    var(--color-purple-950, oklch(29.1% 0.149 302.717))
+  );
+  --toast-deep-overlay: color-mix(
+    in srgb,
+    var(--toast-deep-mix) 39%,
+    transparent
+  );
   /* The artwork face keeps its depth independently of the lighter card glass. */
   --toast-icon-surface: color-mix(
     in srgb,
@@ -55,6 +65,7 @@
         )
         0 0
     ),
+    linear-gradient(var(--toast-deep-overlay) 0 0),
     linear-gradient(var(--toast-surface) 0 0);
   --toast-tile: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
   --toast-tile-overlay: color-mix(
@@ -64,7 +75,7 @@
   );
   --toast-tile-glaze: color-mix(
     in srgb,
-    var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 22%,
+    var(--toast-deep-mix) 78%,
     transparent
   );
   --toast-glyph: #ffeaf6;
@@ -77,7 +88,7 @@
     var(--color-pink-500, #ec4899) 56%,
     transparent
   );
-  --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 31.5%, transparent);
+  --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 41%, transparent);
   --toast-shadow: color-mix(in srgb, var(--palette-black) 18.824%, transparent);
   --toast-quiet-fill: color-mix(in srgb, var(--toast-ink) 7%, transparent);
   font-family: var(--font-sans);
@@ -181,7 +192,7 @@
 /* Keep the legacy Sonner surface consistent for third-party/native notices too. */
 .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"],
 .journal-notification {
-  --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 31.5%, transparent);
+  --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 41%, transparent);
   box-sizing: border-box;
   border: 0;
   border-radius: 18px;
@@ -295,13 +306,13 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px 10px;
+  gap: 4px 14px;
 }
 .journal-toast-heading-status {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  gap: 10px;
+  gap: 8px;
   white-space: nowrap;
 }
 .journal-toast-heading-dot {
@@ -309,7 +320,25 @@
   height: 3px;
   flex: none;
   border-radius: 50%;
-  background: var(--toast-muted);
+  background: var(--heading-status-ink, var(--toast-accent));
+}
+.journal-toast-heading-status[data-notification-status="success"] {
+  --heading-status-ink: var(--color-emerald-300, #5ee9b5);
+}
+.journal-toast-heading-status[data-notification-status="error"] {
+  --heading-status-ink: var(--color-rose-300, #ffa1ad);
+}
+.journal-toast-heading-status[data-notification-status="warning"] {
+  --heading-status-ink: var(--color-amber-200, #fee685);
+}
+.journal-toast-heading-status[data-notification-status="info"] {
+  --heading-status-ink: var(--color-sky-300, #74d4ff);
+}
+.journal-toast-heading-status[data-notification-status="loading"] {
+  --heading-status-ink: var(--color-violet-200, #ddd6ff);
+}
+.journal-toast-heading-status[data-notification-status="update"] {
+  --heading-status-ink: var(--color-fuchsia-200, #f6cfff);
 }
 .journal-toast-heading-text {
   min-width: 0;
@@ -564,7 +593,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   align-items: center;
-  gap: 0;
+  column-gap: 14px;
   padding-right: 16px;
   border-radius: inherit;
 }
@@ -603,12 +632,11 @@
   gap: 6px;
 }
 .journal-notification-description {
-  display: -webkit-box;
+  display: block;
   min-width: 0;
-  padding-right: 14px;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .journal-notification-details {
   position: relative;
@@ -2335,6 +2363,7 @@
       linear-gradient(
         color-mix(in srgb, var(--color-pink-300, #f9a8d4) 11%, transparent) 0 0
       ),
+      linear-gradient(var(--toast-deep-overlay) 0 0),
       radial-gradient(
         ellipse at 0% 0%,
         color-mix(in srgb, var(--palette-rose) 9%, transparent),
@@ -2353,6 +2382,25 @@
     );
     --toast-shadow: color-mix(in srgb, var(--palette-plum) 18%, transparent);
     --toast-quiet-fill: color-mix(in srgb, var(--primary) 7%, transparent);
+  }
+
+  .journal-toast-heading-status[data-notification-status="success"] {
+    --heading-status-ink: var(--color-emerald-800, #065f46);
+  }
+  .journal-toast-heading-status[data-notification-status="error"] {
+    --heading-status-ink: var(--color-rose-800, #9f1239);
+  }
+  .journal-toast-heading-status[data-notification-status="warning"] {
+    --heading-status-ink: var(--color-amber-800, #92400e);
+  }
+  .journal-toast-heading-status[data-notification-status="info"] {
+    --heading-status-ink: var(--color-sky-800, #075985);
+  }
+  .journal-toast-heading-status[data-notification-status="loading"] {
+    --heading-status-ink: var(--color-violet-800, #5b21b6);
+  }
+  .journal-toast-heading-status[data-notification-status="update"] {
+    --heading-status-ink: var(--color-fuchsia-800, #86198f);
   }
 
   .journal-toaster

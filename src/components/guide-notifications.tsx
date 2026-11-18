@@ -1074,16 +1074,15 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         height. The host is top-center, <code>min(460px, 100vw − 32px)</code>{" "}
         wide, with three visible notices and a 10px gap. Mobile side offsets are
         16px and top offsets include the safe area. The entire card keeps
-        <code> --toast-fuchsia-surface</code>: Fuchsia950 at 34% color alpha
-        above a strong 96px standard/Safari backdrop blur. The wash is 60% less
-        opaque than its former 85% setting. Page content behind it is softened
-        while the notification’s own text and controls stay sharp. Reduced
-        transparency uses an opaque same-hue surface. The success icon retains
-        its independent 85% Fuchsia950 base. Every icon tile adds a separate
-        Fuchsia900 layer at 69% alpha over its original base. The front tile
-        alone adds a final Fuchsia950 glaze at 22% alpha for a darker, quieter
-        face. There is no ambient background field; the late-countdown glow
-        remains a separate paint-only overlay. This translucent surface is
+        <code> --toast-fuchsia-surface</code>: Fuchsia950 at 47% color alpha
+        above a strong 96px standard/Safari backdrop blur. A 50/50
+        Fuchsia950–Purple950 mix at 39% deepens that base below the existing
+        Pink300 11% highlight. Page content behind it is softened while the
+        notification’s own text and controls stay sharp. Reduced transparency
+        uses an opaque same-hue surface. Every icon tile keeps its Fuchsia900
+        layer at 69% alpha and adds the same deep Fuchsia/Purple mix at 78% on
+        its front face. There is no ambient background field; the late-countdown
+        glow remains a separate paint-only overlay. This translucent surface is
         separate from the application canvas: opaque Plum/Black
         <code> #29213b</code> beneath the violet Iridescence field, a light 4px
         field blur, Pink300 at 21% and Purple900 at 69%. Loading and fallback
@@ -1100,11 +1099,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Main text / context",
-            "14px, weight 650 heading beside an 18px status badge with 10px, weight 600 text and a 9.5px icon. The 3px dot has a 10px gap to the heading and another 10px to the badge; heading and message have 6px between them.",
+            "14px, weight 650 heading beside an 18px status badge with 10px, weight 600 text and a 9.5px icon. The 3px dot uses the badge ink, sits 14px after the heading and keeps 8px before the badge; heading and message have 6px between them.",
           ],
           [
             "Short secondary copy",
-            "Both modes use readable light ink at 70% color alpha. The copy is clamped to two lines and reserves 14px of internal breathing room before the right-side tool, so narrow update messages never collide with the action.",
+            "Both modes use readable light ink at 70% color alpha. The copy is a single ellipsized line. The header grid owns a guaranteed 14px column gap before the right-side tool, so narrow update messages yield before the action instead of wrapping or colliding.",
           ],
           [
             "Expanded details",
@@ -1112,11 +1111,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Inward frame",
-            "A 5px outer inset band retains the quieter rim mix, followed immediately by a 2.6px saturated Pink500 outline. The −6.3px offset makes the two inward borders meet without transparent corner seams. Neither border changes layout or occupies Sonner’s swipe/stack pseudo-elements. Existing pigments and 18px corners remain, with a restrained Pink400 exterior glow.",
+            "A 5px outer inset band uses 41% of the semantic rim pigment—30% stronger than the former 31.5% mix—followed immediately by a 2.6px saturated Pink500 outline. The −6.3px offset makes the two inward borders meet without transparent corner seams. Neither border changes layout or occupies Sonner’s swipe/stack pseudo-elements. Existing pigments and 18px corners remain, with a restrained Pink400 exterior glow.",
           ],
           [
             "Surface / countdown",
-            "Card uses Fuchsia950 at 47% alpha above 96px standard/Safari backdrop blur, then adds Pink300 at 11% as its highlighting layer. Icon tiles add Fuchsia900 at 69% over their original bases; the front face alone adds a final Fuchsia950 glaze at 22% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
+            "Card uses Fuchsia950 at 47% alpha above 96px standard/Safari backdrop blur, a 39% Fuchsia950/Purple950 depth layer, then Pink300 at 11% as its highlight. Icon tiles add Fuchsia900 at 69% over their original bases; the front face adds the same mixed depth color at 78% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
           ],
           [
             "Last-seconds marker",
@@ -1132,7 +1131,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Artwork / bell",
-            "Successful saves use a two-tone BellCheck: the bell, clapper and two installed Lucide BellRing curves use primary text ink; only .journal-toast-bell-check uses Emerald600 (oklch(59.6% 0.145 163.225)). The glyph retains 27.5625px sizing and 2.9 stroke. Its independent --toast-icon-surface retains the Fuchsia950 85% base below a Fuchsia900 69% overlay and a final Fuchsia950 22% glaze. Other kinds keep their Mauve900 bases and status glyphs below the same overlay. The old corner bell, chevron and StarCheck shape remain absent.",
+            "Successful saves use a two-tone BellCheck: the bell, clapper and two installed Lucide BellRing curves use primary text ink; only .journal-toast-bell-check uses Emerald600 (oklch(59.6% 0.145 163.225)). The glyph retains 27.5625px sizing and 2.9 stroke. Its independent --toast-icon-surface keeps the existing dark base below a Fuchsia900 69% overlay and the shared Fuchsia950/Purple950 mix at 78%. Other kinds retain their own base pigments below the same depth layers. The old corner bell, chevron and StarCheck shape remain absent.",
           ],
         ]}
       />
