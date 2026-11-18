@@ -10,6 +10,16 @@
   direction: ltr;
 }
 
+/* The saved-library name yields before its category rail's protected clearance. */
+.card:global([data-medication-library-card]) :global(.intake-card-heading) {
+  column-gap: max(var(--entry-text-gap), 12px);
+}
+
+.card:global([data-medication-library-card]) .rail:global(.intake-card-tags) {
+  gap: 6px;
+  padding-block: 0;
+}
+
 .card:global([data-intake-card]) .rail:global(.intake-card-tags) {
   gap: 2px;
 }
@@ -119,6 +129,13 @@
 
 .typeBadge svg * {
   fill: none;
+}
+
+.typeLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (prefers-color-scheme: light) {

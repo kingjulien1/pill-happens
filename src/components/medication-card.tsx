@@ -1,4 +1,5 @@
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
+import { Badge } from "@/components/ui/badge";
 import type { ComponentProps, ReactNode } from "react";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { MedicationQuantityBadge } from "@/components/medication-card-icon";
@@ -186,14 +187,15 @@ export function MedicationCard({
             data-intake-substance-type
           >
             {formPresentation === "text" && (
-              <span
+              <Badge
+                variant="secondary"
                 className={cn("intake-card-type-text", styles.typeBadge)}
                 title={hasType ? typeLabel : "Medication Type Not Set"}
                 data-intake-type
               >
                 <MedicationFormGlyph form={form ?? "other"} strokeWidth={2.2} />
-                {typeLabel}
-              </span>
+                <span className={styles.typeLabel}>{typeLabel}</span>
+              </Badge>
             )}
             <span
               className="intake-card-ingredient"

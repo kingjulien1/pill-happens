@@ -15,6 +15,7 @@ export { MedicationCardIcon } from "@/components/medication-card-icon";
 type MedicationCardBaseProps = Omit<ComponentProps<"button">, "color"> & {
   "data-intake-card"?: string;
   "data-check-in-card"?: boolean;
+  "data-medication-library-card"?: string;
   /** Render the identical presentation as a noninteractive snapshot group. */
   readOnly?: boolean;
   color?: string;
@@ -67,7 +68,8 @@ export function MedicationCardBase({
   const hasContent = children !== null && children !== undefined;
   const hasDetailRim =
     props["data-intake-card"] !== undefined ||
-    props["data-check-in-card"] !== undefined;
+    props["data-check-in-card"] !== undefined ||
+    props["data-medication-library-card"] !== undefined;
 
   const frameStyle = {
     "--entry-color": color.hex,

@@ -79,9 +79,14 @@
   }
 }
 
-/* Intake glass owns the blur and both alpha washes on one clipped pane.
+/* Timeline and collection cards share one blur pane and both alpha washes.
    Background images paint front-to-back: medication tint, pink, then glass. */
-.card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card],
+    [data-medication-library-card],
+    [data-history-day-link]
+  ) {
   --entry-inner-rim-width: calc(2px * 4 / 3);
   /* The existing fine outer edge stays independent of the stronger inner rim. */
   --entry-fine-rim-width: 1.5px;
@@ -121,7 +126,12 @@
   pointer-events: none;
 }
 
-.card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+.card:global(.intake-log-card):is(
+    [data-intake-card],
+    [data-check-in-card],
+    [data-medication-library-card],
+    [data-history-day-link]
+  )
   :global(.intake-card-glass) {
   background:
     linear-gradient(var(--entry-surface-base) 0 0),
@@ -133,22 +143,42 @@
 @supports not (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    ) {
     --card-foreground: var(--foreground);
   }
 
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    )
     :global(.intake-card-glass) {
     background-color: var(--entry-intake-base);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    ) {
     --card-foreground: var(--foreground);
   }
 
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    )
     :global(.intake-card-glass) {
     background-color: var(--entry-intake-base);
     -webkit-backdrop-filter: none;
@@ -224,7 +254,12 @@
       0 5px 18px color-mix(in srgb, var(--foreground) 5%, transparent);
   }
 
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card]) {
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    ) {
     --entry-surface-base: color-mix(
       in srgb,
       var(--entry-color) 5%,
@@ -237,7 +272,12 @@
     );
   }
 
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card],
+      [data-history-day-link]
+    )
     :global(.intake-card-glass) {
     background:
       linear-gradient(var(--entry-surface-base) 0 0),
