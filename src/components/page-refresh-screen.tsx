@@ -370,7 +370,7 @@ html[data-page-refresh-active] .page-refresh-screen {
 .page-refresh-footer a { display: none; padding: 8px 4px; color: inherit; font: inherit; font-size: 10px; line-height: 16px; text-decoration: none; text-underline-offset: 3px; }
 .page-refresh-footer a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }
 .page-refresh-footer-copy { margin: 15px 0 0; font-size: 9px; line-height: 14px; letter-spacing: .005em; }
-.page-refresh-footer-copy > span:first-child { color: color-mix(in srgb, var(--refresh-muted) 50%, transparent); font-weight: 450; }
+.page-refresh-footer-copy > span:first-child { color: color-mix(in srgb, var(--refresh-muted) 56%, transparent); font-weight: 450; }
 ${LOADING_SCREEN_LINKS.map(({ id }) => `html[data-page-refresh-link-one="${id}"] .page-refresh-footer a[data-loading-link="${id}"], html[data-page-refresh-link-two="${id}"] .page-refresh-footer a[data-loading-link="${id}"] { display: inline-block; }`).join("\n")}
 .page-refresh-wanderers { position: absolute; inset: 0; pointer-events: none; display: none; }
 html[data-page-refresh-pills-ready="true"] .page-refresh-wanderers { display: block; }
@@ -467,7 +467,7 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
     --brand-tone-emerald: #e879b1;
   }
   :where(html:not([data-color-mode])) .page-refresh-footer-copy > span:first-child {
-    color: var(--refresh-muted);
+    color: color-mix(in srgb, var(--refresh-muted) 94%, var(--refresh-ink));
   }
 }
 :where(html[data-color-mode="light"]) .page-refresh-screen {
@@ -479,7 +479,7 @@ html[data-page-refresh-active="fading"] .page-refresh-copy { animation: refresh-
   --brand-tone-emerald: #e879b1;
 }
 :where(html[data-color-mode="light"]) .page-refresh-footer-copy > span:first-child {
-  color: var(--refresh-muted);
+  color: color-mix(in srgb, var(--refresh-muted) 94%, var(--refresh-ink));
 }
 
 @keyframes refresh-brand-spring-core {

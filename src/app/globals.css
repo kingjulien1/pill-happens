@@ -3557,6 +3557,9 @@ input[type="time"] {
 }
 
 /* Quiet, non-interactive supporting copy keeps its existing 10px clearance. */
+.intake-action-note[data-intake-action-note] {
+  color: color-mix(in srgb, var(--canvas-muted-foreground) 56%, transparent);
+}
 .intake-action-content > .intake-action-note {
   margin-block-start: 3px;
 }
