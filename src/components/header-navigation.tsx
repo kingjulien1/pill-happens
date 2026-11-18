@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Fragment,
   useCallback,
   useLayoutEffect,
   useRef,
@@ -30,7 +31,7 @@ import { NavigationMenuMark } from "@/components/navigation-menu-mark";
 import { useJournal } from "@/components/journal-provider";
 import { useJournalWorkspace } from "@/components/journal-drafts";
 import { dayIntakes, dayKey, formatDay, goalForDay } from "@/lib/domain";
-import { journalDays } from "@/lib/daily-check-in";
+import { checkInForDay, journalDays } from "@/lib/daily-check-in";
 import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
@@ -52,7 +53,8 @@ const links = [
     label: "Today",
     page: "today",
     icon: "navToday",
-    description: "Your intakes and daily check-ins, together.",
+    description: "Intakes and check-ins, together in your current day.",
+    facts: ["Morning & Evening", "06:00 Reset"],
     tone: "peach",
   },
   {
@@ -60,7 +62,8 @@ const links = [
     label: "Journal",
     page: "journal",
     icon: "record",
-    description: "Longer thoughts, kept as pages",
+    description: "Your longer thoughts, reflections and linked medications.",
+    facts: ["Markdown Pages", "Your Own Words"],
     tone: "lilac",
   },
   {
@@ -68,7 +71,8 @@ const links = [
     label: "Past Days",
     page: "history",
     icon: "navHistory",
-    description: "Pick up the thread of any day",
+    description: "Revisit daily intakes, check-ins and the notes you kept.",
+    facts: ["Daily Details", "Intakes & Check-Ins"],
     tone: "sky",
   },
   {
@@ -76,7 +80,8 @@ const links = [
     label: "Medications",
     page: "medications",
     icon: "navMedications",
-    description: "Names, strengths and familiar symbols",
+    description: "Keep names, strengths, ingredients and symbols in sync.",
+    facts: ["Active & Archived", "Saved Defaults"],
     tone: "mint",
   },
   {
@@ -84,7 +89,8 @@ const links = [
     label: "Goals",
     page: "goals",
     icon: "navGoals",
-    description: "Your daily limits, in one place",
+    description: "Review the daily limits you set for each medication.",
+    facts: ["Daily Limits", "Per Medication"],
     tone: "rose",
   },
 ] as const;
@@ -102,7 +108,7 @@ function MenuRow({
   detail,
   active = false,
   tone,
-  featured = false,
+  facts,
 }: {
   label: string;
   description: string;
@@ -110,7 +116,7 @@ function MenuRow({
   detail?: string;
   active?: boolean;
   tone: string;
-  featured?: boolean;
+  facts?: readonly string[];
 }) {
   return (
     <>
@@ -120,16 +126,28 @@ function MenuRow({
       <span className={styles.copy}>
         <span className={styles.labelRow}>
           <span className={styles.label}>{label}</span>
-          {featured && detail && (
+          {detail && (
             <span className={styles.detail}>
               <strong>{detail.split(" ")[0]}</strong>{" "}
               {detail.split(" ").slice(1).join(" ")}
             </span>
           )}
         </span>
-        <span className={styles.description}>
-          {featured ? description : (detail ?? description)}
-        </span>
+        <span className={styles.description}>{description}</span>
+        {facts && facts.length > 0 && (
+          <span className={styles.facts} data-navigation-facts>
+            {facts.map((fact, index) => (
+              <Fragment key={fact}>
+                {index > 0 && (
+                  <span className={styles.factSeparator} aria-hidden="true" />
+                )}
+                <span className={styles.fact} title={fact}>
+                  {fact}
+                </span>
+              </Fragment>
+            ))}
+          </span>
+        )}
       </span>
       <span className={styles.trailing} aria-hidden="true">
         {active ? (
@@ -260,29 +278,70 @@ function NavigationMenu({
   const { data, now } = useJournal();
   const workspace = useJournalWorkspace();
   const today = data && now ? dayKey(now, data.settings.timezone) : null;
-  const details =
+  const summaries =
     open && data && now && today
-      ? {
-          today: countCaption(
-            dayIntakes(data, today).length,
-            "entry",
-            "entries",
-          ),
-          journal: countCaption(
-            journalLibraryEntries(data.dailyCheckIns).length,
-            "page",
-          ),
-          history: countCaption(
-            journalDays(
-              data.intakes,
-              data.dailyCheckIns,
-              data.settings.timezone,
-            ).filter((day) => day < today).length,
-            "day",
-          ),
-          medications: `${data.medications.filter((medication) => !medication.archived).length} active`,
-          goals: `${data.medications.filter((medication) => !medication.archived && goalForDay(data, medication.id, today)).length} active`,
-        }
+      ? (() => {
+          const journal = journalLibraryEntries(data.dailyCheckIns);
+          const history = journalDays(
+            data.intakes,
+            data.dailyCheckIns,
+            data.settings.timezone,
+          ).filter((day) => day < today);
+          const activeMedications = data.medications.filter(
+            (medication) => !medication.archived,
+          );
+          const savedCheckIns = (["morning", "evening"] as const).filter(
+            (period) => checkInForDay(data.dailyCheckIns, today, period),
+          ).length;
+          const shortDate = (day: string) =>
+            formatDay(day, {
+              weekday: undefined,
+              month: "short",
+              day: "numeric",
+            });
+          return {
+            today: {
+              detail: countCaption(
+                dayIntakes(data, today).length,
+                "entry",
+                "entries",
+              ),
+              facts: [`${savedCheckIns}/2 Check-Ins`, "06:00 Reset"],
+            },
+            journal: {
+              detail: countCaption(journal.length, "page"),
+              facts: [
+                `${journal.reduce((words, entry) => words + entry.words, 0).toLocaleString("en")} Words`,
+                journal[0]
+                  ? `Latest ${shortDate(journal[0].day)}`
+                  : "A Page Awaits",
+              ],
+            },
+            history: {
+              detail: countCaption(history.length, "day"),
+              facts: [
+                history[0]
+                  ? `Latest ${shortDate(history[0])}`
+                  : "Starts With Today",
+                "Intakes & Check-Ins",
+              ],
+            },
+            medications: {
+              detail: `${activeMedications.length} active`,
+              facts: [
+                `${data.medications.length - activeMedications.length} Archived`,
+                "Saved Defaults",
+              ],
+            },
+            goals: {
+              detail: `${activeMedications.filter((medication) => goalForDay(data, medication.id, today)).length} active`,
+              facts: [
+                `${data.goals.filter((goal) => goal.startsOn > today && activeMedications.some((medication) => medication.id === goal.medicationId)).length} Upcoming`,
+                "Per Medication",
+              ],
+            },
+          };
+        })()
       : null;
   const followLink = () => {
     followingLink.current = true;
@@ -371,7 +430,10 @@ function NavigationMenu({
           </div>
           <div className={styles.entries}>
             {links.map(
-              ({ href, label, page, icon, description, tone }, index) => {
+              (
+                { href, label, page, icon, description, tone, facts },
+                index,
+              ) => {
                 const active =
                   pathname === href ||
                   (href !== "/" && pathname.startsWith(`${href}/`));
@@ -399,8 +461,8 @@ function NavigationMenu({
                       description={description}
                       tone={tone}
                       active={active}
-                      detail={details?.[page]}
-                      featured={page === "today"}
+                      detail={summaries?.[page].detail}
+                      facts={summaries?.[page].facts ?? facts}
                       icon={<ActionIcon name={icon} weight="fill" />}
                     />
                   </NavigationLink>
@@ -429,7 +491,8 @@ function NavigationMenu({
             >
               <MenuRow
                 label="Getting Started"
-                description="Find your feet, then make it yours."
+                description="Your first log, daily check-ins, and the little details."
+                facts={["Daily Basics", "App & Backups"]}
                 tone="sand"
                 active={pathname === "/guide"}
                 icon={<BookOpenText strokeWidth={2.1} />}

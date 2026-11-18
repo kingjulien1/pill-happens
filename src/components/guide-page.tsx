@@ -907,8 +907,11 @@ export function GuidePage() {
               <p>
                 Open the menu beside the animated tablets to move between Today,
                 Journal, Past Days, Medications and Goals. On phones it opens as
-                a scrollable bottom sheet. Getting Started sits below the main
-                pages; Backups, Report a Bug and Developer are under Help &amp;
+                a scrollable bottom sheet with full-width page cards. Each card
+                includes a short description, live count and a few useful
+                details. Today uses the same layout as the other destinations.
+                Getting Started sits under A Little Help / At Your Pace;
+                Backups, Report a Bug and Developer are under Help &amp;
                 Tools. Scroll to reach the lower shortcuts.
               </p>
             </GuideDetail>

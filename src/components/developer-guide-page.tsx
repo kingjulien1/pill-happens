@@ -1062,11 +1062,15 @@ export function DeveloperGuidePage() {
                 host and preserve focus return to the current trigger.
               </p>
               <p>
-                Today is the featured destination, with a real intake count and
-                the current tracking date above it. On mobile, Journal, Past
-                Days, Medications and Goals form a two-column grid with generous
-                icon stages, 15–16px labels and 12px count captions. Loaded counts
-                replace generic descriptions; unavailable data keeps helpful
+                Today, Journal, Past Days, Medications and Goals are equal
+                full-width destination cards in a single column on both layouts.
+                Each title shares its row with a compact live count, while a
+                two-line purpose description stays visible below it. A fine
+                inset rule separates a small facts row: saved check-ins and the
+                06:00 reset for Today, word count and latest page for Journal,
+                latest historical day, archived medications or upcoming goals.
+                Counts and summaries are derived only while the menu is open
+                from already-loaded journal data; unavailable data keeps helpful
                 context instead of inventing zeroes. Appearance and Close retain
                 44px targets. A 50px layered brand tile ties the masthead to the
                 destinations. Pink and Lilac selection washes add no extra
@@ -1084,11 +1088,14 @@ export function DeveloperGuidePage() {
                 short windows can reach every control without nested scrolling.
               </p>
               <p>
-                Desktop keeps a linear menu with a 99px featured Today row and
-                63px destination rows. Mobile uses a full-width 104px Today card
-                followed by four tiles at least 112px tall. A protected trailing
-                rail holds the current-page check or destination arrow. Long
-                labels truncate without moving that rail. Routes and modified
+                The same 40px icon tile, 15–15.5px label and protected 18px
+                trailing rail compose every destination, including Today.
+                Desktop cards have a 91px minimum height; mobile uses 96px,
+                growing naturally for wrapped purpose copy and facts. The
+                trailing rail holds the current-page check or destination arrow.
+                Long labels yield before the count badge, descriptions use at
+                most two lines, and individual facts truncate without moving
+                the arrow or adding horizontal scrolling. Routes and modified
                 clicks keep their native semantics. Destinations enter with a
                 restrained 380ms rise, offset by 32ms per item; reduced motion
                 shows settled content. Hover remains limited to desktop fine
@@ -1103,11 +1110,12 @@ export function DeveloperGuidePage() {
                 milestone pages are unchanged.
               </p>
               <p>
-                Getting Started has its own supporting row beneath the main
-                destinations. A separated Help &amp; Tools footer contains three
+                Getting Started has its own full-width supporting card beneath
+                “A Little Help / At Your Pace,” with daily basics, installation
+                and backup context. A separated Help &amp; Tools footer contains three
                 shortcut tiles: Backups, Report a Bug and Developer. Mobile uses
-                62px stacked tiles; desktop uses 44px horizontal tools so every
-                main destination remains visible in a normal-height menu. Their
+                62px stacked tiles; desktop uses 44px horizontal tools while
+                the richer destination list keeps its own scroll area. Their
                 CloudDownload, BugPlay and Braces glyphs use the Pink accent;
                 accessible names retain their complete destinations. A quiet
                 two-line note explains that the current place is remembered on
