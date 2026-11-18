@@ -35,6 +35,8 @@ import {
 } from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { PageHeading, PageSurface } from "@/components/page-heading";
+import checkInStyles from "./daily-check-in.module.css";
+import closeStyles from "./dialog-close.module.css";
 import layoutStyles from "./page-layout.module.css";
 import {
   countOpioidPills,
@@ -456,6 +458,73 @@ function CheckInTimeline({
   );
 }
 
+function LogIntakeDialog({
+  day,
+  historical = false,
+  open,
+  onClose,
+}: {
+  day: string;
+  historical?: boolean;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const formId = useId();
+  const [canReset, setCanReset] = useState(false);
+  return (
+    <ResponsiveModal
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+      scrollKey={`intake:new:${historical ? day : "today"}`}
+      title="Log Intake"
+      headerVariant="check-in"
+      context={
+        <time dateTime={day} className={checkInStyles.headerDate}>
+          {formatDay(day, {
+            weekday: "long",
+            month: undefined,
+            day: undefined,
+          })}
+          <small>
+            / {formatDay(day, { weekday: undefined, month: "long" })}
+          </small>
+        </time>
+      }
+      description={
+        historical
+          ? "Add an intake you missed. Use the date and time you took it."
+          : "Record what you took, how much, and when."
+      }
+      headerActions={
+        <Button
+          type="reset"
+          form={formId}
+          variant="ghost"
+          size="icon"
+          rim={false}
+          className={closeStyles.control}
+          disabled={!canReset}
+          aria-label="Reset intake draft"
+          title="Reset draft"
+        >
+          <ActionIcon name="retry" className="size-[18px]" />
+        </Button>
+      }
+    >
+      {open && (
+        <IntakeForm
+          formId={formId}
+          initialDay={historical ? day : undefined}
+          onResetAvailability={setCanReset}
+          onSaved={onClose}
+        />
+      )}
+    </ResponsiveModal>
+  );
+}
+
 export function TodayPage() {
   const { data, now } = useJournal();
   const { dialog, openDialog, closeDialog } = useJournalWorkspace();
@@ -482,18 +551,13 @@ export function TodayPage() {
         opioidCount={countOpioidPills(todayEntries, data.medications)}
         stimulantCount={countStimulantPills(todayEntries, data.medications)}
       />
-      <ResponsiveModal
+      <LogIntakeDialog
         open={open}
-        onOpenChange={(next) => {
-          if (!next && dialog?.kind === "intake-new") closeDialog(dialog);
+        day={today}
+        onClose={() => {
+          if (dialog?.kind === "intake-new") closeDialog(dialog);
         }}
-        scrollKey="intake:new:today"
-        title="Log Intake"
-        context="New Entry"
-        description="Record what you took, how much, and when."
-      >
-        {open && <IntakeForm onSaved={() => closeDialog(dialog)} />}
-      </ResponsiveModal>
+      />
     </div>
   );
 }
@@ -1444,23 +1508,14 @@ export function DayPage({ day }: { day: string }) {
           </Button>
         )}
       </div>
-      <ResponsiveModal
+      <LogIntakeDialog
         open={open}
-        onOpenChange={(next) => {
-          if (!next && open) closeDialog(dialog ?? undefined);
+        day={day}
+        historical
+        onClose={() => {
+          if (open) closeDialog(dialog ?? undefined);
         }}
-        scrollKey={`intake:new:${day}`}
-        title="Log Intake"
-        context="Past Entry"
-        description="Add an intake you missed. Check the date and time before saving."
-      >
-        {open && (
-          <IntakeForm
-            initialDay={day}
-            onSaved={() => closeDialog(dialog ?? undefined)}
-          />
-        )}
-      </ResponsiveModal>
+      />
     </>
   );
 }

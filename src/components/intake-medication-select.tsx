@@ -5,8 +5,11 @@ import {
   ChoiceOptionContent,
 } from "@/components/choice-menu";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
-import { getMedicationIndicatorKinds } from "@/components/medication-indicator";
-import { MedicationIcon } from "@/components/medication-icon";
+import { getMedicationCategories } from "@/lib/medication-categories";
+import {
+  MedicationTypeIcon,
+  MedicationIcon,
+} from "@/components/medication-icon";
 import {
   Select,
   SelectContent,
@@ -30,7 +33,7 @@ export function IntakeMedicationSelect({
   onValueChange: (value: string) => void;
 }) {
   const selected = medications.find((medication) => medication.id === value);
-  const selectedClasses = getMedicationIndicatorKinds(selected);
+  const selectedClasses = getMedicationCategories(selected);
   return (
     <Select
       value={value}
@@ -42,7 +45,7 @@ export function IntakeMedicationSelect({
     >
       <SelectTrigger
         id="intake-medication"
-        className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10"
+        className="h-[26px] py-0 w-full rounded-xl px-3 text-sm data-[size=default]:h-[26px]"
       >
         <SelectValue>
           {selected ? (
@@ -62,8 +65,12 @@ export function IntakeMedicationSelect({
                   · {formatDose(selected.strengthMg)} mg
                   {isMeteredMedicationType(selected.form) ? " / pump" : ""}
                 </span>
+                <MedicationTypeIcon
+                  type={selected.form ?? "other"}
+                  className="size-4 shrink-0"
+                />
                 {selectedClasses.map((kind) => (
-                  <MedicationIndicatorMark key={kind} kind={kind} size={20} />
+                  <MedicationIndicatorMark key={kind} kind={kind} size={16} />
                 ))}
               </span>
             </>
@@ -83,7 +90,7 @@ export function IntakeMedicationSelect({
       >
         <ChoiceMenuHeader title="Medication" count={medications.length} />
         {medications.map((medication) => {
-          const classes = getMedicationIndicatorKinds(medication);
+          const classes = getMedicationCategories(medication);
           const strength = formatDose(medication.strengthMg);
           const current = value === medication.id;
           return (
@@ -116,11 +123,15 @@ export function IntakeMedicationSelect({
                         ? " / pump"
                         : ""}
                     </span>
+                    <MedicationTypeIcon
+                      type={medication.form ?? "other"}
+                      className="size-4 shrink-0"
+                    />
                     {classes.map((kind) => (
                       <MedicationIndicatorMark
                         key={kind}
                         kind={kind}
-                        size={20}
+                        size={16}
                       />
                     ))}
                   </span>

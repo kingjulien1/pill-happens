@@ -34,3 +34,23 @@ test("tablet quantities keep fractional controls and unknown legacy units stay g
   }
   assert.equal(getMedicationType().units, "units");
 });
+
+test("named journal medications choose their recording controls independently of strength", () => {
+  assert.deepEqual(medicationQuantityControls("capsule", "Iserlohn 50 mg"), {
+    increment: 0.01,
+    presets: [0.01, 0.02, 0.03, 0.04],
+  });
+  for (const name of [
+    "Tadalafil",
+    "VIAGRA 50mg",
+    "Desloratadin",
+    "Venlafaxin",
+    "Levomethasan",
+    "Tramal",
+  ]) {
+    assert.deepEqual(medicationQuantityControls("tablet", name), {
+      increment: 1,
+      presets: [1, 2, 3, 4],
+    });
+  }
+});

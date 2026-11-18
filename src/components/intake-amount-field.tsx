@@ -80,7 +80,7 @@ export function IntakeAmountField({
           disabled ||
           composition !== null ||
           parsed === null ||
-          parsed <= MIN_EDITABLE_INTAKE_QUANTITY
+          parsed <= increment
         }
         onClick={() => onStep(-increment)}
       >
@@ -151,8 +151,7 @@ export function IntakeAmountField({
             ) {
               event.preventDefault();
               if (event.key === "ArrowUp") onStep(increment);
-              else if (parsed > MIN_EDITABLE_INTAKE_QUANTITY)
-                onStep(-increment);
+              else if (parsed > increment) onStep(-increment);
             }
           }}
         />

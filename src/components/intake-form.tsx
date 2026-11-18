@@ -2,7 +2,7 @@
 
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
@@ -46,12 +46,20 @@ import {
   hasIntakeQuantityEditorPrecisionLoss,
 } from "@/lib/intake-quantity";
 
+import { CheckInSection } from "./check-in-section";
+import checkStyles from "./daily-check-in.module.css";
+import styles from "./intake-form.module.css";
+
 export function IntakeForm({
   intake,
   initialDay,
   onSaved,
   footerAction,
+  formId,
+  onResetAvailability,
 }: {
+  formId?: string;
+  onResetAvailability?: (available: boolean) => void;
   intake?: Intake;
   initialDay?: string;
   onSaved: () => void;
@@ -77,6 +85,9 @@ export function IntakeForm({
       }),
     isIntakeFormDraft,
   );
+  useEffect(() => {
+    onResetAvailability?.(draft.hasDraft && !busy);
+  }, [onResetAvailability, draft.hasDraft, busy]);
   const { medicationId, quantity } = draft.value;
   const route =
     draft.value.route ??
@@ -101,13 +112,20 @@ export function IntakeForm({
     );
     setError("");
   };
+  const handleReset = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!busy) reset();
+  };
   const medication = medications.find((m) => m.id === medicationId);
   const fallbackIntake =
     intake?.medicationId === medicationId ? intake : undefined;
   const strength = medication?.strengthMg ?? fallbackIntake?.strengthMg ?? 0;
   const medicationForm = medication?.form ?? fallbackIntake?.medicationForm;
   const type = getMedicationType(medicationForm);
-  const { increment, presets } = medicationQuantityControls(medicationForm);
+  const { increment, presets } = medicationQuantityControls(
+    medicationForm,
+    medication?.name ?? fallbackIntake?.medicationName,
+  );
   // Keep the raw draft intact until a quantity interaction explicitly replaces it.
   const unchangedOriginalQuantity = Boolean(
     intake &&
@@ -144,8 +162,13 @@ export function IntakeForm({
         ? doseMg({ strengthMg: strength, quantity: effectiveQuantity! })
         : null;
   const stepQuantity = (delta: number) => {
+    if (delta < 0 && visibleQuantity !== null && visibleQuantity <= increment)
+      return;
     const next = stepEditableIntakeQuantity(editorQuantity, delta);
-    if (next !== null) setQuantity(next);
+    if (next !== null)
+      setQuantity(
+        delta < 0 && Number(next) < increment ? String(increment) : next,
+      );
   };
   let belongsTo = "";
   try {
@@ -156,7 +179,7 @@ export function IntakeForm({
 
   if (!medications.length && !intake)
     return (
-      <div className="py-4 text-center">
+      <form id={formId} onReset={handleReset} className="py-4 text-center">
         <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
@@ -169,9 +192,12 @@ export function IntakeForm({
             render={<Link href="/medications" />}
             onClick={onSaved}
           />
-          <DraftStatus {...draft} onReset={busy ? undefined : reset} />
+          <DraftStatus
+            {...draft}
+            onReset={busy || formId ? undefined : reset}
+          />
         </div>
-      </div>
+      </form>
     );
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -306,48 +332,59 @@ export function IntakeForm({
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4">
-      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
-        <div
-          className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-[minmax(0,1fr)_136px] sm:grid-cols-[minmax(0,1fr)_144px]"
-          data-intake-medication-route-fields
+    <form
+      id={formId}
+      onReset={handleReset}
+      onSubmit={submit}
+      className={checkStyles.form}
+    >
+      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-6">
+        <CheckInSection
+          caption="Medication"
+          context="What you took"
+          detail="Name & route"
         >
-          <div className="form-field min-w-0">
-            <Label htmlFor="intake-medication">Medication</Label>
-            <IntakeMedicationSelect
-              medications={medicationOptions}
-              value={medicationId}
-              fallbackIntake={fallbackIntake}
-              onValueChange={(value) => {
-                draft.setValue((current) => ({
-                  ...current,
-                  medicationId: value,
-                  route:
-                    !intake && value !== current.medicationId
-                      ? preferredIntakeRoute(value, data!.intakes)
-                      : current.route,
-                  quantity:
-                    !intake && value !== current.medicationId
-                      ? String(
-                          medications.find((item) => item.id === value)
-                            ?.defaultQuantity ?? 1,
-                        )
-                      : current.quantity,
-                }));
-              }}
-            />
+          <div
+            className="p-4 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_120px]"
+            data-intake-medication-route-fields
+          >
+            <div className="form-field min-w-0">
+              <Label htmlFor="intake-medication">Medication</Label>
+              <IntakeMedicationSelect
+                medications={medicationOptions}
+                value={medicationId}
+                fallbackIntake={fallbackIntake}
+                onValueChange={(value) => {
+                  draft.setValue((current) => ({
+                    ...current,
+                    medicationId: value,
+                    route:
+                      !intake && value !== current.medicationId
+                        ? preferredIntakeRoute(value, data!.intakes)
+                        : current.route,
+                    quantity:
+                      !intake && value !== current.medicationId
+                        ? String(
+                            medications.find((item) => item.id === value)
+                              ?.defaultQuantity ?? 1,
+                          )
+                        : current.quantity,
+                  }));
+                }}
+              />
+            </div>
+            <div className="form-field min-w-0">
+              <Label htmlFor="intake-route">Intake route</Label>
+              <IntakeRouteSelect
+                value={route}
+                disabled={busy}
+                onValueChange={(value) =>
+                  draft.setValue((current) => ({ ...current, route: value }))
+                }
+              />
+            </div>
           </div>
-          <div className="form-field min-w-0">
-            <Label htmlFor="intake-route">Intake route</Label>
-            <IntakeRouteSelect
-              value={route}
-              disabled={busy}
-              onValueChange={(value) =>
-                draft.setValue((current) => ({ ...current, route: value }))
-              }
-            />
-          </div>
-        </div>
+        </CheckInSection>
         {!medication && !fallbackIntake && medicationId && (
           <p
             role="status"
@@ -357,50 +394,56 @@ export function IntakeForm({
             this draft.
           </p>
         )}
-        <div className="form-field">
-          <Label id="intake-quantity-label" htmlFor="intake-quantity">
-            Amount Taken
-          </Label>
-          <IntakeAmountField
-            value={editorQuantity}
-            onChange={setQuantity}
-            onStep={stepQuantity}
-            increment={increment}
-            unit={visibleQuantity === 1 ? type.unit : type.units}
-            calculatedDose={calculatedDose}
-            originalQuantityPreserved={originalQuantityPreserved}
-            disabled={busy}
-            invalid={Boolean(error) && !validQuantity}
-          />
-          <div className="mt-1 grid grid-cols-4 gap-1.5">
-            {presets.map((amount) => (
-              <button
-                type="button"
-                key={amount}
-                onClick={() => setQuantity(String(amount))}
-                aria-pressed={visibleQuantity === amount}
-                data-dialog-corner="compact"
-                className={`h-8 rounded-lg border text-xs transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
-              >
-                {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
-              </button>
-            ))}
+        <CheckInSection
+          caption="Quantity"
+          context="Units taken"
+          detail={type.label}
+        >
+          <div className="form-field p-4">
+            <Label id="intake-quantity-label" htmlFor="intake-quantity">
+              Amount Taken
+            </Label>
+            <IntakeAmountField
+              value={editorQuantity}
+              onChange={setQuantity}
+              onStep={stepQuantity}
+              increment={increment}
+              unit={visibleQuantity === 1 ? type.unit : type.units}
+              calculatedDose={calculatedDose}
+              originalQuantityPreserved={originalQuantityPreserved}
+              disabled={busy}
+              invalid={Boolean(error) && !validQuantity}
+            />
+            <div className="mt-1 grid grid-cols-4 gap-1.5">
+              {presets.map((amount) => (
+                <button
+                  type="button"
+                  key={amount}
+                  onClick={() => setQuantity(String(amount))}
+                  aria-pressed={visibleQuantity === amount}
+                  data-dialog-corner="compact"
+                  className={`h-8 rounded-lg border text-xs transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+                >
+                  {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="form-field">
-          <IntakeDateTimeFields
-            value={takenAt}
-            onChange={setTakenAt}
-            timezone={timezone}
-            disabled={busy}
-          />
-          <p className="text-[10px] leading-relaxed text-muted-foreground">
-            {belongsTo
-              ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`
-              : "Choose a valid time"}
-            . Days begin at 06:00.
-          </p>
-        </div>
+        </CheckInSection>
+        <CheckInSection
+          caption="Timing"
+          context="When you took it"
+          detail="Local time"
+        >
+          <div className="form-field p-4">
+            <IntakeDateTimeFields
+              value={takenAt}
+              onChange={setTakenAt}
+              timezone={timezone}
+              disabled={busy}
+            />
+          </div>
+        </CheckInSection>
       </fieldset>
 
       {error && (
@@ -408,7 +451,13 @@ export function IntakeForm({
           {error}
         </p>
       )}
-      <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+      <div className={styles.footer} data-draft-action-footer>
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
+          {belongsTo
+            ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`
+            : "Choose a valid time"}
+          . Days begin at 06:00.
+        </p>
         <DialogPrimaryButton
           type="submit"
           disabled={busy}
@@ -419,7 +468,7 @@ export function IntakeForm({
         </DialogPrimaryButton>
         <DraftStatus
           {...draft}
-          onReset={busy || footerAction ? undefined : reset}
+          onReset={busy || footerAction || formId ? undefined : reset}
           action={footerAction}
           copy={
             footerAction

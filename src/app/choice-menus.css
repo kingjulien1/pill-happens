@@ -276,3 +276,14 @@
     color: var(--primary);
   }
 }
+
+/* Keep intake pickers below the notification area on short screens. */
+:is([data-intake-medication-menu], [data-intake-route-menu]) {
+  max-height: min(42dvh, calc(var(--available-height, 100dvh) * 0.6));
+  overscroll-behavior: contain;
+}
+:is([data-intake-medication-menu], [data-intake-route-menu])
+  [data-choice-option] {
+  min-height: 25px;
+  padding-block: 2px;
+}

@@ -38,8 +38,20 @@ export function isMeteredMedicationType(type?: MedicationType) {
   return type === "pump" || type === "pump-bottle" || type === "gel-dispenser";
 }
 
-export function medicationQuantityControls(type?: MedicationType) {
-  return isMeteredMedicationType(type)
+export function medicationQuantityControls(type?: MedicationType, name = "") {
+  const words: string[] = name.toLowerCase().match(/[a-z]+/g) ?? [];
+  if (words.includes("iserlohn"))
+    return { increment: 0.01, presets: [0.01, 0.02, 0.03, 0.04] };
+  const wholeUnits = [
+    "tadalafil",
+    "viagra",
+    "desloratadin",
+    "venlafaxin",
+    "levomethasan",
+    "tramal",
+  ];
+  return isMeteredMedicationType(type) ||
+    words.some((word) => wholeUnits.includes(word))
     ? { increment: 1, presets: [1, 2, 3, 4] }
     : { increment: 0.25, presets: [0.25, 0.5, 1, 2] };
 }
