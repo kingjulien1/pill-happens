@@ -178,6 +178,12 @@ export function MorningSleepFields({
     <div className={styles.fields} data-morning-sleep-fields>
       <CheckInSection
         caption="Looking back"
+        context="Sleep quality"
+        detail={
+          RATINGS.filter(({ key }) => value[key] != null).length +
+          " of " +
+          RATINGS.length
+        }
         left="Your own impression"
         right="Scale of 1–10"
       >
@@ -214,6 +220,8 @@ export function MorningSleepFields({
 
       <CheckInSection
         caption="Overnight"
+        context="Sleep window"
+        detail="Local time"
         left="Local times"
         right="Estimates welcome"
       >
@@ -309,6 +317,8 @@ export function MorningSleepFields({
 
       <CheckInSection
         caption="Rest & recovery"
+        context="Sleep duration"
+        detail="h / min"
         left="Hours and minutes"
         right="Optional"
       >

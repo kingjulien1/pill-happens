@@ -626,6 +626,8 @@ function CheckInForm({
     >
       <CheckInSection
         caption="Journal entry"
+        context="In your words"
+        detail={morning ? "Morning" : "Evening"}
         left="Markdown supported"
         right="Drafts saved as you write"
       >
@@ -656,6 +658,8 @@ function CheckInForm({
         <div className={styles.eveningFields} data-evening-check-in-fields>
           <CheckInSection
             caption="Evening reflection"
+            context="Mood & energy"
+            detail="Today"
             left="Pick up to four moods"
             right="Ratings are optional"
           >
@@ -678,6 +682,8 @@ function CheckInForm({
               </div>
               <CheckInSection
                 caption="Feelings"
+                context="Mood mix"
+                detail={moods.length + " of 4"}
                 left="Search by name"
                 right="Tap a pick to remove it"
               >
@@ -708,6 +714,11 @@ function CheckInForm({
 
               <CheckInSection
                 caption="Daily ratings"
+                context="Energy & stress"
+                detail={
+                  [energy, stress].filter((value) => value != null).length +
+                  " of 2"
+                }
                 left="Energy & stress"
                 right="Scale of 1–10"
               >
@@ -759,6 +770,8 @@ function CheckInForm({
           </CheckInSection>
           <CheckInSection
             caption="Small reminders"
+            context="What helped"
+            detail={helped.trim() ? "Added" : "Optional"}
             left="One thought per line"
             right="Optional"
           >

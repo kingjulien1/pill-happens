@@ -29,6 +29,23 @@
   font-size: 11px;
   line-height: 1.45;
 }
+.caption {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(4px, 1.5vw, 8px);
+  margin-bottom: 7px;
+}
+.caption strong {
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.detail {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
 .foot {
   display: flex;
   align-items: center;
