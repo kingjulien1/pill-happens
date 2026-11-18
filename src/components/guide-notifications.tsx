@@ -1015,8 +1015,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Rear-card rotation / sway",
-            "22s turns + 8.8s sway after 1,660ms",
-            "Rear plates are 25% larger than their preceding 80%-scale design, with 39% less opacity (0.61). Their size is 41.65 × 7/6 × 0.8 × 1.25 pixels, about 48.59px. Both begin 250ms after the 90ms + 1,320ms artwork entrance, rotating once every 22 seconds in opposite directions. Nested faces retain complementary 33-pose, 8.8-second curved sways at two thirds of the older amplitude. Separate owners preserve entrance, spin and sway transforms, with matching loop seams. The front tile stays stationary.",
+            "4.5s turns and 10.8s breathing cycles",
+            "Both rear tiles unfold from the front tile’s size to 129.17%. They turn in opposite directions with a gentle change in angular speed. Their scale cycles run in counterphase at five twelfths of the rotation frequency.",
           ],
           [
             "Status motion",
@@ -1095,7 +1095,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and unchanged 41.65px front tile. Rear plates are enlarged by another 22.5% while remaining centered behind the fixed face; each uses 0.61 opacity. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
+            "49px illustration rail and unchanged 41.65px front tile. Rear plates use a 3px inset rim and 93% opacity across the fill and rim. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
           ],
           [
             "Main text / context",
