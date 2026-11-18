@@ -425,7 +425,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="info">toast.info</code>,
             "Journal notice",
-            "8.633s bar + 1s active grace · Lightbulb.",
+            "8.633s bar + 1s active grace · A closed bulb lights from within on a four-second loop. Short rays recede while the bulb stays lit. Reduced motion shows a steady yellow bulb.",
           ],
           [
             <code key="warning">toast.warning</code>,

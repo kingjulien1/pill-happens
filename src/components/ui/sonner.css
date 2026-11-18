@@ -545,6 +545,21 @@
   height: 27.5625px;
   stroke-width: 2.8;
 }
+.journal-toaster [data-toast-symbol="info"] .journal-toast-glyph {
+  width: 22.05px;
+  height: 22.05px;
+  overflow: visible;
+  color: #fde68a;
+}
+.journal-bulb-glass {
+  fill: currentColor;
+  fill-opacity: 0.7;
+}
+.journal-bulb-rays {
+  stroke-dasharray: 1;
+  opacity: 0.85;
+}
+
 .journal-toaster [data-toast-symbol="success"] .journal-toast-glyph {
   overflow: visible;
   stroke-width: 2.9;
@@ -1664,9 +1679,14 @@
     [data-mounted="true"]
     [data-toast-symbol="info"]
     .journal-toast-glyph {
-    transform-origin: 50% 85%;
-    animation: journal-bulb-idea 3.8s cubic-bezier(0.42, 0, 0.35, 1)
-      var(--toast-ambient-delay) infinite;
+    transform-origin: 50% 80%;
+    animation: journal-bulb-charge 4s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-glass {
+    animation: journal-bulb-light 4s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-rays {
+    animation: journal-bulb-radiate 4s ease-in-out infinite;
   }
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
@@ -1715,6 +1735,8 @@
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-bulb-glass,
+      .journal-bulb-rays,
       .journal-toast-bell-rings,
       .journal-toast-bell-ring-mark,
       .journal-toast-halo,
@@ -1766,6 +1788,8 @@
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-bulb-glass,
+      .journal-bulb-rays,
       .journal-toast-bell-rings,
       .journal-toast-bell-ring-mark,
       .journal-toast-plate-arrival,
@@ -2105,29 +2129,72 @@
 }
 /* Fast → slow → fast ringing. Neutral seam velocities match at −104.17°/s;
    every peak turns smoothly, without an idle range or a loop-reset jump. */
-@keyframes journal-bulb-idea {
+/* Four seconds: charge for one, hold the lit pose, dim for half a second,
+   then spend the final 200ms at the neutral starting pose. */
+@keyframes journal-bulb-charge {
   0%,
-  18%,
-  90%,
+  95%,
   100% {
-    transform: rotate(0deg) scale(1);
+    transform: none;
+    color: var(--toast-glyph);
+  }
+  7% {
+    transform: rotate(-5deg) scale(0.94);
+    color: #facc15;
+  }
+  14% {
+    transform: rotate(4deg) scale(0.9);
+  }
+  19% {
+    transform: rotate(-2deg) scale(1.08);
+    color: #fde047;
+  }
+  22% {
+    transform: rotate(1deg) scale(0.99);
+  }
+  25%,
+  82.5% {
+    transform: none;
+    color: #fff3a3;
+  }
+}
+@keyframes journal-bulb-light {
+  0%,
+  95%,
+  100% {
+    fill-opacity: 0;
     filter: drop-shadow(0 0 0 transparent);
   }
-  31% {
-    transform: rotate(-8deg) scale(0.95);
+  20% {
+    fill-opacity: 0.46;
+    filter: drop-shadow(0 0 0 transparent);
   }
-  42% {
-    transform: rotate(5deg) scale(1.09);
-    color: #fde68a;
-    filter: drop-shadow(0 0 3px #fbbf24b3);
+  25% {
+    fill-opacity: 0.98;
   }
-  54% {
-    transform: rotate(-2deg) scale(1.02);
-    color: #fef3c7;
+  38%,
+  82.5% {
+    fill-opacity: 0.98;
+    filter: drop-shadow(0 0 3px currentColor);
   }
-  66% {
-    transform: rotate(0deg) scale(1.03);
-    filter: drop-shadow(0 0 2px #f9a8d480);
+}
+@keyframes journal-bulb-radiate {
+  0%,
+  20%,
+  70%,
+  100% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  32% {
+    stroke-dashoffset: 0;
+    opacity: 0.95;
+    color: #fde047;
+  }
+  57.5% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    color: #fff8ca;
   }
 }
 

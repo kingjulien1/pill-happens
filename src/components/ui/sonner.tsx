@@ -12,12 +12,7 @@ import {
   type SVGProps,
 } from "react";
 import { Toaster as Sonner, useSonner, type ToasterProps } from "sonner";
-import {
-  CircleAlert,
-  Lightbulb,
-  RefreshCcw,
-  TriangleAlert,
-} from "lucide-react";
+import { CircleAlert, RefreshCcw, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NOTIFICATION_DEFAULT_DURATION } from "@/lib/journal-notification-lifecycle";
 import "./sonner.css";
@@ -54,10 +49,36 @@ function CloudSync(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function NotificationBulb(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path
+        className="journal-bulb-glass"
+        d="M9 18c0-2.2-.7-3.3-2.2-5A7 7 0 1 1 17.2 13c-1.5 1.7-2.2 2.8-2.2 5Z"
+      />
+      <path d="M10 22h4" />
+      <g className="journal-bulb-rays" strokeWidth="1.5">
+        {["M12 -1v-3", "M4 2 2 0", "M20 2l2-2", "M2.5 9H0", "M21.5 9H24"].map(
+          (d) => (
+            <path key={d} pathLength="1" d={d} />
+          ),
+        )}
+      </g>
+    </svg>
+  );
+}
+
 const symbols = {
   success: BellCheck,
   error: CircleAlert,
-  info: Lightbulb,
+  info: NotificationBulb,
   warning: TriangleAlert,
   loading: RefreshCcw,
   update: CloudSync,
