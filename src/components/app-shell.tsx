@@ -16,6 +16,7 @@ import { HEADER_CONTROL_PAINT } from "@/lib/header-control-paint";
 import { useJournalWorkspace } from "@/components/journal-drafts";
 import { CardEntrySequence } from "@/components/card-entry-sequence";
 import { JournalReferenceArrival } from "@/components/journal-reference-arrival";
+import { dayKey, formatDay } from "@/lib/domain";
 import layoutStyles from "./page-layout.module.css";
 import guideStyles from "./guide-shell.module.css";
 import topbarStyles from "./page-topbar.module.css";
@@ -44,7 +45,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const intakePage =
     path === "/" || /^\/history\/\d{4}-\d{2}-\d{2}$/.test(path);
   const guidePage = path === "/guide" || path === "/developer-guide";
-  const { data, error, refresh } = useJournal();
+  const { data, now, error, refresh } = useJournal();
+  const today =
+    path === "/" && data && now ? dayKey(now, data.settings.timezone) : null;
   const { ready } = useJournalWorkspace();
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -97,9 +100,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         className={
           guidePage
             ? `${topbarStyles.header} ${topbarStyles.guideHeader} ${controlStyles.context}`
-            : `${topbarStyles.header} ${controlStyles.context}`
+            : `${topbarStyles.header} ${path === "/" ? topbarStyles.todayHeader : ""} ${controlStyles.context}`
         }
         data-page-topbar
+        data-today-topbar={path === "/" || undefined}
         style={HEADER_CONTROL_PAINT}
         onPointerDownCapture={settleTopbarControl}
         onFocusCapture={settleTopbarControl}
@@ -110,6 +114,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <CompactRefreshBrand />
           </div>
         </div>
+        {path === "/" && (
+          <div className={topbarStyles.todayCalendar}>
+            {today && (
+              <time
+                dateTime={today}
+                aria-label={formatDay(today, { year: "numeric" })}
+                data-today-header-date
+              >
+                <span className={topbarStyles.weekday} data-today-weekday>
+                  {formatDay(today, {
+                    weekday: "long",
+                    month: undefined,
+                    day: undefined,
+                  })}
+                </span>
+                <span className={topbarStyles.calendarDate}>
+                  {formatDay(today, {
+                    weekday: undefined,
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </time>
+            )}
+          </div>
+        )}
         <div className={topbarStyles.rightControls} data-header-right-controls>
           <nav
             aria-label="Main navigation"

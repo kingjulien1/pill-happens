@@ -1449,8 +1449,9 @@ export function DeveloperGuidePage() {
                 scrolls independently within the main content.
               </p>
               <p>
-                The two 46px page icon controls use a Pink950 foundation with
-                a separate Mauve900 overlay at exactly 67% in both color modes.
+                Outside Today, the two 46px page icon controls use a Pink950
+                foundation with a separate Mauve900 overlay at exactly 67% in
+                both color modes.
                 Their icons and both inward edges use full-opacity Pink400.
                 The local headerButton paint preserves its 3px inward bevel,
                 14px corners, 32px glass blur and restrained contact shadow.
@@ -1468,6 +1469,16 @@ export function DeveloperGuidePage() {
                 Keyboard focus retains its offset ring and dark backing;
                 disabled states retain native semantics. Hit areas, gesture
                 thresholds and animation ownership are unchanged.
+              </p>
+              <p>
+                Today alone uses three centered header columns: a 46px control,
+                a flexible calendar and a matching 46px control. The full
+                weekday is 18px/700 in primary canvas ink; the centered date
+                beneath is 10px/450 at 56% ink. Both use the journal’s timezone
+                and 06:00 tracking-day boundary. The buttons reuse the main
+                action’s exact face, ink, Pink400 inner edge and faint Violet/
+                Pink corner washes, with its 10px surround scaled to 5.75px for
+                the smaller controls. Other routes retain their original header.
               </p>
               <p>
                 After shared page-entry readiness, two separate layout wrappers

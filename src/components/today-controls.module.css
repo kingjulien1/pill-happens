@@ -15,6 +15,23 @@
   --control-tool-ink: var(--control-tool-ink-light);
   --control-tool-rim: var(--control-tool-rim-light);
   --control-tool-edge: var(--control-tool-edge-light);
+  --control-face-edge: color-mix(
+    in srgb,
+    var(--color-pink-400, #f472b6) 29%,
+    transparent
+  );
+  --control-face-paint:
+    radial-gradient(
+      ellipse 65% 140% at 0% 0%,
+      color-mix(in srgb, var(--color-violet-400, #a78bfa) 5%, transparent),
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 68% 160% at 100% 100%,
+      color-mix(in srgb, var(--color-pink-500, #ec4899) 6%, transparent),
+      transparent 78%
+    ),
+    var(--control-face);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,11 +57,6 @@
 /* The doubled frosted surround remains paint within the original hit target. */
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
   --control-surround-width: 10px;
-  --control-face-edge: color-mix(
-    in srgb,
-    var(--color-pink-400, #f472b6) 29%,
-    transparent
-  );
   isolation: isolate;
   border: 0;
   border-radius: var(--intake-card-radius, 21px);
@@ -71,18 +83,7 @@
   border-radius: calc(
     var(--intake-card-radius, 21px) - var(--control-surround-width)
   );
-  background:
-    radial-gradient(
-      ellipse 65% 140% at 0% 0%,
-      color-mix(in srgb, var(--color-violet-400, #a78bfa) 5%, transparent),
-      transparent 74%
-    ),
-    radial-gradient(
-      ellipse 68% 160% at 100% 100%,
-      color-mix(in srgb, var(--color-pink-500, #ec4899) 6%, transparent),
-      transparent 78%
-    ),
-    var(--control-face);
+  background: var(--control-face-paint);
   box-shadow:
     inset 0 0 0 1px var(--control-face-edge),
     0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
@@ -309,5 +310,66 @@
   .action.action[data-slot="button"][data-button-system="daily"][data-control-style="satin"]:focus-visible {
     outline-color: var(--ring);
     box-shadow: 0 0 0 4px #f8e9f4;
+  }
+}
+
+/* Today scales the main action's material to the existing 46px controls. */
+:global([data-today-topbar])
+  .headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  ) {
+  --header-tool-ink: var(--control-ink);
+  --header-tool-surface: var(--control-face);
+  --header-button-surface: var(--control-rim);
+  --header-control-ink: var(--control-ink);
+  --header-control-cup-base: var(--control-face);
+  --header-control-score-ink: var(--control-face);
+  --brand-copy: var(--control-ink);
+  --brand-surface: var(--control-face);
+  background: var(--control-rim);
+  color: var(--control-ink);
+  box-shadow:
+    inset 0 0 0 1px var(--control-edge),
+    0 6px 15px -6px var(--control-shadow),
+    0 2px 4px var(--control-shadow);
+  transition:
+    box-shadow 240ms ease,
+    filter 240ms ease;
+}
+
+:global([data-today-topbar])
+  .headerButton.headerButton[data-slot="button"]:is(
+    [data-brand-refresh],
+    [data-navigation-trigger]
+  )::before {
+  inset: 5.75px;
+  border-radius: 8.25px;
+  background: var(--control-face-paint);
+  box-shadow:
+    inset 0 0 0 1px var(--control-face-edge),
+    0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  :global([data-today-topbar])
+    .headerButton.headerButton[data-slot="button"]:not(:disabled):hover {
+    filter: brightness(1.035);
+    box-shadow:
+      inset 0 0 0 1px var(--control-edge),
+      0 8px 18px -5px var(--control-shadow),
+      0 3px 5px var(--control-shadow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global([data-today-topbar]) .headerButton[data-slot="button"] {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :global([data-today-topbar]) .headerButton.headerButton[data-slot="button"] {
+    background: var(--control-face);
   }
 }

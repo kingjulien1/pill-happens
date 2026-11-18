@@ -25,6 +25,47 @@
   gap: 6px;
 }
 
+.todayHeader {
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
+}
+
+.todayCalendar {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+}
+
+.todayCalendar time {
+  display: grid;
+  min-width: 0;
+  max-width: 100%;
+  gap: 2px;
+}
+
+.weekday {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--canvas-foreground);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: -0.025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendarDate {
+  display: block;
+  color: color-mix(in srgb, var(--canvas-foreground) 56%, transparent);
+  font-size: 10px;
+  font-weight: 450;
+  line-height: 12px;
+  white-space: nowrap;
+}
+
 .control {
   --topbar-entry-order: 0;
   position: relative;
