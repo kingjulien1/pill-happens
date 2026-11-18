@@ -24,7 +24,7 @@
   inset: 4px;
   border: 0;
   border-radius: var(--dialog-radius-compact);
-  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  background: var(--dialog-control-wash);
   content: "";
   pointer-events: none;
 }

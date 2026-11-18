@@ -68,6 +68,7 @@
   --canvas-background: #f1e5f4;
   --canvas-foreground: #35233f;
   --canvas-muted-foreground: #604668;
+  --dialog-control-wash: color-mix(in srgb, var(--foreground) 6%, transparent);
   --menu-surface: #f4ebf9;
   --navigation-surface: var(--menu-surface);
   --navigation-highlight: #8051b2;

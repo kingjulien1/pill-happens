@@ -683,6 +683,31 @@
 .submitArea::before {
   margin-bottom: 24px;
 }
+.submitArea[data-has-sleep-summary="true"] {
+  --footer-side: var(--dialog-scroll-gutter);
+  --footer-bottom: max(24px, env(safe-area-inset-bottom));
+  margin-inline: calc(-1 * var(--footer-side));
+  margin-bottom: calc(-1 * var(--footer-bottom));
+  padding-inline: var(--footer-side);
+  padding-bottom: var(--footer-bottom);
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-pink-400) 5%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(
+      to top,
+      var(--dialog-control-wash),
+      color-mix(in srgb, var(--dialog-control-wash) 65%, transparent) 43%,
+      transparent calc(100% - 18px)
+    );
+}
+@media (min-width: 768px) {
+  .submitArea[data-has-sleep-summary="true"] {
+    --footer-bottom: var(--dialog-scroll-gutter);
+  }
+}
 .submitArea [data-morning-sleep-summary] {
   border-top: 0;
   padding-top: 0;
