@@ -259,7 +259,6 @@ export function DailyReflectionEditor({
       data-journal-period={period}
       data-journal-active="false"
     >
-      <span className={styles.ambient} aria-hidden="true" />
       <div className={styles.headingRow}>
         <div className={styles.headingGroup}>
           <MorningCoffee className={styles.writingCoffee} />
