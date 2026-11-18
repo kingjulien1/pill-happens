@@ -1600,6 +1600,14 @@
     animation: journal-notification-bell-ring 4.8s
       cubic-bezier(0.45, 0, 0.55, 1) var(--toast-ambient-delay) infinite;
   }
+  .journal-toaster
+    [data-mounted="true"]
+    [data-toast-symbol="info"]
+    .journal-toast-glyph {
+    transform-origin: 50% 85%;
+    animation: journal-bulb-idea 3.8s cubic-bezier(0.42, 0, 0.35, 1)
+      var(--toast-ambient-delay) infinite;
+  }
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
       infinite;
@@ -2037,6 +2045,32 @@
 }
 /* Fast → slow → fast ringing. Neutral seam velocities match at −104.17°/s;
    every peak turns smoothly, without an idle range or a loop-reset jump. */
+@keyframes journal-bulb-idea {
+  0%,
+  18%,
+  90%,
+  100% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  31% {
+    transform: rotate(-8deg) scale(0.95);
+  }
+  42% {
+    transform: rotate(5deg) scale(1.09);
+    color: #fde68a;
+    filter: drop-shadow(0 0 3px #fbbf24b3);
+  }
+  54% {
+    transform: rotate(-2deg) scale(1.02);
+    color: #fef3c7;
+  }
+  66% {
+    transform: rotate(0deg) scale(1.03);
+    filter: drop-shadow(0 0 2px #f9a8d480);
+  }
+}
+
 @keyframes journal-notification-bell-ring {
   0% {
     transform: rotate(0);
