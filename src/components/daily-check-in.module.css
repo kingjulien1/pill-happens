@@ -87,9 +87,7 @@
     from var(--check-in-rim-angle, 0deg),
     var(--intake-rim-stop-1),
     var(--intake-rim-stop-2) 33%,
-    var(--intake-rim-stop-3) 66.167%,
-    white 66.567% 66.767%,
-    var(--intake-rim-stop-3) 67.167%,
+    var(--intake-rim-stop-3) 67%,
     var(--intake-rim-stop-1)
   );
   mask:

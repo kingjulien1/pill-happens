@@ -212,7 +212,7 @@ export function DailyCheckInSection({
             aria-hidden="true"
           >
             <SpecularRim
-              palette="triad-glint"
+              palette="triad"
               glow={false}
               className={styles.outerLight}
             />
