@@ -64,6 +64,9 @@ test("recorded-route artwork stays native and preserves the shared custom nose",
     );
   assert.match(oral(), /stroke-width="2\.25"/);
   assert.match(oral(2.5), /stroke-width="2\.5"/);
+  assert.match(oral(), /lucide-swallow-intake/);
+  assert.match(oral(), /M5\.15 9\.25h13\.7/);
+  assert.doesNotMatch(oral(), /lucide-arrow-down-to-line/);
 });
 
 test("missing and unrecognized recorded routes show Not specified rather than an inferred route", () => {

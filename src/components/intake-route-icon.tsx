@@ -1,5 +1,4 @@
 import {
-  ArrowDownToLine,
   ArrowUpToLine,
   CircleHelp,
   Ellipsis,
@@ -11,11 +10,12 @@ import {
   Wind,
 } from "lucide-react";
 import { MedicationGlyph } from "@/components/medication-icon";
+import { SwallowIntake } from "@/components/swallow-intake-icon";
 import { isIntakeRoute, type IntakeRoute } from "@/lib/intake-routes";
 
 const routeIcons = {
   unspecified: CircleHelp,
-  oral: ArrowDownToLine,
+  oral: SwallowIntake,
   nasal: null,
   sublingual: Pill,
   buccal: MessageCircle,
