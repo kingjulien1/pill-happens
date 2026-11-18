@@ -148,6 +148,11 @@
   overflow: visible;
   overscroll-behavior: auto;
 }
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster]:has(
+    .journal-notification[data-expanded="true"]
+  ) {
+  max-height: calc(100dvh * 17 / 24 - var(--notification-viewport-top));
+}
 @media (max-width: 600px) {
   .journal-toaster.journal-toaster-scroll[data-sonner-toaster] {
     --notification-viewport-top: var(--mobile-offset-top);
@@ -322,8 +327,9 @@
 .journal-toast-heading {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 14px;
+  min-width: 0;
+  flex-wrap: nowrap;
+  gap: 14px;
 }
 .journal-toast-heading-status {
   display: inline-flex;
@@ -359,6 +365,9 @@
 }
 .journal-toast-heading-text {
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
@@ -379,9 +388,10 @@
   --toast-ambient-delay: calc(
     var(--toast-art-arrival-delay) + var(--toast-art-arrival-duration) + 250ms
   );
-  --toast-tile-size: 41.65px;
+  --toast-original-tile: 41.65px;
+  --toast-tile-size: calc(var(--toast-original-tile) * 7 / 6);
   --toast-spin-period: 4.5s;
-  --toast-plate-size: calc(var(--toast-tile-size) * 31 / 24);
+  --toast-original-plate: calc(var(--toast-original-tile) * 31 / 24);
   position: relative;
   display: block;
   flex: none;
@@ -431,9 +441,11 @@
   border-radius: calc(12.25px * 31 / 24);
 }
 .journal-toast-plate-arrival-back {
+  --toast-plate-size: calc(var(--toast-original-plate) * 5 / 6);
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
 }
 .journal-toast-plate-arrival-middle {
+  --toast-plate-size: calc(var(--toast-original-plate) * 6 / 7);
   transform: translate(1.225px, 0) rotate(15deg);
 }
 /* Continuous turns never overwrite either the finite entrance or local sway. */
@@ -449,17 +461,33 @@
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: var(--plate-pigment);
-  box-shadow: inset 0 0 0 3px
-    color-mix(in srgb, var(--plate-pigment) 68%, var(--toast-soft));
+  background: color-mix(
+    in srgb,
+    var(--plate-pigment) var(--plate-fill),
+    transparent
+  );
+  border: 3px solid;
+  border-color: color-mix(
+    in srgb,
+    var(--plate-edge-color) var(--plate-edge),
+    transparent
+  );
+  --plate-edge-color: color-mix(
+    in oklch,
+    color-mix(in oklch, var(--plate-pigment) 68%, var(--toast-soft)) 90%,
+    gray
+  );
+  background-clip: padding-box;
 }
 .journal-toast-plate-back {
   --plate-pigment: var(--color-pink-500, #ec4899);
-  opacity: calc(0.93 * 0.68);
+  --plate-fill: calc(63.24% * 0.8);
+  --plate-edge: calc(63.24% * 1.18);
 }
 .journal-toast-plate-middle {
   --plate-pigment: var(--color-violet-500, #8b5cf6);
-  opacity: calc(0.93 * 0.54);
+  --plate-fill: calc(50.22% * 0.92);
+  --plate-edge: calc(50.22% * 1.1);
 }
 [data-toast-symbol="success"] {
   --toast-glyph: var(--toast-ink);
@@ -476,6 +504,25 @@
   position: relative;
   display: grid;
   place-items: center;
+  isolation: isolate;
+}
+.journal-toast-tile::before,
+.journal-toast-tile::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+.journal-toast-tile::after {
+  inset: 4px;
+  border-radius: 8.25px;
+  border: 1.5px solid color-mix(in srgb, var(--toast-accent) 77%, transparent);
+  border-color: oklch(from var(--toast-accent) l calc(c * 1.2) h / 77%);
+}
+.journal-toast-tile::before {
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0.82;
   background:
     linear-gradient(var(--toast-tile-glaze) 0 0),
     linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
@@ -612,7 +659,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   align-items: center;
-  column-gap: 14px;
+  column-gap: 18px;
   padding-right: 16px;
   border-radius: inherit;
 }
@@ -673,7 +720,7 @@
 }
 .journal-notification-details-inner {
   min-height: 0;
-  max-height: min(55dvh, 340px);
+  max-height: calc(100dvh * 17 / 24 - var(--details-viewport-top, 0px));
   overflow: hidden;
   overscroll-behavior: contain;
   scrollbar-width: none;

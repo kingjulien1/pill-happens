@@ -228,6 +228,31 @@ export function JournalNotification({
     root.current.inert = true;
   }, [isCurrent]);
 
+  useLayoutEffect(() => {
+    const card = root.current;
+    const details = document.getElementById(detailsId);
+    if (!expanded || !card || !details || stack.expanded) return;
+    const measure = () => {
+      const top =
+        details.getBoundingClientRect().top -
+        (window.visualViewport?.offsetTop ?? 0);
+      card.style.setProperty("--details-viewport-top", `${top}px`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    const header = card.querySelector(".journal-notification-header");
+    if (header) observer.observe(header);
+    window.addEventListener("resize", measure);
+    window.visualViewport?.addEventListener("resize", measure);
+    card.addEventListener("transitionend", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+      window.visualViewport?.removeEventListener("resize", measure);
+      card.removeEventListener("transitionend", measure);
+    };
+  }, [expanded, detailsId, stack.expanded]);
+
   const pause = useCallback((reason: string, value: boolean) => {
     if (value) pauseReasons.current.add(reason);
     else pauseReasons.current.delete(reason);

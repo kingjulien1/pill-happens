@@ -967,7 +967,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         The real summary button supports Enter/Space and exposes expanded,
         controls, labelled-by and described-by relationships. Closed details are
         inert and hidden from accessibility APIs; expanded details form a
-        labelled region with a <code>min(55dvh, 340px)</code> scroll cap for a
+        labelled region with a scroll limit at 17/24 of the viewport height from the top edge for a
         single card. Inside an opened stack, the shared viewport scroller owns
         all vertical overflow and details lose their nested cap. Scroll reads
         vertically without starting a swipe. Sonner retains left/right/up
@@ -1095,7 +1095,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and unchanged 41.65px front tile. The back Violet500 plate uses 50.22% opacity and the Pink500 plate directly behind the icon uses 63.24%. Both use a matching 3px inset rim. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
+            "49px illustration rail and 48.59px front tile with a separate inner accent ring. Violet and pink rear plates use independent fill and border opacity, with the pink plate nearest the front. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
           ],
           [
             "Main text / context",
