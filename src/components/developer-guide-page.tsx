@@ -45,6 +45,95 @@ import { SVG_ICON_CATALOG } from "@/lib/svg-icon-catalog";
 import { DAILY_MOODS, DAILY_MOOD_FAMILIES } from "@/lib/daily-check-in";
 import styles from "./developer-guide.module.css";
 
+const WORKFLOW_SOURCES = [
+  {
+    title: "Shared Cards & History",
+    description:
+      "Start here when changing the daily timeline, medication library or Past Days. They share paint and artwork, while each screen keeps its own action.",
+    files: [
+      [
+        "src/components/medication-card-base.tsx",
+        "Shared card host, background and artwork slots",
+      ],
+      [
+        "src/components/card-frame.module.css",
+        "Shared inward rims, glass and light-mode reading veil",
+      ],
+      [
+        "src/components/medication-card-icon.tsx",
+        "Medication and check-in artwork frames, quantity fans and annotations",
+      ],
+      [
+        "src/components/history-day-card.tsx",
+        "Native day link, counts and saved-period summary",
+      ],
+      [
+        "src/components/use-history-card-summary.ts",
+        "Stable tracking-day eligibility and memoized display models",
+      ],
+      [
+        "src/lib/history-card-cache.ts",
+        "Journal-scoped snapshots, fingerprints, validation and deduplicated writes",
+      ],
+    ],
+  },
+  {
+    title: "Navigation & Responsive Guides",
+    description:
+      "Navigation changes presentation at 768px; guides add their own topic navigation. Preserve native links, focus return and one scrolling surface.",
+    files: [
+      [
+        "src/components/header-navigation.tsx",
+        "Desktop directory menu and mobile navigation sheet",
+      ],
+      [
+        "src/components/responsive-modal.tsx",
+        "Shared drawer/dialog host and scroll restoration",
+      ],
+      [
+        "src/components/guide-outline.tsx",
+        "Guide topic search, current section and desktop outline",
+      ],
+      ["src/lib/guide-outline.ts", "Stable heading IDs and outline hierarchy"],
+    ],
+  },
+  {
+    title: "Drafts, Writing & Sessions",
+    description:
+      "Device drafts, saved writing and authentication have separate owners. Follow the relevant boundary before changing save or recovery behavior.",
+    files: [
+      [
+        "src/lib/journal-drafts.ts",
+        "Validated journal-scoped drafts, workspace state and cross-tab reconciliation",
+      ],
+      [
+        "src/components/use-reflection-save.ts",
+        "Quiet writing autosave and explicit retry coordination",
+      ],
+      [
+        "src/lib/reflection-save.ts",
+        "Save timing, version guards and failure states",
+      ],
+      [
+        "src/lib/check-in-rating.ts",
+        "Legacy and current rating-scale projection",
+      ],
+      [
+        "src/lib/medication-categories.ts",
+        "Manual category vocabulary and legacy compatibility",
+      ],
+      [
+        "src/lib/session-recovery.ts",
+        "Cookie-only probes and bounded session recovery",
+      ],
+      [
+        "src/lib/server/security.ts",
+        "Persistent-cookie policy and pure security checks",
+      ],
+    ],
+  },
+] as const;
+
 function Section({
   id,
   number,
@@ -202,14 +291,10 @@ export function DeveloperGuidePage() {
           </span>
           <h1>Developer Guide</h1>
           <p>
-            A practical reference for the design and code behind the journal.
-            Explore the live palette, see how semantic colors become readable
-            surfaces, and follow the conventions for typography, responsive
-            layouts, motion and reusable components. Working examples and source
-            links connect each decision to its implementation. Whether you are
-            adjusting a small detail or preparing a contribution, start with the
-            foundation, inspect the relevant pattern, and use the validation
-            notes to check the result.
+            Build on the journal’s shared components and preserve its recorded
+            data. Start with the workflow below, then open the component detail
+            you need. Live color references, source links and verification
+            commands connect the visual system to the code that owns it.
           </p>
           <div
             className={styles.paletteRibbon}
@@ -268,6 +353,38 @@ export function DeveloperGuidePage() {
             ))}
           </nav>
         </details>
+
+        <nav
+          className={styles.quickStart}
+          aria-label="Developer starting points"
+        >
+          <a href="#development">
+            <span>Run The Project</span>
+            <small>Node, local storage and project checks</small>
+            <ActionIcon name="next" className="size-4" />
+          </a>
+          <a
+            href={`#${guideHeadingId("developer-detail", "Canvas & Color Layers")}`}
+          >
+            <span>Change A Card</span>
+            <small>Shared frames, light/dark glass and artwork</small>
+            <ActionIcon name="next" className="size-4" />
+          </a>
+          <a
+            href={`#${guideHeadingId("developer-detail", "Writing Saves & Quiet Autosave")}`}
+          >
+            <span>Work On Saving</span>
+            <small>
+              Device drafts, writing autosave and explicit submissions
+            </small>
+            <ActionIcon name="next" className="size-4" />
+          </a>
+          <a href="#architecture">
+            <span>Find The Owner</span>
+            <small>Source index and domain contracts</small>
+            <ActionIcon name="next" className="size-4" />
+          </a>
+        </nav>
 
         <Section
           id="foundation"
@@ -1241,37 +1358,36 @@ export function DeveloperGuidePage() {
               context="Intake Cards"
             >
               <p>
-                Intake, medication-library and Past Days cards use one clipped
-                glass pane with 96px
-                standard/Safari backdrop blur. An 8% Pink200 wash sits above
-                the glass, followed by a faint 6% selected-medication tint.
-                There is no opaque foundation in the normal glass treatment;
-                canvas-paired ink keeps the text clear in both appearances.
-                Folded rear copy remains hidden by its existing stack state.
-                Reduced transparency and browsers without backdrop filtering
-                use the paired opaque reading base beneath the same washes.
-                Light mode uses a paired reading-paper veil beneath 5% Pink and
-                selected-medication washes. Check-in cards use this same recipe.
+                Intake, Morning/Evening check-in, medication-library and Past
+                Days cards share <code>MedicationCardBackground</code> and the
+                selectors in <code>card-frame.module.css</code>. One clipped
+                pane applies 96px standard/Safari backdrop blur. Dark Mode
+                layers an 8% Pink200 wash and a 6% selected-color wash over
+                transparent glass, using canvas-paired ink. Light Mode places 5%
+                Pink and selected-color washes over an 82% reading-paper veil
+                and switches to the paired reading ink. Reduced transparency and
+                unsupported backdrop filtering use an opaque paired base. Folded
+                rear copy stays hidden through stack state.
               </p>
               <p>
                 Intake, Morning/Evening, medication-library and Past Days cards
-                share the same 5⅓px inward
-                outer band. Its pigment mixes two thirds of the existing neutral
-                edge with one third of the inner identity color. Their identity
-                band is now 2⅔px, one third thicker than its former 2px, with
-                the same 50% opacity and a 0.4px tighter corner radius. A second
-                copy sits within the thick outer band: 22.5% wider than the inner
-                line (3.2667px), at half its alpha (25% selected color). Its center
-                is one third outward from the thick band’s inner edge, producing
-                an approximately 1.9222px inset from the card’s outside edge.
-                A decorative, pointer-transparent shadow layer preserves those
-                fractional dimensions; browser outlines round them to whole
-                pixels. The original fine outside edge remains 1.5px at half the
-                mixed outer pigment’s opacity, independently of the increased
-                inner width. These paint layers leave the 80px baseline, 21px
-                outer corners, padding, stack placement and hit targets intact.
-                Collection cards receive these same paint layers without
-                adopting intake-only interaction or animation markers.
+                share the same 5⅓px inward outer band. Its pigment mixes two
+                thirds of the existing neutral edge with one third of the inner
+                identity color. Their identity band is 2⅔px, with 50%
+                selected-color opacity in Dark Mode and 34% in Light Mode, plus
+                a 0.4px tighter corner radius. A second copy sits within the
+                thick outer band: 22.5% wider than the inner line (3.2667px), at
+                half its alpha. Its center is one third outward from the thick
+                band’s inner edge, producing an approximately 1.9222px inset
+                from the card’s outside edge. A decorative, pointer-transparent
+                shadow layer preserves those fractional dimensions; browser
+                outlines round them to whole pixels. The original fine outside
+                edge remains 1.5px at half the mixed outer pigment’s opacity,
+                independently of the increased inner width. These paint layers
+                leave the 80px baseline, 21px outer corners, padding, stack
+                placement and hit targets intact. Collection cards receive these
+                same paint layers without adopting intake-only interaction or
+                animation markers.
               </p>
               <p>
                 The Medications opening uses a compact 24px title on phones,
@@ -1312,13 +1428,15 @@ export function DeveloperGuidePage() {
                 preserving a minimum gap instead of wrapping the top row.
               </p>
               <p>
-                GuideOutline adds an On This Page rail only from 1024px upward,
-                outside the centered page column. Explicit section, card and
-                deep headings use stable fragment IDs. Native links open closed
-                detail ancestors; scroll tracking highlights the current item
-                and its parents without changing the URL. The rail scrolls
-                independently and remains sticky only within main content,
-                before the footer.
+                GuideOutline keeps the desktop On This Page rail outside the
+                reading column. Smaller screens get a persistent topic control
+                with the current section and a searchable hierarchy in the
+                shared responsive modal: a drawer on phones and a dialog on
+                wider screens. Topic links open closed detail ancestors and
+                retain stable fragments. Scroll tracking updates the current
+                item and its parents without rewriting the URL. The inline
+                contents remain available before enhancement; the desktop rail
+                scrolls independently within the main content.
               </p>
               <p>
                 The two 46px page icon controls use a Pink950 foundation with
@@ -1748,15 +1866,12 @@ export function DeveloperGuidePage() {
                 ingredient and dose arithmetic. Library headings remove the old
                 Default prefix, while a small colored form badge accompanies the
                 ingredient below. Library cards and Past Days day links now opt
-                into the same shared intake glass surface and frame: faint Pink
-                and selected-color washes, a 5⅓px inward mixed rim, a 2⅔px
-                identity band at 50%, the faint copied rim, and a 1.5px fine
-                outside edge at half the outer color opacity. Light mode adds
-                its reading-paper veil, while reduced transparency uses the
-                paired opaque fallback.
-                Paint remains
-                independent of the icon pigment or a fixed-color SVG, and native
-                full-card activation opens the appropriate editor.
+                into the same shared intake glass surface and frame described
+                above. This includes the 5⅓px inward mixed rim, 2⅔px identity
+                band, faint copied rim and separate 1.5px outside edge, with
+                mode-specific washes and reading ink. Paint remains independent
+                of the icon pigment or a fixed-color SVG, and native full-card
+                activation opens the appropriate editor.
               </p>
               <p>
                 The shared details fill a 56px artwork stage inside the 80px
@@ -1764,19 +1879,20 @@ export function DeveloperGuidePage() {
                 13.5px/700 at roughly 75% foreground. Both rows remain
                 single-line, with the name truncating before its bounded,
                 horizontally scrollable indicator rail. The route, form and
-                category symbols sit close together in primary outline ink,
-                preceded by a small dot; filled form helpers are suppressed. An
-                intake route is an explicitly recorded value, never inferred
-                from medication form. The ingredient begins at the lower row’s
-                left edge; quantity × strength and total dose stay protected at
-                the right. Known ingredients retain primary ink and weight,
-                while Unspecified stays quieter. Library forms use a compact
-                selected-color shadcn Badge with an appropriate outline glyph
-                rather than a plain Tablets label. Library headings protect at
-                least 12px between the truncated name and indicator rail, with
-                6px between full-opacity category symbols. The bounded rail
-                scrolls horizontally when needed. The layout preserves long-value
-                titles and full accessible descriptions.
+                category symbols sit close together in primary outline ink, with
+                a dot separating the route/form pair from categories; filled
+                form helpers are suppressed. An intake route is an explicitly
+                recorded value, never inferred from medication form. The
+                ingredient begins at the lower row’s left edge; quantity ×
+                strength and total dose stay protected at the right. Known
+                ingredients retain primary ink and weight, while Unspecified
+                stays quieter. Library forms use a compact selected-color shadcn
+                Badge with an appropriate outline glyph rather than a plain
+                Tablets label. Library headings protect at least 12px between
+                the truncated name and indicator rail, with 6px between
+                full-opacity category symbols. The bounded rail scrolls
+                horizontally when needed. The layout preserves long-value titles
+                and full accessible descriptions.
               </p>
               <p>
                 Each saved intake is one native full-card edit button. The
@@ -1832,11 +1948,11 @@ export function DeveloperGuidePage() {
                 with 96px standard/Safari backdrop blur. Its opaque face is
                 clipped to a 6px-padded content box to expose the glass ring.
                 The 1px saturated family-400/500 inner rim stays at 78%, inset
-                6.75px with a 9.25px radius and a 0.75px gap. Morning and Evening
-                use the Purple400 palette selection through the same
+                6.75px with a 9.25px radius and a 0.75px gap. Morning and
+                Evening use the Pink400 palette selection through the same
                 MedicationCardBase, card-frame borders, 96px glass pane and
-                faint selected-color tint as a Purple400 intake. Both retain
-                the Pink200 wash at 8%, selected-color wash at 6% and the same
+                faint selected-color tint as a Pink400 intake. Both share the
+                mode-specific washes, light reading veil and
                 reduced-transparency fallback. Their former independent
                 background and drawn icon-frame overlays are removed; coffee
                 steam, moon movement and the delayed ambient handoff remain.
@@ -1865,25 +1981,15 @@ export function DeveloperGuidePage() {
                 and the quantity fan’s layout stay independent of the motion.
               </p>
               <p>
-                The small corner form badge sits outside the spinning wrapper.
-                It has its own 520ms opacity fade and 1.5px slide, without scale
-                or rotation. Its visible size is 25% larger than before: 16px on
-                mobile and 17.6px on desktop. The opposite category glyphs keep
-                their existing sizes. Cards without category glyphs use the same
-                enlarged form badge. Reduced motion shows the settled artwork
-                and badge without response effects.
-                The quantity counter mirrors the form badge around the fixed
-                48px front artwork, on the same vertical center and with the same
-                16px/17.6px anchor box. Its quiet 12px-high face uses 8px tabular
-                numerals (7px for longer values), 65% foreground ink and a 9%
-                foreground/semantic-base surface, without a border. Long values
-                grow inward, keeping at least 2px before the form symbol and
-                the time column clear; the full count stays in the native title
-                and recorded dose. It follows the form badge’s separate fade/slide
-                and never spins or repeats on rear layers. Today, historical
-                intake cards and read-only notification intake previews share
-                the counter. Library defaults, appearance heroes, history
-                summaries and check-in artwork do not gain it.
+                The mounted MedicationCard path renders route and form in the
+                heading rail. Its artwork overlay is the plain total-quantity
+                annotation described above, outside the spinning wrapper and
+                without a counter surface or corner form tile. Today, historical
+                intakes and read-only notification intake previews share this
+                presentation. Library defaults can determine the decorative fan
+                but do not gain the annotation; appearance heroes, history
+                summaries and check-in artwork stay single frames. Reduced
+                motion shows the settled artwork.
               </p>
               <p>
                 Appearance groups the symbol search and compact rounded color
@@ -1910,7 +2016,7 @@ export function DeveloperGuidePage() {
                 reflection and quiet glaze, but disable backdrop filtering and
                 keep a solid native inward edge. The explicit mask-free fallback
                 prevents a full-surface mask from covering their real icon or
-                journal sample. Normal journal cards retain the 24px glass
+                journal sample. Normal journal cards retain the 96px glass
                 filter and inward gradient rim. A faint geometric network sits
                 behind the foreground using a quiet, mode-aware Lilac tone. The
                 centered rounded title group separates Final Look and Live
@@ -1927,25 +2033,27 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 MedicationIndicatorMark and MedicationCategoryGlyph share one
-                tile system for all 19 manually selected categories. The card
-                rail displays every selected label from right to left with
-                conservative spacing, including on the oldest linked intake. A
-                bounded horizontal rail preserves the single-line heading when
-                many labels are selected; categories are not replaced by a count
-                or silently omitted. Journal medication and ingredient
-                references reuse the same glyphs and palettes. Current manual
-                metadata is authoritative; names never infer classification. The
-                three quantity-summary categories remain independent of this
-                complete display catalog. The medication editor’s selected
-                summary uses a scoped <code>{'presentation="form"'}</code> instead:
-                real shadcn Badge pills show plain primary-color glyphs without
-                their colored tiles. A 4/3 layout scale enlarges the pills and
-                text; each side has 12px padding above a more visible neutral
-                fill. Glyphs shrink by 32% before sharing that scale, keeping
-                them compact. Priority labels remain first, followed by up to
-                three general labels and an accessible overflow count. The
-                Categories dropdown and shared card, goal and streak markers
-                retain their existing presentation.
+                tile system for all 19 manually selected categories. Shared
+                medication cards use the category glyphs as primary-ink outlines
+                in their heading rail; selectors and linked references retain
+                colored category tiles. The rail displays every selected label,
+                including on the oldest linked intake. A bounded horizontal rail
+                preserves the single-line heading when many labels are selected;
+                categories are not replaced by a count or silently omitted.
+                Journal medication and ingredient references reuse the same
+                glyphs and palettes. Current manual metadata is authoritative;
+                names never infer classification. The three quantity-summary
+                categories remain independent of this complete display catalog.
+                The medication editor’s selected summary uses a scoped{" "}
+                <code>{'presentation="form"'}</code> instead: real shadcn Badge
+                pills show plain primary-color glyphs without their colored
+                tiles. A 4/3 layout scale enlarges the pills and text; each side
+                has 12px padding above a more visible neutral fill. Glyphs
+                shrink by 32% before sharing that scale, keeping them compact.
+                Priority labels remain first, followed by up to three general
+                labels and an accessible overflow count. The Categories dropdown
+                and shared card, goal and streak markers retain their existing
+                presentation.
               </p>
               <p>
                 Benzo retains the Categories selector’s #fda4af tile with a
@@ -1973,19 +2081,14 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Shared medication cards retain their 80px height and two
-                single-line rows. The first-row name yields only to the category
-                rail, leaving more room for the medication name. Library and
-                appearance-preview cards retain plain secondary type text before
-                the active ingredient below, without a background, border, form
-                icon or dot separator. Its width is capped at 40% of the
-                flexible label region, and the responsive Smallest gap,{" "}
-                <code>--content-min-gap-tertiary</code>, separates it from the
-                substance. Both labels can ellipsize while staying vertically
-                centered with each other and flush with that region’s left edge.
-                Their overall lower row retains its existing bottom alignment.
-                Actual intake rows instead use the same filled form glyph as
-                their top-left artwork marker, reduced to 10px before the
-                substance with a 4px gap. Full names and labels remain available
+                single-line rows. The first-row name yields to the bounded
+                indicator rail. Library and appearance-preview cards use a
+                compact selected-color Badge with an outline form glyph before
+                the active ingredient below. Its width is capped at 48% of that
+                flexible label region, and both labels can ellipsize. Actual
+                intake rows keep form and recorded route in the top rail, so the
+                lower row starts with the ingredient and protects the dose
+                arithmetic at the right. Full names and labels remain available
                 through accessible descriptions and titles.
               </p>
               <p>
@@ -2220,12 +2323,13 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Past-day links now reuse the intake card’s full 80px frame, 21px
-                corners, 5⅓px inward mixed rim, 2px identity edge and separate
+                corners, 5⅓px inward mixed rim, 2⅔px identity edge and separate
                 1.5px fine outside stroke. MedicationCardBackground supplies the
-                same opaque base and quiet 8% selected-color tint. Artwork
-                follows the first chronologically taken medication, including
-                its saved icon and rotation; reflection-only days retain Morning
-                or Evening artwork. Month/day and weekday share the top row with
+                same mode-aware glass, Pink/selected-color washes and light
+                reading-paper veil as the timeline and library. Artwork follows
+                the first chronologically taken medication, including its saved
+                icon and rotation; reflection-only days retain Morning or
+                Evening artwork. Month/day and weekday share the top row with
                 pill/Benzo totals; Logs, unique Meds and saved check-in periods
                 occupy the lower row. No reflection prose, dose-goal judgment or
                 quantity fan appears. Full dates, counts and medication names
@@ -2649,23 +2753,25 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Nose, Single Tablet and Angled Tablet retain their original
-                selectable geometry. Nose’s shortened bridge fits a square 24×24 viewport while keeping the
-                reference profile recognizable. Lucide-compatible defaults use a
-                2px currentColor stroke, no fill and rounded caps and joins. The
-                stored svg:nose key follows the existing allowlisted catalog and
-                inline-vector rendering path. English and German aliases include
-                nose, nasal, nostril and Nase; selecting or tinting it needs no
-                special image conversion. Angled Tablet uses svg:tablet-angled
-                for a tilted elliptical face, a single score and a visible
-                sidewall, following only the rear pill of the supplied
-                reference. Its Lucide-compatible SVG and native inline renderer
-                share the exact same unfilled geometry. Intake form glyphs reuse
-                that shape with a black 2.5px stroke and fill only its closed
-                areas with full-opacity Levomethasan Zinc 300 #D4D4D8; other
-                saved appearances retain their own settings. The earlier
-                circular svg:tablet-single remains selectable with its stored ID
-                and aliases unchanged. Branding and the Pills count marker
-                retain the original two-tablet symbol.
+                selectable geometry. Nose’s shortened bridge fits a square 24×24
+                viewport while keeping the reference profile recognizable.
+                Lucide-compatible defaults use a 2px currentColor stroke, no
+                fill and rounded caps and joins. The stored svg:nose key follows
+                the existing allowlisted catalog and inline-vector rendering
+                path. English and German aliases include nose, nasal, nostril
+                and Nase; selecting or tinting it needs no special image
+                conversion. Angled Tablet uses svg:tablet-angled for a tilted
+                elliptical face, a single score and a visible sidewall,
+                following only the rear pill of the supplied reference. Its
+                Lucide-compatible SVG and native inline renderer share the exact
+                same unfilled geometry. Intake form glyphs reuse that shape.
+                Their shared glyph includes filled helper geometry; the
+                recorded-intake rail explicitly suppresses fills and applies a
+                2.5px primary-ink stroke. Other saved appearances retain their
+                own settings. The earlier circular svg:tablet-single remains
+                selectable with its stored ID and aliases unchanged. Branding
+                and the Pills count marker retain the original two-tablet
+                symbol.
               </p>
             </Detail>
             <Detail
@@ -2755,7 +2861,7 @@ export function DeveloperGuidePage() {
             </div>
           </div>
           <div className={styles.sourceGroups}>
-            {SOURCE_GROUPS.map((group) => (
+            {[...SOURCE_GROUPS, ...WORKFLOW_SOURCES].map((group) => (
               <Detail
                 key={group.title}
                 title={group.title}
@@ -2893,20 +2999,20 @@ export function DeveloperGuidePage() {
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
-                  flowing page background with a Pink400 identity. A shared 4px
-                  neutral frame and a 2px identity band at 50% opacity paint
-                  entirely inward. Filled coffee and crescent artwork
-                  distinguish the periods; their
+                  flowing page background with a Pink400 identity. The shared
+                  5⅓px mixed rim and 2⅔px identity band paint inward; the
+                  identity alpha follows the light/dark recipe above. Filled
+                  coffee and crescent artwork distinguish the periods; their
                   base and completion-meter surfaces share an opaque, very dark
-                  Pink/Plum mix (88% #210F25 with 12% Pink950). Both main symbols
-                  and the completion number use the primary light ink on those
-                  dark surfaces in either appearance; page headings retain their
-                  adaptive reading color. The Pink identity and artwork
+                  Pink/Plum mix (88% #210F25 with 12% Pink950). Both main
+                  symbols and the completion number use the primary light ink on
+                  those dark surfaces in either appearance; page headings retain
+                  their adaptive reading color. The Pink identity and artwork
                   overrides are local to these cards, leaving medication and
-                  topbar colors independent. Steam, stars, entry motion, ambient loops and
-                  progress replay keep their existing timing. Section dots use
-                  Pink500. Details and icon stages remain 56px, the tile 48px
-                  and symbol holder 30px, with 11px artwork-to-copy
+                  topbar colors independent. Steam, stars, entry motion, ambient
+                  loops and progress replay keep their existing timing. Section
+                  dots use Pink500. Details and icon stages remain 56px, the
+                  tile 48px and symbol holder 30px, with 11px artwork-to-copy
                   clearance (7px below 360px) and 8px trailing inset.
                   SavedCheckInHeading now separates opening history from save
                   history. Its primary HH:mm is the first recorded opening on
@@ -2929,31 +3035,33 @@ export function DeveloperGuidePage() {
                   completion meter. The meter uses a 40px ring with rounded
                   whole number centered alone in 9.208333px/625 type at full
                   primary-ink opacity and a single-line height. There is no
-                  percent sign, caption or separate outside percentage. This remains a 29.1667% reduction from its 13px
-                  reference size, applied once. The background measures 40px
-                  across: the original 17px radius plus one third of the former 9px increase gives a
-                  20px radius. The right component now uses{" "}
+                  percent sign, caption or separate outside percentage. This
+                  remains a 29.1667% reduction from its 13px reference size,
+                  applied once. The background measures 40px across: the
+                  original 17px radius plus one third of the former 9px increase
+                  gives a 20px radius. The right component now uses{" "}
                   <code>align-self: center</code> with zero top margin, placing
                   that footprint 20px below the 80px card’s top edge; the
                   heading retains its 15px inset. The Pink100–400 arc follows a
-                  quiet foreground track. Section dots use Pink500 pigment,
-                  at 50% opacity while unfinished and 100% when complete. This single number replaces the old center
-                  spark/check. The meter is always present. With no saved
-                  record, no genuine draft change and no valid first-opening
-                  observation, the entire meter uses exactly opacity: calc(1 /
-                  3) and a decorative 6% starter arc. The number and accessible
-                  completion remain 0, and no section dot is marked complete. An
-                  observed opening without edits restores full-strength
-                  presentation with a true zero-length arc and the number 0;
-                  opening still earns no completion credit. Saved responses and
-                  genuinely changed drafts retain normal presentation even when
-                  opening metadata is absent. The shared getCheckInCardProgress
-                  helper keeps its visible flag as a saved-or-changed-content
-                  signal; rendering no longer uses that flag to hide the meter.
-                  It projects valid raw draft groups independently: five visible
-                  Evening sections or five Morning groups, rounded to a whole
-                  percentage. It makes no API request and changes neither saved
-                  content nor timestamps. Both periods retain{" "}
+                  quiet foreground track. Section dots use Pink500 pigment, at
+                  50% opacity while unfinished and 100% when complete. This
+                  single number replaces the old center spark/check. The meter
+                  is always present. With no saved record, no genuine draft
+                  change and no valid first-opening observation, the entire
+                  meter uses exactly opacity: calc(1 / 3) and a decorative 6%
+                  starter arc. The number and accessible completion remain 0,
+                  and no section dot is marked complete. An observed opening
+                  without edits restores full-strength presentation with a true
+                  zero-length arc and the number 0; opening still earns no
+                  completion credit. Saved responses and genuinely changed
+                  drafts retain normal presentation even when opening metadata
+                  is absent. The shared getCheckInCardProgress helper keeps its
+                  visible flag as a saved-or-changed-content signal; rendering
+                  no longer uses that flag to hide the meter. It projects valid
+                  raw draft groups independently: five visible Evening sections
+                  or five Morning groups, rounded to a whole percentage. It
+                  makes no API request and changes neither saved content nor
+                  timestamps. Both periods retain{" "}
                   <code>hasCheckInDraftChanges</code> for content detection and{" "}
                   <code>getCheckInCardFeedback</code> for accessible saved/local
                   draft feedback and missing-section descriptions. There is no
@@ -3650,6 +3758,26 @@ export function DeveloperGuidePage() {
                 page. It does not turn medication writes into a background
                 queue; mutations need a connection and explicit result handling.
               </p>
+              <p>
+                Authentication uses a persistent HTTP-only, SameSite=Lax cookie
+                with a maximum age of 400 days and Secure in production. Valid
+                state loads and cookie-only session probes reapply the cookie
+                policy; signed tokens renew at most daily. Browser site-data
+                retention can end a session earlier. Password or signing-secret
+                changes revoke the corresponding sessions, and credentials never
+                enter the draft store or history-card snapshots.
+              </p>
+              <p>
+                The provider rechecks after focus, visible-page return, pageshow
+                and reconnection, coalescing concurrent loads. A visible window
+                also probes every six hours without loading journal records.
+                Only an explicit unauthenticated result can finish recovery as
+                signed out; unavailable servers preserve the current view with
+                retry feedback. Recovery can retry a journal GET, but a failed
+                mutation always needs an intentional retry. Sign-in and sign-out
+                use document navigation to discard stale authenticated route
+                responses.
+              </p>
             </Detail>
             <Detail
               title="Morning Sleep Journal"
@@ -3658,14 +3786,15 @@ export function DeveloperGuidePage() {
               <p>
                 Morning reuses the Evening card, responsive modal, Markdown
                 launcher and Accent save action. Both cards share the same
-                Plum/Lilac theme, 80px frame and two-row summary; the large Sun
-                or Moon tile identifies the period. The journal editor stays
-                first; structured sleep details follow in three compact
-                sections. Time in bed and Sleep efficiency form one calculated
-                summary row immediately above Save Check-In. A 1px separator at
-                13% foreground visibility follows the preceding content after
-                10px. The summary has 12px of top padding, with 16px between its
-                values and Save; both estimates remain one compact row.
+                Pink400 identity, shared glass, 80px frame and two-row summary;
+                the coffee cup or Moon artwork identifies the period. The
+                journal editor stays first; structured sleep details follow in
+                three compact sections. Time in bed and Sleep efficiency form
+                one calculated summary row immediately above Save Check-In. A
+                1px separator at 13% foreground visibility follows the preceding
+                content after 10px. The summary has 12px of top padding, with
+                16px between its values and Save; both estimates remain one
+                compact row.
               </p>
               <p>
                 The Morning dialog starts with Your Morning, Your Words,
@@ -3843,12 +3972,12 @@ export function DeveloperGuidePage() {
               context="Newest Three Stay Live"
             >
               <p>
-                useHistoryCardSummary memoizes display models for the day links
-                used in Past Days and week details. Older recorded past days can
-                reuse a versioned device-local snapshot. The three newest
-                recorded past days always derive from current journal state;
-                Today, future dates and empty dates never use snapshots. The
-                live set is recalculated from the journal timezone and 06:00
+                <code>useHistoryCardSummary</code> memoizes display models for
+                the day links used in Past Days and week details. Older recorded
+                past days can reuse a versioned device-local snapshot. The three
+                newest recorded past days always derive from current journal
+                state; Today, future dates and empty dates never use snapshots.
+                The live set is recalculated from the journal timezone and 06:00
                 boundary, including when days are added or removed. Sparse days
                 and check-in-only days count as recorded days; this is not a
                 three-calendar-day cutoff.
@@ -3882,10 +4011,25 @@ export function DeveloperGuidePage() {
                 cache. Missing, malformed, obsolete or unavailable storage falls
                 back to live rendering without blocking a day link. Nested
                 timestamps, medication artwork, colors and count values are
-                validated before a snapshot reaches a card. Source lives
-                in history-card-cache.ts and use-history-card-summary.ts;
-                focused tests cover live-day membership, 06:00 rollover, journal
-                isolation, relevant-edit invalidation and storage failures.
+                validated before a snapshot reaches a card. The formatted date
+                must match the requested day, including for reflection-only days
+                whose other fingerprint inputs can be identical. See{" "}
+                <ExternalLink
+                  href={developerSource("src/lib/history-card-cache.ts")}
+                >
+                  history-card-cache.ts
+                </ExternalLink>{" "}
+                and{" "}
+                <ExternalLink
+                  href={developerSource(
+                    "src/components/use-history-card-summary.ts",
+                  )}
+                >
+                  use-history-card-summary.ts
+                </ExternalLink>
+                . Focused tests cover live-day membership, 06:00 rollover,
+                journal isolation, relevant-edit invalidation, write
+                deduplication, malformed snapshots and storage failures.
               </p>
             </Detail>
             <Detail title="Durable Form Drafts" context="Local To Each Journal">
@@ -3994,11 +4138,30 @@ export function DeveloperGuidePage() {
               Next.js version is the reference for its conventions.
             </p>
             <p>
-              Development without a database URL uses the local file repository
-              in <code>.data</code>. A configured database URL selects that
-              database; production requires one. Follow the repository README
-              and <code>.env.example</code> for setup, and use an isolated
-              development journal with invented entries.
+              With no database URL or password configured, development opens
+              without sign-in and writes to <code>.data/state.json</code>.
+              Additional local password journals use
+              <code> .data/journals.json</code>. Connecting a database selects
+              that database and requires <code>APP_PASSWORD</code> plus a
+              <code> SESSION_SECRET</code> of at least 32 characters. Production
+              also requires the database and never falls back to local files.
+              Use an isolated journal with invented entries.
+            </p>
+            <p>
+              The development and production servers bind to
+              <code> 127.0.0.1</code>. <code>npm run dev</code> starts the local
+              editor loop; <code>npm run build</code> followed by
+              <code> npm start</code> checks the production server with its
+              required configuration. Copy environment settings from{" "}
+              <ExternalLink href={developerSource(".env.example")}>
+                .env.example
+              </ExternalLink>{" "}
+              into your local environment and restart after changes. The{" "}
+              <ExternalLink href={developerSource("package.json")}>
+                package scripts
+              </ExternalLink>{" "}
+              are the command reference; <code>npm run secrets</code> generates
+              credentials when you choose to enable authentication.
             </p>
           </div>
           <DeveloperCode
