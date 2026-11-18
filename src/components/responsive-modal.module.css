@@ -106,6 +106,16 @@
   --drawer-bleed-background: var(--navigation-surface);
 }
 
+.checkInSurface[data-slot]:has([data-check-in-form="morning"]) {
+  background:
+    radial-gradient(
+      ellipse 170px 115px at top left,
+      color-mix(in srgb, var(--dialog-control-wash) 8%, transparent),
+      transparent
+    ),
+    var(--navigation-paint);
+}
+
 .checkInSurface .scrollBody {
   --dialog-scroll-gutter: 14px;
   padding-inline: var(--dialog-scroll-gutter);
