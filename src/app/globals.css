@@ -3113,11 +3113,14 @@
   }
 
   .intake-dock {
-    --intake-dock-overlay-base: var(--app-canvas-base);
-    --intake-dock-overlay-accent: var(--app-canvas-base);
-    --intake-dock-overlay-base-opacity: 0.66;
-    --intake-dock-overlay-accent-opacity: 0.2;
-    --intake-dock-overlay-height: 160%;
+    --intake-dock-fade-base: color-mix(
+      in srgb,
+      var(--palette-plum) 85%,
+      var(--color-purple-900, #581c87)
+    );
+    --intake-dock-fade-violet: var(--color-violet-900, #4c1d95);
+    --intake-dock-fade-rose: var(--color-fuchsia-900, #701a75);
+    --intake-dock-fade-strength: 0.56;
     --canvas-foreground: var(--palette-white);
     --canvas-muted-foreground: color-mix(
       in srgb,
@@ -3126,93 +3129,73 @@
     );
   }
 
-  /* These fixed-dock layers fade above the summary without changing its layout. */
+  /* Two soft, theme-colored veils replace the former near-opaque layer stack.
+     Neither layer changes the dock's measured height or intercepts gestures. */
   .intake-dock::before,
   .intake-dock::after {
     content: "";
     position: absolute;
     inset-inline: 0;
     bottom: 0;
-    height: var(--intake-dock-overlay-height);
     pointer-events: none;
+  }
+
+  .intake-dock::before {
+    z-index: -2;
+    height: 148%;
+    background: linear-gradient(
+      to top,
+      var(--intake-dock-fade-base) 0%,
+      color-mix(in srgb, var(--intake-dock-fade-base) 93%, transparent) 14%,
+      color-mix(in srgb, var(--intake-dock-fade-base) 70%, transparent) 34%,
+      color-mix(in srgb, var(--intake-dock-fade-base) 41%, transparent) 54%,
+      color-mix(in srgb, var(--intake-dock-fade-base) 16%, transparent) 74%,
+      color-mix(in srgb, var(--intake-dock-fade-base) 4%, transparent) 90%,
+      transparent 100%
+    );
+    opacity: var(--intake-dock-fade-strength);
+  }
+
+  .intake-dock::after {
+    z-index: -1;
+    height: 118%;
+    background:
+      radial-gradient(
+        ellipse at 15% 100%,
+        color-mix(in srgb, var(--intake-dock-fade-rose) 12%, transparent),
+        transparent 76%
+      ),
+      radial-gradient(
+        ellipse at 88% 100%,
+        color-mix(in srgb, var(--intake-dock-fade-violet) 14%, transparent),
+        transparent 80%
+      );
     -webkit-mask-image: linear-gradient(
       to top,
       #000 0%,
-      rgb(0 0 0 / 98%) 12%,
-      rgb(0 0 0 / 90%) 28%,
-      rgb(0 0 0 / 72%) 45%,
-      rgb(0 0 0 / 46%) 62%,
-      rgb(0 0 0 / 23%) 78%,
-      rgb(0 0 0 / 7%) 91%,
+      rgb(0 0 0 / 64%) 48%,
+      rgb(0 0 0 / 18%) 78%,
       transparent 100%
     );
     mask-image: linear-gradient(
       to top,
       #000 0%,
-      rgb(0 0 0 / 98%) 12%,
-      rgb(0 0 0 / 90%) 28%,
-      rgb(0 0 0 / 72%) 45%,
-      rgb(0 0 0 / 46%) 62%,
-      rgb(0 0 0 / 23%) 78%,
-      rgb(0 0 0 / 7%) 91%,
+      rgb(0 0 0 / 64%) 48%,
+      rgb(0 0 0 / 18%) 78%,
       transparent 100%
     );
   }
 
-  .intake-dock::before {
-    z-index: -4;
-    background: var(--intake-dock-overlay-base);
-    opacity: var(--intake-dock-overlay-base-opacity);
-  }
-
-  .intake-dock::after {
-    z-index: -3;
-    background: var(--intake-dock-overlay-accent);
-    opacity: var(--intake-dock-overlay-accent-opacity);
-  }
-
-  /* The static inner keeps these full-width fades anchored to the fixed dock. */
-  .intake-dock-inner::before,
-  .intake-dock-inner::after {
-    content: "";
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    pointer-events: none;
-  }
-
-  .intake-dock-inner::before {
-    z-index: -2;
-    height: calc(var(--intake-dock-overlay-height) * 0.65);
-    background: linear-gradient(
-      to top,
-      var(--app-canvas-base) 0%,
-      color-mix(in srgb, var(--app-canvas-base) 90%, transparent) 20%,
-      color-mix(in srgb, var(--app-canvas-base) 60%, transparent) 48%,
-      color-mix(in srgb, var(--app-canvas-base) 22%, transparent) 76%,
-      transparent 100%
-    );
-    opacity: 0.55;
-  }
-
-  .intake-dock-inner::after {
-    z-index: -1;
-    height: calc(var(--intake-dock-overlay-height) * 0.45);
-    background: linear-gradient(
-      to top,
-      var(--app-canvas-base) 0%,
-      color-mix(in srgb, var(--app-canvas-base) 85%, transparent) 20%,
-      color-mix(in srgb, var(--app-canvas-base) 55%, transparent) 48%,
-      color-mix(in srgb, var(--app-canvas-base) 16%, transparent) 78%,
-      transparent 100%
-    );
-    opacity: 0.6;
-  }
-
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: light) {
     .intake-dock {
-      --intake-dock-overlay-base-opacity: 0.84;
-      --intake-dock-overlay-accent-opacity: 0.34;
+      --intake-dock-fade-base: color-mix(
+        in srgb,
+        var(--surface-sunken) 85%,
+        var(--palette-lilac)
+      );
+      --intake-dock-fade-violet: var(--palette-lilac);
+      --intake-dock-fade-rose: var(--palette-rose);
+      --intake-dock-fade-strength: 0.68;
     }
   }
 }

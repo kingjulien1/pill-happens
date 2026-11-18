@@ -1335,22 +1335,19 @@ export function DeveloperGuidePage() {
                 inset.
               </p>
               <p>
-                Four pointer-inert layers sit behind the fixed mobile action.
-                The two outer fades now reach 160% of the dock height and taper
-                across their full distance, with no long opaque plateau. Their
-                base/accent opacities are 66%/20% in light mode and 84%/34% in
-                dark mode. Above them, an inner fade reaches 104% of the dock at
-                55% opacity, a 37.5% increase. The nearest fade layer reaches
-                72% at 60% opacity. Both use multiple gradual stops ending in
-                complete transparency. All four layers use the shared
-                <code> --app-canvas-base</code> at <code>#29213b</code>, so no
-                separate Blue, Apricot, Slate or Gray patch changes the page
-                color beneath them. The taller decoration moves the fade’s upper
-                edge upward without moving the button or enlarging the measured
-                dock. Footer copy uses light ink over this stronger dark fade.
-                Safe-area clearance, page scroll reserve and native input
-                behavior stay attached to the same fixed parent, and desktop has
-                no mobile fade layers.
+                Two pointer-inert layers soften the page behind the fixed mobile
+                action. A long veil reaches 148% of the dock height: Plum mixed
+                with 15% Purple900 starts at 56% opacity and tapers through six
+                gentle stops to complete transparency. A shorter wash reaches
+                118%, placing Fuchsia900 at 12% near the lower left and Violet900
+                at 14% near the lower right, then masking both away above the
+                summary. This replaces the former four-layer stack, which
+                approached full opacity at the bottom. Light Mode uses sunken
+                Rose/Lilac paper at 68% with matching Rose and Lilac washes.
+                The decorative layers add no layout height or input targets;
+                safe-area clearance, page scroll reserve and the measured dock
+                stay attached to the same fixed parent. Desktop has no mobile
+                fade layers.
               </p>
             </Detail>
             <Detail
