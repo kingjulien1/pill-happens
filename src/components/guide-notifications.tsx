@@ -1095,7 +1095,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and unchanged 41.65px front tile. Rear plates use a 3px inset rim and 93% opacity across the fill and rim. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
+            "49px illustration rail and unchanged 41.65px front tile. The back Violet500 plate uses 50.22% opacity and the Pink500 plate directly behind the icon uses 63.24%. Both use a matching 3px inset rim. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
           ],
           [
             "Main text / context",
@@ -1111,7 +1111,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Inward frame",
-            "A 5px outer inset band uses 41% of the semantic rim pigment—30% stronger than the former 31.5% mix—followed immediately by a 2.6px saturated Pink500 outline. The −6.3px offset makes the two inward borders meet without transparent corner seams. Neither border changes layout or occupies Sonner’s swipe/stack pseudo-elements. Existing pigments and 18px corners remain, with a restrained Pink400 exterior glow.",
+            "The 3.36px pink inner band keeps its inner edge fixed. The 6.67px muted outer band extends beyond the card without changing layout. Existing pigments and 18px corners remain, with a restrained Pink400 exterior glow.",
           ],
           [
             "Surface / countdown",
