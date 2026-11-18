@@ -164,6 +164,12 @@ void main() {
   // Illumination changes RGB only: a translucent stop must not gain an opaque
   // backing from the base color. Apply its alpha once to the physical band.
   vec4 rimColor = vec4(mix(uBaseColor.rgb, lineColor.rgb, illumination), lineColor.a);
+  if (uSpectrum > 2.5) {
+    // A white pinprick centered on the third (brightest) palette stop.
+    float distanceToPeak = abs(fract(position - uSpot) - 2.0 / 3.0);
+    float glint = 1.0 - smoothstep(0.001, 0.005, distanceToPeak);
+    rimColor = mix(rimColor, vec4(1.0), glint);
+  }
   result = over(paint(rimColor, band), result);
   outColor = result;
 }`;
@@ -273,7 +279,7 @@ export function SpecularRim({
 }: {
   radius?: number;
   thickness?: number;
-  palette?: "two-tone" | "spectrum" | "triad";
+  palette?: "two-tone" | "spectrum" | "triad" | "triad-glint";
   /** A separate renderer may own the exterior halo while this keeps the rim. */
   glow?: boolean;
   className?: string;
@@ -518,7 +524,9 @@ export function SpecularRim({
         gl.uniform4fv(uniforms.uGlowColor, palette.glow);
         gl.uniform1f(
           uniforms.uSpectrum,
-          paletteStyle === "triad" ? 2 : paletteStyle === "spectrum" ? 1 : 0,
+          { "two-tone": 0, spectrum: 1, triad: 2, "triad-glint": 3 }[
+            paletteStyle
+          ],
         );
         palette.stops.forEach((color, index) => {
           gl.uniform4fv(uniforms[`uStop${index + 1}`], color);
