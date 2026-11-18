@@ -12,6 +12,7 @@ import { useHistoryCardSummary } from "@/components/use-history-card-summary";
 import { cn } from "@/lib/utils";
 import styles from "./history-day-card.module.css";
 import frameStyles from "./card-frame.module.css";
+import layoutStyles from "./card-layout.module.css";
 
 export function HistoryDayCard({
   data,
@@ -60,12 +61,22 @@ export function HistoryDayCard({
     >
       <Link
         href={`/history/${day}`}
-        className={cn("intake-log-card", frameStyles.card, styles.dayLink)}
+        className={cn(
+          "medication-card-base intake-log-card",
+          frameStyles.card,
+          layoutStyles.card,
+          styles.dayLink,
+        )}
         aria-label={label}
         title={label}
         data-history-day-link
       >
         <MedicationCardBackground />
+        <span
+          className={frameStyles.detailRim}
+          data-card-rim-detail
+          aria-hidden="true"
+        />
         <div
           className={cn(
             "medication-card-content intake-card-content",
@@ -141,7 +152,10 @@ export function HistoryDayCard({
                       size={18}
                       aria-hidden="true"
                     />
-                    <strong className={styles.number} title={formatDose(count)}>
+                    <strong
+                      className={cn("intake-card-total-value", styles.number)}
+                      title={formatDose(count)}
+                    >
                       {formatDose(count)}
                     </strong>
                   </span>
