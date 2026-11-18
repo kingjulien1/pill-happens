@@ -21,15 +21,12 @@
   box-shadow: inset 0 0 0 var(--line-width) var(--checkin-line);
   border-radius: var(--dialog-radius-surface);
 }
-.caption,
-.foot {
+.caption {
   margin: 0;
   padding-inline: 6px;
   color: var(--muted-foreground);
   font-size: 11px;
   line-height: 1.45;
-}
-.caption {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr) auto;
   align-items: center;
@@ -46,18 +43,6 @@
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
-.foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 10px;
-  opacity: 0.85;
-}
-.foot span:last-child {
-  text-align: end;
-}
-
 .frame > fieldset {
   padding: 10px 12px 12px;
 }

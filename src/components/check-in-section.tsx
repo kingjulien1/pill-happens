@@ -5,15 +5,11 @@ export function CheckInSection({
   caption,
   context,
   detail,
-  left,
-  right,
   children,
 }: {
   caption: string;
   context: string;
   detail: string;
-  left: string;
-  right: string;
   children: ReactNode;
 }) {
   return (
@@ -25,10 +21,6 @@ export function CheckInSection({
         <span className={styles.detail}>{detail}</span>
       </p>
       <div className={styles.frame}>{children}</div>
-      <div className={styles.foot}>
-        <span>{left}</span>
-        <span>{right}</span>
-      </div>
     </div>
   );
 }

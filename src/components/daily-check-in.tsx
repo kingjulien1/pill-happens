@@ -628,8 +628,6 @@ function CheckInForm({
         caption="Journal entry"
         context="In your words"
         detail={morning ? "Morning" : "Evening"}
-        left="Markdown supported"
-        right="Drafts saved as you write"
       >
         <DailyReflectionEditor
           id={`${id}-note`}
@@ -660,8 +658,6 @@ function CheckInForm({
             caption="Evening reflection"
             context="Mood & energy"
             detail="Today"
-            left="Pick up to four moods"
-            right="Ratings are optional"
           >
             <section
               className={styles.feelingsSection}
@@ -684,8 +680,6 @@ function CheckInForm({
                 caption="Feelings"
                 context="Mood mix"
                 detail={moods.length + " of 4"}
-                left="Search by name"
-                right="Tap a pick to remove it"
               >
                 <fieldset
                   className={styles.moodField}
@@ -719,8 +713,6 @@ function CheckInForm({
                   [energy, stress].filter((value) => value != null).length +
                   " of 2"
                 }
-                left="Energy & stress"
-                right="Scale of 1–10"
               >
                 <section
                   className={styles.formSection}
@@ -772,8 +764,6 @@ function CheckInForm({
             caption="Small reminders"
             context="What helped"
             detail={helped.trim() ? "Added" : "Optional"}
-            left="One thought per line"
-            right="Optional"
           >
             <div
               className={cn(

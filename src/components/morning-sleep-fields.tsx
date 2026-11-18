@@ -184,8 +184,6 @@ export function MorningSleepFields({
           " of " +
           RATINGS.length
         }
-        left="Your own impression"
-        right="Scale of 1–10"
       >
         <section
           className={styles.section}
@@ -222,8 +220,6 @@ export function MorningSleepFields({
         caption="Overnight"
         context="Sleep window"
         detail="Local time"
-        left="Local times"
-        right="Estimates welcome"
       >
         <section
           className={styles.section}
@@ -319,8 +315,6 @@ export function MorningSleepFields({
         caption="Rest & recovery"
         context="Sleep duration"
         detail="h / min"
-        left="Hours and minutes"
-        right="Optional"
       >
         <section
           className={styles.section}
