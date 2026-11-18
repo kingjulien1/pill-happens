@@ -95,7 +95,9 @@ export function MedicationsHeading({
           role="img"
           data-medications-total
         >
-          {palette.length > 0 && <MedicationPaletteBars palette={palette} />}
+          {palette.length > 0 && (
+            <MedicationPaletteBars palette={palette.slice(0, 6)} />
+          )}
           <span className={styles.total} aria-hidden="true">
             <span className={styles.count} data-kit-count>
               {displayedCount}

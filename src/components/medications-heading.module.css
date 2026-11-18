@@ -36,7 +36,8 @@
   min-height: 32px;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-end;
+  gap: 5px;
   color: var(--foreground);
   text-shadow: none;
 }
@@ -54,6 +55,7 @@
 }
 .preview {
   display: inline-flex;
+  flex-direction: row-reverse;
   min-width: 0;
   flex: 1 1 auto;
   align-items: center;
@@ -94,9 +96,6 @@
   }
   .heading [data-page-heading-row] {
     gap: 8px;
-  }
-  .summary {
-    gap: 6px;
   }
 }
 
