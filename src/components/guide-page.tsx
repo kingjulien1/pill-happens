@@ -79,6 +79,7 @@ function GuideDetail({
       data-card-entry
     >
       <summary
+        data-has-icon={icon ? "" : undefined}
         data-guide-outline-level="2"
         data-guide-outline-label={title}
         data-guide-outline-target={guideHeadingId("guide-detail", title)}
@@ -134,14 +135,12 @@ export function GuidePage() {
             <BookOpenTextIcon size={20} weight="regular" aria-hidden="true" />
             Pill Happens / Your Journal
           </span>
-          <h1>Journal Guide</h1>
+          <h1>Getting Started</h1>
           <p>
-            Start with the medications you use, then build a clear record of
-            what you took and when. This guide walks through your first entry,
-            daily goals and your morning and evening check-ins, with details
-            close at hand when you need them. Learn how your tracking day works,
-            revisit earlier entries, and keep a copy of your history. Follow the
-            four starting steps, or choose a section and pick up from there.
+            Add your medications, record what you took, and leave a check-in
+            when you want to. Start with the four steps below, or jump to the
+            detail you need. You can open Today at any point and return here
+            from the menu.
           </p>
           <div className={styles.atAGlance} aria-label="Journal At A Glance">
             <div>
@@ -199,11 +198,9 @@ export function GuidePage() {
                 </h3>
                 <p>
                   Open Medications and choose <strong>Add Medication</strong>.
-                  Enter its name, strength in mg per unit, medication type, and
-                  default quantity for new entries. Active Ingredient means the
-                  Wirkstoff; leave it blank if you don’t know it. Add optional
-                  labels with Categories, then choose a color and symbol you can
-                  recognize quickly.
+                  Enter its name, strength in mg per unit, type, and default
+                  quantity. Active Ingredient and Categories are optional.
+                  Choose a color and symbol, check Final Look, then save.
                 </p>
                 <PageLink href="/medications">Open Medications</PageLink>
               </div>
@@ -219,10 +216,10 @@ export function GuidePage() {
                   Record An Intake
                 </h3>
                 <p>
-                  On Today, tap <strong>Log Intake</strong> or the empty entry
-                  card. Choose the medication and quantity, check the calculated
-                  mg, and save. Date Taken and Time Taken start at the current
-                  time; change it when you are catching up on an earlier intake.
+                  On Today, tap <strong>Log Intake</strong>. Choose the
+                  medication, actual quantity and intake route. Check the
+                  calculated mg and Date &amp; Time Taken, then save. Change the
+                  time first when recording an earlier intake.
                 </p>
                 <PageLink href="/">Go To Today</PageLink>
               </div>
@@ -241,10 +238,9 @@ export function GuidePage() {
                   Add A Goal, If You Want One
                 </h3>
                 <p>
-                  Goals are daily maximums you enter for an individual
-                  medication. Choose the amount and dates that apply. The
-                  journal compares that medication’s recorded total with your
-                  chosen value.
+                  A goal compares one medication’s recorded daily total with a
+                  maximum you enter. Choose its amount and dates. Goals are
+                  optional; you can start logging without one.
                 </p>
                 <PageLink href="/goals">Open Goals</PageLink>
               </div>
@@ -264,9 +260,10 @@ export function GuidePage() {
                 </h3>
                 <p>
                   Morning is ready from the 06:00 reset; Evening opens at 17:00.
-                  Each has its own saved entry and draft. A few words, one
-                  morning sleep rating, or one evening mood is enough. Tap
-                  either card to start, continue or edit that part of your day.
+                  Tap either card to add sleep details, writing, moods or
+                  ratings. Every field is optional; one detail is enough.
+                  Writing saves separately as you work. Use Save Check-In for
+                  the rest of your answers.
                 </p>
                 <Button
                   navigation
@@ -282,6 +279,17 @@ export function GuidePage() {
               </div>
             </li>
           </ol>
+          <div className={styles.checklist}>
+            <h3>Before Your First Intake Save</h3>
+            <ul>
+              <li>Confirm the medication’s strength is mg per one unit.</li>
+              <li>
+                Check the quantity you actually took and its calculated mg.
+              </li>
+              <li>Check the taken date, time and journal timezone.</li>
+            </ul>
+            <PageLink href="/history">Find Preferences In Past Days</PageLink>
+          </div>
         </section>
 
         <aside
@@ -302,8 +310,8 @@ export function GuidePage() {
             <ActionIcon name="next" className="size-[18px]" />
           </Button>
           <p>
-            Reading on first can help you get familiar with the journal. You can
-            also start now and come back anytime.
+            Start now and return to this guide anytime. On a phone, use Contents
+            to find a topic while you read.
           </p>
         </aside>
 
@@ -389,19 +397,24 @@ export function GuidePage() {
             </GuideDetail>
             <GuideDetail title="Pick Up Where You Left Off" icon="save">
               <p>
-                Unfinished intake, medication, goal, morning or evening
-                check-in, and preference forms keep a draft on this device.
-                Close a dialog, reload, or reopen the app: your last screen and
-                open form return with the values you entered. Each medication
-                and past day keeps its own draft.
+                Intake, medication, goal, check-in and preference forms keep
+                drafts on this device when browser storage is available. Reopen
+                the app to return to your last screen and form. Each medication,
+                tracking day and check-in period keeps its own draft.
               </p>
               <p>
-                Look for Draft Saved or Restored Draft below the fields. Save
-                records the change in your journal and clears that draft; Reset
-                Draft starts the form over. Closing a form keeps your work
-                without recording an intake. Drafts stay on this browser or
-                installed app and do not sync to another device. Clearing its
-                site data removes them.
+                Draft Saved means the form is kept locally. Save records the
+                change in your journal; Reset Draft starts the form over.
+                Closing an intake form does not record an intake. Drafts do not
+                sync to other devices, and clearing site data removes them.
+              </p>
+              <p>
+                <strong>Journal writing has its own save status.</strong> It
+                saves automatically while connected and offers a Save action.
+                Done closes the writing space. Use Save Check-In to save moods,
+                ratings and other answers. If a restored draft or a change from
+                elsewhere needs review, check your writing and use Save to keep
+                that version.
               </p>
             </GuideDetail>
             <GuideDetail
@@ -425,8 +438,7 @@ export function GuidePage() {
               <p>
                 Tap any visible card in a folded stack to show all of its
                 intakes. Once the stack is open, tap any card to edit that
-                intake. A folded stack previews up to six complete cards
-                underneath the first one.
+                intake. Each intake remains a separate record.
               </p>
               <p>
                 <strong>Show Intakes</strong> reveals the whole group.
@@ -530,33 +542,29 @@ export function GuidePage() {
             >
               <p>
                 The Categories menu sits beside Active Ingredient and lists all{" "}
-                {MEDICATION_CATEGORIES.length} labels directly. Scroll to browse
-                or type a label to jump to it with your keyboard. Select as many
-                as you want; each chosen row shows a check and “selected” while
-                the menu stays open. Choose Done when finished, toggle a label
-                again to remove it, or use Clear to leave the selection empty.
+                {MEDICATION_CATEGORIES.length} optional labels. Scroll to browse
+                or type a label with your keyboard to jump to it. Select
+                several, choose Done, or use Clear to remove them all. Tap a
+                selected label again to remove only that one.
               </p>
               <p>
-                These optional labels help organize your own medication list.
-                More than one can be selected for the same item; you choose
-                which ones are useful. Medication Type still describes its form
-                and counting unit. Names and active ingredients never select
-                categories automatically. Categories can be left empty.
+                Choose the labels useful to you. Names and ingredients never
+                select categories automatically. Medication Type still describes
+                the form and counting unit; Categories can stay empty.
               </p>
               <p>
-                Earlier Benzo and Opioid markings carry over. Their recognizable
-                symbols follow the saved labels across intakes, history, goals
-                and medication choices; both can remain selected together. Saved
-                cards keep category symbols together in a compact row, with
-                scrolling when needed. Changing labels does not change
-                quantities, times, notes, or dose calculations.
+                Earlier Benzo and Opioid markings carry over. Their symbols
+                follow your labels across intake cards, history and goals.
+                Changing labels leaves quantities, times, notes and calculated
+                doses as recorded.
               </p>
             </GuideDetail>
             <GuideDetail title="Edits Apply To Past Logs" icon="retry">
               <p>
                 Changing a medication’s name, strength, or type updates every
                 linked past intake. A strength change recalculates its doses and
-                daily totals from the quantities you actually logged.
+                daily totals from the quantities you logged. Check the new
+                strength carefully before saving.
               </p>
               <p>
                 Recorded quantities, taken times, creation times, intake notes,
@@ -566,34 +574,33 @@ export function GuidePage() {
             </GuideDetail>
             <GuideDetail title="A Familiar Color &amp; Symbol" icon="flower">
               <p>
-                Browse with the Icons, Emojis and Customs count buttons, or
-                search by name or keyword in English or German. A source opens
-                its first 100 choices immediately. Load more reveals the next
-                batch; press the active source again for mixed search. Typed
-                results arrive after you stop for 2.5 seconds.
+                Choose Icons, Emojis or Customs to browse, or search by name or
+                keyword in English or German. Each source opens its first 100
+                choices; Load More reveals another batch. Tap the active source
+                again to search all sources. Typed results appear after a
+                2.5-second pause.
               </p>
               <p>
                 Try <code>svg</code> for custom artwork, <code>outline</code>{" "}
                 for tintable tablets, or <code>color</code> for flat-color
-                tablet illustrations. Final Look shows the symbol and its actual
-                journal card, with a clear default-dose breakdown. Try Surprise
-                Me and Undo, or use the small motion button to pause the preview
-                animations. Your motion choice is remembered with the draft.
+                tablet illustrations. Final Look previews the journal card and
+                default-dose calculation. Surprise Me has its own Undo. The
+                motion button pauses the preview and remembers that choice in
+                this draft.
               </p>
               <p>
                 Tintable icons follow your chosen accent; colored artwork keeps
-                its own colors. The app itself follows your device’s light or
-                dark appearance and reduced-motion settings.
+                its own colors. Preview motion respects your device’s
+                reduced-motion setting. Choose the app’s appearance from the
+                menu.
               </p>
             </GuideDetail>
             <GuideDetail title="Archive &amp; Restore" icon="archive">
               <p>
-                Tap anywhere on a medication card to open its editor. Choose
-                Archive Medication when you no longer want it offered for new
-                intakes; its earlier records stay in the journal. Use
-                the Archived group below your active medications to find them,
-                open their card, and choose Restore Medication whenever you
-                need them again. The counts above the list show both statuses.
+                Open a medication card and choose Archive Medication to stop
+                offering it for new intakes. Earlier records stay in the
+                journal. To bring it back, open its card in the Archived group
+                and choose Restore Medication.
               </p>
             </GuideDetail>
           </div>
@@ -639,9 +646,8 @@ export function GuidePage() {
                 yesterday remains current.
               </p>
               <p>
-                Use Explore Streak Milestones below to visit Streaks. It is no
-                longer a navigation-menu item. Early milestones arrive in small
-                steps, then every five days after 30.
+                Open Explore Streak Milestones below. Early milestones arrive in
+                small steps, then every five days after 30.
               </p>
               <p>
                 A streak measures logging activity. It does not indicate whether
@@ -649,19 +655,10 @@ export function GuidePage() {
                 evening check-ins do not add intake days to the counter.
               </p>
               <p>
-                The Streaks page shows the latest three unlocked milestones and
-                the next three targets. Achievements stay unlocked after a gap.
-                Each card opens its own page with the recorded days, check-in
-                changes, and separate medication figures available for that
-                milestone. Missing records stay unknown; dose changes are not
-                labeled as better or worse.
-              </p>
-              <p>
-                When a link includes a milestone spotlight, that milestone moves
-                into view and briefly lights up. If it falls outside the usual
-                list, an extra card appears under In The Spotlight. Its earned
-                or upcoming status still comes from your saved records. Reduced
-                motion uses a brief outline instead of the animated burst.
+                Streaks shows the latest three unlocked milestones and the next
+                three targets. Achievements stay unlocked after a gap. Open a
+                card for its recorded days, check-in changes and separate
+                medication figures. Missing records remain unknown.
               </p>
               <PageLink href="/streaks">Explore Streak Milestones</PageLink>
             </GuideDetail>
@@ -681,45 +678,31 @@ export function GuidePage() {
           />
           <div className={styles.readingCard} data-card-entry>
             <p>
-              Morning is available from the 06:00 tracking-day reset. Evening
-              becomes available at 17:00 in your journal timezone and takes the
-              first position above Today’s intakes. Morning then moves below the
-              last intake until the next reset. Both check-ins sit alongside the
-              intake cards with the same compact spacing. Morning focuses on
-              your sleep and how you’re waking up; Evening keeps your day’s
-              moods and reflections. Add at least one detail to save, including
-              on a day without intakes.
+              Morning opens at the 06:00 reset. Evening opens at 17:00 in your
+              journal timezone and continues until the next 06:00 reset. You can
+              save either on a day with no intakes. Add one detail or several;
+              every field is optional.
             </p>
             <p>
-              Both cards use a pink accent, a dark illustrated tile and a small
-              completion ring. Morning has a steaming cup; Evening has a gently
-              swaying moon. The time before the title remembers the first time
-              you opened that check-in on this device, even without pressing
-              Save. Your latest successful save is tracked separately. Drafts
-              can update the ring, but opening a card alone never marks a
-              section complete. Tap anywhere on the card to continue.
+              Tap the cup or moon card to start, continue or edit. Evening moves
+              above Today’s intakes when it opens; Morning then sits below them.
+              The ring shows how many sections contain something, including
+              draft answers. Opening the card alone does not complete a section.
             </p>
             <p>
               <strong>Morning sleep journal.</strong> Rate dream recall,
               sleepiness, depth, restfulness and overall quality from 1 to 10.
-              Then add lights-out/getting-up times, time to fall asleep and any
-              night awakenings. Record actual sleep and extra sleep wanted in
-              hours and minutes; the form calculates estimated time in bed and
-              the percentage spent asleep. Leave anything unknown blank, or
-              enter 0 for none. The five completion groups are Notes, Sleep
-              Ratings, Sleep Schedule, Night Interruptions and Sleep Duration.
+              Add lights-out and getting-up times, time to fall asleep, night
+              awakenings and sleep duration. The form estimates time in bed and
+              the percentage spent asleep. Leave unknown details blank; use 0
+              when you mean none.
             </p>
             <p>
-              <strong>Evening reflection.</strong> Five groups keep things
-              simple: your journal, Moods, Energy, Stress and What Helped.
-              Browse {DAILY_MOODS.length} feelings with Lucide symbols, search
-              for a word, or narrow the list to a family. Pick up to four;
-              selected feelings stay beneath the scrolling palette while you
-              browse. Familiar choices rise to the top; Shuffle offers a fresh
-              mix without moving them behind unused choices. Moods and the
-              optional Energy/Stress sliders share Your Day, Your Mood. Sleep is
-              collected in Morning Check-In, while older saved sleep details
-              stay intact.
+              <strong>Evening reflection.</strong> Browse {DAILY_MOODS.length}{" "}
+              feelings with Lucide symbols. Search by word or filter by family,
+              then choose up to four. Selected feelings stay below the palette.
+              Familiar choices rise to the top; Shuffle changes the mix. Add
+              optional Energy, Stress and One Thing That Helped answers.
             </p>
             <div
               className={styles.moodList}
@@ -744,9 +727,10 @@ export function GuidePage() {
                 <dd>
                   A roomy journal entry, up to{" "}
                   {DAILY_REFLECTION_MAX_LENGTH.toLocaleString("en-GB")}{" "}
-                  characters. Keep paragraphs and follow the live word and
-                  character counts. Morning calls this Your Morning, Your Words;
-                  both open the same Markdown writing space, without prompts.
+                  characters. Morning calls this Your Morning, Your Words. Both
+                  open the same writing space with Markdown formatting, Preview,
+                  Read and a Markdown download. Watch the writing save status;
+                  Done returns to the check-in.
                 </dd>
               </div>
               <div>
@@ -762,31 +746,23 @@ export function GuidePage() {
                     Use <code>@</code> for a medication, active ingredient or
                     category such as Benzodiazepine. Use <code>/</code> for a
                     day, week or journal: try <code>/Today</code>,{" "}
-                    <code>/Yesterday</code>, <code>/9Nov</code> or{" "}
-                    <code>/ThisWeek</code>. Suggestions appear after 0.8 seconds
-                    without typing, using only the journal already on your
-                    device. Typing a space closes the suggestions so you can
-                    continue normally.
+                    <code>/Yesterday</code> or <code>/ThisWeek</code>.
+                    Suggestions appear after a brief pause using journal data
+                    already loaded on this device. A space closes them.
                   </p>
                   <p className="mt-2">
                     Choose the main row to link a medication or whole day. Its
-                    separate arrow reveals today’s logged intakes or that day’s
-                    saved Morning/Evening journals. Up/Down moves through
-                    choices, Right opens the extra choices, Left returns, and
-                    Enter or Tab inserts. Escape closes just the suggestions.
-                    You can also type an exact name or a reference such as{" "}
-                    <code>/Yesterday.Evening</code> directly.
+                    arrow reveals today’s intakes or that day’s saved journals.
+                    On a keyboard, use Up/Down to browse, Right/Left to open or
+                    leave extra choices, Enter/Tab to insert and Escape to
+                    close. You can also type <code>/Yesterday.Evening</code>{" "}
+                    directly.
                   </p>
                   <p className="mt-2">
-                    Preview and Read turn these into small, colored links. An
-                    intake link reveals and highlights its actual log card; a
-                    medication link highlights its library card. Ingredients
-                    open the most-used matching medication, categories gather
-                    their saved medications, and weeks gather their recorded
-                    days. A direct journal link can read even a short note; the
-                    main Journal collection still needs more than 100 words.
-                    Selected dates stay fixed, and relative references typed in
-                    older writing stay anchored to that entry’s day.
+                    Preview and Read make references into links to the related
+                    card, day or saved writing. Selected dates stay fixed.
+                    Relative references in older writing stay anchored to that
+                    entry’s tracking day.
                   </p>
                 </dd>
               </div>
@@ -831,21 +807,19 @@ export function GuidePage() {
               </div>
             </dl>
             <p>
-              The card keeps your check-in close without showing your private
-              responses. A check mark confirms it was saved; the small section
-              count shows how much you added. Unsaved changes stay in your local
-              draft. Tap anywhere on either card to continue or edit. Morning
-              and Evening each have one record per tracking day, with their own
-              logging time and device-local draft. Saving or resetting one
-              leaves the other alone; edits update only the selected entry.
+              <strong>Find longer writing in Journal.</strong> Saved entries
+              with more than 100 words appear there automatically, with search
+              and a reading view. Shorter saved notes stay in their check-in and
+              can still open through a direct journal link. Unfinished drafts
+              stay with their check-in.
             </p>
+            <PageLink href="/journal">Browse Journal Pages</PageLink>
             <p>
-              The evening continues after midnight until 06:00. An open draft
-              keeps the day it was opened for, even if the clock passes the
-              reset. On past-day pages, Morning sits above the intakes and
-              Evening below them. Those pages let you add either missed check-in
-              at any hour. Earlier entries remain Evening Check-Ins; adding
-              Morning does not move or replace them.
+              Morning and Evening each have one saved record per tracking day
+              and their own local draft. Saving one leaves the other alone. An
+              open draft keeps its original day across the 06:00 reset. In Past
+              Days, add either missed check-in at any hour: Morning sits above
+              the intakes and Evening below them.
             </p>
           </div>
         </section>
@@ -872,17 +846,18 @@ export function GuidePage() {
             <p>
               Open a day for its intake timeline and check-ins. Previous Day and
               Next Day move between dates; Add Missed Intake lets you catch up.
-              Older card summaries are kept on this device to make repeat visits
-              lighter. The latest three recorded past days stay live, and relevant edits
-              refresh older summaries automatically.
+              The latest three recorded past days use live summaries. Older
+              summaries are cached on this device, separately for each journal;
+              relevant edits refresh them. These summaries are not a backup.
             </p>
             <div className={styles.callout}>
               <ActionIcon name="export" className="size-4" />
               <p>
                 <strong>Export Journal</strong> is at the bottom of Past Days.
                 It downloads a JSON backup of medications, intakes, goals,
-                check-ins, and settings. Keep that file somewhere you can find
-                it again.
+                check-ins and settings. Local form drafts are not included. Keep
+                the file somewhere you can find it again. The app currently has
+                no import or restore screen.
               </p>
             </div>
             <PageLink href="/history">Open Past Days</PageLink>
@@ -924,69 +899,64 @@ export function GuidePage() {
             <GuideDetail title="A Place For Everything" icon="menu">
               <p>
                 Open the menu beside the animated tablets to move between Today,
-                Journal, Past Days, Medications and Goals. Today has its own
-                featured card; the other places appear as roomy tiles on phones.
-                The current page is highlighted, and small counts show what is
-                already saved. The menu opens as a scrollable bottom sheet, just
-                like an intake form. Getting Started sits below the main pages;
-                Backups, Report a Bug and Developer are together under Help &amp;
-                Tools. Scroll down on smaller screens to reach every shortcut.
+                Journal, Past Days, Medications and Goals. On phones it opens as
+                a scrollable bottom sheet. Getting Started sits below the main
+                pages; Backups, Report a Bug and Developer are under Help &amp;
+                Tools. Scroll to reach the lower shortcuts.
               </p>
             </GuideDetail>
             <GuideDetail title="Find Your Light" icon="palette">
               <p>
-                The theme button beside Close in the menu opens Appearance.
+                Open Appearance with the theme button beside Close in the menu.
                 Choose Light &amp; Bright, Dark &amp; Cozy or Follow Your
-                Device. Your choice applies across the app and stays in this
-                browser when storage is available. System follows your device
-                automatically; a manual choice stays as you set it. If the
-                browser cannot save it, This Visit Only means it will last for
-                the current visit. Your journal entries and saved medication
-                colors stay the same.
-              </p>
-              <p>
-                Light &amp; Bright pairs lilac and blush paper with deep plum
-                text, rose actions and clear field edges. Cards and journal
-                pages have their own quiet reading surfaces; dark mug, moon and
-                bell tiles stay bright and easy to spot. The loading screen,
-                menus and offline page follow the same appearance too.
+                Device. Your choice stays in this browser when storage is
+                available. This Visit Only means it could not be saved for next
+                time. The app also respects your device’s reduced-motion
+                setting.
               </p>
             </GuideDetail>
             <GuideDetail title="Refresh Or Open Medications" icon="retry">
               <p>
-                Tap the animated tablets to return to Today. Pull that button
-                downward to refresh: its pills fade beneath a warm berry surface
-                and a refresh icon grows in their place. When the button and
-                icon rebound to full size, release to refresh. A short pull
-                cancels. One continuous loading screen stays in place while the
-                page reloads, your journal returns and the app restores your
-                drafts and position.
+                Tap the animated tablets, or activate them with the keyboard, to
+                return to Today. Pull the button downward until it rebounds,
+                then release to refresh the page. A short pull cancels. After
+                the reload, the app restores your local drafts and position.
               </p>
               <p>
                 Pull the same button to the right until it rebounds, then
-                release to open Medications. This keeps your unfinished drafts
-                and uses in-app navigation. If Medications is already open, the
-                button settles back without navigating or changing your scroll
-                position. The menu’s <strong>Medications</strong> link is also
-                available without a gesture.
+                release to open Medications. Pull back before releasing to
+                cancel. The menu also links to Medications. These actions wait
+                while a save is pending.
+              </p>
+            </GuideDetail>
+            <GuideDetail title="Saved Notices &amp; Undo" icon="restore">
+              <p>
+                A notice confirms a save or explains an error. Tap its heading
+                to read the details, view the affected record and follow any
+                related links. If several notices are stacked, the first tap
+                reveals the stack. Reading pauses the notice’s display timer.
               </p>
               <p>
-                You can steer between down and right before the button is ready.
-                Reaching that point locks the action; pulling back cancels it.
-                Releasing a drag never triggers an extra refresh. Clicking or
-                using the keyboard on the tablet button still refreshes this
-                page. These actions are unavailable while a save is pending.
-                Ordinary page scrolling stays separate from the branding
-                gesture.
+                When Undo is available, it reverses that saved change after the
+                server confirms it. Dismissing a notice keeps the saved change.
+                Undo is limited to 15 minutes after the change and can be
+                refused if the record has changed again. Expanding a notice
+                pauses its display timer, not the Undo deadline.
+              </p>
+              <p>
+                Eligible notices and their remaining display time can return
+                after reopening this journal on the same device. They are kept
+                separately for each journal. Use the saved record itself when a
+                notice or Undo is no longer available.
               </p>
             </GuideDetail>
             <GuideDetail title="Connection &amp; App Updates" icon="lightning">
               <p>
-                Loading and saving journal records needs a connection. The
-                installed app can show a neutral offline page, but it does not
-                queue offline intakes or save them for later submission.
-                Unfinished form drafts are separate: they stay on the device and
-                still need your explicit Save when connected.
+                Loading and saving records needs a connection. The installed app
+                can show an offline page; intakes and other forms are not queued
+                for later submission. Their local drafts wait for Save. Writing
+                is different: it keeps a local draft and can resume its own
+                saving when the connection returns. Check its save status.
               </p>
               <p>
                 When a new app version is waiting, App Update Ready offers
@@ -1071,11 +1041,21 @@ export function GuidePage() {
             </GuideDetail>
             <GuideDetail title="What If A Save Fails?">
               <p>
-                Check the connection and retry when you are ready. Failed saves
-                retain the current draft, including if you close the form and
-                return later. The app does not automatically replay a save after
-                restoring a sign-in.
+                Check the connection and keep the draft. For intakes and other
+                forms, reopen and save again when ready; the app does not replay
+                that submission for you. Writing has a separate status and Save
+                action. Review any restored-version or conflict message before
+                choosing to save your writing.
               </p>
+            </GuideDetail>
+            <GuideDetail title="Why Is My Writing Missing From Journal?">
+              <p>
+                Journal gathers saved writing with more than 100 words. Exactly
+                100 words, shorter notes and unfinished drafts stay with their
+                Morning or Evening Check-In. Check the writing’s save status,
+                then reopen the original day and check-in to find it.
+              </p>
+              <PageLink href="/journal">Open Journal</PageLink>
             </GuideDetail>
             <GuideDetail title="Why Am I Being Asked For A Password Again?">
               <p>

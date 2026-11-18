@@ -1,5 +1,6 @@
 .page {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .backLink {
@@ -41,6 +42,7 @@
   min-width: 0;
   flex-direction: column;
   gap: 4px;
+  overflow-wrap: anywhere;
 }
 
 .atAGlance > div + div {
@@ -174,6 +176,26 @@
   text-underline-offset: 4px;
 }
 
+.page .pageLink,
+.page .quickStart,
+.page .returnAction {
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+}
+
+.page .pageLink {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.page .quickStart,
+.page .returnAction {
+  width: 100%;
+  padding: 12px 14px;
+  line-height: 1.5;
+}
+
 .panel,
 .readingCard {
   min-width: 0;
@@ -290,12 +312,14 @@
 }
 
 .reference dt {
+  min-width: 0;
   color: var(--foreground);
   font-weight: 500;
   line-height: 1.8;
 }
 
 .reference dd {
+  min-width: 0;
   margin: 0;
   color: var(--muted-foreground);
   line-height: 1.8;
@@ -405,6 +429,38 @@
   margin: 10px 2px 0;
   color: var(--muted-foreground);
   line-height: 1.8;
+}
+
+.checklist {
+  min-width: 0;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-reading);
+  color: var(--surface-reading-foreground);
+}
+
+.checklist h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.checklist ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.75;
+  list-style: disc;
+}
+
+.checklist li {
+  padding-left: 3px;
 }
 
 .footerLinks {
@@ -621,7 +677,8 @@
 }
 .readingCard > p + p,
 .readingCard > p + .reference,
-.readingCard .reference + p {
+.readingCard .reference + p,
+.readingCard > .pageLink + p {
   margin-top: 20px;
 }
 .detail summary {
@@ -910,6 +967,7 @@
   display: none;
 }
 .contentsBox > summary strong {
+  min-width: 0;
   flex: 1;
   font-size: 13px;
   font-weight: 600;
@@ -966,22 +1024,79 @@
     font-size: 22px;
   }
   .sectionHeading > span {
-    font-size: 11px;
+    width: 100%;
+    margin-left: 0;
+    font-size: 12px;
+    text-align: left;
+  }
+  .atAGlance {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+  .atAGlance > div:last-child {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+  .atAGlance span {
+    font-size: 16px;
+  }
+  .atAGlance small {
+    font-size: 12px;
   }
   .readingCard {
     padding: 20px 18px;
   }
   .detail summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 16px;
     min-height: 54px;
     padding: 15px 16px;
-    gap: 9px;
+    gap: 3px 9px;
+  }
+  .detail summary[data-has-icon] {
+    grid-template-columns: 20px minmax(0, 1fr) 16px;
+  }
+  .detail summary > svg:first-child:not(:last-child) {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    margin-top: 3px;
+  }
+  .detailTitle {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .detailCaret {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  .detail summary[data-has-icon] .detailTitle,
+  .detail summary[data-has-icon] .detailContext {
+    grid-column: 2;
+  }
+  .detail summary[data-has-icon] .detailCaret {
+    grid-column: 3;
   }
   .detailBody {
     padding: 0 18px 20px;
   }
   .detailContext {
-    max-width: 28%;
-    font-size: 10px;
+    grid-column: 1;
+    grid-row: 2;
+    max-width: 100%;
+    font-size: 12px;
+    font-weight: 400;
+    text-align: left;
   }
   .reference > div {
     grid-template-columns: minmax(0, 1fr);
@@ -1001,6 +1116,26 @@
   }
   .steps h3 {
     font-size: 18px;
+  }
+  .stepNumber {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+  .page [data-guide-outline-level="2"] {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .page .reference [data-guide-outline-level="2"] {
+    font-size: 16px;
+  }
+  .checklist {
+    padding: 16px;
+  }
+  .startAction {
+    margin-block: 24px 32px;
+    padding: 16px;
   }
   .moodList {
     gap: 6px;
@@ -1022,6 +1157,24 @@
     min-height: 44px;
   }
 }
+
+.page a:focus-visible,
+.detail summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 5px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .contents a,
+  .detail summary,
+  .detailCaret,
+  .returnAction,
+  .contentsBox > summary > svg:last-child {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .contentsBox > summary > svg:last-child {
     transition: none;

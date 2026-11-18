@@ -6,7 +6,7 @@ import { authenticatedJournal } from "@/lib/server/auth";
 import { journalRepository } from "@/lib/server/database";
 import { journalNeedsGettingStarted } from "@/lib/server/guide-onboarding";
 
-export const metadata: Metadata = { title: "Guide & Getting Started" };
+export const metadata: Metadata = { title: "Getting Started & Journal Guide" };
 
 export default async function Page() {
   const journalId = await authenticatedJournal();
