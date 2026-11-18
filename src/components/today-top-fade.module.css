@@ -14,8 +14,7 @@
     inset: 0 0 auto;
     height: 0;
     display: block;
-    /* One shared opacity keeps the entire bright treatment 30% softer. */
-    opacity: calc(0.56 * 0.7);
+    opacity: 0.55;
     background:
       radial-gradient(
         ellipse at 82% 0%,
@@ -26,7 +25,7 @@
         to bottom,
         var(--top-fade-base) 0%,
         color-mix(in srgb, var(--top-fade-base) 84%, transparent) 18%,
-        color-mix(in srgb, var(--top-fade-base) 50%, transparent) 42%,
+        color-mix(in srgb, var(--top-fade-base) 58%, transparent) 42%,
         color-mix(in srgb, var(--top-fade-base) 20%, transparent) 65%,
         color-mix(in srgb, var(--top-fade-base) 4%, transparent) 86%,
         transparent 100%
@@ -43,7 +42,7 @@
         var(--surface-raised) 76%,
         var(--palette-lilac)
       );
-      opacity: calc(0.68 * 0.7);
+      opacity: 0.64;
     }
   }
 }

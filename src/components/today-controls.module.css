@@ -54,10 +54,11 @@
   }
 }
 
-/* The doubled frosted surround remains paint within the original hit target. */
+/* Log Intake has a 6px inset: a 1⅔px outer line and a 4⅓px frosted band. */
 .action[data-intake-paint="satin"] {
-  --action-outer-line: 1.333px;
-  --action-inner-line: 2px;
+  --action-face-inset: 6px;
+  --action-outer-line: 1.667px;
+  --action-inner-line: 4px;
   --action-surround: color-mix(
     in srgb,
     var(--color-pink-300, #f9a8d4) 32%,
@@ -71,7 +72,7 @@
 }
 
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
-  --control-surround-width: 10px;
+  --control-surround-width: var(--action-face-inset, 10px);
   isolation: isolate;
   border: 0;
   border-radius: var(--intake-card-radius, 21px);

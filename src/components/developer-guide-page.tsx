@@ -1283,7 +1283,8 @@ export function DeveloperGuidePage() {
                 border at 29% opacity. Its former bright reflections are
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
-                shadows retain the raised face.
+                shadows retain the raised face. Log Intake uses a larger face
+                with a 6px inset, a 1⅔px outer line and a 4px inner line.
               </p>
               <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
@@ -1358,13 +1359,13 @@ export function DeveloperGuidePage() {
               <p>
                 Two pointer-inert layers soften the page behind the fixed mobile
                 action. A long veil reaches 148% of the dock height: Plum mixed
-                with 15% Purple900 starts at 56% opacity and tapers through six
+                with 15% Purple900 starts at 74% opacity and tapers through six
                 gentle stops to complete transparency. A shorter wash reaches
-                118%, placing Fuchsia900 at 12% near the lower left and
-                Violet900 at 14% near the lower right, then masking both away
+                118%, placing Fuchsia900 at 16% near the lower left and
+                Violet900 at 18% near the lower right, then masking both away
                 above the summary. This replaces the former four-layer stack,
                 which approached full opacity at the bottom. Light Mode uses
-                sunken Rose/Lilac paper at 68% with matching Rose and Lilac
+                sunken Rose/Lilac paper at 86% with matching Rose and Lilac
                 washes. The decorative layers add no layout height or input
                 targets; safe-area clearance, page scroll reserve and the
                 measured dock stay attached to the same fixed parent. Desktop
@@ -1374,8 +1375,8 @@ export function DeveloperGuidePage() {
                 Today also has a shorter, bright fade from the document top to
                 the upper edge of the Wake-Up time value. Lilac and Pink200
                 supply its light, with a faint Rose wash near the top right. The
-                entire treatment uses 70% of the bottom fade’s strength: 39.2%
-                in Dark Mode and 47.6% in Light Mode. Its absolute paint scrolls
+                top fade uses 55% opacity in Dark Mode and 64% in Light Mode.
+                Its absolute paint scrolls
                 away with the header. ResizeObserver, viewport changes and font
                 readiness keep its endpoint aligned without changing the page
                 layout or intercepting input. The Medications page reuses
