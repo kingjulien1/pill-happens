@@ -634,3 +634,64 @@
     animation: none;
   }
 }
+
+.menuHeading {
+  margin: 8px 3px 14px;
+  row-gap: 12px;
+}
+.titleLine {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.titleMark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--nav-pink);
+}
+.menuHeading [data-slot="button"]::before {
+  inset: 1px;
+}
+.navigation .entries {
+  gap: 6px;
+}
+.navigation .entry {
+  min-height: 54px;
+  padding: 7px 11px;
+  grid-template-columns: 33px minmax(0, 1fr) 18px;
+  gap: 10px;
+  border-radius: 13px;
+}
+.navigation .iconTile {
+  width: 33px;
+  height: 33px;
+  border-radius: 10px;
+}
+.navigation .iconTile > svg {
+  width: 18px;
+  height: 18px;
+}
+.navigation .copy {
+  gap: 2px;
+}
+.navigation .description {
+  -webkit-line-clamp: 1;
+}
+.navigation .entry[data-page="today"] {
+  margin-bottom: 3px;
+  background-image: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--nav-pink) 12%, transparent),
+    color-mix(in srgb, var(--nav-soft) 5%, transparent)
+  );
+}
+.navigation .sectionHeading {
+  padding-block: 10px 7px;
+}
+.navigation .footer {
+  margin-top: 10px;
+}
+.navigation .toolsHeading {
+  padding-block: 8px 6px;
+}

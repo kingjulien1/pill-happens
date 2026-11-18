@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { APP_FOUNDATION } from "@/lib/app-theme";
 import styles from "./header-menus.module.css";
 import compact from "./appearance-menu.module.css";
+import closeStyles from "./dialog-close.module.css";
 import { Button } from "@/components/ui/button";
 
 const options = [
@@ -52,11 +53,7 @@ export function AppearanceMenu({ nested = true }: { nested?: boolean }) {
   const Root = nested ? Menu.SubmenuRoot : Menu.Root;
   const triggerProps = {
     render: <Button variant="ghost" size="icon" type="button" />,
-    className: cn(
-      styles.headerAction,
-      styles.appearanceTrigger,
-      compact.trigger,
-    ),
+    className: cn(closeStyles.control, styles.appearanceTrigger),
     "aria-label": "Choose color mode",
     title: "Choose color mode",
     "data-appearance-trigger": true,

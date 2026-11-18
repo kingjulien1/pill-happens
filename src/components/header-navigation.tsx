@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Fragment,
   useCallback,
   useLayoutEffect,
   useRef,
@@ -36,6 +35,9 @@ import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
 import styles from "./navigation-panel.module.css";
+import dialogStyles from "./responsive-modal.module.css";
+import closeStyles from "./dialog-close.module.css";
+import checkStyles from "./daily-check-in.module.css";
 import controlStyles from "./today-controls.module.css";
 import { Button } from "@/components/ui/button";
 import {
@@ -124,30 +126,16 @@ function MenuRow({
         {icon}
       </span>
       <span className={styles.copy}>
-        <span className={styles.labelRow}>
-          <span className={styles.label}>{label}</span>
+        <span className={styles.label}>{label}</span>
+        <span className={styles.description}>
           {detail && (
-            <span className={styles.detail}>
-              <strong>{detail.split(" ")[0]}</strong>{" "}
-              {detail.split(" ").slice(1).join(" ")}
-            </span>
+            <>
+              {detail}
+              <span aria-hidden="true"> · </span>
+            </>
           )}
+          {facts?.[0] ?? description}
         </span>
-        <span className={styles.description}>{description}</span>
-        {facts && facts.length > 0 && (
-          <span className={styles.facts} data-navigation-facts>
-            {facts.map((fact, index) => (
-              <Fragment key={fact}>
-                {index > 0 && (
-                  <span className={styles.factSeparator} aria-hidden="true" />
-                )}
-                <span className={styles.fact} title={fact}>
-                  {fact}
-                </span>
-              </Fragment>
-            ))}
-          </span>
-        )}
       </span>
       <span className={styles.trailing} aria-hidden="true">
         {active ? (
@@ -361,23 +349,36 @@ function NavigationMenu({
   const Separator = mobile ? "div" : Menu.Separator;
   const contents = (
     <>
-      <div className={styles.masthead} data-navigation-masthead>
-        <span
-          className={styles.mastheadIcon}
-          style={getBrandThemeStyle()}
-          aria-hidden="true"
-          data-navigation-brand
-        >
-          <BrandMark className={styles.navigationLogo} />
-        </span>
-        <div className={styles.mastheadCopy}>
-          <Title className={styles.title}>Your Journal</Title>
-          <Description className={styles.subtitle}>
-            Your days, thoughts and little next steps.
-          </Description>
+      <div
+        className={cn(
+          dialogStyles.headingRow,
+          dialogStyles.checkInHeader,
+          styles.menuHeading,
+        )}
+        data-navigation-masthead
+      >
+        <div className={dialogStyles.headingCopy}>
+          <Title className={dialogStyles.title}>
+            <span className={styles.titleLine}>
+              <BrandMark className={styles.titleMark} />
+              Your Journal
+            </span>
+          </Title>
+          {today && (
+            <time className={checkStyles.headerDate} dateTime={today}>
+              {formatDay(today, {
+                weekday: "long",
+                month: undefined,
+                day: undefined,
+              })}
+              <small>
+                / {formatDay(today, { weekday: undefined, month: "long" })}
+              </small>
+            </time>
+          )}
         </div>
         <div
-          className={styles.headerActions}
+          className={closeStyles.actions}
           role="group"
           aria-label="Navigation controls"
           data-navigation-header-actions
@@ -388,7 +389,7 @@ function NavigationMenu({
               render={<Button variant="ghost" size="icon" type="button" />}
               aria-label="Close navigation"
               title="Close navigation"
-              className={styles.headerAction}
+              className={closeStyles.control}
               data-navigation-close
             >
               <X aria-hidden="true" strokeWidth={2.1} />
@@ -401,13 +402,16 @@ function NavigationMenu({
               label="Close navigation"
               aria-label="Close navigation"
               title="Close navigation"
-              className={styles.headerAction}
+              className={closeStyles.control}
               data-navigation-close
             >
               <X aria-hidden="true" strokeWidth={2.1} />
             </Menu.Item>
           )}
         </div>
+        <Description className={dialogStyles.description}>
+          Open today’s log, revisit a past day, or update your medications.
+        </Description>
       </div>
       <Separator
         role="separator"
@@ -418,15 +422,7 @@ function NavigationMenu({
         <Group aria-label="Journal pages" data-navigation-section="daily">
           <div className={styles.sectionHeading} aria-hidden="true">
             <span>Your Space</span>
-            <span data-navigation-tracking-date>
-              {today
-                ? formatDay(today, {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })
-                : `${links.length} Places To Land`}
-            </span>
+            <span>{links.length} pages</span>
           </div>
           <div className={styles.entries}>
             {links.map(
@@ -491,8 +487,7 @@ function NavigationMenu({
             >
               <MenuRow
                 label="Getting Started"
-                description="Your first log, daily check-ins, and the little details."
-                facts={["Daily Basics", "App & Backups"]}
+                description="Your first intake and daily check-ins."
                 tone="sand"
                 active={pathname === "/guide"}
                 icon={<BookOpenText strokeWidth={2.1} />}
