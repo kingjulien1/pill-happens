@@ -3051,21 +3051,15 @@ export function DeveloperGuidePage() {
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
-                  flowing page background with distinct Rose400 morning and
-                  Violet400 evening identities. The shared 5⅓px mixed rim and
+                  flowing page background with a shared check-in color. The
+                  mixed rim and
                   2⅔px identity band paint inward; the identity alpha follows
                   the light/dark recipe above. Filled coffee and crescent
-                  artwork distinguish the periods; their base and
-                  completion-meter surfaces share an opaque, very dark Pink/Plum
-                  mix (88% #210F25 with 12% Pink950). Both main symbols share
-                  the mug’s pale Rose200 ink on their dark period-specific
-                  surfaces in either appearance; the completion number retains
-                  its primary light ink and page headings retain their adaptive
-                  reading color. The Pink identity and artwork overrides are
-                  local to these cards, leaving medication and topbar colors
-                  independent. Steam, stars, entry motion, ambient loops and
-                  progress replay retain their own timing. Section dots use
-                  Pink500. Details and icon stages remain 56px, the tile 48px
+                  artwork distinguish the periods. Both illustrations sit on a
+                  dark tile. The sleep and mood summaries use the shared card
+                  foreground in both appearances. The steam, stars and entry
+                  motion retain their own timing. Details and icon stages
+                  remain 56px, the tile 48px
                   and symbol holder 30px. A single two-thirds scale on the
                   illustration owner makes both scenes exactly one third
                   smaller, including their steam, stars and motion travel. The
@@ -3089,53 +3083,15 @@ export function DeveloperGuidePage() {
                   Morning and “Survived? Leave notes.” for Evening. It never
                   changes into a response excerpt or claims that a local edit
                   has been saved. Both content rows remain single-line and
-                  truncate before the completion meter. The meter uses a 40px
-                  ring with rounded whole number centered alone in
-                  9.208333px/625 type at full primary-ink opacity and a
-                  single-line height. There is no percent sign, caption or
-                  separate outside percentage. This remains a 29.1667% reduction
-                  from its 13px reference size, applied once. The background
-                  measures 40px across: the original 17px radius plus one third
-                  of the former 9px increase gives a 20px radius. The right
-                  component now uses <code>align-self: center</code> with zero
-                  top margin, placing that footprint 20px below the 80px card’s
-                  top edge; the heading retains its 15px inset. The Pink100–400
-                  arc follows a quiet foreground track. Section dots use Pink500
-                  pigment, at 50% opacity while unfinished and 100% when
-                  complete. This single number replaces the old center
-                  spark/check. The meter is always present. With no saved
-                  record, no genuine draft change and no valid first-opening
-                  observation, the entire meter uses exactly opacity: calc(1 /
-                  3) and a decorative 6% starter arc. The number and accessible
-                  completion remain 0, and no section dot is marked complete. An
-                  observed opening without edits restores full-strength
-                  presentation with a true zero-length arc and the number 0;
-                  opening still earns no completion credit. Saved responses and
-                  genuinely changed drafts retain normal presentation even when
-                  opening metadata is absent. The shared getCheckInCardProgress
-                  helper keeps its visible flag as a saved-or-changed-content
-                  signal; rendering no longer uses that flag to hide the meter.
-                  It projects valid raw draft groups independently: five visible
-                  Evening sections or five Morning groups, rounded to a whole
-                  percentage. It makes no API request and changes neither saved
-                  content nor timestamps. Both periods retain{" "}
-                  <code>hasCheckInDraftChanges</code> for content detection and{" "}
-                  <code>getCheckInCardFeedback</code> for accessible saved/local
-                  draft feedback and missing-section descriptions. There is no
-                  visible Saved, Draft saved, Unsent draft or Optional label.
-                  Number, orb, halo and dots share the existing replay identity
-                  when their own dialog opens/closes or completion changes. The
-                  number and orb arrive over 1560ms, with scale rebounds at 38%
-                  and 65% of the choreography; their peak scales are 1.08 and
-                  1.14 respectively. The arc draws over 1200ms after 160ms,
-                  completed dots pop for 600ms with 90ms section staggering, and
-                  confetti runs for 1200ms after 260ms. Return delays remain
-                  180ms desktop or 400ms mobile. After entry, a restrained
-                  7.2-second halo breath and number float share one loop start.
-                  The shared entry-readiness, pending-card and dialog-open gates
-                  pause motion; reduced motion shows the settled result. The
-                  whole card stays the editor trigger, with no nested meter
-                  button or editor remount. First-open observations live in the
+                  truncate before the right-hand summary. The upper row pairs a
+                  bed or smile with an icon for an empty, drafted or saved
+                  check-in. The lower row uses the intake card’s number and unit
+                  styles for recorded sleep duration or the selected mood count.
+                  An unanswered field offers Add sleep or Add moods. Changed
+                  drafts take precedence, including cleared values. The whole
+                  card opens its editor. The former animated indicator remains
+                  available in <code>CheckInCardProgress</code>.
+                  First-open observations live in the
                   authenticated journal-scoped local workspace’s checkInOpenedAt
                   map, using the existing day/period draft keys. openDialog
                   records the current instant once. setLocation also observes a
@@ -3861,12 +3817,10 @@ export function DeveloperGuidePage() {
                 opening history is unknown. Both period cards retain their
                 Rose/Violet identity frames and dark artwork tiles, with
                 matching pale Rose200 cup/moon illustrations at two-thirds of
-                their former size. The small 40px completion ring centers a
-                9.208333px/625 number without a percent suffix. A valid opening
-                restores normal presentation but earns no completion credit;
-                untouched/unobserved cards remain dimmed. Local drafts and saved
-                responses stay distinct, and both cards retain their shared 80px
-                frame and entry/ambient motion gates.
+                their former size. The right-hand summary shows recorded sleep
+                in hours and minutes, including durations from older entries.
+                Local drafts and saved responses stay distinct, and both cards
+                retain their shared 80px frame and entry/ambient motion gates.
               </p>
               <p>
                 Supporting Morning and Evening sections share quiet, glow-free

@@ -1,7 +1,16 @@
 "use client";
 
 import { useId, useState, useSyncExternalStore } from "react";
-import { Flower2, HeartHandshake, SlidersHorizontal } from "lucide-react";
+import {
+  BedDouble,
+  BookOpen,
+  BookOpenCheck,
+  Flower2,
+  HeartHandshake,
+  PencilLine,
+  SlidersHorizontal,
+  Smile,
+} from "lucide-react";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
 import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
 import { toast } from "@/components/ui/journal-toast";
@@ -15,7 +24,7 @@ import {
   CHECK_IN_CARD_COLOR,
   CheckInCardArtwork,
 } from "@/components/check-in-card-artwork";
-import { CheckInCardProgress } from "@/components/check-in-card-progress";
+import { getCheckInCardMetric } from "@/lib/check-in-card-metric";
 import { CheckInRating } from "@/components/check-in-rating";
 import {
   checkInRatingForSlider,
@@ -138,15 +147,13 @@ export function DailyCheckInSection({
   // Only this card's editor may replay its artwork; restored older days stay scoped.
   const ownDialogOpen = open && targetDay === day;
   const artworkReplayKey = `${day}:${period}:${ownDialogOpen}:${progress.visible}:${progress.percent}:${dormantProgress}`;
-  const progressIndicator = (
-    <CheckInCardProgress
-      progress={progress}
-      dormant={dormantProgress}
-      period={period}
-      replayKey={artworkReplayKey}
-      dialogOpen={ownDialogOpen}
-    />
+  const metric = getCheckInCardMetric(
+    period,
+    currentCheckIn,
+    hasChanges && isCheckInDraft(storedDraft) ? storedDraft : undefined,
   );
+  const MetricIcon = morning ? BedDouble : Smile;
+  const StateIcon = hasChanges ? PencilLine : saved ? BookOpenCheck : BookOpen;
   const feedback = getCheckInCardFeedback({
     period,
     saved,
@@ -236,7 +243,6 @@ export function DailyCheckInSection({
             "medication-card-details intake-card-details",
             styles.details,
           )}
-          data-has-progress="true"
         >
           <SavedCheckInHeading
             period={period}
@@ -244,6 +250,16 @@ export function DailyCheckInSection({
             createdAt={saved ? checkIn?.createdAt : undefined}
             updatedAt={saved ? checkIn?.updatedAt : undefined}
             timeZone={timeZone}
+            trailing={
+              <span className={styles.summaryIcons} aria-hidden="true">
+                <span title={morning ? "Sleep duration" : "Selected moods"}>
+                  <MetricIcon />
+                </span>
+                <span title={feedback.label}>
+                  <StateIcon />
+                </span>
+              </span>
+            }
           />
           <div
             className={cn(
@@ -262,11 +278,20 @@ export function DailyCheckInSection({
                 {hint}
               </span>
             </div>
+            <span
+              className="intake-card-total"
+              aria-hidden="true"
+              title={metric.description}
+            >
+              {metric.value && (
+                <span className="intake-card-total-value">{metric.value}</span>
+              )}
+              <span className="intake-card-total-unit">{metric.unit}</span>
+            </span>
           </div>
-          {progressIndicator}
         </div>
         <span id={previewId} className="sr-only">
-          {feedback.description}
+          {metric.description} {feedback.description}
           {opened && ` ${opened.label}.`}
           {progress.visible &&
             ` ${progress.percent}% complete: ${progress.completion.completedCount} of ${progress.completion.totalCount} optional sections${hasChanges ? ", including your current edits" : ""}.`}
