@@ -6,7 +6,6 @@ import {
   parseJournalMentionHref,
 } from "@/lib/journal-mentions";
 import mentionStyles from "./medication-mention-filter.module.css";
-import medicationOverviewStyles from "./medications-heading.module.css";
 
 import {
   Fragment,
@@ -500,7 +499,7 @@ export function TodayPage() {
 }
 
 export function MedicationsPage() {
-  const { data, mutate, busy } = useJournal();
+  const { data, mutate, busy, notificationScope } = useJournal();
   const search = useSearchParams();
   const medicationReferences = search.getAll("medication");
   const ingredientReferences = search.getAll("ingredient");
@@ -524,6 +523,7 @@ export function MedicationsPage() {
     ? JSON.stringify([medicationReferences, ingredientReferences])
     : "";
   const referenceVisit = useRef("");
+  const historyNoticeShown = useRef(false);
   const {
     dialog,
     openDialog,
@@ -562,6 +562,31 @@ export function MedicationsPage() {
     if (data && medicationDialog?.kind === "medication-edit" && !editing)
       closeDialog(medicationDialog);
   }, [data, medicationDialog, editing, closeDialog]);
+  useEffect(() => {
+    if (!data || historyNoticeShown.current) return;
+    historyNoticeShown.current = true;
+    toast.info(
+      "Strength changes recalculate past doses and totals. Quantities, times and notes stay as entered.",
+      {
+        id: "medication-history-policy",
+        journalScope: notificationScope,
+        heading: "Edits Update All Past Logs",
+        duration: 18_000,
+        details: {
+          paragraphs: [
+            "Medication edits stay in sync across your journal, including entries you recorded before the change.",
+          ],
+          facts: [
+            { label: "Dose totals", value: "Recalculated" },
+            { label: "Recorded details", value: "Kept as entered" },
+          ],
+          links: [{ label: "Medication Library", href: "/medications" }],
+          footer:
+            "Names, strengths and appearance stay consistent wherever that medication appears.",
+        },
+      },
+    );
+  }, [data, notificationScope]);
   if (!data) return null;
   const rankedMedications = sortMedicationsByUsage(
     data.medications.filter((item) =>
@@ -718,22 +743,6 @@ export function MedicationsPage() {
           }
         />
       )}
-      <div
-        className={cn(
-          "mb-4 flex items-start gap-2.5 rounded-2xl border border-border/60 px-3 py-2.5",
-          medicationOverviewStyles.historyNotice,
-        )}
-        data-medication-history-notice
-      >
-        <ActionIcon name="retry" className="mt-0.5 size-4 text-foreground/70" />
-        <p className="text-[11px] leading-[1.7] text-foreground">
-          <span className="font-medium text-foreground">
-            Edits Update All Past Logs.
-          </span>{" "}
-          Strength changes recalculate past doses and totals. Logged quantities,
-          times and notes stay as entered.
-        </p>
-      </div>
       <div id="medication-library-list">
         {!medications.length ? (
           hasReference ? (

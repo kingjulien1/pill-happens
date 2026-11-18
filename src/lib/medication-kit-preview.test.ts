@@ -211,7 +211,7 @@ test("orphans are ignored, duplicate IDs use the first metadata, and input objec
   assert.deepEqual({ meds, records }, before);
 });
 
-test("palette skips repeated pigments before taking six saved colors", () => {
+test("palette keeps every distinct saved pigment in usage order", () => {
   const meds = [
     medication("first", { color: "rose", categories: ["benzodiazepine"] }),
     medication("duplicate", { color: "rose" }),
@@ -224,11 +224,11 @@ test("palette skips repeated pigments before taking six saved colors", () => {
   ];
   assert.deepEqual(
     medicationKitPalette(meds, []).map(({ value }) => value),
-    ["rose", "ruby", "orange", "honey", "violet", "mint"],
+    ["rose", "ruby", "orange", "honey", "violet", "mint", "blue"],
   );
   assert.equal(
     new Set(medicationKitPalette(meds, []).map(({ hex }) => hex)).size,
-    6,
+    7,
   );
 });
 
@@ -248,7 +248,7 @@ test("palette keeps ranking and archived pigments without inventing missing colo
     medicationKitPalette(meds, [intake("popular"), intake("popular")]).map(
       ({ value }) => value,
     ),
-    ["ruby", "mint", "blue"],
+    ["mint", "blue", "ruby"],
   );
   assert.deepEqual(
     medicationKitPalette([meds[0]], []).map(({ value }) => value),

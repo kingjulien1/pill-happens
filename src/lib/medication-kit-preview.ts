@@ -1,6 +1,7 @@
 import type { Intake, Medication } from "./domain";
 import { getMedicationColor } from "./medication-appearance";
 import { getMedicationClasses } from "./medication-classification";
+import { sortMedicationsByUsage } from "./medication-usage";
 
 /**
  * Saved-library order, with manually marked Benzos first.
@@ -60,20 +61,19 @@ export function medicationKitPreview(
   return rankedMedications(medications, intakes).slice(0, 3);
 }
 
-/** Up to six distinct saved pigments, in the same stable usage-based order. */
+/** Every distinct saved pigment, ordered by the medications logged most often. */
 export function medicationKitPalette(
   medications: readonly Medication[],
   intakes: readonly Pick<Intake, "medicationId" | "takenAt">[],
 ) {
   const seen = new Set<string>();
   const colors: ReturnType<typeof getMedicationColor>[] = [];
-  for (const medication of rankedMedications(medications, intakes)) {
+  for (const medication of sortMedicationsByUsage(medications, intakes)) {
     const color = getMedicationColor(medication.color);
     const pigment = color.hex.toLowerCase();
     if (seen.has(pigment)) continue;
     seen.add(pigment);
     colors.push(color);
-    if (colors.length === 6) break;
   }
   return colors;
 }
