@@ -1112,11 +1112,6 @@
   overflow: hidden;
   line-height: 17px;
 }
-/* Check-in summaries retain their established independent baseline. */
-[data-check-in-card] .intake-card-ingredient-group {
-  position: relative;
-  inset-block-start: -6px;
-}
 .intake-card-ingredient {
   min-width: 0;
   max-width: 100%;
@@ -1226,7 +1221,7 @@
 }
 /* The intake second row shares one visual centre, midway between its previous
    raised ingredient and low dose. Protect the ingredient-to-dose gap first. */
-[data-intake-card] .intake-card-bottom {
+:is([data-intake-card], [data-check-in-card]) .intake-card-bottom {
   align-items: center;
   gap: calc(var(--content-min-gap, 8px) + 2px);
   padding-bottom: 3px;
@@ -1237,7 +1232,7 @@
 }
 /* Grow the previously reduced total by exactly 5/12 (41 2/3%), the midpoint
    of one third and one half. Keep recorded-dose arithmetic unchanged. */
-[data-intake-card] .intake-card-total-value {
+:is([data-intake-card], [data-check-in-card]) .intake-card-total-value {
   font-size: calc(15px * 17 / 24 * 17 / 12);
   line-height: 20px;
 }
@@ -1246,7 +1241,7 @@
   .intake-card-total-value {
   font-size: calc(13.5px * 17 / 24 * 17 / 12);
 }
-[data-intake-card] .intake-card-total-unit {
+:is([data-intake-card], [data-check-in-card]) .intake-card-total-unit {
   font-size: calc(9px * 17 / 12);
 }
 @media (min-width: 768px) {

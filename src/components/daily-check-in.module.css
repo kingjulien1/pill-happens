@@ -131,24 +131,13 @@
   opacity: 0.5;
 }
 
-/* Time, title and the lower invitation share one protected text grid. */
-.card .details {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: 1fr 1fr;
-  column-gap: calc(var(--entry-text-gap) + 6px);
-  padding-block: 0;
-  padding-inline-end: var(--entry-trailing-inset);
+/* Both rows share the intake layout; indent the invitation to its title. */
+.card {
+  --check-in-heading-offset: -3px;
 }
-
-.card .details > [data-check-in-heading] {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: start;
+.card [data-check-in-heading] {
   align-items: start;
-  margin-block-start: 3px;
-  margin-inline-start: -3px;
-  padding-inline-end: 0;
+  margin-inline-start: var(--check-in-heading-offset);
 }
 
 .summaryIcons {
@@ -165,24 +154,14 @@
   stroke-width: 2;
 }
 
-.card .bottom {
-  grid-column: 1;
-  grid-row: 2;
-  align-self: end;
-  align-items: flex-end;
-  margin-top: 0;
-  padding-inline-end: 0;
-  padding-bottom: 0;
-}
-
-/* Match the title start even while the update time sits below its own column. */
-.card .bottom :global(.intake-card-ingredient-group) {
-  inset-block-start: 0;
+.card [data-check-in-preview-row] :global(.intake-card-ingredient-group) {
   padding-inline-start: calc(
-    var(--entry-time-width) + var(--entry-text-gap) - 3px
+    var(--entry-time-width) + var(--entry-text-gap) +
+      var(--check-in-heading-offset)
   );
 }
 .timeColumn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -190,6 +169,8 @@
   min-width: 0;
 }
 .updatedTime {
+  position: absolute;
+  inset-block-start: calc(100% + 1px);
   display: block;
   color: var(--card-foreground);
   opacity: 0.36;
@@ -608,13 +589,8 @@
 }
 
 @media (max-width: 359px) {
-  .card .details > [data-check-in-heading] {
-    margin-inline-start: -2px;
-  }
-  .card .bottom :global(.intake-card-ingredient-group) {
-    padding-inline-start: calc(
-      var(--entry-time-width) + var(--entry-text-gap) - 2px
-    );
+  .card {
+    --check-in-heading-offset: -2px;
   }
   .detailsRow {
     gap: 9px;

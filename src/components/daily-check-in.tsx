@@ -238,12 +238,7 @@ export function DailyCheckInSection({
         aria-haspopup="dialog"
         disabled={busy}
       >
-        <div
-          className={cn(
-            "medication-card-details intake-card-details",
-            styles.details,
-          )}
-        >
+        <div className="medication-card-details intake-card-details">
           <SavedCheckInHeading
             period={period}
             openedAt={openedAt}
@@ -262,10 +257,7 @@ export function DailyCheckInSection({
             }
           />
           <div
-            className={cn(
-              "medication-card-bottom intake-card-bottom",
-              styles.bottom,
-            )}
+            className="medication-card-bottom intake-card-bottom"
             data-check-in-preview-row
             data-check-in-status={feedback.state}
           >
@@ -283,9 +275,9 @@ export function DailyCheckInSection({
               aria-hidden="true"
               title={metric.description}
             >
-              {metric.value && (
-                <span className="intake-card-total-value">{metric.value}</span>
-              )}
+              <span className="intake-card-total-value">
+                {metric.value || "\u200b"}
+              </span>
               <span className="intake-card-total-unit">{metric.unit}</span>
             </span>
           </div>
