@@ -598,13 +598,37 @@
   line-height: 1.6;
 }
 
-.submitArea {
-  margin-top: 3px;
+.headerDate {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+  color: color-mix(in srgb, var(--foreground) 83%, transparent);
+  font-size: calc(var(--check-in-title-size) * 2 / 3);
+  font-weight: 650;
+  letter-spacing: -0.025em;
 }
-
-/* The form's 20px gap becomes 10px before the morning estimate separator. */
-.submitArea[data-has-sleep-summary="true"] {
-  margin-top: -10px;
+.headerDate small {
+  font-size: max(10px, 0.625em);
+  font-weight: 400;
+  letter-spacing: normal;
+  color: var(--muted-foreground);
+}
+.form::before,
+.submitArea::before {
+  content: "";
+  display: block;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+}
+.form {
+  padding-top: 24px;
+}
+.submitArea::before {
+  margin-bottom: 24px;
+}
+.submitArea [data-morning-sleep-summary] {
+  border-top: 0;
+  padding-top: 0;
 }
 
 /* The estimate owns its 16px action gap, replacing the shared 24px form margin. */

@@ -60,6 +60,7 @@ import {
   type DailyCheckIn,
   type DailyCheckInPeriod,
 } from "@/lib/daily-check-in";
+import { checkInHeading } from "@/lib/check-in-headings";
 import { formatDay } from "@/lib/domain";
 import {
   checkInDefaults,
@@ -307,7 +308,8 @@ export function DailyCheckInSection({
         }}
         scrollKey={checkInDraftKey(targetDay, period)}
         returnFocus={returnToCard}
-        title={title}
+        headerVariant="check-in"
+        title={checkInHeading(targetDay, period)}
         headerActions={
           <Button
             type="reset"
@@ -323,10 +325,19 @@ export function DailyCheckInSection({
             <ActionIcon name="retry" className="size-[18px]" />
           </Button>
         }
-        context={formatDay(targetDay, {
-          weekday: "short",
-          month: "short",
-        })}
+        context={
+          <time dateTime={targetDay} className={styles.headerDate}>
+            {formatDay(targetDay, {
+              weekday: "long",
+              month: undefined,
+              day: undefined,
+            })}
+            <small>
+              <span aria-hidden="true">/</span>{" "}
+              {formatDay(targetDay, { weekday: undefined, month: "long" })}
+            </small>
+          </time>
+        }
         description={
           morning
             ? "A little space for last night and how you’re waking up. Start anywhere; every field is optional."

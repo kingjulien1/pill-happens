@@ -86,3 +86,17 @@
     line-height: 30px;
   }
 }
+
+.checkInHeader {
+  margin-block-start: 14px;
+  row-gap: 20px;
+  --check-in-title-size: 22px;
+}
+.checkInHeader .title {
+  font-size: var(--check-in-title-size);
+}
+@media (min-width: 768px) {
+  .checkInHeader {
+    --check-in-title-size: 24px;
+  }
+}

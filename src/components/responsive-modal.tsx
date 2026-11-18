@@ -55,10 +55,10 @@ export function ResponsiveModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  headerVariant?: "medication";
+  headerVariant?: "medication" | "check-in";
   /** Native header controls share the close button’s action rail. */
   headerActions?: ReactNode;
-  context?: string;
+  context?: ReactNode;
   description: string;
   scrollKey?: string;
   publicScrollKey?: PublicDialogScrollKey;
@@ -97,6 +97,7 @@ export function ResponsiveModal({
     <div
       className={cn(
         styles.headingRow,
+        headerVariant === "check-in" && styles.checkInHeader,
         medicationHeader && styles.medicationHeader,
       )}
       data-modal-header
