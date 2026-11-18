@@ -105,3 +105,8 @@
   background: var(--navigation-paint);
   --drawer-bleed-background: var(--navigation-surface);
 }
+
+.checkInSurface .scrollBody {
+  --dialog-scroll-gutter: 14px;
+  padding-inline: var(--dialog-scroll-gutter);
+}

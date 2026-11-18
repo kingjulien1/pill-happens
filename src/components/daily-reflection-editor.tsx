@@ -1,15 +1,9 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowUpRight,
+  createLucideIcon,
   BookOpenText,
   Check,
   Copy,
@@ -25,6 +19,8 @@ import {
 } from "@/components/reflection-dialog";
 import type { ReflectionSaveControls } from "@/components/use-reflection-save";
 import { ReflectionReaderDialog } from "@/components/reflection-reader-dialog";
+import { ActionIcon } from "./action-icon";
+import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
 import { TodayActionButton } from "@/components/today-action-button";
 
 import { rememberJournalDestination } from "@/components/journal-drafts";
@@ -40,17 +36,16 @@ import styles from "./daily-reflection-editor.module.css";
 import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
-const launcherPaint = {
-  "--control-face-paint":
-    "color-mix(in srgb, var(--navigation-highlight) 39%, transparent)",
-  "--control-ink": "var(--journal-ink)",
-  "--control-edge": "var(--checkin-line)",
-  "--control-face-edge": "var(--checkin-line)",
-  "--action-surround": "var(--journal-tile)",
-  "--action-face-inset": "6px",
-  "--action-outer-line": "1.667px",
-  "--action-inner-line": "3px",
-} as CSSProperties;
+const MarkdownMark = createLucideIcon("markdown-mark", [
+  [
+    "path",
+    {
+      d: "M4.5 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12m4 0a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7",
+      key: "frame",
+    },
+  ],
+  ["path", { d: "M6 15V9l3 4 3-4v6m5-6v6m-2-2 2 2 2-2", key: "mark" }],
+]);
 
 /** A compact doorway into the same persistent check-in draft. */
 export function DailyReflectionEditor({
@@ -309,18 +304,22 @@ export function DailyReflectionEditor({
           </Button>
         </div>
       </div>
-      <div className={styles.snapshot} data-journal-snapshot>
+      <hr className={styles.divider} />
+      <div data-journal-snapshot>
         <p className={styles.snapshotTitle}>{snapshotTitle}</p>
         <p className={styles.snapshotDetail}>{snapshotDetail}</p>
-        <p
-          className={`${styles.guidance} ${styles.introduction}`}
-          data-journal-introduction
-        >
+      </div>
+      <p
+        className={`${styles.guidance} ${styles.introduction}`}
+        data-journal-introduction
+      >
+        <MarkdownMark size={18} aria-hidden="true" />
+        <span>
           Use headings, lists and Markdown to give a longer entry some shape.
           Closing the writing space brings you back to this check-in with your
           draft.
-        </p>
-      </div>
+        </span>
+      </p>
       <ReflectionDialog
         id={id}
         value={value}
@@ -339,46 +338,31 @@ export function DailyReflectionEditor({
           <TodayActionButton
             ref={launcher}
             type="button"
-            radius={18}
             data-intake-paint="satin"
-            className={styles.launcher}
+            className="intake-primary-cta w-full"
             disabled={disabled}
-            style={launcherPaint}
+            style={{
+              ...getIntakeActionThemeStyle(),
+              height: 72,
+              minHeight: 72,
+            }}
             data-journal-write
           >
-            <span className={styles.launcherLabel}>
-              <PencilLine size={21} strokeWidth={2.3} aria-hidden="true" />
-              <span>{hasWriting ? "Continue Writing" : "Start Writing"}</span>
+            <span className="intake-primary-row">
+              <span className="intake-primary-label">
+                <PencilLine size={21} strokeWidth={2.3} aria-hidden="true" />
+                <span>{hasWriting ? "Continue Writing" : "Start Writing"}</span>
+              </span>
+              <ActionIcon name="next" className="intake-primary-next" />
             </span>
-            <ArrowUpRight size={21} strokeWidth={2.3} aria-hidden="true" />
           </TodayActionButton>
         }
       />
-      <div
-        className={styles.stats}
-        aria-label="Reflection statistics"
-        data-journal-stats
-      >
-        <div className={styles.stat} data-journal-stat="words">
-          <strong>{numberFormat.format(stats.words)}</strong>
-          <span>{stats.words === 1 ? "word" : "words"}</span>
-        </div>
-        <div className={styles.stat} data-journal-stat="characters">
-          <strong>{numberFormat.format(stats.characters)}</strong>
-          <span>characters</span>
-        </div>
-        <div className={styles.stat} data-journal-stat="reading">
-          <strong>
-            {stats.readingMinutes ? `~${stats.readingMinutes}` : "—"}
-          </strong>
-          <span>min read</span>
-        </div>
-      </div>
       <p className={styles.guidance} data-journal-guidance>
-        The book icon opens a clean reading view. Saved entries over 100 words
-        join Journal automatically. Use Save Check-In to keep the rest of your
-        answers with this day.
+        You can reopen your draft to keep writing. Use Save Check-In to keep the
+        rest of your answers with this day.
       </p>
+      <hr className={styles.divider} />
       <div className={styles.captionRow}>
         <Button
           variant="ghost"
@@ -404,19 +388,26 @@ export function DailyReflectionEditor({
         >
           <Copy size={14} aria-hidden="true" />
         </Button>
-        <p className={styles.structure}>
-          <span>
-            {numberFormat.format(stats.paragraphs)}{" "}
-            {stats.paragraphs === 1 ? "paragraph" : "paragraphs"}
-          </span>
-          <span className={styles.dot} aria-hidden="true">
-            ·
-          </span>
-          <span>
-            {numberFormat.format(stats.headings)}{" "}
-            {stats.headings === 1 ? "heading" : "headings"}
-          </span>
-        </p>
+        <div
+          className={styles.stats}
+          aria-label="Reflection statistics"
+          data-journal-stats
+        >
+          <div className={styles.stat} data-journal-stat="words">
+            <strong>{numberFormat.format(stats.words)}</strong>
+            <span>{stats.words === 1 ? "word" : "words"}</span>
+          </div>
+          <div className={styles.stat} data-journal-stat="characters">
+            <strong>{numberFormat.format(stats.characters)}</strong>
+            <span>characters</span>
+          </div>
+          <div className={styles.stat} data-journal-stat="reading">
+            <strong>
+              {stats.readingMinutes ? `~${stats.readingMinutes}` : "—"}
+            </strong>
+            <span>min read</span>
+          </div>
+        </div>
         <Button
           variant="ghost"
           size="icon"

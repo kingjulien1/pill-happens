@@ -75,17 +75,16 @@
   z-index: 1;
 }
 .frame::before {
-  --outer-width: calc(3 * var(--line-width));
+  --outer-width: calc(4.25 * var(--line-width));
   inset: -2px;
   border-radius: calc(var(--dialog-radius-surface) + 2px);
   box-shadow: 0 0 0 var(--outer-width)
-    color-mix(in srgb, var(--checkin-line) 60%, transparent);
+    color-mix(in srgb, var(--checkin-line) 14%, transparent);
 }
 .frame::after {
   inset: 7px;
   border-radius: calc(var(--dialog-radius-surface) - 7px);
-  box-shadow: inset 0 0 0 var(--line-width)
-    color-mix(in srgb, var(--color-violet-200, #ddd6fe) 38%, transparent);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-violet-300, #c4b5fd);
 }
 @media (prefers-reduced-motion: no-preference) {
   .frame::after {
@@ -119,5 +118,14 @@
   }
   87.5% {
     translate: -1.95px 1.95px;
+  }
+}
+
+@media (max-width: 767px) {
+  .section .frame > :first-child {
+    padding-inline: 18px;
+  }
+  .section .frame > [data-journal-card] {
+    padding-inline: 22px;
   }
 }
