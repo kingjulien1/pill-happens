@@ -85,10 +85,7 @@ function ArtworkScene({
           <span className={styles.symbolArrival}>
             <span className={styles.symbolFloat}>
               {morning ? (
-                <MorningCoffee
-                  dialogOpen={dialogOpen}
-                  ambientReady={ambientReady}
-                />
+                <MorningCoffee className={styles.coffee} />
               ) : (
                 <EveningMoon
                   dialogOpen={dialogOpen}

@@ -3003,18 +3003,10 @@ export function DeveloperGuidePage() {
                   do not automatically classify a medication.
                 </li>
                 <li>
-                  MorningCoffee keeps a filled pale Rose200 cup still beneath
-                  three bright Pink/Lilac steam curls. The latest pass shortens
-                  their remaining height by another quarter around the fixed
-                  y=29 mug rim, keeping separated lanes, thicker guide strokes
-                  and travelling highlighted threads. The threads fade naturally
-                  along their paths; there are no fireworks, pouring pot or
-                  large rising glow plume. A restrained rim warmth and the steam
-                  reveal wait for the shared ambient handoff, 300ms after the
-                  main icon settles. The curls reveal upward over one second,
-                  then retain their independent slow CSS clocks.
-                  Hidden/offscreen/dialog gates pause them in phase, and reduced
-                  motion shows settled artwork without a particle loop.
+                  The morning card and writing dialog share a Lucide coffee mug.
+                  On the card it tips into place, rebounds, then settles as the
+                  three steam strokes begin their staggered loop. Reduced motion
+                  shows the settled mug.
                 </li>
                 <li>
                   EveningMoon owns its entrance and permanent motion together. A

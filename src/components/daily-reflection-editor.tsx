@@ -12,7 +12,6 @@ import {
   ArrowUpRight,
   BookOpenText,
   Check,
-  Coffee,
   Copy,
   LibraryBig,
   PencilLine,
@@ -36,6 +35,7 @@ import {
 } from "@/lib/page-entry-readiness";
 import { reflectionStats } from "@/lib/reflection-writing";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
+import { MorningCoffee } from "./morning-coffee";
 import styles from "./daily-reflection-editor.module.css";
 import { Button } from "@/components/ui/button";
 
@@ -262,7 +262,7 @@ export function DailyReflectionEditor({
       <span className={styles.ambient} aria-hidden="true" />
       <div className={styles.headingRow}>
         <div className={styles.headingGroup}>
-          <Coffee className={styles.writingCoffee} aria-hidden="true" />
+          <MorningCoffee className={styles.writingCoffee} />
           <div className={styles.headingCopy}>
             <h3 id={`${id}-heading`} className={styles.heading}>
               {period === "morning"
