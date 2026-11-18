@@ -10,12 +10,12 @@ import {
   Wind,
 } from "lucide-react";
 import { MedicationGlyph } from "@/components/medication-icon";
-import { MouthOpen } from "@/components/mouth-open-icon";
+import { Mouth } from "@/components/mouth-icon";
 import { isIntakeRoute, type IntakeRoute } from "@/lib/intake-routes";
 
 const routeIcons = {
   unspecified: CircleHelp,
-  oral: MouthOpen,
+  oral: Mouth,
   nasal: null,
   sublingual: Pill,
   buccal: MessageCircle,

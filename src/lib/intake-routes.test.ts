@@ -6,7 +6,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { IntakeRouteIcon } from "../components/intake-route-icon";
 import { MedicationGlyph } from "../components/medication-icon";
 import type { Intake } from "./domain";
-import { MOUTH_OPEN_NODES } from "./intake-route-icons";
 import {
   INTAKE_ROUTES,
   isIntakeRoute,
@@ -66,13 +65,10 @@ test("recorded-route artwork stays native and preserves the shared custom nose",
     );
   assert.match(oral(), /stroke-width="2\.25"/);
   assert.match(oral(2.5), /stroke-width="2\.5"/);
-  assert.match(oral(), /lucide-mouth-open/);
-  assert.match(oral(), /M3\.5 12\.75c2\.3-4\.15/);
-  assert.match(oral(), /m13\.2 8\.45\.25 3\.05/);
-  assert.doesNotMatch(oral(), /lucide-arrow-down-to-line/);
+  assert.match(oral(), /\blucide-mouth\b(?:\s|")/);
 });
 
-test("Mouth Open keeps one Lucide-compatible source for runtime and checked-in SVG artwork", () => {
+test("the legacy SVG URL and every rendered oral route use the same Lucide Mouth paths", () => {
   const svg = readFileSync(
     new URL("../../public/icons/intake-routes/mouth-open.svg", import.meta.url),
     "utf8",
@@ -92,10 +88,15 @@ test("Mouth Open keeps one Lucide-compatible source for runtime and checked-in S
       svg,
       new RegExp(attribute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
     );
-  for (const [, attributes] of MOUTH_OPEN_NODES) {
-    if (typeof attributes.d === "string")
-      assert.ok(svg.includes(`d="${attributes.d}"`));
-  }
+  const paths = (markup: string) =>
+    Array.from(markup.matchAll(/<path d="([^"]+)"/g), ([, path]) => path);
+  assert.equal(paths(svg).length, 2);
+  assert.deepEqual(
+    paths(
+      renderToStaticMarkup(createElement(IntakeRouteIcon, { route: "oral" })),
+    ),
+    paths(svg),
+  );
   assert.doesNotMatch(svg, /<(?:image|filter|foreignObject|script|style)\b/i);
 });
 

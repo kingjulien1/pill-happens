@@ -2816,18 +2816,10 @@ export function DeveloperGuidePage() {
                 symbol.
               </p>
               <p>
-                Swallowed intake routes use the project-owned
-                <code> MouthOpen</code> mark. Its outer lip, mouth opening,
-                separate teeth and tongue contours are defined once as
-                Lucide-compatible
-                <code> IconNode</code> geometry and are also checked in as a
-                24×24 SVG under <code>public/icons/intake-routes</code>. The
-                component keeps Lucide&apos;s currentColor stroke, no-fill
-                geometry, rounded caps and joins, plus caller-controlled stroke
-                width. Because every historical swallowed record stores the
-                stable
-                <code> oral</code> route key, the shared renderer updates old
-                entries, cards, previews and selectors without rewriting data.
+                Swallowed entries store the <code>oral</code> route. Today,
+                Past Days, previews and route selectors resolve it to Lucide’s
+                Mouth icon at render time. The original SVG URL also serves
+                that artwork for older references.
               </p>
             </Detail>
             <Detail
