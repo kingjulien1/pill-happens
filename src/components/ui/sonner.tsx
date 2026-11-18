@@ -16,7 +16,6 @@ import {
   CircleAlert,
   Lightbulb,
   RefreshCcw,
-  Sparkles,
   TriangleAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,13 +24,43 @@ import "./sonner.css";
 
 type ToastSymbolKind =
   "success" | "error" | "info" | "warning" | "loading" | "update";
+
+export const NOTIFICATION_COLLAPSE_EVENT =
+  "pill-happens:collapse-notification-details";
+
+/** Local split-path CloudSync lets only the transfer arrows carry emphasis. */
+function CloudSync(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path
+        className="journal-toast-update-cloud"
+        d="M15.5 17H6.2A4.2 4.2 0 0 1 5.5 8.66 6.5 6.5 0 0 1 17.9 7.3 4.8 4.8 0 0 1 20 16"
+      />
+      <g className="journal-toast-update-arrows">
+        <path d="m14.5 12 2-2 2 2" />
+        <path d="M16.5 10v5" />
+        <path d="m9.5 15-2 2-2-2" />
+        <path d="M7.5 17v-5" />
+      </g>
+    </svg>
+  );
+}
+
 const symbols = {
   success: BellCheck,
   error: CircleAlert,
   info: Lightbulb,
   warning: TriangleAlert,
   loading: RefreshCcw,
-  update: Sparkles,
+  update: CloudSync,
 };
 
 /** Lucide-format local BellCheck for the installed icon set's missing export. */
@@ -334,7 +363,15 @@ export function Toaster({
           );
         }}
       >
-        <div className="journal-notification-backdrop" aria-hidden="true" />
+        <div
+          className="journal-notification-backdrop"
+          aria-hidden="true"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            window.dispatchEvent(new Event(NOTIFICATION_COLLAPSE_EVENT));
+          }}
+        />
         <Sonner
           position="top-center"
           duration={NOTIFICATION_DEFAULT_DURATION}

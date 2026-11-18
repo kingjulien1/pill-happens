@@ -164,16 +164,16 @@ export function showUpdateNotice(reloadIfReady: () => boolean) {
     heading: "App update ready",
     duration: Infinity,
     action: {
-      label: "Reload",
+      label: "Apply Now",
       onClick(event) {
         // The caller checks its current worker/draft state and starts reload.
         if (!reloadIfReady()) event.preventDefault();
       },
     },
-    cancel: { label: "Later", onClick() {} },
+    cancel: { label: "Next Open", onClick() {} },
     details: {
       paragraphs: ["A new version is ready when you are."],
-      footer: "Reload and Later are available here after expanding the notice.",
+      footer: "Apply Now and Next Open are available in the update panel.",
     },
   });
 }`;
@@ -440,7 +440,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="update">toast.update</code>,
             "Update available",
-            "8.633s bar + 1s active grace unless overridden · Sparkles.",
+            "8.633s bar + 1s active grace unless overridden · split CloudSync.",
           ],
         ]}
       />
@@ -691,7 +691,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         prose, facts and footer remain suppressed when a typed preview is
         present; the old reading-paused filler is removed. Action/cancel
         controls retain their original behavior in a separate centered row when
-        supplied.
+        supplied. A final Dismiss tool sits at the far edge. From an expanded
+        card it collapses the reading panel first, waits 150ms, then uses the
+        same animated departure as an elapsed timer.
       </p>
       <p>
         Expanded content uses inset separators: the first divider has 4px of
@@ -719,9 +721,12 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         another toaster cannot open it. It sits at z-index 999999998 below
         Sonner, fades over 220ms and never accumulates for multiple open
         notices. Folded rear, removed or exiting cards cannot leave it active.
-        It has no pointer events, focus trap, scroll lock or modal semantics;
-        the page and native toast gestures remain usable. Reduced motion removes
-        the fade. The root canvas and notification surface colors are unchanged.
+        It intercepts pointer input like a lightweight dialog shield. Pressing
+        outside collapses details without dismissing the notice or spending its
+        remaining timer; Escape follows the same collapse-first rule. The open
+        details region exposes dialog and aria-modal semantics, while the toast
+        itself stays visible. Reduced motion removes the fade. The root canvas
+        and notification surface colors are unchanged.
       </p>
 
       <Heading id="updates" level={3}>
@@ -1091,7 +1096,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and unchanged 41.65px front tile. Rear plates are 25% larger than the preceding 80%-scale design: 41.65 × 7/6 × 0.8 × 1.25 = 48.5917px, centered at 0.2042px before their individual offsets. Their proportional corners are 14.2917px and inward strokes are 1.4292px; each plate uses 0.61 opacity. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones, giving the rotating artwork 3px more breathing room without enlarging the front tile.",
+            "49px illustration rail and unchanged 41.65px front tile. Rear plates are enlarged by another 22.5% while remaining centered behind the fixed face; each uses 0.61 opacity. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
           ],
           [
             "Main text / context",
@@ -1099,7 +1104,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Short secondary copy",
-            "Both modes use readable light ink at 70% color alpha, without another element-opacity multiplier.",
+            "Both modes use readable light ink at 70% color alpha. The copy is clamped to two lines and reserves 14px of internal breathing room before the right-side tool, so narrow update messages never collide with the action.",
           ],
           [
             "Expanded details",
@@ -1107,11 +1112,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Inward frame",
-            "Matches intake geometry: a 4px outer band at 31.5% color alpha (37% less than its former 50%), followed by a separate 2px Pink 500 band at 56%. Both stay inside the card. A 2px outline offset by −6px places the inner band 4–6px inward without overlapping the outer tint, changing layout or occupying Sonner’s swipe/stack pseudo-elements. Existing rim pigments and 18px corners remain.",
+            "A 5px outer inset band retains the quieter rim mix, followed immediately by a 2.6px saturated Pink500 outline. The −6.3px offset makes the two inward borders meet without transparent corner seams. Neither border changes layout or occupies Sonner’s swipe/stack pseudo-elements. Existing pigments and 18px corners remain, with a restrained Pink400 exterior glow.",
           ],
           [
             "Surface / countdown",
-            "Card uses Fuchsia950 at 34% alpha (60% less opaque than 85%) above 96px standard/Safari backdrop blur, with an opaque same-hue reduced-transparency fallback. Icon tiles add Fuchsia900 at 69% over their original bases; the front face alone adds a final Fuchsia950 glaze at 22%. The 5.666667px capped rail is 41⅔% thicker, retains its 10px top position and 16px horizontal insets, and reserves its own finite-card space. Separate owners control its arrival sweep, restrained middle-phase thread and clock-driven final rose pulse; pause and reduced-motion gates cover every layer.",
+            "Card uses Fuchsia950 at 47% alpha above 96px standard/Safari backdrop blur, then adds Pink300 at 11% as its highlighting layer. Icon tiles add Fuchsia900 at 69% over their original bases; the front face alone adds a final Fuchsia950 glaze at 22% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
           ],
           [
             "Last-seconds marker",
@@ -1123,7 +1128,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Expanded backdrop / footer",
-            "One pointer-free viewport veil per owning wrapper: Mauve900 at 31%, 4px blur, 220ms fade. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools are centered with 12px gaps; the 9px brief footer uses 50% ink, followed by an 8.5px note at 39% ink with contextual destination links and Daily Log. The bottom wash is min(250px, 74%): Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height. No page lock, fabricated result or root-canvas change.",
+            "One interactive viewport veil per owning wrapper: Mauve900 at 31%, 4px blur, 220ms fade. It blocks page controls and outside press collapses details without dismissing the card. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(250px, 74%): Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
           ],
           [
             "Artwork / bell",
@@ -1132,11 +1137,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         ]}
       />
       <p>
-        Successful saves use BellCheck; Error, Info, Warning, Loading and Update
-        keep fitting status symbols on their Mauve tile. Their accents retain
-        useful distinctions. AppearanceToaster follows the resolved appearance
-        context. These values describe the current presentation; they do not
-        certify every text/background combination for contrast.
+        Successful saves use BellCheck; Error, Info, Warning and Loading keep
+        fitting status symbols on their Mauve tile. Update uses a split
+        CloudSync drawing: Emerald600 arrows perform a held-threshold turn while
+        the cloud only breathes subtly. Its expanded card replaces generic
+        actions with a Pink300-tinted handoff panel, two compact build/record
+        stats, Apply Now / Next Open choices and visual patch notes. Their
+        accents retain useful distinctions. AppearanceToaster follows the
+        resolved appearance context. These values describe the current
+        presentation; they do not certify every text/background combination for
+        contrast.
       </p>
 
       <Heading id="undo">Safe Undo From Response To Server</Heading>

@@ -959,10 +959,10 @@ export function GuidePage() {
                 saving when the connection returns. Check its save status.
               </p>
               <p>
-                When a new app version is waiting, App Update Ready offers
-                Reload or Later. Choose Reload when you are finished with an
-                open form. An update does not automatically reload the page
-                while you are editing.
+                When a new app version is waiting, App Update Ready offers Apply
+                Now or Next Open. Apply Now reloads after you finish an open
+                form; Next Open stages the switch for the next time the app
+                closes or reloads. Neither choice removes journal records.
               </p>
             </GuideDetail>
             <GuideDetail

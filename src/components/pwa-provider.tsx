@@ -104,6 +104,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
     let active = true;
     let registration: ServiceWorkerRegistration | undefined;
     let reloadRequested = false;
+    let applyOnNextOpen = false;
     let announced: ServiceWorker | undefined;
     let updateToastVisible = false;
     let updateTimer: ReturnType<typeof setTimeout> | undefined;
@@ -111,7 +112,13 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
 
     const announceUpdate = () => {
       const waiting = registration?.waiting;
-      if (!active || !waiting || !navigator.serviceWorker.controller) return;
+      if (
+        !active ||
+        applyOnNextOpen ||
+        !waiting ||
+        !navigator.serviceWorker.controller
+      )
+        return;
       if (announced === waiting && updateToastVisible) return;
       announced = waiting;
       updateToastVisible = true;
@@ -122,7 +129,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
         duration: Infinity,
         details: {
           paragraphs: [
-            "A newer app version is ready. Finish your current entry and check its save status before reloading. Choose Later to keep using this version for now.",
+            "A newer app version is staged. Apply it now or let the app switch versions the next time this page closes and opens.",
           ],
           links: [{ label: "App and offline guide", href: "/guide#app" }],
           footer:
@@ -143,12 +150,18 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
           },
         },
         cancel: {
-          label: "Later",
+          label: "Next Open",
           onClick: () => {
+            applyOnNextOpen = true;
             updateToastVisible = false;
           },
         },
       });
+    };
+    const applyDeferredUpdate = () => {
+      if (!applyOnNextOpen || !registration?.waiting) return;
+      applyOnNextOpen = false;
+      registration.waiting.postMessage({ type: "SKIP_WAITING" });
     };
     const watchInstalling = () => {
       const worker = registration?.installing;
@@ -170,12 +183,12 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
       window.location.reload();
     };
     const checkForUpdate = () => {
-      if (!registration) return;
-      // Also offer a waiting update again after the user chose Later.
+      if (!registration || applyOnNextOpen) return;
       void registration.update().then(announceUpdate, announceUpdate);
     };
 
     navigator.serviceWorker.addEventListener("controllerchange", onController);
+    window.addEventListener("pagehide", applyDeferredUpdate);
     void navigator.serviceWorker
       .register("/sw.js", { scope: "/", updateViaCache: "none" })
       .then((result) => {
@@ -197,6 +210,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
         "controllerchange",
         onController,
       );
+      window.removeEventListener("pagehide", applyDeferredUpdate);
       registration?.removeEventListener("updatefound", watchInstalling);
       window.removeEventListener("focus", checkForUpdate);
       for (const [worker, listener] of workerListeners)

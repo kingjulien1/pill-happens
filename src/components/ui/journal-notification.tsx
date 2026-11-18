@@ -18,16 +18,26 @@ import {
   BookOpenText,
   CalendarDays,
   Check,
+  Clock3,
+  CloudDownload,
+  Database,
   Info,
   LoaderCircle,
   Minimize2,
   MoonStar,
   PillBottle,
+  RefreshCcw,
+  ShieldCheck,
   Target,
   Undo2,
+  X,
 } from "lucide-react";
 import type { Action, ExternalToast } from "sonner";
-import { ToastSymbol, useNotificationStack } from "@/components/ui/sonner";
+import {
+  NOTIFICATION_COLLAPSE_EVENT,
+  ToastSymbol,
+  useNotificationStack,
+} from "@/components/ui/sonner";
 import { NotificationCountdownBadge } from "@/components/ui/notification-countdown-badge";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
@@ -498,6 +508,26 @@ export function JournalNotification({
     };
   }, [isCurrent, onExitComplete, registerExit]);
 
+  const closeDetails = useCallback(() => {
+    if (phase !== "idle" || leaving.current || !expandedRef.current) return;
+    root.current
+      ?.querySelector<HTMLButtonElement>(".journal-notification-summary")
+      ?.focus({ preventScroll: true });
+    expandedRef.current = false;
+    pause("expanded", false);
+    setExpanded(false);
+  }, [phase, pause]);
+
+  useEffect(() => {
+    const collapseFromBackdrop = () => closeDetails();
+    window.addEventListener(NOTIFICATION_COLLAPSE_EVENT, collapseFromBackdrop);
+    return () =>
+      window.removeEventListener(
+        NOTIFICATION_COLLAPSE_EVENT,
+        collapseFromBackdrop,
+      );
+  }, [closeDetails]);
+
   const toggle = () => {
     if (phase !== "idle" || suppressClick.current) return;
     const next = !expandedRef.current;
@@ -610,14 +640,22 @@ export function JournalNotification({
 
   const collapseDetails = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+    closeDetails();
+  };
+
+  const dismissFromFooter = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     if (phase !== "idle" || leaving.current) return;
-    // Move keyboard focus out before the details subtree becomes inert.
-    root.current
-      ?.querySelector<HTMLButtonElement>(".journal-notification-summary")
-      ?.focus({ preventScroll: true });
-    expandedRef.current = false;
-    pause("expanded", false);
-    setExpanded(false);
+    const wasExpanded = expandedRef.current;
+    closeDetails();
+    timers.current.push(
+      setTimeout(
+        () => {
+          if (alive.current && isCurrent()) onRequestDismiss("dismiss");
+        },
+        wasExpanded ? 150 : 0,
+      ),
+    );
   };
 
   const followRelatedLink = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -664,6 +702,63 @@ export function JournalNotification({
     );
   };
 
+  const renderUpdateChoice = (
+    value: ExternalToast["action"],
+    mode: "now" | "later",
+  ) => {
+    if (!isAction(value)) return null;
+    const ApplyIcon = mode === "now" ? RefreshCcw : Clock3;
+    const label = mode === "now" ? "Apply Now" : "Next Open";
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        type="button"
+        className="journal-update-choice"
+        data-update-choice={mode}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (leaving.current) return;
+          value.onClick(event);
+          if (mode === "later" || !event.defaultPrevented)
+            onRequestDismiss(mode === "later" ? "cancel" : "action");
+        }}
+      >
+        <ApplyIcon aria-hidden="true" />
+        <span>{label}</span>
+      </Button>
+    );
+  };
+
+  const renderUpdateHeaderAction = () => {
+    if (kind !== "update" || !isAction(action)) return renderUndo();
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        type="button"
+        className="journal-notification-revert journal-update-header-action"
+        aria-label="Apply update and reload"
+        title="Apply update and reload"
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (leaving.current) return;
+          action.onClick(event);
+          if (!event.defaultPrevented) onRequestDismiss("action");
+        }}
+      >
+        <span className="journal-notification-revert-symbol" aria-hidden="true">
+          <RefreshCcw />
+        </span>
+        <span className="journal-notification-revert-label" aria-hidden="true">
+          Freshen Up
+        </span>
+      </Button>
+    );
+  };
+
   const paragraphs = details?.paragraphs ?? [defaultContext[kind]];
   const facts = details?.facts?.slice(0, 4) ?? [];
   const previewRecord = details?.preview?.after ?? details?.preview?.before;
@@ -676,6 +771,75 @@ export function JournalNotification({
           ? "Medication settings apply to linked entries."
           : "Tracking days begin at 06:00."
     : (details?.footer ?? defaultFooter[kind]);
+  const updatePanel = kind === "update" && (
+    <section className="journal-update-panel" aria-label="Update Details">
+      <header className="journal-update-panel-header">
+        <span className="journal-update-panel-title">
+          <strong>Ready To Switch</strong>
+          <span aria-hidden="true">·</span>
+          <span>Draft-Safe</span>
+        </span>
+        <span
+          className="journal-update-stats"
+          aria-label="One build, zero records changed"
+        >
+          <span>
+            <strong>1</strong> Build
+          </span>
+          <span aria-hidden="true">/</span>
+          <span>
+            <strong>0</strong> Records
+          </span>
+        </span>
+      </header>
+      <div className="journal-update-intro">
+        <CloudDownload aria-hidden="true" />
+        <p>
+          The new app files are staged. Pick the hand-off that fits what you’re
+          doing now.
+        </p>
+      </div>
+      <div
+        className="journal-update-choices"
+        role="group"
+        aria-label="Update Timing"
+      >
+        {renderUpdateChoice(action, "now")}
+        {renderUpdateChoice(cancel, "later")}
+      </div>
+      <div className="journal-update-notes" aria-label="Update Notes">
+        <div>
+          <RefreshCcw aria-hidden="true" />
+          <span>
+            <strong>App Shell</strong>
+            <small>Latest interface files are ready.</small>
+          </span>
+        </div>
+        <div>
+          <Database aria-hidden="true" />
+          <span>
+            <strong>Your Journal</strong>
+            <small>Saved records stay exactly where they are.</small>
+          </span>
+        </div>
+        <div>
+          <ShieldCheck aria-hidden="true" />
+          <span>
+            <strong>Safe Handoff</strong>
+            <small>Finish any open draft before applying now.</small>
+          </span>
+        </div>
+      </div>
+      <p className="journal-update-fine-print">
+        <ShieldCheck aria-hidden="true" />
+        No journal records are removed. Need the longer version?{" "}
+        <Link href="/guide#app" prefetch={false} onClick={followRelatedLink}>
+          Open the app guide
+        </Link>
+        .
+      </p>
+    </section>
+  );
   return (
     <div
       ref={root}
@@ -738,6 +902,12 @@ export function JournalNotification({
         if (event.key === "Escape" && stack.expanded && stack.count > 1) {
           event.preventDefault();
           stack.collapse();
+          return;
+        }
+        if (event.key === "Escape" && expandedRef.current) {
+          event.preventDefault();
+          event.stopPropagation();
+          closeDetails();
           return;
         }
         if (
@@ -811,12 +981,13 @@ export function JournalNotification({
             </span>
           </span>
         </button>
-        {renderUndo()}
+        {renderUpdateHeaderAction()}
       </div>
       <div
         className="journal-notification-details"
         id={detailsId}
-        role="region"
+        role={expanded ? "dialog" : "region"}
+        aria-modal={expanded || undefined}
         aria-labelledby={headingId}
         aria-hidden={!expanded}
         inert={!expanded}
@@ -824,7 +995,9 @@ export function JournalNotification({
       >
         <div className="journal-notification-details-inner">
           <div className="journal-notification-main">
-            {details?.preview ? (
+            {updatePanel ? (
+              updatePanel
+            ) : details?.preview ? (
               <NotificationChangePreview preview={details.preview} />
             ) : facts.length ? (
               <dl className="journal-notification-facts">
@@ -909,6 +1082,30 @@ export function JournalNotification({
                   Collapse
                 </span>
               </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                className="journal-notification-tool journal-notification-dismiss"
+                aria-label="Dismiss notification"
+                title="Dismiss notification"
+                disabled={phase !== "idle" || undoState === "pending"}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={dismissFromFooter}
+              >
+                <span
+                  className="journal-notification-tool-symbol"
+                  aria-hidden="true"
+                >
+                  <X />
+                </span>
+                <span
+                  className="journal-notification-tool-label"
+                  aria-hidden="true"
+                >
+                  Dismiss
+                </span>
+              </Button>
             </div>
             <span className="journal-notification-footer-copy">
               {footerCopy}
@@ -950,7 +1147,7 @@ export function JournalNotification({
               </Link>
               .
             </span>
-            {(cancel || action) && (
+            {kind !== "update" && (cancel || action) && (
               <span className="journal-notification-actions">
                 {renderAction(cancel, true)}
                 {renderAction(action)}
