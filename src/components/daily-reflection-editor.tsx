@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  createLucideIcon,
   BookOpenText,
   Check,
   Copy,
@@ -31,22 +30,12 @@ import {
 } from "@/lib/page-entry-readiness";
 import { reflectionStats } from "@/lib/reflection-writing";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
+import { MarkdownMark } from "./markdown-mark";
 import { MorningCoffee } from "./morning-coffee";
 import styles from "./daily-reflection-editor.module.css";
 import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
-const MarkdownMark = createLucideIcon("markdown-mark", [
-  [
-    "path",
-    {
-      d: "M4.5 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12m4 0a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7",
-      key: "frame",
-    },
-  ],
-  ["path", { d: "M6 15V9l3 4 3-4v6m5-6v6m-2-2 2 2 2-2", key: "mark" }],
-]);
-
 /** A compact doorway into the same persistent check-in draft. */
 export function DailyReflectionEditor({
   id,
@@ -313,7 +302,7 @@ export function DailyReflectionEditor({
         className={`${styles.guidance} ${styles.introduction}`}
         data-journal-introduction
       >
-        <MarkdownMark size={18} aria-hidden="true" />
+        <MarkdownMark size={24} aria-hidden="true" />
         <span>
           Use headings, lists and Markdown to give a longer entry some shape.
           Closing the writing space brings you back to this check-in with your
@@ -349,9 +338,13 @@ export function DailyReflectionEditor({
             data-journal-write
           >
             <span className="intake-primary-row">
-              <span className="intake-primary-label">
-                <PencilLine size={21} strokeWidth={2.3} aria-hidden="true" />
-                <span>{hasWriting ? "Continue Writing" : "Start Writing"}</span>
+              <span className="intake-primary-copy">
+                <span className="intake-primary-label">
+                  <PencilLine size={21} strokeWidth={2.3} aria-hidden="true" />
+                  <span>
+                    {hasWriting ? "Continue Writing" : "Start Writing"}
+                  </span>
+                </span>
               </span>
               <ActionIcon name="next" className="intake-primary-next" />
             </span>

@@ -12,6 +12,7 @@ import {
   useSyncExternalStore,
   type RefObject,
   type ReactElement,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { Toolbar } from "@base-ui/react/toolbar";
@@ -152,7 +153,7 @@ export function ReflectionDialog({
   launcherRef: RefObject<HTMLButtonElement | null>;
   launcherClassName?: string;
   /** A complete button with its own content and the supplied launcherRef. */
-  launcher?: ReactElement;
+  launcher?: ReactElement<{ children?: ReactNode }>;
   saving: ReflectionSaveControls;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
@@ -723,7 +724,9 @@ export function ReflectionDialog({
           )
         }
       >
-        {launcher ? null : (
+        {launcher ? (
+          launcher.props.children
+        ) : (
           <>
             <PencilLine size={16} aria-hidden="true" />
             {draftValue.trim() ? "Continue Writing" : "Open Writing Space"}

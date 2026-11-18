@@ -9,7 +9,7 @@ export function CheckInSection({
 }: {
   caption: string;
   context: string;
-  detail: string;
+  detail: ReactNode;
   children: ReactNode;
 }) {
   return (

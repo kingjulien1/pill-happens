@@ -41,6 +41,7 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { MarkdownMark } from "./markdown-mark";
 import { CheckInSection } from "./check-in-section";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
@@ -638,7 +639,12 @@ function CheckInForm({
       <CheckInSection
         caption="Journal entry"
         context="In your words"
-        detail={morning ? "Morning" : "Evening"}
+        detail={
+          <span className="inline-flex items-center gap-1.5">
+            <MarkdownMark size={14} aria-hidden="true" />
+            {morning ? "Morning" : "Evening"}
+          </span>
+        }
       >
         <DailyReflectionEditor
           id={`${id}-note`}
