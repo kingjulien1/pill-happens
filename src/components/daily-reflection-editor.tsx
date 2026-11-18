@@ -244,16 +244,33 @@ export function DailyReflectionEditor({
       data-journal-period={period}
       data-journal-active="false"
     >
-      <div className={styles.headingRow}>
+      <div
+        className={
+          period === "morning" ? styles.morningHeader : styles.headingRow
+        }
+      >
         <div className={styles.headingGroup}>
-          <MorningCoffee className={styles.writingCoffee} />
+          {period === "morning" ? (
+            <span className={styles.coffeeTile}>
+              <MorningCoffee className={styles.writingCoffee} />
+            </span>
+          ) : (
+            <MorningCoffee className={styles.writingCoffee} />
+          )}
           <div className={styles.headingCopy}>
             <h3 id={`${id}-heading`} className={styles.heading}>
-              {period === "morning"
-                ? "Your Morning, Your Words"
-                : "Your Day, Your Words"}
+              {period === "morning" ? (
+                <>
+                  Your Morning,{" "}
+                  <span className={styles.titleAccent}>Your Words</span>
+                </>
+              ) : (
+                "Your Day, Your Words"
+              )}
             </h3>
-            <p className={styles.subtitle}>Room to reflect.</p>
+            {period !== "morning" && (
+              <p className={styles.subtitle}>Room to reflect.</p>
+            )}
           </div>
         </div>
         <div className={closeStyles.actions}>
@@ -295,6 +312,13 @@ export function DailyReflectionEditor({
             <LibraryBig size={19} strokeWidth={2.6} aria-hidden="true" />
           </Button>
         </div>
+        {period === "morning" && (
+          <p className={styles.morningPrompt}>
+            {hasWriting
+              ? "Read your entry or pick up where you left off."
+              : "What was on your mind when you woke up?"}
+          </p>
+        )}
       </div>
       <hr className={styles.divider} />
       <div data-journal-snapshot>
