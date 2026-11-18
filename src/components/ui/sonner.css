@@ -1092,12 +1092,12 @@
 }
 .journal-notification .journal-notification-revert {
   display: inline-grid;
-  grid-template-rows: 28px 12px;
+  grid-template-rows: 36.167px 12px;
   gap: 2px;
   width: 44px;
   min-width: 44px;
-  height: 44px;
-  min-height: 44px;
+  height: 51px;
+  min-height: 51px;
   align-self: start;
   align-content: center;
   justify-items: center;
@@ -1121,8 +1121,8 @@
 }
 .journal-notification-revert-symbol {
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 36.167px;
+  height: 36.167px;
   place-items: center;
   border: 0;
   border-radius: 9px;
@@ -1131,13 +1131,13 @@
   transition: background-color 160ms ease;
 }
 .journal-notification .journal-notification-revert-symbol > svg {
-  width: 17px;
-  height: 17px;
-  stroke-width: 2.25;
+  width: 21.96px;
+  height: 21.96px;
+  stroke-width: 3.05;
 }
 .journal-notification-revert-label {
   color: var(--toast-muted);
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 550;
   line-height: 12px;
   white-space: nowrap;
@@ -1384,35 +1384,27 @@
 }
 
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .journal-notification-summary:hover {
-    background: color-mix(in srgb, var(--toast-ink) 3%, transparent);
-  }
-  .journal-notification-action:hover,
-  .journal-toaster[data-sonner-toaster]
-    [data-sonner-toast][data-styled="true"]
-    [data-button]:hover {
-    background: color-mix(
-      in srgb,
-      var(--toast-accent) 35%,
-      var(--toast-surface)
+  .journal-notification[data-expanded="false"]:hover
+    .journal-notification-header {
+    background: linear-gradient(
+      115deg,
+      color-mix(in srgb, var(--toast-accent) 9%, transparent),
+      color-mix(in srgb, var(--toast-ink) 5%, transparent)
     );
   }
-  .journal-notification .journal-notification-revert:not(:disabled):hover {
-    color: var(--toast-ink);
-  }
-  .journal-notification-revert:not(:disabled):hover
-    .journal-notification-revert-symbol {
-    background: color-mix(in srgb, var(--toast-ink) 11%, transparent);
-  }
-  .journal-notification .journal-notification-tool:not(:disabled):hover {
-    color: var(--toast-ink);
-  }
-  .journal-notification-tool:not(:disabled):hover
-    :is(
-      .journal-notification-tool-symbol,
-      .journal-notification-revert-symbol
-    ) {
-    background: color-mix(in srgb, var(--toast-ink) 11%, transparent);
+  @media (prefers-reduced-motion: no-preference) {
+    .journal-notification[data-expanded="false"]
+      :is(.journal-notification-copy, .journal-notification-art) {
+      transition: transform 190ms ease-out;
+    }
+    .journal-notification[data-expanded="false"]:hover
+      .journal-notification-copy {
+      transform: translateX(2px);
+    }
+    .journal-notification[data-expanded="false"]:hover
+      .journal-notification-art {
+      transform: rotate(-2deg) scale(1.025);
+    }
   }
 }
 @media (max-width: 479px) {
@@ -2363,4 +2355,28 @@
       background: var(--toast-cover), var(--popover);
     }
   }
+}
+
+.journal-notification-facts-intro {
+  font-size: 13px;
+  color: var(--toast-ink);
+  margin: 0 0 10px;
+}
+.journal-notification[data-kind="info"] .journal-notification-facts {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.journal-notification[data-kind="info"] .journal-notification-facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  background: transparent;
+  padding: 0;
+}
+.journal-notification[data-kind="info"] .journal-notification-facts dd {
+  font-size: 10px;
+  color: var(--toast-detail-muted);
 }

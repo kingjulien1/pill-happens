@@ -294,8 +294,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         links and actions. When several cards are folded together, the first
         activation only fans the stack open; activate a card again for its
         details. A real Undo stays in the card header and also appears in the
-        action footer while details are open. Notices without a reversal keep
-        the same slots disabled and quiet. An opened stack has no card-count cap
+        action footer while details are open. Information notices offer Got it in the header. Warnings, errors and
+        loading notices offer Details when there is no reversal. An opened stack has no card-count cap
         and scrolls within the viewport. Use the shared journal facade for every
         application notice.
       </p>
@@ -1123,7 +1123,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Header / unavailable Undo",
-            "In both collapsed and expanded cards: one transparent 44px header target, aligned 10px from the top and 16px from the right. A borderless 28px tile holds a 17px, 2.25-stroke state icon and 9px label. Expanded cards also retain the centered 52px footer tool with a 30px tile and 8.5px caption. Both locations share one confirmed callback and the same pending/done/unavailable state. Without a callback, both locations use native disabled semantics, Zinc300 ink at 38% and a 4% neutral tile, with no extra element-opacity multiplier. The caption stays Undo; the accessible label/title explain that it is unavailable. No handler or fabricated reversal is attached. Pending/done retain their existing feedback.",
+            "Header actions share a 36px tile, 22px icon and small caption. Got it dismisses an information notice. Freshen Up applies an available update. Undo reverses a confirmed change and stays disabled on success notices without a reversal. Information notices omit footer Undo.",
           ],
           [
             "Expanded backdrop / footer",

@@ -731,7 +731,42 @@ export function JournalNotification({
     );
   };
 
-  const renderUpdateHeaderAction = () => {
+  const renderHeaderAction = () => {
+    const acknowledge = kind === "info" && dismissible;
+    if (
+      acknowledge ||
+      (!undo &&
+        (kind === "warning" ||
+          kind === "error" ||
+          kind === "loading" ||
+          kind === "info"))
+    ) {
+      const ActionIcon = acknowledge ? Check : expanded ? Minimize2 : Info;
+      const label = acknowledge ? "Got it" : expanded ? "Collapse" : "Details";
+      return (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="journal-notification-revert"
+          aria-label={label}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            if (needsStackReveal || !acknowledge) toggle();
+            else dismissFromFooter(event);
+          }}
+        >
+          <span
+            className="journal-notification-revert-symbol"
+            aria-hidden="true"
+          >
+            <ActionIcon />
+          </span>
+          <span className="journal-notification-revert-label">{label}</span>
+        </Button>
+      );
+    }
     if (kind !== "update" || !isAction(action)) return renderUndo();
     return (
       <Button
@@ -984,7 +1019,7 @@ export function JournalNotification({
             </span>
           </span>
         </button>
-        {renderUpdateHeaderAction()}
+        {renderHeaderAction()}
       </div>
       <div
         className="journal-notification-details"
@@ -1003,14 +1038,19 @@ export function JournalNotification({
             ) : details?.preview ? (
               <NotificationChangePreview preview={details.preview} />
             ) : facts.length ? (
-              <dl className="journal-notification-facts">
-                {facts.map((fact, index) => (
-                  <div key={index}>
-                    <dt>{fact.label}</dt>
-                    <dd>{fact.value}</dd>
-                  </div>
-                ))}
-              </dl>
+              <>
+                {kind === "info" && (
+                  <p className="journal-notification-facts-intro">{message}</p>
+                )}
+                <dl className="journal-notification-facts">
+                  {facts.map((fact, index) => (
+                    <div key={index}>
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </>
             ) : paragraphs.length ? (
               <div className="journal-notification-context">
                 <Info aria-hidden="true" />
@@ -1060,7 +1100,9 @@ export function JournalNotification({
                   </a>
                 );
               })}
-              {renderUndo(true)}
+              {kind !== "info" &&
+                (undo || kind === "success") &&
+                renderUndo(true)}
               <Button
                 variant="ghost"
                 size="icon"

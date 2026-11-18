@@ -566,7 +566,7 @@ export function MedicationsPage() {
     if (!data || historyNoticeShown.current) return;
     historyNoticeShown.current = true;
     toast.info(
-      "Strength changes recalculate past doses and totals. Quantities, times and notes stay as entered.",
+      "Strength changes recalculate past doses and totals. Logged quantities, times and notes stay as entered.",
       {
         id: "medication-history-policy",
         journalScope: notificationScope,
