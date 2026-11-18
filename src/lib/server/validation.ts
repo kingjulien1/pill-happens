@@ -15,6 +15,7 @@ import {
   DAILY_CHECK_IN_PERIODS,
   DAILY_MOOD_VALUES,
   DAILY_REFLECTION_MAX_LENGTH,
+  WHAT_HELPED_MAX_LENGTH,
 } from "@/lib/daily-check-in";
 import {
   isMedicationIcon,
@@ -197,7 +198,10 @@ export const dailyCheckInSchema = z
     helped: z
       .string()
       .trim()
-      .max(160, "Keep what helped to 160 characters or fewer.")
+      .max(
+        WHAT_HELPED_MAX_LENGTH,
+        `Keep what helped to ${WHAT_HELPED_MAX_LENGTH} characters or fewer.`,
+      )
       .default(""),
   })
   .superRefine((entry, context) => {

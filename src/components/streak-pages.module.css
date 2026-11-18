@@ -897,6 +897,7 @@
   white-space: pre-wrap;
 }
 .helped {
+  white-space: pre-line;
   display: block;
   margin-top: 7px;
   color: var(--muted-foreground);

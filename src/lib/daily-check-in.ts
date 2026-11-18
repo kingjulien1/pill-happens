@@ -3,6 +3,7 @@ import type { CheckInRatingScale } from "./check-in-rating";
 import { dayKey, isValidDayKey, toLocalInput } from "@/lib/domain";
 
 /** Shared by the reflection editor and API; other check-in fields stay concise. */
+export const WHAT_HELPED_MAX_LENGTH = 800;
 export const DAILY_REFLECTION_MAX_LENGTH = 100_000;
 
 /** Stable IDs keep every earlier check-in intact; icon metadata updates its display. */

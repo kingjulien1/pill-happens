@@ -709,7 +709,7 @@ export function GuidePage() {
               feelings with Lucide symbols. Search by word or filter by family,
               then choose up to four. Selected feelings stay below the palette.
               Familiar choices rise to the top; Shuffle changes the mix. Add
-              optional Energy, Stress and One Thing That Helped answers.
+              optional Energy, Stress and Things That Helped answers.
             </p>
             <div
               className={styles.moodList}
@@ -809,7 +809,7 @@ export function GuidePage() {
                   What Helped
                 </dt>
                 <dd>
-                  A small reminder of something useful, up to 160 characters.
+                  Write down the things that helped, one per line if you like. There is room for 800 characters.
                 </dd>
               </div>
             </dl>

@@ -6,6 +6,7 @@ import {
 import {
   DAILY_MOOD_VALUES,
   DAILY_REFLECTION_MAX_LENGTH,
+  WHAT_HELPED_MAX_LENGTH,
   type DailyCheckIn,
   type DailyCheckInPeriod,
   type DailyMood,
@@ -108,7 +109,7 @@ export function isCheckInDraft(value: unknown): value is CheckInDraft {
     (draft.bedtime === undefined ||
       (typeof draft.bedtime === "string" && draft.bedtime.length <= 256)) &&
     typeof draft.helped === "string" &&
-    draft.helped.length <= 160 &&
+    draft.helped.length <= WHAT_HELPED_MAX_LENGTH &&
     (draft.writingOpen === undefined ||
       typeof draft.writingOpen === "boolean") &&
     (draft.reflectionBaseUpdatedAt === undefined ||

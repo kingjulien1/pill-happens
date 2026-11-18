@@ -126,7 +126,7 @@ test("draft validation shares the long reflection cap without relaxing other raw
     false,
   );
   for (const fields of [
-    { helped: "x".repeat(161) },
+    { helped: "x".repeat(801) },
     { sleepHours: "x".repeat(257) },
     { bedtime: "x".repeat(257) },
     { bedtime: null },

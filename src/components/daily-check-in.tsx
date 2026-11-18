@@ -39,7 +39,7 @@ import {
 } from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
@@ -54,6 +54,7 @@ import {
 } from "@/lib/morning-sleep";
 import {
   DAILY_MOODS,
+  WHAT_HELPED_MAX_LENGTH,
   checkInForDay,
   type DailyCheckIn,
   type DailyCheckInPeriod,
@@ -724,18 +725,28 @@ function CheckInForm({
             className={cn(styles.field, styles.helpedField, styles.formSection)}
             data-check-in-section="helped"
           >
-            <Label htmlFor={`${id}-helped`}>
-              <ActionIcon name="sparkle" className="size-4" />
-              One Thing That Helped
-            </Label>
-            <Input
+            <div className={styles.helpedHeading}>
+              <Label htmlFor={`${id}-helped`}>
+                <ActionIcon name="sparkle" className="size-4" />
+                Things That Helped
+              </Label>
+              <span aria-label={`${helped.length} of ${WHAT_HELPED_MAX_LENGTH} characters`}>
+                {helped.length} / {WHAT_HELPED_MAX_LENGTH}
+              </span>
+            </div>
+            <p id={`${id}-helped-hint`} className={styles.helpedHint}>
+              What made today a little easier? Give each thing its own line if you like.
+            </p>
+            <Textarea
               id={`${id}-helped`}
+              aria-describedby={`${id}-helped-hint`}
+              rows={3}
               value={helped}
-              maxLength={160}
+              maxLength={WHAT_HELPED_MAX_LENGTH}
               onChange={(event) => setHelped(event.target.value)}
-              placeholder="A walk, a chat…"
+              placeholder={"A walk before lunch\nA friend who listened"}
               disabled={locked}
-              className={styles.detailInput}
+              className={styles.helpedInput}
             />
           </div>
         </div>

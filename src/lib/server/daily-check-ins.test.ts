@@ -92,9 +92,9 @@ test("moods are allowlisted, unique, and limited to four selections", () => {
 });
 
 test("check-in text has bounded lengths after trimming and uses real calendar dates", () => {
-  assert.equal(input({ helped: "x".repeat(160) }).helped.length, 160);
+  assert.equal(input({ helped: "x".repeat(800) }).helped.length, 800);
   for (const fields of [
-    { helped: "x".repeat(161) },
+    { helped: "x".repeat(801) },
     { day: "2026-02-29" },
     { day: "2026-13-01" },
     { day: "2026-10-30T12:00:00Z" },
