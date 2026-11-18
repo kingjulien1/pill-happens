@@ -51,6 +51,7 @@ import {
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
 import { Button } from "@/components/ui/button";
+import { ActionIcon } from "@/components/action-icon";
 
 export type JournalNotificationDetails = {
   /** Display-only snapshots of the actual affected records, never live editors. */
@@ -820,6 +821,8 @@ export function JournalNotification({
   };
 
   const paragraphs = details?.paragraphs ?? [defaultContext[kind]];
+  const medicationPolicy =
+    id === "medication-history-policy" && kind === "info";
   const facts = details?.facts?.slice(0, 4) ?? [];
   const previewRecord = details?.preview?.after ?? details?.preview?.before;
   const footerCopy = previewRecord
@@ -1063,9 +1066,35 @@ export function JournalNotification({
             ) : details?.preview ? (
               <NotificationChangePreview preview={details.preview} />
             ) : facts.length ? (
-              <>
-                {kind === "info" && (
-                  <p className="journal-notification-facts-intro">{message}</p>
+              <div
+                className={
+                  medicationPolicy ? "journal-medication-policy" : undefined
+                }
+              >
+                {medicationPolicy ? (
+                  <section
+                    className="journal-medication-policy-alert"
+                    aria-label="Medication edit policy"
+                  >
+                    <header>
+                      <strong>History</strong>
+                      <span aria-hidden="true">·</span>
+                      <span>Edit policy</span>
+                      <small>All entries</small>
+                    </header>
+                    <div className="journal-medication-policy-body">
+                      <ActionIcon name="retry" aria-hidden="true" />
+                      <p>
+                        <strong>Edits Update All Past Logs.</strong> {message}
+                      </p>
+                    </div>
+                  </section>
+                ) : (
+                  kind === "info" && (
+                    <p className="journal-notification-facts-intro">
+                      {message}
+                    </p>
+                  )
                 )}
                 <dl className="journal-notification-facts">
                   {facts.map((fact, index) => (
@@ -1075,7 +1104,7 @@ export function JournalNotification({
                     </div>
                   ))}
                 </dl>
-              </>
+              </div>
             ) : paragraphs.length ? (
               <div className="journal-notification-context">
                 <Info aria-hidden="true" />
