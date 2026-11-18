@@ -4,6 +4,63 @@
   margin: 0;
 }
 
+.cardFrame {
+  position: relative;
+  min-width: 0;
+}
+.desktopRim {
+  display: none;
+}
+
+/* On desktop, paint the perimeter as a sibling of the native button.
+   WebKit can clip outboard descendants of a composited, rounded button. */
+@media (min-width: 768px) {
+  .cardFrame .outerFrame {
+    display: none;
+  }
+  .desktopRim {
+    --rim-gap: 3px;
+    --rim-width: 3.733px;
+    --outset: calc(var(--rim-gap) + var(--rim-width) / 2);
+    position: absolute;
+    display: block;
+    inset: calc(-1 * var(--outset));
+    width: calc(100% + 2 * var(--outset));
+    height: calc(100% + 2 * var(--outset));
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    color: color-mix(
+      in srgb,
+      var(--color-purple-400) 78%,
+      var(--color-pink-400)
+    );
+  }
+  .desktopRim rect {
+    rx: calc(var(--intake-card-radius) + var(--rim-gap) + var(--rim-width) / 2);
+    stroke-width: var(--rim-width);
+  }
+  .rimTrack {
+    stroke: currentColor;
+    filter: drop-shadow(0 0 4px var(--color-pink-400));
+  }
+  .rimLight {
+    stroke: color-mix(in srgb, currentColor 40%, white);
+    stroke-dasharray: 12 88;
+    stroke-linecap: round;
+  }
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .rimLight {
+    animation: travel-perimeter 5.46s linear infinite;
+  }
+}
+@keyframes travel-perimeter {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
 /* The timeline contributes another 8px to each check-in spacer. */
 .intakeSpacer {
   width: 100%;

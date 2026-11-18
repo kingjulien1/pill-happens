@@ -203,95 +203,106 @@ export function DailyCheckInSection({
       data-check-in-period={period}
     >
       {intakeSpacing === "before" && intakeSpacer}
-      <MedicationCardBase
-        color={CHECK_IN_CARD_COLOR}
-        decoration={
-          <span
-            className={styles.outerFrame}
-            data-specular-frame
-            aria-hidden="true"
-          >
-            <SpecularRim
-              palette="triad"
-              glow={false}
-              className={styles.outerLight}
+      <div className={styles.cardFrame}>
+        <svg className={styles.desktopRim} aria-hidden="true" focusable="false">
+          <rect width="100%" height="100%" className={styles.rimTrack} />
+          <rect
+            width="100%"
+            height="100%"
+            className={styles.rimLight}
+            pathLength="100"
+          />
+        </svg>
+        <MedicationCardBase
+          color={CHECK_IN_CARD_COLOR}
+          decoration={
+            <span
+              className={styles.outerFrame}
+              data-specular-frame
+              aria-hidden="true"
+            >
+              <SpecularRim
+                palette="triad"
+                glow={false}
+                className={styles.outerLight}
+              />
+            </span>
+          }
+          icon={morning ? "sun" : "moon-star"}
+          leadingArtwork={
+            <CheckInCardArtwork
+              period={period}
+              replayKey={artworkReplayKey}
+              dialogOpen={ownDialogOpen}
             />
-          </span>
-        }
-        icon={morning ? "sun" : "moon-star"}
-        leadingArtwork={
-          <CheckInCardArtwork
-            period={period}
-            replayKey={artworkReplayKey}
-            dialogOpen={ownDialogOpen}
-          />
-        }
-        className={cn(styles.card, "check-in-icon-theme")}
-        data-check-in-card
-        data-check-in-dialog-open={ownDialogOpen}
-        data-filled={saved}
-        data-complete={saved && completion.complete}
-        onClick={() => openCheckIn()}
-        aria-label={
-          saved
-            ? `Edit ${title}. ${logged?.label ?? "Last update time unavailable"}.`
-            : `Write ${title}`
-        }
-        aria-describedby={previewId}
-        aria-haspopup="dialog"
-        disabled={busy}
-      >
-        <div className="medication-card-details intake-card-details">
-          <SavedCheckInHeading
-            period={period}
-            openedAt={openedAt}
-            createdAt={saved ? checkIn?.createdAt : undefined}
-            updatedAt={saved ? checkIn?.updatedAt : undefined}
-            timeZone={timeZone}
-            trailing={
-              <span className={styles.summaryIcons} aria-hidden="true">
-                <span title={morning ? "Sleep duration" : "Selected moods"}>
-                  <MetricIcon />
+          }
+          className={cn(styles.card, "check-in-icon-theme")}
+          data-check-in-card
+          data-check-in-dialog-open={ownDialogOpen}
+          data-filled={saved}
+          data-complete={saved && completion.complete}
+          onClick={() => openCheckIn()}
+          aria-label={
+            saved
+              ? `Edit ${title}. ${logged?.label ?? "Last update time unavailable"}.`
+              : `Write ${title}`
+          }
+          aria-describedby={previewId}
+          aria-haspopup="dialog"
+          disabled={busy}
+        >
+          <div className="medication-card-details intake-card-details">
+            <SavedCheckInHeading
+              period={period}
+              openedAt={openedAt}
+              createdAt={saved ? checkIn?.createdAt : undefined}
+              updatedAt={saved ? checkIn?.updatedAt : undefined}
+              timeZone={timeZone}
+              trailing={
+                <span className={styles.summaryIcons} aria-hidden="true">
+                  <span title={morning ? "Sleep duration" : "Selected moods"}>
+                    <MetricIcon />
+                  </span>
+                  <span title={feedback.label}>
+                    <StateIcon />
+                  </span>
                 </span>
-                <span title={feedback.label}>
-                  <StateIcon />
+              }
+            />
+            <div
+              className="medication-card-bottom intake-card-bottom"
+              data-check-in-preview-row
+              data-check-in-status={feedback.state}
+            >
+              <div className="intake-card-ingredient-group">
+                <span
+                  className={cn("intake-card-ingredient", styles.preview)}
+                  data-check-in-completion-summary
+                  title={hint}
+                >
+                  {hint}
                 </span>
-              </span>
-            }
-          />
-          <div
-            className="medication-card-bottom intake-card-bottom"
-            data-check-in-preview-row
-            data-check-in-status={feedback.state}
-          >
-            <div className="intake-card-ingredient-group">
+              </div>
               <span
-                className={cn("intake-card-ingredient", styles.preview)}
-                data-check-in-completion-summary
-                title={hint}
+                className="intake-card-total"
+                aria-hidden="true"
+                title={metric.description}
               >
-                {hint}
+                <span className="intake-card-total-value">
+                  {metric.value || "\u200b"}
+                </span>
+                <span className="intake-card-total-unit">{metric.unit}</span>
               </span>
             </div>
-            <span
-              className="intake-card-total"
-              aria-hidden="true"
-              title={metric.description}
-            >
-              <span className="intake-card-total-value">
-                {metric.value || "\u200b"}
-              </span>
-              <span className="intake-card-total-unit">{metric.unit}</span>
-            </span>
           </div>
-        </div>
-        <span id={previewId} className="sr-only">
-          {metric.description} {feedback.description}
-          {opened && ` ${opened.label}.`}
-          {progress.visible &&
-            ` ${progress.percent}% complete: ${progress.completion.completedCount} of ${progress.completion.totalCount} optional sections${hasChanges ? ", including your current edits" : ""}.`}
-        </span>
-      </MedicationCardBase>
+          <span id={previewId} className="sr-only">
+            {metric.description} {feedback.description}
+            {opened && ` ${opened.label}.`}
+            {progress.visible &&
+              ` ${progress.percent}% complete: ${progress.completion.completedCount} of ${progress.completion.totalCount} optional sections${hasChanges ? ", including your current edits" : ""}.`}
+          </span>
+        </MedicationCardBase>
+      </div>
       {intakeSpacing === "after" && intakeSpacer}
       <ResponsiveModal
         open={open}
