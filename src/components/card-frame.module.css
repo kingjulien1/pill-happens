@@ -103,12 +103,20 @@
   );
   --entry-edge-color: color-mix(in srgb, var(--foreground) 10%, transparent);
   --card-foreground: var(--canvas-foreground);
-  --entry-surface-base: color-mix(in srgb, var(--entry-color) 6%, transparent);
+  --entry-surface-base: color-mix(
+    in srgb,
+    var(--entry-color) calc(6% * var(--intake-tint-factor, 1)),
+    transparent
+  );
   --entry-glass-pink: color-mix(
     in srgb,
     var(--color-pink-200, #fccee8) 8%,
     transparent
   );
+}
+
+.card[data-intake-card] {
+  --intake-tint-factor: calc(31 / 24);
 }
 
 /* A shadow retains fractional widths that CSS borders/outlines round away.
@@ -262,7 +270,7 @@
     ) {
     --entry-surface-base: color-mix(
       in srgb,
-      var(--entry-color) 5%,
+      var(--entry-color) calc(5% * var(--intake-tint-factor, 1)),
       transparent
     );
     --entry-glass-pink: color-mix(
