@@ -334,8 +334,8 @@
   }
 }
 
-/* Today scales the main action's material to the existing 46px controls. */
-:global([data-today-topbar])
+/* Shared page headers use the main action’s finish on both 46px controls. */
+:global([data-page-topbar])
   .headerButton.headerButton[data-slot="button"]:is(
     [data-brand-refresh],
     [data-navigation-trigger]
@@ -375,7 +375,7 @@
     filter 240ms ease;
 }
 
-:global([data-today-topbar])
+:global([data-page-topbar])
   .headerButton.headerButton[data-slot="button"]:is(
     [data-brand-refresh],
     [data-navigation-trigger]
@@ -390,7 +390,7 @@
 }
 
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  :global([data-today-topbar])
+  :global([data-page-topbar])
     .headerButton.headerButton[data-slot="button"]:not(:disabled):hover {
     filter: brightness(1.035);
     box-shadow:
@@ -401,13 +401,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :global([data-today-topbar]) .headerButton[data-slot="button"] {
+  :global([data-page-topbar]) .headerButton[data-slot="button"] {
     transition: none;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  :global([data-today-topbar]) .headerButton.headerButton[data-slot="button"] {
+  :global([data-page-topbar]) .headerButton.headerButton[data-slot="button"] {
     background: var(--control-face);
   }
 }
