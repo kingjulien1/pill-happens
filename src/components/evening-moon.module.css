@@ -64,7 +64,9 @@
 }
 
 .aureole,
-.rays {
+.rays,
+.burstRing,
+.burstSpecks {
   opacity: 0;
   transform-origin: 0 0;
 }
@@ -77,6 +79,19 @@
   fill: none;
   stroke: #fff6e3;
   stroke-width: 0.55;
+  stroke-linecap: round;
+}
+
+.burstRing {
+  fill: none;
+  stroke: var(--star-to);
+  stroke-width: 0.45;
+}
+
+.burstSpecks {
+  fill: none;
+  stroke: var(--star-from);
+  stroke-width: 0.8;
   stroke-linecap: round;
 }
 
@@ -96,8 +111,18 @@
   }
 
   .star[data-bright="true"] .aureole,
-  .star[data-bright="true"] .rays {
+  .star[data-bright="true"] .rays,
+  .star[data-bright="true"] .burstRing,
+  .star[data-bright="true"] .burstSpecks {
     animation: lunar-star-radiance var(--star-duration) ease-out both;
+  }
+
+  .star[data-bright="true"] .burstRing {
+    animation-name: lunar-star-burst-ring;
+  }
+
+  .star[data-bright="true"] .burstSpecks {
+    animation-name: lunar-star-burst-specks;
   }
 }
 
@@ -169,12 +194,50 @@
     transform: scale(0.35);
   }
   42% {
-    opacity: 0.92;
-    transform: scale(0.95);
+    opacity: 0.96;
+    transform: scale(1.02);
   }
-  64%,
+  58% {
+    opacity: 0.36;
+    transform: scale(1.5);
+  }
+  72%,
   100% {
     opacity: 0;
-    transform: scale(1.45);
+    transform: scale(1.72);
+  }
+}
+
+@keyframes lunar-star-burst-ring {
+  0%,
+  35% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  43% {
+    opacity: 0.82;
+    transform: scale(0.72);
+  }
+  67%,
+  100% {
+    opacity: 0;
+    transform: scale(2.15);
+  }
+}
+
+@keyframes lunar-star-burst-specks {
+  0%,
+  37% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-9deg);
+  }
+  46% {
+    opacity: 0.92;
+    transform: scale(0.9) rotate(2deg);
+  }
+  69%,
+  100% {
+    opacity: 0;
+    transform: scale(1.55) rotate(13deg);
   }
 }

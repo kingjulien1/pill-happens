@@ -5,13 +5,14 @@ import { getEveningMoonMotion } from "@/lib/evening-moon-motion";
 import styles from "./evening-moon.module.css";
 
 const STAR_POSITIONS = [
-  { x: 8, y: 0 },
-  { x: 23, y: 2 },
-  { x: 30, y: 13 },
-  { x: 27, y: 29 },
-  { x: 6, y: 31 },
-  { x: -1, y: 14 },
-  { x: 22, y: 11 },
+  { x: -6, y: 2 },
+  { x: 15, y: -8 },
+  { x: 36, y: 1 },
+  { x: 40, y: 17 },
+  { x: 34, y: 35 },
+  { x: 8, y: 39 },
+  { x: -9, y: 25 },
+  { x: -10, y: 11 },
 ] as const;
 const STAR_COLORS = [
   ["#f9a8d4", "#fce7f3"],
@@ -36,7 +37,7 @@ type EveningStar = {
   bright: boolean;
 };
 
-/** A pendulum crescent carries a soft lagging tilt through its small star field. */
+/** A compound hanging arc carries a softly lagging crescent through a quiet sky. */
 export function EveningMoon({
   dialogOpen = false,
   ambientReady = true,
@@ -134,12 +135,12 @@ export function EveningMoon({
     }
 
     function spawnStar() {
-      if (!active || live.size >= 3) return;
+      if (!active || live.size >= 2) return;
       const slots = STAR_POSITIONS.map((_, index) => index).filter((index) => {
         if (index === lastSlot) return false;
         const point = STAR_POSITIONS[index];
         return !Array.from(live.values()).some(
-          (star) => Math.hypot(star.x - point.x, star.y - point.y) < 12,
+          (star) => Math.hypot(star.x - point.x, star.y - point.y) < 18,
         );
       });
       if (!slots.length) return;
@@ -151,14 +152,12 @@ export function EveningMoon({
         y: point.y + (Math.random() - 0.5) * 1.4,
         dx: (Math.random() - 0.5) * 2.4,
         dy: -0.8 - Math.random() * 1.8,
-        duration: 1000 + Math.random() * 1500,
-        size: 4.8 + Math.random() * 2,
+        duration: 1250 + Math.random() * 1450,
+        size: 7 + Math.random() * 2.4,
         angle: (Math.random() - 0.5) * 24,
         turn: (Math.random() > 0.5 ? 1 : -1) * (12 + Math.random() * 16),
         colors: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
-        bright:
-          Math.random() < 0.28 &&
-          !Array.from(live.values()).some((item) => item.bright),
+        bright: nextStarId.current % 5 !== 0,
       };
       lastSlot = slot;
       live.set(star.id, star);
@@ -179,7 +178,7 @@ export function EveningMoon({
           spawnStar();
           queueStar();
         },
-        first ? 450 + Math.random() * 450 : 650 + Math.random() * 650,
+        first ? 900 + Math.random() * 700 : 1500 + Math.random() * 1300,
       );
     }
 
@@ -310,6 +309,11 @@ export function EveningMoon({
               <path
                 className={styles.rays}
                 d="M0-5v-2M0 5v2M-5 0h-2M5 0h2M3.6-3.6l1.1-1.1M-3.6 3.6l-1.1 1.1M3.6 3.6l1.1 1.1M-3.6-3.6l-1.1-1.1"
+              />
+              <circle className={styles.burstRing} r="2.7" />
+              <path
+                className={styles.burstSpecks}
+                d="M0-5.8v-.7M4.1-4.1l.5-.5M5.8 0h.7M4.1 4.1l.5.5M0 5.8v.7M-4.1 4.1l-.5.5M-5.8 0h-.7M-4.1-4.1l-.5-.5"
               />
             </svg>
           </span>
