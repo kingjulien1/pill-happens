@@ -697,7 +697,7 @@
 .journal-notification-summary-content {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 13px;
   min-height: 77px;
   box-sizing: border-box;
   padding: 12px 8px 16px 15px;
@@ -1001,9 +1001,15 @@
 .journal-notification-footer:empty {
   display: none;
 }
-.journal-notification-footer-copy {
+.journal-notification-footer-copy,
+.journal-notification-footer-note {
+  box-sizing: border-box;
+  width: 100%;
   min-width: 0;
-  max-width: 42ch;
+  padding-inline: 8px;
+  overflow-wrap: anywhere;
+}
+.journal-notification-footer-copy {
   color: color-mix(in srgb, var(--toast-ink) 50%, transparent);
   font-size: 9px;
   font-weight: 450;
@@ -1011,7 +1017,6 @@
   text-align: center;
 }
 .journal-notification-footer-note {
-  max-width: 45ch;
   color: color-mix(in srgb, var(--toast-ink) 39%, transparent);
   font-size: 8.5px;
   font-weight: 450;
@@ -1036,7 +1041,7 @@
   position: absolute;
   z-index: 0;
   inset: auto 0 0;
-  height: min(250px, 74%);
+  height: min(200px, 59.2%);
   border-radius: 0 0 18px 18px;
   background:
     linear-gradient(to top, #f9a8d412, #f9a8d400 28%),
@@ -1048,7 +1053,7 @@
   pointer-events: none;
 }
 .journal-notification[data-expanded="true"] .journal-notification-footer-fade {
-  opacity: 1;
+  opacity: calc(2 / 3);
 }
 .journal-notification-header {
   position: relative;
@@ -1493,7 +1498,7 @@
 @media (max-width: 479px) {
   .journal-notification-summary-content {
     padding-left: 14px;
-    gap: 9px;
+    gap: 12px;
   }
   .journal-toaster[data-sonner-toaster]
     [data-sonner-toast][data-styled="true"] {

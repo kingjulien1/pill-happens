@@ -699,12 +699,12 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Expanded content uses inset separators: the first divider has 4px of
         space above and 20px below, and the footer divider has 20px above and
         below. Preview rows have a 16px gap. A four-layer footer wash reaches
-        250px or 74% of the card, whichever is smaller. Its longest, strongest
+        200px or 59.2% of the card, whichever is smaller, at two-thirds opacity. Its longest, strongest
         dark Fuchsia900 base fades from 70% alpha to 36% halfway up, then to
         zero at the full height. Fuchsia600 starts at 18% and ends at 70% of
         that height; Pink400 starts at 10% and ends at 45%; Pink300 starts at 7%
         and ends at 28%. All paint stays behind the live tools and text, never
-        changing their hit targets. Below the brief footer context, an 8.5px
+        changing their hit targets. Both footer lines use the available width with 8px of inline padding. Below the brief footer context, an 8.5px
         note at 39% ink alpha explains that snapshots may differ from later
         edits. It names relevant destinations from the notice’s existing links
         and offers a Daily Log link, without awkwardly turning action labels
@@ -1127,7 +1127,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Expanded backdrop / footer",
-            "One interactive viewport veil per owning wrapper: Mauve900 at 31%, 4px blur, 220ms fade. It blocks page controls and outside press collapses details without dismissing the card. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(250px, 74%): Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
+            "One interactive viewport veil per owning wrapper: Mauve900 at 31%, 4px blur, 220ms fade. It blocks page controls and outside press collapses details without dismissing the card. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(200px, 59.2%) at two-thirds opacity: Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
           ],
           [
             "Artwork / bell",
