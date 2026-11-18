@@ -1130,6 +1130,23 @@
   box-shadow: none;
   transition: background-color 160ms ease;
 }
+.journal-notification
+  :is(.journal-notification-revert-symbol, .journal-notification-tool-symbol) {
+  outline: 2px solid
+    color-mix(
+      in srgb,
+      color-mix(
+          in srgb,
+          var(--color-fuchsia-800, #86198f),
+          var(--color-violet-900, #4c1d95)
+        )
+        79%,
+      transparent
+    );
+  outline-offset: -2px;
+  border: 2px solid var(--toast-pink-edge);
+  box-sizing: border-box;
+}
 .journal-notification .journal-notification-revert-symbol > svg {
   width: 21.96px;
   height: 21.96px;
