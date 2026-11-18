@@ -1151,7 +1151,7 @@ export function DeveloperGuidePage() {
                 <code>JournalBackground</code> mounts one passive React Bits
                 Iridescence field at the root, shared across every route and
                 appearance mode. The native WebGL2 shader uses
-                <code> #7c3aed</code> with speed 0.92, detail 8 and
+                <code> #7c3aed</code> with speed 0.86, detail 8 and
                 brightness 1.5. Mouse reaction and click swirls are disabled;
                 there are no pointer listeners or interaction textures. Source
                 is pinned to revision <code>d01aa91</code>, with its David Haz

@@ -376,7 +376,7 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
     mixAppColors(APP_FOUNDATION.plum, APP_FOUNDATION.black, 0.92),
   );
   assert.equal(APP_IRIDESCENCE.color, "#7c3aed");
-  assert.equal(APP_IRIDESCENCE.speed, 0.92);
+  assert.equal(APP_IRIDESCENCE.speed, 0.86);
   assert.equal(APP_IRIDESCENCE.blur, 4);
   assert.equal(APP_IRIDESCENCE.brightness, 1.5);
   assert.equal(APP_IRIDESCENCE.hueShift, 0);

@@ -106,7 +106,7 @@ export const APP_CANVAS_MUTED_FOREGROUND = "#ded8ec";
 export const APP_IRIDESCENCE = Object.freeze({
   color: "#7c3aed",
   colorRgb: Object.freeze([124 / 255, 58 / 255, 237 / 255] as const),
-  speed: 0.92,
+  speed: 0.86,
   amplitude: 0.1,
   scale: 1,
   detail: 8,
