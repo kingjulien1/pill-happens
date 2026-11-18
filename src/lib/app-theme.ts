@@ -132,6 +132,17 @@ export const APP_CANVAS_OVERLAY = [
   `linear-gradient(oklch(82.3% 0.12 346.018 / ${APP_IRIDESCENCE.pinkOpacity}) 0 0)`,
 ].join(", ");
 
+// A single translucent layer composites these overlapping pigments at a constant 7%.
+const fuchsia300 = "oklch(83.3% 0.145 321.434)";
+const violet400 = "oklch(70.2% 0.183 293.541)";
+const canvasAccentCss = `
+  --app-canvas-accent: radial-gradient(ellipse 66% 44% at 13% 17%, ${fuchsia300} 10%, transparent 90%),
+    radial-gradient(ellipse 54% 62% at 80% 39%, ${violet400} 14%, transparent 88%),
+    radial-gradient(ellipse 78% 51% at 71% 96%, ${fuchsia300} 8%, transparent 89%),
+    ${violet400};
+  --app-canvas-accent-opacity: 0.07;
+`;
+
 /** A smooth violet still keeps critical, offline and unsupported-WebGL views coherent. */
 export const APP_CANVAS_BACKGROUND = [
   APP_CANVAS_OVERLAY,
@@ -139,6 +150,7 @@ export const APP_CANVAS_BACKGROUND = [
   APP_CANVAS_BASE,
 ].join(", ");
 export const APP_CANVAS_CSS = `
+  ${canvasAccentCss}
   --app-canvas-base: ${APP_CANVAS_BASE};
   --app-canvas-background: ${APP_CANVAS_BACKGROUND};
   --app-canvas-overlay: ${APP_CANVAS_OVERLAY};
@@ -193,6 +205,7 @@ export function getAppCanvasCss(mode: AppThemeMode): string {
   if (mode === "dark") return APP_CANVAS_CSS;
   const canvas = APP_CANVAS_BY_MODE.light;
   return `
+  ${canvasAccentCss}
   --app-canvas-base: ${canvas.base};
   --app-canvas-background: ${canvas.background};
   --app-canvas-overlay: ${canvas.overlay};

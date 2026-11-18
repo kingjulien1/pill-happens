@@ -2,6 +2,25 @@
 :root {
   color-scheme: light;
 
+  --app-canvas-accent:
+    radial-gradient(
+      ellipse 66% 44% at 13% 17%,
+      oklch(83.3% 0.145 321.434) 10%,
+      transparent 90%
+    ),
+    radial-gradient(
+      ellipse 54% 62% at 80% 39%,
+      oklch(70.2% 0.183 293.541) 14%,
+      transparent 88%
+    ),
+    radial-gradient(
+      ellipse 78% 51% at 71% 96%,
+      oklch(83.3% 0.145 321.434) 8%,
+      transparent 89%
+    ),
+    oklch(70.2% 0.183 293.541);
+  --app-canvas-accent-opacity: 0.07;
+
   --app-canvas-base: #f1e5f4;
   --app-canvas-background:
     radial-gradient(ellipse at 10% 5%, #f5cee6, transparent 57%),
@@ -106,6 +125,25 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+
+    --app-canvas-accent:
+      radial-gradient(
+        ellipse 66% 44% at 13% 17%,
+        oklch(83.3% 0.145 321.434) 10%,
+        transparent 90%
+      ),
+      radial-gradient(
+        ellipse 54% 62% at 80% 39%,
+        oklch(70.2% 0.183 293.541) 14%,
+        transparent 88%
+      ),
+      radial-gradient(
+        ellipse 78% 51% at 71% 96%,
+        oklch(83.3% 0.145 321.434) 8%,
+        transparent 89%
+      ),
+      oklch(70.2% 0.183 293.541);
+    --app-canvas-accent-opacity: 0.07;
 
     --app-canvas-base: #29213b;
     --app-canvas-background:

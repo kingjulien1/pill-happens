@@ -1182,6 +1182,12 @@ export function DeveloperGuidePage() {
                 still when WebGL is unavailable.
               </p>
               <p>
+                A final 7% wash blends Fuchsia300 and Violet400 in offset
+                elliptical pools above the field. It drifts on a 34-second loop
+                in both appearances. Reduced motion, the refresh screen and the
+                offline page show the still gradient.
+              </p>
+              <p>
                 Hidden documents and offscreen backgrounds pause their animation
                 clock without consuming hidden time. Live reduced-motion changes
                 settle on a still frame; disabling the preference resumes the

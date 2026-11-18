@@ -22,6 +22,26 @@
       /* BEGIN GENERATED APP THEME */
       :root {
         color-scheme: light;
+
+        --app-canvas-accent:
+          radial-gradient(
+            ellipse 66% 44% at 13% 17%,
+            oklch(83.3% 0.145 321.434) 10%,
+            transparent 90%
+          ),
+          radial-gradient(
+            ellipse 54% 62% at 80% 39%,
+            oklch(70.2% 0.183 293.541) 14%,
+            transparent 88%
+          ),
+          radial-gradient(
+            ellipse 78% 51% at 71% 96%,
+            oklch(83.3% 0.145 321.434) 8%,
+            transparent 89%
+          ),
+          oklch(70.2% 0.183 293.541);
+        --app-canvas-accent-opacity: 0.07;
+
         --app-canvas-base: #f1e5f4;
         --app-canvas-background:
           radial-gradient(ellipse at 10% 5%, #f5cee6, transparent 57%),
@@ -50,6 +70,26 @@
       @media (prefers-color-scheme: dark) {
         :root:not([data-color-mode]) {
           color-scheme: dark;
+
+          --app-canvas-accent:
+            radial-gradient(
+              ellipse 66% 44% at 13% 17%,
+              oklch(83.3% 0.145 321.434) 10%,
+              transparent 90%
+            ),
+            radial-gradient(
+              ellipse 54% 62% at 80% 39%,
+              oklch(70.2% 0.183 293.541) 14%,
+              transparent 88%
+            ),
+            radial-gradient(
+              ellipse 78% 51% at 71% 96%,
+              oklch(83.3% 0.145 321.434) 8%,
+              transparent 89%
+            ),
+            oklch(70.2% 0.183 293.541);
+          --app-canvas-accent-opacity: 0.07;
+
           --app-canvas-base: #29213b;
           --app-canvas-background:
             linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
@@ -83,6 +123,26 @@
       }
       :root[data-color-mode="dark"] {
         color-scheme: dark;
+
+        --app-canvas-accent:
+          radial-gradient(
+            ellipse 66% 44% at 13% 17%,
+            oklch(83.3% 0.145 321.434) 10%,
+            transparent 90%
+          ),
+          radial-gradient(
+            ellipse 54% 62% at 80% 39%,
+            oklch(70.2% 0.183 293.541) 14%,
+            transparent 88%
+          ),
+          radial-gradient(
+            ellipse 78% 51% at 71% 96%,
+            oklch(83.3% 0.145 321.434) 8%,
+            transparent 89%
+          ),
+          oklch(70.2% 0.183 293.541);
+        --app-canvas-accent-opacity: 0.07;
+
         --app-canvas-base: #29213b;
         --app-canvas-background:
           linear-gradient(oklch(38.1% 0.176 304.987 / 0.69) 0 0),
@@ -121,6 +181,7 @@
         background: var(--app-canvas-base);
       }
       body {
+        isolation: isolate;
         margin: 0;
         min-height: 100dvh;
         display: grid;
@@ -136,6 +197,15 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: var(--app-canvas-accent);
+        opacity: var(--app-canvas-accent-opacity);
+        pointer-events: none;
       }
       main {
         width: 100%;

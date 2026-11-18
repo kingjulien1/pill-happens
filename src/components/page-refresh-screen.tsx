@@ -98,6 +98,15 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   font-family: ui-sans-serif, system-ui, sans-serif;
   isolation: isolate;
 }
+.page-refresh-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--app-canvas-accent);
+  opacity: var(--app-canvas-accent-opacity);
+  pointer-events: none;
+}
 html[data-page-refresh-active] .page-refresh-screen {
   --page-refresh-motion: var(--page-refresh-visibility, running);
   display: grid;
