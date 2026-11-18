@@ -599,14 +599,15 @@ export function DeveloperGuidePage() {
             <Detail title="Actions, Focus & Feedback" context="Clear Intent">
               <p>
                 Button keeps standard semantic variants for ordinary controls,
-                toolbars, links and guide utilities. Primary, Accent and
-                DialogPrimaryButton explicitly select intake appearance for main
+                toolbars, links and guide utilities. Primary and Accent
+                explicitly select intake appearance for main
                 actions: a mode-aware Rose face, inward identity edge and
                 restrained moving pink perimeter. Supporting icons and copy use
                 the paired --daily-action-secondary-ink. Light actions use a
                 rich raspberry contrast surface with light copy; Dark Mode
-                keeps its existing paint. Today and Add Medication use their
-                separate satin adapter over the same native button host.
+                keeps its existing paint. Today, Add Medication and dialog
+                submissions use the shared TodayActionButton satin adapter over
+                the same native button host.
                 SecondaryButton keeps its quiet tonal surface and paired
                 semantic foreground. All paths preserve one Base UI host and
                 native behavior without making every small control look like the
@@ -1262,7 +1263,8 @@ export function DeveloperGuidePage() {
                 the text color.
               </p>
               <p>
-                TodayActionButton gives Today and Add Medication a fresh satin
+                TodayActionButton gives prominent page actions and dialog
+                submissions a satin
                 surface while retaining the native PrimaryButton host, 80px
                 height and intake-card 21px corners. The independent skin turns
                 off both old moving-rim renderers. A 10px inward frosted
@@ -1290,9 +1292,12 @@ export function DeveloperGuidePage() {
               <p>
                 MedicationActionButton reuses this exact component for Add
                 Medication with its existing creation symbol, label, dot,
-                Set Up aside and arrow. Save Medication and other compact
-                submissions retain their existing shared pink finish and form
-                geometry. Ordinary small controls and SecondaryButton keep
+                Set Up aside and arrow. DialogPrimaryButton composes the same
+                satin component, 80px height, 21px corners, inset icon well and
+                directional arrow for Save Medication, intake saves, check-ins,
+                goals, preferences and sign-in. Explicit pending and custom
+                glyphs retain their native submission behavior. Ordinary small
+                controls and SecondaryButton keep
                 their semantic variants; the new surface is scoped to the
                 prominent page actions and the matching toolbar family.
               </p>
@@ -1327,7 +1332,12 @@ export function DeveloperGuidePage() {
                 paint and border loops keep their own clocks.
               </p>
               <p>
-                The mobile intake action is fixed directly to the document body.
+                PageActionDock fixes both the mobile intake action and Add
+                Medication directly to the document body, with the same fade
+                stack, gutters, safe-area spacing and secondary note below.
+                The medication note reads “Your medications, your defaults,
+                your way.” Desktop places each action in the normal page flow
+                at a maximum width of 446px.
                 ResizeObserver measures its complete height, including a wrapped
                 summary, text sizing and safe-area padding. That height plus
                 24px drives both the page’s bottom clearance and the viewport’s
@@ -1359,8 +1369,9 @@ export function DeveloperGuidePage() {
                 39.2% in Dark Mode and 47.6% in Light Mode. Its absolute paint
                 scrolls away with the header. ResizeObserver, viewport changes
                 and font readiness keep its endpoint aligned without changing
-                the page layout or intercepting input. It is absent on other
-                routes and hidden at desktop widths.
+                the page layout or intercepting input. The Medications page
+                reuses PageTopFade with its heading as the measured endpoint.
+                Both top fades are hidden at desktop widths.
               </p>
             </Detail>
             <Detail
@@ -1397,7 +1408,15 @@ export function DeveloperGuidePage() {
                 leave the 80px baseline, 21px outer corners, padding, stack
                 placement and hit targets intact. Collection cards receive these
                 same paint layers without adopting intake-only interaction or
-                animation markers.
+                animation markers. Medication library cards also share the
+                intake icon rail, quantity marker, ingredient typography and
+                dose alignment; their values describe saved defaults rather
+                than an already-recorded dose. On Today, a separate native link
+                overlays the main artwork and opens that medication’s detail
+                route. The rest of the card remains an edit button, with no
+                nested interactive elements. A folded group first reveals on
+                ordinary activation; its visible icon then navigates. History
+                cards keep their existing edit behavior.
               </p>
               <p>
                 The Medications opening uses a compact 24px title on phones,
@@ -2280,17 +2299,15 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Dialog saves delegate through DialogPrimaryButton to
-                AccentButton, explicitly selecting intake appearance on the
-                shared Button host. Their compact responsive height and 21/80
-                corner ratio remain; Today and page-level Add Medication instead
-                share the full 80px height and 21px corners. All main actions
-                use the dark-pink face, Pink600 inward edge and Pink200
-                supporting ink, without restyling ordinary small controls.
+                TodayActionButton on the shared Button host. Today, page-level
+                Add Medication and submissions all share the full 80px height,
+                21px corners and mode-paired satin face, inward edge and inset
+                icon treatment, without restyling ordinary small controls.
                 Pending replaces the leading glyph and keeps native
-                submission/disabled behavior. Dialog action clearance, explicit
-                radius overrides and the separate keyboard focus ring remain
-                available. See the button component reference for standalone and
-                compact examples.
+                submission/disabled behavior. Dialog action clearance and the
+                separate keyboard focus ring remain available; the submission
+                adapter enforces the main action’s geometry even when older
+                callers still supply compact utility classes.
               </p>
               <p>
                 Intake and history week groups share the same 8px spacing token

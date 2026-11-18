@@ -43,7 +43,6 @@ type MedicationCardProps = Omit<
   | "form"
   | "name"
   | "artworkBadge"
-  | "artworkControls"
 > & {
   medication?: MedicationCardIdentity;
   name: string;
@@ -56,8 +55,8 @@ type MedicationCardProps = Omit<
   decoration?: ReactNode;
   /** Recorded routes remain distinct from a medication's physical form. */
   intakeRoute?: IntakeRoute;
-  /** Library forms use a small label; recorded intakes use the outline rail. */
-  formPresentation?: "text" | "icon";
+  /** Library and recorded cards share the outline rail; only intakes add a route. */
+  formPresentation?: "text" | "icon" | "library";
 };
 
 /** The same two single-line rows compose actual entries and saved medications. */
@@ -83,6 +82,7 @@ export function MedicationCard({
     !activeIngredient || activeIngredient.toLowerCase() === "unspecified";
   const hasLeading =
     leading !== undefined && leading !== null && leading !== false;
+  const iconPresentation = formPresentation !== "text";
 
   return (
     <MedicationCardBase
@@ -100,7 +100,7 @@ export function MedicationCard({
       data-medication-classification={getMedicationClassification(medication)}
       decoration={decoration}
       artworkBadge={
-        formPresentation === "icon" ? (
+        iconPresentation ? (
           <MedicationQuantityBadge
             quantity={quantity}
             hasIndicators={indicators.length > 0}
@@ -116,9 +116,7 @@ export function MedicationCard({
           className="medication-card-heading intake-card-heading"
           data-intake-heading
           data-has-leading={hasLeading}
-          data-has-indicators={
-            indicators.length > 0 || formPresentation === "icon"
-          }
+          data-has-indicators={indicators.length > 0 || iconPresentation}
         >
           {leading}
           <div className="intake-card-title-group" data-intake-title-group>
@@ -126,25 +124,30 @@ export function MedicationCard({
               {name}
             </h3>
           </div>
-          {(indicators.length > 0 || formPresentation === "icon") && (
+          {(indicators.length > 0 || iconPresentation) && (
             <span
               className={cn("intake-card-tags", styles.rail)}
               data-medication-indicators
             >
-              {formPresentation === "icon" && (
+              {iconPresentation && (
                 <>
                   <span className={styles.intakeTypes}>
-                    <span
-                      className={styles.route}
-                      title={
-                        INTAKE_ROUTES.find(
-                          (route) =>
-                            route.value === (intakeRoute ?? "unspecified"),
-                        )?.label
-                      }
-                    >
-                      <IntakeRouteIcon route={intakeRoute} strokeWidth={2.5} />
-                    </span>
+                    {formPresentation === "icon" && (
+                      <span
+                        className={styles.route}
+                        title={
+                          INTAKE_ROUTES.find(
+                            (route) =>
+                              route.value === (intakeRoute ?? "unspecified"),
+                          )?.label
+                        }
+                      >
+                        <IntakeRouteIcon
+                          route={intakeRoute}
+                          strokeWidth={2.5}
+                        />
+                      </span>
+                    )}
                     <span className={styles.form} title={typeLabel}>
                       <MedicationFormGlyph
                         form={form ?? "other"}

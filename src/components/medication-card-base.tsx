@@ -152,7 +152,9 @@ export function MedicationCardBase({
     // root. Only interaction attributes belong to the native action button.
     const frameAttributes = Object.fromEntries(
       Object.entries(props).filter(
-        ([name]) => name.startsWith("data-") || name === "id",
+        ([name]) =>
+          (name.startsWith("data-") && name !== "data-intake-card-action") ||
+          name === "id",
       ),
     );
     const actionAttributes = Object.fromEntries(

@@ -467,6 +467,13 @@ export function GuidePage() {
             title="Medication Details"
             context="One Familiar Marker Each"
           />
+          <p className={styles.sectionIntro}>
+            Add Medication stays within reach at the bottom of your phone,
+            using the same action as your daily log. Saved medication cards
+            show your default quantity, strength and ingredient. On Today,
+            tap a medication’s main icon to open its details; tap the rest of
+            an entry to edit that intake. Reveal a folded group first.
+          </p>
           <div className={styles.panel}>
             <GuideDetail
               title="Name, Ingredient, Strength &amp; Type"

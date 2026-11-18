@@ -1,0 +1,23 @@
+/* The existing artwork remains in the edit button. This sibling link overlays
+   its stable 56px rail without nesting interactive elements or duplicating art. */
+.medicationLink {
+  position: absolute;
+  z-index: 4;
+  inset-block: 12px;
+  inset-inline-start: var(--entry-card-padding, 15px);
+  display: block;
+  width: 56px;
+  border-radius: 16px;
+  color: inherit;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.medicationLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.medicationLink[aria-disabled="true"] {
+  pointer-events: none;
+}

@@ -307,13 +307,15 @@ const usageCode = `import { Button } from "@/components/ui/button";
 import { PrimaryButton } from "@/components/primary-button";
 import { SecondaryButton } from "@/components/secondary-button";
 import { AccentButton } from "@/components/accent-button";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { MedicationActionButton } from "@/components/medication-action-button";
 
 // Ordinary controls default to standard semantic styling, without intake art.
 <Button type="button" variant="ghost" size="sm" onClick={reviewDetails}>
   Review
 </Button>
 
-// A page's strongest next step opts into intake paint through its adapter.
+// A lower-level main action can opt into the original intake paint.
 <PrimaryButton type="button" onClick={openIntake}>
   Log Intake
 </PrimaryButton>
@@ -323,17 +325,20 @@ import { AccentButton } from "@/components/accent-button";
   Review details
 </SecondaryButton>
 
-// Main form submissions explicitly use intake paint through Accent.
+// Prominent live actions share the latest Today satin design and 80px height.
+<MedicationActionButton intent="add" onClick={openMedication} />
+
+// Dialog submissions use that same face, size, icon well and arrow.
 // Labels only: PencilSparkles and ArrowRight are shared defaults.
 // Pending keeps a meaningful label and prevents another activation.
-<AccentButton type="submit" pending={saving}>
+<DialogPrimaryButton type="submit" pending={saving}>
   {saving ? "Saving…" : "Save Medication"}
-</AccentButton>
+</DialogPrimaryButton>
 
-// A direct main action can opt in without an adapter.
-<Button appearance="intake" type="submit" pending={creating}>
+// Sign-in and journal creation use the same submission adapter.
+<DialogPrimaryButton type="submit" pending={creating}>
   {creating ? "Creating…" : "Create Journal"}
-</Button>
+</DialogPrimaryButton>
 
 // Optional decorative slots accept a React node or null.
 <AccentButton type="button" leadingIcon={null} trailingIcon={null}>
@@ -694,9 +699,12 @@ export function GuideButtons() {
             <p>
               Existing <code>surface</code> and <code>finish</code> props remain
               accepted so saved examples and callers keep compiling. They no
-              longer select decorative main-action backgrounds. Primary, Accent
-              and DialogPrimaryButton opt into intake paint on the shared{" "}
-              <code>Button</code> host; Secondary defaults to its quiet standard
+              longer select decorative main-action backgrounds. Primary and
+              Accent
+              opt into intake paint on the shared <code>Button</code> host.
+              DialogPrimaryButton instead composes TodayActionButton’s satin
+              face, 80px height, 21px corners, icon well and arrow; Secondary
+              defaults to its quiet standard
               variant. The separate
               <code> AccentButtonSurface</code> export remains a paint-only
               artwork utility for the journal illustration; it is not mounted
@@ -1012,8 +1020,10 @@ export function GuideButtons() {
                   <code>{'"intake"'}</code> for a main action
                 </td>
                 <td>
-                  Primary, Accent and DialogPrimaryButton opt into intake paint.
-                  A direct Button can select it explicitly. Secondary and
+                  Primary and Accent opt into intake paint. A direct Button
+                  can select it explicitly. Dialog submissions use the
+                  TodayActionButton satin adapter at the full intake size.
+                  Secondary and
                   ordinary utility controls keep standard semantic styling,
                   without the intake rim, glow or secondary icon ink.
                 </td>

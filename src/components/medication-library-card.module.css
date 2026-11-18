@@ -1,0 +1,50 @@
+/* Saved defaults use the same compact second-row composition as logged intakes. */
+.card {
+  min-width: 0;
+}
+
+.card :global(.intake-card-content) {
+  column-gap: 11px;
+}
+
+.card :global(.intake-card-bottom) {
+  align-items: center;
+  gap: calc(var(--content-min-gap, 8px) + 2px);
+  padding-bottom: 3px;
+}
+
+.card :global(.intake-card-dose-group) {
+  --entry-dose-gap: 4px;
+  align-items: flex-end;
+}
+
+.card :global(.intake-card-ingredient-group) {
+  gap: 4px;
+}
+
+.card :global(.intake-card-total-value) {
+  font-size: calc(15px * 17 / 24 * 17 / 12);
+  line-height: 20px;
+}
+
+.card
+  :global(.intake-card-total[data-total-long="true"])
+  :global(.intake-card-total-value) {
+  font-size: calc(13.5px * 17 / 24 * 17 / 12);
+}
+
+.card :global(.intake-card-total-unit) {
+  font-size: calc(9px * 17 / 12);
+}
+
+@media (min-width: 768px) {
+  .card :global(.intake-card-dose-group) {
+    --entry-dose-gap: 5px;
+  }
+}
+
+@media (max-width: 359px) {
+  .card :global(.intake-card-content) {
+    column-gap: 7px;
+  }
+}

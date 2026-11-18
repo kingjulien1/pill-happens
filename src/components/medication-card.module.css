@@ -10,13 +10,8 @@
   direction: ltr;
 }
 
-/* The saved-library name yields before its category rail's protected clearance. */
-.card:global([data-medication-library-card]) :global(.intake-card-heading) {
-  column-gap: max(var(--entry-text-gap), 12px);
-}
-
 .card:global([data-medication-library-card]) .rail:global(.intake-card-tags) {
-  gap: 6px;
+  gap: 2px;
   padding-block: 0;
 }
 
@@ -25,7 +20,9 @@
 }
 
 /* Recorded route, physical form and category marks share one outline weight. */
-.card:global([data-intake-card]) .rail:global(.intake-card-tags) svg {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  .rail:global(.intake-card-tags)
+  svg {
   width: 13px;
   height: 13px;
   color: var(--card-foreground) !important;
@@ -34,7 +31,7 @@
   stroke-width: 2.5;
 }
 
-.card:global([data-intake-card])
+.card:global(:is([data-intake-card], [data-medication-library-card]))
   .rail:global(.intake-card-tags)
   svg
   [stroke-width] {
