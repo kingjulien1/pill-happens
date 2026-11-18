@@ -1241,7 +1241,8 @@ export function DeveloperGuidePage() {
               context="Intake Cards"
             >
               <p>
-                Actual intake cards use one clipped glass pane with 96px
+                Intake, medication-library and Past Days cards use one clipped
+                glass pane with 96px
                 standard/Safari backdrop blur. An 8% Pink200 wash sits above
                 the glass, followed by a faint 6% selected-medication tint.
                 There is no opaque foundation in the normal glass treatment;
@@ -1249,11 +1250,12 @@ export function DeveloperGuidePage() {
                 Folded rear copy remains hidden by its existing stack state.
                 Reduced transparency and browsers without backdrop filtering
                 use the paired opaque reading base beneath the same washes.
-                Medication-library and Past Days cards retain their established
-                reading surfaces and share the frame geometry.
+                Light mode uses a paired reading-paper veil beneath 5% Pink and
+                selected-medication washes. Check-in cards use this same recipe.
               </p>
               <p>
-                Intake and Morning/Evening cards share the same 5⅓px inward
+                Intake, Morning/Evening, medication-library and Past Days cards
+                share the same 5⅓px inward
                 outer band. Its pigment mixes two thirds of the existing neutral
                 edge with one third of the inner identity color. Their identity
                 band is now 2⅔px, one third thicker than its former 2px, with
@@ -1268,8 +1270,8 @@ export function DeveloperGuidePage() {
                 mixed outer pigment’s opacity, independently of the increased
                 inner width. These paint layers leave the 80px baseline, 21px
                 outer corners, padding, stack placement and hit targets intact.
-                Library and Past Days link cards retain their 2px inner band and
-                do not receive the additional copied line.
+                Collection cards receive these same paint layers without
+                adopting intake-only interaction or animation markers.
               </p>
               <p>
                 The Medications opening uses a compact 24px title on phones,
@@ -1746,12 +1748,12 @@ export function DeveloperGuidePage() {
                 ingredient and dose arithmetic. Library headings remove the old
                 Default prefix, while a small colored form badge accompanies the
                 ingredient below. Library cards and Past Days day links now opt
-                into the same shared intake surface and frame: an opaque base
-                with an 8% selected-color tint, lifted with 12% Lilac in dark
-                mode, a 5⅓px inward mixed rim, a 2px identity band at 50%, and a
-                1.5px fine outside edge at half the outer color opacity.
-                Today’s intakes and check-ins use their stronger 2⅔px identity
-                band and the faint copied rim; collection frames stay at 2px.
+                into the same shared intake glass surface and frame: faint Pink
+                and selected-color washes, a 5⅓px inward mixed rim, a 2⅔px
+                identity band at 50%, the faint copied rim, and a 1.5px fine
+                outside edge at half the outer color opacity. Light mode adds
+                its reading-paper veil, while reduced transparency uses the
+                paired opaque fallback.
                 Paint remains
                 independent of the icon pigment or a fixed-color SVG, and native
                 full-card activation opens the appropriate editor.
@@ -1769,8 +1771,11 @@ export function DeveloperGuidePage() {
                 left edge; quantity × strength and total dose stay protected at
                 the right. Known ingredients retain primary ink and weight,
                 while Unspecified stays quieter. Library forms use a compact
-                selected-color badge with an appropriate outline glyph rather
-                than a plain Tablets label. The layout preserves long-value
+                selected-color shadcn Badge with an appropriate outline glyph
+                rather than a plain Tablets label. Library headings protect at
+                least 12px between the truncated name and indicator rail, with
+                6px between full-opacity category symbols. The bounded rail
+                scrolls horizontally when needed. The layout preserves long-value
                 titles and full accessible descriptions.
               </p>
               <p>
@@ -1821,8 +1826,8 @@ export function DeveloperGuidePage() {
                 quantity of one needs no extra label, and invalid/nonpositive
                 values omit it. The old top-left form overlay moves into the
                 heading rail. MedicationCardIconFrame now hosts both medication
-                glyphs and the animated coffee/moon artwork. Intake and check-in
-                artwork use a 6px inward glass rim
+                glyphs and the animated coffee/moon artwork. Intake, check-in,
+                medication-library and Past Days artwork use a 6px inward glass rim
                 at 28% combined alpha (20% selected color plus 8% primary ink),
                 with 96px standard/Safari backdrop blur. Its opaque face is
                 clipped to a 6px-padded content box to expose the glass ring.
@@ -1835,8 +1840,7 @@ export function DeveloperGuidePage() {
                 reduced-transparency fallback. Their former independent
                 background and drawn icon-frame overlays are removed; coffee
                 steam, moon movement and the delayed ambient handoff remain.
-                Other artwork
-                retains its 3.5px outer frame. These borders do not
+                Standalone previews retain their 3.5px outer frame. These borders do not
                 enlarge the 48px tile. One inner entrance owner animates the
                 whole fan, while the quantity label enters separately and
                 grouped disclosure never remounts its frames.
@@ -3845,7 +3849,9 @@ export function DeveloperGuidePage() {
                 recorded past days always derive from current journal state;
                 Today, future dates and empty dates never use snapshots. The
                 live set is recalculated from the journal timezone and 06:00
-                boundary, including when days are added or removed.
+                boundary, including when days are added or removed. Sparse days
+                and check-in-only days count as recorded days; this is not a
+                three-calendar-day cutoff.
               </p>
               <p>
                 The key combines history-card cache version, authenticated
@@ -3860,12 +3866,23 @@ export function DeveloperGuidePage() {
                 another scope.
               </p>
               <p>
+                Source models depend on journal data and the requested date;
+                cache eligibility depends on the stable tracking-day key. A
+                new clock object on a minute tick or focus refresh therefore
+                does not rescan or rewrite unchanged summaries. Persistence
+                compares the serialized record before writing, so remounting a
+                card can reuse the existing snapshot without storage churn.
+                Moving past the 06:00 boundary still updates eligibility.
+              </p>
+              <p>
                 Snapshots contain card counts, artwork identity and accessible
                 summary labels. They exclude raw intake notes, journal prose,
                 passwords and session material. This is localStorage, not an
                 encrypted backup, service-worker response cache or shared server
                 cache. Missing, malformed, obsolete or unavailable storage falls
-                back to live rendering without blocking a day link. Source lives
+                back to live rendering without blocking a day link. Nested
+                timestamps, medication artwork, colors and count values are
+                validated before a snapshot reaches a card. Source lives
                 in history-card-cache.ts and use-history-card-summary.ts;
                 focused tests cover live-day membership, 06:00 rollover, journal
                 isolation, relevant-edit invalidation and storage failures.

@@ -873,7 +873,7 @@ export function GuidePage() {
               Open a day for its intake timeline and check-ins. Previous Day and
               Next Day move between dates; Add Missed Intake lets you catch up.
               Older card summaries are kept on this device to make repeat visits
-              lighter. The latest three days stay live, and relevant edits
+              lighter. The latest three recorded past days stay live, and relevant edits
               refresh older summaries automatically.
             </p>
             <div className={styles.callout}>
