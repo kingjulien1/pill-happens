@@ -3133,40 +3133,13 @@ export function DeveloperGuidePage() {
                   Position is independent of draft or saved status. A keyed
                   editor keeps the open period and original day across rollover.
                   The shared Your Morning, Your Words / Your Day, Your Words
-                  doorway uses the shared Plum/Lilac foundation, one Apricot
-                  accent and neutral copy. A quiet blurred outer rim and finer
-                  inner edge distinguish it from the ordinary form sections;
-                  their paint stays behind content and does not change layout.
-                  The title, leading icon tile and trailing controls align at
-                  their top edges. Base sizes are 15px/20px for the single-line
-                  heading, 40px for the tile, 28.333px for the two controls and
-                  15.833px for their glyphs. The named journal-doorway
-                  inline-size container reduces those sizes at 310px of content
-                  width to 13px/35px/25px/14px, and at 260px to
-                  11.75px/30px/24px/13.5px. This keeps the complete title on one
-                  line without taking space from the opposing actions. Morning’s
-                  real vector coffee mug sways by two degrees over 3.6 seconds.
-                  Three curved steam paths rise and sway over 2.8 seconds with
-                  0ms, 220ms and 440ms starts. Evening retains its ScribbleLoop
-                  dance; both glyphs use a quiet theme-aware ink cycle. The tile
-                  reuses AccentButtonSurface at 50% opacity over a neutral
-                  reading base, with a restrained Lilac edge and softened halo.
-                  Real artwork remains above the clipped paint. Read and Library
-                  remain borderless neutral controls with 2.6-stroke glyphs.
-                  Visibility, hidden tabs, writer and reader states pause
-                  decoration; reduced motion keeps it still. A real
-                  SecondaryButton opens the existing writer. Its local 56px base
-                  height retains the shared responsive increments and its 18px
-                  radius. This supporting launcher uses a quiet semantic
-                  secondary surface and paired foreground, without an animated
-                  perimeter, intake glow or Purple action ink. Its layout and
-                  writer behavior stay intact. Decorative journal-icon paint
-                  keeps its earlier palette through a separate artwork helper.
-                  The surrounding journal-panel backgrounds and decorations
-                  retain their existing Apricot detail. These are local button
-                  paint changes; Secondary behavior remains unchanged. Equal
-                  22px outer rails center the pencil-and-label group while the
-                  arrow stays at the right. Local word, character and reading
+                  doorway pairs a static coffee icon with reading and library
+                  controls. Its writing action uses the Today button frame with
+                  the check-in section’s fuchsia-violet inner edge. Copy Writing
+                  and Refresh sit on opposite sides of the paragraph count.
+                  The morning and evening sections share a tinted gradient,
+                  an introductory caption and two small footer notes.
+                  Local word, character and reading
                   statistics use one unboxed single line beneath it: 10.5px
                   values, 10px labels and a 14px line height. The surrounding
                   11.5px/600 guidance uses an 18px line to explain Markdown,

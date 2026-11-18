@@ -41,6 +41,7 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { CheckInSection } from "./check-in-section";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import { useReflectionSave } from "@/components/use-reflection-save";
@@ -612,20 +613,26 @@ function CheckInForm({
       aria-busy={locked}
       data-check-in-form={period}
     >
-      <DailyReflectionEditor
-        id={`${id}-note`}
-        value={note}
-        onChange={setNote}
-        day={day}
-        period={period}
-        open={writingOpen}
-        onOpenChange={(value) => setField("writingOpen", value)}
-        draftStatus={draft.hasDraft ? draft.status : undefined}
-        saving={reflectionSave.controls}
-        savedAt={checkIn?.updatedAt}
-        disabled={locked}
-        onLibraryNavigate={onSaved}
-      />
+      <CheckInSection
+        caption="Journal entry"
+        left="Markdown supported"
+        right="Drafts saved as you write"
+      >
+        <DailyReflectionEditor
+          id={`${id}-note`}
+          value={note}
+          onChange={setNote}
+          day={day}
+          period={period}
+          open={writingOpen}
+          onOpenChange={(value) => setField("writingOpen", value)}
+          draftStatus={draft.hasDraft ? draft.status : undefined}
+          saving={reflectionSave.controls}
+          savedAt={checkIn?.updatedAt}
+          disabled={locked}
+          onLibraryNavigate={onSaved}
+        />
+      </CheckInSection>
 
       {morning ? (
         <MorningSleepFields
@@ -636,119 +643,150 @@ function CheckInForm({
         />
       ) : (
         <div className={styles.eveningFields} data-evening-check-in-fields>
-          <section
-            className={styles.feelingsSection}
-            aria-labelledby={`${id}-feelings-heading`}
-            data-evening-feelings
+          <CheckInSection
+            caption="Evening reflection"
+            left="Pick up to four moods"
+            right="Ratings are optional"
           >
-            <div className={styles.feelingsHeading}>
-              <span className={styles.feelingsMark} aria-hidden="true">
-                <HeartHandshake size={21} strokeWidth={2.1} />
-              </span>
-              <div>
-                <h3 id={`${id}-feelings-heading`}>Your Day, Your Mood</h3>
-                <p>
-                  A few shades of today. A mix is welcome; every part is
-                  optional.
-                </p>
-              </div>
-            </div>
-            <fieldset
-              className={styles.moodField}
-              disabled={locked}
-              data-check-in-section="mood"
-            >
-              <legend className={styles.moodLegend}>
-                <span className={styles.fieldHeading}>
-                  <Flower2 size={17} strokeWidth={2.1} />
-                  Today Felt Like
-                </span>
-                <span className={styles.optional}>{moods.length} / 4</span>
-              </legend>
-              <p className={styles.fieldHint}>
-                Choose up to four. There is room for mixed feelings.
-              </p>
-              <DailyMoodPicker
-                value={moods}
-                onChange={(value) => setField("moods", value)}
-                checkIns={data?.dailyCheckIns}
-                seed={`${day}:${period}`}
-                disabled={locked}
-              />
-            </fieldset>
-
             <section
-              className={styles.formSection}
-              aria-labelledby={`${id}-ratings-heading`}
+              className={styles.feelingsSection}
+              aria-labelledby={`${id}-feelings-heading`}
+              data-evening-feelings
             >
-              <div className={styles.sectionHeading}>
-                <h3 id={`${id}-ratings-heading`}>
-                  <SlidersHorizontal
-                    size={17}
-                    strokeWidth={2.1}
-                    aria-hidden="true"
+              <div className={styles.feelingsHeading}>
+                <span className={styles.feelingsMark} aria-hidden="true">
+                  <HeartHandshake size={21} strokeWidth={2.1} />
+                </span>
+                <div>
+                  <h3 id={`${id}-feelings-heading`}>Your Day, Your Mood</h3>
+                  <p>
+                    A few shades of today. A mix is welcome; every part is
+                    optional.
+                  </p>
+                </div>
+              </div>
+              <CheckInSection
+                caption="Feelings"
+                left="Search by name"
+                right="Tap a pick to remove it"
+              >
+                <fieldset
+                  className={styles.moodField}
+                  disabled={locked}
+                  data-check-in-section="mood"
+                >
+                  <legend className={styles.moodLegend}>
+                    <span className={styles.fieldHeading}>
+                      <Flower2 size={17} strokeWidth={2.1} />
+                      Today Felt Like
+                    </span>
+                    <span className={styles.optional}>{moods.length} / 4</span>
+                  </legend>
+                  <p className={styles.fieldHint}>
+                    Choose up to four. There is room for mixed feelings.
+                  </p>
+                  <DailyMoodPicker
+                    value={moods}
+                    onChange={(value) => setField("moods", value)}
+                    checkIns={data?.dailyCheckIns}
+                    seed={`${day}:${period}`}
+                    disabled={locked}
                   />
-                  How Your Day Felt
-                </h3>
-                <span>1–10 · Optional</span>
-              </div>
-              <p className={styles.fieldHint}>
-                Slide or tap to rate. Leave anything blank.
-              </p>
-              <div className={styles.ratingRow}>
-                <RatingField
-                  id={`${id}-energy`}
-                  label="Energy"
-                  scale={draft.value.energyScale}
-                  icon="energy"
-                  value={energy}
-                  onChange={(value) => setRating("energy", value)}
-                  disabled={locked}
-                  low="Low"
-                  high="Full"
-                />
-                <RatingField
-                  id={`${id}-stress`}
-                  label="Stress"
-                  scale={draft.value.stressScale}
-                  icon="stress"
-                  value={stress}
-                  onChange={(value) => setRating("stress", value)}
-                  disabled={locked}
-                  low="Low"
-                  high="High"
-                />
-              </div>
+                </fieldset>
+              </CheckInSection>
+
+              <CheckInSection
+                caption="Daily ratings"
+                left="Energy & stress"
+                right="Scale of 1–10"
+              >
+                <section
+                  className={styles.formSection}
+                  aria-labelledby={`${id}-ratings-heading`}
+                >
+                  <div className={styles.sectionHeading}>
+                    <h3 id={`${id}-ratings-heading`}>
+                      <SlidersHorizontal
+                        size={17}
+                        strokeWidth={2.1}
+                        aria-hidden="true"
+                      />
+                      How Your Day Felt
+                    </h3>
+                    <span>1–10 · Optional</span>
+                  </div>
+                  <p className={styles.fieldHint}>
+                    Slide or tap to rate. Leave anything blank.
+                  </p>
+                  <div className={styles.ratingRow}>
+                    <RatingField
+                      id={`${id}-energy`}
+                      label="Energy"
+                      scale={draft.value.energyScale}
+                      icon="energy"
+                      value={energy}
+                      onChange={(value) => setRating("energy", value)}
+                      disabled={locked}
+                      low="Low"
+                      high="Full"
+                    />
+                    <RatingField
+                      id={`${id}-stress`}
+                      label="Stress"
+                      scale={draft.value.stressScale}
+                      icon="stress"
+                      value={stress}
+                      onChange={(value) => setRating("stress", value)}
+                      disabled={locked}
+                      low="Low"
+                      high="High"
+                    />
+                  </div>
+                </section>
+              </CheckInSection>
             </section>
-          </section>
-          <div
-            className={cn(styles.field, styles.helpedField, styles.formSection)}
-            data-check-in-section="helped"
+          </CheckInSection>
+          <CheckInSection
+            caption="Small reminders"
+            left="One thought per line"
+            right="Optional"
           >
-            <div className={styles.helpedHeading}>
-              <Label htmlFor={`${id}-helped`}>
-                <ActionIcon name="sparkle" className="size-4" />
-                Things That Helped
-              </Label>
-              <span aria-label={`${helped.length} of ${WHAT_HELPED_MAX_LENGTH} characters`}>
-                {helped.length} / {WHAT_HELPED_MAX_LENGTH}
-              </span>
+            <div
+              className={cn(
+                styles.field,
+                styles.helpedField,
+                styles.formSection,
+              )}
+              data-check-in-section="helped"
+            >
+              <div className={styles.helpedHeading}>
+                <Label htmlFor={`${id}-helped`}>
+                  <ActionIcon name="sparkle" className="size-4" />
+                  Things That Helped
+                </Label>
+                <span
+                  aria-label={`${helped.length} of ${WHAT_HELPED_MAX_LENGTH} characters`}
+                >
+                  {helped.length} / {WHAT_HELPED_MAX_LENGTH}
+                </span>
+              </div>
+              <p id={`${id}-helped-hint`} className={styles.helpedHint}>
+                What made today a little easier? Give each thing its own line if
+                you like.
+              </p>
+              <Textarea
+                id={`${id}-helped`}
+                aria-describedby={`${id}-helped-hint`}
+                rows={3}
+                value={helped}
+                maxLength={WHAT_HELPED_MAX_LENGTH}
+                onChange={(event) => setHelped(event.target.value)}
+                placeholder={"A walk before lunch\nA friend who listened"}
+                disabled={locked}
+                className={styles.helpedInput}
+              />
             </div>
-            <p id={`${id}-helped-hint`} className={styles.helpedHint}>
-              What made today a little easier? Give each thing its own line if you like.
-            </p>
-            <Textarea
-              id={`${id}-helped`}
-              aria-describedby={`${id}-helped-hint`}
-              rows={3}
-              value={helped}
-              maxLength={WHAT_HELPED_MAX_LENGTH}
-              onChange={(event) => setHelped(event.target.value)}
-              placeholder={"A walk before lunch\nA friend who listened"}
-              disabled={locked}
-              className={styles.helpedInput}
-            />
-          </div>
+          </CheckInSection>
         </div>
       )}
 

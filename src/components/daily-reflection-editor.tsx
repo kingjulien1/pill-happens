@@ -12,21 +12,22 @@ import {
   ArrowUpRight,
   BookOpenText,
   Check,
+  Coffee,
+  Copy,
   LibraryBig,
   PencilLine,
   RefreshCw,
 } from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
-import { ScribbleLoopIcon } from "@phosphor-icons/react/dist/ssr/ScribbleLoop";
+
 import {
   ReflectionDialog,
   type ReflectionDraftStatus,
 } from "@/components/reflection-dialog";
 import type { ReflectionSaveControls } from "@/components/use-reflection-save";
 import { ReflectionReaderDialog } from "@/components/reflection-reader-dialog";
-import { SecondaryButton } from "@/components/secondary-button";
-import { AccentButtonSurface } from "@/components/accent-button";
-import { getJournalSymbolPaintStyle } from "@/lib/action-button-system";
+import { TodayActionButton } from "@/components/today-action-button";
+
 import { rememberJournalDestination } from "@/components/journal-drafts";
 import { useJournal } from "@/components/journal-provider";
 import {
@@ -39,36 +40,16 @@ import styles from "./daily-reflection-editor.module.css";
 import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
-const symbolPaint = getJournalSymbolPaintStyle();
-const launcherPaint = { "--action-base-height": "56px" } as CSSProperties;
-
-/** A small mug with separate, staggered steam paths; motion follows the doorway. */
-function MorningCoffee() {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={styles.coffee}
-      aria-hidden="true"
-      focusable="false"
-      data-journal-coffee
-    >
-      <g className={styles.coffeeMug}>
-        <path d="M7.5 15.5h14v5.3a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6z" />
-        <path d="M21.5 16.5H23a3.5 3.5 0 0 1 0 7h-2.1M6.5 29h17" />
-      </g>
-      <g className={styles.coffeeSteam} data-journal-coffee-steam>
-        <path d="M9 12c-2-1.7 2-3.1 0-4.8S7.2 4.7 9 3" />
-        <path d="M15 12c-2-1.7 2-3.1 0-4.8S13.2 4.7 15 3" />
-        <path d="M21 12c-2-1.7 2-3.1 0-4.8S19.2 4.7 21 3" />
-      </g>
-    </svg>
-  );
-}
+const launcherPaint = {
+  "--control-face-paint": "var(--journal-fill)",
+  "--control-ink": "var(--journal-ink)",
+  "--control-edge": "var(--checkin-line)",
+  "--control-face-edge": "var(--checkin-line)",
+  "--action-surround": "var(--journal-tile)",
+  "--action-face-inset": "6px",
+  "--action-outer-line": "1.667px",
+  "--action-inner-line": "3px",
+} as CSSProperties;
 
 /** A compact doorway into the same persistent check-in draft. */
 export function DailyReflectionEditor({
@@ -280,27 +261,7 @@ export function DailyReflectionEditor({
       <span className={styles.ambient} aria-hidden="true" />
       <div className={styles.headingRow}>
         <div className={styles.headingGroup}>
-          <span
-            className={styles.headingIcon}
-            style={symbolPaint}
-            aria-hidden="true"
-            data-journal-symbol
-          >
-            <AccentButtonSurface
-              className={styles.iconSurface}
-              data-journal-icon-surface
-            />
-            <span
-              className={`${styles.iconGlyph} ${period === "morning" ? styles.coffeeGlyph : ""}`}
-              data-journal-icon-glyph
-            >
-              {period === "morning" ? (
-                <MorningCoffee />
-              ) : (
-                <ScribbleLoopIcon size={29} weight="bold" />
-              )}
-            </span>
-          </span>
+          <Coffee className={styles.staticCoffee} aria-hidden="true" />
           <div className={styles.headingCopy}>
             <h3 id={`${id}-heading`} className={styles.heading}>
               {period === "morning"
@@ -375,11 +336,11 @@ export function DailyReflectionEditor({
         stats={stats}
         launcherRef={launcher}
         launcher={
-          <SecondaryButton
+          <TodayActionButton
             ref={launcher}
             type="button"
             radius={18}
-            surface="accent"
+            data-intake-paint="satin"
             className={styles.launcher}
             disabled={disabled}
             style={launcherPaint}
@@ -390,7 +351,7 @@ export function DailyReflectionEditor({
               <span>{hasWriting ? "Continue Writing" : "Start Writing"}</span>
             </span>
             <ArrowUpRight size={21} strokeWidth={2.3} aria-hidden="true" />
-          </SecondaryButton>
+          </TodayActionButton>
         }
       />
       <div
@@ -419,6 +380,30 @@ export function DailyReflectionEditor({
         answers with this day.
       </p>
       <div className={styles.captionRow}>
+        <Button
+          variant="ghost"
+          size="icon"
+          type="button"
+          className={`${styles.iconButton} ${styles.refresh}`}
+          disabled={!hasWriting}
+          aria-label="Copy writing"
+          title="Copy your writing"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(value);
+              toast.success("Writing copied.", {
+                journalScope: notificationScope,
+              });
+            } catch {
+              toast.error(
+                "Clipboard unavailable. Open the editor to select and copy your writing.",
+                { journalScope: notificationScope },
+              );
+            }
+          }}
+        >
+          <Copy size={14} aria-hidden="true" />
+        </Button>
         <p className={styles.structure}>
           <span>
             {numberFormat.format(stats.paragraphs)}{" "}

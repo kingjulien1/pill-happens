@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckInSection } from "./check-in-section";
 import { Input } from "@/components/ui/input";
 import { CheckInRating } from "@/components/check-in-rating";
 import { Label } from "@/components/ui/label";
@@ -175,160 +176,180 @@ export function MorningSleepFields({
 
   return (
     <div className={styles.fields} data-morning-sleep-fields>
-      <section
-        className={styles.section}
-        aria-labelledby={`${id}-ratings-heading`}
-        data-check-in-section="morning-ratings"
+      <CheckInSection
+        caption="Looking back"
+        left="Your own impression"
+        right="Scale of 1–10"
       >
-        <div className={styles.sectionHeading}>
-          <h3 id={`${id}-ratings-heading`}>How the night felt</h3>
-          <span>1–10 · Optional</span>
-        </div>
-        <p className={styles.hint}>
-          Slide or tap to rate. Leave anything blank.
-        </p>
-        <div className={styles.ratings}>
-          {RATINGS.map((rating) => (
-            <CheckInRating
-              key={rating.key}
-              id={`${id}-${rating.key}`}
-              name={rating.key}
-              label={rating.label}
-              low={rating.low}
-              high={rating.high}
-              morning
-              value={value[rating.key]}
-              disabled={disabled}
-              onChange={(next) => setField(rating.key, next)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section
-        className={styles.section}
-        aria-labelledby={`${id}-timeline-heading`}
-      >
-        <div className={styles.sectionHeading}>
-          <h3 id={`${id}-timeline-heading`}>The night’s timeline</h3>
-          <span>Optional</span>
-        </div>
-        <div
-          className={styles.schedule}
-          data-check-in-section="morning-schedule"
+        <section
+          className={styles.section}
+          aria-labelledby={`${id}-ratings-heading`}
+          data-check-in-section="morning-ratings"
         >
-          <div className={styles.pair}>
-            <div className={styles.field}>
-              <Label htmlFor={`${id}-lights-out`}>Lights out</Label>
-              <Input
-                id={`${id}-lights-out`}
-                name="lightsOut"
-                data-sleep-field="lightsOut"
-                className={`${styles.input} ${styles.timeInput}`}
-                type="time"
-                step={60}
-                value={value.lightsOut}
-                disabled={disabled}
-                onChange={(event) => setField("lightsOut", event.target.value)}
-              />
-            </div>
-            <div className={styles.field}>
-              <Label htmlFor={`${id}-got-up`}>Got up</Label>
-              <Input
-                id={`${id}-got-up`}
-                name="gotUp"
-                data-sleep-field="gotUp"
-                className={`${styles.input} ${styles.timeInput}`}
-                type="time"
-                step={60}
-                value={value.gotUp}
-                disabled={disabled}
-                onChange={(event) => setField("gotUp", event.target.value)}
-              />
-            </div>
+          <div className={styles.sectionHeading}>
+            <h3 id={`${id}-ratings-heading`}>How the night felt</h3>
+            <span>1–10 · Optional</span>
           </div>
-          <NumberField
-            id={`${id}-fall-asleep`}
-            name="fallAsleepMinutes"
-            label="Time to fall asleep"
-            value={value.fallAsleepMinutes}
-            unit="min"
-            max={1440}
-            disabled={disabled}
-            onChange={(next) => setField("fallAsleepMinutes", next)}
-          />
-        </div>
+          <p className={styles.hint}>
+            Slide or tap to rate. Leave anything blank.
+          </p>
+          <div className={styles.ratings}>
+            {RATINGS.map((rating) => (
+              <CheckInRating
+                key={rating.key}
+                id={`${id}-${rating.key}`}
+                name={rating.key}
+                label={rating.label}
+                low={rating.low}
+                high={rating.high}
+                morning
+                value={value[rating.key]}
+                disabled={disabled}
+                onChange={(next) => setField(rating.key, next)}
+              />
+            ))}
+          </div>
+        </section>
+      </CheckInSection>
 
-        <div
-          className={styles.interruptions}
-          data-check-in-section="morning-interruptions"
+      <CheckInSection
+        caption="Overnight"
+        left="Local times"
+        right="Estimates welcome"
+      >
+        <section
+          className={styles.section}
+          aria-labelledby={`${id}-timeline-heading`}
         >
-          <div className={styles.pair}>
+          <div className={styles.sectionHeading}>
+            <h3 id={`${id}-timeline-heading`}>The night’s timeline</h3>
+            <span>Optional</span>
+          </div>
+          <div
+            className={styles.schedule}
+            data-check-in-section="morning-schedule"
+          >
+            <div className={styles.pair}>
+              <div className={styles.field}>
+                <Label htmlFor={`${id}-lights-out`}>Lights out</Label>
+                <Input
+                  id={`${id}-lights-out`}
+                  name="lightsOut"
+                  data-sleep-field="lightsOut"
+                  className={`${styles.input} ${styles.timeInput}`}
+                  type="time"
+                  step={60}
+                  value={value.lightsOut}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    setField("lightsOut", event.target.value)
+                  }
+                />
+              </div>
+              <div className={styles.field}>
+                <Label htmlFor={`${id}-got-up`}>Got up</Label>
+                <Input
+                  id={`${id}-got-up`}
+                  name="gotUp"
+                  data-sleep-field="gotUp"
+                  className={`${styles.input} ${styles.timeInput}`}
+                  type="time"
+                  step={60}
+                  value={value.gotUp}
+                  disabled={disabled}
+                  onChange={(event) => setField("gotUp", event.target.value)}
+                />
+              </div>
+            </div>
             <NumberField
-              id={`${id}-awakenings`}
-              name="awakenings"
-              label="Night awakenings"
-              value={value.awakenings}
-              max={100}
-              disabled={disabled}
-              describedBy={`${id}-awakenings-hint`}
-              onChange={(next) => setField("awakenings", next)}
-            />
-            <NumberField
-              id={`${id}-awake-minutes`}
-              name="awakeMinutes"
-              label="Total time awake"
-              value={value.awakeMinutes}
+              id={`${id}-fall-asleep`}
+              name="fallAsleepMinutes"
+              label="Time to fall asleep"
+              value={value.fallAsleepMinutes}
               unit="min"
               max={1440}
               disabled={disabled}
-              describedBy={`${id}-awakenings-hint`}
-              onChange={(next) => setField("awakeMinutes", next)}
+              onChange={(next) => setField("fallAsleepMinutes", next)}
             />
           </div>
-          <p id={`${id}-awakenings-hint`} className={styles.hint}>
-            During the night, excluding your final wake-up. Enter 0 for none.
-          </p>
-        </div>
-      </section>
 
-      <section
-        className={styles.section}
-        aria-labelledby={`${id}-duration-heading`}
-        data-check-in-section="morning-duration"
+          <div
+            className={styles.interruptions}
+            data-check-in-section="morning-interruptions"
+          >
+            <div className={styles.pair}>
+              <NumberField
+                id={`${id}-awakenings`}
+                name="awakenings"
+                label="Night awakenings"
+                value={value.awakenings}
+                max={100}
+                disabled={disabled}
+                describedBy={`${id}-awakenings-hint`}
+                onChange={(next) => setField("awakenings", next)}
+              />
+              <NumberField
+                id={`${id}-awake-minutes`}
+                name="awakeMinutes"
+                label="Total time awake"
+                value={value.awakeMinutes}
+                unit="min"
+                max={1440}
+                disabled={disabled}
+                describedBy={`${id}-awakenings-hint`}
+                onChange={(next) => setField("awakeMinutes", next)}
+              />
+            </div>
+            <p id={`${id}-awakenings-hint`} className={styles.hint}>
+              During the night, excluding your final wake-up. Enter 0 for none.
+            </p>
+          </div>
+        </section>
+      </CheckInSection>
+
+      <CheckInSection
+        caption="Rest & recovery"
+        left="Hours and minutes"
+        right="Optional"
       >
-        <div className={styles.sectionHeading}>
-          <h3 id={`${id}-duration-heading`}>Sleep &amp; the morning ahead</h3>
-          <span>Optional</span>
-        </div>
-        <div className={styles.durations}>
-          <SleepDuration
-            id={`${id}-total-sleep`}
-            hoursName="sleepHours"
-            minutesName="sleepMinutes"
-            label="Time actually asleep"
-            hours={value.sleepHours}
-            minutes={value.sleepMinutes}
-            disabled={disabled}
-            onHoursChange={(next) => setField("sleepHours", next)}
-            onMinutesChange={(next) => setField("sleepMinutes", next)}
-          />
-          <SleepDuration
-            id={`${id}-extra-sleep`}
-            hoursName="extraSleepHours"
-            minutesName="extraSleepMinutes"
-            label="More sleep you wanted"
-            hours={value.extraSleepHours}
-            minutes={value.extraSleepMinutes}
-            disabled={disabled}
-            onHoursChange={(next) => setField("extraSleepHours", next)}
-            onMinutesChange={(next) => setField("extraSleepMinutes", next)}
-          />
-        </div>
-        <p className={styles.hint}>
-          Your best estimate is enough. Enter 0 if you wanted no more sleep.
-        </p>
-      </section>
+        <section
+          className={styles.section}
+          aria-labelledby={`${id}-duration-heading`}
+          data-check-in-section="morning-duration"
+        >
+          <div className={styles.sectionHeading}>
+            <h3 id={`${id}-duration-heading`}>Sleep &amp; the morning ahead</h3>
+            <span>Optional</span>
+          </div>
+          <div className={styles.durations}>
+            <SleepDuration
+              id={`${id}-total-sleep`}
+              hoursName="sleepHours"
+              minutesName="sleepMinutes"
+              label="Time actually asleep"
+              hours={value.sleepHours}
+              minutes={value.sleepMinutes}
+              disabled={disabled}
+              onHoursChange={(next) => setField("sleepHours", next)}
+              onMinutesChange={(next) => setField("sleepMinutes", next)}
+            />
+            <SleepDuration
+              id={`${id}-extra-sleep`}
+              hoursName="extraSleepHours"
+              minutesName="extraSleepMinutes"
+              label="More sleep you wanted"
+              hours={value.extraSleepHours}
+              minutes={value.extraSleepMinutes}
+              disabled={disabled}
+              onHoursChange={(next) => setField("extraSleepHours", next)}
+              onMinutesChange={(next) => setField("extraSleepMinutes", next)}
+            />
+          </div>
+          <p className={styles.hint}>
+            Your best estimate is enough. Enter 0 if you wanted no more sleep.
+          </p>
+        </section>
+      </CheckInSection>
     </div>
   );
 }

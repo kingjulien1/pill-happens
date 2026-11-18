@@ -159,77 +159,6 @@
   letter-spacing: -0.025em;
   white-space: nowrap;
 }
-.headingIcon {
-  --accent-play-state: var(--journal-motion);
-  --accent-radius: 13px;
-  --action-base: var(--action-light-base);
-  --action-field-1: var(--action-light-field-1);
-  --action-field-2: var(--action-light-field-2);
-  --action-field-3: var(--action-light-field-3);
-  --action-field-4: var(--action-light-field-4);
-  --action-field-opacity: var(--action-light-field-opacity);
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  place-items: center;
-  border: 0;
-  border-radius: 13px;
-  background: var(--journal-fill);
-  color: var(--journal-icon);
-  box-shadow: 0 4px 12px
-    color-mix(in srgb, var(--palette-plum) 7.5%, transparent);
-}
-.headingIcon::before {
-  position: absolute;
-  z-index: -1;
-  inset: -4px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from 25deg,
-    color-mix(in srgb, var(--palette-apricot) 15%, transparent),
-    color-mix(in srgb, var(--palette-lilac) 8%, transparent),
-    color-mix(in srgb, var(--palette-white) 12%, transparent),
-    color-mix(in srgb, var(--palette-apricot) 15%, transparent)
-  );
-  filter: blur(7px);
-  content: "";
-  animation: journal-icon-halo 7.2s ease-in-out infinite;
-  animation-play-state: var(--journal-motion);
-}
-.headingIcon::after {
-  position: absolute;
-  z-index: 4;
-  inset: 0;
-  border: 1.5px solid
-    color-mix(in srgb, var(--palette-white) 22.5%, transparent);
-  border-radius: inherit;
-  content: "";
-  pointer-events: none;
-}
-.iconSurface {
-  opacity: 0.5;
-}
-.iconSurface [data-accent-field] {
-  animation-duration: 18s;
-}
-.iconGlyph {
-  position: relative;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  animation: journal-icon-dance 7.2s ease-in-out infinite;
-  animation-play-state: var(--journal-motion);
-}
-.iconGlyph svg {
-  width: 24.1667px;
-  height: 24.1667px;
-  color: var(--journal-icon);
-  animation: journal-icon-ink 10.8s ease-in-out infinite;
-  animation-play-state: var(--journal-motion);
-}
 @media (prefers-color-scheme: dark) {
   .editor {
     --journal-fill: color-mix(
@@ -243,14 +172,6 @@
       var(--palette-black) 12.5%,
       transparent
     );
-  }
-  .headingIcon {
-    --action-base: var(--action-dark-base);
-    --action-field-1: var(--action-dark-field-1);
-    --action-field-2: var(--action-dark-field-2);
-    --action-field-3: var(--action-dark-field-3);
-    --action-field-4: var(--action-dark-field-4);
-    --action-field-opacity: var(--action-dark-field-opacity);
   }
 }
 .subtitle {
@@ -297,58 +218,6 @@
 .topActions .iconButton > svg {
   width: 15.8333px;
   height: 15.8333px;
-}
-.coffee {
-  overflow: visible;
-}
-.coffeeGlyph {
-  animation: none;
-}
-.coffeeMug {
-  transform-origin: 15px 26px;
-  animation: coffee-mug-sway 3.6s ease-in-out infinite;
-  animation-play-state: var(--journal-motion);
-}
-.coffeeSteam > path {
-  transform-box: view-box;
-  transform-origin: center;
-  opacity: 0.6;
-  stroke-width: 1.8px;
-  animation: coffee-steam-wave 2.8s ease-in-out infinite both;
-  animation-play-state: var(--journal-motion);
-}
-.coffeeSteam > path:nth-child(2) {
-  animation-delay: 220ms;
-}
-.coffeeSteam > path:nth-child(3) {
-  animation-delay: 440ms;
-}
-@keyframes coffee-mug-sway {
-  0%,
-  100% {
-    transform: rotate(-2deg) translateY(0);
-  }
-  45% {
-    transform: rotate(2deg) translateY(-0.5px);
-  }
-  75% {
-    transform: rotate(-0.5deg) translateY(0.25px);
-  }
-}
-@keyframes coffee-steam-wave {
-  0%,
-  100% {
-    opacity: 0.6;
-    transform: translate(0, 0.6px) scaleY(0.97);
-  }
-  40% {
-    opacity: 0.95;
-    transform: translate(0.65px, -0.9px) scaleY(1.04);
-  }
-  72% {
-    opacity: 0.72;
-    transform: translate(-0.55px, -0.35px) scaleY(1.01);
-  }
 }
 .snapshot {
   min-width: 0;
@@ -534,47 +403,6 @@
     transform: translate(4%, 3%) rotate(9deg) scale(1.08);
   }
 }
-@keyframes journal-icon-dance {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-5deg) scale(1);
-  }
-  22% {
-    transform: translate(1px, -2px) rotate(8deg) scale(1.04);
-  }
-  47% {
-    transform: translate(-1px, 1px) rotate(-9deg) scale(0.98);
-  }
-  70% {
-    transform: translate(1px, -1px) rotate(12deg) scale(1.06);
-  }
-  85% {
-    transform: translateY(1px) rotate(-7deg) scale(0.99);
-  }
-}
-@keyframes journal-icon-ink {
-  0%,
-  100% {
-    color: var(--journal-icon);
-  }
-  38% {
-    color: color-mix(in srgb, var(--journal-icon) 88%, var(--palette-apricot));
-  }
-  68% {
-    color: color-mix(in srgb, var(--journal-icon) 86%, var(--palette-white));
-  }
-}
-@keyframes journal-icon-halo {
-  0%,
-  100% {
-    transform: rotate(-8deg) scale(0.96);
-    opacity: 0.65;
-  }
-  48% {
-    transform: rotate(20deg) scale(1.08);
-    opacity: 1;
-  }
-}
 @keyframes journal-refresh-spin {
   to {
     transform: rotate(360deg);
@@ -621,16 +449,6 @@
     font-size: 13px;
     line-height: 18px;
   }
-  .headingIcon {
-    width: 35px;
-    height: 35px;
-    border-radius: 11px;
-    --accent-radius: 11px;
-  }
-  .iconGlyph svg {
-    width: 21px;
-    height: 21px;
-  }
   .topActions {
     gap: 4px;
   }
@@ -649,16 +467,6 @@
     font-size: 11.75px;
     line-height: 17px;
   }
-  .headingIcon {
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-    --accent-radius: 10px;
-  }
-  .iconGlyph svg {
-    width: 19px;
-    height: 19px;
-  }
   .topActions .iconButton {
     width: 24px;
     height: 24px;
@@ -672,14 +480,8 @@
   .editor::before,
   .editor::after,
   .ambient::before,
-  .headingIcon::before,
-  .iconGlyph,
-  .iconGlyph svg,
-  .iconSurface [data-accent-field],
   .launcher [data-accent-field],
-  .refresh svg,
-  .coffeeMug,
-  .coffeeSteam > path {
+  .refresh svg {
     animation: none !important;
   }
   .iconButton {
@@ -708,13 +510,51 @@
     --journal-shadow: color-mix(in srgb, var(--palette-plum) 8%, transparent);
   }
 
-  .headingIcon::after {
-    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-  }
-
   .editor .launcher[data-slot="button"] {
     box-shadow:
       0 0 0 1px color-mix(in srgb, var(--primary) 16%, transparent),
       0 6px 18px -8px color-mix(in srgb, var(--palette-plum) 20%, transparent);
   }
+}
+
+.editor::before {
+  inset: -4px;
+  padding: 1.5px;
+  filter: none;
+  opacity: 0.85;
+}
+.editor::after {
+  inset: 1px;
+  padding: 2px;
+  background: var(--checkin-line);
+  opacity: 0.94;
+}
+.staticCoffee {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  color: var(--foreground);
+}
+.editor .topActions .iconButton {
+  width: 40px;
+  height: 40px;
+  background: color-mix(in srgb, var(--menu-surface) 78%, var(--journal-tile));
+  color: var(--menu-foreground);
+}
+.editor .topActions .iconButton > svg {
+  width: 21px;
+  height: 21px;
+}
+.editor .heading {
+  white-space: normal;
+}
+.editor .snapshot {
+  background: var(--checkin-wash), var(--journal-fill);
+  box-shadow: inset 0 0 0 1.5px var(--checkin-line);
+}
+.captionRow > .refresh:first-child {
+  inset-inline: 0 auto;
+}
+.editor .launcher[data-control-style="satin"]::before {
+  box-shadow: 0 0 0 var(--action-inner-line) var(--checkin-line);
 }

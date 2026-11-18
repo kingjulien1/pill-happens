@@ -198,8 +198,8 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 20px;
-  padding-top: 4px;
+  gap: 24px;
+  padding-top: 20px;
 }
 
 .eveningFields {
