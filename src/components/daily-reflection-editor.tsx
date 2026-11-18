@@ -261,7 +261,7 @@ export function DailyReflectionEditor({
       <span className={styles.ambient} aria-hidden="true" />
       <div className={styles.headingRow}>
         <div className={styles.headingGroup}>
-          <Coffee className={styles.staticCoffee} aria-hidden="true" />
+          <Coffee className={styles.writingCoffee} aria-hidden="true" />
           <div className={styles.headingCopy}>
             <h3 id={`${id}-heading`} className={styles.heading}>
               {period === "morning"

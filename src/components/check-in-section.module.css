@@ -6,9 +6,9 @@
   );
   --checkin-wash: linear-gradient(
     138deg,
-    color-mix(in srgb, var(--color-pink-300) 45%, transparent),
-    color-mix(in srgb, var(--color-purple-300) 45%, transparent) 51%,
-    color-mix(in srgb, var(--color-violet-400) 45%, transparent)
+    color-mix(in srgb, var(--color-pink-300) 8%, transparent),
+    color-mix(in srgb, var(--color-purple-300) 8%, transparent) 51%,
+    color-mix(in srgb, var(--color-violet-400) 8%, transparent)
   );
   display: grid;
   min-width: 0;

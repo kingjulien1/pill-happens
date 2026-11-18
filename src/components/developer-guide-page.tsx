@@ -3133,11 +3133,11 @@ export function DeveloperGuidePage() {
                   Position is independent of draft or saved status. A keyed
                   editor keeps the open period and original day across rollover.
                   The shared Your Morning, Your Words / Your Day, Your Words
-                  doorway pairs a static coffee icon with reading and library
+                  doorway pairs a gently steaming coffee icon with reading and library
                   controls. Its writing action uses the Today button frame with
                   the check-in section’s fuchsia-violet inner edge. Copy Writing
                   and Refresh sit on opposite sides of the paragraph count.
-                  The morning and evening sections share a tinted gradient,
+                  The morning and evening sections share an 8% tinted gradient,
                   an introductory caption and two small footer notes.
                   Local word, character and reading
                   statistics use one unboxed single line beneath it: 10.5px
