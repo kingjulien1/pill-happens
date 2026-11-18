@@ -1349,6 +1349,17 @@ export function DeveloperGuidePage() {
                 stay attached to the same fixed parent. Desktop has no mobile
                 fade layers.
               </p>
+              <p>
+                Today also has a shorter, bright fade from the document top to
+                the upper edge of the Wake-Up time value. Lilac and Pink200
+                supply its light, with a faint Rose wash near the top right.
+                The entire treatment uses 70% of the bottom fade’s strength:
+                39.2% in Dark Mode and 47.6% in Light Mode. Its absolute paint
+                scrolls away with the header. ResizeObserver, viewport changes
+                and font readiness keep its endpoint aligned without changing
+                the page layout or intercepting input. It is absent on other
+                routes and hidden at desktop widths.
+              </p>
             </Detail>
             <Detail
               title="Canvas & Color Layers"

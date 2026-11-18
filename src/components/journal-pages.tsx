@@ -68,6 +68,7 @@ import { HistoryWeekGroup } from "@/components/history-week-group";
 import { groupHistoryWeeks, visibleHistoryWeeks } from "@/lib/history-weeks";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { DailyCheckInSection } from "@/components/daily-check-in";
+import { TodayTopFade } from "@/components/today-top-fade";
 import { DayTimeMarker } from "@/components/day-time-marker";
 import { cn } from "@/lib/utils";
 import {
@@ -466,6 +467,7 @@ export function TodayPage() {
   const openLog = () => openDialog({ kind: "intake-new" });
   return (
     <div className="flex flex-1 flex-col" data-today-layout>
+      <TodayTopFade />
       <h1 className="sr-only">Daily Log</h1>
       <CheckInTimeline
         data={data}
