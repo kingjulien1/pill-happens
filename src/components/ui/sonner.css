@@ -229,7 +229,7 @@
         var(--color-pink-800, #9d174d),
         var(--color-rose-800, #9f1239)
       )
-      clamp(0%, calc(50% - var(--notification-remaining, 1) * 150%), 50%),
+      clamp(0%, calc(17% - var(--notification-remaining, 1) * 51%), 17%),
     transparent
   );
 }

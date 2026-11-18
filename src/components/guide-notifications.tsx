@@ -1077,7 +1077,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <code> --toast-fuchsia-surface</code>: Fuchsia950 at 47% color alpha
         above a strong 96px standard/Safari backdrop blur. A 50/50
         Fuchsia950–Purple950 mix at 67% covers the Pink300 highlight. During the final third of the
-        countdown, a Pink800 and Rose800 wash rises from 0% to 50%. Page content behind it is softened while the
+        countdown, a Pink800 and Rose800 wash rises from 0% to 17%. Page content behind it is softened while the
         notification’s own text and controls stay sharp. Reduced transparency
         uses an opaque same-hue surface. Every icon tile keeps its Fuchsia900
         layer at 69% alpha and adds the same deep Fuchsia/Purple mix at 78% on
