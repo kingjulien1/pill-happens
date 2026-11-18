@@ -1948,11 +1948,12 @@ export function DeveloperGuidePage() {
                 with 96px standard/Safari backdrop blur. Its opaque face is
                 clipped to a 6px-padded content box to expose the glass ring.
                 The 1px saturated family-400/500 inner rim stays at 78%, inset
-                6.75px with a 9.25px radius and a 0.75px gap. Morning and
-                Evening use the Pink400 palette selection through the same
+                6.75px with a 9.25px radius and a 0.75px gap. Morning uses a
+                warm Rose400 identity while Evening uses a cool Violet400
+                identity through the same
                 MedicationCardBase, card-frame borders, 96px glass pane and
-                faint selected-color tint as a Pink400 intake. Both share the
-                mode-specific washes, light reading veil and
+                the same faint selected-color tint as a matching intake. Both
+                share the mode-specific washes, light reading veil and
                 reduced-transparency fallback. Their former independent
                 background and drawn icon-frame overlays are removed; coffee
                 steam, moon movement and the delayed ambient handoff remain.
@@ -2999,7 +3000,8 @@ export function DeveloperGuidePage() {
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
-                  flowing page background with a Pink400 identity. The shared
+                  flowing page background with distinct Rose400 morning and
+                  Violet400 evening identities. The shared
                   5⅓px mixed rim and 2⅔px identity band paint inward; the
                   identity alpha follows the light/dark recipe above. Filled
                   coffee and crescent artwork distinguish the periods; their
@@ -3786,7 +3788,8 @@ export function DeveloperGuidePage() {
               <p>
                 Morning reuses the Evening card, responsive modal, Markdown
                 launcher and Accent save action. Both cards share the same
-                Pink400 identity, shared glass, 80px frame and two-row summary;
+                period-specific Rose400 or Violet400 identity, shared glass,
+                80px frame and two-row summary;
                 the coffee cup or Moon artwork identifies the period. The
                 journal editor stays first; structured sleep details follow in
                 three compact sections. Time in bed and Sleep efficiency form

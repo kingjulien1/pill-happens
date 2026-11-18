@@ -26,6 +26,28 @@
   pointer-events: none;
 }
 
+/* Morning is warm and rosy; Evening is cool and violet. Both retain a dark
+   artwork face so their pale glyphs remain crisp in either system theme. */
+.stage[data-check-in-artwork="morning"] {
+  --art-ink: var(--color-rose-200, #fecdd3);
+  --art-soft: var(--color-rose-400, #fb7185);
+  --check-in-art-base: color-mix(
+    in srgb,
+    var(--color-rose-950, #4c0519) 88%,
+    var(--color-pink-950, #500724)
+  );
+}
+
+.stage[data-check-in-artwork="evening"] {
+  --art-ink: var(--color-violet-200, #ddd6fe);
+  --art-soft: var(--color-violet-400, #a78bfa);
+  --check-in-art-base: color-mix(
+    in srgb,
+    var(--color-violet-950, #2e1065) 88%,
+    var(--color-fuchsia-950, #4a044e)
+  );
+}
+
 /* A nonvisual CSS clock hands off only after arrival and the quiet pause. */
 .ambientGate {
   position: absolute;

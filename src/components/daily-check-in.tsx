@@ -90,6 +90,7 @@ export function DailyCheckInSection({
   const { data, busy } = useJournal();
   const workspace = useJournalWorkspace();
   const morning = period === "morning";
+  const artworkColor = morning ? "tw-rose-400" : "tw-violet-400";
   const title = `${morning ? "Morning" : "Evening"} Check-In`;
   const currentCheckIn = checkInForDay(data?.dailyCheckIns, day, period);
   // The current variant owns the portal, including a restored earlier-day dialog.
@@ -190,7 +191,7 @@ export function DailyCheckInSection({
     >
       {intakeSpacing === "before" && intakeSpacer}
       <MedicationCardBase
-        color="tw-pink-400"
+        color={artworkColor}
         icon={morning ? "sun" : "moon-star"}
         leadingArtwork={
           <CheckInCardArtwork

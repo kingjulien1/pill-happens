@@ -36,6 +36,7 @@ function ArtworkScene({
 }) {
   const [ambientReady, setAmbientReady] = useState(false);
   const morning = period === "morning";
+  const artworkColor = morning ? "tw-rose-400" : "tw-violet-400";
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -61,7 +62,7 @@ function ArtworkScene({
       />
       <span className={styles.arrival}>
         <MedicationCardIconFrame
-          color="tw-pink-400"
+          color={artworkColor}
           className={styles.tile}
           style={{
             color: "var(--art-ink)",
