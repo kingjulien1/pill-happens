@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { HeadingText } from "@/components/heading-text";
 import { BrandMark } from "@/components/brand";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
@@ -37,14 +38,14 @@ export default function ErrorPage({
       <p className="mt-2 max-w-64 text-sm leading-relaxed text-canvas-muted-foreground">
         Something interrupted this page. Try loading it again.
       </p>
-      <Button
-        appearance="intake"
+      <DialogPrimaryButton
+        type="button"
         onClick={reset}
-        className="mt-6 h-12 gap-2.5 rounded-xl px-6"
+        className="mt-6 w-full"
+        leadingIcon={<ActionIcon name="retry" />}
       >
-        <ActionIcon name="retry" />
         Try again
-      </Button>
+      </DialogPrimaryButton>
       <Button
         navigation
         variant="ghost"

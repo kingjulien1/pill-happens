@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
 import { HeadingText } from "@/components/heading-text";
 import { BrandMark } from "@/components/brand";
-import { Button } from "@/components/ui/button";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
 
 export default function NotFound() {
@@ -30,17 +30,15 @@ export default function NotFound() {
       <p className="mt-2 max-w-64 text-sm leading-relaxed text-canvas-muted-foreground">
         Let’s head back to your daily journal.
       </p>
-      <Button
-        appearance="intake"
+      <DialogPrimaryButton
         navigation
         nativeButton={false}
         render={<Link href="/" />}
-        size="lg"
-        className="mt-6 inline-flex h-auto min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-medium transition-colors"
+        className="mt-6 w-full"
+        leadingIcon={<ActionIcon name="back" />}
       >
-        <ActionIcon name="back" />
         Back to today
-      </Button>
+      </DialogPrimaryButton>
     </main>
   );
 }

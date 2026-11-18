@@ -1,31 +1,61 @@
 "use client";
 
-import type { ComponentProps, CSSProperties } from "react";
-import { AccentButton } from "@/components/accent-button";
-import {
-  ACCENT_RADIUS_RATIO,
-  getAccentRadiusStyle,
-} from "@/lib/action-button-system";
+import type { CSSProperties } from "react";
+import { ArrowRight, LoaderCircle } from "lucide-react";
+import { PencilSparklesIcon } from "@/components/action-icon";
+import type { AccentButtonProps } from "@/components/accent-button";
+import { TodayActionButton } from "@/components/today-action-button";
+import { INTAKE_ACTION_GEOMETRY } from "@/lib/action-button-system";
 import { cn } from "@/lib/utils";
 import styles from "./dialog-primary-button.module.css";
 
-/** Dialog geometry composes the shared action renderer through AccentButton. */
+type DialogPrimaryButtonProps = Omit<AccentButtonProps, "radius" | "finish">;
+
+/** Submission content uses the same satin host and fixed geometry as Log Intake. */
 export function DialogPrimaryButton({
+  children,
   className,
   style,
-  radius,
+  pending = false,
+  leadingIcon,
+  trailingIcon,
+  "aria-busy": ariaBusy,
   ...props
-}: ComponentProps<typeof AccentButton>) {
-  const corner = `calc(var(--dialog-action-height) * ${ACCENT_RADIUS_RATIO})`;
-  const geometry: CSSProperties =
-    typeof radius === "number" && Number.isFinite(radius)
-      ? getAccentRadiusStyle(radius)
-      : ({ borderRadius: corner, "--accent-radius": corner } as CSSProperties);
+}: DialogPrimaryButtonProps) {
+  const busy = pending || ariaBusy === true || ariaBusy === "true";
+  const geometry: CSSProperties = {
+    height: INTAKE_ACTION_GEOMETRY.height,
+    minHeight: INTAKE_ACTION_GEOMETRY.height,
+    borderRadius: INTAKE_ACTION_GEOMETRY.radius,
+  };
+  const leading =
+    leadingIcon === undefined ? (
+      busy ? (
+        <LoaderCircle
+          className={styles.spinner}
+          size={23}
+          strokeWidth={2.5}
+          aria-hidden="true"
+        />
+      ) : (
+        <PencilSparklesIcon size={23} strokeWidth={2.5} aria-hidden="true" />
+      )
+    ) : (
+      leadingIcon
+    );
+  const trailing =
+    trailingIcon === undefined ? (
+      <ArrowRight size={23} strokeWidth={2.5} aria-hidden="true" />
+    ) : (
+      trailingIcon
+    );
 
   return (
-    <AccentButton
+    <TodayActionButton
       {...props}
-      radius={radius}
+      pending={pending}
+      aria-busy={ariaBusy}
+      radius={INTAKE_ACTION_GEOMETRY.radius}
       className={
         typeof className === "function"
           ? (state) => cn(styles.button, className(state))
@@ -37,6 +67,27 @@ export function DialogPrimaryButton({
           : { ...style, ...geometry }
       }
       data-dialog-primary-button
-    />
+    >
+      <span
+        className={cn("intake-primary-row", styles.content)}
+        data-no-trailing={trailing == null || undefined}
+      >
+        <span className="intake-primary-copy">
+          <span className="intake-primary-label">
+            {leading != null && (
+              <span className="intake-log-symbol" aria-hidden="true">
+                {leading}
+              </span>
+            )}
+            <span className={styles.label}>{children}</span>
+          </span>
+        </span>
+        {trailing != null && (
+          <span className="intake-primary-next" aria-hidden="true">
+            {trailing}
+          </span>
+        )}
+      </span>
+    </TodayActionButton>
   );
 }

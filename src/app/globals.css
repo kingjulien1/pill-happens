@@ -3089,6 +3089,11 @@
   /* The page gutter and this inset still leave room for the exterior glow. */
   padding-bottom: 20px;
 }
+.page-action-desktop {
+  width: 100%;
+  max-width: 446px;
+  margin-inline: auto;
+}
 @media (min-width: 640px) {
   .intake-dock-inner {
     padding-inline: max(32px, env(safe-area-inset-left))

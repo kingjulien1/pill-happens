@@ -5,8 +5,7 @@ import {
   subscribePageEntryReadiness,
 } from "@/lib/page-entry-readiness";
 
-import { useCallback, useRef, useSyncExternalStore } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useRef } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
@@ -17,19 +16,10 @@ import {
   INTAKE_ACTION_GEOMETRY,
 } from "@/lib/action-button-system";
 import { IntakeLogSymbol } from "@/components/intake-log-symbol";
-import { useIntakeDock } from "@/components/use-intake-dock";
+import { PageActionDock } from "@/components/page-action-dock";
 
 // Temporary visibility switch: set true to restore the unchanged amounts bar.
 const SHOW_INTAKE_AMOUNTS = false;
-
-const mobileQuery = "(max-width: 767px)";
-const subscribe = (onChange: () => void) => {
-  const query = window.matchMedia(mobileQuery);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
-const getSnapshot = () => window.matchMedia(mobileQuery).matches;
-const getServerSnapshot = () => false;
 
 /** One entrance survives responsive portal moves; ambient paint keeps its own clock. */
 function useIntakeActionEntrance() {
@@ -204,14 +194,7 @@ export function IntakeAction({
   opioidCount: number;
   stimulantCount: number;
 }) {
-  const dockRef = useRef<HTMLDivElement>(null);
   const entryRoot = useIntakeActionEntrance();
-  const mobile = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
-  useIntakeDock(dockRef, mobile);
   const action = (
     <div
       ref={entryRoot}
@@ -304,20 +287,5 @@ export function IntakeAction({
     </div>
   );
 
-  if (mobile) {
-    // Animated page wrappers can anchor fixed elements; the body portal avoids that.
-    return createPortal(
-      <div
-        ref={dockRef}
-        className="intake-dock"
-        role="region"
-        aria-label="Intake actions"
-      >
-        <div className="intake-dock-inner">{action}</div>
-      </div>,
-      document.body,
-    );
-  }
-
-  return <div className="intake-action-desktop">{action}</div>;
+  return <PageActionDock label="Intake actions">{action}</PageActionDock>;
 }

@@ -68,7 +68,8 @@ import { HistoryWeekGroup } from "@/components/history-week-group";
 import { groupHistoryWeeks, visibleHistoryWeeks } from "@/lib/history-weeks";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
 import { DailyCheckInSection } from "@/components/daily-check-in";
-import { TodayTopFade } from "@/components/today-top-fade";
+import { PageTopFade, TodayTopFade } from "@/components/today-top-fade";
+import { PageActionDock } from "@/components/page-action-dock";
 import { DayTimeMarker } from "@/components/day-time-marker";
 import { cn } from "@/lib/utils";
 import {
@@ -659,19 +660,12 @@ export function MedicationsPage() {
     }
   }
   return (
-    <>
+    <div data-medications-page>
+      <PageTopFade targetSelector="[data-medications-page] [data-page-heading-title]" />
       <MedicationsHeading
         medications={data.medications}
         intakes={data.intakes}
         dialogOpen={open}
-      />
-      <MedicationActionButton
-        intent="add"
-        className="mb-7"
-        onClick={(event) => {
-          medicationOpener.current = event.currentTarget;
-          openDialog({ kind: "medication-new" });
-        }}
       />
       {hasReference ? (
         <section
@@ -788,6 +782,22 @@ export function MedicationsPage() {
           </div>
         )}
       </div>
+      <PageActionDock label="Medication actions">
+        <div className="intake-action-content pointer-events-auto">
+          <div className="intake-action-shell">
+            <MedicationActionButton
+              intent="add"
+              onClick={(event) => {
+                medicationOpener.current = event.currentTarget;
+                openDialog({ kind: "medication-new" });
+              }}
+            />
+          </div>
+          <p className="intake-action-note" data-medication-action-note>
+            Your medications, your defaults, your way.
+          </p>
+        </div>
+      </PageActionDock>
       <ResponsiveModal
         open={open}
         onOpenChange={(next) => {
@@ -837,7 +847,7 @@ export function MedicationsPage() {
           />
         )}
       </ResponsiveModal>
-    </>
+    </div>
   );
 }
 
@@ -912,14 +922,15 @@ export function GoalsPage() {
       >
         Keep track of the targets agreed with your prescriber.
       </PageHeading>
-      <Button
-        appearance="intake"
-        className="mb-7 h-13 w-full gap-2 rounded-2xl"
+      <DialogPrimaryButton
+        type="button"
+        className="mb-7 w-full"
+        leadingIcon={<ActionIcon name="goals" />}
+        trailingIcon={<ActionIcon name="next" />}
         onClick={() => openDialog({ kind: "goal-new" })}
       >
-        <ActionIcon name="goals" />
-        Set a daily goal
-      </Button>
+        Set a Daily Goal
+      </DialogPrimaryButton>
       {!goals.length ? (
         <EmptyState icon="goals" title="A Little Direction, When You’re Ready.">
           Add a daily maximum for one medication. Your journal will help you

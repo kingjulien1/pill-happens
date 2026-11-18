@@ -45,6 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const intakePage =
     path === "/" || /^\/history\/\d{4}-\d{2}-\d{2}$/.test(path);
   const guidePage = path === "/guide" || path === "/developer-guide";
+  const dockedPage = path === "/" || path === "/medications";
   const { data, now, error, refresh } = useJournal();
   const today =
     path === "/" && data && now ? dayKey(now, data.settings.timezone) : null;
@@ -88,7 +89,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       className={
         guidePage
           ? guideStyles.shell
-          : `${layoutStyles.shell} ${intakePage ? layoutStyles.timeline : ""} ${path === "/" ? "with-intake-dock" : ""}`
+          : `${layoutStyles.shell} ${intakePage ? layoutStyles.timeline : ""} ${dockedPage ? "with-intake-dock" : ""}`
       }
       data-guide-shell={guidePage || undefined}
       data-page-layout={

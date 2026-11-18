@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { recoverSession } from "@/lib/session-recovery";
@@ -265,24 +266,20 @@ export function LoginForm() {
             </p>
           )}
         </div>
-        <Button
+        <DialogPrimaryButton
           type="submit"
-          appearance="intake"
           disabled={busy || candidatePassword !== null}
-          className="h-12 w-full gap-3 rounded-xl text-sm"
+          pending={pending === "login"}
+          leadingIcon={
+            <ActionIcon
+              name={pending === "login" ? "loading" : "secure"}
+              className={pending === "login" ? "animate-spin" : undefined}
+            />
+          }
+          className="w-full"
         >
-          {pending === "login" ? (
-            <>
-              <ActionIcon name="loading" className="animate-spin" />
-              Opening your journal…
-            </>
-          ) : (
-            <>
-              Open journal
-              <ActionIcon name="next" className="size-[22px]" />
-            </>
-          )}
-        </Button>
+          {pending === "login" ? "Opening your journal…" : "Open Journal"}
+        </DialogPrimaryButton>
         <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
           <ActionIcon name="secure" className="size-4" />
           Your password opens your space.
@@ -372,24 +369,26 @@ export function LoginForm() {
               </p>
             )}
             <div className="flex flex-col gap-2">
-              <Button
+              <DialogPrimaryButton
                 type="submit"
-                appearance="intake"
                 disabled={busy}
+                pending={pending === "create"}
                 data-create-journal
-                className="h-16 w-full gap-3 rounded-2xl text-base font-semibold"
+                leadingIcon={
+                  <ActionIcon
+                    name={pending === "create" ? "loading" : "confetti"}
+                    weight="bold"
+                    className={
+                      pending === "create" ? "animate-spin" : undefined
+                    }
+                  />
+                }
+                className="w-full"
               >
-                <ActionIcon
-                  name={pending === "create" ? "loading" : "confetti"}
-                  weight="bold"
-                  className={
-                    pending === "create" ? "size-6 animate-spin" : "size-6"
-                  }
-                />
                 {pending === "create"
                   ? "Creating your journal…"
-                  : "Create journal"}
-              </Button>
+                  : "Create Journal"}
+              </DialogPrimaryButton>
               <Button
                 type="button"
                 variant="ghost"

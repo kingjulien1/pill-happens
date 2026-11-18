@@ -539,7 +539,7 @@
 
 /* The estimate owns its 16px action gap, replacing the shared 24px form margin. */
 .submitArea[data-has-sleep-summary="true"]
-  [data-dialog-primary-button][data-slot="button"][data-button-kind="accent"] {
+  [data-dialog-primary-button][data-slot="button"] {
   margin-block-start: 0;
 }
 

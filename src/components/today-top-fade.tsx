@@ -3,18 +3,16 @@
 import { useLayoutEffect } from "react";
 import styles from "./today-top-fade.module.css";
 
-/** Paint from the document top to the wake-up value, outside all entry transforms. */
-export function TodayTopFade() {
+/** Paint from the document top to the page's first value or heading. */
+export function PageTopFade({ targetSelector }: { targetSelector: string }) {
   useLayoutEffect(() => {
-    const today = document.querySelector<HTMLElement>("[data-today-layout]");
-    const value = today?.querySelector<HTMLElement>(
-      '[data-day-time-marker="start"] time',
-    );
-    if (!today || !value) return;
+    const value = document.querySelector<HTMLElement>(targetSelector);
+    if (!value) return;
 
     const fade = document.createElement("div");
     fade.className = styles.fade;
     fade.setAttribute("data-today-top-fade", "");
+    fade.setAttribute("data-page-top-fade", "");
     fade.setAttribute("aria-hidden", "true");
     document.body.append(fade);
     let frame = 0;
@@ -39,7 +37,7 @@ export function TodayTopFade() {
         ? new ResizeObserver(schedule)
         : null;
     for (const element of [
-      today.closest("[data-page-layout]"),
+      value.closest("[data-page-layout]"),
       document.querySelector("[data-page-topbar]"),
       document.querySelector("[data-page-topbar-separator]"),
       value.parentElement,
@@ -62,7 +60,15 @@ export function TodayTopFade() {
       window.visualViewport?.removeEventListener("resize", schedule);
       fade.remove();
     };
-  }, []);
+  }, [targetSelector]);
 
   return null;
+}
+
+export function TodayTopFade() {
+  return (
+    <PageTopFade
+      targetSelector={'[data-today-layout] [data-day-time-marker="start"] time'}
+    />
+  );
 }
