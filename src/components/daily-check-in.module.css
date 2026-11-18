@@ -30,6 +30,43 @@
 /* Pale check-in glass needs the reading ink, independent of the page canvas. */
 .section .card:global(.intake-log-card[data-check-in-card]) {
   --card-foreground: var(--foreground);
+  --check-in-outer-gap: 3px;
+  --check-in-outer-width: calc(var(--entry-inner-rim-width) * 1.4);
+  --check-in-outer-color: color-mix(
+    in srgb,
+    var(--color-purple-400, #c084fc) 78%,
+    var(--color-pink-400, #f472b6) 22%
+  );
+}
+
+/* The third frame is a painted sibling so its deliberate outside clearance
+   never changes the measured card or competes with the focus outline. */
+.outerFrame {
+  position: absolute;
+  z-index: 4;
+  box-sizing: border-box;
+  inset: calc((var(--check-in-outer-gap) + var(--check-in-outer-width)) * -1);
+  border: var(--check-in-outer-width) solid var(--check-in-outer-color);
+  border-radius: calc(
+    var(--entry-card-radius) + var(--check-in-outer-gap) +
+      var(--check-in-outer-width)
+  );
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+/* Two separate glows originate at the existing thick card edge. Pink400 sits
+   over Purple400 at 54%, preserving the purple identity underneath. */
+.outerFrame::before {
+  position: absolute;
+  inset: calc(var(--check-in-outer-gap) - 0.5px);
+  border-radius: var(--entry-card-radius);
+  box-shadow:
+    0 0 18px 1px
+      color-mix(in srgb, var(--color-purple-400, #c084fc) 46%, transparent),
+    0 0 11px 0
+      color-mix(in srgb, var(--color-pink-400, #f472b6) 54%, transparent);
+  content: "";
 }
 
 .card:disabled {

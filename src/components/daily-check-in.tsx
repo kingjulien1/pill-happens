@@ -215,6 +215,7 @@ export function DailyCheckInSection({
         aria-haspopup="dialog"
         disabled={busy}
       >
+        <span className={styles.outerFrame} aria-hidden="true" />
         <div
           className={cn(
             "medication-card-details intake-card-details",
