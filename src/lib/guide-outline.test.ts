@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { guideHeadingId, guideOutlineEntries } from "./guide-outline";
+import {
+  guideHeadingId,
+  guideOutlineEntries,
+  searchGuideOutline,
+} from "./guide-outline";
 
 test("guide fragments remain readable and stable across punctuation and page namespaces", () => {
   assert.equal(
@@ -40,4 +44,43 @@ test("outline preserves source order and real parentage without inventing missin
     ],
   );
   assert.equal(result[2].label, "Deeper Details");
+});
+
+const searchable = guideOutlineEntries([
+  { id: "notifications", label: "Notifications", level: 1 },
+  { id: "timers", label: "Countdown & Pause", level: 2 },
+  { id: "undo", label: "Undo An Edit", level: 2 },
+  { id: "colors", label: "Colors & Appearance", level: 1 },
+  { id: "cafe", label: "Café Palette", level: 2 },
+]);
+
+test("outline search preserves heading context and the original reading order", () => {
+  assert.deepEqual(
+    searchGuideOutline(searchable, "pause").map(({ id }) => id),
+    ["notifications", "timers"],
+  );
+  assert.deepEqual(
+    searchGuideOutline(searchable, "notifications").map(({ id }) => id),
+    ["notifications", "timers", "undo"],
+  );
+});
+
+test("outline search combines parent and child terms without crossing branches", () => {
+  assert.deepEqual(
+    searchGuideOutline(searchable, "notifications countdown").map(
+      ({ id }) => id,
+    ),
+    ["notifications", "timers"],
+  );
+  assert.deepEqual(searchGuideOutline(searchable, "colors countdown"), []);
+});
+
+test("outline search accepts accents, mixed case and whitespace and leaves its source untouched", () => {
+  const previous = structuredClone(searchable);
+  assert.deepEqual(
+    searchGuideOutline(searchable, "  CAFE   palette ").map(({ id }) => id),
+    ["colors", "cafe"],
+  );
+  assert.deepEqual(searchGuideOutline(searchable, " \n "), searchable);
+  assert.deepEqual(searchable, previous);
 });

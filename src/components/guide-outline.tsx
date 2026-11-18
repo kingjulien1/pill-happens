@@ -3,6 +3,8 @@
 import {
   useCallback,
   useEffect,
+  useId,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -11,12 +13,17 @@ import {
 } from "react";
 import { ListBulletsIcon } from "@phosphor-icons/react/dist/ssr/ListBullets";
 import { CrosshairIcon } from "@phosphor-icons/react/dist/ssr/Crosshair";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import {
   guideOutlineEntries,
+  searchGuideOutline,
   type GuideOutlineEntry,
 } from "@/lib/guide-outline";
 import { GUIDE_SIDEBAR_QUERY } from "@/lib/guide-responsive";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ResponsiveModal } from "@/components/responsive-modal";
 import styles from "./guide-outline.module.css";
 
 const subscribe = (listener: () => void) => {
@@ -33,6 +40,18 @@ function openAncestors(target: HTMLElement) {
     if (node instanceof HTMLDetailsElement) node.open = true;
     node = node.parentElement;
   }
+}
+function alignGuideTarget(target: HTMLElement) {
+  // Chromium can ignore scroll-margin on an expanded details taller than the
+  // viewport. These guide anchors belong to the document, not an inner scroller.
+  const margin = Number.parseFloat(getComputedStyle(target).scrollMarginTop);
+  window.scrollTo({
+    top:
+      window.scrollY +
+      target.getBoundingClientRect().top -
+      (Number.isFinite(margin) ? margin : 28),
+    behavior: "instant",
+  });
 }
 function exposed(heading: HTMLElement) {
   if (!heading.getClientRects().length) return false;
@@ -51,14 +70,30 @@ function exposed(heading: HTMLElement) {
 export function GuideOutline({ children }: { children: ReactNode }) {
   const content = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
+  const mobileTrigger = useRef<HTMLButtonElement>(null);
+  const navigationTarget = useRef<HTMLElement | null>(null);
   const targets = useRef(new Map<string, HTMLElement>());
   const [entries, setEntries] = useState<GuideOutlineEntry[]>([]);
   const [active, setActive] = useState("");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const searchId = useId();
+  const mobileListId = useId();
   const wide = useSyncExternalStore(subscribe, wideSnapshot, serverSnapshot);
+  const matches = useMemo(
+    () => searchGuideOutline(entries, query),
+    [entries, query],
+  );
+
+  useEffect(() => {
+    if (!wide) return;
+    const frame = requestAnimationFrame(() => setMobileOpen(false));
+    return () => cancelAnimationFrame(frame);
+  }, [wide]);
 
   useEffect(() => {
     const root = content.current;
-    if (!root || !wide) return;
+    if (!root) return;
     let frame = 0;
     let disposed = false;
     const collect = () => {
@@ -96,7 +131,7 @@ export function GuideOutline({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [wide]);
+  }, []);
 
   useEffect(() => {
     const root = content.current;
@@ -117,7 +152,7 @@ export function GuideOutline({ children }: { children: ReactNode }) {
       cancelAnimationFrame(followup);
       frame = requestAnimationFrame(() => {
         followup = requestAnimationFrame(() => {
-          target.scrollIntoView({ block: "start", behavior: "auto" });
+          alignGuideTarget(target);
         });
       });
     };
@@ -134,20 +169,23 @@ export function GuideOutline({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = content.current;
-    if (!root || !wide || !entries.length) return;
+    if (!root || !entries.length) return;
     let frame = 0;
     const update = () => {
       let current = entries[0].id;
       const atPageEnd =
         Math.ceil(window.scrollY + window.innerHeight) >=
         document.documentElement.scrollHeight - 2;
-      for (const entry of entries) {
+      // On phones the toolbar tracks sections; the desktop rail tracks details too.
+      for (const entry of wide
+        ? entries
+        : entries.filter((item) => item.level === 1)) {
         const node = targets.current.get(entry.id);
         if (
           node &&
           exposed(node) &&
           node.getBoundingClientRect().top <=
-            (atPageEnd ? window.innerHeight : 40)
+            (atPageEnd ? window.innerHeight : wide ? 40 : 88)
         )
           current = entry.id;
       }
@@ -232,9 +270,15 @@ export function GuideOutline({ children }: { children: ReactNode }) {
     const target = document.getElementById(entry.id);
     if (target) openAncestors(target);
     setActive(entry.id);
+    if (mobileOpen && target) {
+      target.tabIndex = -1;
+      target.dataset.guideOutlineFocus = "true";
+      navigationTarget.current = target;
+      setMobileOpen(false);
+    }
     // Native anchors retain copy-link, history and modified-click behavior.
-    if (window.location.hash === `#${entry.id}`)
-      target?.scrollIntoView({ block: "start", behavior: "auto" });
+    if (window.location.hash === `#${entry.id}` && target)
+      alignGuideTarget(target);
   };
   const ancestors = new Set<string>();
   let ancestor = entries.find((entry) => entry.id === active)?.parentId;
@@ -242,9 +286,12 @@ export function GuideOutline({ children }: { children: ReactNode }) {
     ancestors.add(ancestor);
     ancestor = entries.find((entry) => entry.id === ancestor)?.parentId;
   }
-  const renderEntries = (parentId: string | null): ReactNode => (
+  const renderEntries = (
+    parentId: string | null,
+    mobile = false,
+  ): ReactNode => (
     <ol className={parentId ? styles.children : styles.items}>
-      {entries
+      {(mobile ? matches : entries)
         .filter((entry) => entry.parentId === parentId)
         .map((entry) => (
           <li key={entry.id}>
@@ -259,20 +306,120 @@ export function GuideOutline({ children }: { children: ReactNode }) {
               data-outline-target={entry.id}
               data-active-path={ancestors.has(entry.id) || undefined}
             >
-              {entry.label}
+              <span>{entry.label}</span>
+              {mobile && !query.trim() && entry.level === 1 && (
+                <small>
+                  {
+                    entries.filter((child) => child.parentId === entry.id)
+                      .length
+                  }{" "}
+                  topics
+                </small>
+              )}
             </a>
-            {entries.some((child) => child.parentId === entry.id) &&
-              renderEntries(entry.id)}
+            {(!mobile || query.trim()) &&
+              (mobile ? matches : entries).some(
+                (child) => child.parentId === entry.id,
+              ) &&
+              renderEntries(entry.id, mobile)}
           </li>
         ))}
     </ol>
   );
+  const sections = entries.filter((entry) => entry.level === 1);
+  const currentSection =
+    sections.find((entry) => entry.id === active || ancestors.has(entry.id)) ??
+    sections[0];
 
   return (
-    <div className={styles.boundary} data-guide-outline-boundary>
+    <div
+      className={styles.boundary}
+      data-guide-outline-boundary
+      data-mobile-outline-ready={entries.length > 0 || undefined}
+    >
+      {entries.length > 0 && (
+        <div className={styles.mobileBar} data-guide-mobile-toolbar>
+          <Button
+            ref={mobileTrigger}
+            variant="ghost"
+            type="button"
+            className={styles.mobileTrigger}
+            aria-haspopup="dialog"
+            aria-expanded={mobileOpen && !wide}
+            aria-controls={mobileOpen && !wide ? mobileListId : undefined}
+            onClick={() => {
+              navigationTarget.current = null;
+              setQuery("");
+              setMobileOpen(true);
+            }}
+          >
+            <ListBulletsIcon size={18} weight="bold" aria-hidden="true" />
+            <strong>Contents</strong>
+            <span>{currentSection?.label}</span>
+            <CaretDownIcon size={14} weight="bold" aria-hidden="true" />
+          </Button>
+        </div>
+      )}
       <div ref={content} data-guide-outline-content className={styles.content}>
         {children}
       </div>
+      {!wide && (
+        <ResponsiveModal
+          open={mobileOpen}
+          onOpenChange={setMobileOpen}
+          title="On This Page"
+          description="Jump to a section, or search all headings for a specific topic."
+          restoreScroll={false}
+          returnFocus={() => navigationTarget.current ?? mobileTrigger.current}
+        >
+          <div className={styles.mobileContents}>
+            <label htmlFor={searchId} className={styles.searchLabel}>
+              Find A Topic
+            </label>
+            <div className={styles.search}>
+              <MagnifyingGlassIcon
+                size={18}
+                weight="regular"
+                aria-hidden="true"
+              />
+              <Input
+                id={searchId}
+                type="search"
+                autoComplete="off"
+                placeholder="Search topics…"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                aria-controls={mobileListId}
+              />
+            </div>
+            <div className={styles.mobileMeta} role="status" aria-live="polite">
+              <span>
+                {query.trim()
+                  ? `${matches.length} links`
+                  : `${sections.length} sections`}
+              </span>
+              <span>
+                {query.trim()
+                  ? "Heading Matches"
+                  : `${entries.length} topics to explore`}
+              </span>
+            </div>
+            <nav
+              id={mobileListId}
+              className={styles.mobileList}
+              aria-label="Guide topics"
+            >
+              {matches.length > 0 ? (
+                renderEntries(null, true)
+              ) : (
+                <p className={styles.noResults}>
+                  No matching topic yet. Try a shorter word.
+                </p>
+              )}
+            </nav>
+          </div>
+        </ResponsiveModal>
+      )}
       {wide && entries.length > 0 && (
         <aside className={styles.rail} data-guide-outline>
           <nav
@@ -286,7 +433,9 @@ export function GuideOutline({ children }: { children: ReactNode }) {
               <span>
                 {entries.filter((entry) => entry.level === 1).length} sections
               </span>
-              <Button variant="ghost" size="icon"
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 onClick={() => findCurrent(true)}
                 aria-label="Find current section"

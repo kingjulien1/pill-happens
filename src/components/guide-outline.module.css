@@ -5,22 +5,184 @@
 .content {
   min-width: 0;
 }
+.content [id],
 .content [data-guide-outline-level],
 .content [data-guide-outline-anchor] {
-  scroll-margin-top: 28px;
+  scroll-margin-top: 88px;
+}
+.content [data-guide-outline-focus]:focus-visible {
+  outline: 2px solid var(--canvas-foreground);
+  outline-offset: 5px;
+}
+.mobileBar {
+  position: sticky;
+  z-index: 20;
+  top: max(8px, env(safe-area-inset-top));
+  min-width: 0;
+  margin-bottom: 20px;
+}
+.mobileTrigger {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  gap: 9px;
+  justify-content: flex-start;
+  padding: 10px 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--canvas-foreground) 14%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-reading) 94%, transparent);
+  color: var(--surface-reading-foreground);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 4px 18px
+    color-mix(in srgb, var(--app-canvas-base) 12%, transparent);
+  font-size: 12px;
+  line-height: 20px;
+}
+.mobileTrigger strong {
+  flex-shrink: 0;
+  font-weight: 650;
+}
+.mobileTrigger > span {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 450;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mobileTrigger > svg {
+  flex-shrink: 0;
+}
+.boundary[data-mobile-outline-ready] .content [data-guide-inline-contents] {
+  display: none;
+}
+.mobileContents {
+  min-width: 0;
+  color: var(--foreground);
+}
+.searchLabel {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 550;
+}
+.search {
+  position: relative;
+  min-width: 0;
+}
+.search > svg {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 12px;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.search input {
+  min-height: 44px;
+  padding-inline-start: 39px;
+  font-size: 16px;
+}
+.mobileMeta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-block: 14px 10px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 17px;
+}
+.mobileList {
+  min-width: 0;
+  padding: 2px;
+}
+.mobileList .items,
+.mobileList .children {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mobileList .children {
+  margin-inline-start: 12px;
+  padding-inline-start: 8px;
+  border-inline-start: 1px solid var(--border);
+}
+.mobileList .link {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.link > span {
+  min-width: 0;
+}
+.mobileList .link small {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 450;
+}
+.mobileList .link[data-outline-level="2"],
+.mobileList .link[data-outline-level="3"] {
+  font-size: 13px;
+  font-weight: 450;
+}
+.mobileList .link[aria-current="location"],
+.mobileList .link[data-active-path] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.mobileTrigger:focus-visible,
+.mobileList .link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.noResults {
+  margin: 0;
+  padding: 20px 12px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.7;
 }
 .rail {
   display: none;
 }
 
 @media (min-width: 64rem) {
+  .mobileBar {
+    display: none;
+  }
+  .content [id],
+  .content [data-guide-outline-level],
+  .content [data-guide-outline-anchor] {
+    scroll-margin-top: 28px;
+  }
   .boundary {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(18rem, 1fr);
     column-gap: 2rem;
-  }
-  .content [data-guide-inline-contents] {
-    display: none;
   }
   .rail {
     display: block;

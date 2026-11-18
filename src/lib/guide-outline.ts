@@ -44,3 +44,33 @@ export function guideOutlineEntries(
   }
   return result;
 }
+
+/** Search heading paths while keeping the parents needed to understand a result. */
+export function searchGuideOutline(
+  entries: readonly GuideOutlineEntry[],
+  query: string,
+): GuideOutlineEntry[] {
+  const normalize = (value: string) =>
+    value
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  const terms = normalize(query).trim().split(/\s+/).filter(Boolean);
+  if (!terms.length) return [...entries];
+  const byId = new Map(entries.map((entry) => [entry.id, entry]));
+  const retained = new Set<string>();
+  for (const entry of entries) {
+    const path: GuideOutlineEntry[] = [];
+    const visited = new Set<string>();
+    let current: GuideOutlineEntry | undefined = entry;
+    while (current && !visited.has(current.id)) {
+      visited.add(current.id);
+      path.push(current);
+      current = current.parentId ? byId.get(current.parentId) : undefined;
+    }
+    const text = normalize(path.map((item) => item.label).join(" "));
+    if (terms.every((term) => text.includes(term)))
+      for (const item of path) retained.add(item.id);
+  }
+  return entries.filter((entry) => retained.has(entry.id));
+}
