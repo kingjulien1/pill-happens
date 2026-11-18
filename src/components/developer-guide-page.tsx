@@ -600,18 +600,17 @@ export function DeveloperGuidePage() {
               <p>
                 Button keeps standard semantic variants for ordinary controls,
                 toolbars, links and guide utilities. Primary and Accent
-                explicitly select intake appearance for main
-                actions: a mode-aware Rose face, inward identity edge and
-                restrained moving pink perimeter. Supporting icons and copy use
-                the paired --daily-action-secondary-ink. Light actions use a
-                rich raspberry contrast surface with light copy; Dark Mode
-                keeps its existing paint. Today, Add Medication and dialog
-                submissions use the shared TodayActionButton satin adapter over
-                the same native button host.
-                SecondaryButton keeps its quiet tonal surface and paired
-                semantic foreground. All paths preserve one Base UI host and
-                native behavior without making every small control look like the
-                main intake action.
+                explicitly select intake appearance for main actions: a
+                mode-aware Rose face, inward identity edge and restrained moving
+                pink perimeter. Supporting icons and copy use the paired
+                --daily-action-secondary-ink. Light actions use a rich raspberry
+                contrast surface with light copy; Dark Mode keeps its existing
+                paint. Today, Add Medication and dialog submissions use the
+                shared TodayActionButton satin adapter over the same native
+                button host. SecondaryButton keeps its quiet tonal surface and
+                paired semantic foreground. All paths preserve one Base UI host
+                and native behavior without making every small control look like
+                the main intake action.
               </p>
               <p>
                 Keep keyboard focus visible through <code>--ring</code>. Borders
@@ -637,9 +636,9 @@ export function DeveloperGuidePage() {
                 boundaries and focus rings remain distinct on rose/lilac paper;
                 selected ratings use deep semantic primary ink. The root uses
                 <code> {APP_LIGHT_CANVAS.base}</code> Rose/Lilac paper with a
-                protective 90% glaze over the same passive violet shader.
-                Dark Mode keeps its original deeper field and exact overlays.
-                Local surfaces follow Light, Dark or System. Editing the light
+                protective 90% glaze over the same passive violet shader. Dark
+                Mode keeps its original deeper field and exact overlays. Local
+                surfaces follow Light, Dark or System. Editing the light
                 registry does not recolor personal medication symbols or change
                 the dark role values. The live tables and inspectors below read
                 the registry directly, including every light/dark HEX value.
@@ -648,13 +647,13 @@ export function DeveloperGuidePage() {
                 Light Mode is a full reading hierarchy: warm raised cards,
                 recessed field wells, an opaque writing surface and distinct
                 selected states. Primary copy and readable muted copy remain
-                opaque; shadows use Plum rather than gray or black haze.
-                Small labels, keyboard focus and input boundaries are tested
-                after compositing. The mug, moon and notification bell keep
-                deliberate dark artwork tiles with light ink, while page text,
-                timestamps, dose calculations and status badges adapt to the
-                lighter surroundings. Personal medication colors remain saved
-                identities rather than becoming a second application theme.
+                opaque; shadows use Plum rather than gray or black haze. Small
+                labels, keyboard focus and input boundaries are tested after
+                compositing. The mug, moon and notification bell keep deliberate
+                dark artwork tiles with light ink, while page text, timestamps,
+                dose calculations and status badges adapt to the lighter
+                surroundings. Personal medication colors remain saved identities
+                rather than becoming a second application theme.
               </p>
               <p>
                 getAppCanvasCss supplies generated CSS, the prepaint head,
@@ -663,9 +662,9 @@ export function DeveloperGuidePage() {
                 appearance flag then owns the same declarations. Browser
                 theme-color metadata follows the selected mode, including a
                 manual selection opposite to the device. Offline restores that
-                same device-local preference without reading journal data.
-                Mode changes retain the shader instance and phase without
-                modifying medication data, drafts or a notification timer.
+                same device-local preference without reading journal data. Mode
+                changes retain the shader instance and phase without modifying
+                medication data, drafts or a notification timer.
               </p>
             </Detail>
             <Detail
@@ -675,8 +674,8 @@ export function DeveloperGuidePage() {
               <p>
                 An eight-digit hex value includes alpha: the last pair controls
                 opacity. The same wash will look different on White, Plum, a
-                card, or the root canvas. The inspector displays the exact
-                value and opacity rather than replacing it with an opaque
+                card, or the root canvas. The inspector displays the exact value
+                and opacity rather than replacing it with an opaque
                 approximation.
               </p>
               <p>
@@ -976,8 +975,8 @@ export function DeveloperGuidePage() {
                 stops and readable secondary ink. The inspectable button
                 reference below reports its source-defined layer values.
                 Primary, Accent and dialog submission adapters opt into the
-                main-action family. Small controls keep their
-                semantic variants, while SecondaryButton stays quiet and tonal.
+                main-action family. Small controls keep their semantic variants,
+                while SecondaryButton stays quiet and tonal.
               </p>
               <p>
                 The{" "}
@@ -1094,9 +1093,9 @@ export function DeveloperGuidePage() {
                 growing naturally for wrapped purpose copy and facts. The
                 trailing rail holds the current-page check or destination arrow.
                 Long labels yield before the count badge, descriptions use at
-                most two lines, and individual facts truncate without moving
-                the arrow or adding horizontal scrolling. Routes and modified
-                clicks keep their native semantics. Destinations enter with a
+                most two lines, and individual facts truncate without moving the
+                arrow or adding horizontal scrolling. Routes and modified clicks
+                keep their native semantics. Destinations enter with a
                 restrained 380ms rise, offset by 32ms per item; reduced motion
                 shows settled content. Hover remains limited to desktop fine
                 pointers and never moves the icons.
@@ -1112,15 +1111,16 @@ export function DeveloperGuidePage() {
               <p>
                 Getting Started has its own full-width supporting card beneath
                 “A Little Help / At Your Pace,” with daily basics, installation
-                and backup context. A separated Help &amp; Tools footer contains three
-                shortcut tiles: Backups, Report a Bug and Developer. Mobile uses
-                62px stacked tiles; desktop uses 44px horizontal tools while
-                the richer destination list keeps its own scroll area. Their
-                CloudDownload, BugPlay and Braces glyphs use the Pink accent;
-                accessible names retain their complete destinations. A quiet
-                two-line note explains that the current place is remembered on
-                this device. Every tool stays reachable through the sheet’s
-                existing scroll owner; no decorative wash overlaps the links.
+                and backup context. A separated Help &amp; Tools footer contains
+                three shortcut tiles: Backups, Report a Bug and Developer.
+                Mobile uses 62px stacked tiles; desktop uses 44px horizontal
+                tools while the richer destination list keeps its own scroll
+                area. Their CloudDownload, BugPlay and Braces glyphs use the
+                Pink accent; accessible names retain their complete
+                destinations. A quiet two-line note explains that the current
+                place is remembered on this device. Every tool stays reachable
+                through the sheet’s existing scroll owner; no decorative wash
+                overlaps the links.
               </p>
               <p>
                 Navigation keys its host by pathname and responsive layout. A
@@ -1160,25 +1160,26 @@ export function DeveloperGuidePage() {
                 <code>JournalBackground</code> mounts one passive React Bits
                 Iridescence field at the root, shared across every route and
                 appearance mode. The native WebGL2 shader uses
-                <code> #7c3aed</code> with speed 0.86, detail 8 and
-                brightness 1.5. Mouse reaction and click swirls are disabled;
-                there are no pointer listeners or interaction textures. Source
-                is pinned to revision <code>d01aa91</code>, with its David Haz
-                attribution and MIT + Commons Clause notice preserved at
+                <code> #7c3aed</code> with speed 0.86, detail 8 and brightness
+                1.5. Mouse reaction and click swirls are disabled; there are no
+                pointer listeners or interaction textures. Source is pinned to
+                revision <code>d01aa91</code>, with its David Haz attribution
+                and MIT + Commons Clause notice preserved at
                 <code> public/licenses/react-bits.txt</code>.
               </p>
               <p>
-                Dark Mode paint order is deliberate: the field first receives a light
+                Dark Mode paint order is deliberate: the field first receives a
+                light
                 <strong> 4px blur</strong>, then Pink300 at exactly
                 <strong> 21% opacity</strong>, then Purple900 at exactly
                 <strong> 69% opacity</strong>. Only the canvas blurs; text,
                 cards and controls remain sharp. A 12px overscan keeps blurred
                 edges outside the viewport. The frozen
                 <code> APP_IRIDESCENCE</code> settings and shared
-                <code> APP_CANVAS_OVERLAY</code> keep the live field and fallback
-                washes in agreement. The ready layer contains both the opaque
-                shader and its washes, preventing an extra tint over the still
-                when WebGL is unavailable.
+                <code> APP_CANVAS_OVERLAY</code> keep the live field and
+                fallback washes in agreement. The ready layer contains both the
+                opaque shader and its washes, preventing an extra tint over the
+                still when WebGL is unavailable.
               </p>
               <p>
                 Hidden documents and offscreen backgrounds pause their animation
@@ -1201,14 +1202,15 @@ export function DeveloperGuidePage() {
                 <code> {APP_LIGHT_CANVAS.foreground}</code> copy and muted Plum
                 <code> {APP_LIGHT_CANVAS.mutedForeground}</code>. A 90% paper
                 glaze bounds the entire shader before quiet Rose/Lilac radial
-                reflections. Unit checks exhaust every independent RGB bound
-                and radial extreme for normal-copy contrast, including fallback
+                reflections. Unit checks exhaust every independent RGB bound and
+                radial extreme for normal-copy contrast, including fallback
                 colors. The same registry supplies pre-hydration, loading,
                 offline and unsupported-WebGL views and mode-aware browser
                 chrome. No shader reinitialization is needed when mode changes.
-                Semantic cards, dialogs, menus and reading panels follow Appearance.
-                Mobile dock fades, medication artwork, check-in motion and the
-                notification surface remain independent of the root field.
+                Semantic cards, dialogs, menus and reading panels follow
+                Appearance. Mobile dock fades, medication artwork, check-in
+                motion and the notification surface remain independent of the
+                root field.
               </p>
             </Detail>
             <Detail title="A Dock That Leaves Room" context="Mobile Actions">
@@ -1272,42 +1274,42 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 TodayActionButton gives prominent page actions and dialog
-                submissions a satin
-                surface while retaining the native PrimaryButton host, 80px
-                height and intake-card 21px corners. The independent skin turns
-                off both old moving-rim renderers. A 10px inward frosted
-                surround doubles the original 5px band without enlarging the
-                measured hit target. The inner face follows the outer curve
-                with an 11px radius and a fine Pink400 border at 29% opacity.
-                Its former bright reflections are replaced by restrained
-                Violet400 at 5% in the upper left and Pink500 at 6% in the lower
-                right. Soft directional contact shadows retain the raised face.
+                submissions a satin surface while retaining the native
+                PrimaryButton host, 80px height and intake-card 21px corners.
+                The independent skin turns off both old moving-rim renderers. A
+                10px inward frosted surround doubles the original 5px band
+                without enlarging the measured hit target. The inner face
+                follows the outer curve with an 11px radius and a fine Pink400
+                border at 29% opacity. Its former bright reflections are
+                replaced by restrained Violet400 at 5% in the upper left and
+                Pink500 at 6% in the lower right. Soft directional contact
+                shadows retain the raised face.
               </p>
               <p>
-                TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs.
-                Dark mode uses a pale lilac face with deep plum text; light mode
-                uses a rich plum face with pale lilac text. Supporting copy and
-                the arrow use a quieter, readable ink in the same family. The
+                TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
+                mode uses a pale lilac face with deep plum text; light mode uses
+                a rich plum face with pale lilac text. Supporting copy and the
+                arrow use a quieter, readable ink in the same family. The
                 original Tablets SVG, Log Intake label, dot, Jot it! aside and
                 directional arrow remain; the same 23px leading glyph now rests
                 in a 38px soft inset well. Its entrance and the content entrance
                 retain independent transform owners. Mobile keeps one centered
                 content row down to 320px and no hover feedback. Fine-pointer
                 desktop hover adjusts only luminance and shadow; reduced motion
-                removes those transitions, and reduced transparency replaces
-                the frosted base with opaque paint.
+                removes those transitions, and reduced transparency replaces the
+                frosted base with opaque paint.
               </p>
               <p>
                 MedicationActionButton reuses this exact component for Add
-                Medication with its existing creation symbol, label, dot,
-                Set Up aside and arrow. DialogPrimaryButton composes the same
-                satin component, 80px height, 21px corners, inset icon well and
+                Medication with its existing creation symbol, label, dot, Set Up
+                aside and arrow. DialogPrimaryButton composes the same satin
+                component, 80px height, 21px corners, inset icon well and
                 directional arrow for Save Medication, intake saves, check-ins,
                 goals, preferences and sign-in. Explicit pending and custom
                 glyphs retain their native submission behavior. Ordinary small
-                controls and SecondaryButton keep
-                their semantic variants; the new surface is scoped to the
-                prominent page actions and the matching toolbar family.
+                controls and SecondaryButton keep their semantic variants; the
+                new surface is scoped to the prominent page actions and the
+                matching toolbar family.
               </p>
               <p>
                 IntakeAction reserves its final geometry before its own
@@ -1342,50 +1344,46 @@ export function DeveloperGuidePage() {
               <p>
                 PageActionDock fixes both the mobile intake action and Add
                 Medication directly to the document body, with the same fade
-                stack, gutters, safe-area spacing and secondary note below.
-                The medication note reads “Your medications, your defaults,
-                your way.” Desktop places each action in the normal page flow
-                at a maximum width of 446px.
-                ResizeObserver measures its complete height, including a wrapped
-                summary, text sizing and safe-area padding. That height plus
-                24px drives both the page’s bottom clearance and the viewport’s
-                scroll padding, so the final entry and keyboard focus can clear
-                it. Short windows reduce the dock’s outer padding to preserve
-                reading room while retaining the control’s size and safe-area
-                inset.
+                stack, gutters, safe-area spacing and secondary note below. The
+                medication note reads “Your medications, your defaults, your
+                way.” Desktop places each action in the normal page flow at a
+                maximum width of 446px. ResizeObserver measures its complete
+                height, including a wrapped summary, text sizing and safe-area
+                padding. That height plus 24px drives both the page’s bottom
+                clearance and the viewport’s scroll padding, so the final entry
+                and keyboard focus can clear it. Short windows reduce the dock’s
+                outer padding to preserve reading room while retaining the
+                control’s size and safe-area inset.
               </p>
               <p>
                 Two pointer-inert layers soften the page behind the fixed mobile
                 action. A long veil reaches 148% of the dock height: Plum mixed
                 with 15% Purple900 starts at 56% opacity and tapers through six
                 gentle stops to complete transparency. A shorter wash reaches
-                118%, placing Fuchsia900 at 12% near the lower left and Violet900
-                at 14% near the lower right, then masking both away above the
-                summary. This replaces the former four-layer stack, which
-                approached full opacity at the bottom. Light Mode uses sunken
-                Rose/Lilac paper at 68% with matching Rose and Lilac washes.
-                The decorative layers add no layout height or input targets;
-                safe-area clearance, page scroll reserve and the measured dock
-                stay attached to the same fixed parent. Desktop has no mobile
-                fade layers.
+                118%, placing Fuchsia900 at 12% near the lower left and
+                Violet900 at 14% near the lower right, then masking both away
+                above the summary. This replaces the former four-layer stack,
+                which approached full opacity at the bottom. Light Mode uses
+                sunken Rose/Lilac paper at 68% with matching Rose and Lilac
+                washes. The decorative layers add no layout height or input
+                targets; safe-area clearance, page scroll reserve and the
+                measured dock stay attached to the same fixed parent. Desktop
+                has no mobile fade layers.
               </p>
               <p>
                 Today also has a shorter, bright fade from the document top to
                 the upper edge of the Wake-Up time value. Lilac and Pink200
-                supply its light, with a faint Rose wash near the top right.
-                The entire treatment uses 70% of the bottom fade’s strength:
-                39.2% in Dark Mode and 47.6% in Light Mode. Its absolute paint
-                scrolls away with the header. ResizeObserver, viewport changes
-                and font readiness keep its endpoint aligned without changing
-                the page layout or intercepting input. The Medications page
-                reuses PageTopFade with its heading as the measured endpoint.
-                Both top fades are hidden at desktop widths.
+                supply its light, with a faint Rose wash near the top right. The
+                entire treatment uses 70% of the bottom fade’s strength: 39.2%
+                in Dark Mode and 47.6% in Light Mode. Its absolute paint scrolls
+                away with the header. ResizeObserver, viewport changes and font
+                readiness keep its endpoint aligned without changing the page
+                layout or intercepting input. The Medications page reuses
+                PageTopFade with its heading as the measured endpoint. Both top
+                fades are hidden at desktop widths.
               </p>
             </Detail>
-            <Detail
-              title="Canvas & Color Layers"
-              context="Intake Cards"
-            >
+            <Detail title="Canvas & Color Layers" context="Intake Cards">
               <p>
                 Intake, Morning/Evening check-in, medication-library and Past
                 Days cards share <code>MedicationCardBackground</code> and the
@@ -1418,8 +1416,8 @@ export function DeveloperGuidePage() {
                 same paint layers without adopting intake-only interaction or
                 animation markers. Medication library cards also share the
                 intake icon rail, quantity marker, ingredient typography and
-                dose alignment; their values describe saved defaults rather
-                than an already-recorded dose. On Today, a separate native link
+                dose alignment; their values describe saved defaults rather than
+                an already-recorded dose. On Today, a separate native link
                 overlays the main artwork and opens that medication’s detail
                 route. The rest of the card remains an edit button, with no
                 nested interactive elements. A folded group first reveals on
@@ -1431,16 +1429,16 @@ export function DeveloperGuidePage() {
                 21px below 360px, and 32px from 640px. Its 44px/48px artwork
                 stage and saved-count summary align on the same centered row.
                 Below it, the 14px/500 library heading states the total
-                medication count, opposite a centered, noninteractive summary
-                of active and archived counts. There is no Active button or
-                saved archive-view filter: all definitions remain visible,
-                active first and usage-ranked within each status. A compact
-                Archived divider identifies the later group; its cards remain
-                editable and can be restored from the usual editor. Explicit
-                medication and ingredient journal references keep their own
-                query filtering. The notice that edits update all past logs
-                uses an explicit 37%-opacity card surface without dimming its
-                icon or text.
+                medication count, opposite a centered, noninteractive summary of
+                active and archived counts. There is no Active button or saved
+                archive-view filter: all definitions remain visible, active
+                first and usage-ranked within each status. A compact Archived
+                divider identifies the later group; its cards remain editable
+                and can be restored from the usual editor. Explicit medication
+                and ingredient journal references keep their own query
+                filtering. The notice that edits update all past logs uses an
+                explicit 37%-opacity card surface without dimming its icon or
+                text.
               </p>
               <p>
                 After page-entry readiness, the artwork tile grows and fades
@@ -1478,24 +1476,24 @@ export function DeveloperGuidePage() {
               <p>
                 Outside Today, the two 46px page icon controls use a Pink950
                 foundation with a separate Mauve900 overlay at exactly 67% in
-                both color modes.
-                Their icons and both inward edges use full-opacity Pink400.
-                The local headerButton paint preserves its 3px inward bevel,
-                14px corners, 32px glass blur and restrained contact shadow.
-                Hover, open and keyboard-focus edges retain the same Pink400
-                pigment. Glyphs stay still during hover; navigation, Today
-                links and directional pull gestures keep their original behavior.
+                both color modes. Their icons and both inward edges use
+                full-opacity Pink400. The local headerButton paint preserves its
+                3px inward bevel, 14px corners, 32px glass blur and restrained
+                contact shadow. Hover, open and keyboard-focus edges retain the
+                same Pink400 pigment. Glyphs stay still during hover;
+                navigation, Today links and directional pull gestures keep their
+                original behavior.
               </p>
               <p>
-                These overrides live only in today-controls.module.css, so
-                the main action and critical loader keep their own paint. The
-                underlying HEADER_CONTROL_PAINT still aliases TODAY_CONTROL_PAINT
-                and supplies literal light/dark pigments before hydration.
-                Tablet score lines and pull feedback use the opaque composite
-                of 67% Mauve900 and 33% Pink950 to match their button face.
-                Keyboard focus retains its offset ring and dark backing;
-                disabled states retain native semantics. Hit areas, gesture
-                thresholds and animation ownership are unchanged.
+                These overrides live only in today-controls.module.css, so the
+                main action and critical loader keep their own paint. The
+                underlying HEADER_CONTROL_PAINT still aliases
+                TODAY_CONTROL_PAINT and supplies literal light/dark pigments
+                before hydration. Tablet score lines and pull feedback use the
+                opaque composite of 67% Mauve900 and 33% Pink950 to match their
+                button face. Keyboard focus retains its offset ring and dark
+                backing; disabled states retain native semantics. Hit areas,
+                gesture thresholds and animation ownership are unchanged.
               </p>
               <p>
                 Today alone uses three centered header columns: a 46px control,
@@ -1522,17 +1520,16 @@ export function DeveloperGuidePage() {
                 transforms and tablet loops stay on their existing inner owners.
               </p>
               <p>
-                Header tablet circles use the new opaque mixed ink for fill
-                and stroke; their scores use the solid coffee-tile base rather
-                than its layered background value. These scoped rules account
-                for
+                Header tablet circles use the new opaque mixed ink for fill and
+                stroke; their scores use the solid coffee-tile base rather than
+                its layered background value. These scoped rules account for
                 BrandMark’s inline palette, so its nested artwork cannot retain
                 the old Pink by accident. The navigation glyph follows the same
                 mixed foreground. The menu masthead uses its destination tiles’
                 surface and ink, while sign-in branding keeps its own palette.
                 The loading core shares the page controls’ new face and rims.
-                The page header mark stays 34.5px in its 46px control. The
-                panel masthead’s separate 32.4px/43.2px pair keeps the same
+                The page header mark stays 34.5px in its 46px control. The panel
+                masthead’s separate 32.4px/43.2px pair keeps the same
                 three-quarter ratio. Orbit, approach and spin still share the
                 same base keyframes. A 7.2-second header cycle runs at
                 two-thirds of the menu’s 4.8-second speed, with unchanged
@@ -1585,33 +1582,34 @@ export function DeveloperGuidePage() {
                 own compact tablet duet, separate from the header and menu brand
                 loops. Its existing phase handoff remains attached to committed
                 downward pulls and their guarded full-document reload. Pressing
-                the branding button opens Today instead; the navigation menu
-                has no separate refresh action.
+                the branding button opens Today instead; the navigation menu has
+                no separate refresh action.
               </p>
               <p>
                 A rightward branding pull opens Medications with in-app
                 navigation and remembers it as the last screen. Already on
                 Medications, it only settles back without navigating, scrolling
                 or changing drafts. Both gestures retain an 8px slop, 1.5 axis
-                dominance and a resisted offset capped at 84px, with a deliberate 340px release
-                threshold. Each pointer-down captures the available physical
-                travel with a 16px screen-edge inset; a narrow phone or short
-                landscape viewport can use a shorter threshold so the gesture
-                remains reachable. Viewport changes cannot move that captured
-                goal during the pull. After slop, intent can change freely
-                between down and right; a neutral diagonal is recoverable and
-                does not cancel the gesture. Only reaching the threshold commits
-                the chosen axis. That lock survives opposite-axis drift and even
-                retraction to zero, so a later direction cannot replace it.
-                Release still requires reaching the captured threshold along the
-                locked axis; pulling back cancels the action without unlocking.
-                Coalesced samples are processed in order and final pointer-up
-                coordinates pass through the same transition, preserving fast
-                threshold crossings between paints. Pointer capture tolerates
-                interrupted Safari touches; the completed gesture is cleared
-                before releasing capture. The following dragged or cancelled
-                pointer click is suppressed; ordinary taps and keyboard
-                activation open Today through the same native button.
+                dominance and a resisted offset capped at 84px, with a
+                deliberate 340px release threshold. Each pointer-down captures
+                the available physical travel with a 16px screen-edge inset; a
+                narrow phone or short landscape viewport can use a shorter
+                threshold so the gesture remains reachable. Viewport changes
+                cannot move that captured goal during the pull. After slop,
+                intent can change freely between down and right; a neutral
+                diagonal is recoverable and does not cancel the gesture. Only
+                reaching the threshold commits the chosen axis. That lock
+                survives opposite-axis drift and even retraction to zero, so a
+                later direction cannot replace it. Release still requires
+                reaching the captured threshold along the locked axis; pulling
+                back cancels the action without unlocking. Coalesced samples are
+                processed in order and final pointer-up coordinates pass through
+                the same transition, preserving fast threshold crossings between
+                paints. Pointer capture tolerates interrupted Safari touches;
+                the completed gesture is cleared before releasing capture. The
+                following dragged or cancelled pointer click is suppressed;
+                ordinary taps and keyboard activation open Today through the
+                same native button.
               </p>
               <p>
                 The original getIntakeBrandStyle() retains its two-value
@@ -1723,18 +1721,17 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Clicking or pressing the branding button opens the clean Today
-                route <code>/</code>, dropping any current query or fragment.
-                It first calls{" "}
-                <code>{'workspace.rememberDestination("/")'}</code>, preserving
-                raw drafts while clearing Today’s remembered dialog and making
-                this explicit destination take precedence over screen resume.
-                Unavailability or a pending gesture release blocks another
-                activation. Taps and keyboard activation do not reload the
-                document. A rightward pull still opens Medications; when already
-                there, its release plays the existing return burst without
-                navigating, scrolling or changing drafts. A committed downward
-                release enters the full-page refresh handoff, including its
-                separate 1500ms outbound hold. Native button identity, refs,
+                route <code>/</code>, dropping any current query or fragment. It
+                first calls <code>{'workspace.rememberDestination("/")'}</code>,
+                preserving raw drafts while clearing Today’s remembered dialog
+                and making this explicit destination take precedence over screen
+                resume. Unavailability or a pending gesture release blocks
+                another activation. Taps and keyboard activation do not reload
+                the document. A rightward pull still opens Medications; when
+                already there, its release plays the existing return burst
+                without navigating, scrolling or changing drafts. A committed
+                downward release enters the full-page refresh handoff, including
+                its separate 1500ms outbound hold. Native button identity, refs,
                 keyboard handling and dragged-click suppression stay intact.
               </p>
               <p>
@@ -1782,40 +1779,38 @@ export function DeveloperGuidePage() {
                 Dark Mode retains the 87%-alpha Fuchsia900 foundation, 31% cup
                 surface and brighter Purple-mixed glyph. Light Mode uses pale
                 Rose glass with deeper raspberry artwork and soft reflected
-                light. Critical declarations are generated from the same
-                frozen paint object, with literal fallbacks for every Tailwind
-                and palette color before app CSS arrives. The cup surface stays
-                on its own clipped layer; plain base and score colors remain
-                valid in SVG strokes and color-mix. The full-screen backdrop
-                instead shares the application’s violet Iridescence fallback
-                beneath Pink300 at 21% and Purple900 at 69% in Dark Mode, and
-                the luminous paper glaze in Light Mode.
-                Header and loading artwork share the same paint
-                under system and explicit Appearance preferences; external
-                styles do not replace it with the old Purple action face.
-                Local artwork glow and particles retain their own choreography
-                without changing the root field’s clock.
+                light. Critical declarations are generated from the same frozen
+                paint object, with literal fallbacks for every Tailwind and
+                palette color before app CSS arrives. The cup surface stays on
+                its own clipped layer; plain base and score colors remain valid
+                in SVG strokes and color-mix. The full-screen backdrop instead
+                shares the application’s violet Iridescence fallback beneath
+                Pink300 at 21% and Purple900 at 69% in Dark Mode, and the
+                luminous paper glaze in Light Mode. Header and loading artwork
+                share the same paint under system and explicit Appearance
+                preferences; external styles do not replace it with the old
+                Purple action face. Local artwork glow and particles retain
+                their own choreography without changing the root field’s clock.
               </p>
               <p>
-                A loading-only veil reaches 79% opacity outside a
-                circular focus opening. The inner 128px radius is completely
-                clear; intermediate 12%, 40% and 68% alpha stops feather toward
-                an outer radius of <code>clamp(168px, 49vmin, 460px)</code>.
-                Dark Mode uses Mauve900 and Light Mode uses pale Rose/Lilac
-                paper, preserving the core’s breathing room while larger screens
-                retain a broader soft transition.
-                A second, faint Violet300 8% / Pink300 4.5% reflected halo
-                breathes between 68% and full layer opacity over 8.8 seconds,
-                beginning on the existing loop clock. Reduced motion settles it
-                and retains the mode-aware veil.
+                A loading-only veil reaches 79% opacity outside a circular focus
+                opening. The inner 128px radius is completely clear;
+                intermediate 12%, 40% and 68% alpha stops feather toward an
+                outer radius of <code>clamp(168px, 49vmin, 460px)</code>. Dark
+                Mode uses Mauve900 and Light Mode uses pale Rose/Lilac paper,
+                preserving the core’s breathing room while larger screens retain
+                a broader soft transition. A second, faint Violet300 8% /
+                Pink300 4.5% reflected halo breathes between 68% and full layer
+                opacity over 8.8 seconds, beginning on the existing loop clock.
+                Reduced motion settles it and retains the mode-aware veil.
               </p>
               <p>
                 Shared focus coordinates align the veil, existing aura and
-                scene: 50% / 44% normally, 50% / 39% on short screens, and
-                27% / 42% in short landscape. The veil is a separate passive
-                layer below all foreground artwork, copy and links, including
-                the charged face and particles. Direct radial alpha gradients
-                work in critical CSS before app styles arrive, without mask or
+                scene: 50% / 44% normally, 50% / 39% on short screens, and 27% /
+                42% in short landscape. The veil is a separate passive layer
+                below all foreground artwork, copy and links, including the
+                charged face and particles. Direct radial alpha gradients work
+                in critical CSS before app styles arrive, without mask or
                 backdrop-filter support. The shade is present immediately;
                 neither its paint nor its decorative halo changes the original
                 loading, release, scroll or handoff clock.
@@ -1979,41 +1974,41 @@ export function DeveloperGuidePage() {
                 recorded amount. MedicationQuantityBadge now displays the total
                 as × n in primary ink at the artwork’s top-left, without a badge
                 background: 2.5 units reads × 2.5, not +1.5. Its 10px caption
-                uses the stored number directly; long legacy values wrap
-                instead of shrinking to 7px, rounding or being ellipsized.
-                A separate tooltip uses that same exact number. Ordinary labels
-                sit at top 1px/left 0 within the 56px rail, clear of the pill’s
-                glyph. Labels longer than nine characters get an in-flow strip
-                above the 48px artwork; the settle response follows the glyph’s
-                center rather than the enlarged rail.
-                Non-unit positive fractions are also represented; an ordinary
-                quantity of one needs no extra label, and invalid/nonpositive
-                values omit it. The old top-left form overlay moves into the
-                heading rail. MedicationCardIconFrame now hosts both medication
-                glyphs and the animated coffee/moon artwork. Intake, check-in,
-                medication-library and Past Days artwork use a 6px inward glass rim
-                at 28% combined alpha (20% selected color plus 8% primary ink),
-                with 96px standard/Safari backdrop blur. Its opaque face is
-                clipped to a 6px-padded content box to expose the glass ring.
+                uses the stored number directly; long legacy values wrap instead
+                of shrinking to 7px, rounding or being ellipsized. A separate
+                tooltip uses that same exact number. Ordinary labels sit at top
+                1px/left 0 within the 56px rail, clear of the pill’s glyph.
+                Labels longer than nine characters get an in-flow strip above
+                the 48px artwork; the settle response follows the glyph’s center
+                rather than the enlarged rail. Non-unit positive fractions are
+                also represented; an ordinary quantity of one needs no extra
+                label, and invalid/nonpositive values omit it. The old top-left
+                form overlay moves into the heading rail.
+                MedicationCardIconFrame now hosts both medication glyphs and the
+                animated coffee/moon artwork. Intake, check-in,
+                medication-library and Past Days artwork use a 6px inward glass
+                rim at 28% combined alpha (20% selected color plus 8% primary
+                ink), with 96px standard/Safari backdrop blur. Its opaque face
+                is clipped to a 6px-padded content box to expose the glass ring.
                 The 1px saturated family-400/500 inner rim stays at 78%, inset
                 6.75px with a 9.25px radius and a 0.75px gap. Morning uses a
                 warm Rose400 identity while Evening uses a cool Violet400
-                identity through the same
-                MedicationCardBase, card-frame borders, 96px glass pane and
-                the same faint selected-color tint as a matching intake. Both
-                share the mode-specific washes, light reading veil and
-                reduced-transparency fallback. Their former independent
-                background and drawn icon-frame overlays are removed; coffee
-                steam, moon movement and the delayed ambient handoff remain.
-                Standalone previews retain their 3.5px outer frame. These borders do not
-                enlarge the 48px tile. One inner entrance owner animates the
-                whole fan, while the quantity label enters separately and
-                grouped disclosure never remounts its frames.
+                identity through the same MedicationCardBase, card-frame
+                borders, 96px glass pane and the same faint selected-color tint
+                as a matching intake. Both share the mode-specific washes, light
+                reading veil and reduced-transparency fallback. Their former
+                independent background and drawn icon-frame overlays are
+                removed; coffee steam, moon movement and the delayed ambient
+                handoff remain. Standalone previews retain their 3.5px outer
+                frame. These borders do not enlarge the 48px tile. One inner
+                entrance owner animates the whole fan, while the quantity label
+                enters separately and grouped disclosure never remounts its
+                frames.
               </p>
               <p>
-                The recorded-intake heading rail starts with an atomic route
-                and physical-form pair, using the normal 2px inter-icon gap.
-                A dot with balanced side spacing separates this pair from the
+                The recorded-intake heading rail starts with an atomic route and
+                physical-form pair, using the normal 2px inter-icon gap. A dot
+                with balanced side spacing separates this pair from the
                 medication categories. Entries without categories omit the dot.
                 Every glyph uses a 13px viewport, primary ink, no fill and a
                 2.5px stroke, including custom route SVGs. The bounded rail
@@ -2219,27 +2214,27 @@ export function DeveloperGuidePage() {
                 minimum 32px rail clearance separates the text from a 14px
                 CircleCheckBig at a 14px trailing inset. The shared SelectItem
                 accepts an optional indicator for these two pickers; Route and
-                other selects retain
-                their existing presentation. Selected and keyboard-focused
-                options have no enclosing border, outline or shadow. Keyboard
-                focus instead underlines the label and strengthens its warm
-                fill. Other sits below a short inset separator and an 8px gap,
-                with quieter text until selected. Categories lists all 19
-                options without a search field in a 256px popup, constrained to
-                the viewport. Its fixed header and footer sit outside the
-                listbox; only the options scroll. An inset separator precedes
-                the footer with 8px spacing on each vertical side. Clear and
-                Done share subtle 28px foreground-tinted controls with compact
-                labels and tiny leading Trash/CheckCheck icons. Clear always
-                appends a dot and the selected count, including 0, and is
-                disabled when empty. The centered “19 options” count stays
-                between the buttons. Multiple selection keeps the menu open,
-                normalizes the stored order and preserves native typeahead,
-                Escape and focus return. Old drafts with a category search
-                string still restore their selections; that obsolete string is
-                ignored. Medication choices keep their saved artwork, exact
-                strengths and contextual “This intake” caption. Quantity and
-                draft behavior stay connected to the existing controls.
+                other selects retain their existing presentation. Selected and
+                keyboard-focused options have no enclosing border, outline or
+                shadow. Keyboard focus instead underlines the label and
+                strengthens its warm fill. Other sits below a short inset
+                separator and an 8px gap, with quieter text until selected.
+                Categories lists all 19 options without a search field in a
+                256px popup, constrained to the viewport. Its fixed header and
+                footer sit outside the listbox; only the options scroll. An
+                inset separator precedes the footer with 8px spacing on each
+                vertical side. Clear and Done share subtle 28px
+                foreground-tinted controls with compact labels and tiny leading
+                Trash/CheckCheck icons. Clear always appends a dot and the
+                selected count, including 0, and is disabled when empty. The
+                centered “19 options” count stays between the buttons. Multiple
+                selection keeps the menu open, normalizes the stored order and
+                preserves native typeahead, Escape and focus return. Old drafts
+                with a category search string still restore their selections;
+                that obsolete string is ignored. Medication choices keep their
+                saved artwork, exact strengths and contextual “This intake”
+                caption. Quantity and draft behavior stay connected to the
+                existing controls.
               </p>
               <p>
                 Shared dialogs are explicitly modal. The document root declares
@@ -2264,29 +2259,29 @@ export function DeveloperGuidePage() {
                 Shared dialog and drawer headers use 22px titles on mobile and
                 24px from 768px, without leading title artwork. Context follows
                 beneath the title in 12px copy without a dot or slash, and
-                visible descriptions align to the title’s text column.
-                Reader and writing-help headers also begin with text; body
-                artwork and action icons stay in place. The headerActions slot
-                places native controls beside Close; check-in Reset Draft uses
-                the same 44px styling. Its footer keeps draft feedback without a
-                duplicate Reset link. Native dismissal, focus return and scroll
-                memory remain with the existing primitives.
+                visible descriptions align to the title’s text column. Reader
+                and writing-help headers also begin with text; body artwork and
+                action icons stay in place. The headerActions slot places native
+                controls beside Close; check-in Reset Draft uses the same 44px
+                styling. Its footer keeps draft feedback without a duplicate
+                Reset link. Native dismissal, focus return and scroll memory
+                remain with the existing primitives.
               </p>
               <p>
                 Dialog heading sections use 7/12 of their previous top padding,
                 a 5/12 reduction, while keeping their text and action sizes.
-                Headers are part of the content flow: title, supporting copy
-                and header controls scroll out of view together. Mobile drawers
+                Headers are part of the content flow: title, supporting copy and
+                header controls scroll out of view together. Mobile drawers
                 place the header inside the same remembered scroller as the
                 form, matching desktop dialogs. Edit Intake omits the duplicate
                 Update Entry context and keeps its existing description directly
                 beneath the title. Heading artwork is omitted; medication
                 selectors and functional action icons retain their purpose.
                 Reader, writing-help and confirmation dialogs use the same
-                compact top-spacing rule and whole-content scrolling.
-                Shared modal scroll hosts disable browser scroll anchoring, so
-                header reflow at the drawer/dialog breakpoint cannot overwrite
-                a remembered numeric position before the new layout restores it.
+                compact top-spacing rule and whole-content scrolling. Shared
+                modal scroll hosts disable browser scroll anchoring, so header
+                reflow at the drawer/dialog breakpoint cannot overwrite a
+                remembered numeric position before the new layout restores it.
               </p>
               <p>
                 Medication dialogs use their own slightly higher, compact header
@@ -2362,11 +2357,11 @@ export function DeveloperGuidePage() {
                 Shared subsection backplates use the semantic surface family.
                 Dark cards and popovers use opaque Plum backplates; related
                 reading panels retain 94% Plum glass. Light cards and popovers
-                use opaque rose/lilac paper with deep Plum copy. Foregrounds remain opaque
-                and independently paired. Registry tests composite translucent
-                panels over the moving ramps and neutral extremes, then check
-                normal text at 4.5:1 or better. Component decoration may add
-                depth, but it must not replace that readable base.
+                use opaque rose/lilac paper with deep Plum copy. Foregrounds
+                remain opaque and independently paired. Registry tests composite
+                translucent panels over the moving ramps and neutral extremes,
+                then check normal text at 4.5:1 or better. Component decoration
+                may add depth, but it must not replace that readable base.
               </p>
               <p>
                 Past-day links now reuse the intake card’s full 80px frame, 21px
@@ -2638,9 +2633,9 @@ export function DeveloperGuidePage() {
             Light Mode uses opaque reading paper with soft Rose/Lilac tints,
             deep Plum text and stronger status colors. The bell keeps its dark
             artwork tile and light outline; only its check uses the success
-            pigment. Expanded previews, footer actions and countdown badges
-            use the same paired reading roles. Surface changes never change
-            the stored timer, hold-to-pause behavior or Undo ownership.
+            pigment. Expanded previews, footer actions and countdown badges use
+            the same paired reading roles. Surface changes never change the
+            stored timer, hold-to-pause behavior or Undo ownership.
           </p>
           <GuideNotifications>
             <GuideNotificationDemo />
@@ -2822,13 +2817,15 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Swallowed intake routes use the project-owned
-                <code> SwallowIntake</code> mark. Its mouth arch, separate teeth
-                line, tongue and jaw are defined once as Lucide-compatible
+                <code> MouthOpen</code> mark. Its outer lip, mouth opening,
+                separate teeth and tongue contours are defined once as
+                Lucide-compatible
                 <code> IconNode</code> geometry and are also checked in as a
                 24×24 SVG under <code>public/icons/intake-routes</code>. The
-                component keeps Lucide&apos;s currentColor stroke, no-fill geometry,
-                rounded caps and joins, plus caller-controlled stroke width.
-                Because every historical swallowed record stores the stable
+                component keeps Lucide&apos;s currentColor stroke, no-fill
+                geometry, rounded caps and joins, plus caller-controlled stroke
+                width. Because every historical swallowed record stores the
+                stable
                 <code> oral</code> route key, the shared renderer updates old
                 entries, cards, previews and selectors without rewriting data.
               </p>
@@ -2982,10 +2979,10 @@ export function DeveloperGuidePage() {
                   uses 11px text above its 13.5px time, separated by 2px; quiet
                   rules flank the time. Their 12:30 and 23:30 defaults are
                   display-only. Morning’s Got up field updates the first marker;
-                  an existing saved Evening bedtime can inform the last.
-                  Evening no longer offers a bedtime input. Unknown values
-                  retain the display fallback. These clocks do not
-                  create answers, reorder intakes or change the 06:00 boundary.
+                  an existing saved Evening bedtime can inform the last. Evening
+                  no longer offers a bedtime input. Unknown values retain the
+                  display fallback. These clocks do not create answers, reorder
+                  intakes or change the 06:00 boundary.
                 </li>
                 <li>
                   Consecutive intakes within a rolling 13-minute gap share a
@@ -3010,43 +3007,43 @@ export function DeveloperGuidePage() {
                   MorningCoffee keeps a filled pale Rose200 cup still beneath
                   three bright Pink/Lilac steam curls. The latest pass shortens
                   their remaining height by another quarter around the fixed
-                  y=29 mug rim, keeping separated
-                  lanes, thicker guide strokes and travelling highlighted threads.
-                  The threads fade naturally along their paths; there are no
-                  fireworks, pouring pot or large rising glow plume. A restrained
-                  rim warmth and the steam reveal wait for the shared ambient
-                  handoff, 300ms after the main icon settles. The curls reveal
-                  upward over one second, then retain their independent slow CSS
-                  clocks. Hidden/offscreen/dialog gates pause them in phase, and
-                  reduced motion shows settled artwork without a particle loop.
+                  y=29 mug rim, keeping separated lanes, thicker guide strokes
+                  and travelling highlighted threads. The threads fade naturally
+                  along their paths; there are no fireworks, pouring pot or
+                  large rising glow plume. A restrained rim warmth and the steam
+                  reveal wait for the shared ambient handoff, 300ms after the
+                  main icon settles. The curls reveal upward over one second,
+                  then retain their independent slow CSS clocks.
+                  Hidden/offscreen/dialog gates pause them in phase, and reduced
+                  motion shows settled artwork without a particle loop.
                 </li>
                 <li>
-                  EveningMoon owns its entrance and permanent motion together.
-                  A 2.4-second curved approach grows and rolls into the first
+                  EveningMoon owns its entrance and permanent motion together. A
+                  2.4-second curved approach grows and rolls into the first
                   floating swing, with matching pose, velocity and acceleration
                   at the handoff. The 10.8-second nonlinear loop slows near its
-                  raised turning points and
-                  gathers speed through the center; a small lagging tilt keeps
-                  the crescent from moving like a rigid metronome. Browser-native
-                  animation timelines preserve phase when the page is hidden,
-                  the card goes offscreen or a dialog opens, and are cancelled
-                  on unmount. The moon shares the mug’s pale Rose200 ink while
-                  retaining its Violet artwork frame. Short-lived colored stars
-                  keep their separate bounded scheduler and wait until the
-                  entrance has completed. Reduced motion shows a still crescent
-                  and static stars. No per-frame React render or JavaScript
-                  animation loop is needed. The sampled motion model is cached
-                  and immutable; focused unit checks protect the entrance
-                  handoff, loop seam, bounded travel and trailing tilt.
+                  raised turning points and gathers speed through the center; a
+                  small lagging tilt keeps the crescent from moving like a rigid
+                  metronome. Browser-native animation timelines preserve phase
+                  when the page is hidden, the card goes offscreen or a dialog
+                  opens, and are cancelled on unmount. The moon shares the mug’s
+                  pale Rose200 ink while retaining its Violet artwork frame.
+                  Short-lived colored stars keep their separate bounded
+                  scheduler and wait until the entrance has completed. Reduced
+                  motion shows a still crescent and static stars. No per-frame
+                  React render or JavaScript animation loop is needed. The
+                  sampled motion model is cached and immutable; focused unit
+                  checks protect the entrance handoff, loop seam, bounded travel
+                  and trailing tilt.
                 </li>
                 <li>
                   Check-in tiles retain their 1560ms arrival. Morning keeps its
                   spin-and-settle illustration response; its steam opens 300ms
                   later through the existing nonvisual ambient clock. Evening
                   receives a separate nonvisual entry signal at the tile’s
-                  start, so the moon’s own entrance flows directly into its
-                  loop instead of waiting for the older shared spin or ambient
-                  pause. Evening omits that shared symbol animation and settle
+                  start, so the moon’s own entrance flows directly into its loop
+                  instead of waiting for the older shared spin or ambient pause.
+                  Evening omits that shared symbol animation and settle
                   flourish. A keyed scene replays both clocks, while page/dialog
                   pauses hold their progress.
                 </li>
@@ -3055,74 +3052,73 @@ export function DeveloperGuidePage() {
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
                   flowing page background with distinct Rose400 morning and
-                  Violet400 evening identities. The shared
-                  5⅓px mixed rim and 2⅔px identity band paint inward; the
-                  identity alpha follows the light/dark recipe above. Filled
-                  coffee and crescent artwork distinguish the periods; their
-                  base and completion-meter surfaces share an opaque, very dark
-                  Pink/Plum mix (88% #210F25 with 12% Pink950). Both main
-                  symbols share the mug’s pale Rose200 ink on their dark
-                  period-specific surfaces in either appearance; the completion
-                  number retains its primary light ink and page headings retain
-                  their adaptive reading color. The Pink identity and artwork
-                  overrides are local to these cards, leaving medication and
-                  topbar colors independent. Steam, stars, entry motion, ambient
-                  loops and progress replay retain their own timing. Section
-                  dots use Pink500. Details and icon stages remain 56px, the
-                  tile 48px and symbol holder 30px. A single two-thirds scale
-                  on the illustration owner makes both scenes exactly one third
+                  Violet400 evening identities. The shared 5⅓px mixed rim and
+                  2⅔px identity band paint inward; the identity alpha follows
+                  the light/dark recipe above. Filled coffee and crescent
+                  artwork distinguish the periods; their base and
+                  completion-meter surfaces share an opaque, very dark Pink/Plum
+                  mix (88% #210F25 with 12% Pink950). Both main symbols share
+                  the mug’s pale Rose200 ink on their dark period-specific
+                  surfaces in either appearance; the completion number retains
+                  its primary light ink and page headings retain their adaptive
+                  reading color. The Pink identity and artwork overrides are
+                  local to these cards, leaving medication and topbar colors
+                  independent. Steam, stars, entry motion, ambient loops and
+                  progress replay retain their own timing. Section dots use
+                  Pink500. Details and icon stages remain 56px, the tile 48px
+                  and symbol holder 30px. A single two-thirds scale on the
+                  illustration owner makes both scenes exactly one third
                   smaller, including their steam, stars and motion travel. The
                   moon’s 30px source becomes 20px visually without changing the
                   shared tile, card measurements, 11px artwork-to-copy clearance
-                  (7px below 360px) or 8px trailing inset.
-                  SavedCheckInHeading now separates opening history from save
-                  history. Its primary HH:mm is the first recorded opening on
-                  this device, using the intake time class: 13.5px/700
-                  rounded-system type at roughly 75% foreground visibility. The
-                  5ch time column and shared text gap lead the 15px/650 title
-                  with its 20px line box and 15px top inset. Unknown first
-                  openings display an em dash with an explanatory accessible
-                  label; createdAt is never substituted for an opening. Under
-                  the primary time, the latest successful updatedAt uses 9px/475
-                  type, 36% foreground visibility, a 12px line and 1px vertical
-                  gap. Only this saved-update display may fall back to a
-                  validated legacy createdAt. No valid save means no secondary
-                  timestamp. The heading shifts 3px left, or 2px below 360px.
-                  The static 11px/550 lower invitation starts on the title’s
-                  vertical line: “Still here. Take stock.” for Morning and
-                  “Survived? Leave notes.” for Evening. It never changes into a
-                  response excerpt or claims that a local edit has been saved.
-                  Both content rows remain single-line and truncate before the
-                  completion meter. The meter uses a 40px ring with rounded
-                  whole number centered alone in 9.208333px/625 type at full
-                  primary-ink opacity and a single-line height. There is no
-                  percent sign, caption or separate outside percentage. This
-                  remains a 29.1667% reduction from its 13px reference size,
-                  applied once. The background measures 40px across: the
-                  original 17px radius plus one third of the former 9px increase
-                  gives a 20px radius. The right component now uses{" "}
-                  <code>align-self: center</code> with zero top margin, placing
-                  that footprint 20px below the 80px card’s top edge; the
-                  heading retains its 15px inset. The Pink100–400 arc follows a
-                  quiet foreground track. Section dots use Pink500 pigment, at
-                  50% opacity while unfinished and 100% when complete. This
-                  single number replaces the old center spark/check. The meter
-                  is always present. With no saved record, no genuine draft
-                  change and no valid first-opening observation, the entire
-                  meter uses exactly opacity: calc(1 / 3) and a decorative 6%
-                  starter arc. The number and accessible completion remain 0,
-                  and no section dot is marked complete. An observed opening
-                  without edits restores full-strength presentation with a true
-                  zero-length arc and the number 0; opening still earns no
-                  completion credit. Saved responses and genuinely changed
-                  drafts retain normal presentation even when opening metadata
-                  is absent. The shared getCheckInCardProgress helper keeps its
-                  visible flag as a saved-or-changed-content signal; rendering
-                  no longer uses that flag to hide the meter. It projects valid
-                  raw draft groups independently: five visible Evening sections
-                  or five Morning groups, rounded to a whole percentage. It
-                  makes no API request and changes neither saved content nor
-                  timestamps. Both periods retain{" "}
+                  (7px below 360px) or 8px trailing inset. SavedCheckInHeading
+                  now separates opening history from save history. Its primary
+                  HH:mm is the first recorded opening on this device, using the
+                  intake time class: 13.5px/700 rounded-system type at roughly
+                  75% foreground visibility. The 5ch time column and shared text
+                  gap lead the 15px/650 title with its 20px line box and 15px
+                  top inset. Unknown first openings display an em dash with an
+                  explanatory accessible label; createdAt is never substituted
+                  for an opening. Under the primary time, the latest successful
+                  updatedAt uses 9px/475 type, 36% foreground visibility, a 12px
+                  line and 1px vertical gap. Only this saved-update display may
+                  fall back to a validated legacy createdAt. No valid save means
+                  no secondary timestamp. The heading shifts 3px left, or 2px
+                  below 360px. The static 11px/550 lower invitation starts on
+                  the title’s vertical line: “Still here. Take stock.” for
+                  Morning and “Survived? Leave notes.” for Evening. It never
+                  changes into a response excerpt or claims that a local edit
+                  has been saved. Both content rows remain single-line and
+                  truncate before the completion meter. The meter uses a 40px
+                  ring with rounded whole number centered alone in
+                  9.208333px/625 type at full primary-ink opacity and a
+                  single-line height. There is no percent sign, caption or
+                  separate outside percentage. This remains a 29.1667% reduction
+                  from its 13px reference size, applied once. The background
+                  measures 40px across: the original 17px radius plus one third
+                  of the former 9px increase gives a 20px radius. The right
+                  component now uses <code>align-self: center</code> with zero
+                  top margin, placing that footprint 20px below the 80px card’s
+                  top edge; the heading retains its 15px inset. The Pink100–400
+                  arc follows a quiet foreground track. Section dots use Pink500
+                  pigment, at 50% opacity while unfinished and 100% when
+                  complete. This single number replaces the old center
+                  spark/check. The meter is always present. With no saved
+                  record, no genuine draft change and no valid first-opening
+                  observation, the entire meter uses exactly opacity: calc(1 /
+                  3) and a decorative 6% starter arc. The number and accessible
+                  completion remain 0, and no section dot is marked complete. An
+                  observed opening without edits restores full-strength
+                  presentation with a true zero-length arc and the number 0;
+                  opening still earns no completion credit. Saved responses and
+                  genuinely changed drafts retain normal presentation even when
+                  opening metadata is absent. The shared getCheckInCardProgress
+                  helper keeps its visible flag as a saved-or-changed-content
+                  signal; rendering no longer uses that flag to hide the meter.
+                  It projects valid raw draft groups independently: five visible
+                  Evening sections or five Morning groups, rounded to a whole
+                  percentage. It makes no API request and changes neither saved
+                  content nor timestamps. Both periods retain{" "}
                   <code>hasCheckInDraftChanges</code> for content detection and{" "}
                   <code>getCheckInCardFeedback</code> for accessible saved/local
                   draft feedback and missing-section descriptions. There is no
@@ -3301,8 +3297,8 @@ export function DeveloperGuidePage() {
                 pane during scroll, resize and mobile viewport changes. Writing
                 Space intersects that room with its shared scroll viewport,
                 watches its scroll and hides suggestions for an offscreen caret.
-                Reduced
-                motion retains readable pending feedback without decoration.
+                Reduced motion retains readable pending feedback without
+                decoration.
               </p>
             </Detail>
             <Detail
@@ -3670,13 +3666,13 @@ export function DeveloperGuidePage() {
                 Different existing prose needs an exact version match; older
                 clients can create a record or save unchanged writing, but
                 cannot replace newer text without review. A stale version cannot
-                revive a deleted record. Both writing and full-form saves advance
-                versions monotonically, including writes in the same millisecond.
-                Submissions drain their own autosave before reading its latest
-                acknowledged base, and successful cleanup retains any observed
-                newer local draft. This protects against stale full-form saves;
-                it does not provide an archive of historical notes or an atomic
-                transaction across browser tabs.
+                revive a deleted record. Both writing and full-form saves
+                advance versions monotonically, including writes in the same
+                millisecond. Submissions drain their own autosave before reading
+                its latest acknowledged base, and successful cleanup retains any
+                observed newer local draft. This protects against stale
+                full-form saves; it does not provide an archive of historical
+                notes or an atomic transaction across browser tabs.
               </p>
               <p>
                 These rules bound background request frequency without promising
@@ -3848,15 +3844,14 @@ export function DeveloperGuidePage() {
                 Morning reuses the Evening card, responsive modal, Markdown
                 launcher and Accent save action. Both cards share the same
                 period-specific Rose400 or Violet400 identity, shared glass,
-                80px frame and two-row summary;
-                the coffee cup or Moon artwork identifies the period. The
-                journal editor stays first; structured sleep details follow in
-                three compact sections. Time in bed and Sleep efficiency form
-                one calculated summary row immediately above Save Check-In. A
-                1px separator at 13% foreground visibility follows the preceding
-                content after 10px. The summary has 12px of top padding, with
-                16px between its values and Save; both estimates remain one
-                compact row.
+                80px frame and two-row summary; the coffee cup or Moon artwork
+                identifies the period. The journal editor stays first;
+                structured sleep details follow in three compact sections. Time
+                in bed and Sleep efficiency form one calculated summary row
+                immediately above Save Check-In. A 1px separator at 13%
+                foreground visibility follows the preceding content after 10px.
+                The summary has 12px of top padding, with 16px between its
+                values and Save; both estimates remain one compact row.
               </p>
               <p>
                 The Morning dialog starts with Your Morning, Your Words,
@@ -3866,10 +3861,9 @@ export function DeveloperGuidePage() {
                 opening history is unknown. Both period cards retain their
                 Rose/Violet identity frames and dark artwork tiles, with
                 matching pale Rose200 cup/moon illustrations at two-thirds of
-                their former size.
-                The small 40px completion ring centers a 9.208333px/625 number
-                without a percent suffix. A valid opening restores normal
-                presentation but earns no completion credit;
+                their former size. The small 40px completion ring centers a
+                9.208333px/625 number without a percent suffix. A valid opening
+                restores normal presentation but earns no completion credit;
                 untouched/unobserved cards remain dimmed. Local drafts and saved
                 responses stay distinct, and both cards retain their shared 80px
                 frame and entry/ambient motion gates.
@@ -3997,38 +3991,39 @@ export function DeveloperGuidePage() {
                 Search matches labels, IDs, keywords and family names
                 immediately. Family chips sit above a three-row, two-column
                 scrolling palette with 44px choices; removable selections stay
-                beneath it even when a filter hides their matching options.
-                The selection limit remains four. rankDailyMoods counts each mood once per
-                saved check-in, then sorts by descending usage. Equal and unused
-                choices use a deterministic day-seeded shuffle, so ordering
-                feels fresh across days without jumping while someone is
-                choosing or differing between server and client. Shuffle gives
-                equal-frequency choices a new seeded mix while retaining usage
-                priority; search, family changes and a fresh mix reset only the
-                results viewport, never the chosen moods or parent form scroll.
+                beneath it even when a filter hides their matching options. The
+                selection limit remains four. rankDailyMoods counts each mood
+                once per saved check-in, then sorts by descending usage. Equal
+                and unused choices use a deterministic day-seeded shuffle, so
+                ordering feels fresh across days without jumping while someone
+                is choosing or differing between server and client. Shuffle
+                gives equal-frequency choices a new seeded mix while retaining
+                usage priority; search, family changes and a fresh mix reset
+                only the results viewport, never the chosen moods or parent form
+                scroll.
               </p>
               <p>
                 The default Evening completion catalog excludes Sleep, while an
                 explicit legacy sleep section remains queryable. Removing Sleep
                 &amp; Tonight from the form never deletes historical sleepHours
-                or bedtime values. Evening saves omit both hidden fields;
-                the atomic server update retains their latest saved values,
+                or bedtime values. Evening saves omit both hidden fields; the
+                atomic server update retains their latest saved values,
                 including after a newer clock save in another session. Old
                 incomplete draft values cannot block saving or overwrite that
                 record. Explicit clears from legacy clients retain their
-                meaning. Morning remains the place to add new sleep
-                details. Optional Energy and Stress use 1–10 ratings, retaining
-                legacy five-point scale metadata until edited.
+                meaning. Morning remains the place to add new sleep details.
+                Optional Energy and Stress use 1–10 ratings, retaining legacy
+                five-point scale metadata until edited.
               </p>
               <p>
                 Your Day, Your Mood owns the mood picker and the two compact
                 Energy/Stress cards as one standalone root section. Its inward
-                Pink/Purple frame and soft wash echo Your Day, Your Words,
-                whose base and moving rim now use the same palette. Family
-                colors stay related rather than marking any feeling as good or
-                bad. Choice feedback and a restrained section entrance respect
-                reduced motion; hover is limited to desktop fine pointers.
-                The Morning ratings and sleep form keep their existing layout.
+                Pink/Purple frame and soft wash echo Your Day, Your Words, whose
+                base and moving rim now use the same palette. Family colors stay
+                related rather than marking any feeling as good or bad. Choice
+                feedback and a restrained section entrance respect reduced
+                motion; hover is limited to desktop fine pointers. The Morning
+                ratings and sleep form keep their existing layout.
               </p>
             </Detail>
             <Detail
@@ -4060,12 +4055,12 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Source models depend on journal data and the requested date;
-                cache eligibility depends on the stable tracking-day key. A
-                new clock object on a minute tick or focus refresh therefore
-                does not rescan or rewrite unchanged summaries. Persistence
-                compares the serialized record before writing, so remounting a
-                card can reuse the existing snapshot without storage churn.
-                Moving past the 06:00 boundary still updates eligibility.
+                cache eligibility depends on the stable tracking-day key. A new
+                clock object on a minute tick or focus refresh therefore does
+                not rescan or rewrite unchanged summaries. Persistence compares
+                the serialized record before writing, so remounting a card can
+                reuse the existing snapshot without storage churn. Moving past
+                the 06:00 boundary still updates eligibility.
               </p>
               <p>
                 Snapshots contain card counts, artwork identity and accessible
@@ -4164,12 +4159,12 @@ export function DeveloperGuidePage() {
               <p>
                 Each dialog remembers its own scroll position across closing,
                 refresh and switching between desktop dialog and mobile drawer.
-                Writing Space stores independent source and preview positions
-                on its shared content scroller; write and split modes use the
-                source key, while preview mode uses the preview key.
-                Scroll updates persist quietly without rerendering the journal.
-                Color inspections also retain their preview, format and filters.
-                The public install and create-journal dialogs store numeric
+                Writing Space stores independent source and preview positions on
+                its shared content scroller; write and split modes use the
+                source key, while preview mode uses the preview key. Scroll
+                updates persist quietly without rerendering the journal. Color
+                inspections also retain their preview, format and filters. The
+                public install and create-journal dialogs store numeric
                 positions only.
               </p>
               <p>
