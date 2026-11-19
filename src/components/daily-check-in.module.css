@@ -820,3 +820,26 @@
       0 7px 24px color-mix(in srgb, var(--feelings-purple) 5%, transparent);
   }
 }
+
+@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .shinyTitle {
+      display: inline-block;
+      background-image: linear-gradient(126deg, var(--foreground) 26.5%, #fae8ff 50%, var(--foreground) 73.5%);
+      background-size: 300% 100%;
+      background-position: 100% center;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: checkin-title-shine 5.2s linear infinite;
+    }
+  }
+}
+
+/* Sweep for 3.2 seconds, then rest at the base color for two seconds. */
+@keyframes checkin-title-shine {
+  0% { background-position: 100% center; }
+  61.54%, 100% { background-position: 0% center; }
+  0%, 61.54%, 100% { filter: drop-shadow(0 0 2px transparent); }
+  30.77% { filter: drop-shadow(0 0 2px rgb(250 232 255 / 50%)); }
+}

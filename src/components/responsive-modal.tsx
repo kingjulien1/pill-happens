@@ -54,7 +54,7 @@ export function ResponsiveModal({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
+  title: ReactNode;
   headerVariant?: "medication" | "check-in";
   /** Native header controls share the close button’s action rail. */
   headerActions?: ReactNode;

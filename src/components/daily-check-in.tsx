@@ -323,7 +323,7 @@ export function DailyCheckInSection({
         scrollKey={checkInDraftKey(targetDay, period)}
         returnFocus={returnToCard}
         headerVariant="check-in"
-        title={checkInHeading(targetDay, period)}
+        title={<span className={styles.shinyTitle}>{checkInHeading(targetDay, period)}</span>}
         headerActions={
           <Button
             type="reset"
