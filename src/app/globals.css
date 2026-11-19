@@ -249,6 +249,17 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   min-width: 0;
 }
 :root {
+  --navigation-selection-ink: #d23b8b;
+  --navigation-selection-weight: 9.41%;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navigation-selection-ink: #f472b6;
+    --navigation-selection-weight: 10.98%;
+  }
+}
+
+:root {
   --intake-card-radius: 21px;
 }
 .intake-group {
