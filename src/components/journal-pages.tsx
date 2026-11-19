@@ -479,7 +479,7 @@ function LogIntakeDialog({
         if (!next) onClose();
       }}
       scrollKey={`intake:new:${historical ? day : "today"}`}
-      title="Log Intake"
+      title={<span className="block truncate pe-2">Jot That Dose</span>}
       headerVariant="check-in"
       context={
         <time dateTime={day} className={checkInStyles.headerDate}>
