@@ -182,6 +182,7 @@ export function ResponsiveModal({
         <div
           ref={setScrollElement}
           data-dialog-scroll
+          data-base-ui-swipe-ignore={headerVariant === "check-in" ? "" : undefined}
           className={cn(
             "min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]",
             styles.scrollBody,

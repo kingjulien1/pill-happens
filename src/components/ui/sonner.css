@@ -554,7 +554,7 @@
   filter: drop-shadow(0 0 1px #fde047bd) drop-shadow(0 0 4px #facc156b);
 }
 .journal-bulb-halo {
-  opacity: 0.3;
+  opacity: 0.95;
 }
 .journal-bulb-glass {
   fill: currentColor;
@@ -2197,7 +2197,7 @@
 /* Rays disappear at 70%; the halo holds another 300ms of the 4s loop. */
 @keyframes journal-bulb-halo {
   0%, 16%, 100% { opacity: 0; }
-  32%, 77.5% { opacity: 0.47; }
+  32%, 77.5% { opacity: 0.95; }
 }
 @keyframes journal-bulb-radiate {
   0%,

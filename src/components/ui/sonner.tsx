@@ -64,8 +64,8 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
       <defs>
         <radialGradient id={haloId}>
           <stop stopColor="#fff8ca" />
-          <stop offset=".42" stopColor="#fff8ca" stopOpacity=".66" />
-          <stop offset=".75" stopColor="#fff8ca" stopOpacity=".17" />
+          <stop offset=".667" stopColor="#fff8ca" stopOpacity=".8" />
+          <stop offset=".86" stopColor="#fff8ca" stopOpacity=".32" />
           <stop offset="1" stopColor="#fff8ca" stopOpacity="0" />
         </radialGradient>
       </defs>

@@ -139,6 +139,13 @@
   }
 }
 
+/* Keep the page stationary throughout check-in gestures, including at scroll limits. */
+html:has([data-dialog-scroll] [data-check-in-form]),
+body:has([data-dialog-scroll] [data-check-in-form]) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 /* Hide native tracks even in components with their own scrollbar styling. */
 * {
   scrollbar-width: none !important;

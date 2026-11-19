@@ -41,11 +41,11 @@
     stroke-width: var(--rim-width);
   }
   .rimTrack {
-    stroke: currentColor;
+    stroke: color-mix(in srgb, currentColor 92%, black);
     filter: drop-shadow(0 0 4px var(--color-pink-400));
   }
   .rimLight {
-    stroke: color-mix(in srgb, currentColor 40%, white);
+    stroke: color-mix(in srgb, currentColor 32%, white);
     stroke-dasharray: 12 88;
     stroke-linecap: round;
   }
@@ -104,9 +104,9 @@
    never changes the measured card or competes with the focus outline. */
 .outerFrame {
   --intake-rim-base: var(--check-in-outer-color);
-  --intake-rim-stop-1: var(--intake-rim-base);
+  --intake-rim-stop-1: color-mix(in srgb, var(--intake-rim-base) 92%, black);
   --intake-rim-stop-2: color-mix(in srgb, var(--intake-rim-base) 68%, white);
-  --intake-rim-stop-3: color-mix(in srgb, var(--intake-rim-base) 30%, white);
+  --intake-rim-stop-3: color-mix(in srgb, var(--intake-rim-base) 24%, white);
   position: absolute;
   z-index: 4;
   box-sizing: border-box;
