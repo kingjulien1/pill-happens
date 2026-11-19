@@ -110,7 +110,8 @@
   position: relative;
   isolation: isolate;
   --fade-ink: var(--color-mauve-950, #0c090c);
-  --fade-tail: 22px;
+  /* Header-to-form space, form padding, separator, then the gap to Journal entry. */
+  --fade-tail: calc(5 * var(--spacing) + 24px + 1px + 24px);
 }
 .checkInSurface:has([data-check-in-form]) .checkInHeader::before {
   content: "";
@@ -123,12 +124,6 @@
   bottom: calc(-1 * var(--fade-tail));
   background: linear-gradient(to bottom, color-mix(in srgb, var(--fade-ink) 67%, transparent), transparent);
 }
-@media (min-width: 768px) {
-  .checkInSurface:has([data-check-in-form]) .checkInHeader {
-    --fade-tail: 17px;
-  }
-}
-
 .checkInSurface .scrollBody {
   --dialog-scroll-gutter: 14px;
   padding-inline: var(--dialog-scroll-gutter);
