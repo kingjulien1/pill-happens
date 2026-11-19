@@ -381,7 +381,7 @@
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--color-indigo-400) 13.89%, transparent),
-    color-mix(in srgb, var(--color-pink-700) 13.89%, transparent)
+    color-mix(in srgb, var(--color-purple-500) 13.89%, transparent)
   );
   background-color: color-mix(in srgb, var(--color-mauve-950, #0c090c) 59%, transparent);
   color: #f9f2fc;
