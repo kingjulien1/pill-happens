@@ -18,7 +18,7 @@
 .section .frame > :first-child {
   margin-block: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 2.125px
+  box-shadow: inset 0 0 0 3.01px
     color-mix(in srgb, var(--color-violet-400, #a78bfa) 34%, transparent);
   border-radius: var(--dialog-radius-surface);
 }
@@ -48,70 +48,19 @@
   padding: 10px 12px 12px;
 }
 
-/* The shared frame owns the three outlines; each section keeps its own content. */
+/* Keep the outer edge fixed as the two static rims grow inward. */
 .section .frame > :first-child::before,
 .section .frame > :first-child::after {
   content: none;
 }
-.frame::before,
-.frame::after {
+.frame::before {
   content: "";
   pointer-events: none;
   position: absolute;
-  z-index: 1;
-}
-.frame::before {
-  --outer-width: calc(4.25 * var(--line-width));
-  inset: -4px;
-  border-radius: calc(var(--dialog-radius-surface) + 4px);
-  box-shadow: 0 0 0 var(--outer-width)
+  inset: -10.375px;
+  border-radius: calc(var(--dialog-radius-surface) + 10.375px);
+  box-shadow: inset 0 0 0 7.81px
     color-mix(in srgb, var(--checkin-line) 14%, transparent);
-}
-.frame::after {
-  opacity: 0.602;
-  inset: 6.5px;
-  border-radius: calc(var(--dialog-radius-surface) - 6.5px);
-  box-shadow: inset 0 0 0 calc(var(--line-width) * 1.225)
-    var(--color-violet-300, #c4b5fd);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .frame::after {
-    animation:
-      rim-orbit 8s linear infinite,
-      rim-diagonals 16s ease-in-out infinite;
-  }
-}
-@keyframes rim-orbit {
-  from {
-    transform: rotate(0turn) translateX(1.9px) rotate(0turn);
-  }
-  to {
-    transform: rotate(1turn) translateX(1.9px) rotate(-1turn);
-  }
-}
-@keyframes rim-diagonals {
-  0%,
-  50%,
-  100% {
-    inset: 6.5px;
-    translate: 0 0;
-  }
-  12.5% {
-    inset: 6.25px;
-    translate: -2.2px -2.2px;
-  }
-  37.5% {
-    inset: 6.25px;
-    translate: 2.2px 2.2px;
-  }
-  62.5% {
-    inset: 6.25px;
-    translate: 2.2px -2.2px;
-  }
-  87.5% {
-    inset: 6.25px;
-    translate: -2.2px 2.2px;
-  }
 }
 
 @media (max-width: 767px) {

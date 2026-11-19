@@ -380,8 +380,8 @@
   border-radius: 12px;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-indigo-400) 18%, transparent),
-    color-mix(in srgb, var(--color-purple-500) 18%, transparent)
+    color-mix(in srgb, var(--color-indigo-400) 14.94%, transparent),
+    color-mix(in srgb, var(--color-pink-700) 14.94%, transparent)
   );
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
@@ -404,58 +404,33 @@
   flex-wrap: wrap;
 }
 
-.morningHeader {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px 6px;
-}
-.morningHeader .headingGroup {
-  align-items: center;
-  gap: 10px;
-}
 .coffeeTile {
   display: grid;
   place-items: center;
   flex: none;
-  width: 39px;
-  height: 43px;
-  border-radius: 13px 13px 13px 5px;
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--color-pink-400) 20%, transparent),
-    color-mix(in srgb, var(--color-violet-400) 10%, transparent)
-  );
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--color-violet-400) 28%, transparent);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--color-pink-500) 36%, transparent), color-mix(in srgb, var(--color-violet-500) 18%, transparent));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-violet-400) 28%, transparent);
 }
 .coffeeTile .writingCoffee {
   width: 25px;
   height: 25px;
 }
-.morningHeader .heading {
+.editor .heading {
   font-size: clamp(16px, 5.3cqi, 21px);
-  font-weight: 660;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  line-height: 1.15;
 }
-.titleAccent {
-  display: block;
-  color: color-mix(in srgb, var(--foreground) 72%, var(--color-violet-400));
-}
-.morningPrompt {
-  grid-column: 1 / -1;
-  margin: 0;
+.morningPrompt { margin: 3px 0 0; }
+.morningPrompt, .snapshotDetail, .guidance, .stats, .stat > span {
   color: var(--muted-foreground);
-  font-size: 12px;
+  font-weight: 400;
   line-height: 1.5;
 }
-@container journal-doorway (max-width: 285px) {
-  .morningHeader .headingGroup {
-    gap: 6px;
-  }
-  .coffeeTile {
-    width: 31px;
-    height: 36px;
-  }
+.morningPrompt, .snapshotDetail, .guidance:not(.introduction), .stats, .stat > span {
+  font-size: 12px;
+}
+@container journal-doorway (max-width: 300px) {
+  .stats { gap: 3px; }
 }

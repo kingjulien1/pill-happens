@@ -41,7 +41,9 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MarkdownMark } from "./markdown-mark";
+import Link from "next/link";
+import { ArrowUpRight, LibraryBig } from "lucide-react";
+import { rememberJournalDestination } from "@/components/journal-drafts";
 import { CheckInSection } from "./check-in-section";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
@@ -640,10 +642,14 @@ function CheckInForm({
         caption="Journal entry"
         context="In your words"
         detail={
-          <span className="inline-flex items-center gap-1.5">
-            <MarkdownMark size={14} aria-hidden="true" />
-            {morning ? "Morning" : "Evening"}
-          </span>
+          <Link href="/journal" className="inline-flex items-center gap-1.5" onNavigate={() => {
+              onSaved?.();
+              rememberJournalDestination("/journal");
+            }}>
+            <LibraryBig size={14} aria-hidden="true" />
+            All journals
+            <ArrowUpRight size={12} className="opacity-60" aria-hidden="true" />
+          </Link>
         }
       >
         <DailyReflectionEditor
@@ -658,7 +664,6 @@ function CheckInForm({
           saving={reflectionSave.controls}
           savedAt={checkIn?.updatedAt}
           disabled={locked}
-          onLibraryNavigate={onSaved}
         />
       </CheckInSection>
 

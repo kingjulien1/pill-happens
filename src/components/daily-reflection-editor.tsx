@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import {
-  BookOpenText,
   Check,
   Copy,
-  LibraryBig,
-  PencilLine,
   RefreshCw,
+  Info,
+  Moon,
 } from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
 
@@ -17,12 +15,10 @@ import {
   type ReflectionDraftStatus,
 } from "@/components/reflection-dialog";
 import type { ReflectionSaveControls } from "@/components/use-reflection-save";
-import { ReflectionReaderDialog } from "@/components/reflection-reader-dialog";
 import { ActionIcon } from "./action-icon";
 import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
 import { TodayActionButton } from "@/components/today-action-button";
 
-import { rememberJournalDestination } from "@/components/journal-drafts";
 import { useJournal } from "@/components/journal-provider";
 import {
   getPageEntryReadiness,
@@ -33,7 +29,6 @@ import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { MarkdownMark } from "./markdown-mark";
 import { MorningCoffee } from "./morning-coffee";
 import styles from "./daily-reflection-editor.module.css";
-import closeStyles from "./dialog-close.module.css";
 import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
@@ -50,7 +45,6 @@ export function DailyReflectionEditor({
   draftStatus,
   savedAt,
   saving,
-  onLibraryNavigate,
 }: {
   id: string;
   value: string;
@@ -63,12 +57,9 @@ export function DailyReflectionEditor({
   draftStatus?: ReflectionDraftStatus;
   savedAt?: string;
   saving: ReflectionSaveControls;
-  onLibraryNavigate?: () => void;
 }) {
   const editor = useRef<HTMLElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
-  const readerTrigger = useRef<HTMLButtonElement>(null);
-  const [reading, setReading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshFinished, setRefreshFinished] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
@@ -109,8 +100,7 @@ export function DailyReflectionEditor({
           !document.hidden &&
           !reduced.matches &&
           getPageEntryReadiness() &&
-          !open &&
-          !reading,
+          !open,
       );
     };
     const observer =
@@ -136,7 +126,7 @@ export function DailyReflectionEditor({
       reduced.removeEventListener("change", sync);
       node.dataset.journalActive = "false";
     };
-  }, [open, reading]);
+  }, [open]);
 
   // Provider.refresh resolves after updating its error state, including on failure.
   // Use the committed result rather than claiming success from Promise<void>.
@@ -244,81 +234,18 @@ export function DailyReflectionEditor({
       data-journal-period={period}
       data-journal-active="false"
     >
-      <div
-        className={
-          period === "morning" ? styles.morningHeader : styles.headingRow
-        }
-      >
-        <div className={styles.headingGroup}>
-          {period === "morning" ? (
-            <span className={styles.coffeeTile}>
-              <MorningCoffee className={styles.writingCoffee} />
-            </span>
-          ) : (
-            <MorningCoffee className={styles.writingCoffee} />
-          )}
-          <div className={styles.headingCopy}>
-            <h3 id={`${id}-heading`} className={styles.heading}>
-              {period === "morning" ? (
-                <>
-                  Your Morning,{" "}
-                  <span className={styles.titleAccent}>Your Words</span>
-                </>
-              ) : (
-                "Your Day, Your Words"
-              )}
-            </h3>
-            {period !== "morning" && (
-              <p className={styles.subtitle}>Room to reflect.</p>
-            )}
-          </div>
-        </div>
-        <div className={closeStyles.actions}>
-          <Button
-            variant="ghost"
-            size="icon"
-            ref={readerTrigger}
-            type="button"
-            rim={false}
-            className={closeStyles.control}
-            aria-label="Read journal"
-            title="Read this journal page"
-            disabled={!hasWriting}
-            onClick={() => setReading(true)}
-            data-journal-read
-          >
-            <BookOpenText size={19} strokeWidth={2.6} aria-hidden="true" />
-          </Button>
-          <Button
-            navigation
-            variant="ghost"
-            size="icon"
-            nativeButton={false}
-            render={
-              <Link
-                href="/journal"
-                onNavigate={() => {
-                  onLibraryNavigate?.();
-                  rememberJournalDestination("/journal");
-                }}
-              />
-            }
-            rim={false}
-            className={closeStyles.control}
-            aria-label="Open journal library"
-            title="Open journal library"
-            data-journal-library
-          >
-            <LibraryBig size={19} strokeWidth={2.6} aria-hidden="true" />
-          </Button>
-        </div>
-        {period === "morning" && (
+      <div className={styles.headingGroup}>
+        <span className={styles.coffeeTile}>
+          {period === "morning" ? <MorningCoffee className={styles.writingCoffee} /> : <Moon size={25} aria-hidden="true" />}
+        </span>
+        <div className={styles.headingCopy}>
+          <h3 id={`${id}-heading`} className={styles.heading}>
+            Your {period === "morning" ? "Morning" : "Day"}, Your Words
+          </h3>
           <p className={styles.morningPrompt}>
-            {hasWriting
-              ? "Read your entry or pick up where you left off."
-              : "What was on your mind when you woke up?"}
+            {period === "morning" ? "What was on your mind when you woke up? Start with the thought that stayed with you." : "What stayed with you today? Pick one moment you’d like to remember."}
           </p>
-        )}
+        </div>
       </div>
       <hr className={styles.divider} />
       <div data-journal-snapshot>
@@ -329,7 +256,7 @@ export function DailyReflectionEditor({
         className={`${styles.guidance} ${styles.introduction}`}
         data-journal-introduction
       >
-        <MarkdownMark size={24} aria-hidden="true" />
+        <Info size={20} aria-hidden="true" />
         <span>
           Use headings, lists and Markdown to give a longer entry some shape.
           Closing the writing space brings you back to this check-in with your
@@ -367,11 +294,13 @@ export function DailyReflectionEditor({
             <span className="intake-primary-row">
               <span className="intake-primary-copy">
                 <span className="intake-primary-label">
-                  <PencilLine size={21} strokeWidth={2.3} aria-hidden="true" />
+                  <MarkdownMark size={21} aria-hidden="true" />
                   <span>
-                    {hasWriting ? "Continue Writing" : "Start Writing"}
+                    {hasWriting ? "Keep Writing" : "Start Writing"}
                   </span>
                 </span>
+                <span className="intake-primary-dot" aria-hidden="true">·</span>
+                <span className="intake-primary-aside">Pen it!</span>
               </span>
               <ActionIcon name="next" className="intake-primary-next" />
             </span>
@@ -417,13 +346,15 @@ export function DailyReflectionEditor({
             <strong>{numberFormat.format(stats.words)}</strong>
             <span>{stats.words === 1 ? "word" : "words"}</span>
           </div>
+          <span aria-hidden="true">·</span>
           <div className={styles.stat} data-journal-stat="characters">
             <strong>{numberFormat.format(stats.characters)}</strong>
             <span>characters</span>
           </div>
+          <span aria-hidden="true">·</span>
           <div className={styles.stat} data-journal-stat="reading">
             <strong>
-              {stats.readingMinutes ? `~${stats.readingMinutes}` : "—"}
+              {stats.readingMinutes ? `~${stats.readingMinutes}` : "0"}
             </strong>
             <span>min read</span>
           </div>
@@ -456,14 +387,6 @@ export function DailyReflectionEditor({
           )}
         </Button>
       </div>
-      <ReflectionReaderDialog
-        open={reading}
-        onOpenChange={setReading}
-        value={value}
-        day={day}
-        onEdit={() => onOpenChange(true)}
-        returnFocus={readerTrigger}
-      />
     </section>
   );
 }
