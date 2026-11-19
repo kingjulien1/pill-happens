@@ -1,3 +1,7 @@
+.heading {
+  --check-in-title-size: 18px;
+}
+
 .heading [data-page-heading-row] {
   flex-wrap: nowrap;
   gap: 12px;
@@ -15,7 +19,7 @@
 }
 
 .heading [data-page-heading-title] {
-  font-size: 24px;
+  font-size: var(--check-in-title-size);
   overflow-wrap: normal;
   white-space: nowrap;
 }
@@ -79,8 +83,8 @@
 }
 
 @media (min-width: 640px) {
-  .heading [data-page-heading-title] {
-    font-size: 32px;
+  .heading {
+    --check-in-title-size: 24px;
   }
 
   .heading [data-page-heading-icon] {
@@ -100,8 +104,8 @@
 }
 
 @media (max-width: 359px) {
-  .heading [data-page-heading-title] {
-    font-size: 21px;
+  .heading {
+    --check-in-title-size: 15.75px;
   }
 
   .heading[data-kit-count-long] .countLabel {

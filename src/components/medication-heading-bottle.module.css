@@ -8,19 +8,11 @@
   isolation: isolate;
 }
 
-.container {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: color-mix(in srgb, var(--primary) 12%, var(--card));
-  box-shadow: inset 0 0 0 1px var(--border);
-}
-
 .glyph,
 .rock {
   display: grid;
-  width: 27px;
-  height: 27px;
+  width: 33.075px;
+  height: 33.075px;
   place-items: center;
 }
 
@@ -41,29 +33,23 @@
 @media (min-width: 640px) {
   .glyph,
   .rock {
-    width: 31px;
-    height: 31px;
+    width: 37.975px;
+    height: 37.975px;
   }
 }
 
 @media (max-width: 359px) {
   .glyph,
   .rock {
-    width: 25px;
-    height: 25px;
+    width: 30.625px;
+    height: 30.625px;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .stage[data-medication-bottle-phase="waiting"] .container,
   .stage[data-medication-bottle-phase="waiting"] .glyph {
     opacity: 0;
     transform: scale(0.2);
-  }
-
-  .stage[data-medication-bottle-phase="entering"] .container {
-    animation: tile-arrival 760ms both;
-    animation-play-state: paused;
   }
 
   .stage[data-medication-bottle-phase="entering"] .glyph {
@@ -71,34 +57,8 @@
     animation-play-state: paused;
   }
 
-  .stage[data-medication-bottle-active="true"] .container,
   .stage[data-medication-bottle-active="true"] .glyph {
     animation-play-state: running;
-  }
-}
-
-@keyframes tile-arrival {
-  0% {
-    opacity: 0;
-    transform: scale(0.18);
-    animation-timing-function: cubic-bezier(0.16, 0.8, 0.2, 1);
-  }
-  43% {
-    opacity: 1;
-    transform: scale(1.1);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
-  }
-  64% {
-    transform: scale(0.965);
-    animation-timing-function: cubic-bezier(0.2, 0.65, 0.3, 1);
-  }
-  83% {
-    transform: scale(1.035);
-    animation-timing-function: cubic-bezier(0.25, 0, 0.2, 1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 

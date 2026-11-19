@@ -188,7 +188,6 @@ export function MedicationHeadingBottle({
       data-medication-bottle-active="false"
       data-medication-bottle-shaking="false"
     >
-      <span className={styles.container} data-medication-bottle-container />
       <span
         ref={glyphRef}
         className={styles.glyph}

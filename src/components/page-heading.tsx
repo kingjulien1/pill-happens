@@ -6,6 +6,7 @@ import styles from "./page-layout.module.css";
 export function PageHeading({
   title,
   context,
+  subtitle,
   icon,
   actions,
   children,
@@ -14,6 +15,7 @@ export function PageHeading({
 }: Omit<HTMLAttributes<HTMLElement>, "title"> & {
   title: ReactNode;
   context?: ReactNode;
+  subtitle?: ReactNode;
   icon?: ReactNode;
   actions?: ReactNode;
 }) {
@@ -39,6 +41,7 @@ export function PageHeading({
             <h1 className={styles.title} data-page-heading-title>
               {title}
             </h1>
+            {subtitle}
           </div>
         </div>
         {actions && <div className={styles.actions}>{actions}</div>}

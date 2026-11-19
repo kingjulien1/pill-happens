@@ -5,6 +5,7 @@ import { PageHeading } from "@/components/page-heading";
 import { MedicationHeadingBottle } from "@/components/medication-heading-bottle";
 import { medicationKitPalette } from "@/lib/medication-kit-preview";
 import type { Intake, Medication } from "@/lib/domain";
+import checkInStyles from "./daily-check-in.module.css";
 import styles from "./medications-heading.module.css";
 
 const SWATCH_WIDTH = 8;
@@ -81,6 +82,12 @@ export function MedicationsHeading({
   return (
     <PageHeading
       title="Medications"
+      subtitle={
+        <p className={checkInStyles.headerDate}>
+          {medications.length ? "Tap a medication" : "Add your first"}
+          <small><span aria-hidden="true">/</span> {medications.length ? "Edit details" : "Set defaults"}</small>
+        </p>
+      }
       className={styles.heading}
       icon={<MedicationHeadingBottle paused={dialogOpen} />}
       data-medications-heading
