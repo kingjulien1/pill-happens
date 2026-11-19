@@ -71,6 +71,10 @@
   );
 }
 
+.action[data-intake-paint="satin"][data-journal-write] {
+  --control-face-edge: var(--control-ink);
+}
+
 :global([data-intake-entry-part="button"]) .action[data-intake-paint="satin"] {
   --action-surround: transparent;
   --action-reduced-surround: transparent;
