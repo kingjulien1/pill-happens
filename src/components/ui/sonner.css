@@ -553,6 +553,9 @@
   stroke: #fde047;
   filter: drop-shadow(0 0 1px #fde047bd) drop-shadow(0 0 4px #facc156b);
 }
+.journal-bulb-halo {
+  opacity: 0.3;
+}
 .journal-bulb-glass {
   fill: currentColor;
   fill-opacity: 0.7;
@@ -1690,6 +1693,9 @@
     transform-origin: 50% 80%;
     animation: journal-bulb-charge 4s ease-in-out infinite;
   }
+  .journal-toaster [data-mounted="true"] .journal-bulb-halo {
+    animation: journal-bulb-halo 4s ease-in-out infinite;
+  }
   .journal-toaster [data-mounted="true"] .journal-bulb-glass {
     animation: journal-bulb-light 4s ease-in-out infinite;
   }
@@ -1743,6 +1749,7 @@
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-bulb-halo,
       .journal-bulb-glass,
       .journal-bulb-rays,
       .journal-toast-bell-rings,
@@ -1796,6 +1803,7 @@
       .journal-toast-art-arrival,
       .journal-toast-glyph-enter,
       .journal-toast-glyph,
+      .journal-bulb-halo,
       .journal-bulb-glass,
       .journal-bulb-rays,
       .journal-toast-bell-rings,
@@ -2185,6 +2193,11 @@
     fill-opacity: 0.98;
     filter: drop-shadow(0 0 3px currentColor);
   }
+}
+/* Rays disappear at 70%; the halo holds another 300ms of the 4s loop. */
+@keyframes journal-bulb-halo {
+  0%, 16%, 100% { opacity: 0; }
+  32%, 77.5% { opacity: 0.47; }
 }
 @keyframes journal-bulb-radiate {
   0%,

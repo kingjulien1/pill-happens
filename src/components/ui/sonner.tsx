@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useId,
   useRef,
   useState,
   type CSSProperties,
@@ -50,6 +51,7 @@ function CloudSync(props: SVGProps<SVGSVGElement>) {
 }
 
 function NotificationBulb(props: SVGProps<SVGSVGElement>) {
+  const haloId = useId();
   return (
     <svg
       viewBox="0 0 24 24"
@@ -59,6 +61,16 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
+      <defs>
+        <radialGradient id={haloId}>
+          <stop stopColor="#fff8ca" />
+          <stop offset=".42" stopColor="#fff8ca" stopOpacity=".66" />
+          <stop offset=".75" stopColor="#fff8ca" stopOpacity=".17" />
+          <stop offset="1" stopColor="#fff8ca" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse className="journal-bulb-halo" cx="12" cy="7" rx="14" ry="13"
+        fill={`url(#${haloId})`} stroke="none" />
       <path
         className="journal-bulb-glass"
         d="M9 18c0-2.2-.7-3.3-2.2-5A7 7 0 1 1 17.2 13c-1.5 1.7-2.2 2.8-2.2 5Z"
