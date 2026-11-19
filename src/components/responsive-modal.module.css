@@ -121,7 +121,7 @@
   z-index: -1;
   top: -48px;
   bottom: calc(-1 * var(--fade-tail));
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--fade-ink) 80%, transparent), transparent);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--fade-ink) 67%, transparent), transparent);
 }
 @media (min-width: 768px) {
   .checkInSurface:has([data-check-in-form]) .checkInHeader {
