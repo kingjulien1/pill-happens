@@ -139,35 +139,15 @@
   }
 }
 
-/* Keep dialogs and their portaled selects scrollable without scrollbar tracks. */
-:is(
-  [data-slot="dialog-content"],
-  [data-slot="drawer-popup"],
-  [data-slot="select-content"]
-),
-:is(
-    [data-slot="dialog-content"],
-    [data-slot="drawer-popup"],
-    [data-slot="select-content"]
-  )
-  * {
-  scrollbar-width: none;
-  scrollbar-gutter: auto;
+/* Hide native tracks even in components with their own scrollbar styling. */
+* {
+  scrollbar-width: none !important;
+  scrollbar-gutter: auto !important;
 }
-:is(
-  [data-slot="dialog-content"],
-  [data-slot="drawer-popup"],
-  [data-slot="select-content"]
-)::-webkit-scrollbar,
-:is(
-    [data-slot="dialog-content"],
-    [data-slot="drawer-popup"],
-    [data-slot="select-content"]
-  )
-  *::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .ambient {

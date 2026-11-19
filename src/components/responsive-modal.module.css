@@ -120,3 +120,10 @@
   --dialog-scroll-gutter: 14px;
   padding-inline: var(--dialog-scroll-gutter);
 }
+
+/* The faded footer owns the bottom safe area on both dialog layouts. */
+.checkInSurface[data-dialog-scroll]:has([data-morning-sleep-summary]),
+.checkInSurface .scrollBody:has([data-morning-sleep-summary]) {
+  padding-bottom: 0;
+  overscroll-behavior-y: none;
+}

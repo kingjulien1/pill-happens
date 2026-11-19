@@ -687,7 +687,7 @@
   --footer-side: var(--dialog-scroll-gutter);
   --footer-bottom: max(24px, env(safe-area-inset-bottom));
   margin-inline: calc(-1 * var(--footer-side));
-  margin-bottom: calc(-1 * var(--footer-bottom));
+  padding-top: 24px; /* Together with the form gap, leaves 48px above the rule. */
   padding-inline: var(--footer-side);
   padding-bottom: var(--footer-bottom);
   background:
@@ -708,12 +708,16 @@
     --footer-bottom: var(--dialog-scroll-gutter);
   }
 }
+.submitArea[data-has-sleep-summary="true"]::before {
+  margin-bottom: 48px;
+}
 .submitArea [data-morning-sleep-summary] {
+  margin-bottom: 9px;
   border-top: 0;
   padding-top: 0;
 }
 
-/* The estimate owns its 16px action gap, replacing the shared 24px form margin. */
+/* The summary supplies the gap above the save action. */
 .submitArea[data-has-sleep-summary="true"]
   [data-dialog-primary-button][data-slot="button"] {
   margin-block-start: 0;
