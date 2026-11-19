@@ -72,6 +72,8 @@
 }
 
 .action[data-intake-paint="satin"][data-journal-write] {
+  --action-surround: var(--control-secondary);
+  --action-reduced-surround: var(--action-surround);
   --control-face-edge: var(--control-ink);
 }
 
