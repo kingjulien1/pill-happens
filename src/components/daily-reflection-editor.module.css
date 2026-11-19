@@ -163,7 +163,7 @@
 .snapshotTitle {
   margin: 0;
   color: var(--journal-emphasis);
-  font-size: 15.11px;
+  font-size: 13.96px;
   font-weight: 600;
   line-height: 18px;
 }
@@ -409,7 +409,7 @@
 }
 
 .editor .heading {
-  font-size: clamp(20.67px, 6.85cqi, 27.13px);
+  font-size: clamp(16.54px, 5.48cqi, 21.70px);
   line-height: 1.15;
 }
 .morningPrompt { margin: 3px 0 0; }

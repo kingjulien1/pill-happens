@@ -9,7 +9,7 @@
   margin-block-start: 10px;
 }
 .frame {
-  --line-width: 1.5px;
+  --inner-rim: inset 0 0 0 3.01px color-mix(in srgb, var(--color-violet-400, #a78bfa) 34%, transparent);
   position: relative;
   isolation: isolate;
   min-width: 0;
@@ -18,8 +18,7 @@
 .section .frame > :first-child {
   margin-block: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 3.01px
-    color-mix(in srgb, var(--color-violet-400, #a78bfa) 34%, transparent);
+  box-shadow: var(--inner-rim);
   border-radius: var(--dialog-radius-surface);
 }
 .caption {
@@ -61,6 +60,44 @@
   border-radius: calc(var(--dialog-radius-surface) + 10.375px);
   box-shadow: inset 0 0 0 7.81px
     color-mix(in srgb, var(--checkin-line) 14%, transparent);
+}
+
+[data-check-in-form] .frame {
+  --surface-ink: var(--color-mauve-950, #0c090c);
+  background: radial-gradient(ellipse closest-side,
+    color-mix(in srgb, var(--surface-ink) 67%, transparent) 65%,
+    color-mix(in srgb, var(--surface-ink) 43%, transparent));
+}
+[data-check-in-form] .section .frame > :first-child {
+  box-shadow: none;
+}
+[data-check-in-form] .frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--inner-rim);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-check-in-form] .frame::before,
+  [data-check-in-form] .frame::after {
+    animation: breathe-rim 4.2s cubic-bezier(.42, .03, .22, 1) infinite;
+  }
+  [data-check-in-form] .frame::before {
+    --rest: -10.375px;
+    --travel: 1.6px;
+  }
+  [data-check-in-form] .frame::after {
+    --rest: 0px;
+    --travel: 1px;
+    animation-delay: -0.45s;
+  }
+}
+@keyframes breathe-rim {
+  0%, 100% { inset: var(--rest); }
+  38% { inset: calc(var(--rest) - var(--travel)); }
+  78% { inset: calc(var(--rest) + var(--travel)); }
 }
 
 @media (max-width: 767px) {
