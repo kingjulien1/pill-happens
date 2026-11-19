@@ -258,6 +258,7 @@ export function IntakeAction({
               minHeight: INTAKE_ACTION_GEOMETRY.height,
             }}
             data-intake-paint="satin"
+            data-log-intake-rim
             onClick={onClick}
             className="intake-primary-cta pointer-events-auto w-full"
           >
