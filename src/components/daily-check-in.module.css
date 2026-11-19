@@ -252,6 +252,11 @@
 }
 
 .form {
+  --checkin-line: color-mix(
+    in srgb,
+    var(--color-fuchsia-500) 65%,
+    var(--color-violet-400)
+  );
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -693,13 +698,13 @@
   background:
     linear-gradient(
       to top,
-      color-mix(in srgb, var(--color-pink-400) 5%, transparent),
-      transparent 72%
+      color-mix(in srgb, var(--color-violet-400) 34%, transparent),
+      transparent 76%
     ),
     linear-gradient(
       to top,
-      var(--dialog-control-wash),
-      color-mix(in srgb, var(--dialog-control-wash) 65%, transparent) 43%,
+      color-mix(in srgb, var(--checkin-line) 44%, transparent),
+      color-mix(in srgb, var(--checkin-line) 21%, transparent) 43%,
       transparent calc(100% - 18px)
     );
 }

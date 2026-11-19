@@ -106,14 +106,39 @@
   --drawer-bleed-background: var(--navigation-surface);
 }
 
-.checkInSurface[data-slot]:has([data-check-in-form="morning"]) {
-  background:
-    radial-gradient(
-      ellipse 170px 115px at top left,
-      color-mix(in srgb, var(--dialog-control-wash) 8%, transparent),
-      transparent
-    ),
-    var(--navigation-paint);
+/* Split the fade at the date's midline. Grid rows follow wrapped copy. */
+.checkInSurface:has([data-check-in-form]) .checkInHeader {
+  position: relative;
+  isolation: isolate;
+  --fade-ink: var(--color-mauve-950, #0c090c);
+  --fade-join: color-mix(in srgb, var(--fade-ink) 68%, transparent);
+  --fade-tail: 22px;
+}
+.checkInSurface:has([data-check-in-form]) .checkInHeader::before,
+.checkInSurface:has([data-check-in-form]) .checkInHeader::after {
+  content: "";
+  position: absolute;
+  grid-column: 1 / -1;
+  inset-inline: calc(-1 * var(--dialog-scroll-gutter)) calc(8px - var(--dialog-scroll-gutter));
+  pointer-events: none;
+  z-index: -1;
+}
+.checkInSurface:has([data-check-in-form]) .checkInHeader::before {
+  grid-row: 1;
+  top: -48px;
+  bottom: 9px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--fade-ink) 80%, transparent), var(--fade-join));
+}
+.checkInSurface:has([data-check-in-form]) .checkInHeader::after {
+  grid-row: 2;
+  top: -29px; /* 20px row gap plus half the date line */
+  bottom: calc(-1 * var(--fade-tail));
+  background: linear-gradient(to bottom, var(--fade-join), transparent);
+}
+@media (min-width: 768px) {
+  .checkInSurface:has([data-check-in-form]) .checkInHeader {
+    --fade-tail: 17px;
+  }
 }
 
 .checkInSurface .scrollBody {

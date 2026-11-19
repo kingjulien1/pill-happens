@@ -1,9 +1,4 @@
 .section {
-  --checkin-line: color-mix(
-    in srgb,
-    var(--color-fuchsia-500) 65%,
-    var(--color-violet-400)
-  );
   display: grid;
   min-width: 0;
   gap: 8px;
