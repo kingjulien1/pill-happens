@@ -7,6 +7,7 @@ export function PageHeading({
   title,
   context,
   subtitle,
+  titleClassName,
   icon,
   actions,
   children,
@@ -16,6 +17,7 @@ export function PageHeading({
   title: ReactNode;
   context?: ReactNode;
   subtitle?: ReactNode;
+  titleClassName?: string;
   icon?: ReactNode;
   actions?: ReactNode;
 }) {
@@ -38,7 +40,7 @@ export function PageHeading({
           )}
           <div className={styles.headingCopy}>
             {context && <p className={styles.context}>{context}</p>}
-            <h1 className={styles.title} data-page-heading-title>
+            <h1 className={titleClassName ?? styles.title} data-page-heading-title>
               {title}
             </h1>
             {subtitle}

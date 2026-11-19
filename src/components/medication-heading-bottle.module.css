@@ -11,8 +11,8 @@
 .glyph,
 .rock {
   display: grid;
-  width: 33.075px;
-  height: 33.075px;
+  width: 38.5875px;
+  height: 38.5875px;
   place-items: center;
 }
 
@@ -33,16 +33,16 @@
 @media (min-width: 640px) {
   .glyph,
   .rock {
-    width: 37.975px;
-    height: 37.975px;
+    width: 44.3042px;
+    height: 44.3042px;
   }
 }
 
 @media (max-width: 359px) {
   .glyph,
   .rock {
-    width: 30.625px;
-    height: 30.625px;
+    width: 35.7292px;
+    height: 35.7292px;
   }
 }
 
