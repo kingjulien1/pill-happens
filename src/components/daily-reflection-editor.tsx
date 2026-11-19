@@ -235,9 +235,11 @@ export function DailyReflectionEditor({
       data-journal-active="false"
     >
       <div className={styles.headingGroup}>
-        <span className={styles.coffeeTile}>
-          {period === "morning" ? <MorningCoffee className={styles.writingCoffee} /> : <Moon size={25} aria-hidden="true" />}
-        </span>
+        {period === "morning" ? (
+          <MorningCoffee className={styles.headingIcon} />
+        ) : (
+          <Moon className={styles.headingIcon} aria-hidden="true" />
+        )}
         <div className={styles.headingCopy}>
           <h3 id={`${id}-heading`} className={styles.heading}>
             Your {period === "morning" ? "Morning" : "Day"}, Your Words

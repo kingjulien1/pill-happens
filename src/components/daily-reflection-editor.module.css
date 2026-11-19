@@ -352,10 +352,10 @@
   background: var(--checkin-line);
   opacity: 0.94;
 }
-.writingCoffee {
+.headingIcon {
   --coffee-motion: var(--journal-motion, running);
-  width: 40px;
-  height: 40px;
+  width: 32.3px;
+  height: 32.3px;
   flex: none;
   color: var(--foreground);
 }
@@ -408,20 +408,6 @@
   flex-wrap: wrap;
 }
 
-.coffeeTile {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--color-pink-500) 36%, transparent), color-mix(in srgb, var(--color-violet-500) 18%, transparent));
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-violet-400) 28%, transparent);
-}
-.coffeeTile .writingCoffee {
-  width: 25px;
-  height: 25px;
-}
 .editor .heading {
   font-size: clamp(20.67px, 6.85cqi, 27.13px);
   line-height: 1.15;
