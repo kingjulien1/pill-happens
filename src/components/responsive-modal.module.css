@@ -144,13 +144,13 @@
   background:
     linear-gradient(
       to top,
-      color-mix(in srgb, var(--color-violet-400) 34%, transparent),
+      color-mix(in srgb, var(--color-violet-400) var(--footer-violet, 34%), transparent),
       transparent 76%
     ),
     linear-gradient(
       to top,
-      color-mix(in srgb, var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))) 44%, transparent),
-      color-mix(in srgb, var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))) 21%, transparent) 43%,
+      color-mix(in srgb, var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))) var(--footer-base, 44%), transparent),
+      color-mix(in srgb, var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))) var(--footer-middle, 21%), transparent) 43%,
       transparent calc(100% - 18px)
     );
 }
@@ -162,4 +162,14 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+.checkInSurface [data-check-in-form] [data-dialog-fade-footer] {
+  --footer-violet: 13.6%;
+  --footer-base: 17.6%;
+  --footer-middle: 8.4%;
+}
+
+.checkInSurface:has([data-check-in-form]) [data-slot="button"][aria-label] > svg {
+  color: color-mix(in srgb, currentColor 86%, var(--color-purple-400));
 }
