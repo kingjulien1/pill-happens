@@ -46,7 +46,7 @@ export function IntakeRouteSelect({
         id={id}
         title={label}
         data-compact-choice-trigger
-        className="h-[26px] py-0 w-full rounded-xl px-2 text-xs data-[size=default]:h-[26px] sm:px-3 sm:text-sm"
+        className="h-10 w-full rounded-xl px-2 text-xs data-[size=default]:h-10 sm:px-3 sm:text-sm"
       >
         <SelectValue>
           <MedicationChoiceIcon kind="route" value={value} />

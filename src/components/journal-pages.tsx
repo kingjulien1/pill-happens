@@ -214,7 +214,8 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
       title="Edit Intake"
-      description="Update this entry. Changes are saved to the day the intake was taken."
+      headerVariant="check-in"
+      description="Adjust the medication, route or amount to match what you took. The date and time determine which tracking day this entry belongs to."
     >
       <IntakeForm
         intake={intake}
@@ -494,8 +495,8 @@ function LogIntakeDialog({
       }
       description={
         historical
-          ? "Add an intake you missed. Use the date and time you took it."
-          : "Record what you took, how much, and when."
+          ? "Choose the medication, route and amount for the intake you missed. Enter the time you took it so it appears on the correct tracking day."
+          : "Choose your medication and how you took it, then enter the amount. If you’re logging later, adjust the date and time to match when you took it."
       }
       headerActions={
         <Button

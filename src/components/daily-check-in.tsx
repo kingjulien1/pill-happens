@@ -833,6 +833,7 @@ function CheckInForm({
       )}
       <div
         className={styles.submitArea}
+        data-dialog-fade-footer
         data-check-in-submit
         data-has-sleep-summary={morning || undefined}
       >

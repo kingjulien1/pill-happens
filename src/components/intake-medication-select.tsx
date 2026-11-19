@@ -45,7 +45,7 @@ export function IntakeMedicationSelect({
     >
       <SelectTrigger
         id="intake-medication"
-        className="h-[26px] py-0 w-full rounded-xl px-3 text-sm data-[size=default]:h-[26px]"
+        className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10"
       >
         <SelectValue>
           {selected ? (

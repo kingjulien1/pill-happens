@@ -7,18 +7,12 @@
   padding: 22px 0 6px;
   text-align: center;
 }
-.footer::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  z-index: -1;
-  inset: 0 calc(-1 * var(--dialog-scroll-gutter, 14px)) -24px;
-  background:
-    linear-gradient(to top, #210d2585, transparent 76%),
-    linear-gradient(to top, #31103973, transparent);
+
+.medicationSection {
+  display: grid;
+  gap: 16px;
+  padding-block: 16px;
 }
-@media (prefers-color-scheme: light) {
-  .footer::before {
-    opacity: 0.31;
-  }
+[data-intake-form] .medicationSection:first-child {
+  padding-inline: 0;
 }

@@ -179,12 +179,21 @@ export function IntakeForm({
 
   if (!medications.length && !intake)
     return (
-      <form id={formId} onReset={handleReset} className="py-4 text-center">
+      <form
+        id={formId}
+        onReset={handleReset}
+        data-intake-form
+        className="pt-4 text-center"
+      >
         <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
         </p>
-        <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+        <div
+          className={styles.footer}
+          data-dialog-fade-footer
+          data-draft-action-footer
+        >
           <MedicationActionButton
             intent="add"
             navigation
@@ -337,96 +346,93 @@ export function IntakeForm({
       onReset={handleReset}
       onSubmit={submit}
       className={checkStyles.form}
+      data-intake-form
     >
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-6">
         <CheckInSection
-          caption="Medication"
+          caption="Medication & Amount"
           context="What you took"
-          detail="Name & route"
-        >
-          <div
-            className="p-4 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_120px]"
-            data-intake-medication-route-fields
-          >
-            <div className="form-field min-w-0">
-              <Label htmlFor="intake-medication">Medication</Label>
-              <IntakeMedicationSelect
-                medications={medicationOptions}
-                value={medicationId}
-                fallbackIntake={fallbackIntake}
-                onValueChange={(value) => {
-                  draft.setValue((current) => ({
-                    ...current,
-                    medicationId: value,
-                    route:
-                      !intake && value !== current.medicationId
-                        ? preferredIntakeRoute(value, data!.intakes)
-                        : current.route,
-                    quantity:
-                      !intake && value !== current.medicationId
-                        ? String(
-                            medications.find((item) => item.id === value)
-                              ?.defaultQuantity ?? 1,
-                          )
-                        : current.quantity,
-                  }));
-                }}
-              />
-            </div>
-            <div className="form-field min-w-0">
-              <Label htmlFor="intake-route">Intake route</Label>
-              <IntakeRouteSelect
-                value={route}
-                disabled={busy}
-                onValueChange={(value) =>
-                  draft.setValue((current) => ({ ...current, route: value }))
-                }
-              />
-            </div>
-          </div>
-        </CheckInSection>
-        {!medication && !fallbackIntake && medicationId && (
-          <p
-            role="status"
-            className="text-xs leading-relaxed text-muted-foreground"
-          >
-            That medication is no longer available. Choose another to continue
-            this draft.
-          </p>
-        )}
-        <CheckInSection
-          caption="Quantity"
-          context="Units taken"
           detail={type.label}
         >
-          <div className="form-field p-4">
-            <Label id="intake-quantity-label" htmlFor="intake-quantity">
-              Amount Taken
-            </Label>
-            <IntakeAmountField
-              value={editorQuantity}
-              onChange={setQuantity}
-              onStep={stepQuantity}
-              increment={increment}
-              unit={visibleQuantity === 1 ? type.unit : type.units}
-              calculatedDose={calculatedDose}
-              originalQuantityPreserved={originalQuantityPreserved}
-              disabled={busy}
-              invalid={Boolean(error) && !validQuantity}
-            />
-            <div className="mt-1 grid grid-cols-4 gap-1.5">
-              {presets.map((amount) => (
-                <button
-                  type="button"
-                  key={amount}
-                  onClick={() => setQuantity(String(amount))}
-                  aria-pressed={visibleQuantity === amount}
-                  data-dialog-corner="compact"
-                  className={`h-8 rounded-lg border text-xs transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
-                >
-                  {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
-                </button>
-              ))}
+          <div className={styles.medicationSection}>
+            <div
+              className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-[minmax(0,1fr)_136px] sm:grid-cols-[minmax(0,1fr)_144px]"
+              data-intake-medication-route-fields
+            >
+              <div className="form-field min-w-0">
+                <Label htmlFor="intake-medication">Medication</Label>
+                <IntakeMedicationSelect
+                  medications={medicationOptions}
+                  value={medicationId}
+                  fallbackIntake={fallbackIntake}
+                  onValueChange={(value) => {
+                    draft.setValue((current) => ({
+                      ...current,
+                      medicationId: value,
+                      route:
+                        !intake && value !== current.medicationId
+                          ? preferredIntakeRoute(value, data!.intakes)
+                          : current.route,
+                      quantity:
+                        !intake && value !== current.medicationId
+                          ? String(
+                              medications.find((item) => item.id === value)
+                                ?.defaultQuantity ?? 1,
+                            )
+                          : current.quantity,
+                    }));
+                  }}
+                />
+              </div>
+              <div className="form-field min-w-0">
+                <Label htmlFor="intake-route">Intake route</Label>
+                <IntakeRouteSelect
+                  value={route}
+                  disabled={busy}
+                  onValueChange={(value) =>
+                    draft.setValue((current) => ({ ...current, route: value }))
+                  }
+                />
+              </div>
+            </div>
+            {!medication && !fallbackIntake && medicationId && (
+              <p
+                role="status"
+                className="text-xs leading-relaxed text-muted-foreground"
+              >
+                That medication is no longer available. Choose another to
+                continue this draft.
+              </p>
+            )}
+            <div className="form-field">
+              <Label id="intake-quantity-label" htmlFor="intake-quantity">
+                Amount Taken
+              </Label>
+              <IntakeAmountField
+                value={editorQuantity}
+                onChange={setQuantity}
+                onStep={stepQuantity}
+                increment={increment}
+                unit={visibleQuantity === 1 ? type.unit : type.units}
+                calculatedDose={calculatedDose}
+                originalQuantityPreserved={originalQuantityPreserved}
+                disabled={busy}
+                invalid={Boolean(error) && !validQuantity}
+              />
+              <div className="mt-1 grid grid-cols-4 gap-1.5">
+                {presets.map((amount) => (
+                  <button
+                    type="button"
+                    key={amount}
+                    onClick={() => setQuantity(String(amount))}
+                    aria-pressed={visibleQuantity === amount}
+                    data-dialog-corner="compact"
+                    className={`h-8 rounded-lg border text-xs transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+                  >
+                    {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </CheckInSection>
@@ -451,7 +457,11 @@ export function IntakeForm({
           {error}
         </p>
       )}
-      <div className={styles.footer} data-draft-action-footer>
+      <div
+        className={styles.footer}
+        data-dialog-fade-footer
+        data-draft-action-footer
+      >
         <p className="text-[10px] leading-relaxed text-muted-foreground">
           {belongsTo
             ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`

@@ -106,14 +106,14 @@
   --drawer-bleed-background: var(--navigation-surface);
 }
 
-.checkInSurface:has([data-check-in-form]) .checkInHeader {
+.checkInSurface:has([data-check-in-form], [data-intake-form]) .checkInHeader {
   position: relative;
   isolation: isolate;
   --fade-ink: var(--color-mauve-950, #0c090c);
   /* Header-to-form space, form padding, separator, then the gap to Journal entry. */
   --fade-tail: calc(5 * var(--spacing) + 24px + 1px + 24px);
 }
-.checkInSurface:has([data-check-in-form]) .checkInHeader::before {
+.checkInSurface:has([data-check-in-form], [data-intake-form]) .checkInHeader::before {
   content: "";
   position: absolute;
   grid-column: 1 / -1;
@@ -130,8 +130,36 @@
 }
 
 /* The faded footer owns the bottom safe area on both dialog layouts. */
-.checkInSurface[data-dialog-scroll]:has([data-morning-sleep-summary]),
-.checkInSurface .scrollBody:has([data-morning-sleep-summary]) {
+.checkInSurface[data-dialog-scroll]:has([data-dialog-fade-footer]),
+.checkInSurface .scrollBody:has([data-dialog-fade-footer]) {
   padding-bottom: 0;
   overscroll-behavior-y: none;
+}
+
+
+.checkInSurface [data-dialog-fade-footer] {
+  margin-inline: calc(-1 * var(--dialog-scroll-gutter));
+  padding-inline: var(--dialog-scroll-gutter);
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-violet-400) 34%, transparent),
+      transparent 76%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))) 44%, transparent),
+      color-mix(in srgb, var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))) 21%, transparent) 43%,
+      transparent calc(100% - 18px)
+    );
+}
+@media (min-width: 768px) {
+  .checkInSurface [data-dialog-fade-footer] { padding-bottom: var(--dialog-scroll-gutter); }
+}
+.checkInSurface:has([data-intake-form]) .description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }

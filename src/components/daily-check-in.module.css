@@ -689,29 +689,7 @@
   margin-bottom: 24px;
 }
 .submitArea[data-has-sleep-summary="true"] {
-  --footer-side: var(--dialog-scroll-gutter);
-  --footer-bottom: max(24px, env(safe-area-inset-bottom));
-  margin-inline: calc(-1 * var(--footer-side));
-  padding-top: 24px; /* Together with the form gap, leaves 48px above the rule. */
-  padding-inline: var(--footer-side);
-  padding-bottom: var(--footer-bottom);
-  background:
-    linear-gradient(
-      to top,
-      color-mix(in srgb, var(--color-violet-400) 34%, transparent),
-      transparent 76%
-    ),
-    linear-gradient(
-      to top,
-      color-mix(in srgb, var(--checkin-line) 44%, transparent),
-      color-mix(in srgb, var(--checkin-line) 21%, transparent) 43%,
-      transparent calc(100% - 18px)
-    );
-}
-@media (min-width: 768px) {
-  .submitArea[data-has-sleep-summary="true"] {
-    --footer-bottom: var(--dialog-scroll-gutter);
-  }
+  padding-top: 24px;
 }
 .submitArea[data-has-sleep-summary="true"]::before {
   margin-bottom: 48px;
