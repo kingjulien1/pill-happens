@@ -163,7 +163,7 @@
 .snapshotTitle {
   margin: 0;
   color: var(--journal-emphasis);
-  font-size: 16px;
+  font-size: 11.33px;
   font-weight: 600;
   line-height: 18px;
 }
@@ -380,9 +380,13 @@
   border-radius: 12px;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-indigo-400) 14.94%, transparent),
-    color-mix(in srgb, var(--color-pink-700) 14.94%, transparent)
+    color-mix(in srgb, var(--color-indigo-400) 13.89%, transparent),
+    color-mix(in srgb, var(--color-pink-700) 13.89%, transparent)
   );
+  background-color: color-mix(in srgb, var(--color-mauve-950, #0c090c) 59%, transparent);
+  color: #f9f2fc;
+  font-size: 13.8px;
+  font-weight: 500;
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   text-align: start;
@@ -419,7 +423,7 @@
   height: 25px;
 }
 .editor .heading {
-  font-size: clamp(16px, 5.3cqi, 21px);
+  font-size: clamp(20.67px, 6.85cqi, 27.13px);
   line-height: 1.15;
 }
 .morningPrompt { margin: 3px 0 0; }
