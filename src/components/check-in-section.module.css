@@ -3,6 +3,11 @@
   min-width: 0;
   gap: 8px;
 }
+.section + .section,
+.section + [data-morning-sleep-fields],
+.section + [data-evening-check-in-fields] {
+  margin-block-start: 10px;
+}
 .frame {
   --line-width: 1.5px;
   position: relative;
