@@ -16,17 +16,22 @@
   padding-inline-end: 8.75px;
 }
 
+.previewDivider { margin-block: 24px; }
+
 .preview {
   display: grid;
-  gap: 18px;
+  gap: 13.5px;
   min-width: 0;
 }
 .preview > [data-preview-title-pill] {
   --final-look-copy: var(--foreground);
   --final-look-muted: var(--muted-foreground);
   justify-self: center;
+  padding-inline: 16px;
   background: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
 }
+.preview h3 { display: inline-flex; align-items: center; gap: 5px; }
+
 .trackingDay {
   display: flex;
   justify-content: space-between;
