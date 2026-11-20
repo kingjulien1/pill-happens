@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps, CSSProperties } from "react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import {
   BUTTON_SYSTEM,
@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import styles from "./action-button.module.css";
 
 export type PrimaryButtonProps = Omit<ComponentProps<typeof Button>, "kind"> & {
+  /** Outboard paint must anchor to the native button, outside its content row. */
+  decoration?: ReactNode;
   radius?: number;
   pending?: boolean;
   theme?: ActionButtonTheme;
@@ -28,6 +30,7 @@ export type PrimaryButtonProps = Omit<ComponentProps<typeof Button>, "kind"> & {
 /** Compatibility geometry and content; Button owns the host and shared paint. */
 export function LayeredActionButton({
   children,
+  decoration,
   className,
   style,
   radius,
@@ -77,6 +80,7 @@ export function LayeredActionButton({
           : { ...baseStyle, ...style }
       }
     >
+      {decoration}
       <span className={styles.content} data-button-content>
         {children}
       </span>

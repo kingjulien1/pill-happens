@@ -15,7 +15,7 @@ import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationCardBase } from "@/components/medication-card-base";
-import { SpecularRim } from "@/components/specular-rim";
+import { SpecularCardBorder } from "@/components/specular-card-border";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
 import {
   CHECK_IN_CARD_COLOR,
@@ -203,30 +203,10 @@ export function DailyCheckInSection({
     >
       {intakeSpacing === "before" && intakeSpacer}
       <div className={styles.cardFrame}>
-        <svg className={styles.desktopRim} aria-hidden="true" focusable="false">
-          <rect width="100%" height="100%" className={styles.rimTrack} />
-          <rect
-            width="100%"
-            height="100%"
-            className={styles.rimLight}
-            pathLength="100"
-          />
-        </svg>
+        <SpecularCardBorder desktop />
         <MedicationCardBase
           color={CHECK_IN_CARD_COLOR}
-          decoration={
-            <span
-              className={styles.outerFrame}
-              data-specular-frame
-              aria-hidden="true"
-            >
-              <SpecularRim
-                palette="triad"
-                glow={false}
-                className={styles.outerLight}
-              />
-            </span>
-          }
+          decoration={<SpecularCardBorder />}
           icon={morning ? "sun" : "moon-star"}
           leadingArtwork={
             <CheckInCardArtwork

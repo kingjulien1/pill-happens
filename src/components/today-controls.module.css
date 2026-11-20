@@ -417,33 +417,3 @@
     background: var(--control-face);
   }
 }
-
-@property --log-intake-shine-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 126deg;
-}
-
-.action[data-log-intake-rim]::after {
-  --rim-outset: calc(var(--action-outer-line) * 0.292);
-  content: "";
-  position: absolute;
-  inset: calc(-1 * var(--rim-outset));
-  padding: calc(var(--action-outer-line) * 2 + var(--rim-outset));
-  border-radius: calc(var(--intake-card-radius, 21px) + var(--rim-outset));
-  background: conic-gradient(from var(--log-intake-shine-angle),
-    #783b70, #cf79ae 23%, #ffe1ee 32%, #e898c4 39%, #783b70 62%, #a982c3 82%, #783b70);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .action[data-log-intake-rim]::after {
-    animation: log-intake-shine 5.2s linear infinite;
-  }
-}
-@keyframes log-intake-shine {
-  to { --log-intake-shine-angle: 486deg; }
-}

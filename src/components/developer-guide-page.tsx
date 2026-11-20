@@ -1294,7 +1294,14 @@ export function DeveloperGuidePage() {
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
                 shadows retain the raised face. Log Intake uses a larger face
-                with a 6px inset, a 1⅔px outer line and a 4px inner line.
+                with a 6px inset, a 1⅔px surface edge and a 4px inner line.
+                Its outer SpecularCardBorder is shared with the Morning and
+                Evening cards: a 3px gap, 3.733px purple/pink rim, three brighter
+                stops and the same glow. Mobile keeps the shader inside the
+                native button through PrimaryButton’s decoration slot; desktop
+                uses the same sibling SVG and 5.46s highlight loop to avoid
+                Safari clipping. The transparent surround remains independent
+                of that outer border.
               </p>
               <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark

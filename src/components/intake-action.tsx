@@ -17,6 +17,7 @@ import {
 } from "@/lib/action-button-system";
 import { IntakeLogSymbol } from "@/components/intake-log-symbol";
 import { PageActionDock } from "@/components/page-action-dock";
+import { SpecularCardBorder } from "@/components/specular-card-border";
 
 // Temporary visibility switch: set true to restore the unchanged amounts bar.
 const SHOW_INTAKE_AMOUNTS = false;
@@ -248,6 +249,7 @@ export function IntakeAction({
         data-intake-entry-part="button"
       >
         <div className="intake-action-shell">
+          <SpecularCardBorder desktop />
           <TodayActionButton
             type="button"
             surface="solid"
@@ -259,6 +261,7 @@ export function IntakeAction({
             }}
             data-intake-paint="satin"
             data-log-intake-rim
+            decoration={<SpecularCardBorder />}
             onClick={onClick}
             className="intake-primary-cta pointer-events-auto w-full"
           >
