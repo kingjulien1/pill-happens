@@ -3,7 +3,6 @@ import {
   CircleHelp,
   Ellipsis,
   Hand,
-  Layers2,
   MessageCircle,
   Pill,
   Syringe,
@@ -11,6 +10,7 @@ import {
 } from "lucide-react";
 import { MedicationGlyph } from "@/components/medication-icon";
 import { Mouth } from "@/components/mouth-icon";
+import { CreamJar } from "@/components/cream-jar-icon";
 import { isIntakeRoute, type IntakeRoute } from "@/lib/intake-routes";
 
 const routeIcons = {
@@ -21,7 +21,7 @@ const routeIcons = {
   buccal: MessageCircle,
   inhalation: Wind,
   topical: Hand,
-  transdermal: Layers2,
+  transdermal: CreamJar,
   rectal: ArrowUpToLine,
   injection: Syringe,
   other: Ellipsis,
