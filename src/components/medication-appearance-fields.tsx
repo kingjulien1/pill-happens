@@ -52,6 +52,7 @@ import {
   isMedicationLucideIcon,
   type MedicationColor,
 } from "@/lib/medication-appearance";
+import { FinalLookHeading } from "./final-look-heading";
 import styles from "./medication-appearance-fields.module.css";
 import { Button } from "@/components/ui/button";
 
@@ -732,11 +733,7 @@ export function MedicationAppearanceFields({
             data-preview-content
           >
             <header className={styles.previewHeader} data-preview-header>
-              <div className={styles.titlePill} data-preview-title-pill>
-                <h3 id={`${id}-preview-title`}>Final Look</h3>
-                <span aria-hidden="true" className={styles.titleSeparator} />
-                <span>Live Preview</span>
-              </div>
+              <FinalLookHeading id={`${id}-preview-title`} />
               <span className={styles.colorChip} data-preview-color-chip>
                 <span
                   aria-hidden="true"

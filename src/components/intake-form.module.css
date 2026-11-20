@@ -3,7 +3,6 @@
   isolation: isolate;
   display: grid;
   gap: 10px;
-  border-top: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
   padding: 22px 0 6px;
   text-align: center;
 }
@@ -15,4 +14,24 @@
 }
 .medicationSection [data-compact-choice-trigger] {
   padding-inline-end: 8.75px;
+}
+
+.preview {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  padding-block-start: 8px;
+}
+.preview > :first-child { justify-self: center; }
+.trackingDay {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
+  color: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
+  font-size: 10px;
+  font-weight: 525;
 }

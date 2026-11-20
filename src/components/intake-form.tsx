@@ -7,12 +7,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
+import { MedicationPreview } from "./notification-change-preview";
+import { FinalLookHeading } from "./final-look-heading";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import { toast } from "@/components/ui/journal-toast";
 import {
   intakeNotificationSnapshot,
+  medicationNotificationSnapshot,
   savedNotificationRecord,
 } from "@/lib/notification-change-preview";
 import {
@@ -173,9 +176,11 @@ export function IntakeForm({
         delta < 0 && Number(next) < increment ? String(increment) : next,
       );
   };
+  let previewTime = "";
   let belongsTo = "";
   try {
-    belongsTo = dayKey(fromLocalInput(takenAt, timezone), timezone);
+    previewTime = fromLocalInput(takenAt, timezone);
+    belongsTo = dayKey(previewTime, timezone);
   } catch {
     /* shown on submit */
   }
@@ -351,7 +356,7 @@ export function IntakeForm({
       className={checkStyles.form}
       data-intake-form
     >
-      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-6">
+      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-7">
         <CheckInSection
           caption="Medication & Amount"
           context="What you took"
@@ -458,6 +463,24 @@ export function IntakeForm({
         </CheckInSection>
       </fieldset>
 
+      <section className={styles.preview} aria-labelledby="intake-preview-title">
+        <FinalLookHeading id="intake-preview-title" large />
+        {belongsTo && validQuantity && effectiveQuantity !== null && (medication || fallbackIntake) ? (
+          <MedicationPreview record={{
+            kind: "intake",
+            name: medication?.name ?? fallbackIntake!.medicationName,
+            medication: medication ? medicationNotificationSnapshot(medication) : undefined,
+            strengthMg: strength,
+            quantity: effectiveQuantity,
+            form: medicationForm,
+            route,
+            takenAt: previewTime,
+            timeZone: timezone,
+          }} />
+        ) : (
+          <p className="text-center text-sm text-muted-foreground">Choose a medication, amount and time to preview your entry.</p>
+        )}
+      </section>
       {error && (
         <p role="alert" className="text-xs leading-relaxed text-destructive">
           {error}
@@ -468,22 +491,14 @@ export function IntakeForm({
         data-dialog-fade-footer
         data-draft-action-footer
       >
-        <div className="grid gap-1">
-          <p className="text-[10px] leading-relaxed text-muted-foreground">
-            {belongsTo
-              ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`
-              : "Choose a valid time"}
-            . Days begin at 06:00.
-          </p>
-          <DialogPrimaryButton
-            type="submit"
-            disabled={busy}
-            pending={busy}
-            className="w-full rounded-2xl"
-          >
-            {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
-          </DialogPrimaryButton>
-        </div>
+        <DialogPrimaryButton
+          type="submit"
+          disabled={busy}
+          pending={busy}
+          className="w-full rounded-2xl"
+        >
+          {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
+        </DialogPrimaryButton>
         <DraftStatus
           {...draft}
           onReset={busy || footerAction || formId ? undefined : reset}
@@ -498,6 +513,10 @@ export function IntakeForm({
               : undefined
           }
         />
+        <div className={styles.trackingDay}>
+          <span>{belongsTo ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.` : "Choose a valid time."}</span>
+          <span>Days begin at 06:00.</span>
+        </div>
       </div>
     </form>
   );

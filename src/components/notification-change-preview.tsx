@@ -127,7 +127,7 @@ function SnapshotCaption({
   );
 }
 
-function MedicationPreview({
+export function MedicationPreview({
   record,
 }: {
   record: Extract<NotificationPreviewRecord, { kind: "intake" | "medication" }>;

@@ -165,6 +165,7 @@
 }
 
 .checkInSurface [data-intake-form] [data-dialog-fade-footer] {
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
   --footer-violet: 19.83%;
   --footer-base: 25.67%;
   --footer-middle: 12.25%;
