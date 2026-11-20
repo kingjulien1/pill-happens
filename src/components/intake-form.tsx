@@ -456,9 +456,14 @@ export function IntakeForm({
                     onClick={() => setQuantity(String(amount))}
                     aria-pressed={visibleQuantity === amount}
                     data-dialog-corner="compact"
-                    className={`h-8 rounded-lg border text-sm font-semibold tabular-nums transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-[color-mix(in_srgb,var(--checkin-line)_14%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+                    className={`flex min-h-8 flex-wrap items-baseline justify-center content-center gap-x-1 rounded-lg border py-1 text-sm font-semibold tabular-nums transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-[color-mix(in_srgb,var(--checkin-line)_14%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
                   >
-                    {formatQuantityShortcut(amount)}
+                    <span>{formatQuantityShortcut(amount)}</span>
+                    {strength > 0 && (
+                      <span className="text-[10px] leading-tight opacity-50">
+                        {formatDose(doseMg({ strengthMg: strength, quantity: amount }))} mg
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
