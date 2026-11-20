@@ -48,10 +48,7 @@ import { CheckInSection } from "./check-in-section";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import { useReflectionSave } from "@/components/use-reflection-save";
-import {
-  MorningSleepFields,
-  MorningSleepSummary,
-} from "@/components/morning-sleep-fields";
+import { MorningSleepFields } from "@/components/morning-sleep-fields";
 import {
   hasMorningSleepContent,
   parseMorningSleepDraft,
@@ -829,9 +826,7 @@ function CheckInForm({
         className={styles.submitArea}
         data-dialog-fade-footer
         data-check-in-submit
-        data-has-sleep-summary={morning || undefined}
       >
-        {morning && <MorningSleepSummary value={morningSleep} />}
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
           <DialogPrimaryButton
             type="submit"

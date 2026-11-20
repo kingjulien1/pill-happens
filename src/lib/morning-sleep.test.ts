@@ -8,6 +8,7 @@ import {
   isMorningSleepDraft,
   morningSleepDefaults,
   parseMorningSleepDraft,
+  withSleepStageTotals,
 } from "./morning-sleep";
 
 test("a new sleep draft has no guessed ratings, clocks or zero durations", () => {
@@ -211,4 +212,70 @@ test("legacy sleep hours prefill only a known duration and canonical unknown sta
     value: saved,
     error: null,
   });
+});
+
+test("complete report stages derive total sleep and the gap to 10 h 30 min through saving and reopening", () => {
+  const draft = {
+    ...morningSleepDefaults(),
+    lightsOut: "01:40",
+    gotUp: "12:49",
+    lightMinutes: "227",
+    dreamMinutes: "55",
+    deepMinutes: "65",
+  };
+  const calculated = withSleepStageTotals(Object.freeze(draft));
+  assert.equal(calculated.sleepHours, "5");
+  assert.equal(calculated.sleepMinutes, "47");
+  assert.equal(calculated.extraSleepHours, "4");
+  assert.equal(calculated.extraSleepMinutes, "43");
+  const parsed = parseMorningSleepDraft(draft);
+  assert.equal(parsed.error, null);
+  assert.equal(parsed.value?.totalSleepMinutes, 347);
+  assert.equal(parsed.value?.extraSleepMinutes, 283);
+  const reopened = morningSleepDefaults(parsed.value);
+  assert.equal(reopened.sleepMinutes, "47");
+  assert.equal(reopened.extraSleepMinutes, "43");
+});
+
+test("zero stage values remain valid and sleep at or beyond the reference yields zero extra sleep", () => {
+  for (const [light, dream, deep, total, extra] of [
+    [0, 0, 0, 0, 630],
+    [600, 30, 0, 630, 0],
+    [600, 60, 60, 720, 0],
+  ]) {
+    const parsed = parseMorningSleepDraft({
+      ...morningSleepDefaults(),
+      lightMinutes: String(light),
+      dreamMinutes: String(dream),
+      deepMinutes: String(deep),
+    });
+    assert.equal(parsed.error, null);
+    assert.equal(parsed.value?.totalSleepMinutes, total);
+    assert.equal(parsed.value?.extraSleepMinutes, extra);
+    const reopened = morningSleepDefaults(parsed.value);
+    assert.equal(reopened.sleepMinutes, String(total % 60));
+    assert.equal(reopened.extraSleepMinutes, String(extra % 60));
+  }
+});
+
+test("partial, unfinished and invalid stage edits preserve previously known total and extra sleep", () => {
+  const base = {
+    ...morningSleepDefaults({
+      ...emptyMorningSleep(),
+      totalSleepMinutes: 455,
+      extraSleepMinutes: 35,
+    }),
+    lightMinutes: "227",
+    dreamMinutes: "55",
+  };
+  for (const deepMinutes of [undefined, "", "-", "1.5", "-1", "1441", "1440"]) {
+    const draft = { ...base, deepMinutes };
+    const calculated = withSleepStageTotals(draft);
+    assert.equal(calculated, draft);
+    assert.equal(calculated.sleepHours, "7");
+    assert.equal(calculated.sleepMinutes, "35");
+    assert.equal(calculated.extraSleepHours, "0");
+    assert.equal(calculated.extraSleepMinutes, "35");
+  }
+  assert.equal(parseMorningSleepDraft(base).value?.totalSleepMinutes, 455);
 });

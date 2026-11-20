@@ -1,19 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ImagePlus } from "lucide-react";
-import { CheckInSection } from "./check-in-section";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { useEffect, useId, useRef, useState } from "react";
 import {
-  reportMetrics,
+  AlarmClockCheck,
+  ArrowRight,
+  ImageDown,
+  LoaderCircle,
+  Check,
+  X,
+} from "lucide-react";
+import { TodayActionButton } from "./today-action-button";
+import { Button } from "./ui/button";
+import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
+import {
   reportLabels,
-  sleepCycleMetrics,
   type ReportKey,
   type ReportValues,
 } from "@/lib/sleep-cycle-report";
-import type { MorningSleepDraft } from "@/lib/morning-sleep";
-import styles from "./morning-sleep-fields.module.css";
+import {
+  withSleepStageTotals,
+  type MorningSleepDraft,
+} from "@/lib/morning-sleep";
+import styles from "./sleep-cycle-import.module.css";
 
 export function SleepCycleImport({
   value,
@@ -24,37 +32,43 @@ export function SleepCycleImport({
   onChange: (next: MorningSleepDraft) => void;
   disabled: boolean;
 }) {
+  const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const task = useRef<AbortController | null>(null);
   const [reading, setReading] = useState(false);
   const [message, setMessage] = useState("");
   const [review, setReview] = useState<ReportValues | null>(null);
+  const [count, setCount] = useState(0);
   useEffect(() => () => task.current?.abort(), []);
 
   async function load(file: File) {
+    task.current?.abort();
     const controller = new AbortController();
     task.current = controller;
     setReading(true);
+    setCount(0);
     setReview(null);
-    setMessage("Preparing the image reader…");
+    setMessage("Waking up the image reader…");
     try {
       const { readSleepCycleImage } =
         await import("@/lib/read-sleep-cycle-image");
       const result = await readSleepCycleImage(
         file,
         controller.signal,
-        (count) => {
-          if (!controller.signal.aborted)
-            setMessage(`Reading report · ${count} / 11`);
+        (next) => {
+          if (!controller.signal.aborted) {
+            setCount(next);
+            setMessage(`Reading your night · ${next} / 11`);
+          }
         },
       );
       if (controller.signal.aborted) return;
-      const count = Object.keys(result).length;
-      if (count) setReview(result);
+      const found = Object.keys(result).length;
+      if (found) setReview(result);
       setMessage(
-        count
-          ? `Read ${count} of 11 values. Check them against your report before applying.`
-          : "No values were readable. Try the original export or enter them below.",
+        found
+          ? `${found} of 11 readings found. Give them a quick once-over.`
+          : "Couldn’t read the values. Try the full export, or fill in the fields below.",
       );
     } catch (error) {
       if (!controller.signal.aborted)
@@ -68,125 +82,135 @@ export function SleepCycleImport({
 
   function apply() {
     if (!review) return;
-    const patch: Partial<MorningSleepDraft> = { ...review };
-    if (review.lightMinutes && review.deepMinutes && review.dreamMinutes) {
-      const minutes =
-        Number(review.lightMinutes) +
-        Number(review.deepMinutes) +
-        Number(review.dreamMinutes);
-      if (minutes <= 1440) {
-        patch.sleepHours = String(Math.floor(minutes / 60));
-        patch.sleepMinutes = String(minutes % 60);
-      }
-    }
-    onChange({ ...value, ...patch });
+    onChange(withSleepStageTotals({ ...value, ...review }));
     setReview(null);
     setMessage(
-      "Added to your draft. Review the sleep fields, then save your check-in.",
+      "Night imported. Everything below is ready to check before you save.",
     );
   }
 
   return (
-    <CheckInSection
-      caption="Sleep Cycle"
-      context="Nightly report"
-      detail="Optional"
+    <section
+      className={styles.import}
+      aria-labelledby={`${id}-heading`}
+      aria-busy={reading}
     >
-      <section className={styles.section}>
-        <p className="text-xs text-muted-foreground">
-          Choose the full portrait share image for this morning. Your browser
-          reads it on this device.
-        </p>
-        <input
-          ref={input}
-          hidden
-          type="file"
-          accept="image/*"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = "";
-            if (file) void load(file);
-          }}
+      <hr className={styles.separator} />
+      <div className={styles.heading}>
+        <AlarmClockCheck
+          className={styles.mark}
+          size={38}
+          strokeWidth={1.8}
+          aria-hidden="true"
         />
-        <Button
-          type="button"
-          variant="secondary"
-          disabled={disabled || reading}
-          onClick={() => input.current?.click()}
-        >
-          <ImagePlus />
-          {reading ? "Reading image…" : "Choose report image"}
-        </Button>
-        <p role="status" className="text-xs text-muted-foreground">
+        <div>
+          <h3 id={`${id}-heading`}>Sleep, With Receipts.</h3>
+          <p>
+            Bring your Sleep Cycle report. We’ll read the times, stages and
+            score, then let you check the numbers. One less job for your morning
+            brain.
+          </p>
+        </div>
+      </div>
+      <input
+        ref={input}
+        hidden
+        type="file"
+        accept="image/*"
+        disabled={disabled || reading}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          if (file) void load(file);
+        }}
+      />
+      <TodayActionButton
+        type="button"
+        className={styles.importButton}
+        radius={17}
+        disabled={disabled || reading}
+        style={{ ...getIntakeActionThemeStyle(), height: 48, minHeight: 48 }}
+        onClick={() => input.current?.click()}
+      >
+        {reading ? (
+          <LoaderCircle
+            className={styles.spinner}
+            size={17}
+            style={{ color: "var(--control-ink)" }}
+            aria-hidden="true"
+          />
+        ) : (
+          <ImageDown
+            size={17}
+            style={{ color: "var(--control-ink)" }}
+            aria-hidden="true"
+          />
+        )}
+        <span>{reading ? "Reading Your Snooze…" : "Scan My Snooze"}</span>
+        <span className={styles.buttonAside}>
+          / {reading ? `${count} of 11` : "Import Report"}
+        </span>
+        <ArrowRight
+          size={17}
+          style={{ color: "var(--control-ink)" }}
+          aria-hidden="true"
+        />
+      </TodayActionButton>
+      <p className={styles.hint}>
+        Use the full portrait share image. It stays on this device; the readings
+        go into your editable draft.
+      </p>
+      {message && (
+        <p role="status" className={styles.status}>
           {message}
         </p>
-        {review && (
-          <div className="grid gap-2">
-            <dl className="grid grid-cols-2 gap-2 text-xs">
-              {(Object.keys(review) as ReportKey[]).map((key) => (
+      )}
+      {review && (
+        <div className={styles.review}>
+          <dl>
+            {(Object.keys(review) as ReportKey[]).map((key) => {
+              const raw = review[key];
+              const display = key.endsWith("Minutes")
+                ? `${Math.floor(Number(raw) / 60)} h ${Number(raw) % 60} min`
+                : raw;
+              return (
                 <div key={key}>
-                  <dt className="text-muted-foreground">
-                    {reportLabels[key as keyof typeof reportLabels] ??
-                      sleepCycleMetrics[key as keyof typeof sleepCycleMetrics]
-                        ?.label}
-                  </dt>
+                  <dt>{reportLabels[key]}</dt>
                   <dd>
-                    {review[key]}{" "}
-                    {key.endsWith("Minutes")
-                      ? "min"
-                      : key === "regularity"
-                        ? "%"
-                        : key === "coughingRate"
-                          ? "/ h"
-                          : ""}
+                    {display}
+                    {key === "regularity"
+                      ? "%"
+                      : key === "coughingRate"
+                        ? " / h"
+                        : ""}
                   </dd>
                 </div>
-              ))}
-            </dl>
-            <p className="text-xs text-muted-foreground">
-              Applying replaces the matching fields. Total sleep is calculated
-              when all three sleep stages are readable.
-            </p>
-            <div className="flex gap-2">
-              <Button type="button" disabled={disabled} onClick={apply}>
-                Apply to draft
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setReview(null);
-                  setMessage("");
-                }}
-              >
-                Discard
-              </Button>
-            </div>
+              );
+            })}
+          </dl>
+          <p className={styles.hint}>
+            Apply these readings to the matching fields below. Save Check-In
+            keeps them with this day.
+          </p>
+          <div className={styles.reviewActions}>
+            <Button type="button" disabled={disabled} onClick={apply}>
+              <Check size={15} />
+              Use These Readings
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setReview(null);
+                setMessage("");
+              }}
+            >
+              <X size={14} />
+              Discard
+            </Button>
           </div>
-        )}
-        <div className="grid grid-cols-2 gap-3">
-          {reportMetrics.map((key) => (
-            <label key={key} className="grid gap-1 text-xs">
-              {sleepCycleMetrics[key].label} · {sleepCycleMetrics[key].unit}
-              <Input
-                type="number"
-                min={0}
-                max={
-                  Number.isFinite(sleepCycleMetrics[key].max)
-                    ? sleepCycleMetrics[key].max
-                    : undefined
-                }
-                step={key === "coughingRate" ? "any" : 1}
-                disabled={disabled}
-                value={value[key] ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, [key]: event.target.value })
-                }
-              />
-            </label>
-          ))}
         </div>
-      </section>
-    </CheckInSection>
+      )}
+    </section>
   );
 }

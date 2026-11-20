@@ -1,4 +1,8 @@
-import { reportMetrics, sleepCycleMetrics, type ReportMetric } from "./sleep-cycle-report";
+import {
+  reportMetrics,
+  sleepCycleMetrics,
+  type ReportMetric,
+} from "./sleep-cycle-report";
 
 /** Optional, self-reported sleep details. Clock differences are estimates, not instants. */
 export type MorningSleep = Partial<Record<ReportMetric, number>> & {
@@ -28,17 +32,18 @@ export const MORNING_SLEEP_RATING_FIELDS = [
 export type MorningSleepDraft = Pick<
   MorningSleep,
   (typeof MORNING_SLEEP_RATING_FIELDS)[number]
-> & Partial<Record<ReportMetric, string>> & {
-  lightsOut: string;
-  gotUp: string;
-  fallAsleepMinutes: string;
-  awakenings: string;
-  awakeMinutes: string;
-  sleepHours: string;
-  sleepMinutes: string;
-  extraSleepHours: string;
-  extraSleepMinutes: string;
-};
+> &
+  Partial<Record<ReportMetric, string>> & {
+    lightsOut: string;
+    gotUp: string;
+    fallAsleepMinutes: string;
+    awakenings: string;
+    awakeMinutes: string;
+    sleepHours: string;
+    sleepMinutes: string;
+    extraSleepHours: string;
+    extraSleepMinutes: string;
+  };
 
 const textFields = [
   "lightsOut",
@@ -94,6 +99,29 @@ export function hasMorningSleepData(sleep?: MorningSleep | null) {
   );
 }
 
+/** Complete sleep stages provide the total and the gap to the chosen 10 h 30 min reference. */
+export function withSleepStageTotals(
+  draft: MorningSleepDraft,
+): MorningSleepDraft {
+  const stages = (["lightMinutes", "dreamMinutes", "deepMinutes"] as const).map(
+    (key) => {
+      const raw = draft[key]?.trim();
+      return raw && /^\d+$/.test(raw) ? Number(raw) : null;
+    },
+  );
+  if (!stages.every(validMinutes)) return draft;
+  const total = stages.reduce((sum, minutes) => sum + minutes, 0);
+  if (total > 1_440) return draft;
+  const extra = Math.max(0, 630 - total);
+  return {
+    ...draft,
+    sleepHours: String(Math.floor(total / 60)),
+    sleepMinutes: String(total % 60),
+    extraSleepHours: String(Math.floor(extra / 60)),
+    extraSleepMinutes: String(extra % 60),
+  };
+}
+
 export function morningSleepDefaults(
   saved?: MorningSleep | null,
   legacySleepHours?: number | null,
@@ -114,7 +142,7 @@ export function morningSleepDefaults(
   const extra = duration(saved?.extraSleepMinutes);
   const raw = (value: number | null | undefined) =>
     value === null || value === undefined ? "" : String(value);
-  return {
+  return withSleepStageTotals({
     dreamRecall: validRating(saved?.dreamRecall) ? saved.dreamRecall : null,
     sleepiness: validRating(saved?.sleepiness) ? saved.sleepiness : null,
     sleepDepth: validRating(saved?.sleepDepth) ? saved.sleepDepth : null,
@@ -127,10 +155,14 @@ export function morningSleepDefaults(
     awakeMinutes: raw(saved?.awakeMinutes),
     sleepHours: asleep.hours,
     sleepMinutes: asleep.minutes,
-    ...Object.fromEntries(reportMetrics.filter(key => saved?.[key] != null).map(key => [key, String(saved![key])])),
+    ...Object.fromEntries(
+      reportMetrics
+        .filter((key) => saved?.[key] != null)
+        .map((key) => [key, String(saved![key])]),
+    ),
     extraSleepHours: extra.hours,
     extraSleepMinutes: extra.minutes,
-  };
+  });
 }
 
 export function isMorningSleepDraft(
@@ -142,7 +174,11 @@ export function isMorningSleepDraft(
     MORNING_SLEEP_RATING_FIELDS.every(
       (key) => draft[key] === null || validRating(draft[key]),
     ) &&
-    reportMetrics.every(key => draft[key] === undefined || (typeof draft[key] === "string" && draft[key].length <= 256)) &&
+    reportMetrics.every(
+      (key) =>
+        draft[key] === undefined ||
+        (typeof draft[key] === "string" && draft[key].length <= 256),
+    ) &&
     textFields.every(
       (key) => typeof draft[key] === "string" && draft[key].length <= 256,
     )
@@ -152,7 +188,7 @@ export function isMorningSleepDraft(
 export function hasMorningSleepContent(draft: MorningSleepDraft) {
   return (
     MORNING_SLEEP_RATING_FIELDS.some((key) => draft[key] !== null) ||
-    reportMetrics.some(key => draft[key]?.trim()) ||
+    reportMetrics.some((key) => draft[key]?.trim()) ||
     textFields.some((key) => draft[key].trim().length > 0)
   );
 }
@@ -199,6 +235,7 @@ export function parseMorningSleepDraft(draft: MorningSleepDraft): {
       error:
         "Use whole sleep ratings from 1 to 10 and review the entered times.",
     };
+  draft = withSleepStageTotals(draft);
   if (!hasMorningSleepContent(draft)) return { value: null, error: null };
   const sleep = emptyMorningSleep();
   for (const key of MORNING_SLEEP_RATING_FIELDS) sleep[key] = draft[key];
@@ -260,7 +297,11 @@ export function parseMorningSleepDraft(draft: MorningSleepDraft): {
     if (!raw) continue;
     const number = Number(raw);
     const pattern = key === "coughingRate" ? /^\d+(?:\.\d+)?$/ : /^\d+$/;
-    if (!pattern.test(raw) || !Number.isFinite(number) || number > sleepCycleMetrics[key].max)
+    if (
+      !pattern.test(raw) ||
+      !Number.isFinite(number) ||
+      number > sleepCycleMetrics[key].max
+    )
       error ??= "Check the value for " + sleepCycleMetrics[key].label + ".";
     else sleep[key] = number;
   }

@@ -689,26 +689,9 @@
 .submitArea::before {
   margin-bottom: 24px;
 }
-.submitArea[data-has-sleep-summary="true"] {
-  padding-top: 24px;
-}
-.submitArea[data-has-sleep-summary="true"]::before {
-  margin-bottom: 48px;
-}
-.submitArea [data-morning-sleep-summary] {
-  margin-bottom: 9px;
-  border-top: 0;
-  padding-top: 0;
-}
-
-/* The summary supplies the gap above the save action. */
-.submitArea[data-has-sleep-summary="true"]
-  [data-dialog-primary-button][data-slot="button"] {
-  margin-block-start: 0;
-}
-
 .saveHint {
-  margin-top: 9px;
+  margin: 18px 0 2px;
+  opacity: 0.5;
   text-align: center;
 }
 

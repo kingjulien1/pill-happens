@@ -433,11 +433,15 @@ export function DraftStatus({
       {(hasDraft || !durable || copy?.idle) && (
         <p
           role="status"
-          className="flex min-w-0 items-center justify-center gap-1.5"
+          className={`flex min-w-0 items-center justify-center gap-1.5 ${durable && hasDraft && restored ? "font-semibold text-foreground/90" : ""}`}
         >
           <ActionIcon
             name={durable ? "save" : "retry"}
-            className="size-3 shrink-0"
+            className={
+              durable && hasDraft && restored
+                ? "size-3.5 shrink-0"
+                : "size-3 shrink-0"
+            }
           />
           <span>
             {durable

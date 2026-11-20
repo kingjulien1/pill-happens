@@ -11,14 +11,18 @@ export const sleepCycleMetrics = {
 export type ReportMetric = keyof typeof sleepCycleMetrics;
 export const reportMetrics = Object.keys(sleepCycleMetrics) as ReportMetric[];
 export const reportLabels = {
-  lightsOut: "Went to bed",
-  gotUp: "Woke up",
-  fallAsleepMinutes: "Asleep after",
+  lightsOut: "Went to Bed",
+  gotUp: "Woke Up",
+  fallAsleepMinutes: "Asleep After",
   awakeMinutes: "Awake",
-  ...Object.fromEntries(
-    reportMetrics.map((key) => [key, sleepCycleMetrics[key].label]),
-  ),
-};
+  reportScore: "Sleep Score",
+  lightMinutes: "Light Sleep",
+  dreamMinutes: "Dream Sleep",
+  deepMinutes: "Deep Sleep",
+  regularity: "Regularity",
+  snoringMinutes: "Snoring",
+  coughingRate: "Coughing",
+} satisfies Record<ReportKey, string>;
 export type ReportKey =
   ReportMetric | "lightsOut" | "gotUp" | "fallAsleepMinutes" | "awakeMinutes";
 export type ReportValues = Partial<Record<ReportKey, string>>;

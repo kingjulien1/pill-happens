@@ -1,0 +1,329 @@
+.section {
+  position: relative;
+  isolation: isolate;
+  padding: 21px 17px 17px;
+  overflow: hidden;
+  border-radius: var(--dialog-radius-surface, 24px);
+  background:
+    radial-gradient(ellipse at 0% 3%, #c084fc21, transparent 60%),
+    radial-gradient(ellipse at 100% 50%, #f9a8d421, transparent 61%),
+    color-mix(
+      in srgb,
+      var(--navigation-surface, var(--popover)) 87%,
+      transparent
+    );
+  --score-edge: color-mix(in srgb, var(--foreground) 11%, transparent);
+  border: 1px solid var(--score-edge);
+}
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.heading > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.heading svg {
+  flex-shrink: 0;
+  color: #d8b4fe;
+}
+.heading h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 650;
+}
+.heading > span {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  text-align: right;
+  max-width: 85px;
+  line-height: 1.4;
+}
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  margin: 15px 0 18px;
+}
+.dial {
+  position: relative;
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 1;
+}
+.halo {
+  position: absolute;
+  inset: 15%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #c084fc16 0,
+    #f9a8d40a 48%,
+    transparent 75%
+  );
+  animation: score-breathe 7s 1.6s ease-in-out infinite;
+}
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.ring path {
+  fill: none;
+  stroke-width: 14px;
+  stroke-linecap: round;
+}
+.track {
+  stroke: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+.progress {
+  stroke-dasharray: 100;
+  stroke-dashoffset: var(--score-offset);
+  filter: drop-shadow(0 0 4px #c084fc4d);
+  animation:
+    score-arrive 1.8s cubic-bezier(0.16, 0.76, 0.16, 1) both,
+    score-radiate 7s 1.8s ease-in-out infinite;
+}
+.score {
+  position: absolute;
+  inset: 25% 10% 23%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  animation: score-copy-in 1.1s 0.3s both;
+}
+.score > label {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 500;
+}
+.scoreNumber {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+.scoreNumber input {
+  appearance: textfield;
+  width: 2.1em;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--foreground);
+  text-align: center;
+  font-size: clamp(32px, 8vw, 48px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+.scoreNumber input::-webkit-inner-spin-button,
+.scoreNumber input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.scoreNumber input:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.scoreNumber > span {
+  color: #d8b4fe;
+  font-size: 15px;
+  font-weight: 500;
+}
+.scoreCaption {
+  max-width: 112px;
+  color: var(--muted-foreground);
+  font-size: 8px;
+  line-height: 1.4;
+  text-align: center;
+}
+.ringFoot {
+  position: absolute;
+  bottom: 6%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.stats {
+  display: grid;
+  gap: 15px;
+  margin: 0;
+}
+.stats > div {
+  display: grid;
+  gap: 4px;
+}
+.stats dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.stats dt svg {
+  color: #d8b4fe;
+  flex-shrink: 0;
+}
+.stats dd {
+  margin: 0;
+  padding-left: 21px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+.metrics > label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.metrics > label > span {
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.metrics label > div {
+  position: relative;
+  min-width: 0;
+}
+.metrics input {
+  width: 100%;
+  height: 38px;
+  padding-left: 9px;
+  padding-right: 29px;
+  font-size: 16px;
+}
+.metrics label > div > span {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.note {
+  margin: 13px 0 0;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.6;
+}
+@keyframes score-arrive {
+  from {
+    stroke-dashoffset: 100;
+    opacity: 0;
+    stroke-width: 7px;
+  }
+  30% {
+    opacity: 1;
+  }
+  80% {
+    stroke-width: 15px;
+  }
+  to {
+    stroke-dashoffset: var(--score-offset);
+    stroke-width: 14px;
+  }
+}
+@keyframes score-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+  75% {
+    transform: translateY(-1px) scale(1.025);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes score-radiate {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px #c084fc4d);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px #f9a8d45c);
+  }
+}
+@keyframes score-breathe {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+@media (min-width: 768px) {
+  .section {
+    padding: 24px;
+  }
+  .overview {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 30px;
+  }
+  .dial {
+    justify-self: center;
+  }
+  .heading h3 {
+    font-size: 17px;
+  }
+  .heading > span {
+    max-width: none;
+  }
+  .stats {
+    gap: 20px;
+  }
+  .stats dd {
+    font-size: 22px;
+  }
+  .metrics input {
+    font-size: 14px;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .heading svg,
+  .stats svg,
+  .scoreNumber > span {
+    color: #7e22ce;
+  }
+  .section {
+    background:
+      radial-gradient(ellipse at 0% 3%, #c084fc24, transparent 60%),
+      radial-gradient(ellipse at 100% 50%, #f9a8d42e, transparent 61%),
+      var(--popover);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress,
+  .score,
+  .halo {
+    animation: none;
+  }
+}
