@@ -15,6 +15,9 @@
   min-width: 0;
   border-radius: var(--dialog-radius-surface);
 }
+[data-intake-form] .frame {
+  --inner-rim: none;
+}
 .section .frame > :first-child {
   margin-block: 0;
   background: transparent;
