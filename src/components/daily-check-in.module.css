@@ -64,12 +64,8 @@
 /* The timeline contributes another 8px to each check-in spacer. */
 .intakeSpacer {
   width: 100%;
-  height: 4px;
-  pointer-events: none;
-}
-
-.intakeSpacer[data-check-in-spacer="after"] {
   height: 16px;
+  pointer-events: none;
 }
 
 /* Pink identity stays local to check-ins; shared medication frames keep their palette. */
