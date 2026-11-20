@@ -74,3 +74,39 @@
 .trackingDay { column-gap: 20px; }
 .trackingDay > span { display: inline-flex; align-items: center; gap: 5px; }
 .trackingDay svg { width: 12px; height: 12px; flex: none; }
+
+.detailsStack {
+  display: grid;
+  gap: 2px;
+  transition: gap 300ms ease;
+}
+.detailsStack[data-open="true"], .extraRows { gap: 9px; }
+.detailsStack .previewContext { transition: opacity 250ms ease; overflow-wrap: anywhere; }
+.detailsStack[data-open="false"] > p:nth-child(2) { opacity: .5; }
+.detailsStack[data-open="false"] .disclosureRow p { opacity: .15; }
+.disclosureRow { display: grid; align-items: center; justify-items: center; }
+.disclosureRow > * { grid-area: 1 / 1; }
+.detailsToggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  padding-inline: 9px;
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  background: var(--card);
+  font-size: 10px;
+  font-weight: 550;
+  cursor: pointer;
+}
+.detailsToggle:focus-visible { outline: 2px solid var(--ring); }
+.detailsStack[data-open="true"] .detailsToggle { grid-row: 2; margin-top: 8px; }
+.detailsStack[data-open="true"] .detailsToggle svg { transform: rotate(180deg); }
+.extraDetails { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 300ms ease, opacity 240ms ease; }
+.extraDetails > div { min-height: 0; overflow: hidden; }
+.extraRows { display: grid; }
+.detailsStack[data-open="true"] .extraDetails { grid-template-rows: 1fr; opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .detailsStack, .detailsStack .previewContext, .extraDetails { transition: none; }
+}

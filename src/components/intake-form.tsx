@@ -1,8 +1,8 @@
 "use client";
 
-import { CalendarCheck, NotebookTabs, Sunrise } from "lucide-react";
+import { CalendarCheck, Clock3, NotebookTabs, Pill, Route, StickyNote, Sunrise, Tags } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
-import { getMedicationCategories } from "@/lib/medication-categories";
+import { getMedicationCategories, getMedicationCategory } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
+import { IntakePreviewDetails } from "./intake-preview-details";
 import { FinalLookHeading } from "./final-look-heading";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
@@ -41,7 +42,7 @@ import {
   type Intake,
 } from "@/lib/domain";
 import { Label } from "@/components/ui/label";
-import { preferredIntakeRoute } from "@/lib/intake-routes";
+import { INTAKE_ROUTES, preferredIntakeRoute } from "@/lib/intake-routes";
 import { IntakeRouteSelect } from "@/components/intake-route-select";
 import {
   MIN_EDITABLE_INTAKE_QUANTITY,
@@ -505,10 +506,17 @@ export function IntakeForm({
           <p className="text-center text-sm text-muted-foreground">Choose a medication, amount and time to preview your entry.</p>
         )}
         {belongsTo && validQuantity && (medication || fallbackIntake) && (
-          <p className={styles.previewContext}>
-            <NotebookTabs aria-hidden="true" />
-            <span>{otherEntries === 0 ? "No other entries" : `${otherEntries} other ${otherEntries === 1 ? "entry" : "entries"}`} for this medication on this tracking day.</span>
-          </p>
+          <IntakePreviewDetails rows={[
+            { icon: NotebookTabs, text: `${otherEntries === 0 ? "No other entries" : `${otherEntries} other ${otherEntries === 1 ? "entry" : "entries"}`} for this medication on this tracking day.` },
+            { icon: CalendarCheck, text: `Tracking day · ${formatDay(belongsTo, { weekday: "long", month: "short" })}` },
+            { icon: Pill, text: `Recorded strength · ${formatDose(strength)} mg per ${type.unit}` },
+            { icon: Route, text: `Intake route · ${INTAKE_ROUTES.find((item) => item.value === route)?.label ?? "Not specified"}` },
+            { icon: Clock3, text: `Time taken · ${takenAt.slice(11, 16)} (${timezone})` },
+            ...(getMedicationCategories(medication).length ? [{
+              icon: Tags, text: `Categories · ${getMedicationCategories(medication).map((kind) => getMedicationCategory(kind).label).join(", ")}`,
+            }] : []),
+            ...(intake?.note?.trim() ? [{ icon: StickyNote, text: `Entry note · ${intake.note}` }] : []),
+          ]} />
         )}
       </section>
       {error && (
