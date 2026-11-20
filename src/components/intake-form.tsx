@@ -471,6 +471,7 @@ export function IntakeForm({
         </CheckInSection>
       </fieldset>
 
+      <div className={checkStyles.sectionDivider} role="separator" />
       <section className={styles.preview} aria-labelledby="intake-preview-title">
         <FinalLookHeading id="intake-preview-title" />
         {belongsTo && validQuantity && effectiveQuantity !== null && (medication || fallbackIntake) ? (
