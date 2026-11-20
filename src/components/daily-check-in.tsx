@@ -64,6 +64,7 @@ import {
   type DailyCheckInPeriod,
 } from "@/lib/daily-check-in";
 import { checkInHeading } from "@/lib/check-in-headings";
+import { JournalDialogSubheading } from "./journal-dialog-subheading";
 import { formatDay } from "@/lib/domain";
 import {
   checkInDefaults,
@@ -340,17 +341,10 @@ export function DailyCheckInSection({
           </Button>
         }
         context={
-          <time dateTime={targetDay} className={styles.headerDate}>
-            {formatDay(targetDay, {
-              weekday: "long",
-              month: undefined,
-              day: undefined,
-            })}
-            <small>
-              <span aria-hidden="true">/</span>{" "}
-              {formatDay(targetDay, { weekday: undefined, month: "long" })}
-            </small>
-          </time>
+          <JournalDialogSubheading
+            title={<time dateTime={targetDay}>{formatDay(targetDay, { weekday: "long", month: undefined, day: undefined })}</time>}
+            detail={formatDay(targetDay, { weekday: undefined, month: "long" })}
+          />
         }
         description={
           morning

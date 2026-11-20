@@ -36,7 +36,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { PageHeading, PageSurface } from "@/components/page-heading";
-import checkInStyles from "./daily-check-in.module.css";
+import { JournalDialogSubheading } from "./journal-dialog-subheading";
 import closeStyles from "./dialog-close.module.css";
 import layoutStyles from "./page-layout.module.css";
 import {
@@ -216,6 +216,15 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       scrollKey={`intake:edit:${intake.id}`}
       title="Edit Intake"
       headerVariant="check-in"
+      context={
+        <JournalDialogSubheading
+          title={intake.medicationName}
+          detail={<time dateTime={intake.takenAt}>{new Intl.DateTimeFormat("en-GB", {
+            timeZone: data?.settings.timezone, day: "numeric", month: "short",
+            hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+          }).format(new Date(intake.takenAt))}</time>}
+        />
+      }
       description="Adjust the medication, route or amount to match what you took. The date and time determine which tracking day this entry belongs to."
     >
       <IntakeForm
@@ -497,16 +506,10 @@ function LogIntakeDialog({
       title={<span className="block truncate pe-2">Jot That Dose</span>}
       headerVariant="check-in"
       context={
-        <time dateTime={day} className={checkInStyles.headerDate}>
-          {formatDay(day, {
-            weekday: "long",
-            month: undefined,
-            day: undefined,
-          })}
-          <small>
-            / {formatDay(day, { weekday: undefined, month: "long" })}
-          </small>
-        </time>
+        <JournalDialogSubheading
+          title={<time dateTime={day}>{formatDay(day, { weekday: "long", month: undefined, day: undefined })}</time>}
+          detail={formatDay(day, { weekday: undefined, month: "long" })}
+        />
       }
       description={
         historical
