@@ -406,32 +406,12 @@
   gap: 10px;
 }
 
-.detailsRow label,
-.helpedField label {
+.detailsRow label {
   align-items: center;
   gap: 5px;
   font-size: 11px;
   font-weight: 450;
   line-height: 16px;
-}
-
-.field.helpedField {
-  gap: 14px;
-  padding: 16px;
-}
-.helpedHint {
-  margin: 0;
-  color: var(--muted-foreground);
-  font-size: 12px;
-  line-height: 1.55;
-}
-.helpedInput {
-  min-height: 6rem;
-  max-height: 15rem;
-  overflow-y: auto;
-  resize: vertical;
-  font-size: 16px;
-  line-height: 1.5;
 }
 
 .field .detailInput {
@@ -450,8 +430,7 @@
   padding-right: 30px;
 }
 
-.detailsRow label svg,
-.helpedField label svg {
+.detailsRow label svg {
   flex-shrink: 0;
 }
 

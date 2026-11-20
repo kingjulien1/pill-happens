@@ -41,13 +41,18 @@ import {
 } from "@/components/journal-drafts";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { ArrowUpRight, LibraryBig } from "lucide-react";
 import { rememberJournalDestination } from "@/components/journal-drafts";
 import { CheckInSection } from "./check-in-section";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
+import { SmallReminders } from "@/components/small-reminders";
+import {
+  reminderItems,
+  remindersCount,
+  serializeReminders,
+  type ReminderItem,
+} from "@/lib/check-in-reminders";
 import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import { useReflectionSave } from "@/components/use-reflection-save";
 import { MorningSleepFields } from "@/components/morning-sleep-fields";
@@ -57,7 +62,6 @@ import {
 } from "@/lib/morning-sleep";
 import {
   DAILY_MOODS,
-  WHAT_HELPED_MAX_LENGTH,
   checkInForDay,
   type DailyCheckIn,
   type DailyCheckInPeriod,
@@ -470,7 +474,12 @@ function CheckInForm({
       [field]: value,
       [`${field}Scale`]: 10,
     }));
-  const setHelped = (value: string) => setField("helped", value);
+  const setReminders = (items: ReminderItem[]) =>
+    draft.setValue((current) => ({
+      ...current,
+      helped: serializeReminders(items),
+      helpedList: items,
+    }));
   const [error, setError] = useState("");
   const reset = () => {
     draft.resetDraft(checkInDefaults(checkIn, period));
@@ -783,46 +792,19 @@ function CheckInForm({
             caption={
               <>
                 <ActionIcon name="sparkle" />
-                Things That Helped
+                Small Reminders
               </>
             }
             headingId={`${id}-helped-heading`}
-            context="Little Wins"
-            detail={
-              <span
-                aria-label={`${helped.length} of ${WHAT_HELPED_MAX_LENGTH} characters`}
-              >
-                {helped.length} / {WHAT_HELPED_MAX_LENGTH}
-              </span>
-            }
+            context="What Helped"
+            detail={`${remindersCount(helped)} ${remindersCount(helped) === 1 ? "Item" : "Items"}`}
           >
-            <div
-              className={cn(
-                styles.field,
-                styles.helpedField,
-                styles.formSection,
-              )}
-              data-check-in-section="helped"
-            >
-              <Label htmlFor={`${id}-helped`} className="sr-only">
-                Things That Helped
-              </Label>
-              <p id={`${id}-helped-hint`} className={styles.helpedHint}>
-                What made today a little easier? Give each thing its own line if
-                you like.
-              </p>
-              <Textarea
-                id={`${id}-helped`}
-                aria-describedby={`${id}-helped-hint`}
-                rows={3}
-                value={helped}
-                maxLength={WHAT_HELPED_MAX_LENGTH}
-                onChange={(event) => setHelped(event.target.value)}
-                placeholder={"A walk before lunch\nA friend who listened"}
-                disabled={locked}
-                className={styles.helpedInput}
-              />
-            </div>
+            <SmallReminders
+              id={`${id}-helped`}
+              items={reminderItems(helped, draft.value.helpedList)}
+              onChange={setReminders}
+              disabled={locked}
+            />
           </CheckInSection>
         </div>
       )}

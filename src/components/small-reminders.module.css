@@ -1,0 +1,222 @@
+.editor {
+  display: grid;
+  min-width: 0;
+  gap: 15px;
+  padding: 18px 16px;
+}
+.hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.65;
+}
+.list {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 19px minmax(0, 1fr) 32px;
+  align-items: start;
+  gap: 8px;
+  padding: 11px 8px 11px 11px;
+  border-radius: 13px;
+  background: linear-gradient(115deg, #f9a8d40b, #c4b5fd0b);
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition:
+    background-color 180ms ease,
+    outline-color 180ms ease;
+}
+.row:focus-within {
+  background-color: color-mix(in srgb, var(--color-purple-300) 7%, transparent);
+  outline-color: color-mix(in srgb, var(--color-pink-300) 30%, transparent);
+}
+.marker {
+  padding-top: 6px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
+.input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  margin: 0;
+  padding: 3px 0;
+  resize: none;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: none;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.input::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.6;
+}
+.input:disabled {
+  opacity: 0.6;
+}
+.more[data-slot="button"] {
+  width: 32px;
+  height: 32px;
+  margin-top: -1px;
+  border-radius: 10px;
+  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+.more[data-slot="button"] svg {
+  width: 17px;
+  height: 17px;
+}
+.actions,
+.undo,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.add[data-slot="button"] {
+  min-height: 34px;
+  height: auto;
+  gap: 6px;
+  padding-inline: 11px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-purple-300) 12%, transparent);
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 550;
+}
+.add[data-slot="button"] svg {
+  width: 14px;
+  height: 14px;
+}
+.keyboardHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  opacity: 0.65;
+}
+.undo {
+  border-radius: 10px;
+  padding: 5px 8px 5px 11px;
+  background: color-mix(in srgb, var(--color-pink-300) 8%, transparent);
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.undo [data-slot="button"] {
+  font-size: 10px;
+}
+.footer {
+  gap: 12px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.5;
+}
+.footer > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.footer > span:last-child {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
+.footer strong {
+  font-weight: 650;
+}
+.positioner {
+  z-index: 70;
+}
+.menu {
+  min-width: 155px;
+  padding: 6px;
+  border-radius: 15px;
+  background: var(--navigation-surface, var(--popover));
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 30px
+    color-mix(in srgb, var(--palette-black) 28%, transparent);
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 9px;
+  border-radius: 9px;
+  font-size: 12px;
+  outline: 0;
+  cursor: pointer;
+}
+.menuItem[data-highlighted] {
+  background: color-mix(in srgb, var(--color-purple-300) 12%, transparent);
+}
+.menuItem[data-disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+.menuSeparator {
+  height: 1px;
+  margin: 5px 8px;
+  background: var(--border);
+}
+@media (min-width: 768px) {
+  .input {
+    font-size: 13px;
+  }
+}
+@media (pointer: coarse) {
+  .keyboardHint {
+    display: none;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .row {
+    background: linear-gradient(115deg, #f9a8d414, #c4b5fd14);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .row {
+    animation: reminder-arrive 260ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  }
+}
+@keyframes reminder-arrive {
+  from {
+    opacity: 0;
+    translate: 0 5px;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
+}
+.notice {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 10px;
+  line-height: 1.6;
+}
