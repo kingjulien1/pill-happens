@@ -1696,6 +1696,118 @@ export type DailyMood = (typeof DAILY_MOODS)[number]["value"];
 export type DailyMoodOption = (typeof DAILY_MOODS)[number];
 export type DailyMoodFamily = DailyMoodOption["family"];
 export const DAILY_MOOD_VALUES = DAILY_MOODS.map((mood) => mood.value);
+
+/** Close alternatives remain valid for earlier records and searchable under a clearer choice. */
+const DAILY_MOOD_ALIASES = {
+  peaceful: "calm",
+  steady: "balanced",
+  unhurried: "patient",
+  pensive: "reflective",
+  quiet: "calm",
+  centered: "grounded",
+  settled: "calm",
+  "at-ease": "calm",
+  reassured: "relieved",
+  soothed: "calm",
+  secure: "safe",
+  composed: "calm",
+  "in-control": "confident",
+  unbothered: "calm",
+  unburdened: "relieved",
+  "in-tune": "present",
+  joyful: "happy",
+  optimistic: "hopeful",
+  lighthearted: "playful",
+  delighted: "happy",
+  cheerful: "happy",
+  elated: "excited",
+  radiant: "happy",
+  blissful: "happy",
+  thrilled: "excited",
+  uplifted: "encouraged",
+  "pleasantly-surprised": "surprised",
+  appreciative: "grateful",
+  tickled: "amused",
+  sunny: "happy",
+  buoyant: "hopeful",
+  satisfied: "content",
+  enchanted: "wonderstruck",
+  close: "connected",
+  warm: "tender",
+  belonging: "included",
+  seen: "understood",
+  heard: "understood",
+  valued: "appreciated",
+  cherished: "loved",
+  welcomed: "included",
+  "cared-for": "supported",
+  held: "supported",
+  affectionate: "loving",
+  empathetic: "compassionate",
+  kind: "compassionate",
+  friendly: "social",
+  outgoing: "social",
+  "open-hearted": "loving",
+  "in-good-company": "connected",
+  "part-of-something": "included",
+  restored: "rested",
+  awake: "energized",
+  ready: "motivated",
+  brave: "confident",
+  eager: "motivated",
+  driven: "determined",
+  capable: "confident",
+  empowered: "confident",
+  bold: "confident",
+  fearless: "confident",
+  tenacious: "persistent",
+  "self-assured": "confident",
+  "up-for-it": "motivated",
+  invigorated: "energized",
+  recharged: "energized",
+  absorbed: "in-the-flow",
+  committed: "determined",
+  engaged: "focused",
+  heavy: "low",
+  tearful: "sad",
+  sluggish: "tired",
+  fragile: "vulnerable",
+  "hopeful-but-tired": "tired",
+  weary: "tired",
+  exhausted: "tired",
+  sleepy: "tired",
+  "worn-out": "tired",
+  depleted: "drained",
+  deflated: "disappointed",
+  "let-down": "disappointed",
+  melancholy: "sad",
+  disheartened: "discouraged",
+  unfulfilled: "empty",
+  flat: "numb",
+  worried: "anxious",
+  uneasy: "anxious",
+  "on-edge": "anxious",
+  pressured: "stressed",
+  rushed: "impatient",
+  "spaced-out": "foggy",
+  mixed: "conflicted",
+} as const satisfies Partial<Record<DailyMood, DailyMood>>;
+
+/** A concise picker library, while DAILY_MOODS retains every saved ID and its display metadata. */
+export const DAILY_MOOD_CHOICES = DAILY_MOODS.filter(
+  (mood) => !(mood.value in DAILY_MOOD_ALIASES),
+);
+
+const moodAliasSearch = new Map<DailyMood, string>();
+for (const [value, target] of Object.entries(DAILY_MOOD_ALIASES)) {
+  const alias = DAILY_MOODS.find((mood) => mood.value === value)!;
+  const existing = moodAliasSearch.get(target) ?? "";
+  moodAliasSearch.set(
+    target,
+    `${existing} ${alias.label} ${alias.value} ${alias.keywords}`,
+  );
+}
+
 export const DAILY_MOOD_FAMILIES = [
   { value: "grounded", label: "Steady" },
   { value: "bright", label: "Bright" },
@@ -1735,7 +1847,7 @@ export function rankDailyMoods(
 export function matchesDailyMood(mood: DailyMoodOption, query: string) {
   const words = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
   const text =
-    `${mood.label} ${mood.value} ${mood.family} ${mood.keywords}`.toLocaleLowerCase();
+    `${mood.label} ${mood.value} ${mood.family} ${mood.keywords} ${moodAliasSearch.get(mood.value) ?? ""}`.toLocaleLowerCase();
   return words.every((word) => text.includes(word));
 }
 

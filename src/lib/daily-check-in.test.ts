@@ -3,6 +3,7 @@ import test from "node:test";
 import { dayKey } from "./domain";
 import {
   DAILY_MOODS,
+  DAILY_MOOD_CHOICES,
   DAILY_MOOD_VALUES,
   DAILY_MOOD_FAMILIES,
   matchesDailyMood,
@@ -408,4 +409,54 @@ test("new and original moods share frequency ranking across Morning and Evening 
     new Set(first.map((mood) => mood.value)).size,
     DAILY_MOODS.length,
   );
+});
+
+test("the concise feeling picker removes overlapping alternatives while every saved ID stays readable", () => {
+  const choices = new Set(DAILY_MOOD_CHOICES.map((mood) => mood.value));
+  assert.equal(choices.size, DAILY_MOOD_CHOICES.length);
+  assert.ok(choices.size <= Math.floor((DAILY_MOODS.length * 2) / 3));
+  for (const mood of DAILY_MOOD_CHOICES)
+    assert.ok(DAILY_MOOD_VALUES.includes(mood.value));
+  for (const value of [
+    "calm",
+    "okay",
+    "hopeful",
+    "happy",
+    "tired",
+    "anxious",
+    "low",
+    "restless",
+    "irritable",
+    "overwhelmed",
+  ] as const)
+    assert.ok(choices.has(value));
+  for (const family of DAILY_MOOD_FAMILIES)
+    assert.ok(DAILY_MOOD_CHOICES.some((mood) => mood.family === family.value));
+  for (const mood of DAILY_MOODS.filter((mood) => !choices.has(mood.value))) {
+    assert.ok(DAILY_MOOD_VALUES.includes(mood.value));
+    assert.ok(mood.label && mood.icon);
+    assert.ok(
+      DAILY_MOOD_CHOICES.some((choice) => matchesDailyMood(choice, mood.label)),
+      mood.label,
+    );
+  }
+});
+
+test("searching a retired near-synonym finds a retained feeling without rewriting the original selection", () => {
+  for (const [query, target] of [
+    ["peaceful", "calm"],
+    ["optimistic", "hopeful"],
+    ["kind", "compassionate"],
+    ["self-assured", "confident"],
+    ["worn out", "tired"],
+    ["let down", "disappointed"],
+  ]) {
+    const choice = DAILY_MOOD_CHOICES.find((mood) => mood.value === target);
+    assert.ok(choice, target);
+    assert.equal(matchesDailyMood(choice, query), true, query);
+    const original = DAILY_MOODS.find(
+      (mood) => mood.value === query || mood.label.toLowerCase() === query,
+    );
+    if (original) assert.equal(matchesDailyMood(original, query), true);
+  }
 });
