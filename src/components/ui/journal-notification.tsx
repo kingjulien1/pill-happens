@@ -1003,6 +1003,8 @@ export function JournalNotification({
         hidden={counter.hidden}
       />
       <span className="journal-notification-urgency-glow" aria-hidden="true" />
+      <span className="journal-notification-closed-wash" aria-hidden="true" />
+      <span className="journal-notification-frame" aria-hidden="true" />
       <span className="journal-notification-footer-fade" aria-hidden="true" />
       <div className="journal-notification-header">
         <button
