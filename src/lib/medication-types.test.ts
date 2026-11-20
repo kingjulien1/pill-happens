@@ -13,7 +13,7 @@ test("both dispenser presentations count actuations like legacy metered pumps", 
     assert.equal(getMedicationType(type).units, "pumps");
     assert.deepEqual(medicationQuantityControls(type), {
       increment: 1,
-      presets: [1, 2, 3, 4],
+      presets: [1, 2, 3, 4, 5],
     });
   }
 });
@@ -29,7 +29,7 @@ test("tablet quantities keep fractional controls and unknown legacy units stay g
     assert.equal(isMeteredMedicationType(type), false);
     assert.deepEqual(medicationQuantityControls(type), {
       increment: 0.25,
-      presets: [0.25, 0.5, 1, 2],
+      presets: [0.25, 0.5, 0.75, 1, 2],
     });
   }
   assert.equal(getMedicationType().units, "units");
@@ -38,7 +38,7 @@ test("tablet quantities keep fractional controls and unknown legacy units stay g
 test("named journal medications choose their recording controls independently of strength", () => {
   assert.deepEqual(medicationQuantityControls("capsule", "Iserlohn 50 mg"), {
     increment: 0.01,
-    presets: [0.01, 0.02, 0.03, 0.04],
+    presets: [0.01, 0.02, 0.03, 0.04, 0.05],
   });
   for (const name of [
     "Tadalafil",
@@ -50,7 +50,7 @@ test("named journal medications choose their recording controls independently of
   ]) {
     assert.deepEqual(medicationQuantityControls("tablet", name), {
       increment: 1,
-      presets: [1, 2, 3, 4],
+      presets: [1, 2, 3, 4, 5],
     });
   }
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useEffect, useState, type ReactNode } from "react";
@@ -42,6 +43,7 @@ import {
   MAX_INTAKE_QUANTITY,
   parseIntakeQuantity,
   stepEditableIntakeQuantity,
+  intakeQuantityShortcuts,
   normalizeIntakeQuantityForEditor,
   hasIntakeQuantityEditorPrecisionLoss,
 } from "@/lib/intake-quantity";
@@ -122,10 +124,11 @@ export function IntakeForm({
   const strength = medication?.strengthMg ?? fallbackIntake?.strengthMg ?? 0;
   const medicationForm = medication?.form ?? fallbackIntake?.medicationForm;
   const type = getMedicationType(medicationForm);
-  const { increment, presets } = medicationQuantityControls(
+  const { increment, presets: fallbackPresets } = medicationQuantityControls(
     medicationForm,
     medication?.name ?? fallbackIntake?.medicationName,
   );
+  const presets = intakeQuantityShortcuts(medicationId, data!.intakes, medication?.defaultQuantity, fallbackPresets);
   // Keep the raw draft intact until a quantity interaction explicitly replaces it.
   const unchangedOriginalQuantity = Boolean(
     intake &&
@@ -413,13 +416,16 @@ export function IntakeForm({
                 onChange={setQuantity}
                 onStep={stepQuantity}
                 increment={increment}
+                route={route}
+                form={medicationForm ?? "other"}
+                categories={getMedicationCategories(medication)}
                 unit={visibleQuantity === 1 ? type.unit : type.units}
                 calculatedDose={calculatedDose}
                 originalQuantityPreserved={originalQuantityPreserved}
                 disabled={busy}
                 invalid={Boolean(error) && !validQuantity}
               />
-              <div className="mt-1 grid grid-cols-4 gap-1.5">
+              <div className="mt-1 grid grid-cols-5 gap-1.5">
                 {presets.map((amount) => (
                   <button
                     type="button"
@@ -427,7 +433,7 @@ export function IntakeForm({
                     onClick={() => setQuantity(String(amount))}
                     aria-pressed={visibleQuantity === amount}
                     data-dialog-corner="compact"
-                    className={`h-8 rounded-lg border text-xs transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-accent text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+                    className={`h-8 rounded-lg border text-[15px] font-semibold tabular-nums transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-[color-mix(in_srgb,var(--checkin-line)_14%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
                   >
                     {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
                   </button>

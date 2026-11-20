@@ -41,7 +41,7 @@ export function isMeteredMedicationType(type?: MedicationType) {
 export function medicationQuantityControls(type?: MedicationType, name = "") {
   const words: string[] = name.toLowerCase().match(/[a-z]+/g) ?? [];
   if (words.includes("iserlohn"))
-    return { increment: 0.01, presets: [0.01, 0.02, 0.03, 0.04] };
+    return { increment: 0.01, presets: [0.01, 0.02, 0.03, 0.04, 0.05] };
   const wholeUnits = [
     "tadalafil",
     "viagra",
@@ -52,6 +52,6 @@ export function medicationQuantityControls(type?: MedicationType, name = "") {
   ];
   return isMeteredMedicationType(type) ||
     words.some((word) => wholeUnits.includes(word))
-    ? { increment: 1, presets: [1, 2, 3, 4] }
-    : { increment: 0.25, presets: [0.25, 0.5, 1, 2] };
+    ? { increment: 1, presets: [1, 2, 3, 4, 5] }
+    : { increment: 0.25, presets: [0.25, 0.5, 0.75, 1, 2] };
 }

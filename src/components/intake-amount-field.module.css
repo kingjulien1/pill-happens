@@ -2,7 +2,7 @@
   display: grid;
   width: 100%;
   min-width: 0;
-  height: 40px;
+  min-height: 40px;
   grid-template-columns: 28px minmax(0, 1fr) 28px;
   align-items: center;
   gap: 6px;
@@ -56,10 +56,11 @@
 .center {
   display: flex;
   min-width: 0;
-  height: 28px;
+  min-height: 28px;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 2px 4px;
   cursor: text;
 }
 
@@ -74,7 +75,8 @@
   border-radius: 0;
   background: transparent;
   color: var(--foreground);
-  font-size: 16px;
+  font-size: 19.5px;
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
   line-height: 20px;
   text-align: right;
@@ -86,8 +88,9 @@
   max-width: 8ch;
   min-width: 0;
   overflow: hidden;
-  color: var(--muted-foreground);
-  font-size: 11px;
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 14px;
   line-height: 18px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -107,8 +110,9 @@
   min-width: 0;
   align-items: baseline;
   gap: 3px;
-  color: var(--muted-foreground);
-  font-size: 11px;
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
   line-height: 18px;
   white-space: nowrap;
@@ -118,8 +122,8 @@
   min-width: 0;
   overflow: hidden;
   color: var(--foreground);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 19.5px;
+  font-weight: 650;
   text-overflow: ellipsis;
 }
 
@@ -134,8 +138,8 @@
 }
 
 @media (min-width: 768px) {
-  .field .valueInput {
-    font-size: 14px;
+  .field .valueInput, .dose strong {
+    font-size: 17px;
   }
 }
 
@@ -145,3 +149,7 @@
     color: var(--foreground);
   }
 }
+
+.unit { text-transform: capitalize; }
+.glyph { width: 14px; height: 14px; flex: none; color: var(--foreground); }
+.separator { font-size: 28px; }

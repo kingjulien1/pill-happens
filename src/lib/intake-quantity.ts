@@ -143,3 +143,29 @@ export function stepEditableIntakeQuantity(
     rounded < minimum ? minimum : rounded > maximum ? maximum : rounded;
   return formatEditorScale(bounded);
 }
+
+/** Rank exact, editable quantities by use, then by most recent intake. */
+export function intakeQuantityShortcuts(
+  medicationId: string,
+  entries: readonly { medicationId: string; quantity: number; takenAt: string }[],
+  defaultQuantity: number | undefined,
+  fallback: readonly number[],
+) {
+  const usage = new Map<number, { count: number; latest: number }>();
+  const editable = (n: number) =>
+    n >= MIN_EDITABLE_INTAKE_QUANTITY && n <= MAX_INTAKE_QUANTITY &&
+    Number(n.toFixed(INTAKE_QUANTITY_DECIMAL_PLACES)) === n;
+
+  for (const entry of entries) {
+    if (entry.medicationId !== medicationId || !editable(entry.quantity)) continue;
+    const stat = usage.get(entry.quantity) ?? { count: 0, latest: 0 };
+    stat.count++;
+    stat.latest = Math.max(stat.latest, Date.parse(entry.takenAt) || 0);
+    usage.set(entry.quantity, stat);
+  }
+  const ranked = [...usage].sort(([a, x], [b, y]) =>
+    y.count - x.count || y.latest - x.latest || a - b
+  ).map(([quantity]) => quantity);
+  const choices = new Set([...ranked, defaultQuantity ?? 1, ...fallback].filter(editable));
+  return [...choices].slice(0, 5).sort((a, b) => a - b);
+}

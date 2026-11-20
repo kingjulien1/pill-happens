@@ -1,6 +1,12 @@
 "use client";
 
 import { useRef, useState, type CSSProperties } from "react";
+import { MedicationIndicatorMark } from "./medication-indicator-mark";
+import { MedicationTypeIcon } from "./medication-icon";
+import { IntakeRouteIcon } from "./intake-route-icon";
+import type { MedicationCategory } from "@/lib/medication-categories";
+import type { MedicationType } from "@/lib/medication-types";
+import type { IntakeRoute } from "@/lib/intake-routes";
 import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +30,9 @@ export function IntakeAmountField({
   onStep,
   increment,
   unit,
+  route,
+  form,
+  categories,
   calculatedDose,
   originalQuantityPreserved = false,
   disabled = false,
@@ -34,6 +43,9 @@ export function IntakeAmountField({
   onStep: (delta: number) => void;
   increment: number;
   unit: string;
+  route: IntakeRoute;
+  form: MedicationType;
+  categories: MedicationCategory[];
   calculatedDose: number | null;
   originalQuantityPreserved?: boolean;
   disabled?: boolean;
@@ -155,6 +167,8 @@ export function IntakeAmountField({
             }
           }}
         />
+        <IntakeRouteIcon route={route} className={styles.glyph} />
+        <MedicationTypeIcon type={form} className={styles.glyph} />
         <span className={styles.unit} title={unit} data-intake-amount-unit>
           {unit}
         </span>
@@ -170,6 +184,7 @@ export function IntakeAmountField({
         >
           <strong>{doseRounded ? `≈${dose}` : dose}</strong> <span>mg</span>
         </span>
+        {categories.map((kind) => <MedicationIndicatorMark key={kind} kind={kind} size={14} />)}
         {originalQuantityPreserved && (
           <span id="intake-amount-original" className="sr-only">
             {legacyDescription}

@@ -6,6 +6,7 @@ import {
   MIN_INTAKE_QUANTITY,
   hasIntakeQuantityEditorPrecisionLoss,
   limitIntakeQuantityInput,
+  intakeQuantityShortcuts,
   normalizeIntakeQuantityForEditor,
   parseIntakeQuantity,
   stepEditableIntakeQuantity,
@@ -208,4 +209,14 @@ test("repeated editor steps do not drift or produce more than two fraction digit
     assert.match(quantity, /^\d+(?:\.\d{1,2})?$/);
   }
   assert.equal(quantity, "0.01");
+});
+
+test("shortcut ranking favors exact recorded quantities for the selected medication", () => {
+  const entries = [1, 1, 2, 3, 4, 5, 6, 0.001].map((quantity, i) => ({
+    medicationId: "a", quantity, takenAt: new Date(i + 1).toISOString(),
+  }));
+  entries.push({ medicationId: "b", quantity: 9, takenAt: new Date().toISOString() });
+  const fallback = [1, 2, 3, 4, 5];
+  assert.deepEqual(intakeQuantityShortcuts("a", entries, 8, fallback), [1, 3, 4, 5, 6]);
+  assert.deepEqual(intakeQuantityShortcuts("b", entries, 8, fallback), [1, 2, 3, 8, 9]);
 });
