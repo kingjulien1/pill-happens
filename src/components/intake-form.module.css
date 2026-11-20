@@ -20,8 +20,14 @@
 
 .preview {
   display: grid;
+  /* Bound the track before the card's ingredient and dose share its width. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 13.5px;
   min-width: 0;
+}
+.preview > [data-notification-snapshot-card] {
+  min-width: 0;
+  max-width: 100%;
 }
 .preview > [data-preview-title-pill] {
   --final-look-copy: var(--foreground);
