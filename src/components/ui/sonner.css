@@ -2609,7 +2609,10 @@
   padding: 14px;
   border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--card) 37%, transparent);
+  background:
+    linear-gradient(125deg, rgb(224 180 131 / 16%), rgb(187 128 107 / 16%) 56%, rgb(141 159 139 / 16%)),
+    linear-gradient(color-mix(in srgb, var(--color-mauve-950, #0c090c) 24%, transparent) 0 0),
+    color-mix(in srgb, var(--card) 37%, transparent);
 }
 .journal-medication-policy-alert header {
   display: flex;
