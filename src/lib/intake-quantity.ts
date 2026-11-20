@@ -144,6 +144,22 @@ export function stepEditableIntakeQuantity(
   return formatEditorScale(bounded);
 }
 
+/** Shortcut quantities use the editor's fixed decimal precision. */
+export function formatQuantityShortcut(quantity: number): string {
+  if (Number.isInteger(quantity)) return String(quantity);
+  const scale = 10 ** INTAKE_QUANTITY_DECIMAL_PLACES;
+  const scaled = Math.round(quantity * scale);
+  if (quantity < 0 || scaled / scale !== quantity) return String(quantity);
+
+  const remainder = scaled % scale;
+  let divisor = scale;
+  let next = remainder;
+  while (next) [divisor, next] = [next, divisor % next];
+  const fraction = `${remainder / divisor}/${scale / divisor}`;
+  const whole = Math.floor(scaled / scale);
+  return whole ? `${whole} ${fraction}` : fraction;
+}
+
 /** Rank exact, editable quantities by use, then by most recent intake. */
 export function intakeQuantityShortcuts(
   medicationId: string,

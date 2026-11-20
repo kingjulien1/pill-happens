@@ -7,6 +7,7 @@ import {
   hasIntakeQuantityEditorPrecisionLoss,
   limitIntakeQuantityInput,
   intakeQuantityShortcuts,
+  formatQuantityShortcut,
   normalizeIntakeQuantityForEditor,
   parseIntakeQuantity,
   stepEditableIntakeQuantity,
@@ -219,4 +220,11 @@ test("shortcut ranking favors exact recorded quantities for the selected medicat
   const fallback = [1, 2, 3, 4, 5];
   assert.deepEqual(intakeQuantityShortcuts("a", entries, 8, fallback), [1, 3, 4, 5, 6]);
   assert.deepEqual(intakeQuantityShortcuts("b", entries, 8, fallback), [1, 2, 3, 8, 9]);
+});
+
+test("shortcut labels show exact reduced fractions, mixed numbers and whole units", () => {
+  assert.deepEqual(
+    [0.01, 0.03, 0.1, 0.25, 0.5, 0.75, 0.33, 1, 1.25, 2.55, 2].map(formatQuantityShortcut),
+    ["1/100", "3/100", "1/10", "1/4", "1/2", "3/4", "33/100", "1", "1 1/4", "2 11/20", "2"],
+  );
 });
