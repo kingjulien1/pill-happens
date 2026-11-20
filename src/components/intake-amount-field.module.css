@@ -91,7 +91,7 @@
   min-width: 0;
   overflow: hidden;
   color: var(--foreground);
-  font-weight: 600;
+  font-weight: 550;
   line-height: 18px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -111,7 +111,7 @@
   align-items: baseline;
   gap: 3px;
   color: var(--foreground);
-  font-weight: 600;
+  font-weight: 550;
   font-variant-numeric: tabular-nums;
   line-height: 18px;
   white-space: nowrap;
