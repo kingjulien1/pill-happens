@@ -1,11 +1,11 @@
 "use client";
 
-import { CalendarCheck, Sunrise } from "lucide-react";
+import { CalendarCheck, NotebookTabs, Sunrise } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
@@ -194,6 +194,14 @@ export function IntakeForm({
   } catch {
     /* shown on submit */
   }
+
+  const otherEntries = useMemo(() => {
+    if (!belongsTo || !medicationId) return 0;
+    return data!.intakes.filter((entry) =>
+      entry.id !== intake?.id && entry.medicationId === medicationId &&
+      dayKey(entry.takenAt, timezone) === belongsTo
+    ).length;
+  }, [belongsTo, data, intake?.id, medicationId, timezone]);
 
   if (!medications.length && !intake)
     return (
@@ -490,6 +498,12 @@ export function IntakeForm({
           }} />
         ) : (
           <p className="text-center text-sm text-muted-foreground">Choose a medication, amount and time to preview your entry.</p>
+        )}
+        {belongsTo && validQuantity && (medication || fallbackIntake) && (
+          <p className={styles.previewContext}>
+            <NotebookTabs aria-hidden="true" />
+            <span>{otherEntries === 0 ? "No other entries" : `${otherEntries} other ${otherEntries === 1 ? "entry" : "entries"}`} for this medication on this tracking day.</span>
+          </p>
         )}
       </section>
       {error && (
