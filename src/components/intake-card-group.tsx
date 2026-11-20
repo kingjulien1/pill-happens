@@ -356,8 +356,7 @@ export function IntakeCardGroup({
           aria-hidden="true"
         >
           <div className="intake-group-blur" />
-          <div className="intake-group-wash intake-group-wash--pink" />
-          <div className="intake-group-wash intake-group-wash--purple" />
+          <div className="intake-group-wash intake-group-wash--intakes" />
         </div>
       )}
       <div

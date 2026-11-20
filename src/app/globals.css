@@ -318,6 +318,15 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   border-radius: inherit;
   pointer-events: none;
 }
+.intake-group-wash--intakes {
+  /* The glass meets the toggle at its midpoint; stop at its visible top edge. */
+  bottom: 12px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-purple-800, #6b21a8) 30%, transparent) 33.333%,
+    transparent 100%
+  );
+}
 .intake-group-wash--pink {
   --intake-group-wash-color: color-mix(
     in srgb,
