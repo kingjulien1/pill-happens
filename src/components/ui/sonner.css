@@ -1117,7 +1117,7 @@
   pointer-events: none;
 }
 .journal-notification[data-expanded="true"] .journal-notification-footer-fade {
-  opacity: var(--toast-wash-opacity);
+  opacity: calc(var(--toast-wash-opacity) * 17 / 24);
 }
 .journal-notification-header {
   position: relative;
