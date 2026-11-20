@@ -631,7 +631,6 @@ export function MedicationsPage() {
     if (!data || historyNoticeShown.current) return;
     historyNoticeShown.current = true;
     const linkedMedications = new Set(data.intakes.map((entry) => entry.medicationId)).size;
-    const notes = data.intakes.filter((entry) => entry.note?.trim()).length;
     toast.info(
       "Strength changes recalculate past doses and totals. Logged quantities, times and notes stay as entered.",
       {
@@ -647,7 +646,6 @@ export function MedicationsPage() {
             { label: "Entries", value: String(data.intakes.length) },
             { label: "Library", value: String(data.medications.length) },
             { label: "Dose totals", value: `${linkedMedications} logged medication${linkedMedications === 1 ? "" : "s"}` },
-            { label: "Recorded details", value: `${notes} saved note${notes === 1 ? "" : "s"}` },
           ],
           links: [{ label: "Medication Library", href: "/medications" }],
           footer:

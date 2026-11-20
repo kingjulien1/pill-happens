@@ -19,6 +19,8 @@ import {
   CalendarDays,
   Check,
   Clock3,
+  ListFilter,
+  ChevronsUp,
   CloudDownload,
   History as RotateCcwClock,
   Database,
@@ -216,6 +218,8 @@ export function JournalNotification({
     "ready",
   );
   const [undoError, setUndoError] = useState("");
+  const [policyOpen, setPolicyOpen] = useState(false);
+  const policyId = useId();
   const detailsId = useId();
   const headingId = useId();
   const messageId = useId();
@@ -501,6 +505,7 @@ export function JournalNotification({
       ).matches;
       const hadDetails = expandedRef.current;
       expandedRef.current = false;
+      setPolicyOpen(false);
       setExpanded(false);
       setPhase(hadDetails ? "collapsing" : "anticipate");
       const beginExit = () => {
@@ -542,6 +547,7 @@ export function JournalNotification({
       ?.focus({ preventScroll: true });
     expandedRef.current = false;
     pause("expanded", false);
+    setPolicyOpen(false);
     setExpanded(false);
   }, [phase, pause]);
 
@@ -560,6 +566,7 @@ export function JournalNotification({
     const next = !expandedRef.current;
     expandedRef.current = next;
     pause("expanded", next);
+    if (!next) setPolicyOpen(false);
     setExpanded(next);
   };
 
@@ -1087,29 +1094,32 @@ export function JournalNotification({
                   <header>
                     <RotateCcwClock className="journal-policy-clock" size={17} strokeWidth={2.65} aria-hidden="true" />
                     <h4>History</h4>
-                    <span>· &nbsp; Edit policy</span>
+                    <span>· &nbsp; Edit Policy</span>
                     {policyCount("Entries", "Entry", "Entries")}
                   </header>
                   <p>Change a strength and each linked dose is recalculated from the quantity you logged. Daily totals for that medication follow suit.</p>
                 </section>
-                <hr />
-                <dl className="journal-policy-stats">
-                  <div>
-                    <dt><PillBottle />Dose totals</dt>
-                    <dd>{policyCount("Dose totals", "medication", "medications")}</dd>
-                    <dd className="journal-policy-description">Each dose uses the updated strength multiplied by the quantity recorded for that intake. The daily total adds those doses together.</dd>
-                  </div>
-                  <div>
-                    <dt><ShieldCheck />Recorded details</dt>
-                    <dd>{policyCount("Recorded details", "saved note", "saved notes")}</dd>
-                    <dd className="journal-policy-description">Each intake keeps the time and quantity you entered. Any note you wrote stays with that entry, in your original words.</dd>
-                  </div>
-                  <div>
-                    <dt><BookOpenText />Medication library</dt>
-                    <dd>{policyCount("Library", "medication", "medications")}</dd>
-                    <dd className="journal-policy-description">Rename a medication or change its symbol in the library. Earlier intake cards show the updated name and appearance wherever that medication was logged.</dd>
-                  </div>
-                </dl>
+                <div className="journal-policy-disclosure" data-open={policyOpen}>
+                  <div className="journal-policy-reveal" aria-hidden="true"><div><hr /></div></div>
+                  <button type="button" className="journal-policy-toggle" aria-expanded={policyOpen} aria-controls={policyId} onClick={() => setPolicyOpen(!policyOpen)}>
+                    {policyOpen ? <ChevronsUp size={14} /> : <ListFilter size={14} />}
+                    {policyOpen ? "Hide edit details" : "See what changes"}
+                  </button>
+                  <div className="journal-policy-reveal" id={policyId} aria-hidden={!policyOpen}><div>
+                      <dl className="journal-policy-stats">
+                        <div>
+                          <dt><PillBottle />Dose Totals</dt>
+                          <dd>{policyCount("Dose totals", "Medication", "Medications")}</dd>
+                          <dd className="journal-policy-description">Each dose uses the updated strength multiplied by the quantity recorded for that intake. The daily total adds those doses together.</dd>
+                        </div>
+                        <div>
+                          <dt><BookOpenText />Medication Library</dt>
+                          <dd>{policyCount("Library", "Medication", "Medications")}</dd>
+                          <dd className="journal-policy-description">Rename a medication or change its symbol in the library. Earlier intake cards show the updated name and appearance wherever that medication was logged.</dd>
+                        </div>
+                      </dl>
+                  </div></div>
+                </div>
               </section>
             ) : facts.length ? (
               <div>
