@@ -7,10 +7,7 @@ import {
   Moon,
   BookOpen,
   BookOpenCheck,
-  Flower2,
-  HeartHandshake,
   PencilLine,
-  SlidersHorizontal,
   Smile,
 } from "lucide-react";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
@@ -62,6 +59,7 @@ import {
 } from "@/lib/morning-sleep";
 import {
   DAILY_MOODS,
+  DAILY_MOOD_CHOICES,
   checkInForDay,
   type DailyCheckIn,
   type DailyCheckInPeriod,
@@ -699,93 +697,66 @@ function CheckInForm({
           <CheckInSection
             caption={
               <>
-                <HeartHandshake aria-hidden="true" />
+                <Moon aria-hidden="true" />
                 Your Day, Your Mood
               </>
             }
             headingId={`${id}-feelings-heading`}
-            context="Evening"
-            detail="Optional"
-            description="A few shades of today. A mix is welcome; every part is optional."
+            context="Room for mixed feelings."
+            detail={
+              <>
+                <strong>{DAILY_MOOD_CHOICES.length}</strong> feelings
+              </>
+            }
           >
             <section
               className={styles.feelingsSection}
               aria-labelledby={`${id}-feelings-heading`}
               data-evening-feelings
             >
-              <CheckInSection
-                caption={
-                  <>
-                    <Flower2 strokeWidth={2.1} aria-hidden="true" />
-                    Today Felt Like
-                  </>
-                }
-                headingId={`${id}-mood-heading`}
-                context="Mood Mix"
-                detail={moods.length + " of 4"}
+              <fieldset
+                className={styles.moodField}
+                disabled={locked}
+                data-check-in-section="mood"
               >
-                <fieldset
-                  className={styles.moodField}
+                <legend className="sr-only">Today Felt Like</legend>
+                <DailyMoodPicker
+                  value={moods}
+                  onChange={(value) => setField("moods", value)}
+                  checkIns={data?.dailyCheckIns}
+                  seed={`${day}:${period}`}
                   disabled={locked}
-                  data-check-in-section="mood"
-                >
-                  <legend className="sr-only">Today Felt Like</legend>
-                  <p className={styles.fieldHint}>
-                    Choose up to four. There is room for mixed feelings.
-                  </p>
-                  <DailyMoodPicker
-                    value={moods}
-                    onChange={(value) => setField("moods", value)}
-                    checkIns={data?.dailyCheckIns}
-                    seed={`${day}:${period}`}
-                    disabled={locked}
-                  />
-                </fieldset>
-              </CheckInSection>
-
-              <CheckInSection
-                caption={
-                  <>
-                    <SlidersHorizontal strokeWidth={2.1} aria-hidden="true" />
-                    How Your Day Felt
-                  </>
-                }
-                headingId={`${id}-ratings-heading`}
-                detail="1–10 · Optional"
+                />
+              </fieldset>
+              <hr className={styles.feelingsDivider} />
+              <div
+                className={styles.ratingRow}
+                role="group"
+                aria-label="Energy and stress ratings"
               >
-                <section
-                  className={styles.formSection}
-                  aria-labelledby={`${id}-ratings-heading`}
-                >
-                  <p className={styles.fieldHint}>
-                    Slide or tap to rate. Leave anything blank.
-                  </p>
-                  <div className={styles.ratingRow}>
-                    <RatingField
-                      id={`${id}-energy`}
-                      label="Energy"
-                      scale={draft.value.energyScale}
-                      icon="energy"
-                      value={energy}
-                      onChange={(value) => setRating("energy", value)}
-                      disabled={locked}
-                      low="Low"
-                      high="Full"
-                    />
-                    <RatingField
-                      id={`${id}-stress`}
-                      label="Stress"
-                      scale={draft.value.stressScale}
-                      icon="stress"
-                      value={stress}
-                      onChange={(value) => setRating("stress", value)}
-                      disabled={locked}
-                      low="Low"
-                      high="High"
-                    />
-                  </div>
-                </section>
-              </CheckInSection>
+                <RatingField
+                  id={`${id}-energy`}
+                  label="Energy"
+                  scale={draft.value.energyScale}
+                  icon="energy"
+                  value={energy}
+                  onChange={(value) => setRating("energy", value)}
+                  disabled={locked}
+                  low="Low"
+                  high="Full"
+                />
+                <RatingField
+                  id={`${id}-stress`}
+                  label="Stress"
+                  scale={draft.value.stressScale}
+                  icon="stress"
+                  value={stress}
+                  onChange={(value) => setRating("stress", value)}
+                  disabled={locked}
+                  low="Low"
+                  high="High"
+                />
+              </div>
             </section>
           </CheckInSection>
           <CheckInSection

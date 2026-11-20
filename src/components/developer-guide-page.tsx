@@ -42,7 +42,11 @@ import {
 } from "@/lib/developer-guide";
 import { MEDICATION_COLORS } from "@/lib/medication-appearance";
 import { SVG_ICON_CATALOG } from "@/lib/svg-icon-catalog";
-import { DAILY_MOODS, DAILY_MOOD_FAMILIES } from "@/lib/daily-check-in";
+import {
+  DAILY_MOODS,
+  DAILY_MOOD_CHOICES,
+  DAILY_MOOD_FAMILIES,
+} from "@/lib/daily-check-in";
 import styles from "./developer-guide.module.css";
 
 const WORKFLOW_SOURCES = [
@@ -3901,24 +3905,26 @@ export function DeveloperGuidePage() {
                 feelings library contains {DAILY_MOODS.length} stable mood IDs
                 across {DAILY_MOOD_FAMILIES.length} families:{" "}
                 {DAILY_MOOD_FAMILIES.map((family) => family.label).join(", ")}.
-                All earlier mood IDs remain valid. DailyMoodIcon renders Lucide
-                symbols in the picker, saved previews, journals and summaries;
-                changing the renderer requires no emoji-to-ID data migration.
+                The picker displays {DAILY_MOOD_CHOICES.length} curated choices.
+                Search maps close alternatives to their curated choices.
+                Historical selections use the full registry for validation and
+                display, including when editing earlier entries. DailyMoodIcon
+                uses those stored IDs to render Lucide symbols in the picker,
+                saved previews, journals and summaries.
               </p>
               <p>
-                Search matches labels, IDs, keywords and family names
-                immediately. Family chips sit above a three-row, two-column
-                scrolling palette with 44px choices; removable selections stay
-                beneath it even when a filter hides their matching options. The
-                selection limit remains four. rankDailyMoods counts each mood
-                once per saved check-in, then sorts by descending usage. Equal
-                and unused choices use a deterministic day-seeded shuffle, so
-                ordering feels fresh across days without jumping while someone
-                is choosing or differing between server and client. Shuffle
-                gives equal-frequency choices a new seeded mix while retaining
-                usage priority; search, family changes and a fresh mix reset
-                only the results viewport, never the chosen moods or parent form
-                scroll.
+                Search matches labels, IDs, keywords, family names and retired
+                near-synonyms immediately. The compact search and Shuffle
+                controls share their background and inset border treatment.
+                Removable selections stay beneath the scrolling palette during
+                searches, and the selection limit remains four. rankDailyMoods
+                counts each mood once per saved check-in and sorts the registry
+                by descending usage. The picker reverses that order for its
+                least-used-first view, then filters to active or selected IDs.
+                Equal-frequency choices use a deterministic day-seeded shuffle.
+                Shuffle gives those ties a new seeded mix. Searching and
+                shuffling reset only the results viewport, preserving selected
+                moods and the parent form scroll.
               </p>
               <p>
                 The default Evening completion catalog excludes Sleep, while an
@@ -3934,14 +3940,12 @@ export function DeveloperGuidePage() {
                 five-point scale metadata until edited.
               </p>
               <p>
-                Your Day, Your Mood owns the mood picker and the two compact
-                Energy/Stress cards as one standalone root section. Its inward
-                Pink/Purple frame and soft wash echo Your Day, Your Words, whose
-                base and moving rim now use the same palette. Family colors stay
-                related rather than marking any feeling as good or bad. Choice
-                feedback and a restrained section entrance respect reduced
-                motion; hover is limited to desktop fine pointers. The Morning
-                ratings and sleep form keep their existing layout.
+                Your Day, Your Mood contains the mood picker and Energy/Stress
+                ratings in one section. Its outside heading matches Your Day,
+                Your Words. A divider separates the two parts within their
+                shared frame. Family metadata supplies the
+                related choice colors. Selection feedback respects reduced
+                motion, and hover effects apply to desktop fine pointers.
               </p>
             </Detail>
             <Detail

@@ -12,7 +12,10 @@ import { GuideOutline } from "@/components/guide-outline";
 import { guideHeadingId } from "@/lib/guide-outline";
 import { InstallAppButton } from "@/components/install-app-button";
 import { DailyMoodIcon } from "@/components/daily-mood-icon";
-import { DAILY_MOODS, DAILY_REFLECTION_MAX_LENGTH } from "@/lib/daily-check-in";
+import {
+  DAILY_MOOD_CHOICES,
+  DAILY_REFLECTION_MAX_LENGTH,
+} from "@/lib/daily-check-in";
 import { MEDICATION_CATEGORIES } from "@/lib/medication-categories";
 import styles from "./guide-page.module.css";
 import { Button } from "@/components/ui/button";
@@ -705,17 +708,18 @@ export function GuidePage() {
               when you mean none.
             </p>
             <p>
-              <strong>Evening reflection.</strong> Browse {DAILY_MOODS.length}{" "}
-              feelings with Lucide symbols. Search by word or filter by family,
-              then choose up to four. Selected feelings stay below the palette.
-              Familiar choices rise to the top; Shuffle changes the mix. Add
-              optional Energy, Stress and Things That Helped answers.
+              <strong>Evening reflection.</strong> Browse{" "}
+              {DAILY_MOOD_CHOICES.length}{" "}
+              feelings with Lucide symbols. Search by word and choose up to four.
+              Shuffle remixes choices used equally often. Selected feelings stay
+              below the palette while you search. Add optional Energy, Stress
+              and Small Reminders answers.
             </p>
             <div
               className={styles.moodList}
               aria-label="Available Check-In Moods"
             >
-              {DAILY_MOODS.slice(0, 10).map((mood) => (
+              {DAILY_MOOD_CHOICES.slice(0, 10).map((mood) => (
                 <span key={mood.value}>
                   <DailyMoodIcon mood={mood.value} size={14} />
                   {mood.label}

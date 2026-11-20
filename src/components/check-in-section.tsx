@@ -29,10 +29,10 @@ export function CheckInSection({
               <strong className={styles.title}>{caption}</strong>
             )}
             {context && (
-              <>
+              <span className={styles.contextGroup}>
                 <span aria-hidden="true">/</span>
                 <span className={styles.context}>{context}</span>
-              </>
+              </span>
             )}
           </div>
           <span className={styles.detail}>{detail}</span>

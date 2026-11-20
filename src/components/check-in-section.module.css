@@ -60,6 +60,12 @@
   margin-inline-end: 7px;
   vertical-align: -0.125em;
 }
+.contextGroup {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1.5vw, 8px);
+  min-width: 0;
+}
 .context {
   min-width: 0;
   overflow: hidden;
@@ -141,5 +147,32 @@
 @media (prefers-color-scheme: light) {
   [data-check-in-form] .frame {
     --surface-ink: var(--surface-sunken);
+  }
+}
+
+/* Keep the mood prompt readable alongside the full title and library count. */
+@media (max-width: 767px) {
+  .section:has(> .frame > [data-evening-feelings]) > .header > .caption {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 6px;
+  }
+  .section:has(> .frame > [data-evening-feelings])
+    > .header
+    > .caption
+    > .labelRow {
+    display: contents;
+  }
+  .section:has(> .frame > [data-evening-feelings]) .contextGroup {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-left: 21px;
+  }
+  .section:has(> .frame > [data-evening-feelings])
+    > .header
+    > .caption
+    > .detail {
+    grid-column: 2;
+    grid-row: 1;
   }
 }

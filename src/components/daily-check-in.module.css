@@ -271,45 +271,6 @@
   gap: 22px;
 }
 
-.formSection {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px 12px;
-  border: 0;
-  border-radius: var(--dialog-radius-surface);
-  background:
-    radial-gradient(
-      ellipse at 12% 18%,
-      color-mix(in srgb, var(--palette-apricot) 2.5%, transparent),
-      transparent 72%
-    ),
-    color-mix(in srgb, var(--foreground) 2%, transparent);
-}
-
-/* Two quiet inward bands echo the writing panel without another glow. */
-.formSection::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  box-sizing: border-box;
-  border: 3px solid color-mix(in srgb, var(--palette-white) 7%, transparent);
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 0.75px
-    color-mix(in srgb, var(--palette-apricot) 11%, transparent);
-  content: "";
-  pointer-events: none;
-}
-
-.formSection:focus-within::before {
-  border-color: color-mix(in srgb, var(--palette-white) 12%, transparent);
-  box-shadow: inset 0 0 0 0.75px
-    color-mix(in srgb, var(--palette-apricot) 18%, transparent);
-}
-
 .field {
   display: flex;
   min-width: 0;
@@ -335,50 +296,31 @@
 .feelingsSection {
   --feelings-pink: var(--color-pink-300, #f9a8d4);
   --feelings-purple: var(--color-purple-300, #d8b4fe);
-  position: relative;
-  isolation: isolate;
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 19px;
-  margin-block: 4px 0;
-  padding: 18px 14px 15px;
-  border-radius: var(--dialog-radius-surface);
-  background:
-    radial-gradient(
-      ellipse at 2% 0%,
-      color-mix(in srgb, var(--feelings-pink) 10%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      ellipse at 100% 80%,
-      color-mix(in srgb, var(--feelings-purple) 9%, transparent),
-      transparent 65%
-    ),
-    color-mix(in srgb, var(--surface-reading) 92%, var(--feelings-pink));
-  color: var(--surface-reading-foreground);
-  box-shadow:
-    inset 0 0 0 3px color-mix(in srgb, var(--feelings-pink) 19%, transparent),
-    inset 0 0 0 4px color-mix(in srgb, var(--feelings-purple) 16%, transparent),
-    0 7px 24px color-mix(in srgb, var(--feelings-purple) 6%, transparent);
-}
-.feelingsSection .fieldHint {
-  font-size: 10.5px;
+  gap: 18px;
+  padding: 18px 14px;
+  color: var(--foreground);
 }
 .feelingsSection .ratingRow {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 12px;
 }
-.feelingsSection > .formSection {
-  gap: 11px;
-  padding: 13px 11px;
-  background: color-mix(in srgb, var(--feelings-purple) 5%, transparent);
-}
-.feelingsSection > .formSection::before {
-  border-width: 2px;
-  border-color: color-mix(in srgb, var(--feelings-purple) 18%, transparent);
+.feelingsSection .ratingRow > [data-check-in-rating] {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
   box-shadow: none;
+}
+.feelingsDivider {
+  width: 100%;
+  height: 1px;
+  margin: 5px 0;
+  border: 0;
+  background: color-mix(in srgb, var(--foreground) 13%, transparent);
 }
 
 .moodField {
@@ -563,29 +505,6 @@
     --feelings-pink: var(--color-pink-600, #db2777);
     --feelings-purple: var(--color-purple-600, #9333ea);
   }
-  .formSection {
-    background: color-mix(in srgb, var(--surface-sunken) 38%, var(--popover));
-  }
-  .formSection::before {
-    border-color: color-mix(in srgb, var(--primary) 9%, transparent);
-    box-shadow: inset 0 0 0 0.75px
-      color-mix(in srgb, var(--primary) 15%, transparent);
-  }
-  .formSection:focus-within::before {
-    border-color: color-mix(in srgb, var(--primary) 14%, transparent);
-    box-shadow: inset 0 0 0 0.75px
-      color-mix(in srgb, var(--primary) 23%, transparent);
-  }
-  .feelingsSection > .formSection {
-    background: color-mix(
-      in srgb,
-      var(--feelings-purple) 4%,
-      var(--surface-reading)
-    );
-  }
-  .feelingsSection > .formSection::before {
-    border-color: color-mix(in srgb, var(--feelings-purple) 16%, transparent);
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -614,29 +533,6 @@
 
   .updatedTime {
     opacity: 0.65;
-  }
-}
-
-/* Paper-led feelings keep vivid family accents inside one calm writing family. */
-@media (prefers-color-scheme: light) {
-  .feelingsSection {
-    background:
-      radial-gradient(
-        ellipse at 2% 0%,
-        color-mix(in srgb, var(--feelings-pink) 5%, transparent),
-        transparent 62%
-      ),
-      radial-gradient(
-        ellipse at 100% 80%,
-        color-mix(in srgb, var(--feelings-purple) 4%, transparent),
-        transparent 65%
-      ),
-      var(--surface-reading);
-    box-shadow:
-      inset 0 0 0 3px color-mix(in srgb, var(--feelings-pink) 16%, transparent),
-      inset 0 0 0 4px
-        color-mix(in srgb, var(--feelings-purple) 12%, transparent),
-      0 7px 24px color-mix(in srgb, var(--feelings-purple) 5%, transparent);
   }
 }
 
