@@ -11,8 +11,8 @@
 .medicationSection {
   display: grid;
   gap: 16px;
-  padding-block: 16px;
+  padding: 1rem;
 }
-[data-intake-form] .medicationSection:first-child {
-  padding-inline: 0;
+.medicationSection [data-compact-choice-trigger] {
+  padding-inline-end: 8.75px;
 }

@@ -356,7 +356,7 @@ export function IntakeForm({
         >
           <div className={styles.medicationSection}>
             <div
-              className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-[minmax(0,1fr)_136px] sm:grid-cols-[minmax(0,1fr)_144px]"
+              className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-[minmax(0,1fr)_96px] sm:grid-cols-[minmax(0,1fr)_102px]"
               data-intake-medication-route-fields
             >
               <div className="form-field min-w-0">

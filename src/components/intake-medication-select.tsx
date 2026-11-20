@@ -4,8 +4,6 @@ import {
   ChoiceMenuHeader,
   ChoiceOptionContent,
 } from "@/components/choice-menu";
-import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
-import { getMedicationCategories } from "@/lib/medication-categories";
 import {
   MedicationTypeIcon,
   MedicationIcon,
@@ -33,7 +31,6 @@ export function IntakeMedicationSelect({
   onValueChange: (value: string) => void;
 }) {
   const selected = medications.find((medication) => medication.id === value);
-  const selectedClasses = getMedicationCategories(selected);
   return (
     <Select
       value={value}
@@ -45,6 +42,7 @@ export function IntakeMedicationSelect({
     >
       <SelectTrigger
         id="intake-medication"
+        data-compact-choice-trigger
         className="h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10"
       >
         <SelectValue>
@@ -69,9 +67,6 @@ export function IntakeMedicationSelect({
                   type={selected.form ?? "other"}
                   className="size-4 shrink-0"
                 />
-                {selectedClasses.map((kind) => (
-                  <MedicationIndicatorMark key={kind} kind={kind} size={16} />
-                ))}
               </span>
             </>
           ) : fallbackIntake ? (
@@ -90,7 +85,6 @@ export function IntakeMedicationSelect({
       >
         <ChoiceMenuHeader title="Medication" count={medications.length} />
         {medications.map((medication) => {
-          const classes = getMedicationCategories(medication);
           const strength = formatDose(medication.strengthMg);
           const current = value === medication.id;
           return (
@@ -127,13 +121,6 @@ export function IntakeMedicationSelect({
                       type={medication.form ?? "other"}
                       className="size-4 shrink-0"
                     />
-                    {classes.map((kind) => (
-                      <MedicationIndicatorMark
-                        key={kind}
-                        kind={kind}
-                        size={16}
-                      />
-                    ))}
                   </span>
                 }
               />
