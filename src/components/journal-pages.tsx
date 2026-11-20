@@ -630,6 +630,8 @@ export function MedicationsPage() {
   useEffect(() => {
     if (!data || historyNoticeShown.current) return;
     historyNoticeShown.current = true;
+    const linkedMedications = new Set(data.intakes.map((entry) => entry.medicationId)).size;
+    const notes = data.intakes.filter((entry) => entry.note?.trim()).length;
     toast.info(
       "Strength changes recalculate past doses and totals. Logged quantities, times and notes stay as entered.",
       {
@@ -642,8 +644,9 @@ export function MedicationsPage() {
             "Medication edits stay in sync across your journal, including entries you recorded before the change.",
           ],
           facts: [
-            { label: "Dose totals", value: "Recalculated" },
-            { label: "Recorded details", value: "Kept as entered" },
+            { label: "Entries", value: String(data.intakes.length) },
+            { label: "Dose totals", value: `${linkedMedications} logged medication${linkedMedications === 1 ? "" : "s"}` },
+            { label: "Recorded details", value: `${notes} saved note${notes === 1 ? "" : "s"}` },
           ],
           links: [{ label: "Medication Library", href: "/medications" }],
           footer:

@@ -910,6 +910,7 @@ export function JournalNotification({
       data-notification-id={id}
       data-notification-host-id={nativeHostId}
       data-kind={kind}
+      data-medication-policy={medicationPolicy || undefined}
       data-variant={variant}
       data-expanded={expanded}
       data-phase={phase}
@@ -1067,43 +1068,34 @@ export function JournalNotification({
               updatePanel
             ) : details?.preview ? (
               <NotificationChangePreview preview={details.preview} />
+            ) : medicationPolicy ? (
+              <section className="journal-medication-policy" aria-label="How medication edits work">
+                <header className="journal-policy-intro">
+                  <h3>One edit. The math follows.</h3>
+                  <p>Correct a medication in your library and its past entries pick up the change. Your journal handles the arithmetic.</p>
+                </header>
+                <section className="journal-medication-policy-alert">
+                  <header>
+                    <RefreshCcw size={16} aria-hidden="true" />
+                    <h4>History</h4>
+                    <span>· &nbsp; Edit policy</span>
+                    <small><b>{facts.find((item) => item.label === "Entries")?.value ?? "All"}</b> {facts.find((item) => item.label === "Entries")?.value === "1" ? "entry" : "entries"}</small>
+                  </header>
+                  <p>Change a strength and each linked dose is recalculated from the quantity you logged. Daily totals for that medication follow suit.</p>
+                </section>
+                <p className="journal-policy-tip">Only one intake needs correcting? Open that entry to edit its quantity, time or note.</p>
+                <hr />
+                <dl className="journal-policy-stats">
+                  <div><dt><PillBottle />Dose totals</dt><dd>{facts.find((item) => item.label === "Dose totals")?.value ?? "Recalculated"}<small>Strength × recorded quantity</small></dd></div>
+                  <div><dt><ShieldCheck />Recorded details</dt><dd>{facts.find((item) => item.label === "Recorded details")?.value ?? "Kept as entered"}<small>Times, quantities and notes stay as entered.</small></dd></div>
+                </dl>
+              </section>
             ) : facts.length ? (
-              <div
-                className={
-                  medicationPolicy ? "journal-medication-policy" : undefined
-                }
-              >
-                {medicationPolicy ? (
-                  <section
-                    className="journal-medication-policy-alert"
-                    aria-label="Medication edit policy"
-                  >
-                    <header>
-                      <strong>History</strong>
-                      <span aria-hidden="true">·</span>
-                      <span>Edit policy</span>
-                      <small>All entries</small>
-                    </header>
-                    <div className="journal-medication-policy-body">
-                      <ActionIcon name="retry" aria-hidden="true" />
-                      <p>
-                        <strong>Edits Update All Past Logs.</strong> {message}
-                      </p>
-                    </div>
-                  </section>
-                ) : (
-                  kind === "info" && (
-                    <p className="journal-notification-facts-intro">
-                      {message}
-                    </p>
-                  )
-                )}
+              <div>
+                {kind === "info" && <p className="journal-notification-facts-intro">{message}</p>}
                 <dl className="journal-notification-facts">
                   {facts.map((fact, index) => (
-                    <div key={index}>
-                      <dt>{fact.label}</dt>
-                      <dd>{fact.value}</dd>
-                    </div>
+                    <div key={index}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
                   ))}
                 </dl>
               </div>
