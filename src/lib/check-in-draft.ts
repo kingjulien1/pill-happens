@@ -100,7 +100,6 @@ export function isCheckInDraft(value: unknown): value is CheckInDraft {
     typeof draft.note === "string" &&
     draft.note.length <= DAILY_REFLECTION_MAX_LENGTH &&
     Array.isArray(draft.moods) &&
-    draft.moods.length <= 4 &&
     draft.moods.every((value) =>
       DAILY_MOOD_VALUES.includes(value as DailyMood),
     ) &&

@@ -3917,10 +3917,11 @@ export function DeveloperGuidePage() {
                 near-synonyms immediately. The compact search and Shuffle
                 controls share their background and inset border treatment.
                 Removable selections stay beneath the scrolling palette during
-                searches, and the selection limit remains four. rankDailyMoods
-                counts each mood once per saved check-in and sorts the registry
-                by descending usage. The picker reverses that order for its
-                least-used-first view, then filters to active or selected IDs.
+                searches. Any number of distinct registered feelings can be
+                selected. rankDailyMoods counts each mood once per saved check-in
+                and sorts the registry by descending usage. The picker reverses
+                that order for its least-used-first view, then filters to active
+                or selected IDs.
                 Equal-frequency choices use a deterministic day-seeded shuffle.
                 Shuffle gives those ties a new seeded mix. Searching and
                 shuffling reset only the results viewport, preserving selected

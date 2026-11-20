@@ -14,6 +14,7 @@ import {
 } from "./check-in-draft";
 import {
   DAILY_REFLECTION_MAX_LENGTH,
+  DAILY_MOOD_VALUES,
   type DailyCheckIn,
 } from "./daily-check-in";
 import { createDraftWorkspace } from "./journal-drafts";
@@ -134,7 +135,6 @@ test("draft validation shares the long reflection cap without relaxing other raw
     { energy: 0 },
     { stress: 1.5 },
     { moods: ["unknown"] },
-    { moods: ["calm", "okay", "happy", "low", "tired"] },
   ])
     assert.equal(isCheckInDraft({ ...draft, ...fields }), false);
   assert.equal(isCheckInDraft(null), false);
@@ -547,4 +547,36 @@ test("old raw rating drafts remain five-point while new entries record explicit 
     }),
     false,
   );
+});
+
+test("every registered feeling survives a durable check-in draft reload", () => {
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+  };
+  const draft = { ...checkInDefaults(), moods: [...DAILY_MOOD_VALUES] };
+  assert.equal(isCheckInDraft(draft), true);
+  const before = createDraftWorkspace("all_feelings_draft");
+  before.hydrate(storage);
+  before.setDraft("checkin:2026-11-20", draft);
+  const after = createDraftWorkspace("all_feelings_draft");
+  after.hydrate(storage);
+  const restored = after.getSnapshot().drafts["checkin:2026-11-20"].value;
+  assert.equal(isCheckInDraft(restored), true);
+  assert.deepEqual(restored, draft);
+});
+
+test("a legacy raw repeated mood selection keeps its writing recoverable", () => {
+  const draft = {
+    ...checkInDefaults(),
+    note: "Keep these existing words while correcting the selection.",
+    moods: ["calm", "calm"],
+  };
+  const restored = JSON.parse(JSON.stringify(draft));
+  assert.equal(isCheckInDraft(restored), true);
+  assert.equal(restored.note, draft.note);
+  assert.deepEqual(restored.moods, draft.moods);
 });

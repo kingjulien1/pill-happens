@@ -188,7 +188,6 @@ export const dailyCheckInSchema = z
       .optional(),
     moods: z
       .array(z.enum(DAILY_MOOD_VALUES))
-      .max(4, "Choose up to four moods.")
       .refine(
         (moods) => new Set(moods).size === moods.length,
         "Choose each mood only once.",

@@ -74,21 +74,26 @@ test("check-in periods default old clients to Evening and reject unknown discrim
     );
 });
 
-test("moods are allowlisted, unique, and limited to four selections", () => {
+test("moods accept every distinct registered choice and reject invalid selections", () => {
   for (const mood of DAILY_MOOD_VALUES)
     assert.deepEqual(input({ moods: [mood] }).moods, [mood]);
-  assert.equal(input({ moods: DAILY_MOOD_VALUES.slice(0, 4) }).moods.length, 4);
-  for (const moods of [
-    ["unknown"],
-    ["calm", "calm"],
-    DAILY_MOOD_VALUES.slice(0, 5),
-    "calm",
-    [null],
-  ])
+  assert.deepEqual(
+    input({ moods: DAILY_MOOD_VALUES }).moods,
+    DAILY_MOOD_VALUES,
+  );
+  for (const moods of [["unknown"], ["calm", "calm"], "calm", [null]])
     assert.equal(
       dailyCheckInSchema.safeParse({ day: "2026-10-30", moods }).success,
       false,
     );
+});
+
+test("all registered feelings survive a check-in save and JSON reopening", () => {
+  const state = emptyData();
+  const fields = input({ moods: [...DAILY_MOOD_VALUES] });
+  upsertDailyCheckIn(state, fields, now);
+  const reopened: AppData = JSON.parse(JSON.stringify(state));
+  assert.deepEqual(checkIns(reopened)[0].moods, DAILY_MOOD_VALUES);
 });
 
 test("check-in text has bounded lengths after trimming and uses real calendar dates", () => {

@@ -710,10 +710,10 @@ export function GuidePage() {
             <p>
               <strong>Evening reflection.</strong> Browse{" "}
               {DAILY_MOOD_CHOICES.length}{" "}
-              feelings with Lucide symbols. Search by word and choose up to four.
-              Shuffle remixes choices used equally often. Selected feelings stay
-              below the palette while you search. Add optional Energy, Stress
-              and Small Reminders answers.
+              feelings with Lucide symbols. Search by word and pick every feeling
+              that fits. Shuffle remixes choices used equally often. Selected
+              feelings stay below the palette while you search. Add optional
+              Energy, Stress and Small Reminders answers.
             </p>
             <div
               className={styles.moodList}
@@ -786,8 +786,8 @@ export function GuidePage() {
                   Moods
                 </dt>
                 <dd>
-                  Choose up to four. Search or scroll the compact library;
-                  selected feelings stay within reach and can be removed with
+                  Search or scroll the compact library to choose what fits.
+                  Selected feelings stay within reach and can be removed with
                   another tap. A mixed day is welcome.
                 </dd>
               </div>
