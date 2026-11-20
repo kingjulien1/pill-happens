@@ -22,7 +22,12 @@
   min-width: 0;
   padding-block-start: 8px;
 }
-.preview > :first-child { justify-self: center; }
+.preview > [data-preview-title-pill] {
+  --final-look-copy: var(--foreground);
+  --final-look-muted: var(--muted-foreground);
+  justify-self: center;
+  background: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
+}
 .trackingDay {
   display: flex;
   justify-content: space-between;

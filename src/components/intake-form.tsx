@@ -472,7 +472,7 @@ export function IntakeForm({
       </fieldset>
 
       <section className={styles.preview} aria-labelledby="intake-preview-title">
-        <FinalLookHeading id="intake-preview-title" large />
+        <FinalLookHeading id="intake-preview-title" />
         {belongsTo && validQuantity && effectiveQuantity !== null && (medication || fallbackIntake) ? (
           <MedicationPreview record={{
             kind: "intake",

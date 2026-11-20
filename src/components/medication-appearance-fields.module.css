@@ -675,15 +675,3 @@
     color: var(--muted-foreground);
   }
 }
-
-.titlePill[data-large] {
-  --final-look-copy: var(--foreground);
-  --final-look-muted: var(--muted-foreground);
-  min-height: 48px;
-  gap: 14px;
-  padding: 8px 18px;
-  background: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
-  font-size: 16px;
-}
-.titlePill[data-large] h3 { font-size: 21px; }
-.titlePill[data-large] .titleSeparator { height: 18px; }
