@@ -2263,13 +2263,13 @@
   88% { opacity: 0; }
   94%, 100% { opacity: 0; transform: scale(1.34); }
 }
-/* The 2.9s bright hold fits two 1.15s turns and three equal 200ms rests. */
+/* Rays appear at 1.2s and finish fading at 3.7s: 200ms inside either
+   edge of the bright hold. Each burst finishes its outward drift unseen. */
 @keyframes journal-bulb-echo {
-  0%, 26.08696% { transform: rotate(0turn) scale(.96); }
-  51.08696%, 55.43478% { transform: rotate(1turn) scale(1.15); }
-  80.43478%, 100% { transform: rotate(2turn) scale(1.34); }
-  0%, 26.08696%, 51.08696%, 55.43478%, 80.43478%, 100% { opacity: 0; }
-  30%, 47%, 59.35%, 76.35% { opacity: .85; }
+  0%, 26.087%, 61.522% { opacity: 0; transform: scale(.96); }
+  32%, 39%, 67.435%, 74.435% { opacity: .85; transform: scale(1); }
+  45%, 80.435% { opacity: 0; }
+  51%, 86.435%, 100% { opacity: 0; transform: scale(1.38); }
 }
 @keyframes journal-bulb-halo {
   0%, 13.91%, 100% { opacity: 0; }
