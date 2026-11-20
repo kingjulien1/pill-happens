@@ -1110,6 +1110,29 @@
 .journal-notification[data-expanded="true"] .journal-notification-footer-fade {
   opacity: calc(var(--toast-wash-opacity) * 17 / 24);
 }
+/* Reveal the open surface through a soft moving edge behind the content. */
+@media (prefers-reduced-motion: no-preference) {
+  .journal-notification-closed-wash {
+    --toast-reveal-mask: linear-gradient(to bottom, transparent 34%, #000 66%);
+    -webkit-mask: var(--toast-reveal-mask) center bottom / 100% 300% no-repeat;
+    mask: var(--toast-reveal-mask) center bottom / 100% 300% no-repeat;
+    transition: mask-position 620ms cubic-bezier(.48, .04, .2, 1);
+    transition-property: -webkit-mask-position, mask-position;
+  }
+  .journal-notification[data-expanded="true"] .journal-notification-closed-wash {
+    opacity: var(--toast-wash-opacity);
+    -webkit-mask-position: center top;
+    mask-position: center top;
+    transition-duration: 980ms;
+  }
+  .journal-notification[data-expanded="true"] .journal-notification-footer-fade {
+    transition: opacity 680ms 200ms ease-in-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-notification-closed-wash,
+  .journal-notification-footer-fade { transition: none; }
+}
 .journal-notification-header {
   position: relative;
   z-index: 1;
