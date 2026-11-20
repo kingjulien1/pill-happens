@@ -468,20 +468,22 @@ export function IntakeForm({
         data-dialog-fade-footer
         data-draft-action-footer
       >
-        <p className="text-[10px] leading-relaxed text-muted-foreground">
-          {belongsTo
-            ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`
-            : "Choose a valid time"}
-          . Days begin at 06:00.
-        </p>
-        <DialogPrimaryButton
-          type="submit"
-          disabled={busy}
-          pending={busy}
-          className="w-full rounded-2xl"
-        >
-          {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
-        </DialogPrimaryButton>
+        <div className="grid gap-1">
+          <p className="text-[10px] leading-relaxed text-muted-foreground">
+            {belongsTo
+              ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}`
+              : "Choose a valid time"}
+            . Days begin at 06:00.
+          </p>
+          <DialogPrimaryButton
+            type="submit"
+            disabled={busy}
+            pending={busy}
+            className="w-full rounded-2xl"
+          >
+            {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
+          </DialogPrimaryButton>
+        </div>
         <DraftStatus
           {...draft}
           onReset={busy || footerAction || formId ? undefined : reset}
