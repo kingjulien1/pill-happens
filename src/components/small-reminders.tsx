@@ -345,6 +345,7 @@ export function SmallReminders({
             />
             <Menu.Root modal={false}>
               <Menu.Trigger
+                disabled={disabled}
                 render={
                   <Button
                     type="button"
@@ -371,7 +372,7 @@ export function SmallReminders({
                   >
                     <Menu.Item
                       className={styles.menuItem}
-                      disabled={index === 0}
+                      disabled={disabled || index === 0}
                       onClick={() => move(index, -1)}
                     >
                       <ArrowUp size={14} />
@@ -379,7 +380,7 @@ export function SmallReminders({
                     </Menu.Item>
                     <Menu.Item
                       className={styles.menuItem}
-                      disabled={index === rows.length - 1}
+                      disabled={disabled || index === rows.length - 1}
                       onClick={() => move(index, 1)}
                     >
                       <ArrowDown size={14} />
@@ -388,7 +389,7 @@ export function SmallReminders({
                     <Menu.Separator className={styles.menuSeparator} />
                     <Menu.Item
                       className={styles.menuItem}
-                      disabled={items.length === 0}
+                      disabled={disabled || items.length === 0}
                       onClick={() => remove(index)}
                     >
                       <Trash2 size={14} />
