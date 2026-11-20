@@ -164,6 +164,12 @@
   overflow: hidden;
 }
 
+.checkInSurface [data-intake-form] [data-dialog-fade-footer] {
+  --footer-violet: 19.83%;
+  --footer-base: 25.67%;
+  --footer-middle: 12.25%;
+}
+
 .checkInSurface [data-check-in-form] [data-dialog-fade-footer] {
   --footer-violet: 13.6%;
   --footer-base: 17.6%;
