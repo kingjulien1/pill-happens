@@ -166,9 +166,18 @@
 
 .checkInSurface [data-intake-form] [data-dialog-fade-footer] {
   padding-bottom: max(10px, env(safe-area-inset-bottom));
-  --footer-violet: 19.83%;
-  --footer-base: 25.67%;
-  --footer-middle: 12.25%;
+  --outer-rim-color: var(--checkin-line, color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400)));
+  --inner-rim-color: var(--color-violet-400, #a78bfa);
+  background:
+    linear-gradient(to top,
+      color-mix(in srgb, var(--inner-rim-color) 20%, transparent),
+      color-mix(in srgb, var(--inner-rim-color) 8%, transparent) 19%,
+      transparent 42%),
+    linear-gradient(to top,
+      color-mix(in srgb, var(--outer-rim-color) 26%, transparent),
+      color-mix(in srgb, var(--outer-rim-color) 16%, transparent) 38%,
+      color-mix(in srgb, var(--outer-rim-color) 4%, transparent) 76%,
+      transparent);
 }
 
 .checkInSurface [data-check-in-form] [data-dialog-fade-footer] {
