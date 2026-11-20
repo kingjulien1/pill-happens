@@ -1,6 +1,7 @@
 "use client";
 
 import { CalendarCheck, Sunrise } from "lucide-react";
+import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
@@ -474,7 +475,7 @@ export function IntakeForm({
 
       <div className={`${checkStyles.sectionDivider} ${styles.previewDivider}`} role="separator" />
       <section className={styles.preview} aria-labelledby="intake-preview-title">
-        <FinalLookHeading id="intake-preview-title" showIcon />
+        <FinalLookHeading id="intake-preview-title" showIcon color={medication && getMedicationColor(medication.color)} />
         {belongsTo && validQuantity && effectiveQuantity !== null && (medication || fallbackIntake) ? (
           <MedicationPreview record={{
             kind: "intake",

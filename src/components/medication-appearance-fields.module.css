@@ -91,6 +91,15 @@
   line-height: inherit;
 }
 
+.liveLabel { display: inline-flex; align-items: center; gap: 5px; }
+.liveDot {
+  width: 0.7em;
+  height: 0.7em;
+  flex: none;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 25%, transparent);
+}
+
 .titleSeparator {
   width: 1px;
   height: 11px;

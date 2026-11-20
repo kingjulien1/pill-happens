@@ -733,7 +733,7 @@ export function MedicationAppearanceFields({
             data-preview-content
           >
             <header className={styles.previewHeader} data-preview-header>
-              <FinalLookHeading id={`${id}-preview-title`} />
+              <FinalLookHeading id={`${id}-preview-title`} color={selectedColor} />
               <span className={styles.colorChip} data-preview-color-chip>
                 <span
                   aria-hidden="true"

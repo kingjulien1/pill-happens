@@ -1,7 +1,12 @@
 import { Eye } from "lucide-react";
+import { getMedicationColor } from "@/lib/medication-appearance";
 import styles from "./medication-appearance-fields.module.css";
 
-export function FinalLookHeading({ id, showIcon = false }: { id: string; showIcon?: boolean }) {
+export function FinalLookHeading({ id, showIcon = false, color }: {
+  id: string;
+  showIcon?: boolean;
+  color?: ReturnType<typeof getMedicationColor>;
+}) {
   return (
     <div className={styles.titlePill} data-preview-title-pill>
       <h3 id={id}>
@@ -9,7 +14,16 @@ export function FinalLookHeading({ id, showIcon = false }: { id: string; showIco
         Final Look
       </h3>
       <span aria-hidden="true" className={styles.titleSeparator} />
-      <span>Live Preview</span>
+      <span className={styles.liveLabel}>
+        {color && <span
+          className={styles.liveDot}
+          style={{ backgroundColor: color.hex }}
+          role="img"
+          aria-label={color.label}
+          title={color.label}
+        />}
+        Live Preview
+      </span>
     </div>
   );
 }
