@@ -68,6 +68,9 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
           <stop offset=".86" stopColor="#fff8ca" stopOpacity=".32" />
           <stop offset="1" stopColor="#fff8ca" stopOpacity="0" />
         </radialGradient>
+        <clipPath id={`${haloId}-crown`}>
+          <rect x="-10" y="-14" width="44" height="23" />
+        </clipPath>
       </defs>
       <ellipse className="journal-bulb-halo" cx="12" cy="7" rx="14" ry="13"
         fill={`url(#${haloId})`} stroke="none" />
@@ -83,10 +86,12 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
           ),
         )}
       </g>
-      <g className="journal-bulb-echo-rays" strokeWidth="1.15">
-        {[-67.5, -22.5, 22.5, 67.5].map((angle) => (
-          <path key={angle} d="M12 -1v-2" transform={`rotate(${angle} 12 9)`} />
-        ))}
+      <g clipPath={`url(#${haloId}-crown)`}>
+        <g className="journal-bulb-echo-rays" strokeWidth="1.15">
+          {[-67.5, -22.5, 22.5, 67.5].map((angle) => (
+            <path key={angle} d="M12 -1v-2" transform={`rotate(${angle} 12 9)`} />
+          ))}
+        </g>
       </g>
     </svg>
   );

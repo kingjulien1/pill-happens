@@ -425,7 +425,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="info">toast.info</code>,
             "Journal notice",
-            "8.633s bar + 1s active grace · The bulb lights from within on a 4.6-second loop. A softer gold outline frames the bright glass. Two sets of rays drift outward, with the shorter rays appearing between the first set. Reduced motion shows a steady yellow bulb.",
+            "8.633s bar + 1s active grace · The bulb lights from within on a 4.6-second loop. A softer gold outline frames the bright glass. Two sets of rays drift outward, with the shorter rays making two turns above the bulb during its bright hold. Reduced motion shows a steady yellow bulb.",
           ],
           [
             <code key="warning">toast.warning</code>,
