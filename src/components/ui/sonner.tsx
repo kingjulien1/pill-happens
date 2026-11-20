@@ -78,7 +78,7 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
         className="journal-bulb-glass"
         d="M9 18c0-2.2-.7-3.3-2.2-5A7 7 0 1 1 17.2 13c-1.5 1.7-2.2 2.8-2.2 5Z"
       />
-      <path d="M10 22h4" />
+      <path d="M9 21.5h6 M10.5 25h3" stroke="currentColor" strokeWidth="2" />
       <g className="journal-bulb-rays" strokeWidth="1.5">
         {["M12 -1v-3", "M4 2 2 0", "M20 2l2-2", "M2.5 9H0", "M21.5 9H24"].map(
           (d) => (

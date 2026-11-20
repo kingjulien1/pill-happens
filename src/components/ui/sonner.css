@@ -539,6 +539,8 @@
 .journal-toaster [data-toast-symbol="info"] .journal-toast-glyph {
   width: 22.05px;
   height: 22.05px;
+  position: relative;
+  top: 1px;
   overflow: visible;
   color: #fde68a;
   stroke: #e6c743;
