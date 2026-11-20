@@ -34,6 +34,8 @@ export type CheckInDraft = {
   /** Optional for older drafts; unfinished clock text stays recoverable. */
   bedtime?: string;
   helped: string;
+  /** Device-only row metadata is validated independently from canonical helped text. */
+  helpedList?: unknown;
   writingOpen?: boolean;
   /** Absent on legacy drafts: never silently publish them over a newer journal. */
   reflectionBaseUpdatedAt?: string | null;
