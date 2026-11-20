@@ -33,6 +33,7 @@ import {
   useJournalWorkspace,
   usePersistentDraft,
 } from "@/components/journal-drafts";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { PageHeading, PageSurface } from "@/components/page-heading";
 import checkInStyles from "./daily-check-in.module.css";
@@ -472,6 +473,20 @@ function LogIntakeDialog({
 }) {
   const formId = useId();
   const [canReset, setCanReset] = useState(false);
+  const [showResetHint, setShowResetHint] = useState(false);
+  const resetId = useId();
+  useEffect(() => {
+    if (!open || !showResetHint) return;
+    const dismiss = () => setShowResetHint(false);
+    document.addEventListener("pointerdown", dismiss, true);
+    document.addEventListener("click", dismiss, true);
+    document.addEventListener("keydown", dismiss, true);
+    return () => {
+      document.removeEventListener("pointerdown", dismiss, true);
+      document.removeEventListener("click", dismiss, true);
+      document.removeEventListener("keydown", dismiss, true);
+    };
+  }, [open, showResetHint]);
   return (
     <ResponsiveModal
       open={open}
@@ -499,19 +514,18 @@ function LogIntakeDialog({
           : "Choose your medication and how you took it, then enter the amount. If you’re logging later, adjust the date and time to match when you took it."
       }
       headerActions={
-        <Button
-          type="reset"
-          form={formId}
-          variant="ghost"
-          size="icon"
-          rim={false}
-          className={closeStyles.control}
-          disabled={!canReset}
-          aria-label="Reset intake draft"
-          title="Reset draft"
-        >
-          <ActionIcon name="retry" className="size-[18px]" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip open={showResetHint && canReset} triggerId={resetId}>
+            <TooltipTrigger id={resetId} type="reset" render={
+              <Button type="reset" form={formId} variant="ghost" size="icon" rim={false}
+                className={closeStyles.control} data-restored-hint={showResetHint || undefined}
+                disabled={!canReset} aria-label="Reset intake draft">
+                <ActionIcon name="retry" className="size-[18px]" />
+              </Button>
+            } />
+            <TooltipContent side="bottom" align="end">Clear this draft and start fresh.</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       }
     >
       {open && (
@@ -519,6 +533,7 @@ function LogIntakeDialog({
           formId={formId}
           initialDay={historical ? day : undefined}
           onResetAvailability={setCanReset}
+          onRestoredHint={setShowResetHint}
           onSaved={onClose}
         />
       )}

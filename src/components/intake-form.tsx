@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarCheck, Sunrise } from "lucide-react";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
@@ -62,8 +63,10 @@ export function IntakeForm({
   footerAction,
   formId,
   onResetAvailability,
+  onRestoredHint,
 }: {
   formId?: string;
+  onRestoredHint?: (restored: boolean) => void;
   onResetAvailability?: (available: boolean) => void;
   intake?: Intake;
   initialDay?: string;
@@ -93,6 +96,11 @@ export function IntakeForm({
   useEffect(() => {
     onResetAvailability?.(draft.hasDraft && !busy);
   }, [onResetAvailability, draft.hasDraft, busy]);
+  const showRestoredHelp = Boolean(formId && draft.hasDraft && draft.restored && draft.status === "saved");
+  useEffect(() => {
+    onRestoredHint?.(showRestoredHelp);
+    return () => onRestoredHint?.(false);
+  }, [onRestoredHint, showRestoredHelp]);
   const { medicationId, quantity } = draft.value;
   const route =
     draft.value.route ??
@@ -513,9 +521,14 @@ export function IntakeForm({
               : undefined
           }
         />
+        {showRestoredHelp && (
+          <p className={styles.restoredHelp}>
+            Your device kept these unfinished changes. Save Intake to log them, or use <strong>Reset draft</strong> at the top right to start fresh.
+          </p>
+        )}
         <div className={styles.trackingDay}>
-          <span>{belongsTo ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.` : "Choose a valid time."}</span>
-          <span>Days begin at 06:00.</span>
+          <span><CalendarCheck aria-hidden="true" />{belongsTo ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.` : "Choose a valid time."}</span>
+          <span><Sunrise aria-hidden="true" />Days begin at 06:00.</span>
         </div>
       </div>
     </form>

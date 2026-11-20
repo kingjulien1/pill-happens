@@ -35,3 +35,20 @@
   font-size: 10px;
   font-weight: 525;
 }
+
+.restoredHelp {
+  max-width: 50ch;
+  margin: -4px auto 2px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.45;
+  text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.restoredHelp strong { color: var(--foreground); }
+.trackingDay { column-gap: 20px; }
+.trackingDay > span { display: inline-flex; align-items: center; gap: 5px; }
+.trackingDay svg { width: 12px; height: 12px; flex: none; }
