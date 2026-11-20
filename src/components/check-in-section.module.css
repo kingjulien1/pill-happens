@@ -20,27 +20,64 @@
   box-shadow: none;
   border-radius: var(--dialog-radius-surface);
 }
-.caption {
-  margin: 0;
+.header {
+  min-width: 0;
+  margin-bottom: 7px;
   padding-inline: 6px;
+}
+.caption {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
   color: var(--muted-foreground);
   font-size: 11px;
   line-height: 1.45;
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: clamp(4px, 1.5vw, 8px);
-  margin-bottom: 7px;
 }
-.caption strong {
+.labelRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: clamp(4px, 1.5vw, 8px);
+}
+.title {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
   color: var(--foreground);
   font-size: 14px;
   font-weight: 650;
   line-height: 1.25;
 }
+.title svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: 7px;
+  vertical-align: -0.125em;
+}
+.context {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .detail {
+  flex-shrink: 0;
   text-align: end;
   font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.description {
+  margin: 7px 0 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.6;
 }
 .frame > fieldset {
   padding: 10px 12px 12px;

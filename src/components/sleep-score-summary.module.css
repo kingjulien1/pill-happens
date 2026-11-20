@@ -15,7 +15,12 @@
   --score-edge: color-mix(in srgb, var(--foreground) 11%, transparent);
   border: 1px solid var(--score-edge);
 }
+.wrapper {
+  min-width: 0;
+}
 .heading {
+  padding-inline: 6px;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -33,7 +38,7 @@
 }
 .heading h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.3;
   font-weight: 650;
 }
@@ -290,9 +295,6 @@
   }
   .dial {
     justify-self: center;
-  }
-  .heading h3 {
-    font-size: 17px;
   }
   .heading > span {
     max-width: none;

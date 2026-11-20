@@ -188,19 +188,16 @@ export function MorningSleepFields({
     <div className={styles.fields} data-morning-sleep-fields>
       <SleepCycleImport value={value} onChange={onChange} disabled={disabled} />
       <CheckInSection
-        caption="Looking Back"
-        context="Sleep quality"
-        detail={`${RATINGS.filter(({ key }) => value[key] != null).length} of ${RATINGS.length}`}
+        caption="How the Night Felt"
+        context="Sleep Quality"
+        detail="1–10 · Optional"
+        headingId={`${id}-ratings-heading`}
       >
         <section
           className={styles.section}
           aria-labelledby={`${id}-ratings-heading`}
           data-check-in-section="morning-ratings"
         >
-          <div className={styles.sectionHeading}>
-            <h3 id={`${id}-ratings-heading`}>How the Night Felt</h3>
-            <span>1–10 · Optional</span>
-          </div>
           <p className={styles.hint}>
             Slide or tap to rate. Leave anything blank.
           </p>
@@ -223,18 +220,15 @@ export function MorningSleepFields({
         </section>
       </CheckInSection>
       <CheckInSection
-        caption="Overnight"
-        context="Sleep window"
-        detail="Local time"
+        caption="The Night’s Timeline"
+        context="Overnight"
+        detail="24-hour clock"
+        headingId={`${id}-timeline-heading`}
       >
         <section
           className={styles.section}
           aria-labelledby={`${id}-timeline-heading`}
         >
-          <div className={styles.sectionHeading}>
-            <h3 id={`${id}-timeline-heading`}>The Night’s Timeline</h3>
-            <span>24-hour clock</span>
-          </div>
           <div
             className={styles.schedule}
             data-check-in-section="morning-schedule"
@@ -268,19 +262,15 @@ export function MorningSleepFields({
         </section>
       </CheckInSection>
       <CheckInSection
-        caption="Rest & Recovery"
-        context="Sleep duration"
-        detail="Hours & minutes"
+        caption="The Sleep Breakdown"
+        detail="From your report"
+        headingId={`${id}-duration-heading`}
       >
         <section
           className={styles.section}
           aria-labelledby={`${id}-duration-heading`}
           data-check-in-section="morning-duration"
         >
-          <div className={styles.sectionHeading}>
-            <h3 id={`${id}-duration-heading`}>The Sleep Breakdown</h3>
-            <span>From your report</span>
-          </div>
           <div className={styles.durations}>
             {duration("fallAsleepMinutes", "Asleep After", "-rest")}
             {duration("lightMinutes", "Light Sleep")}

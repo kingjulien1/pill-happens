@@ -3,6 +3,8 @@
 import { useId, useState, useSyncExternalStore } from "react";
 import {
   BedDouble,
+  Coffee,
+  Moon,
   BookOpen,
   BookOpenCheck,
   Flower2,
@@ -630,13 +632,31 @@ function CheckInForm({
       data-check-in-form={period}
     >
       <CheckInSection
-        caption="Journal entry"
-        context="In your words"
+        caption={
+          <>
+            {morning ? (
+              <Coffee aria-hidden="true" />
+            ) : (
+              <Moon aria-hidden="true" />
+            )}
+            Your {morning ? "Morning" : "Day"}, Your Words
+          </>
+        }
+        headingId={`${id}-journal-heading`}
+        description={
+          morning
+            ? "What was on your mind when you woke up? Start with the thought that stayed with you."
+            : "What stayed with you today? Pick one moment you’d like to remember."
+        }
         detail={
-          <Link href="/journal" className="inline-flex items-center gap-1.5" onNavigate={() => {
+          <Link
+            href="/journal"
+            className="inline-flex items-center gap-1.5"
+            onNavigate={() => {
               onSaved?.();
               rememberJournalDestination("/journal");
-            }}>
+            }}
+          >
             <LibraryBig size={14} aria-hidden="true" />
             All journals
             <ArrowUpRight size={12} className="opacity-60" aria-hidden="true" />
@@ -668,30 +688,31 @@ function CheckInForm({
       ) : (
         <div className={styles.eveningFields} data-evening-check-in-fields>
           <CheckInSection
-            caption="Evening reflection"
-            context="Mood & energy"
-            detail="Today"
+            caption={
+              <>
+                <HeartHandshake aria-hidden="true" />
+                Your Day, Your Mood
+              </>
+            }
+            headingId={`${id}-feelings-heading`}
+            context="Evening"
+            detail="Optional"
+            description="A few shades of today. A mix is welcome; every part is optional."
           >
             <section
               className={styles.feelingsSection}
               aria-labelledby={`${id}-feelings-heading`}
               data-evening-feelings
             >
-              <div className={styles.feelingsHeading}>
-                <span className={styles.feelingsMark} aria-hidden="true">
-                  <HeartHandshake size={21} strokeWidth={2.1} />
-                </span>
-                <div>
-                  <h3 id={`${id}-feelings-heading`}>Your Day, Your Mood</h3>
-                  <p>
-                    A few shades of today. A mix is welcome; every part is
-                    optional.
-                  </p>
-                </div>
-              </div>
               <CheckInSection
-                caption="Feelings"
-                context="Mood mix"
+                caption={
+                  <>
+                    <Flower2 strokeWidth={2.1} aria-hidden="true" />
+                    Today Felt Like
+                  </>
+                }
+                headingId={`${id}-mood-heading`}
+                context="Mood Mix"
                 detail={moods.length + " of 4"}
               >
                 <fieldset
@@ -699,13 +720,7 @@ function CheckInForm({
                   disabled={locked}
                   data-check-in-section="mood"
                 >
-                  <legend className={styles.moodLegend}>
-                    <span className={styles.fieldHeading}>
-                      <Flower2 size={17} strokeWidth={2.1} />
-                      Today Felt Like
-                    </span>
-                    <span className={styles.optional}>{moods.length} / 4</span>
-                  </legend>
+                  <legend className="sr-only">Today Felt Like</legend>
                   <p className={styles.fieldHint}>
                     Choose up to four. There is room for mixed feelings.
                   </p>
@@ -720,28 +735,19 @@ function CheckInForm({
               </CheckInSection>
 
               <CheckInSection
-                caption="Daily ratings"
-                context="Energy & stress"
-                detail={
-                  [energy, stress].filter((value) => value != null).length +
-                  " of 2"
+                caption={
+                  <>
+                    <SlidersHorizontal strokeWidth={2.1} aria-hidden="true" />
+                    How Your Day Felt
+                  </>
                 }
+                headingId={`${id}-ratings-heading`}
+                detail="1–10 · Optional"
               >
                 <section
                   className={styles.formSection}
                   aria-labelledby={`${id}-ratings-heading`}
                 >
-                  <div className={styles.sectionHeading}>
-                    <h3 id={`${id}-ratings-heading`}>
-                      <SlidersHorizontal
-                        size={17}
-                        strokeWidth={2.1}
-                        aria-hidden="true"
-                      />
-                      How Your Day Felt
-                    </h3>
-                    <span>1–10 · Optional</span>
-                  </div>
                   <p className={styles.fieldHint}>
                     Slide or tap to rate. Leave anything blank.
                   </p>
@@ -774,9 +780,21 @@ function CheckInForm({
             </section>
           </CheckInSection>
           <CheckInSection
-            caption="Small reminders"
-            context="What helped"
-            detail={helped.trim() ? "Added" : "Optional"}
+            caption={
+              <>
+                <ActionIcon name="sparkle" />
+                Things That Helped
+              </>
+            }
+            headingId={`${id}-helped-heading`}
+            context="Little Wins"
+            detail={
+              <span
+                aria-label={`${helped.length} of ${WHAT_HELPED_MAX_LENGTH} characters`}
+              >
+                {helped.length} / {WHAT_HELPED_MAX_LENGTH}
+              </span>
+            }
           >
             <div
               className={cn(
@@ -786,17 +804,9 @@ function CheckInForm({
               )}
               data-check-in-section="helped"
             >
-              <div className={styles.helpedHeading}>
-                <Label htmlFor={`${id}-helped`}>
-                  <ActionIcon name="sparkle" className="size-4" />
-                  Things That Helped
-                </Label>
-                <span
-                  aria-label={`${helped.length} of ${WHAT_HELPED_MAX_LENGTH} characters`}
-                >
-                  {helped.length} / {WHAT_HELPED_MAX_LENGTH}
-                </span>
-              </div>
+              <Label htmlFor={`${id}-helped`} className="sr-only">
+                Things That Helped
+              </Label>
               <p id={`${id}-helped-hint`} className={styles.helpedHint}>
                 What made today a little easier? Give each thing its own line if
                 you like.

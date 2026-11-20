@@ -50,127 +50,139 @@ export function SleepScoreSummary({
   const chartStyle = { "--score-offset": 100 - (score ?? 0) } as CSSProperties;
 
   return (
-    <section
-      className={styles.section}
-      aria-labelledby={`${id}-heading`}
-      data-sleep-score-summary
-    >
+    <div className={styles.wrapper}>
       <div className={styles.heading}>
         <div>
           <Sparkles size={17} strokeWidth={2} aria-hidden="true" />
           <h3 id={`${id}-heading`}>The Night, In Numbers</h3>
         </div>
-        <span>Your Sleep Cycle report</span>
+        <span>Sleep Cycle</span>
       </div>
-      <div className={styles.overview}>
-        <div className={styles.dial} style={chartStyle}>
-          <span className={styles.halo} aria-hidden="true" />
-          <svg viewBox="0 0 240 240" className={styles.ring} aria-hidden="true">
-            <defs>
-              <linearGradient id={`${id}-gradient`} x1="0" y1="1" x2="1" y2="0">
-                <stop offset="0%" stopColor="#f9a8d4" />
-                <stop offset="48%" stopColor="#c084fc" />
-                <stop offset="100%" stopColor="#818cf8" />
-              </linearGradient>
-            </defs>
-            <path
-              className={styles.track}
-              d="M55.65 184.35a91 91 0 1 1 128.7 0"
-              pathLength="100"
-            />
-            <path
-              key={score ?? "empty"}
-              className={styles.progress}
-              d="M55.65 184.35a91 91 0 1 1 128.7 0"
-              pathLength="100"
-              stroke={`url(#${id}-gradient)`}
-            />
-          </svg>
-          <div className={styles.score}>
-            <label htmlFor={`${id}-score`}>Sleep Score</label>
-            <div className={styles.scoreNumber}>
-              <input
-                id={`${id}-score`}
-                type="number"
-                min={0}
-                max={100}
-                step={1}
-                inputMode="numeric"
-                placeholder="—"
-                value={value.reportScore ?? ""}
-                disabled={disabled}
-                onChange={(event) =>
-                  onChange({ ...value, reportScore: event.target.value })
-                }
+      <section
+        className={styles.section}
+        aria-labelledby={`${id}-heading`}
+        data-sleep-score-summary
+      >
+        <div className={styles.overview}>
+          <div className={styles.dial} style={chartStyle}>
+            <span className={styles.halo} aria-hidden="true" />
+            <svg
+              viewBox="0 0 240 240"
+              className={styles.ring}
+              aria-hidden="true"
+            >
+              <defs>
+                <linearGradient
+                  id={`${id}-gradient`}
+                  x1="0"
+                  y1="1"
+                  x2="1"
+                  y2="0"
+                >
+                  <stop offset="0%" stopColor="#f9a8d4" />
+                  <stop offset="48%" stopColor="#c084fc" />
+                  <stop offset="100%" stopColor="#818cf8" />
+                </linearGradient>
+              </defs>
+              <path
+                className={styles.track}
+                d="M55.65 184.35a91 91 0 1 1 128.7 0"
+                pathLength="100"
               />
-              <span>%</span>
+              <path
+                key={score ?? "empty"}
+                className={styles.progress}
+                d="M55.65 184.35a91 91 0 1 1 128.7 0"
+                pathLength="100"
+                stroke={`url(#${id}-gradient)`}
+              />
+            </svg>
+            <div className={styles.score}>
+              <label htmlFor={`${id}-score`}>Sleep Score</label>
+              <div className={styles.scoreNumber}>
+                <input
+                  id={`${id}-score`}
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  inputMode="numeric"
+                  placeholder="—"
+                  value={value.reportScore ?? ""}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange({ ...value, reportScore: event.target.value })
+                  }
+                />
+                <span>%</span>
+              </div>
+              <span className={styles.scoreCaption}>
+                {score === null
+                  ? "Add or import a score"
+                  : "Your tracker’s nightly score"}
+              </span>
             </div>
-            <span className={styles.scoreCaption}>
-              {score === null
-                ? "Add or import a score"
-                : "Your tracker’s nightly score"}
-            </span>
+            <span className={styles.ringFoot}>Out Of 100</span>
           </div>
-          <span className={styles.ringFoot}>Out Of 100</span>
-        </div>
-        <dl className={styles.stats}>
-          <div>
-            <dt>
-              <MoonStar size={15} aria-hidden="true" />
-              Total Asleep
-            </dt>
-            <dd>{duration(parsed?.totalSleepMinutes)}</dd>
-          </div>
-          <div>
-            <dt>
-              <BedDouble size={15} aria-hidden="true" />
-              Time In Bed
-            </dt>
-            <dd>{duration(summary.timeInBedMinutes)}</dd>
-          </div>
-          <div>
-            <dt>
-              <ChartNoAxesCombined size={15} aria-hidden="true" />
-              Sleep Efficiency
-            </dt>
-            <dd>
-              {summary.sleepEfficiency === null
-                ? "—"
-                : `${Math.round(summary.sleepEfficiency)}%`}
-            </dd>
-          </div>
-        </dl>
-      </div>
-      <div className={styles.metrics}>
-        {additionalMetrics.map((metric) => (
-          <label key={metric.key} htmlFor={`${id}-${metric.key}`}>
-            <span>{metric.label}</span>
+          <dl className={styles.stats}>
             <div>
-              <Input
-                id={`${id}-${metric.key}`}
-                type="number"
-                min={0}
-                max={metric.max}
-                step={metric.step}
-                inputMode={
-                  metric.key === "coughingRate" ? "decimal" : "numeric"
-                }
-                value={value[metric.key] ?? ""}
-                placeholder="—"
-                disabled={disabled}
-                onChange={(event) =>
-                  onChange({ ...value, [metric.key]: event.target.value })
-                }
-              />
-              <span aria-hidden="true">{metric.unit}</span>
+              <dt>
+                <MoonStar size={15} aria-hidden="true" />
+                Total Asleep
+              </dt>
+              <dd>{duration(parsed?.totalSleepMinutes)}</dd>
             </div>
-          </label>
-        ))}
-      </div>
-      <p className={styles.note}>
-        The score comes from your report. Efficiency uses your sleep stages and
-        the time between bed and waking.
-      </p>
-    </section>
+            <div>
+              <dt>
+                <BedDouble size={15} aria-hidden="true" />
+                Time In Bed
+              </dt>
+              <dd>{duration(summary.timeInBedMinutes)}</dd>
+            </div>
+            <div>
+              <dt>
+                <ChartNoAxesCombined size={15} aria-hidden="true" />
+                Sleep Efficiency
+              </dt>
+              <dd>
+                {summary.sleepEfficiency === null
+                  ? "—"
+                  : `${Math.round(summary.sleepEfficiency)}%`}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div className={styles.metrics}>
+          {additionalMetrics.map((metric) => (
+            <label key={metric.key} htmlFor={`${id}-${metric.key}`}>
+              <span>{metric.label}</span>
+              <div>
+                <Input
+                  id={`${id}-${metric.key}`}
+                  type="number"
+                  min={0}
+                  max={metric.max}
+                  step={metric.step}
+                  inputMode={
+                    metric.key === "coughingRate" ? "decimal" : "numeric"
+                  }
+                  value={value[metric.key] ?? ""}
+                  placeholder="—"
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange({ ...value, [metric.key]: event.target.value })
+                  }
+                />
+                <span aria-hidden="true">{metric.unit}</span>
+              </div>
+            </label>
+          ))}
+        </div>
+        <p className={styles.note}>
+          The score comes from your report. Efficiency uses your sleep stages
+          and the time between bed and waking.
+        </p>
+      </section>
+    </div>
   );
 }

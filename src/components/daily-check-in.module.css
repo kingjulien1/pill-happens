@@ -310,32 +310,6 @@
     color-mix(in srgb, var(--palette-apricot) 18%, transparent);
 }
 
-.sectionHeading {
-  display: flex;
-  min-width: 0;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.sectionHeading h3 {
-  margin: 0;
-  color: var(--foreground);
-  font-size: 13px;
-  font-weight: 550;
-  line-height: 1.5;
-}
-
-.sectionHeading > span {
-  flex-shrink: 0;
-  color: var(--muted-foreground);
-  font-size: 9px;
-}
-
-.sectionHeading + .fieldHint {
-  margin: -7px 0 0;
-}
-
 .field {
   display: flex;
   min-width: 0;
@@ -388,77 +362,6 @@
     inset 0 0 0 4px color-mix(in srgb, var(--feelings-purple) 16%, transparent),
     0 7px 24px color-mix(in srgb, var(--feelings-purple) 6%, transparent);
 }
-.feelingsHeading {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 9px;
-}
-.feelingsHeading > div {
-  min-width: 0;
-}
-.feelingsHeading h3 {
-  margin: 0;
-  color: var(--foreground);
-  font-size: 15px;
-  font-weight: 650;
-  line-height: 1.4;
-  letter-spacing: -0.025em;
-}
-.feelingsHeading p {
-  margin: 4px 0 0;
-  color: var(--muted-foreground);
-  font-size: 10px;
-  line-height: 1.6;
-}
-.feelingsMark {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  width: 40px;
-  height: 40px;
-  flex: none;
-  place-items: center;
-  border-radius: 13px;
-  background: color-mix(in srgb, var(--feelings-pink) 14%, transparent);
-  color: var(--foreground);
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--feelings-pink) 30%, transparent);
-}
-.feelingsMark::before {
-  position: absolute;
-  z-index: -1;
-  inset: 3px;
-  rotate: -9deg;
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--feelings-purple) 14%, transparent);
-  content: "";
-}
-.feelingsSection .moodLegend {
-  align-items: center;
-  margin-block-end: 6px;
-}
-.feelingsSection .optional {
-  padding: 5px 7px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--feelings-purple) 10%, transparent);
-  color: var(--foreground);
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-}
-.feelingsSection .sectionHeading {
-  align-items: center;
-}
-.feelingsSection .sectionHeading h3 {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-weight: 600;
-}
-.feelingsSection .sectionHeading h3 > svg {
-  flex: none;
-  color: var(--feelings-purple);
-}
 .feelingsSection .fieldHint {
   font-size: 10.5px;
 }
@@ -483,24 +386,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-}
-
-.moodLegend {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 4px;
-}
-
-.fieldHeading {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--foreground);
-  font-size: 13px;
-  font-weight: 550;
-  line-height: 16px;
 }
 
 .fieldHint {
@@ -534,18 +419,6 @@
   gap: 14px;
   padding: 16px;
 }
-.helpedHeading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.helpedHeading > span {
-  color: var(--muted-foreground);
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
 .helpedHint {
   margin: 0;
   color: var(--muted-foreground);
@@ -559,10 +432,6 @@
   resize: vertical;
   font-size: 16px;
   line-height: 1.5;
-}
-.helpedField .helpedHeading label {
-  font-size: 13px;
-  font-weight: 550;
 }
 
 .field .detailInput {

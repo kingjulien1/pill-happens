@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Check,
-  Copy,
-  RefreshCw,
-  Info,
-  Moon,
-} from "lucide-react";
+import { Check, Copy, RefreshCw, Info } from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
 
 import {
@@ -27,7 +21,6 @@ import {
 import { reflectionStats } from "@/lib/reflection-writing";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { MarkdownMark } from "./markdown-mark";
-import { MorningCoffee } from "./morning-coffee";
 import styles from "./daily-reflection-editor.module.css";
 import { Button } from "@/components/ui/button";
 
@@ -229,31 +222,14 @@ export function DailyReflectionEditor({
     <section
       ref={editor}
       className={styles.editor}
-      aria-labelledby={`${id}-heading`}
+      aria-label={`${period === "morning" ? "Morning" : "Evening"} journal writing`}
       data-journal-card
       data-journal-period={period}
       data-journal-active="false"
     >
-      <div className={styles.headingGroup}>
-        {period === "morning" ? (
-          <MorningCoffee className={styles.headingIcon} />
-        ) : (
-          <Moon className={styles.headingIcon} aria-hidden="true" />
-        )}
-        <div className={styles.headingCopy}>
-          <h3 id={`${id}-heading`} className={styles.heading}>
-            Your {period === "morning" ? "Morning" : "Day"}, Your Words
-          </h3>
-          <p className={styles.morningPrompt}>
-            {period === "morning" ? "What was on your mind when you woke up? Start with the thought that stayed with you." : "What stayed with you today? Pick one moment you’d like to remember."}
-          </p>
-        </div>
-      </div>
-      <hr className={styles.divider} />
-      <div data-journal-snapshot>
-        <p className={styles.snapshotTitle}>{snapshotTitle}</p>
-        <p className={styles.snapshotDetail}>{snapshotDetail}</p>
-      </div>
+      <p className={styles.snapshot} data-journal-snapshot>
+        {snapshotTitle} {snapshotDetail}
+      </p>
       <p
         className={`${styles.guidance} ${styles.introduction}`}
         data-journal-introduction
@@ -297,11 +273,11 @@ export function DailyReflectionEditor({
               <span className="intake-primary-copy">
                 <span className="intake-primary-label">
                   <MarkdownMark size={21} aria-hidden="true" />
-                  <span>
-                    {hasWriting ? "Keep Writing" : "Start Writing"}
-                  </span>
+                  <span>{hasWriting ? "Keep Writing" : "Start Writing"}</span>
                 </span>
-                <span className="intake-primary-dot" aria-hidden="true">·</span>
+                <span className="intake-primary-dot" aria-hidden="true">
+                  ·
+                </span>
                 <span className="intake-primary-aside">Pen it!</span>
               </span>
               <ActionIcon name="next" className="intake-primary-next" />
