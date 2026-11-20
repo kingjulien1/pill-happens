@@ -93,11 +93,37 @@
 
 .liveLabel { display: inline-flex; align-items: center; gap: 5px; }
 .liveDot {
-  width: 0.7em;
-  height: 0.7em;
+  position: relative;
+  isolation: isolate;
+  width: 0.57em;
+  height: 0.57em;
+  margin-inline: 1px;
   flex: none;
   border-radius: 50%;
   box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.liveDot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background-color: inherit;
+  filter: blur(1.5px);
+  opacity: .28;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .liveDot::before {
+    animation: live-dot-glow 3.8s cubic-bezier(.45, 0, .3, 1) infinite;
+  }
+}
+@keyframes live-dot-glow {
+  0%, 100% { transform: scale(.9); opacity: .08; }
+  45% { transform: scale(1.7); opacity: .52; }
+  86% { transform: scale(2.6); opacity: 0; }
+  87% { transform: scale(.9); opacity: 0; }
 }
 
 .titleSeparator {

@@ -10,7 +10,7 @@ export function FinalLookHeading({ id, showIcon = false, color }: {
   return (
     <div className={styles.titlePill} data-preview-title-pill>
       <h3 id={id}>
-        {showIcon && <Eye aria-hidden="true" size="0.875em" strokeWidth={2.5} />}
+        {showIcon && <Eye aria-hidden="true" size="1.05em" strokeWidth={2.5} />}
         Final Look
       </h3>
       <span aria-hidden="true" className={styles.titleSeparator} />
