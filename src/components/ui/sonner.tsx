@@ -83,6 +83,11 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
           ),
         )}
       </g>
+      <g className="journal-bulb-echo-rays" strokeWidth="1.15">
+        {[-67.5, -22.5, 22.5, 67.5].map((angle) => (
+          <path key={angle} d="M12 -1v-2" transform={`rotate(${angle} 12 9)`} />
+        ))}
+      </g>
     </svg>
   );
 }

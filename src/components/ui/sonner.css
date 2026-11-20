@@ -550,15 +550,23 @@
   height: 22.05px;
   overflow: visible;
   color: #fde68a;
-  stroke: #fde047;
-  filter: drop-shadow(0 0 1px #fde047bd) drop-shadow(0 0 4px #facc156b);
+  stroke: #e6c743;
+  filter: drop-shadow(0 0 1px #fde0479d) drop-shadow(0 0 4px #facc1559);
 }
 .journal-bulb-halo {
-  opacity: 0.95;
+  opacity: 0.7885;
 }
 .journal-bulb-glass {
   fill: currentColor;
   fill-opacity: 0.7;
+}
+.journal-bulb-echo-rays {
+  stroke: #fff8ca;
+  opacity: 0;
+}
+.journal-bulb-rays,
+.journal-bulb-echo-rays {
+  transform-origin: 12px 9px;
 }
 .journal-bulb-rays {
   stroke: currentColor;
@@ -1691,16 +1699,19 @@
     [data-toast-symbol="info"]
     .journal-toast-glyph {
     transform-origin: 50% 80%;
-    animation: journal-bulb-charge 4s ease-in-out infinite;
+    animation: journal-bulb-charge 4.6s ease-in-out infinite;
   }
   .journal-toaster [data-mounted="true"] .journal-bulb-halo {
-    animation: journal-bulb-halo 4s ease-in-out infinite;
+    animation: journal-bulb-halo 4.6s ease-in-out infinite;
   }
   .journal-toaster [data-mounted="true"] .journal-bulb-glass {
-    animation: journal-bulb-light 4s ease-in-out infinite;
+    animation: journal-bulb-light 4.6s ease-in-out infinite;
   }
   .journal-toaster [data-mounted="true"] .journal-bulb-rays {
-    animation: journal-bulb-radiate 4s ease-in-out infinite;
+    animation: journal-bulb-radiate 4.6s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-echo-rays {
+    animation: journal-bulb-echo 4.6s ease-out infinite;
   }
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
@@ -1751,6 +1762,7 @@
       .journal-toast-glyph,
       .journal-bulb-halo,
       .journal-bulb-glass,
+      .journal-bulb-echo-rays,
       .journal-bulb-rays,
       .journal-toast-bell-rings,
       .journal-toast-bell-ring-mark,
@@ -1805,6 +1817,7 @@
       .journal-toast-glyph,
       .journal-bulb-halo,
       .journal-bulb-glass,
+      .journal-bulb-echo-rays,
       .journal-bulb-rays,
       .journal-toast-bell-rings,
       .journal-toast-bell-ring-mark,
@@ -2145,78 +2158,70 @@
 }
 /* Fast → slow → fast ringing. Neutral seam velocities match at −104.17°/s;
    every peak turns smoothly, without an idle range or a loop-reset jump. */
-/* Four seconds: charge for one, hold the lit pose, dim for half a second,
-   then spend the final 200ms at the neutral starting pose. */
+/* Charge for 1s, hold until 3.9s, then dim and settle. */
 @keyframes journal-bulb-charge {
   0%,
-  95%,
+  95.65%,
   100% {
     transform: none;
     color: #fde68a;
   }
-  7% {
+  6.09% {
     transform: rotate(-5deg) scale(0.94);
     color: #facc15;
   }
-  14% {
+  12.17% {
     transform: rotate(4deg) scale(0.9);
   }
-  19% {
+  16.52% {
     transform: rotate(-2deg) scale(1.08);
     color: #fde047;
   }
-  22% {
+  19.13% {
     transform: rotate(1deg) scale(0.99);
   }
-  25%,
-  82.5% {
+  21.74%,
+  84.78% {
     transform: none;
     color: #fff3a3;
   }
 }
 @keyframes journal-bulb-light {
   0%,
-  95%,
+  95.65%,
   100% {
     fill-opacity: 0;
     filter: drop-shadow(0 0 0 transparent);
   }
-  20% {
+  17.39% {
     fill-opacity: 0.46;
     filter: drop-shadow(0 0 0 transparent);
   }
-  25% {
+  21.74% {
     fill-opacity: 0.98;
   }
-  38%,
-  82.5% {
+  33.04%,
+  84.78% {
     fill-opacity: 0.98;
     filter: drop-shadow(0 0 3px currentColor);
   }
 }
-/* Rays disappear at 70%; the halo holds another 300ms of the 4s loop. */
-@keyframes journal-bulb-halo {
-  0%, 16%, 100% { opacity: 0; }
-  32%, 77.5% { opacity: 0.95; }
-}
+/* The first rays open at 0.8s and release at 3.8s, just before dimming. */
 @keyframes journal-bulb-radiate {
-  0%,
-  20%,
-  70%,
-  100% {
-    stroke-dashoffset: 1;
-    opacity: 0;
-  }
-  32% {
-    stroke-dashoffset: 0;
-    opacity: 0.95;
-    color: #fde047;
-  }
-  57.5% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-    color: #fff8ca;
-  }
+  0%, 17.39% { opacity: 0; stroke-dashoffset: 1; transform: scale(1); }
+  27.83%, 82.61% { opacity: 1; stroke-dashoffset: 0; transform: scale(1); color: #fff8ca; }
+  88% { opacity: 0; }
+  94%, 100% { opacity: 0; transform: scale(1.34); }
+}
+@keyframes journal-bulb-echo {
+  0%, 26.09% { opacity: 0; transform: scale(.96); }
+  32%, 39% { opacity: .85; transform: scale(1); }
+  45% { opacity: 0; }
+  51%, 100% { opacity: 0; transform: scale(1.38); }
+}
+@keyframes journal-bulb-halo {
+  0%, 13.91%, 100% { opacity: 0; }
+  27.83%, 94.52% { opacity: .7885; }
 }
 
 @keyframes journal-notification-bell-ring {
