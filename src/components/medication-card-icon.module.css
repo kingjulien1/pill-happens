@@ -106,6 +106,56 @@
   box-shadow: inset 0 0 0 1px var(--intake-artwork-inner-rim);
 }
 
+/* Intake faces grow around the fixed artwork centre. The rail, fan spacing,
+   glyph and 6px outer stroke retain their existing dimensions. */
+:global([data-intake-card]) .mark:global(.intake-card-mark) {
+  --intake-artwork-outset: 6px;
+  --intake-artwork-vivid-width: 1.85px;
+  --intake-artwork-vivid-growth: 0.85px;
+  --intake-artwork-rim-inset: calc(
+    6px * 2 / 3 - var(--intake-artwork-vivid-width) / 2
+  );
+  --intake-artwork-face-tint: color-mix(
+    in srgb,
+    var(--medication-frame-pigment) 37%,
+    transparent
+  );
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background-image:
+    linear-gradient(var(--intake-artwork-face-tint) 0 0),
+    linear-gradient(var(--entry-icon-tint) 0 0);
+}
+
+/* Absolute placement grows each face equally on all sides of its original
+   48px fan layer, without scaling its drawing or entrance animation. */
+:global([data-intake-card]) .layer > .mark {
+  position: absolute;
+  inset: calc(-1 * var(--intake-artwork-outset));
+}
+
+/* Centre the extra saturated line two thirds into the thick glass rim. */
+:global([data-intake-card]) .mark::before {
+  content: "";
+  position: absolute;
+  inset: var(--intake-artwork-rim-inset);
+  border-radius: calc(20px - var(--intake-artwork-rim-inset));
+  box-shadow: inset 0 0 0 var(--intake-artwork-vivid-width)
+    var(--intake-artwork-inner-rim);
+  pointer-events: none;
+}
+
+/* Preserve the old ring's inner edge and centre; only its outward edge grows. */
+:global([data-intake-card]) .mark::after {
+  inset: calc(
+    6.75px + var(--intake-artwork-outset) - var(--intake-artwork-vivid-growth)
+  );
+  border-radius: calc(9.25px + var(--intake-artwork-vivid-growth));
+  box-shadow: inset 0 0 0 var(--intake-artwork-vivid-width)
+    var(--intake-artwork-inner-rim);
+}
+
 /* The first row starts 3px below the artwork stage, with 20px text or a
    category icon plus its 4px rail padding. Keep the small form badge on that
    centre line, with 40% outside the front mark's left edge.

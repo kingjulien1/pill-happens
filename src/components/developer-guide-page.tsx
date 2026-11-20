@@ -1971,7 +1971,7 @@ export function DeveloperGuidePage() {
                 MedicationCardIconStack places the leftmost frame above the
                 others. Each next frame is 92% of the preceding size and 83% of
                 its opacity, with all vertical centers aligned. Every quantity
-                keeps a 48px front frame, 30px glyph and 56px rail at all
+                keeps a 48px artwork anchor, 30px glyph and 56px rail at all
                 breakpoints; the front starts at a fixed 4px inset and never
                 shrinks. Rear frames begin with 20% exposure of their own
                 smaller widths, then compress only those exposed edges into the
@@ -2011,10 +2011,16 @@ export function DeveloperGuidePage() {
                 independent background and drawn icon-frame overlays are
                 removed; coffee steam, moon movement and the delayed ambient
                 handoff remain. Standalone previews retain their 3.5px outer
-                frame. These borders do not enlarge the 48px tile. One inner
+                frame. The shared base retains a 48px tile. One inner
                 entrance owner animates the whole fan, while the quantity label
                 enters separately and grouped disclosure never remounts its
-                frames.
+                frames. Recorded intake faces now paint a centred 60px surface
+                around that anchor, retaining the 6px outer stroke and the
+                glyph’s original coordinates. The saturated inner ring grows
+                outward to 1.85px while preserving its inner edge; a matching
+                ring sits two thirds into the outer rim. A 37% overlay uses that
+                same family pigment. These intake-only styles also cover
+                historical entries, notification snapshots and Final Look.
               </p>
               <p>
                 The recorded-intake heading rail starts with an atomic route and
