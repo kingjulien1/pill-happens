@@ -91,7 +91,7 @@
   display: none;
 }
 .viewport {
-  height: 168px;
+  height: 224px;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 2px;
@@ -105,24 +105,24 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  gap: 5px;
 }
 .mood {
   --mood-color: var(--color-pink-300, #f9a8d4);
   display: flex;
   min-width: 0;
-  height: 44px;
+  height: 36px;
   align-items: center;
   justify-content: flex-start;
-  gap: 7px;
-  padding: 7px 9px;
+  gap: 6px;
+  padding: 5px 8px;
   border: 0;
   border-radius: var(--dialog-radius-compact);
   background: color-mix(in srgb, var(--mood-color) 7%, transparent);
   box-shadow: inset 0 0 0 1px
     color-mix(in srgb, var(--mood-color) 18%, transparent);
   color: var(--foreground);
-  font-size: 11.5px;
+  font-size: 10.5px;
   font-weight: 475;
   line-height: 1.25;
   transition:
@@ -150,8 +150,8 @@
 }
 .mood > svg {
   flex: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   color: color-mix(in srgb, var(--mood-color) 75%, var(--foreground));
 }
 .mood > span {
@@ -192,25 +192,28 @@
 }
 .selection {
   display: flex;
-  min-height: 32px;
+  min-height: 30px;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 .selection button {
   display: inline-flex;
   min-width: 0;
   max-width: 100%;
-  min-height: 32px;
+  min-height: 30px;
   align-items: center;
-  gap: 6px;
-  padding: 6px 9px;
+  gap: 5px;
+  padding: 5px 8px;
   border: 0;
-  border-radius: 10px;
-  background: color-mix(
-    in srgb,
-    var(--feelings-pink, var(--palette-rose)) 12%,
-    transparent
+  border-radius: 9px;
+  background: var(
+    --checkin-feeling-selection-surface,
+    color-mix(
+      in srgb,
+      var(--feelings-pink, var(--palette-rose)) 12%,
+      transparent
+    )
   );
   box-shadow: inset 0 0 0 1px
     color-mix(
@@ -219,7 +222,7 @@
       transparent
     );
   color: var(--foreground);
-  font-size: 10.5px;
+  font-size: 10px;
   line-height: 1.3;
 }
 .selection button > svg {
@@ -238,7 +241,7 @@
 }
 .empty {
   display: flex;
-  min-height: 148px;
+  min-height: 220px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -293,6 +296,11 @@
     --mood-color: var(--color-pink-600, #db2777);
   }
 }
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .mood:not(:disabled):hover {
     background: color-mix(in srgb, var(--mood-color) 16%, transparent);
@@ -311,7 +319,7 @@
   .mood {
     gap: 5px;
     padding-inline: 7px;
-    font-size: 11px;
+    font-size: 10px;
   }
   .mood > svg {
     width: 14px;
@@ -347,6 +355,9 @@
   }
 
   .selection button {
-    background: color-mix(in srgb, var(--primary) 8%, var(--surface-reading));
+    background: var(
+      --checkin-feeling-selection-surface,
+      color-mix(in srgb, var(--primary) 8%, var(--surface-reading))
+    );
   }
 }

@@ -51,7 +51,7 @@ export function DailyMoodPicker({
   const toggle = (mood: DailyMood) => {
     if (disabled) return;
     if (value.includes(mood)) onChange(value.filter((entry) => entry !== mood));
-    else if (value.length < 4) onChange([...value, mood]);
+    else onChange([...value, mood]);
   };
 
   return (
@@ -97,14 +97,14 @@ export function DailyMoodPicker({
       </div>
       <p id={`${id}-results-status`} className="sr-only" role="status">
         {results.length} {results.length === 1 ? "feeling" : "feelings"}{" "}
-        available. Choose up to four.
+        available. Choose any that fit.
       </p>
       <div
         ref={viewport}
         id={`${id}-results`}
         className={styles.viewport}
         role="group"
-        aria-label="Choose up to four moods"
+        aria-label="Choose feelings that fit your day"
         aria-describedby={`${id}-results-status`}
         data-mood-viewport
         tabIndex={disabled ? -1 : 0}
@@ -120,7 +120,7 @@ export function DailyMoodPicker({
                   className={styles.mood}
                   data-mood-family={mood.family}
                   aria-pressed={selected}
-                  disabled={disabled || (!selected && value.length >= 4)}
+                  disabled={disabled}
                   onClick={() => toggle(mood.value)}
                   title={mood.label}
                   data-mood-value={mood.value}
@@ -163,9 +163,9 @@ export function DailyMoodPicker({
                 disabled={disabled}
                 aria-label={`Remove ${mood.label}`}
               >
-                <DailyMoodIcon mood={selected} size={14} />
+                <DailyMoodIcon mood={selected} size={13} />
                 <span>{mood.label}</span>
-                <X size={12} aria-hidden="true" />
+                <X size={11} aria-hidden="true" />
               </button>
             ) : null;
           })

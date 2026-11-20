@@ -101,7 +101,10 @@
   inset: -10.375px;
   border-radius: calc(var(--dialog-radius-surface) + 10.375px);
   box-sizing: border-box;
-  --section-edge: color-mix(in srgb, var(--checkin-line) 14%, transparent);
+  --section-edge: var(
+    --checkin-section-edge,
+    color-mix(in srgb, var(--checkin-line) 14%, transparent)
+  );
   border: 7.81px solid var(--section-edge);
 }
 

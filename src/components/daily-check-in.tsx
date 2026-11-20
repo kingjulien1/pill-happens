@@ -10,8 +10,6 @@ import {
   PencilLine,
   Smile,
 } from "lucide-react";
-import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
-import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
 import { toast } from "@/components/ui/journal-toast";
 import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
@@ -24,11 +22,6 @@ import {
   CheckInCardArtwork,
 } from "@/components/check-in-card-artwork";
 import { getCheckInCardMetric } from "@/lib/check-in-card-metric";
-import { CheckInRating } from "@/components/check-in-rating";
-import {
-  checkInRatingForSlider,
-  type CheckInRatingScale,
-} from "@/lib/check-in-rating";
 import { getCheckInCardProgress } from "@/lib/check-in-card-progress";
 import { useJournal } from "@/components/journal-provider";
 import {
@@ -43,6 +36,7 @@ import { ArrowUpRight, LibraryBig } from "lucide-react";
 import { rememberJournalDestination } from "@/components/journal-drafts";
 import { CheckInSection } from "./check-in-section";
 import { DailyMoodPicker } from "@/components/daily-mood-picker";
+import { EveningDayRatings } from "@/components/evening-day-ratings";
 import { SmallReminders } from "@/components/small-reminders";
 import {
   reminderItems,
@@ -368,48 +362,6 @@ export function DailyCheckInSection({
   );
 }
 
-function RatingField({
-  id,
-  label,
-  scale = 5,
-  value,
-  onChange,
-  disabled,
-  icon,
-  low,
-  high,
-}: {
-  id: string;
-  label: string;
-  scale?: CheckInRatingScale;
-  value: number | null;
-  onChange: (value: number | null) => void;
-  disabled: boolean;
-  icon: "energy" | "stress";
-  low: string;
-  high: string;
-}) {
-  const Icon = icon === "energy" ? BatteryMediumIcon : WavesIcon;
-  return (
-    <CheckInRating
-      id={id}
-      name={icon}
-      label={label}
-      value={checkInRatingForSlider(value, scale)}
-      low={low}
-      high={high}
-      disabled={disabled}
-      onChange={onChange}
-      icon={<Icon size={15} weight="bold" aria-hidden="true" />}
-      description={
-        scale === 5 && value !== null
-          ? `Previously rated ${value} of 5. Move the slider to choose a new rating.`
-          : undefined
-      }
-    />
-  );
-}
-
 function CheckInForm({
   formId,
   day,
@@ -729,34 +681,18 @@ function CheckInForm({
                 />
               </fieldset>
               <hr className={styles.feelingsDivider} />
-              <div
-                className={styles.ratingRow}
-                role="group"
-                aria-label="Energy and stress ratings"
-              >
-                <RatingField
-                  id={`${id}-energy`}
-                  label="Energy"
-                  scale={draft.value.energyScale}
-                  icon="energy"
-                  value={energy}
-                  onChange={(value) => setRating("energy", value)}
-                  disabled={locked}
-                  low="Low"
-                  high="Full"
-                />
-                <RatingField
-                  id={`${id}-stress`}
-                  label="Stress"
-                  scale={draft.value.stressScale}
-                  icon="stress"
-                  value={stress}
-                  onChange={(value) => setRating("stress", value)}
-                  disabled={locked}
-                  low="Low"
-                  high="High"
-                />
-              </div>
+              <EveningDayRatings
+                id={`${id}-ratings`}
+                day={day}
+                energy={energy}
+                stress={stress}
+                energyScale={draft.value.energyScale}
+                stressScale={draft.value.stressScale}
+                checkIns={data?.dailyCheckIns}
+                disabled={locked}
+                onEnergyChange={(value) => setRating("energy", value)}
+                onStressChange={(value) => setRating("stress", value)}
+              />
             </section>
           </CheckInSection>
           <CheckInSection
