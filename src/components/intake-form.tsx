@@ -446,7 +446,7 @@ export function IntakeForm({
                     onClick={() => setQuantity(String(amount))}
                     aria-pressed={visibleQuantity === amount}
                     data-dialog-corner="compact"
-                    className={`h-8 rounded-lg border text-[15px] font-semibold tabular-nums transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-[color-mix(in_srgb,var(--checkin-line)_14%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
+                    className={`h-8 rounded-lg border text-sm font-semibold tabular-nums transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-[color-mix(in_srgb,var(--checkin-line)_14%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
                   >
                     {amount === 0.25 ? "¼" : amount === 0.5 ? "½" : amount}
                   </button>
