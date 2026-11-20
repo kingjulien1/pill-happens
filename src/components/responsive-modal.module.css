@@ -129,6 +129,16 @@
   padding-inline: var(--dialog-scroll-gutter);
 }
 
+/* Start the scroll surface at the drawer edge so its header fade also paints
+   behind the handle. Reserve the handle's original space inside that surface. */
+.checkInSurface[data-slot="drawer-popup"]:has([data-check-in-form], [data-intake-form]) > [data-slot="drawer-swipe-handle"] {
+  position: absolute;
+  inset: 0 0 auto;
+}
+.checkInSurface[data-slot="drawer-popup"]:has([data-check-in-form], [data-intake-form]) .scrollBody {
+  padding-top: calc(3 * var(--spacing));
+}
+
 /* The faded footer owns the bottom safe area on both dialog layouts. */
 .checkInSurface[data-dialog-scroll]:has([data-dialog-fade-footer]),
 .checkInSurface .scrollBody:has([data-dialog-fade-footer]) {
