@@ -645,6 +645,7 @@ export function MedicationsPage() {
           ],
           facts: [
             { label: "Entries", value: String(data.intakes.length) },
+            { label: "Library", value: String(data.medications.length) },
             { label: "Dose totals", value: `${linkedMedications} logged medication${linkedMedications === 1 ? "" : "s"}` },
             { label: "Recorded details", value: `${notes} saved note${notes === 1 ? "" : "s"}` },
           ],

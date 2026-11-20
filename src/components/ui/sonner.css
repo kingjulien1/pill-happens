@@ -2605,21 +2605,31 @@
   gap: 12px;
   padding: 3px clamp(4px, 2vw, 12px) 0;
 }
-.journal-policy-intro, .journal-policy-tip { text-align: center; }
+.journal-policy-intro { text-align: center; }
 .journal-policy-intro h3, .journal-medication-policy-alert h4 {
   margin: 0;
   color: var(--toast-ink);
   font-size: 16px;
   line-height: 1.25;
 }
-.journal-policy-intro p, .journal-medication-policy .journal-policy-tip {
+.journal-policy-intro p {
   max-width: 44ch;
   margin: 5px auto;
   text-wrap: pretty;
 }
-.journal-medication-policy .journal-policy-tip {
-  padding-inline: clamp(14px, 5vw, 30px);
-  margin-block: 0 2px;
+.journal-policy-intro h3 { font-weight: 800; }
+.journal-medication-policy-alert h4 { font-weight: 720; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-expanded="true"] .journal-policy-clock {
+    animation: journal-policy-clock-in 680ms 350ms both;
+    transform-origin: center;
+  }
+}
+@keyframes journal-policy-clock-in {
+  0% { opacity: 0; transform: rotate(145deg) scale(.25); }
+  58% { opacity: 1; transform: rotate(-16deg) scale(1.24); }
+  80% { transform: rotate(5deg) scale(.94); }
+  100% { transform: rotate(0) scale(1); }
 }
 .journal-medication-policy-alert {
   padding: 13px;
@@ -2633,7 +2643,8 @@
   gap: 7px;
 }
 .journal-medication-policy-alert header small { margin-inline-start: auto; }
-.journal-medication-policy-alert header b { color: var(--toast-ink); font-size: 15px; margin-inline-end: 3px; }
+.journal-policy-count { white-space: nowrap; font-size: 11px; }
+.journal-policy-count b { color: var(--toast-ink); font-size: 15px; margin-inline-end: 3px; }
 .journal-medication-policy-alert p {
   margin: 9px 0 0;
   display: -webkit-box;
@@ -2641,11 +2652,12 @@
   -webkit-line-clamp: 4;
   overflow: hidden;
 }
-.journal-policy-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 0; }
-.journal-policy-stats dt { color: var(--toast-ink); font-size: 12px; font-weight: 650; }
+.journal-policy-stats { display: grid; gap: 15px; margin: 0; }
+.journal-policy-stats > div { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 4px 8px; }
+.journal-policy-stats dt { color: var(--toast-ink); font-size: 13px; font-weight: 650; }
 .journal-policy-stats svg { width: 14px; height: 14px; flex: none; }
-.journal-policy-stats dd { margin: 4px 0 0; font-size: 11px; }
-.journal-policy-stats small { display: block; margin-top: 2px; font-size: 10px; }
+.journal-policy-stats dd { margin: 0; }
+.journal-policy-description { grid-column: 1 / -1; font-size: 12px; line-height: 1.5; text-wrap: pretty; }
 [data-medication-policy] .journal-notification-details-inner::before,
 [data-medication-policy] .journal-notification-footer::before,
 .journal-medication-policy hr {
@@ -2658,10 +2670,8 @@
   background: linear-gradient(90deg, transparent, var(--toast-rim-muted) 8% 92%, transparent);
 }
 .journal-medication-policy hr {
-  width: calc(100% - 24px);
-  height: 2px;
-  margin: 0 auto 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-violet-400) 42%, transparent) 9% 91%, transparent);
+  opacity: .6667;
+  margin-block: 2px;
 }
 [data-medication-policy] .journal-notification-footer { border: 0; padding-top: 0; }
 [data-medication-policy] .journal-notification-footer::before { margin: 0 auto 5px; }

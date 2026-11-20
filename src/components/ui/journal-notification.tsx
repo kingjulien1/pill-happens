@@ -20,6 +20,7 @@ import {
   Check,
   Clock3,
   CloudDownload,
+  History as RotateCcwClock,
   Database,
   Info,
   LoaderCircle,
@@ -824,6 +825,14 @@ export function JournalNotification({
   const medicationPolicy =
     id === "medication-history-policy" && kind === "info";
   const facts = details?.facts?.slice(0, 4) ?? [];
+  function policyCount(key: string, singular: string, plural: string) {
+    const value = facts.find((fact) => fact.label === key)?.value;
+    const count = typeof value === "string" || typeof value === "number"
+      ? String(value).match(/^\d+\b/)?.[0]
+      : undefined;
+    return <small className="journal-policy-count">{count ? <><b>{count}</b> {count === "1" ? singular : plural}</> : "Across your journal"}</small>;
+  }
+
   const previewRecord = details?.preview?.after ?? details?.preview?.before;
   const footerCopy = previewRecord
     ? undo
@@ -1076,18 +1085,30 @@ export function JournalNotification({
                 </header>
                 <section className="journal-medication-policy-alert">
                   <header>
-                    <RefreshCcw size={16} aria-hidden="true" />
+                    <RotateCcwClock className="journal-policy-clock" size={17} strokeWidth={2.65} aria-hidden="true" />
                     <h4>History</h4>
                     <span>· &nbsp; Edit policy</span>
-                    <small><b>{facts.find((item) => item.label === "Entries")?.value ?? "All"}</b> {facts.find((item) => item.label === "Entries")?.value === "1" ? "entry" : "entries"}</small>
+                    {policyCount("Entries", "Entry", "Entries")}
                   </header>
                   <p>Change a strength and each linked dose is recalculated from the quantity you logged. Daily totals for that medication follow suit.</p>
                 </section>
-                <p className="journal-policy-tip">Only one intake needs correcting? Open that entry to edit its quantity, time or note.</p>
                 <hr />
                 <dl className="journal-policy-stats">
-                  <div><dt><PillBottle />Dose totals</dt><dd>{facts.find((item) => item.label === "Dose totals")?.value ?? "Recalculated"}<small>Strength × recorded quantity</small></dd></div>
-                  <div><dt><ShieldCheck />Recorded details</dt><dd>{facts.find((item) => item.label === "Recorded details")?.value ?? "Kept as entered"}<small>Times, quantities and notes stay as entered.</small></dd></div>
+                  <div>
+                    <dt><PillBottle />Dose totals</dt>
+                    <dd>{policyCount("Dose totals", "medication", "medications")}</dd>
+                    <dd className="journal-policy-description">Each dose uses the updated strength multiplied by the quantity recorded for that intake. The daily total adds those doses together.</dd>
+                  </div>
+                  <div>
+                    <dt><ShieldCheck />Recorded details</dt>
+                    <dd>{policyCount("Recorded details", "saved note", "saved notes")}</dd>
+                    <dd className="journal-policy-description">Each intake keeps the time and quantity you entered. Any note you wrote stays with that entry, in your original words.</dd>
+                  </div>
+                  <div>
+                    <dt><BookOpenText />Medication library</dt>
+                    <dd>{policyCount("Library", "medication", "medications")}</dd>
+                    <dd className="journal-policy-description">Rename a medication or change its symbol in the library. Earlier intake cards show the updated name and appearance wherever that medication was logged.</dd>
+                  </div>
                 </dl>
               </section>
             ) : facts.length ? (
