@@ -124,6 +124,13 @@ const morningClock = checkInClock.nullable().default(null);
 
 export const morningSleepSchema = z
   .object({
+    reportScore: z.number().int().min(0).max(100).optional(),
+    regularity: z.number().int().min(0).max(100).optional(),
+    dreamMinutes: z.number().int().min(0).max(1440).optional(),
+    lightMinutes: z.number().int().min(0).max(1440).optional(),
+    deepMinutes: z.number().int().min(0).max(1440).optional(),
+    snoringMinutes: z.number().int().min(0).max(1440).optional(),
+    coughingRate: z.number().finite().nonnegative().optional(),
     dreamRecall: morningRating,
     sleepiness: morningRating,
     sleepDepth: morningRating,

@@ -1,5 +1,7 @@
+import { reportMetrics, sleepCycleMetrics, type ReportMetric } from "./sleep-cycle-report";
+
 /** Optional, self-reported sleep details. Clock differences are estimates, not instants. */
-export type MorningSleep = {
+export type MorningSleep = Partial<Record<ReportMetric, number>> & {
   dreamRecall: number | null;
   sleepiness: number | null;
   sleepDepth: number | null;
@@ -26,7 +28,7 @@ export const MORNING_SLEEP_RATING_FIELDS = [
 export type MorningSleepDraft = Pick<
   MorningSleep,
   (typeof MORNING_SLEEP_RATING_FIELDS)[number]
-> & {
+> & Partial<Record<ReportMetric, string>> & {
   lightsOut: string;
   gotUp: string;
   fallAsleepMinutes: string;
@@ -125,6 +127,7 @@ export function morningSleepDefaults(
     awakeMinutes: raw(saved?.awakeMinutes),
     sleepHours: asleep.hours,
     sleepMinutes: asleep.minutes,
+    ...Object.fromEntries(reportMetrics.filter(key => saved?.[key] != null).map(key => [key, String(saved![key])])),
     extraSleepHours: extra.hours,
     extraSleepMinutes: extra.minutes,
   };
@@ -139,6 +142,7 @@ export function isMorningSleepDraft(
     MORNING_SLEEP_RATING_FIELDS.every(
       (key) => draft[key] === null || validRating(draft[key]),
     ) &&
+    reportMetrics.every(key => draft[key] === undefined || (typeof draft[key] === "string" && draft[key].length <= 256)) &&
     textFields.every(
       (key) => typeof draft[key] === "string" && draft[key].length <= 256,
     )
@@ -148,6 +152,7 @@ export function isMorningSleepDraft(
 export function hasMorningSleepContent(draft: MorningSleepDraft) {
   return (
     MORNING_SLEEP_RATING_FIELDS.some((key) => draft[key] !== null) ||
+    reportMetrics.some(key => draft[key]?.trim()) ||
     textFields.some((key) => draft[key].trim().length > 0)
   );
 }
@@ -250,6 +255,15 @@ export function parseMorningSleepDraft(draft: MorningSleepDraft): {
     draft.extraSleepMinutes,
     "Extra sleep wanted",
   );
+  for (const key of reportMetrics) {
+    const raw = draft[key]?.trim();
+    if (!raw) continue;
+    const number = Number(raw);
+    const pattern = key === "coughingRate" ? /^\d+(?:\.\d+)?$/ : /^\d+$/;
+    if (!pattern.test(raw) || !Number.isFinite(number) || number > sleepCycleMetrics[key].max)
+      error ??= "Check the value for " + sleepCycleMetrics[key].label + ".";
+    else sleep[key] = number;
+  }
   if (error) return { value: null, error };
   error = getMorningSleepValidationError(sleep);
   return { value: error ? null : sleep, error };

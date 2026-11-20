@@ -13,3 +13,4 @@ test-results/
 coverage/
 .agents/
 skills-lock.json
+/public/sleep-ocr/

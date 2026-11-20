@@ -149,7 +149,7 @@ export function hasCheckInDraftChanges(
     );
   const before = defaults.morningSleep!;
   const after = morningSleepForDraft(value, checkIn);
-  return (Object.keys(before) as (keyof MorningSleepDraft)[]).some(
+  return (Object.keys({ ...before, ...after }) as (keyof MorningSleepDraft)[]).some(
     (key) => before[key] !== after[key],
   );
 }

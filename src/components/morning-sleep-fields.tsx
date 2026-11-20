@@ -1,5 +1,6 @@
 "use client";
 
+import { SleepCycleImport } from "./sleep-cycle-import";
 import { CheckInSection } from "./check-in-section";
 import { Input } from "@/components/ui/input";
 import { CheckInRating } from "@/components/check-in-rating";
@@ -176,6 +177,7 @@ export function MorningSleepFields({
 
   return (
     <div className={styles.fields} data-morning-sleep-fields>
+      <SleepCycleImport value={value} onChange={onChange} disabled={disabled} />
       <CheckInSection
         caption="Looking back"
         context="Sleep quality"
