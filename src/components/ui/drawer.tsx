@@ -8,6 +8,7 @@ import {
 } from "@/lib/page-entry-readiness";
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { cn } from "@/lib/utils";
+import { useDialogOpeningFocus } from "@/components/use-dialog-opening-focus";
 
 type DrawerContextProps = {
   hasSnapPoints: boolean;
@@ -108,10 +109,16 @@ function DrawerSwipeHandle({
 }
 
 function DrawerContent({
+  ref,
+  initialFocus,
   className,
   children,
   ...props
 }: DrawerPrimitive.Popup.Props) {
+  const { ref: popupRef, initialFocus: focusAtStart } = useDialogOpeningFocus(
+    ref,
+    initialFocus,
+  );
   const { hasSnapPoints, modal, showSwipeHandle, swipeDirection } = useDrawer();
   const swipeAxis =
     swipeDirection === "down" || swipeDirection === "up" ? "y" : "x";
@@ -158,6 +165,8 @@ function DrawerContent({
             className,
           )}
           {...props}
+          ref={popupRef}
+          initialFocus={focusAtStart}
         >
           {showSwipeHandle && <DrawerSwipeHandle />}
           <DrawerPrimitive.Content

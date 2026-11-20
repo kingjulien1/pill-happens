@@ -62,7 +62,7 @@ export function ResponsiveModal({
   description: string;
   scrollKey?: string;
   publicScrollKey?: PublicDialogScrollKey;
-  /** Explicit section shortcuts take precedence over a previously saved position. */
+  /** Pane positions are local to this opening; new popups always start at the top. */
   restoreScroll?: boolean;
   returnFocus?: RefObject<HTMLElement | null> | (() => HTMLElement | null);
   scrollControlsRef?: Ref<DialogScrollControls>;

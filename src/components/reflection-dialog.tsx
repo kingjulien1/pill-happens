@@ -354,12 +354,14 @@ export function ReflectionDialog({
   const { setScrollElement: setWritingElement, save: saveWritingScroll } =
     useDialogScrollMemory<HTMLDivElement>({
       open: open && view !== "preview",
+      sessionOpen: open,
       scrollKey: `${checkInDraftKey(day, period)}:writing-source`,
       layout: view,
     });
   const { setScrollElement: setPreviewElement, save: savePreviewScroll } =
     useDialogScrollMemory<HTMLDivElement>({
       open: open && view === "preview",
+      sessionOpen: open,
       scrollKey: `${checkInDraftKey(day, period)}:writing-preview`,
       layout: view,
     });
@@ -740,13 +742,7 @@ export function ReflectionDialog({
         className={styles.dialog}
         showCloseButton={false}
         finalFocus={launcherRef}
-        initialFocus={(interaction) =>
-          // Restored-open writers have no opening gesture. Focusing a textarea
-          // then can reveal its reset caret and overwrite the remembered scroll.
-          interaction === "" || interaction === "touch" || view === "preview"
-            ? title.current
-            : input.current
-        }
+        initialFocus={title}
         data-reflection-dialog
         data-reflection-period={period}
         data-reflection-mode={view}

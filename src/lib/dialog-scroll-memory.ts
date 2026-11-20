@@ -1,6 +1,29 @@
 import { safeWorkspacePath } from "@/lib/journal-drafts";
 
 export type DialogScrollPosition = { top: number; left: number };
+
+/** A real close/open cycle discards positions; pane/layout changes do not. */
+export function createDialogScrollSession() {
+  let open = false;
+  const positions = new Map<string, DialogScrollPosition>();
+  return {
+    setOpen(next: boolean) {
+      if (next && !open) positions.clear();
+      open = next;
+    },
+    reset() {
+      positions.clear();
+    },
+    get(key: string): DialogScrollPosition {
+      const position = positions.get(key);
+      return position ? { ...position } : { top: 0, left: 0 };
+    },
+    set(key: string, position: DialogScrollPosition) {
+      if (open) positions.set(key, { ...position });
+    },
+  };
+}
+
 export type PublicDialogScrollKey = "create-journal" | "install-app";
 const storageKey = "pill-happens:public-dialog-scroll:v1";
 const maxPosition = 10_000_000;

@@ -92,7 +92,7 @@ const WORKFLOW_SOURCES = [
       ],
       [
         "src/components/responsive-modal.tsx",
-        "Shared drawer/dialog host and scroll restoration",
+        "Shared drawer/dialog host and opening at the top",
       ],
       [
         "src/components/guide-outline.tsx",
@@ -4093,15 +4093,15 @@ export function DeveloperGuidePage() {
                 the journal’s saved-update timestamp.
               </p>
               <p>
-                Each dialog remembers its own scroll position across closing,
-                refresh and switching between desktop dialog and mobile drawer.
-                Writing Space stores independent source and preview positions on
-                its shared content scroller; write and split modes use the
-                source key, while preview mode uses the preview key. Scroll
-                updates persist quietly without rerendering the journal. Color
-                inspections also retain their preview, format and filters. The
-                public install and create-journal dialogs store numeric
-                positions only.
+                Every dialog and drawer opens at the top, including reopened
+                dialogs and those restored after refresh. Shared opening focus
+                uses preventScroll and a visible header target or the popup
+                itself, so a lower field cannot pull the initial view down.
+                Writing Space’s independent source and preview panes keep
+                positions only while the current popup remains open. A new
+                popup or closing and reopening starts fresh;
+                legacy workspace and public-dialog scroll offsets are ignored.
+                Color inspections still retain their preview, format and filters.
               </p>
               <p>
                 Drafts have no age expiry and remain on that browser or

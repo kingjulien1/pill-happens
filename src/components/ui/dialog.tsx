@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ActionIcon } from "@/components/action-icon";
 import closeStyles from "../dialog-close.module.css";
+import { useDialogOpeningFocus } from "@/components/use-dialog-opening-focus";
 
 function Dialog({ modal = true, ...props }: DialogPrimitive.Root.Props) {
   const entryReady = React.useSyncExternalStore(
@@ -58,6 +59,8 @@ function DialogOverlay({
 }
 
 function DialogContent({
+  ref,
+  initialFocus,
   className,
   children,
   showCloseButton = true,
@@ -65,6 +68,10 @@ function DialogContent({
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
 }) {
+  const { ref: popupRef, initialFocus: focusAtStart } = useDialogOpeningFocus(
+    ref,
+    initialFocus,
+  );
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -76,6 +83,8 @@ function DialogContent({
           className,
         )}
         {...props}
+        ref={popupRef}
+        initialFocus={focusAtStart}
       >
         {children}
         {showCloseButton && (

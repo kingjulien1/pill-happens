@@ -776,7 +776,6 @@ export function GuideColors() {
             <label htmlFor={`${id}-manual`}>{manual.label}</label>
             <Textarea
               id={`${id}-manual`}
-              autoFocus
               readOnly
               value={manual.value}
               onFocus={(event) => event.target.select()}

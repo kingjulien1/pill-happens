@@ -2,8 +2,60 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   clampDialogScroll,
+  createDialogScrollSession,
   createPublicDialogScrollMemory,
 } from "./dialog-scroll-memory";
+
+test("a new dialog visit always starts at the top after an earlier scrolled visit", () => {
+  const session = createDialogScrollSession();
+  session.setOpen(true);
+  session.set("body", { top: 570, left: 20 });
+  session.setOpen(false);
+  session.set("body", { top: 990, left: 30 });
+  session.setOpen(true);
+  assert.deepEqual(session.get("body"), { top: 0, left: 0 });
+});
+
+test("pane changes retain only the current open session", () => {
+  const session = createDialogScrollSession();
+  session.setOpen(true);
+  session.set("source", { top: 300, left: 0 });
+  session.set("preview", { top: 160, left: 0 });
+  session.setOpen(true);
+  assert.deepEqual(session.get("source"), { top: 300, left: 0 });
+  assert.deepEqual(session.get("preview"), { top: 160, left: 0 });
+  assert.deepEqual(session.get("another-record"), { top: 0, left: 0 });
+  session.setOpen(false);
+  session.setOpen(true);
+  assert.deepEqual(session.get("source"), { top: 0, left: 0 });
+  assert.deepEqual(session.get("preview"), { top: 0, left: 0 });
+});
+
+test("a replacement popup discards positions without ending the active session", () => {
+  const session = createDialogScrollSession();
+  session.setOpen(true);
+  session.set("source", { top: 300, left: 0 });
+  session.set("preview", { top: 160, left: 0 });
+  session.reset();
+  assert.deepEqual(session.get("source"), { top: 0, left: 0 });
+  assert.deepEqual(session.get("preview"), { top: 0, left: 0 });
+  session.set("source", { top: 60, left: 0 });
+  assert.deepEqual(session.get("source"), { top: 60, left: 0 });
+});
+
+test("dialog instances and returned coordinates cannot leak positions into one another", () => {
+  const first = createDialogScrollSession();
+  const second = createDialogScrollSession();
+  first.setOpen(true);
+  second.setOpen(true);
+  const position = { top: 80, left: 0 };
+  first.set("body", position);
+  position.top = 300;
+  const read = first.get("body");
+  read.top = 900;
+  assert.deepEqual(first.get("body"), { top: 80, left: 0 });
+  assert.deepEqual(second.get("body"), { top: 0, left: 0 });
+});
 
 test("restoration clamps to a smaller dialog without negative coordinates", () => {
   assert.deepEqual(
