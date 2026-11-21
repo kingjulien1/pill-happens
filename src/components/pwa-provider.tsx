@@ -150,7 +150,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
           },
         },
         cancel: {
-          label: "Next Open",
+          label: "Update Later",
           onClick: () => {
             applyOnNextOpen = true;
             updateToastVisible = false;

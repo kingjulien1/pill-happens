@@ -18,7 +18,7 @@ import {
   BookOpenText,
   CalendarDays,
   Check,
-  Clock3,
+  Coffee,
   ListFilter,
   ChevronsUp,
   CloudDownload,
@@ -755,8 +755,8 @@ export function JournalNotification({
     mode: "now" | "later",
   ) => {
     if (!isAction(value)) return null;
-    const ApplyIcon = mode === "now" ? RefreshCcw : Clock3;
-    const label = mode === "now" ? "Apply Now" : "Next Open";
+    const ApplyIcon = mode === "now" ? RefreshCcw : Coffee;
+    const label = mode === "now" ? "Apply Now" : "Update Later";
     return (
       <Button
         variant="ghost"
@@ -775,6 +775,10 @@ export function JournalNotification({
       >
         <ApplyIcon aria-hidden="true" />
         <span>{label}</span>
+        <ArrowUpRight
+          className="journal-update-choice-arrow"
+          aria-hidden="true"
+        />
       </Button>
     );
   };
@@ -876,7 +880,7 @@ export function JournalNotification({
           : "Tracking days begin at 06:00."
     : (details?.footer ?? defaultFooter[kind]);
   const updatePanel = kind === "update" && (
-    <section className="journal-update-panel" aria-label="Update Details">
+    <section className="journal-update-section" aria-label="Update Details">
       <header className="journal-update-panel-header">
         <span className="journal-update-panel-title">
           <strong>Ready To Switch</strong>
@@ -896,52 +900,57 @@ export function JournalNotification({
           </span>
         </span>
       </header>
-      <div className="journal-update-intro">
-        <CloudDownload aria-hidden="true" />
-        <p>
-          The new app files are staged. Pick the hand-off that fits what you’re
-          doing now.
+      <div className="journal-update-panel">
+        <div className="journal-update-intro">
+          <CloudDownload aria-hidden="true" />
+          <p>
+            The new app files are staged. Pick the hand-off that fits what
+            you’re doing now. Apply Now reloads the app, so save your current
+            entry first. Update Later keeps you here and switches versions when
+            the app closes or reloads. Your saved journal records stay put; only
+            the app gets a change of clothes.
+          </p>
+        </div>
+        <div
+          className="journal-update-choices"
+          role="group"
+          aria-label="Update Timing"
+        >
+          {renderUpdateChoice(action, "now")}
+          {renderUpdateChoice(cancel, "later")}
+        </div>
+        <div className="journal-update-notes" aria-label="Update Notes">
+          <div>
+            <RefreshCcw aria-hidden="true" />
+            <span>
+              <strong>App Shell</strong>
+              <small>Latest interface files are ready.</small>
+            </span>
+          </div>
+          <div>
+            <Database aria-hidden="true" />
+            <span>
+              <strong>Your Journal</strong>
+              <small>Saved records stay exactly where they are.</small>
+            </span>
+          </div>
+          <div>
+            <ShieldCheck aria-hidden="true" />
+            <span>
+              <strong>Safe Handoff</strong>
+              <small>Finish any open draft before applying now.</small>
+            </span>
+          </div>
+        </div>
+        <p className="journal-update-fine-print">
+          <ShieldCheck aria-hidden="true" />
+          No journal records are removed. Need the longer version?{" "}
+          <Link href="/guide#app" prefetch={false} onClick={followRelatedLink}>
+            Open the app guide
+          </Link>
+          .
         </p>
       </div>
-      <div
-        className="journal-update-choices"
-        role="group"
-        aria-label="Update Timing"
-      >
-        {renderUpdateChoice(action, "now")}
-        {renderUpdateChoice(cancel, "later")}
-      </div>
-      <div className="journal-update-notes" aria-label="Update Notes">
-        <div>
-          <RefreshCcw aria-hidden="true" />
-          <span>
-            <strong>App Shell</strong>
-            <small>Latest interface files are ready.</small>
-          </span>
-        </div>
-        <div>
-          <Database aria-hidden="true" />
-          <span>
-            <strong>Your Journal</strong>
-            <small>Saved records stay exactly where they are.</small>
-          </span>
-        </div>
-        <div>
-          <ShieldCheck aria-hidden="true" />
-          <span>
-            <strong>Safe Handoff</strong>
-            <small>Finish any open draft before applying now.</small>
-          </span>
-        </div>
-      </div>
-      <p className="journal-update-fine-print">
-        <ShieldCheck aria-hidden="true" />
-        No journal records are removed. Need the longer version?{" "}
-        <Link href="/guide#app" prefetch={false} onClick={followRelatedLink}>
-          Open the app guide
-        </Link>
-        .
-      </p>
     </section>
   );
   return (

@@ -974,8 +974,8 @@ export function GuidePage() {
               </p>
               <p>
                 When a new app version is waiting, App Update Ready offers Apply
-                Now or Next Open. Apply Now reloads after you finish an open
-                form; Next Open stages the switch for the next time the app
+                Now or Update Later. Apply Now reloads after you finish an open
+                form; Update Later stages the switch for the next time the app
                 closes or reloads. Neither choice removes journal records.
               </p>
             </GuideDetail>

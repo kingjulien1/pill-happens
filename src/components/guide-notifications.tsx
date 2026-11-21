@@ -170,10 +170,10 @@ export function showUpdateNotice(reloadIfReady: () => boolean) {
         if (!reloadIfReady()) event.preventDefault();
       },
     },
-    cancel: { label: "Next Open", onClick() {} },
+    cancel: { label: "Update Later", onClick() {} },
     details: {
       paragraphs: ["A new version is ready when you are."],
-      footer: "Apply Now and Next Open are available in the update panel.",
+      footer: "Apply Now and Update Later are available in the update panel.",
     },
   });
 }`;
@@ -1141,7 +1141,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         CloudSync drawing: Emerald600 arrows perform a held-threshold turn while
         the cloud only breathes subtly. Its expanded card replaces generic
         actions with a Pink300-tinted handoff panel, two compact build/record
-        stats, Apply Now / Next Open choices and visual patch notes. Their
+        stats, Apply Now / Update Later choices and visual patch notes. Their
         accents retain useful distinctions. AppearanceToaster follows the
         resolved appearance context. These values describe the current
         presentation; they do not certify every text/background combination for
