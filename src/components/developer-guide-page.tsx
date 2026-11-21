@@ -1920,6 +1920,20 @@ export function DeveloperGuidePage() {
                 and full accessible descriptions.
               </p>
               <p>
+                Empty intake previews retain the real card geometry and a
+                Mauve-gray palette, with the Final Look title at 82% opacity
+                and disabled More details at 20%. A 6.8-second CSS sequence
+                compresses and rebounds the icon frame, releases three rings,
+                eight rays and eight particles, then relays light through the
+                rows and opposing border trails into two edge flares. These
+                are fixed decorative elements, with no particle timers or
+                per-frame DOM changes. The existing visibility gate pauses the
+                whole sequence offscreen, on hidden tabs and behind nested
+                dialogs; reduced motion renders a static preview. The empty
+                artwork disables its unnecessary backdrop filter. Choosing a
+                medication replaces and unmounts the skeleton.
+              </p>
+              <p>
                 Each saved intake is one native full-card edit button. The
                 data-intake-card-action marker preserves stack keyboard
                 disclosure and reference-arrival focus. Decorative artwork and

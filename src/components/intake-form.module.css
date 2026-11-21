@@ -224,18 +224,16 @@
   margin-top: 5px;
 }
 .detailsToggle:disabled {
+  opacity: 0.2;
   color: var(--preview-empty-muted, var(--muted-foreground));
-  background: color-mix(
-    in srgb,
-    var(--preview-empty-surface, var(--color-mauve-600, #594c5b)) 27%,
-    transparent
-  );
+  background: var(--preview-empty-surface, var(--color-mauve-600, #594c5b));
   cursor: default;
 }
 .preview[data-preview-empty="true"] > [data-preview-title-pill] {
   --final-look-copy: var(--preview-empty-copy);
   --final-look-muted: var(--preview-empty-muted);
   background: var(--preview-empty-surface);
+  opacity: 0.82;
 }
 @media (prefers-reduced-motion: reduce) {
   .detailsToggle {

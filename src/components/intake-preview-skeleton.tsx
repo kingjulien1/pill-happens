@@ -19,6 +19,7 @@ function SkeletonLine({ phase = 0 }: { phase?: number }) {
         <i />
       </span>
       <span className={styles.lineSheen} />
+      <span className={styles.linePulse} />
     </span>
   );
 }
@@ -114,7 +115,32 @@ export function IntakePreviewSkeleton() {
               rx="18"
               pathLength="100"
             />
+            <rect
+              className={styles.traceCounterTrail}
+              x="3"
+              y="3"
+              rx="18"
+              pathLength="100"
+            />
+            <rect
+              className={styles.traceCounterHead}
+              x="3"
+              y="3"
+              rx="18"
+              pathLength="100"
+            />
+            <rect
+              className={styles.traceRelay}
+              x="3"
+              y="3"
+              rx="18"
+              pathLength="100"
+            />
           </svg>
+          <span className={styles.edgeFlares}>
+            <i />
+            <i />
+          </span>
         </span>
       }
       leadingArtwork={
@@ -132,12 +158,30 @@ export function IntakePreviewSkeleton() {
                 "var(--preview-empty-surface, var(--color-mauve-600, #594c5b))",
             }}
           >
+            <span className={styles.frameAura} />
+            <span className={styles.orbit} />
+            <span className={styles.orbitSecond} />
             <span className={styles.iconStage}>
               <span className={styles.iconRipple} />
               <span className={styles.iconRippleSecond} />
+              <span className={styles.iconShock} />
               <span className={styles.iconCore} />
               <SquareDashed className={styles.icon} data-skeleton-glyph />
+              <span className={styles.rays}>
+                {Array.from({ length: 8 }, (_, index) => (
+                  <i
+                    key={index}
+                    style={
+                      { "--ray-angle": `${index * 45}deg` } as CSSProperties
+                    }
+                  />
+                ))}
+              </span>
               <span className={styles.sparks}>
+                <i />
+                <i />
+                <i />
+                <i />
                 <i />
                 <i />
                 <i />

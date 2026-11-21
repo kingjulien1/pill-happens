@@ -18,6 +18,15 @@
   border-radius: inherit;
   pointer-events: none;
 }
+.scene::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--skeleton-light);
+  border-radius: calc(var(--entry-card-radius, 21px) - 4px);
+  opacity: 0;
+  animation: skeleton-edge-flash var(--skeleton-period) ease-out infinite;
+}
 .wash,
 .grid,
 .scan {
@@ -88,9 +97,99 @@
   stroke-dasharray: 11 89;
   opacity: 0.85;
 }
+.trace .traceCounterTrail,
+.trace .traceCounterHead {
+  animation-name: skeleton-counter-circuit;
+}
+.traceCounterTrail {
+  stroke-width: 5;
+  stroke-dasharray: 16 84;
+  opacity: 0.16;
+}
+.traceCounterHead {
+  stroke-width: 1.8;
+  stroke-dasharray: 7 93;
+  opacity: 0.72;
+}
+.trace .traceRelay {
+  stroke-width: 1.3;
+  stroke-dasharray: 3 30 3 64;
+  opacity: 0.9;
+  animation-delay: 0.24s;
+}
+.edgeFlares {
+  position: absolute;
+  inset: 0;
+  color: var(--skeleton-light);
+}
+.edgeFlares i {
+  position: absolute;
+  top: -6px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+}
+.edgeFlares i + i {
+  inset: auto 12px -6px auto;
+}
+.edgeFlares i::before,
+.edgeFlares i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  animation: skeleton-edge-burst var(--skeleton-period)
+    cubic-bezier(0.16, 0.8, 0.22, 1) infinite;
+}
+.edgeFlares i::after {
+  inset: 7px;
+  border-radius: 1px;
+  background: currentColor;
+  animation-delay: 0.1s;
+}
 .iconFrame {
   animation: skeleton-frame var(--skeleton-period) cubic-bezier(0.3, 0, 0.2, 1)
     infinite;
+}
+/* The empty artwork has a real fill; no moving backdrop filter is needed. */
+.skeleton[data-intake-preview-skeleton] .iconFrame:global(.intake-card-mark) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.frameAura,
+.orbit,
+.orbitSecond {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.frameAura {
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--skeleton-light) 44%, transparent),
+    transparent 70%
+  );
+  animation: skeleton-aura var(--skeleton-period) ease-in-out infinite;
+}
+.orbit,
+.orbitSecond {
+  --orbit-direction: 1;
+  inset: -3px;
+  border: 1px solid var(--skeleton-light);
+  border-radius: 20px;
+  animation: skeleton-orbit var(--skeleton-period)
+    cubic-bezier(0.2, 0.8, 0.22, 1) infinite;
+}
+.orbitSecond {
+  --orbit-direction: -1;
+  inset: 1px;
+  border-style: dashed;
+  border-radius: 17px;
+  animation-delay: 0.09s;
 }
 .iconStage {
   position: relative;
@@ -122,15 +221,18 @@
 }
 .iconRipple,
 .iconRippleSecond,
+.iconShock,
 .iconCore,
-.sparks {
+.sparks,
+.rays {
   position: absolute;
   pointer-events: none;
 }
 .iconRipple,
-.iconRippleSecond {
+.iconRippleSecond,
+.iconShock {
   inset: -12px;
-  border: 1px solid currentColor;
+  border: 1.5px solid currentColor;
   border-radius: 50%;
   opacity: 0;
   animation: skeleton-ripple var(--skeleton-period)
@@ -140,6 +242,11 @@
   inset: -6px;
   border-style: dashed;
   animation-delay: 0.2s;
+}
+.iconShock {
+  inset: -16px;
+  border-width: 2px;
+  animation-delay: 0.12s;
 }
 .iconCore {
   inset: -5px;
@@ -151,12 +258,30 @@
   );
   animation: skeleton-core var(--skeleton-period) ease-in-out infinite;
 }
-.sparks {
+.sparks,
+.rays {
   inset: 0;
 }
+.rays i {
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: 50% 0;
+  opacity: 0;
+  animation: skeleton-ray var(--skeleton-period)
+    cubic-bezier(0.16, 0.8, 0.22, 1) infinite;
+}
+.rays i:nth-child(even) {
+  height: 5px;
+  animation-delay: 0.07s;
+}
 .sparks i {
-  --spark-x: -27px;
-  --spark-y: -25px;
+  --spark-x: -32px;
+  --spark-y: -29px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -169,23 +294,51 @@
     cubic-bezier(0.15, 0.5, 0.2, 1) infinite;
 }
 .sparks i:nth-child(2) {
-  --spark-x: 27px;
-  --spark-y: -20px;
+  --spark-x: 34px;
+  --spark-y: -25px;
   animation-delay: 0.12s;
 }
 .sparks i:nth-child(3) {
-  --spark-x: 22px;
-  --spark-y: 25px;
+  --spark-x: 28px;
+  --spark-y: 32px;
   width: 2px;
   height: 2px;
   animation-delay: 0.22s;
 }
 .sparks i:nth-child(4) {
-  --spark-x: -24px;
-  --spark-y: 22px;
+  --spark-x: -31px;
+  --spark-y: 27px;
   width: 2px;
   height: 2px;
   animation-delay: 0.3s;
+}
+.sparks i:nth-child(5) {
+  --spark-x: -42px;
+  --spark-y: -3px;
+  width: 5px;
+  height: 2px;
+  animation-delay: 0.04s;
+}
+.sparks i:nth-child(6) {
+  --spark-x: 41px;
+  --spark-y: 4px;
+  width: 5px;
+  height: 2px;
+  animation-delay: 0.16s;
+}
+.sparks i:nth-child(7) {
+  --spark-x: -5px;
+  --spark-y: -37px;
+  width: 2px;
+  height: 5px;
+  animation-delay: 0.08s;
+}
+.sparks i:nth-child(8) {
+  --spark-x: 7px;
+  --spark-y: 37px;
+  width: 2px;
+  height: 5px;
+  animation-delay: 0.2s;
 }
 .heading,
 .bottom {
@@ -256,23 +409,67 @@
     cubic-bezier(0.22, 0.05, 0.16, 1) infinite;
   animation-delay: var(--line-phase);
 }
+.linePulse {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 18%,
+    var(--skeleton-light) 23%,
+    transparent 28%,
+    transparent 43%,
+    color-mix(in srgb, var(--skeleton-light) 64%, transparent) 47%,
+    transparent 53%
+  );
+  opacity: 0;
+  animation: skeleton-line-pulse var(--skeleton-period)
+    cubic-bezier(0.16, 0.8, 0.22, 1) infinite;
+  animation-delay: var(--line-phase);
+}
+.line::before,
+.line::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 1px solid var(--skeleton-light);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  animation: skeleton-line-echo var(--skeleton-period) ease-out infinite;
+  animation-delay: var(--line-phase);
+}
+.line::after {
+  inset: 3px;
+  animation-delay: calc(var(--line-phase) + 0.14s);
+}
 
 /* Every part shares one phase clock. Activity changes pause native timelines
    together, without frame timers, React updates or new particles being created. */
 .skeleton .wash,
 .skeleton .grid,
 .skeleton .scan,
+.skeleton .scene::after,
 .skeleton .trace rect,
 .skeleton .iconFrame,
+.skeleton .frameAura,
+.skeleton .orbit,
+.skeleton .orbitSecond,
 .skeleton .icon,
 .skeleton .icon path,
 .skeleton .iconRipple,
 .skeleton .iconRippleSecond,
+.skeleton .iconShock,
 .skeleton .iconCore,
+.skeleton .rays i,
 .skeleton .sparks i,
+.skeleton .edgeFlares i::before,
+.skeleton .edgeFlares i::after,
 .skeleton .line,
+.skeleton .line::before,
+.skeleton .line::after,
 .skeleton .segments i,
-.skeleton .lineSheen {
+.skeleton .lineSheen,
+.skeleton .linePulse {
   animation-play-state: var(--skeleton-play-state);
   animation-fill-mode: both;
 }
@@ -346,11 +543,39 @@
   }
 }
 @keyframes skeleton-circuit {
-  from {
+  0% {
     stroke-dashoffset: 0;
   }
-  to {
+  20% {
+    stroke-dashoffset: -14;
+  }
+  44% {
+    stroke-dashoffset: -44;
+  }
+  52% {
+    stroke-dashoffset: -50;
+  }
+  59%,
+  100% {
     stroke-dashoffset: -100;
+  }
+}
+@keyframes skeleton-counter-circuit {
+  0% {
+    stroke-dashoffset: 50;
+  }
+  20% {
+    stroke-dashoffset: 64;
+  }
+  44% {
+    stroke-dashoffset: 94;
+  }
+  52% {
+    stroke-dashoffset: 100;
+  }
+  59%,
+  100% {
+    stroke-dashoffset: 150;
   }
 }
 @keyframes skeleton-frame {
@@ -358,17 +583,20 @@
   100% {
     transform: translateY(0) rotate(0) scale(1);
   }
-  22% {
-    transform: translateY(2px) rotate(-8deg) scale(0.92);
+  24% {
+    transform: translateY(2px) rotate(-12deg) scale(0.86);
   }
-  39% {
-    transform: translateY(-3px) rotate(8deg) scale(1.1);
+  41% {
+    transform: translateY(-3px) rotate(11deg) scale(1.14);
   }
   49% {
-    transform: translateY(0) rotate(-2deg) scale(1);
+    transform: translateY(1px) rotate(-5deg) scale(0.97);
   }
-  68% {
-    transform: translateY(-1px) rotate(2deg) scale(1.03);
+  56% {
+    transform: translateY(-1px) rotate(3deg) scale(1.06);
+  }
+  66% {
+    transform: translateY(0) rotate(-1deg) scale(0.995);
   }
   84% {
     transform: translateY(0) rotate(0) scale(1);
@@ -427,16 +655,21 @@
 }
 @keyframes skeleton-ripple {
   0%,
-  47% {
-    transform: scale(0.42);
+  46% {
+    transform: scale(0.28);
     opacity: 0;
   }
-  53% {
-    opacity: 0.65;
+  50% {
+    transform: scale(0.56);
+    opacity: 0.92;
   }
-  72%,
+  56% {
+    transform: scale(1.42);
+    opacity: 0.6;
+  }
+  67%,
   100% {
-    transform: scale(1.6);
+    transform: scale(2.15);
     opacity: 0;
   }
 }
@@ -459,22 +692,28 @@
 }
 @keyframes skeleton-spark {
   0%,
-  52% {
+  48% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0) rotate(0);
   }
-  58% {
-    opacity: 0.9;
+  53% {
+    opacity: 1;
+    transform: translate(
+        calc(var(--spark-x) * 0.28),
+        calc(var(--spark-y) * 0.28)
+      )
+      scale(1.35) rotate(28deg);
   }
-  71% {
-    opacity: 0.6;
-    transform: translate(var(--spark-x), var(--spark-y)) scale(1) rotate(90deg);
+  61% {
+    opacity: 0.78;
+    transform: translate(var(--spark-x), var(--spark-y)) scale(0.8)
+      rotate(110deg);
   }
-  80%,
+  72%,
   100% {
     opacity: 0;
-    transform: translate(calc(var(--spark-x) * 1.3), calc(var(--spark-y) * 1.3))
-      scale(0) rotate(160deg);
+    transform: translate(calc(var(--spark-x) * 1.2), calc(var(--spark-y) * 1.2))
+      scale(0) rotate(190deg);
   }
 }
 @keyframes skeleton-line {
@@ -491,8 +730,19 @@
     opacity: 1;
     transform: scaleX(1.025) scaleY(1.08);
   }
-  43%,
-  67% {
+  43% {
+    opacity: 0.95;
+    transform: scaleX(1) scaleY(1);
+  }
+  54% {
+    opacity: 1;
+    transform: scaleX(1.015) scaleY(1.18);
+  }
+  61% {
+    opacity: 0.9;
+    transform: scaleX(0.97) scaleY(0.92);
+  }
+  69% {
     opacity: 0.95;
     transform: scaleX(1) scaleY(1);
   }
@@ -543,6 +793,135 @@
     transform: translateX(115%);
   }
 }
+@keyframes skeleton-aura {
+  0%,
+  22%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+  40% {
+    opacity: 0.45;
+    transform: scale(0.94);
+  }
+  51% {
+    opacity: 0.9;
+    transform: scale(1.2);
+  }
+  65% {
+    opacity: 0.18;
+    transform: scale(1.4);
+  }
+}
+@keyframes skeleton-orbit {
+  0%,
+  16% {
+    opacity: 0;
+    transform: rotate(calc(-25deg * var(--orbit-direction))) scale(0.82);
+  }
+  35% {
+    opacity: 0.3;
+    transform: rotate(calc(28deg * var(--orbit-direction))) scale(0.96);
+  }
+  49% {
+    opacity: 0.64;
+    transform: rotate(calc(66deg * var(--orbit-direction))) scale(1.06);
+  }
+  61% {
+    opacity: 0.25;
+    transform: rotate(calc(104deg * var(--orbit-direction))) scale(1.22);
+  }
+  72%,
+  100% {
+    opacity: 0;
+    transform: rotate(calc(145deg * var(--orbit-direction))) scale(1.34);
+  }
+}
+@keyframes skeleton-ray {
+  0%,
+  47% {
+    opacity: 0;
+    transform: rotate(var(--ray-angle)) translateY(-14px) scaleY(0);
+  }
+  52% {
+    opacity: 0.9;
+    transform: rotate(var(--ray-angle)) translateY(-27px) scaleY(1.3);
+  }
+  60% {
+    opacity: 0.45;
+    transform: rotate(var(--ray-angle)) translateY(-39px) scaleY(0.6);
+  }
+  68%,
+  100% {
+    opacity: 0;
+    transform: rotate(var(--ray-angle)) translateY(-46px) scaleY(0);
+  }
+}
+@keyframes skeleton-edge-burst {
+  0%,
+  55% {
+    opacity: 0;
+    transform: scale(0.1) rotate(-20deg);
+  }
+  59% {
+    opacity: 0.85;
+    transform: scale(0.8) rotate(20deg);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.3) rotate(70deg);
+  }
+}
+@keyframes skeleton-edge-flash {
+  0%,
+  53%,
+  73%,
+  100% {
+    opacity: 0;
+  }
+  59% {
+    opacity: 0.7;
+  }
+  65% {
+    opacity: 0.12;
+  }
+}
+@keyframes skeleton-line-pulse {
+  0%,
+  43% {
+    opacity: 0;
+    transform: translateX(-110%);
+  }
+  51% {
+    opacity: 0.9;
+  }
+  66% {
+    opacity: 0.65;
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+}
+@keyframes skeleton-line-echo {
+  0%,
+  45% {
+    opacity: 0;
+    transform: scaleX(0.55) scaleY(0.5);
+  }
+  54% {
+    opacity: 0.8;
+    transform: scaleX(0.9) scaleY(1);
+  }
+  67%,
+  100% {
+    opacity: 0;
+    transform: scaleX(1.12) scaleY(1.5);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation: none !important;
@@ -555,5 +934,10 @@
   }
   .icon {
     opacity: 0.7;
+  }
+  .traceCounterTrail,
+  .traceCounterHead,
+  .traceRelay {
+    opacity: 0;
   }
 }
