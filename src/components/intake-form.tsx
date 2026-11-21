@@ -23,6 +23,7 @@ import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewDetails } from "./intake-preview-details";
+import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
@@ -214,6 +215,13 @@ export function IntakeForm({
       return { previewTime: "", belongsTo: "" };
     }
   }, [takenAt, timezone]);
+
+  const hasPreview = Boolean(
+    belongsTo &&
+    validQuantity &&
+    effectiveQuantity !== null &&
+    (medication || fallbackIntake),
+  );
 
   const otherEntries = useMemo(() => {
     if (!belongsTo || !medicationId) return 0;
@@ -519,12 +527,13 @@ export function IntakeForm({
       />
       <section
         className={styles.preview}
+        data-preview-empty={!hasPreview || undefined}
         aria-labelledby="intake-preview-title"
       >
         <FinalLookHeading
           id="intake-preview-title"
           showIcon
-          color={medication && getMedicationColor(medication.color)}
+          color={getMedicationColor(medication?.color ?? "tw-neutral-400")}
         />
         {belongsTo &&
         validQuantity &&
@@ -546,12 +555,11 @@ export function IntakeForm({
             }}
           />
         ) : (
-          <p className="text-center text-sm text-muted-foreground">
-            Choose a medication, amount and time to preview your entry.
-          </p>
+          <IntakePreviewSkeleton />
         )}
         {belongsTo && validQuantity && (medication || fallbackIntake) && (
           <IntakePreviewDetails
+            color={getMedicationColor(medication?.color).hex}
             rows={[
               {
                 icon: NotebookTabs,
@@ -589,6 +597,7 @@ export function IntakeForm({
             ]}
           />
         )}
+        {!hasPreview && <IntakePreviewDetails disabled rows={[]} />}
       </section>
       {error && (
         <p role="alert" className="text-xs leading-relaxed text-destructive">
