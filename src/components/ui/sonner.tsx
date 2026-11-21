@@ -38,13 +38,13 @@ function CloudSync(props: SVGProps<SVGSVGElement>) {
     >
       <path
         className="journal-toast-update-cloud"
-        d="M15.5 17H6.2A4.2 4.2 0 0 1 5.5 8.66 6.5 6.5 0 0 1 17.9 7.3 4.8 4.8 0 0 1 20 16"
+        d="M20.996 15.251A4.5 4.5 0 0 0 17.495 8h-1.79a7 7 0 1 0-12.709 5.607"
       />
       <g className="journal-toast-update-arrows">
-        <path d="m14.5 12 2-2 2 2" />
-        <path d="M16.5 10v5" />
-        <path d="m9.5 15-2 2-2-2" />
-        <path d="M7.5 17v-5" />
+        <path d="m17 18-1.535 1.605a5 5 0 0 1-8-1.5" />
+        <path d="M17 22v-4h-4" />
+        <path d="M7 10v4h4" />
+        <path d="m7 14 1.535-1.605a5 5 0 0 1 8 1.5" />
       </g>
     </svg>
   );
@@ -146,7 +146,7 @@ function BellCheck(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** Static layered artwork; short arrival feedback never runs an idle render loop. */
+/** Layered artwork; only the update glyph adds a small CSS motion loop. */
 export function ToastSymbol({
   kind,
   variant,
