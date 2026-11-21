@@ -23,7 +23,7 @@ export function IntakeQuantityShortcuts({
   return (
     <div className={styles.root} data-intake-quantity-shortcuts>
       <div className={styles.caption} aria-hidden="true">
-        <span>Quick Amounts</span>
+        <span>Amounts</span>
         <span>
           {disabled
             ? "Choose medication first"
@@ -35,7 +35,7 @@ export function IntakeQuantityShortcuts({
       <div
         className={styles.options}
         role="group"
-        aria-label="Quick intake amounts"
+        aria-label="Intake amounts"
       >
         {amounts.map((amount) => {
           const label = formatQuantityShortcut(amount);
