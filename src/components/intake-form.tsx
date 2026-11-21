@@ -25,6 +25,7 @@ import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewDetails } from "./intake-preview-details";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
+import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
 import { MedicationActionButton } from "@/components/medication-action-button";
@@ -63,7 +64,6 @@ import {
   parseIntakeQuantity,
   stepEditableIntakeQuantity,
   intakeQuantityShortcuts,
-  formatQuantityShortcut,
   normalizeIntakeQuantityForEditor,
   hasIntakeQuantityEditorPrecisionLoss,
 } from "@/lib/intake-quantity";
@@ -480,28 +480,14 @@ export function IntakeForm({
                 disabled={busy}
                 invalid={Boolean(error) && !validQuantity}
               />
-              <div className="mt-1 grid grid-cols-5 gap-1.5">
-                {presets.map((amount) => (
-                  <button
-                    type="button"
-                    key={amount}
-                    onClick={() => setQuantity(String(amount))}
-                    aria-pressed={visibleQuantity === amount}
-                    data-dialog-corner="compact"
-                    className={`flex min-h-8 flex-wrap items-baseline justify-center content-center gap-x-1 rounded-lg border py-1 text-sm font-semibold tabular-nums transition-colors ${visibleQuantity === amount ? "border-primary/25 bg-[color-mix(in_srgb,var(--checkin-line)_14%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}
-                  >
-                    <span>{formatQuantityShortcut(amount)}</span>
-                    {strength > 0 && (
-                      <span className="text-[10px] leading-tight opacity-50">
-                        {formatDose(
-                          doseMg({ strengthMg: strength, quantity: amount }),
-                        )}{" "}
-                        mg
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
+              <IntakeQuantityShortcuts
+                amounts={presets}
+                value={visibleQuantity}
+                strengthMg={strength}
+                unit={type.unit}
+                units={type.units}
+                onSelect={(amount) => setQuantity(String(amount))}
+              />
             </div>
           </div>
         </CheckInSection>
