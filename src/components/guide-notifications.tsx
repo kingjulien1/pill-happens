@@ -1139,7 +1139,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         Successful saves use BellCheck; Error, Info, Warning and Loading keep
         fitting status symbols on their Mauve tile. Update uses a split
-        CloudSync drawing: Emerald600 arrows make a steady 2.6-second turn
+        CloudSync drawing: Emerald400 arrows make a steady 2.6-second turn
         around their own center. The cloud’s light is one third softer, with a
         small irregular drift on a 7.6-second loop. Icon artwork paints above
         the rest of its card, and the Update badge uses Amber. Its expanded card
