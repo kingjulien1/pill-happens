@@ -522,7 +522,7 @@
   background: var(--toast-icon-fill);
   box-shadow:
     inset 0 0 0 var(--toast-tile-border)
-      color-mix(in srgb, var(--toast-deep-mix) 35%, #09060d),
+      color-mix(in srgb, var(--toast-icon-fill) 92%, var(--palette-white, #fff)),
     0 4px 9px #190d2345;
 }
 .journal-toast-glyph-enter {
