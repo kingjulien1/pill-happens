@@ -9,6 +9,7 @@ export function IntakeQuantityShortcuts({
   strengthMg,
   unit,
   units = unit,
+  disabled = false,
   onSelect,
 }: {
   amounts: number[];
@@ -16,13 +17,14 @@ export function IntakeQuantityShortcuts({
   strengthMg: number;
   unit: string;
   units?: string;
+  disabled?: boolean;
   onSelect: (amount: number) => void;
 }) {
   return (
     <div className={styles.root} data-intake-quantity-shortcuts>
       <div className={styles.caption} aria-hidden="true">
         <span>Quick amounts</span>
-        <span>Tap to set</span>
+        <span>{disabled ? "Choose medication first" : "Tap to set"}</span>
       </div>
       <div
         className={styles.options}
@@ -43,7 +45,8 @@ export function IntakeQuantityShortcuts({
               className={styles.option}
               aria-label={`Set amount to ${description}`}
               title={description}
-              aria-pressed={value === amount}
+              disabled={disabled}
+              aria-pressed={!disabled && value === amount}
               onClick={() => onSelect(amount)}
             >
               <span

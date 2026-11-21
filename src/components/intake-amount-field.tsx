@@ -36,6 +36,7 @@ export function IntakeAmountField({
   calculatedDose,
   originalQuantityPreserved = false,
   disabled = false,
+  empty = false,
   invalid = false,
 }: {
   value: string;
@@ -43,12 +44,13 @@ export function IntakeAmountField({
   onStep: (delta: number) => void;
   increment: number;
   unit: string;
-  route: IntakeRoute;
+  route?: IntakeRoute;
   form: MedicationType;
   categories: MedicationCategory[];
   calculatedDose: number | null;
   originalQuantityPreserved?: boolean;
   disabled?: boolean;
+  empty?: boolean;
   invalid?: boolean;
 }) {
   const [composition, setComposition] = useState<string | null>(null);
@@ -136,7 +138,11 @@ export function IntakeAmountField({
           maxLength={256}
           role="spinbutton"
           aria-labelledby="intake-quantity-label"
-          aria-describedby={`intake-amount-dose${originalQuantityPreserved ? " intake-amount-original" : ""}`}
+          aria-describedby={
+            empty
+              ? undefined
+              : `intake-amount-dose${originalQuantityPreserved ? " intake-amount-original" : ""}`
+          }
           aria-valuemin={
             originalQuantityPreserved && parsed === 0
               ? 0
@@ -167,24 +173,30 @@ export function IntakeAmountField({
             }
           }}
         />
-        <IntakeRouteIcon route={route} className={styles.glyph} />
-        <MedicationTypeIcon type={form} className={styles.glyph} />
-        <span className={styles.unit} title={unit} data-intake-amount-unit>
-          {unit}
-        </span>
-        <span className={styles.separator} aria-hidden="true">
-          ·
-        </span>
-        <span
-          id="intake-amount-dose"
-          className={styles.dose}
-          title={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose} mg`}
-          data-intake-amount-dose
-          aria-label={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose === "—" ? "not available" : `${dose} milligrams`}`}
-        >
-          <strong>{doseRounded ? `≈${dose}` : dose}</strong> <span>mg</span>
-        </span>
-        {categories.map((kind) => <MedicationIndicatorMark key={kind} kind={kind} size={14} />)}
+        {!empty && (
+          <>
+            <IntakeRouteIcon route={route} className={styles.glyph} />
+            <MedicationTypeIcon type={form} className={styles.glyph} />
+            <span className={styles.unit} title={unit} data-intake-amount-unit>
+              {unit}
+            </span>
+            <span className={styles.separator} aria-hidden="true">
+              ·
+            </span>
+            <span
+              id="intake-amount-dose"
+              className={styles.dose}
+              title={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose} mg`}
+              data-intake-amount-dose
+              aria-label={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose === "—" ? "not available" : `${dose} milligrams`}`}
+            >
+              <strong>{doseRounded ? `≈${dose}` : dose}</strong> <span>mg</span>
+            </span>
+            {categories.map((kind) => (
+              <MedicationIndicatorMark key={kind} kind={kind} size={14} />
+            ))}
+          </>
+        )}
         {originalQuantityPreserved && (
           <span id="intake-amount-original" className="sr-only">
             {legacyDescription}

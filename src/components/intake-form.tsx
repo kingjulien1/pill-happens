@@ -94,7 +94,7 @@ export function IntakeForm({
   const medications = data!.medications.filter(
     (m) => !m.archived || m.id === intake?.medicationId,
   );
-  // Sorting the menu must not change fresh/reset draft defaults.
+  // Sorting choices never selects a medication for a fresh draft.
   const medicationOptions = sortMedicationsByUsage(medications, data!.intakes);
   const timezone = data!.settings.timezone;
   const draft = usePersistentDraft(
@@ -119,12 +119,15 @@ export function IntakeForm({
     onRestoredHint?.(showRestoredHelp);
     return () => onRestoredHint?.(false);
   }, [onRestoredHint, showRestoredHelp]);
-  const { medicationId, quantity } = draft.value;
+  const { medicationId } = draft.value;
+  const quantity = medicationId ? draft.value.quantity : "";
   const route =
     draft.value.route ??
     (intake
       ? (intake.route ?? "unspecified")
-      : preferredIntakeRoute(medicationId, data!.intakes));
+      : medicationId
+        ? preferredIntakeRoute(medicationId, data!.intakes)
+        : undefined);
   const takenAt = intakeDraftDisplayTime(draft.value, timezone);
   const setQuantity = (value: string) =>
     draft.setValue((current) => ({ ...current, quantity: value }));
@@ -220,7 +223,8 @@ export function IntakeForm({
     belongsTo &&
     validQuantity &&
     effectiveQuantity !== null &&
-    (medication || fallbackIntake),
+    (medication || fallbackIntake) &&
+    route !== undefined,
   );
 
   const otherEntries = useMemo(() => {
@@ -272,6 +276,12 @@ export function IntakeForm({
     try {
       if (!medication && !fallbackIntake) {
         setError("Choose an available medication. Your draft is still here.");
+        return;
+      }
+      if (route === undefined) {
+        setError(
+          "Choose how you took this medication. Your draft is still here.",
+        );
         return;
       }
       // The draft stores its original instant and the zone of any edited field.
@@ -429,7 +439,10 @@ export function IntakeForm({
                       medicationId: value,
                       route:
                         !intake && value !== current.medicationId
-                          ? preferredIntakeRoute(value, data!.intakes)
+                          ? ((!current.medicationId
+                              ? current.route
+                              : undefined) ??
+                            preferredIntakeRoute(value, data!.intakes))
                           : current.route,
                       quantity:
                         !intake && value !== current.medicationId
@@ -477,12 +490,14 @@ export function IntakeForm({
                 unit={visibleQuantity === 1 ? type.unit : type.units}
                 calculatedDose={calculatedDose}
                 originalQuantityPreserved={originalQuantityPreserved}
-                disabled={busy}
+                disabled={busy || (!medication && !fallbackIntake)}
+                empty={!medication && !fallbackIntake}
                 invalid={Boolean(error) && !validQuantity}
               />
               <IntakeQuantityShortcuts
                 amounts={presets}
-                value={visibleQuantity}
+                disabled={busy || (!medication && !fallbackIntake)}
+                value={medication || fallbackIntake ? visibleQuantity : null}
                 strengthMg={strength}
                 unit={type.unit}
                 units={type.units}
@@ -524,6 +539,7 @@ export function IntakeForm({
         {belongsTo &&
         validQuantity &&
         effectiveQuantity !== null &&
+        route !== undefined &&
         (medication || fallbackIntake) ? (
           <MedicationPreview
             record={{
@@ -543,7 +559,7 @@ export function IntakeForm({
         ) : (
           <IntakePreviewSkeleton />
         )}
-        {belongsTo && validQuantity && (medication || fallbackIntake) && (
+        {hasPreview && (
           <IntakePreviewDetails
             color={getMedicationColor(medication?.color).hex}
             rows={[

@@ -33,7 +33,7 @@ export function IntakeMedicationSelect({
   const selected = medications.find((medication) => medication.id === value);
   return (
     <Select
-      value={value}
+      value={value || null}
       highlightItemOnHover={false}
       onValueChange={(next) => {
         if (next) onValueChange(next);

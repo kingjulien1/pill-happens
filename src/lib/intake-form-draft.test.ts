@@ -64,8 +64,8 @@ test("resetting new and past-day drafts creates fresh defaults without retaining
     now: new Date("2026-11-01T07:00:00.000Z"),
   });
   assert.equal(next.initialTimestamp, "2026-11-01T07:00:00.000Z");
-  assert.equal(next.quantity, "1");
-  assert.equal(next.route, "oral");
+  assert.equal(next.quantity, "");
+  assert.equal(next.route, undefined);
   assert.equal(Object.hasOwn(next, "note"), false);
   const past = newIntakeFormDraft({
     medications: [],
@@ -74,7 +74,7 @@ test("resetting new and past-day drafts creates fresh defaults without retaining
     now: new Date("2026-10-31T12:00:00.000Z"),
   });
   assert.equal(past.takenAt, "2026-10-20T12:00");
-  assert.equal(past.route, "oral");
+  assert.equal(past.route, undefined);
 });
 
 // Removed controls must not invalidate the amount/time in an older saved draft.
@@ -92,7 +92,7 @@ test("note-free drafts work and older context drafts retain their current contro
   assert.equal(intakeDraftTimestamp(older), draft.initialTimestamp);
 });
 
-test("new intake drafts default to oral independently of medication form", () => {
+test("new intake drafts leave medication, route and quantity empty even with medication defaults", () => {
   const medication: Medication = {
     id: "sample",
     name: "Sample tablet",
@@ -108,12 +108,12 @@ test("new intake drafts default to oral independently of medication form", () =>
     timezone: "Europe/Vienna",
     now: new Date("2026-10-31T12:00:15.000Z"),
   });
-  assert.equal(draft.route, "oral");
-  assert.equal(draft.quantity, "2.5");
-  assert.equal(draft.medicationId, medication.id);
+  assert.equal(draft.route, undefined);
+  assert.equal(draft.quantity, "");
+  assert.equal(draft.medicationId, "");
 });
 
-test("fresh and reset drafts use the first medication's recorded route preference", () => {
+test("fresh and reset drafts do not preselect a medication from route history", () => {
   const medication: Medication = {
     id: "sample",
     name: "Sample medication",
@@ -150,13 +150,14 @@ test("fresh and reset drafts use the first medication's recorded route preferenc
     now: new Date("2026-11-04T12:00:00.000Z"),
   };
   const draft = newIntakeFormDraft(options);
-  assert.equal(draft.route, "nasal");
-  assert.equal(draft.quantity, "0.5");
+  assert.equal(draft.route, undefined);
+  assert.equal(draft.quantity, "");
+  assert.equal(draft.medicationId, "");
   draft.route = "unspecified";
   draft.quantity = ",";
   assert.equal(isIntakeFormDraft(draft), true);
   assert.equal(isIntakeFormDraft(JSON.parse(JSON.stringify(draft))), true);
-  assert.equal(newIntakeFormDraft(options).route, "nasal");
+  assert.equal(newIntakeFormDraft(options).route, undefined);
   assert.equal(recorded.route, "nasal");
 });
 
@@ -237,4 +238,21 @@ test("legacy route-free drafts remain valid while malformed route values are rej
   assert.equal(intakeDraftTimestamp(legacy), draft.initialTimestamp);
   for (const route of [null, 3, "", "not-a-route", {}, []])
     assert.equal(isIntakeFormDraft({ ...draft, route }), false);
+});
+
+test("timing-only drafts round-trip without inventing medication selections", () => {
+  const initial = newIntakeFormDraft({
+    medications: emptyData().medications,
+    timezone: "Europe/Vienna",
+    now: new Date("2026-11-21T12:00:00.000Z"),
+  });
+  const restored = JSON.parse(
+    JSON.stringify({ ...initial, takenAt: "2026-11-20T17:35" }),
+  );
+  assert.equal(isIntakeFormDraft(restored), true);
+  assert.equal(restored.medicationId, "");
+  assert.equal(restored.quantity, "");
+  assert.equal(restored.route, undefined);
+  assert.equal(restored.takenAt, "2026-11-20T17:35");
+  assert.equal(intakeDraftTimestamp(restored), "2026-11-20T16:35:00.000Z");
 });

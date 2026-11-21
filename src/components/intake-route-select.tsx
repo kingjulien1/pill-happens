@@ -26,16 +26,16 @@ export function IntakeRouteSelect({
   disabled = false,
 }: {
   id?: string;
-  value: IntakeRoute;
+  value?: IntakeRoute;
   onValueChange: (route: IntakeRoute) => void;
   disabled?: boolean;
 }) {
   const selected = INTAKE_ROUTES.find((route) => route.value === value);
-  const label = selected?.label ?? "Not specified";
+  const label = selected?.label ?? "Choose route";
 
   return (
     <Select
-      value={value}
+      value={value ?? null}
       highlightItemOnHover={false}
       disabled={disabled}
       onValueChange={(next) => {
@@ -49,7 +49,9 @@ export function IntakeRouteSelect({
         className="h-10 w-full rounded-xl px-2 text-sm data-[size=default]:h-10 sm:px-3"
       >
         <SelectValue>
-          <MedicationChoiceIcon kind="route" value={value} />
+          {value !== undefined && (
+            <MedicationChoiceIcon kind="route" value={value} />
+          )}
           <span className="min-w-0 truncate" data-choice-trigger-label>
             {label}
           </span>

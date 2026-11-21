@@ -5,17 +5,13 @@ import {
   type Intake,
   type Medication,
 } from "./domain";
-import {
-  isIntakeRoute,
-  preferredIntakeRoute,
-  type IntakeRoute,
-} from "./intake-routes";
+import { isIntakeRoute, type IntakeRoute } from "./intake-routes";
 
 /** Raw controls stay strings; the original instant keeps seconds and DST offset. */
 export type IntakeFormDraft = {
   medicationId: string;
   quantity: string;
-  /** Missing on older drafts; the form keeps the entry's saved route. */
+  /** Empty for fresh drafts; missing legacy edit values retain the saved route. */
   route?: IntakeRoute;
   initialTimestamp: string;
   takenAt: string;
@@ -25,8 +21,6 @@ export type IntakeFormDraft = {
 export function newIntakeFormDraft({
   intake,
   initialDay,
-  medications,
-  intakes = [],
   timezone,
   now = new Date(),
 }: {
@@ -37,7 +31,7 @@ export function newIntakeFormDraft({
   timezone: string;
   now?: Date;
 }): IntakeFormDraft {
-  const medicationId = intake?.medicationId ?? medications[0]?.id ?? "";
+  const medicationId = intake?.medicationId ?? "";
   const initialTimestamp =
     intake?.takenAt ??
     (initialDay && initialDay !== dayKey(now, timezone)
@@ -45,14 +39,8 @@ export function newIntakeFormDraft({
       : now.toISOString());
   return {
     medicationId,
-    quantity: String(
-      intake?.quantity ??
-        medications.find((item) => item.id === medicationId)?.defaultQuantity ??
-        1,
-    ),
-    route: intake
-      ? (intake.route ?? "unspecified")
-      : preferredIntakeRoute(medicationId, intakes),
+    quantity: intake ? String(intake.quantity) : "",
+    route: intake ? (intake.route ?? "unspecified") : undefined,
     initialTimestamp,
     takenAt: toLocalInput(initialTimestamp, timezone),
     timezone,
