@@ -15,7 +15,7 @@
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--reader-ink) 14%, transparent);
   border-radius: 24px;
-  background:
+  --dialog-surface-paint:
     radial-gradient(ellipse at 0% 0%, #a78bfa24, transparent 65%),
     radial-gradient(
       ellipse at 100% 100%,
@@ -89,7 +89,7 @@
     --reader-paper: var(--surface-reading);
     --reader-ink: var(--surface-reading-foreground);
     --reader-muted: var(--muted-foreground);
-    background:
+    --dialog-surface-paint:
       radial-gradient(ellipse at 0% 0%, #8b5cf626, transparent 65%),
       radial-gradient(
         ellipse at 100% 100%,

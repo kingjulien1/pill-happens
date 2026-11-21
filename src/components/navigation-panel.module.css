@@ -4,6 +4,7 @@
   outline: none;
 }
 .popup.navigation {
+  --dialog-surface-paint: var(--navigation-paint);
   --nav-surface: var(--navigation-surface);
   --nav-ink: var(--menu-foreground);
   --nav-muted: var(--menu-muted-foreground);

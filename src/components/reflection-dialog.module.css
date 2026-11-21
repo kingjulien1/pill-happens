@@ -27,7 +27,7 @@
   padding: 0;
   /* The fullscreen workspace meets the viewport along its bottom edge. */
   border-radius: var(--dialog-radius-surface) var(--dialog-radius-surface) 0 0;
-  background:
+  --dialog-surface-paint:
     linear-gradient(var(--surface-reading), var(--surface-reading)),
     var(--background);
   color: var(--surface-reading-foreground);

@@ -1,0 +1,83 @@
+.surface {
+  --dialog-surface-paint: var(--popover);
+  --dialog-top-fade-opacity: 67%;
+  --dialog-top-fade-end: min(55%, 180px);
+  --dialog-bottom-fade-strength: 0.79;
+}
+
+/* Paint belongs to the popup itself: it covers the handle, padding and every
+   scroll position without a curtain element, observer or animation timeline. */
+.surface[data-slot][data-dialog-surface] {
+  --dialog-mauve: var(--color-mauve-950, #0c090c);
+  --dialog-mauve-wash: color-mix(in srgb, var(--dialog-mauve) 67%, transparent);
+  --drawer-bleed-background: color-mix(
+    in srgb,
+    var(--dialog-mauve) 67%,
+    var(--navigation-surface, var(--popover))
+  );
+  isolation: isolate;
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(
+        in srgb,
+        var(--dialog-mauve) var(--dialog-top-fade-opacity),
+        transparent
+      ),
+      transparent var(--dialog-top-fade-end)
+    ),
+    linear-gradient(var(--dialog-mauve-wash), var(--dialog-mauve-wash)),
+    var(--dialog-surface-paint);
+  background-attachment: scroll;
+}
+
+.surface[data-reflection-dialog],
+.surface[data-reflection-reader],
+.surface[data-writing-help] {
+  --dialog-top-fade-end: min(55%, 260px);
+}
+
+/* Dark mauve is a contrast island in daylight too. Keep its semantic surfaces
+   and inks paired; menus portaled outside the dialog retain the page theme. */
+@media (prefers-color-scheme: light) {
+  .surface {
+    color-scheme: dark;
+    --background: #2b233e;
+    --foreground: #ffffff;
+    --card: #352a45;
+    --card-foreground: #ffffff;
+    --popover: #3f334e;
+    --popover-foreground: #ffffff;
+    --muted: #433655f0;
+    --muted-foreground: #e1d9f4;
+    --surface-raised: #4b4059f0;
+    --surface-raised-foreground: #ffffff;
+    --surface-sunken: #2f253cf0;
+    --surface-sunken-foreground: #ffffff;
+    --surface-reading: #352a44f0;
+    --surface-reading-foreground: #ffffff;
+    --menu-surface: #28214b;
+    --menu-foreground: #fbfafd;
+    --menu-muted-foreground: #d8d3ed;
+    --menu-edge: #584f6d;
+    --primary: #bca4e4;
+    --primary-foreground: #111014;
+    --secondary: #4a3c5df0;
+    --secondary-foreground: #ffffff;
+    --accent: #594455f0;
+    --accent-foreground: #ffffff;
+    --border: #bca4e445;
+    --input: #bca4e48a;
+    --ring: #bca4e4;
+    --navigation-surface: #211625;
+    --navigation-highlight: #c4b5fd;
+    --navigation-paint:
+      radial-gradient(ellipse 90% 38% at 0% 0%, #ec48990b, transparent),
+      var(--navigation-surface);
+    --dialog-control-wash: color-mix(
+      in srgb,
+      var(--foreground) 6%,
+      transparent
+    );
+  }
+}

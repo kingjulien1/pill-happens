@@ -25,7 +25,6 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { IntakeDialogReveal } from "@/components/intake-dialog-reveal";
 import { cn } from "@/lib/utils";
 import { useDialogScrollMemory } from "@/components/use-dialog-scroll-memory";
 import type { PublicDialogScrollKey } from "@/lib/dialog-scroll-memory";
@@ -148,12 +147,12 @@ export function ResponsiveModal({
           className={cn(
             "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
             styles.dialog,
+            styles.surface,
             journalHeader && styles.checkInSurface,
             intakeHeader && styles.intakeSurface,
             medicationHeader && styles.medicationDialog,
           )}
         >
-          {intakeHeader && open && <IntakeDialogReveal />}
           <DialogHeader
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
           >
@@ -180,12 +179,12 @@ export function ResponsiveModal({
       <DrawerContent
         className={cn(
           "rounded-t-[var(--dialog-radius-surface)]",
+          styles.surface,
           journalHeader && styles.checkInSurface,
           intakeHeader && styles.intakeSurface,
         )}
         finalFocus={returnFocus}
       >
-        {intakeHeader && open && <IntakeDialogReveal />}
         <div
           ref={setScrollElement}
           data-dialog-scroll
