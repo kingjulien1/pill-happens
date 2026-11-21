@@ -444,11 +444,11 @@
   border-radius: calc(12.25px * 31 / 24);
 }
 .journal-toast-plate-arrival-back {
-  --toast-plate-size: calc(35.37px * 1.18);
+  --toast-plate-size: calc(35.37px * 1.18 * 97 / 84);
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
 }
 .journal-toast-plate-arrival-middle {
-  --toast-plate-size: calc(37.41px * 1.18);
+  --toast-plate-size: calc(37.41px * 1.18 * 97 / 84);
   transform: translate(1.225px, 0) rotate(15deg);
 }
 /* Continuous turns never overwrite either the finite entrance or local sway. */
@@ -1867,6 +1867,17 @@
   .journal-toaster [data-mounted="true"] .journal-toast-plate-arrival-middle {
     animation: journal-toast-middle-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
       180ms backwards;
+  }
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin {
+    animation: journal-toast-turn var(--toast-spin-period)
+      cubic-bezier(0.42, 0.3, 0.58, 0.7) var(--toast-ambient-delay) infinite;
+  }
+  /* DOM paint order puts violet at the base and pink nearest the front tile. */
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin-middle {
+    animation-direction: reverse;
+  }
+  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin-back {
+    animation-direction: normal;
   }
   .journal-toaster [data-toast-symbol="update"] .journal-toast-update-arrows {
     animation: journal-toast-update-sync 2.6s linear infinite;

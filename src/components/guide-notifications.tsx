@@ -1019,9 +1019,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "Eight staggered glints and separate rear-plate wrappers finish their entrance once; nested spin wrappers and inner plate faces own the later rotation and sway independently.",
           ],
           [
-            "Rear-card rotation / sway",
-            "4.5s turns and 10.8s breathing cycles",
-            "Both rear tiles unfold from the front tile’s size to 129.17%. They turn in opposite directions with a gentle change in angular speed. Their scale cycles run in counterphase at five twelfths of the rotation frequency.",
+            "Rear-card rotation",
+            "4.5s turns after the artwork entrance",
+            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. Both rear cards are 15.48% larger: about 50.98px violet and 48.20px pink, with the front tile and illustration rail unchanged. Hidden/folded layers pause; reduced motion keeps both still.",
           ],
           [
             "Status motion",

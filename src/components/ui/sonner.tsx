@@ -191,7 +191,7 @@ function BellCheck(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** Layered artwork; only the update glyph adds a small CSS motion loop. */
+/** Rear cards turn independently of each other and the status glyph. */
 export function ToastSymbol({
   kind,
   variant,
