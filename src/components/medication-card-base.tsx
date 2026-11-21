@@ -4,7 +4,10 @@ import {
   MedicationCardIconStack,
 } from "@/components/medication-card-icon";
 import { getMedicationColor } from "@/lib/medication-appearance";
-import { getMedicationIconPigment } from "@/lib/medication-preview-colors";
+import {
+  getMedicationFramePigment,
+  getMedicationIconPigment,
+} from "@/lib/medication-preview-colors";
 import { cn } from "@/lib/utils";
 import styles from "./medication-card-base.module.css";
 import frameStyles from "./card-frame.module.css";
@@ -74,6 +77,7 @@ export function MedicationCardBase({
   const frameStyle = {
     "--entry-color": color.hex,
     "--entry-icon-tint": `${color.hex}66`,
+    "--entry-frame-pigment": getMedicationFramePigment(color.value),
     "--intake-identity-color": getMedicationIconPigment(color.value, icon),
     ...style,
   } as CSSProperties;

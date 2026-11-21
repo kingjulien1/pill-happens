@@ -106,15 +106,34 @@
   box-shadow: inset 0 0 0 1px var(--intake-artwork-inner-rim);
 }
 
-/* Intake faces grow around the fixed artwork centre. The rail, fan spacing,
-   glyph and 6px outer stroke retain their existing dimensions. */
+/* Keep the 60px face and fan anchors fixed. Unitless geometry lets the glyph
+   follow the inner ring's growth without scaling either ring's stroke. */
 :global([data-intake-card]) .mark:global(.intake-card-mark) {
   --intake-artwork-outset: 6px;
-  --intake-artwork-vivid-width: 1.85px;
-  --intake-artwork-vivid-growth: 0.85px;
-  --intake-artwork-rim-inset: calc(
-    6px * 2 / 3 - var(--intake-artwork-vivid-width) / 2
+  --intake-artwork-face-size: 60;
+  --intake-artwork-thick-size: 6;
+  --intake-artwork-vivid-size: 1.85;
+  --intake-artwork-inner-origin: 11.9;
+  /* Place the middle stroke 60% outward from the thick rim's inside edge. */
+  --intake-artwork-middle-inset: calc(
+    var(--intake-artwork-thick-size) * 0.4 - var(--intake-artwork-vivid-size) /
+      2
   );
+  /* Consume two thirds of the clear gap toward the middle stroke. */
+  --intake-artwork-inner-inset: calc(
+    var(--intake-artwork-inner-origin) / 3 +
+      (var(--intake-artwork-middle-inset) + var(--intake-artwork-vivid-size)) *
+      2 / 3
+  );
+  --intake-artwork-glyph-size: calc(
+    30px *
+      (
+        var(--intake-artwork-face-size) - 2 * var(--intake-artwork-inner-inset)
+      ) /
+      (var(--intake-artwork-face-size) - 2 * var(--intake-artwork-inner-origin))
+  );
+  --intake-artwork-vivid-width: calc(var(--intake-artwork-vivid-size) * 1px);
+  --intake-artwork-rim-inset: calc(var(--intake-artwork-middle-inset) * 1px);
   --intake-artwork-face-tint: color-mix(
     in srgb,
     var(--medication-frame-pigment) 37%,
@@ -135,7 +154,7 @@
   inset: calc(-1 * var(--intake-artwork-outset));
 }
 
-/* Centre the extra saturated line two thirds into the thick glass rim. */
+/* The equal-width middle stroke stays completely inside the thick glass rim. */
 :global([data-intake-card]) .mark::before {
   content: "";
   position: absolute;
@@ -146,14 +165,19 @@
   pointer-events: none;
 }
 
-/* Preserve the old ring's inner edge and centre; only its outward edge grows. */
+/* Enlarge the inner ring and drawing together, leaving all fan layout intact. */
 :global([data-intake-card]) .mark::after {
-  inset: calc(
-    6.75px + var(--intake-artwork-outset) - var(--intake-artwork-vivid-growth)
-  );
-  border-radius: calc(9.25px + var(--intake-artwork-vivid-growth));
+  inset: calc(var(--intake-artwork-inner-inset) * 1px);
+  border-radius: calc(20px - var(--intake-artwork-inner-inset) * 1px);
   box-shadow: inset 0 0 0 var(--intake-artwork-vivid-width)
     var(--intake-artwork-inner-rim);
+}
+
+:global([data-intake-card])
+  .mark:global([data-medication-mark])
+  > :global([data-medication-glyph]) {
+  width: var(--intake-artwork-glyph-size);
+  height: var(--intake-artwork-glyph-size);
 }
 
 /* The first row starts 3px below the artwork stage, with 20px text or a

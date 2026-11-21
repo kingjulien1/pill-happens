@@ -1986,11 +1986,16 @@ export function DeveloperGuidePage() {
                 tile. One inner entrance owner animates the whole fan, while the
                 quantity label enters separately and grouped disclosure never
                 remounts its frames. Recorded intake faces now paint a centred
-                60px surface around that anchor, retaining the 6px outer stroke
-                and the glyph’s original coordinates. The saturated inner ring
-                grows outward to 1.85px while preserving its inner edge; a
-                matching ring sits two thirds into the outer rim. A 37% overlay
-                uses that same family pigment. These intake-only styles also
+                60px surface around that anchor, retaining the 6px outer stroke.
+                Two equal 1.85px saturated strokes frame the drawing: the middle
+                stroke sits 60% outward through the thick rim, while the inner
+                stroke consumes two thirds of the former clear gap toward it.
+                The 30px drawing grows proportionally to about 39.5px around its
+                original centre. A 37% icon overlay uses the same family pigment.
+                Real card washes use that exact pigment at 18% on the right,
+                10% at 74% across toward the left, then 6% at the left edge;
+                the final falloff is about 42% steeper. Empty skeletons keep
+                their neutral wash. These intake-only styles also
                 cover historical entries, notification snapshots and Final Look.
               </p>
               <p>

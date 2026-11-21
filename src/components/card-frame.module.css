@@ -119,6 +119,33 @@
   --intake-tint-factor: calc(31 / 24);
 }
 
+/* The artwork's saturated family pigment also owns the real intake wash.
+   From the right, the last 26% drops from 10% to 6%: about 42% steeper.
+   Empty previews keep their independent neutral skeleton surface. */
+.card[data-intake-card]:not([data-intake-preview-skeleton]) {
+  --entry-tint-right: color-mix(
+    in srgb,
+    var(--entry-frame-pigment) 18%,
+    transparent
+  );
+  --entry-tint-turn: color-mix(
+    in srgb,
+    var(--entry-frame-pigment) 10%,
+    transparent
+  );
+  --entry-tint-left: color-mix(
+    in srgb,
+    var(--entry-frame-pigment) 6%,
+    transparent
+  );
+  --entry-surface-paint: linear-gradient(
+    to left,
+    var(--entry-tint-right),
+    var(--entry-tint-turn) 74%,
+    var(--entry-tint-left)
+  );
+}
+
 /* A shadow retains fractional widths that CSS borders/outlines round away.
    Center the extra line one third outward from the thick rim's inner edge. */
 .detailRim {
@@ -142,7 +169,7 @@
   )
   :global(.intake-card-glass) {
   background:
-    linear-gradient(var(--entry-surface-base) 0 0),
+    var(--entry-surface-paint, linear-gradient(var(--entry-surface-base) 0 0)),
     linear-gradient(var(--entry-glass-pink) 0 0), var(--entry-intake-base);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -288,7 +315,10 @@
     )
     :global(.intake-card-glass) {
     background:
-      linear-gradient(var(--entry-surface-base) 0 0),
+      var(
+        --entry-surface-paint,
+        linear-gradient(var(--entry-surface-base) 0 0)
+      ),
       linear-gradient(var(--entry-glass-pink) 0 0),
       color-mix(in srgb, var(--surface-reading) 82%, transparent);
   }
@@ -304,7 +334,10 @@
   .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
     :global(.intake-card-glass) {
     background:
-      linear-gradient(var(--entry-surface-base) 0 0),
+      var(
+        --entry-surface-paint,
+        linear-gradient(var(--entry-surface-base) 0 0)
+      ),
       linear-gradient(var(--entry-glass-pink) 0 0), transparent;
     -webkit-backdrop-filter: blur(96px);
     backdrop-filter: blur(96px);
