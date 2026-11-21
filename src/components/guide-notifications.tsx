@@ -1021,7 +1021,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Rear-card rotation",
             "4.5s turns after the artwork entrance",
-            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. Both rear cards have another one-seventh size increase: about 58.26px violet and 55.08px pink, with the front tile and illustration rail unchanged. Hidden/folded layers pause; reduced motion keeps both still. The outermost notification rim shares the front icon's resolved background color, including its transparency.",
+            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. Both rear cards have another one-seventh size increase: about 58.26px violet and 55.08px pink, with the front tile and illustration rail unchanged. Hidden/folded layers pause; reduced motion keeps both still.",
           ],
           [
             "Status motion",
@@ -1115,8 +1115,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "General detail context uses 88% ink alpha in both modes. A generated change summary uses full primary ink at 13px, weight 700, immediately after the top divider. The preview grid has 16px gaps; three-column captions keep History/Before, BadgeCheck/After or Saved, and Trash2/Removed independently centered above their original shared cards, with yearless dates or status at the right.",
           ],
           [
-            "Inward frame",
-            "The 3.36px pink inner band keeps its inner edge fixed. The 6.67px muted outer band extends beyond the card without changing layout. Existing pigments and 18px corners remain, with a restrained Pink400 exterior glow.",
+            "Layered frame / specular rim",
+            "The inner pink edge and expansion-only middle band keep their geometry. The 2.83px outer rim uses the check-in specular triad, replacing Purple400 with Fuchsia400 in its 78%/22% mix with Pink400. The base mixes 92% pigment with black; the sheen mixes 68% pigment with white; the short core mixes 24% pigment with white, all at 88% opacity. A 12% perimeter sheen and nested 3% core sweep every 5.46s on an SVG, following the existing visibility pause gate; reduced motion keeps them static. The SVG follows the former outer shadow without changing layout or adding a shader, timer or frame loop.",
           ],
           [
             "Surface / countdown",

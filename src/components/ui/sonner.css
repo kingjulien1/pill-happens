@@ -1211,10 +1211,60 @@
   opacity: 0;
 }
 .journal-notification-frame {
+  /* Match the check-in triad and sweep, with Fuchsia400 replacing Purple400. */
+  --notification-rim-color: color-mix(
+    in srgb,
+    var(--color-fuchsia-400, #e879f9) 78%,
+    var(--color-pink-400, #f472b6) 22%
+  );
+  --notification-rim-base: color-mix(
+    in srgb,
+    var(--notification-rim-color) 92%,
+    black
+  );
+  --notification-rim-sheen: color-mix(
+    in srgb,
+    var(--notification-rim-color) 68%,
+    white
+  );
+  --notification-rim-core: color-mix(
+    in srgb,
+    var(--notification-rim-color) 24%,
+    white
+  );
   inset: var(--frame-inset);
   border-radius: calc(18px - var(--frame-inset));
   z-index: 2;
-  box-shadow: 0 0 0 var(--frame-outer) var(--toast-icon-background);
+}
+/* The SVG centerline follows the former shadow, preserving every border inset.
+   Only the short highlights travel; no shader or full-card gradient repaints. */
+.journal-notification-specular {
+  position: absolute;
+  inset: calc(var(--frame-outer) / -2);
+  width: calc(100% + var(--frame-outer));
+  height: calc(100% + var(--frame-outer));
+  fill: none;
+  overflow: visible;
+  opacity: 0.88;
+  pointer-events: none;
+}
+.journal-notification-specular rect {
+  rx: calc(18px - var(--frame-inset) + var(--frame-outer) / 2);
+  stroke-width: var(--frame-outer);
+}
+.journal-notification-specular-track {
+  stroke: var(--notification-rim-base);
+}
+.journal-notification-specular-sheen {
+  stroke: var(--notification-rim-sheen);
+  stroke-dasharray: 12 88;
+  stroke-linecap: round;
+}
+.journal-notification-specular-core {
+  stroke: var(--notification-rim-core);
+  stroke-dasharray: 3 97;
+  stroke-dashoffset: -4.5;
+  stroke-linecap: round;
 }
 .journal-notification-frame::after {
   content: "";
@@ -1908,6 +1958,18 @@
 @media (prefers-reduced-motion: no-preference) {
   .journal-toaster
     [data-mounted="true"]
+    :is(
+      .journal-notification-specular-sheen,
+      .journal-notification-specular-core
+    ) {
+    animation: journal-notification-specular-sweep 5.46s linear infinite;
+    animation-play-state: var(--notification-motion-play-state, running);
+  }
+  .journal-toaster [data-mounted="true"] .journal-notification-specular-core {
+    animation-delay: -245.7ms;
+  }
+  .journal-toaster
+    [data-mounted="true"]
     .journal-notification[data-phase="idle"] {
     animation: journal-notification-card-arrive 860ms
       cubic-bezier(0.16, 0.9, 0.23, 1) both;
@@ -2080,6 +2142,15 @@
     [data-removed="true"]
     .journal-toast-symbol:not([data-toast-reversed="true"]) {
     animation: journal-toast-art-reverse 180ms ease-in both;
+  }
+}
+
+@keyframes journal-notification-specular-sweep {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
   }
 }
 @keyframes journal-notification-countdown-unfold {
