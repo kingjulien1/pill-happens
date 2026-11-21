@@ -186,10 +186,14 @@
       backwards;
   }
   .halo {
-    animation: none;
+    animation:
+      check-in-progress-halo 1560ms ease-out var(--progress-start) backwards,
+      check-in-progress-breathe 7200ms ease-in-out var(--progress-loop-start)
+        infinite;
   }
   .numberMotion {
-    animation: none;
+    animation: check-in-progress-float 7200ms ease-in-out
+      var(--progress-loop-start) infinite;
   }
   .confetti {
     animation: check-in-progress-confetti 1200ms ease-out

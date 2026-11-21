@@ -1,0 +1,146 @@
+.border {
+  --rim-gap: var(--check-in-outer-gap, 3px);
+  --rim-width: var(--check-in-outer-width, 3.733333px);
+  --rim-radius: var(--entry-card-radius, var(--intake-card-radius, 21px));
+  --rim-color: var(
+    --check-in-outer-color,
+    color-mix(
+      in srgb,
+      var(--color-purple-400, #c084fc) 78%,
+      var(--color-pink-400, #f472b6) 22%
+    )
+  );
+  --rim-purple-glow: color-mix(
+    in srgb,
+    var(--color-purple-400, #c084fc) 46%,
+    transparent
+  );
+  --rim-pink-glow: color-mix(
+    in srgb,
+    var(--color-pink-400, #f472b6) 54%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+.desktop {
+  display: none;
+}
+
+.frame {
+  --intake-rim-base: var(--rim-color);
+  --intake-rim-stop-1: color-mix(in srgb, var(--intake-rim-base) 92%, black);
+  --intake-rim-stop-2: color-mix(in srgb, var(--intake-rim-base) 68%, white);
+  --intake-rim-stop-3: color-mix(in srgb, var(--intake-rim-base) 24%, white);
+  position: absolute;
+  z-index: 4;
+  box-sizing: border-box;
+  inset: calc((var(--rim-gap) + var(--rim-width)) * -1);
+  padding: var(--rim-width);
+  border-radius: calc(var(--rim-radius) + var(--rim-gap) + var(--rim-width));
+  opacity: 0.88;
+}
+
+.light {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* The three-stop CSS fallback is also the first paint before the shader. */
+@property --specular-card-rim-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.frame::after {
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--specular-card-rim-angle, 0deg),
+    var(--intake-rim-stop-1),
+    var(--intake-rim-stop-2) 33%,
+    var(--intake-rim-stop-3) 67%,
+    var(--intake-rim-stop-1)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  content: "";
+}
+.frame:has(> [data-rendered="true"])::after {
+  visibility: hidden;
+}
+
+/* Purple400 at 46% and Pink400 at 54% share the check-in card's quiet halo. */
+.frame::before {
+  position: absolute;
+  inset: calc(var(--rim-width) + var(--rim-gap) - 0.5px);
+  border-radius: var(--rim-radius);
+  box-shadow:
+    0 0 18px 1px var(--rim-purple-glow),
+    0 0 11px 0 var(--rim-pink-glow);
+  content: "";
+}
+
+/* Rounded, composited buttons can clip outboard descendants in desktop WebKit. */
+@media (min-width: 768px) {
+  .frame {
+    display: none;
+  }
+  .desktop {
+    --outset: calc(var(--rim-gap) + var(--rim-width) / 2);
+    position: absolute;
+    display: block;
+    inset: calc(-1 * var(--outset));
+    width: calc(100% + 2 * var(--outset));
+    height: calc(100% + 2 * var(--outset));
+    overflow: visible;
+    fill: none;
+    color: var(--rim-color);
+  }
+  .desktop rect {
+    rx: calc(var(--rim-radius) + var(--rim-gap) + var(--rim-width) / 2);
+    stroke-width: var(--rim-width);
+  }
+  .track {
+    stroke: color-mix(in srgb, currentColor 92%, black);
+    filter: drop-shadow(0 0 4px var(--color-pink-400));
+  }
+  .highlight {
+    stroke: color-mix(in srgb, currentColor 32%, white);
+    stroke-dasharray: 12 88;
+    stroke-linecap: round;
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .highlight {
+    animation: travel-perimeter 5.46s linear infinite;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .frame:has(> [data-rendered="false"][data-fallback-active="true"])::after {
+    animation: specular-card-rim-turn 5.46s linear infinite;
+  }
+}
+@keyframes travel-perimeter {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+@keyframes specular-card-rim-turn {
+  to {
+    --specular-card-rim-angle: 360deg;
+  }
+}

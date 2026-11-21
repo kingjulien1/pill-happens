@@ -6,6 +6,15 @@
     var(--color-violet-950, #2e1065) 88%,
     var(--color-fuchsia-950, #4a044e)
   );
+  --art-return-delay: 180ms;
+  --art-start: var(
+    --check-in-art-delay,
+    calc(var(--card-entry-delay, 0ms) + var(--art-return-delay))
+  );
+  --art-entry-end: calc(var(--art-start) + 1560ms);
+  --art-loop-start: calc(var(--art-entry-end) + 300ms);
+  --icon-settle-color: var(--art-soft);
+  --art-play: var(--page-entry-play-state, running);
   position: relative;
   isolation: isolate;
   display: inline-flex;
@@ -21,6 +30,22 @@
 .coffee {
   width: 100%;
   height: 100%;
+  --coffee-motion: paused;
+}
+.stage[data-artwork-ambient-ready="true"] .coffee {
+  --coffee-motion: var(--art-play);
+}
+
+/* Nonvisual clocks synchronize moon entry and the later ambient handoff. */
+.entryGate,
+.ambientGate {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .arrival {
@@ -41,12 +66,155 @@
   overflow: visible;
 }
 
-/* Keep the existing tile and 20px illustration footprint without a motion layer. */
+.symbolArrival,
 .symbolFloat {
   display: inline-flex;
   width: 30px;
   height: 30px;
   align-items: center;
   justify-content: center;
+  transform-origin: center;
+}
+
+/* Scale the illustration once; the shared tile and card's text rail stay aligned. */
+.symbolFloat {
   scale: calc(2 / 3);
+}
+
+.flourish {
+  position: absolute;
+  inset: 0;
+  width: 56px;
+  height: 56px;
+  overflow: visible;
+  color: var(--art-soft);
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+/* The moon and steam own their ambient motion after the shared arrival. */
+.stage .symbolFloat {
+  animation: none;
+}
+
+@media (max-width: 767px) {
+  .stage {
+    --art-return-delay: 400ms;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Keep both clocks parked until this card and the refresh curtain are ready. */
+  :global([data-card-entry-state="pending"]) .stage {
+    --art-play: paused;
+  }
+
+  .stage[data-artwork-dialog-open="true"] {
+    --art-play: paused;
+  }
+
+  .ambientGate {
+    animation: check-in-ambient-open 1ms linear var(--art-loop-start) both;
+  }
+
+  .entryGate {
+    animation: check-in-ambient-open 1ms linear var(--art-start) both;
+  }
+
+  .arrival {
+    animation: check-in-art-arrive 1560ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--art-start) backwards;
+  }
+
+  .symbolArrival {
+    animation: check-in-art-unfurl 1560ms cubic-bezier(0.22, 1, 0.36, 1)
+      var(--art-start) backwards;
+  }
+
+  /* EveningMoon owns one continuous entrance-to-loop motion timeline. */
+  .stage[data-check-in-artwork="evening"] .symbolArrival {
+    animation: none;
+  }
+
+  .flourish {
+    animation: check-in-art-flourish 1200ms ease-out
+      calc(var(--art-start) + 260ms) backwards;
+  }
+
+  .entryGate,
+  .ambientGate,
+  .arrival,
+  .symbolArrival,
+  .flourish,
+  .symbolFloat {
+    animation-play-state: var(--art-play);
+  }
+}
+
+@keyframes check-in-ambient-open {
+  from,
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes check-in-art-arrive {
+  0% {
+    opacity: 0.3;
+    transform: translateY(4px) scale(0.66) rotate(-10deg);
+  }
+  28% {
+    opacity: 1;
+    transform: translateY(-0.8px) scale(0.96) rotate(1.5deg);
+  }
+  56% {
+    transform: scale(1.06) rotate(1deg);
+  }
+  70% {
+    transform: scale(0.985) rotate(-0.4deg);
+  }
+  82% {
+    transform: scale(1.025) rotate(0.2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes check-in-art-unfurl {
+  0% {
+    opacity: 0;
+    transform: translate(-5px, 5px) rotate(-70deg) scale(0.45);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(1px, -2px) rotate(12deg) scale(1.06);
+  }
+  68% {
+    transform: translateY(0.5px) rotate(-5deg) scale(0.98);
+  }
+  86% {
+    transform: rotate(1.5deg) scale(1.01);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes check-in-art-flourish {
+  0% {
+    opacity: 0;
+    transform: scale(0.55) rotate(-12deg);
+  }
+  35% {
+    opacity: 0.85;
+    transform: scale(0.95) rotate(3deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05) rotate(8deg);
+  }
 }

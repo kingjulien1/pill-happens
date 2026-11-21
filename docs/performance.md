@@ -4,6 +4,16 @@ Responsiveness takes priority over decorative motion. The palette, card geometry
 group disclosure, drafts, notifications and save behavior remain; ambient effects
 now use static CSS/SVG.
 
+## Card appearance restoration — November 21
+
+At the user's request, intake and Morning/Evening check-in cards now use the
+November 20 appearance (`c6b937f`) again: glass blur, timeline arrivals, group
+wash positioning, icon motion, shine, and check-in border effects. Their original
+visibility and reduced-motion gates are retained. The check-in rim renderer is
+isolated from ordinary buttons. The measurements below describe the earlier
+performance pass, before this visual restoration; storage, subscription, history,
+notification-clock, lazy-loading and app-wide background fixes remain in place.
+
 ## Bottlenecks and fixes
 
 - **Decorative rendering:** the full-screen Iridescence shader and per-button

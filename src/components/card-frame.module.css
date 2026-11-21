@@ -298,3 +298,15 @@
     opacity: 0.12;
   }
 }
+
+/* Restore the November 20 glass only for intake and check-in faces. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+    :global(.intake-card-glass) {
+    background:
+      linear-gradient(var(--entry-surface-base) 0 0),
+      linear-gradient(var(--entry-glass-pink) 0 0), transparent;
+    -webkit-backdrop-filter: blur(96px);
+    backdrop-filter: blur(96px);
+  }
+}

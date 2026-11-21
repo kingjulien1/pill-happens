@@ -15,7 +15,7 @@ import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationCardBase } from "@/components/medication-card-base";
-import { SpecularCardBorder } from "@/components/specular-card-border";
+import { CheckInCardBorder as SpecularCardBorder } from "@/components/check-in-card-border";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
 import {
   CHECK_IN_CARD_COLOR,

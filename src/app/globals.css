@@ -1273,7 +1273,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   filter: blur(4px);
   opacity: 0;
   transform: translate3d(-160%, 0, 0) skewX(-18deg);
-  animation: none;
+  animation: intake-card-rare-shine var(--intake-shine-cycle) linear
+    var(--intake-shine-wait) infinite;
   animation-play-state: paused;
   pointer-events: none;
 }
@@ -2213,8 +2214,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   color: var(--empty-intake-copy);
 }
 .empty-intake-card {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  -webkit-backdrop-filter: blur(48px);
+  backdrop-filter: blur(48px);
   box-shadow:
     inset 0 1px 1px
       color-mix(in srgb, var(--palette-peach) 34.902%, transparent),
@@ -3049,7 +3050,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .empty-intake-card .empty-intake-dashes {
-    animation: none;
+    animation: empty-intake-dash-flow 1.2s linear infinite paused;
   }
   .empty-intake-card:hover .empty-intake-dashes {
     animation-play-state: running;

@@ -437,3 +437,10 @@
     box-shadow: none;
   }
 }
+
+/* These two card families retain their November 20 icon glass. */
+:global(:is([data-intake-card], [data-check-in-card]))
+  .mark:global(.intake-card-mark) {
+  -webkit-backdrop-filter: blur(96px) saturate(120%);
+  backdrop-filter: blur(96px) saturate(120%);
+}
