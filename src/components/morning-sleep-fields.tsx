@@ -263,11 +263,8 @@ export function MorningSleepFields({
       </CheckInSection>
       <CheckInSection
         caption="How the Night Felt"
-        detail={
-          <span title="Rate how you feel now. High sleepiness means sleepier, not better rested; follow each slider’s end labels.">
-            Body &gt; graph
-          </span>
-        }
+        detail="Your own read"
+        description="Rate what you remember and how rested you feel now. Follow each slider’s end labels: a higher sleepiness score means sleepier, not better rested."
         headingId={`${id}-ratings-heading`}
       >
         <section

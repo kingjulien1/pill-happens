@@ -86,38 +86,6 @@
   line-height: 1.6;
 }
 
-.section:has(> .frame > [data-check-in-section="morning-ratings"]) > .header {
-  margin-top: 4px;
-  margin-bottom: 3px;
-}
-.section:has(> .frame > [data-check-in-section="morning-ratings"])
-  > .header
-  :is(.caption, .title, .detail) {
-  color: color-mix(in srgb, var(--color-violet-300, #c4b5fd) 67%, transparent);
-}
-
-/* Keep the night-rating title and its useful aside intact on narrow phones. */
-@media (max-width: 359px) {
-  .section:has(> .frame > [data-check-in-section="morning-ratings"])
-    > .header
-    > .caption {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 5px;
-  }
-  .section:has(> .frame > [data-check-in-section="morning-ratings"]) .labelRow {
-    display: contents;
-  }
-  .section:has(> .frame > [data-check-in-section="morning-ratings"])
-    .contextGroup {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-  .section:has(> .frame > [data-check-in-section="morning-ratings"]) .detail {
-    grid-column: 2;
-    grid-row: 1;
-  }
-}
 .frame > fieldset {
   padding: 10px 12px 12px;
 }
