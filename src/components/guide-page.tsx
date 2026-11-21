@@ -223,6 +223,9 @@ export function GuidePage() {
                   medication, actual quantity and intake route. Check the
                   calculated mg and Date &amp; Time Taken, then save. Change the
                   time first when recording an earlier intake.
+                  Manually chosen dates and times stay pinned across new and
+                  edited intakes, even after saving. Release the pin with the
+                  button beside Time Taken to return to the current date and time.
                 </p>
                 <PageLink href="/">Go To Today</PageLink>
               </div>

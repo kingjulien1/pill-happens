@@ -2177,13 +2177,21 @@ export function DeveloperGuidePage() {
                 dose formatting elsewhere in the journal.
               </p>
               <p>
-                Date Taken and Time Taken share the row equally, using 40px
-                controls. Native values are centered vertically with a 14px left
-                inset. Edit Intake puts safe draft feedback and an underlined
+                Timing uses 40px controls. Date is one seventh narrower and time
+                one sixth narrower than the previous layout, with the original
+                gaps retained and the recovered space assigned to reset. Native
+                values stay vertically centered. Edit Intake puts safe draft feedback and an underlined
                 Delete intake action directly beneath Save Changes; deletion
                 requires a separate confirmation. Storage warnings remain
-                visible. The square time-reset button keeps the date, restores
-                the journal’s current clock and shows a check for 1.5 seconds.
+                visible. Manual date/time changes use the shared, journal-scoped
+                intake:timing draft. Saving an intake or resetting its other fields
+                preserves the pin. Native commit/blur waits 180ms before the pin’s
+                entry; reset releases it and sets both values to now after its
+                outro. Closing mid-reset still honors that reset. Fresh current-day
+                forms and explicitly reset forms use the existing minute clock
+                without draft writes. Untouched edits retain their recorded instant.
+                Ambient sparkle scheduling pauses offscreen and when hidden, with
+                reduced-motion alternatives and no frame loop.
                 Native number spinners and date/time icons are hidden. Intake
                 context inputs and card notes are removed; saved historical
                 notes remain in storage and backups. Medication choices and the

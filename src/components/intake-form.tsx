@@ -28,6 +28,7 @@ import { FinalLookHeading } from "./final-look-heading";
 import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
+import { useIntakeTiming } from "@/components/use-intake-timing";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import { toast } from "@/components/ui/journal-toast";
 import {
@@ -95,7 +96,7 @@ export function IntakeForm({
   /** The editing owner can place a secondary action beside safe draft feedback. */
   footerAction?: ReactNode;
 }) {
-  const { data, mutate, busy, derived } = useJournal();
+  const { data, mutate, busy, derived, now } = useJournal();
   const medications = useMemo(
     () =>
       data!.medications.filter(
@@ -122,6 +123,23 @@ export function IntakeForm({
       }),
     isIntakeFormDraft,
   );
+  const timing = useIntakeTiming({
+    draft: draft.value,
+    hasDraft: draft.hasDraft,
+    editing: Boolean(intake),
+    initialDay,
+    timezone,
+    now: now ?? new Date(),
+    savedTimestamp: intake?.takenAt,
+  });
+  const [timingResetting, setTimingResetting] = useState(false);
+  const draftFeedback = {
+    ...draft,
+    hasDraft: draft.hasDraft || timing.pinned,
+    // Each save status must report the least durable of the two draft stores.
+    status:
+      timing.pinned && timing.status !== "saved" ? timing.status : draft.status,
+  };
   useEffect(() => {
     onResetAvailability?.(draft.hasDraft && !busy);
   }, [onResetAvailability, draft.hasDraft, busy]);
@@ -145,11 +163,9 @@ export function IntakeForm({
       : medicationId
         ? preferredRoute(medicationId)
         : undefined);
-  const takenAt = intakeDraftDisplayTime(draft.value, timezone);
+  const takenAt = intakeDraftDisplayTime(timing.draft, timezone);
   const setQuantity = (value: string) =>
     draft.setValue((current) => ({ ...current, quantity: value }));
-  const setTakenAt = (value: string) =>
-    draft.setValue((current) => ({ ...current, takenAt: value, timezone }));
   const [error, setError] = useState("");
   const reset = () => {
     draft.resetDraft(
@@ -282,7 +298,7 @@ export function IntakeForm({
             onClick={onSaved}
           />
           <DraftStatus
-            {...draft}
+            {...draftFeedback}
             onReset={busy || formId ? undefined : reset}
           />
         </div>
@@ -291,7 +307,7 @@ export function IntakeForm({
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (busy) return;
+    if (busy || timingResetting) return;
     setError("");
     try {
       if (!medication && !fallbackIntake) {
@@ -305,7 +321,7 @@ export function IntakeForm({
         return;
       }
       // The draft stores its original instant and the zone of any edited field.
-      const timestamp = intakeDraftTimestamp(draft.value);
+      const timestamp = intakeDraftTimestamp(timing.draft);
       // This runs only from onSubmit, so it must check the actual submit time.
       // eslint-disable-next-line react-hooks/purity
       if (new Date(timestamp).getTime() > Date.now()) {
@@ -554,12 +570,16 @@ export function IntakeForm({
         <CheckInSection
           caption="Timing"
           context="When you took it"
-          detail="Local time"
+          detail={timing.pinned ? "Pinned across entries" : "Local time"}
         >
           <div className="form-field p-4">
             <IntakeDateTimeFields
               value={takenAt}
-              onChange={setTakenAt}
+              onChange={timing.pin}
+              onReset={timing.reset}
+              pinned={timing.pinned}
+              onEditingChange={timing.editingChanged}
+              onResettingChange={setTimingResetting}
               timezone={timezone}
               disabled={busy}
             />
@@ -658,14 +678,14 @@ export function IntakeForm({
       >
         <DialogPrimaryButton
           type="submit"
-          disabled={busy}
+          disabled={busy || timingResetting}
           pending={busy}
           className="w-full rounded-2xl"
         >
           {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
         </DialogPrimaryButton>
         <DraftStatus
-          {...draft}
+          {...draftFeedback}
           onReset={busy || footerAction || formId ? undefined : reset}
           action={footerAction}
           copy={

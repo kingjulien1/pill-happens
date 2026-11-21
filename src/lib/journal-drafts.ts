@@ -137,6 +137,7 @@ export function safeDraftKey(key: unknown): key is string {
       "goal:new",
       "preferences",
       "intake:new:today",
+      "intake:timing",
       "view:medications",
       "view:guide-colors",
       "view:history",
