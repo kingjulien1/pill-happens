@@ -14,16 +14,14 @@
 }
 .aura {
   position: absolute;
-  inset: 12%;
+  inset: 4% 1% 8%;
   z-index: -1;
   border-radius: 50%;
-  opacity: 0.55;
-  background: radial-gradient(
-    circle at 36% 62%,
-    #f9a8d41c,
-    #a78bfa1c 40%,
-    transparent 72%
-  );
+  opacity: 0.85;
+  background:
+    radial-gradient(ellipse at 24% 62%, #e879f95c, transparent 58%),
+    radial-gradient(ellipse at 75% 28%, #8b5cf669, transparent 60%),
+    radial-gradient(ellipse at 45% 30%, #f9a8d438, transparent 62%);
   pointer-events: none;
 }
 .scene {
@@ -76,8 +74,13 @@
   stroke: #fff;
 }
 .glow {
-  stroke-width: 29;
-  opacity: 0.13;
+  stroke-width: 27;
+  opacity: 0.82;
+}
+.bloom {
+  fill: none;
+  stroke-width: 42;
+  opacity: 0.58;
 }
 .filled {
   opacity: 1;
@@ -85,6 +88,9 @@
 }
 .dial[data-score-positive="false"] .filled {
   opacity: 0;
+}
+.dial[data-score-positive="false"] .aura {
+  opacity: 0.18;
 }
 .beam {
   transform-box: view-box;
@@ -103,22 +109,6 @@
   stroke-dasharray: 14 86;
   stroke-linecap: round;
   opacity: 0.15;
-}
-.sparkFlight {
-  opacity: 0;
-}
-.star {
-  fill: var(--score-pearl);
-  stroke: var(--score-pink);
-  stroke-width: 0.9;
-}
-.burst {
-  fill: none;
-  stroke: var(--score-orchid);
-  stroke-width: 1;
-  stroke-linecap: round;
-  opacity: 0;
-  transform-origin: 0 0;
 }
 .copy {
   position: absolute;
@@ -214,11 +204,64 @@
   }
 }
 
-/* Keep the numeric arc; no idle highlight or particle timelines. */
 .beam {
-  display: none;
+  opacity: 0;
 }
-
 .arcGlow {
-  opacity: 0.7;
+  opacity: 0.85;
+  transform-box: view-box;
+  transform-origin: center;
+}
+.particles {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  user-select: none;
+  contain: strict;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dial[data-active="true"] .arcGlow {
+    animation: score-corona 3.4s cubic-bezier(0.45, 0.04, 0.3, 1) infinite;
+  }
+  .dial[data-active="true"] .aura {
+    animation: score-aura 4.6s cubic-bezier(0.42, 0, 0.25, 1) infinite;
+  }
+  .dial[data-active="true"] .beam {
+    opacity: 1;
+    animation: score-current 5.6s cubic-bezier(0.35, 0.02, 0.45, 1) infinite;
+  }
+}
+@keyframes score-corona {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.995);
+  }
+  38% {
+    opacity: 1;
+    transform: scale(1.025);
+  }
+  66% {
+    opacity: 0.87;
+    transform: scale(1.008);
+  }
+}
+@keyframes score-aura {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.96) rotate(-5deg);
+  }
+  52% {
+    opacity: 1;
+    transform: scale(1.08) rotate(7deg);
+  }
+}
+@keyframes score-current {
+  from {
+    transform: rotate(20deg);
+  }
+  to {
+    transform: rotate(380deg);
+  }
 }

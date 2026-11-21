@@ -261,14 +261,8 @@ export function MorningSleepFields({
           </p>
         </section>
       </CheckInSection>
-      <SleepScoreSummary
-        ratingsHeadingId={`${id}-ratings-heading`}
-        value={value}
-        disabled={disabled}
-        onChange={(next) => onChange(withSleepStageTotals(next))}
-      />
       <CheckInSection
-        caption="Did Sleep Do Its Job?"
+        caption="How the Night Felt"
         detail={
           <span title="Rate how you feel now. High sleepiness means sleepier, not better rested; follow each slider’s end labels.">
             Body &gt; graph
@@ -299,6 +293,12 @@ export function MorningSleepFields({
           </div>
         </section>
       </CheckInSection>
+      <hr className={styles.recapDivider} data-sleep-recap-divider />
+      <SleepScoreSummary
+        value={value}
+        disabled={disabled}
+        onChange={(next) => onChange(withSleepStageTotals(next))}
+      />
     </div>
   );
 }

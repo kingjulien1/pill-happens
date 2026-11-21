@@ -1,10 +1,11 @@
 "use client";
 
 import { type CSSProperties } from "react";
+import { useSleepScoreMotion } from "./use-sleep-score-motion";
 import styles from "./sleep-score-ring.module.css";
 
 const ARC = "M55.653283 184.346717 A91 91 0 1 1 184.346717 184.346717";
-/** A static SVG score: edits update the arc without decorative render clocks. */
+/** Score edits stay native; the visible dial owns one bounded decorative layer. */
 export function SleepScoreRing({
   id,
   score,
@@ -19,18 +20,41 @@ export function SleepScoreRing({
   onScoreChange: (value: string) => void;
 }) {
   const positive = score !== null && score > 0;
+  const dial = useSleepScoreMotion(positive && !disabled);
   return (
     <div
+      ref={dial}
       className={styles.dial}
       data-sleep-score-ring
       data-active="false"
       data-score-known={score !== null}
       data-score-positive={positive}
+      data-score={score ?? undefined}
       style={{ "--score-offset": 100 - (score ?? 0) } as CSSProperties}
     >
       <span className={styles.aura} aria-hidden="true" />
       <svg className={styles.scene} viewBox="0 0 240 240" aria-hidden="true">
         <defs>
+          <filter
+            id={`${id}-score-bloom`}
+            x="-45%"
+            y="-45%"
+            width="190%"
+            height="190%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+          <filter
+            id={`${id}-score-corona`}
+            x="-25%"
+            y="-25%"
+            width="150%"
+            height="150%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur stdDeviation="2.5" />
+          </filter>
           <linearGradient
             id={`${id}-score-pigment`}
             x1="15"
@@ -73,10 +97,18 @@ export function SleepScoreRing({
         <g className={styles.filled}>
           <g className={styles.arcGlow}>
             <path
+              className={`${styles.progress} ${styles.bloom}`}
+              d={ARC}
+              pathLength="100"
+              stroke={`url(#${id}-score-pigment)`}
+              filter={`url(#${id}-score-bloom)`}
+            />
+            <path
               className={`${styles.progress} ${styles.glow}`}
               d={ARC}
               pathLength="100"
               stroke={`url(#${id}-score-pigment)`}
+              filter={`url(#${id}-score-corona)`}
             />
           </g>
           <path

@@ -35,12 +35,10 @@ export function SleepScoreSummary({
   value,
   disabled,
   onChange,
-  ratingsHeadingId,
 }: {
   value: MorningSleepDraft;
   disabled: boolean;
   onChange: (next: MorningSleepDraft) => void;
-  ratingsHeadingId?: string;
 }) {
   const id = useId();
   // Editing a score must not temporarily erase otherwise valid time/stage math.
@@ -70,9 +68,6 @@ export function SleepScoreSummary({
       unit: "/ h",
     },
   ];
-  const presentReadings =
-    readings.filter((reading) => reading.value !== null).length +
-    Number(score !== null);
   const sleepStages = stages.map((stage) => ({
     ...stage,
     minutes: reportNumber(value[stage.key], 1440),
@@ -81,51 +76,18 @@ export function SleepScoreSummary({
     ? sleepStages.reduce((sum, stage) => sum + stage.minutes!, 0)
     : null;
   const validStageTotal = stageTotal !== null && stageTotal <= 1440;
-  const windowLabel =
-    parsed?.lightsOut && parsed?.gotUp
-      ? `${parsed.lightsOut} → ${parsed.gotUp}`
-      : "Add bed & wake times";
-
-  const revisitFeelings = () => {
-    const target = ratingsHeadingId
-      ? document.getElementById(ratingsHeadingId)
-      : null;
-    if (!target) return;
-    target.tabIndex = -1;
-    target.focus({ preventScroll: true });
-    target.scrollIntoView({
-      block: "start",
-      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
-    });
-  };
-
   return (
     <div className={styles.wrapper}>
-      <div className={styles.heading}>
-        <h3 id={`${id}-heading`}>The Overnight Evidence</h3>
-        <span>
-          Tracker <span aria-hidden="true">·</span> Your context
-        </span>
-      </div>
       <section
         className={styles.section}
         aria-labelledby={`${id}-heading`}
         data-sleep-score-summary
       >
         <div className={styles.topline}>
-          <div>
-            <span>Bedtime → waking</span>
-            <strong>{windowLabel}</strong>
-          </div>
-          <div>
-            <span>Readings entered</span>
-            <strong>
-              {presentReadings}
-              <span> / 4</span>
-            </strong>
-          </div>
+          <h3 id={`${id}-heading`}>The Night, In Numbers</h3>
+          <span>
+            Sleep Cycle <span aria-hidden="true">·</span> Night recap
+          </span>
         </div>
 
         <div className={styles.overview}>
@@ -223,17 +185,8 @@ export function SleepScoreSummary({
         <footer className={styles.footer}>
           <p>
             Efficiency is time asleep ÷ time in bed. The score comes from your
-            tracker; your ratings below capture what the numbers miss.
+            tracker; your ratings above capture what the numbers miss.
           </p>
-          {ratingsHeadingId && (
-            <button
-              type="button"
-              className={styles.feelingsLink}
-              onClick={revisitFeelings}
-            >
-              Add your verdict <span aria-hidden="true">↗</span>
-            </button>
-          )}
         </footer>
       </section>
     </div>
