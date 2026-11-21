@@ -169,6 +169,12 @@
    native slider's touch area while reducing only the visible thumb and header. */
 .rating[data-morning-sleep-rating] .ratingHeading {
   min-height: 20px;
+  margin-bottom: -4px;
+}
+/* Keep the icon-only reset target above the slider's unchanged touch area. */
+.rating[data-morning-sleep-rating] .ratingValue {
+  position: relative;
+  z-index: 1;
 }
 .rating[data-morning-sleep-rating] .clearRating {
   display: inline-grid;

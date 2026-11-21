@@ -259,10 +259,19 @@ export function MorningSleepFields({
           </p>
         </section>
       </CheckInSection>
+      <SleepScoreSummary
+        ratingsHeadingId={`${id}-ratings-heading`}
+        value={value}
+        disabled={disabled}
+        onChange={(next) => onChange(withSleepStageTotals(next))}
+      />
       <CheckInSection
         caption="How the Night Felt"
-        context="Sleep Quality"
-        detail="Beyond the stats"
+        detail={
+          <span title="Higher numbers mean more of each feeling, not necessarily better sleep.">
+            More ≠ better
+          </span>
+        }
         headingId={`${id}-ratings-heading`}
       >
         <section
@@ -288,12 +297,6 @@ export function MorningSleepFields({
           </div>
         </section>
       </CheckInSection>
-      <SleepScoreSummary
-        ratingsHeadingId={`${id}-ratings-heading`}
-        value={value}
-        disabled={disabled}
-        onChange={(next) => onChange(withSleepStageTotals(next))}
-      />
     </div>
   );
 }
