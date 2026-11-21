@@ -24,6 +24,8 @@ type ToastSymbolKind =
 export const NOTIFICATION_COLLAPSE_EVENT =
   "pill-happens:collapse-notification-details";
 
+export type NotificationCollapseDetail = { target: HTMLElement };
+
 /** Split Lucide paths keep the lit cloud and emerald transfer arrows independent. */
 function CloudSync(props: SVGProps<SVGSVGElement>) {
   const lightId = useId();
@@ -336,16 +338,65 @@ export function Toaster({
       )
         collapse();
     };
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") collapse();
-    };
     document.addEventListener("pointerdown", outside, true);
-    document.addEventListener("keydown", escape);
     return () => {
       document.removeEventListener("pointerdown", outside, true);
-      document.removeEventListener("keydown", escape);
     };
   }, [stackOpen, collapse]);
+
+  useEffect(() => {
+    if (!count) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      const element = region.current;
+      if (!element) return;
+      const focused = document.activeElement?.closest<HTMLElement>(
+        ".journal-notification",
+      );
+      const focusedCard = focused && element.contains(focused) ? focused : null;
+      // A closed, focused card owns the next press through its native handler.
+      if (focusedCard?.dataset.expanded === "false") return;
+      const opened =
+        focusedCard ??
+        Array.from(
+          element.querySelectorAll<HTMLElement>(
+            '.journal-notification[data-expanded="true"][data-phase="idle"]',
+          ),
+        ).find(
+          (card) =>
+            !card.closest('[inert], [aria-hidden="true"]') &&
+            (expanded ||
+              card.closest<HTMLElement>("[data-sonner-toast]")?.dataset
+                .front !== "false"),
+        );
+      if (opened) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!event.repeat)
+          window.dispatchEvent(
+            new CustomEvent<NotificationCollapseDetail>(
+              NOTIFICATION_COLLAPSE_EVENT,
+              {
+                detail: { target: opened },
+              },
+            ),
+          );
+        return;
+      }
+      // Escape on the list itself still folds the fan without dismissing a card.
+      if (
+        stackOpen &&
+        event.target instanceof Node &&
+        element.contains(event.target)
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!event.repeat) collapse();
+      }
+    };
+    window.addEventListener("keydown", escape, true);
+    return () => window.removeEventListener("keydown", escape, true);
+  }, [count, expanded, stackOpen, collapse]);
 
   useEffect(() => {
     const element = region.current;

@@ -971,9 +971,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         single card. Inside an opened stack, the shared viewport scroller owns
         all vertical overflow and details lose their nested cap. Scroll reads
         vertically without starting a swipe. Sonner retains left/right/up
-        dismissal and its Alt+T focus shortcut. Escape from focused content
-        first closes an explicitly revealed multi-card fan; otherwise it
-        dismisses eligible notices. Pending Undo blocks pointer swipe starts and
+        dismissal and its Alt+T focus shortcut. Escape first collapses an open
+        notification and returns focus to its summary; the next press dismisses
+        that notice if eligible. Escape on the stack list folds the fan. Holding
+        Escape does not advance both steps. Pending Undo blocks pointer swipe starts and
         dismissal; it does not trap focus. Inline failure uses{" "}
         <code>role=&quot;alert&quot;</code>.
       </p>

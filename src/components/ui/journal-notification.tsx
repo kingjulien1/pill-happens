@@ -40,6 +40,7 @@ import {
   NOTIFICATION_COLLAPSE_EVENT,
   ToastSymbol,
   useNotificationStack,
+  type NotificationCollapseDetail,
 } from "@/components/ui/sonner";
 import { NotificationCountdownBadge } from "@/components/ui/notification-countdown-badge";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
@@ -566,7 +567,11 @@ export function JournalNotification({
   }, [phase, pause]);
 
   useEffect(() => {
-    const collapseFromBackdrop = () => closeDetails();
+    const collapseFromBackdrop = (event: Event) => {
+      const target = (event as CustomEvent<NotificationCollapseDetail>).detail
+        ?.target;
+      if (!target || target === root.current) closeDetails();
+    };
     window.addEventListener(NOTIFICATION_COLLAPSE_EVENT, collapseFromBackdrop);
     return () =>
       window.removeEventListener(
@@ -1014,26 +1019,19 @@ export function JournalNotification({
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ")
           suppressClick.current = false;
-        if (event.key === "Escape" && stack.expanded && stack.count > 1) {
-          event.preventDefault();
-          stack.collapse();
-          return;
-        }
-        if (event.key === "Escape" && expandedRef.current) {
-          event.preventDefault();
-          event.stopPropagation();
+        if (event.key !== "Escape" || event.defaultPrevented) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.repeat) return;
+        if (expandedRef.current) {
           closeDetails();
           return;
         }
-        if (
-          event.key === "Escape" &&
-          dismissible &&
-          phase === "idle" &&
-          undoState !== "pending"
-        ) {
-          event.stopPropagation();
+        if (dismissible && phase === "idle" && undoState !== "pending") {
           onRequestDismiss("dismiss");
+          return;
         }
+        if (stack.expanded && stack.count > 1) stack.collapse();
       }}
     >
       <div
