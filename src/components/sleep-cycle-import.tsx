@@ -204,16 +204,21 @@ export function SleepCycleImport({
     >
       <hr className={styles.separator} />
       <div className={styles.heading}>
-        <h3 id={`${id}-heading`} className={dialogStyles.title}>
-          Let the Report Talk.
-        </h3>
-        <div className={styles.subheading}>
-          <JournalDialogSubheading
-            title="Rest, Allegedly"
-            detail="Resurrection Pending"
-          />
+        <div>
+          <h3 id={`${id}-heading`} className={dialogStyles.title}>
+            Let the Report Talk.
+          </h3>
+          <div className={dialogStyles.context}>
+            <JournalDialogSubheading
+              title="Rest, Allegedly"
+              detail="Resurrection Pending"
+            />
+          </div>
         </div>
-        <p>
+        <p
+          className={`${dialogStyles.description} text-balance md:text-wrap`}
+          data-sleep-import-description
+        >
           Upload or paste your Sleep Cycle image to bring in the times, stages
           and score. Review the readings before applying them—the graph can
           testify, but you get to correct it.

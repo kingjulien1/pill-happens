@@ -17,27 +17,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
+  row-gap: 20px;
 }
 .heading h3 {
   margin: 0;
-}
-.subheading {
-  margin-bottom: 12px;
 }
 @media (min-width: 768px) {
   .heading {
     --check-in-title-size: 24px;
   }
-}
-.heading p {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin: 0;
-  color: var(--muted-foreground);
-  font-size: 11px;
-  line-height: 1.7;
 }
 .import
   .importButton.importButton[data-slot="button"][data-control-style="satin"] {
