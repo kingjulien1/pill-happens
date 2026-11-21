@@ -1021,7 +1021,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Rear-card rotation",
             "4.5s turns after the artwork entrance",
-            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. Both rear cards are 15.48% larger: about 50.98px violet and 48.20px pink, with the front tile and illustration rail unchanged. Hidden/folded layers pause; reduced motion keeps both still.",
+            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. Both rear cards have another one-seventh size increase: about 58.26px violet and 55.08px pink, with the front tile and illustration rail unchanged. Hidden/folded layers pause; reduced motion keeps both still. The outermost notification rim shares the front icon's resolved background color, including its transparency.",
           ],
           [
             "Status motion",

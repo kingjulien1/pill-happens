@@ -70,16 +70,6 @@
       color-mix(in srgb, var(--toast-surface) 65%, transparent) 0 0
     );
   --toast-tile: var(--color-mauve-900, oklch(21.2% 0.019 322.12));
-  --toast-tile-overlay: color-mix(
-    in srgb,
-    var(--color-fuchsia-900, oklch(40.1% 0.17 325.612)) 69%,
-    transparent
-  );
-  --toast-tile-glaze: color-mix(
-    in srgb,
-    var(--toast-deep-mix) 78%,
-    transparent
-  );
   --toast-glyph: #ffeaf6;
   --toast-accent: #fda5d5;
   --toast-bright: #fff1f8;
@@ -163,6 +153,7 @@
   }
 }
 .journal-toaster :is([data-type="success"], [data-kind="success"]) {
+  --toast-tile: var(--toast-icon-surface);
   --toast-accent: #fda5d5;
   --toast-bright: #ffe4f3;
   --toast-soft: #c4b5fd;
@@ -200,6 +191,21 @@
 .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"],
 .journal-notification {
   --toast-rim-muted: color-mix(in srgb, var(--toast-rim) 41%, transparent);
+  /* Resolve the icon's depth layers once for its face and the outer card rim. */
+  --toast-icon-fill: color-mix(
+    in srgb,
+    var(--toast-deep-mix) 78%,
+    color-mix(
+      in srgb,
+      var(--color-fuchsia-900, oklch(40.1% 0.17 325.612)) 69%,
+      var(--toast-tile)
+    )
+  );
+  --toast-icon-background: color-mix(
+    in srgb,
+    var(--toast-icon-fill) 82%,
+    transparent
+  );
   box-sizing: border-box;
   border: 0;
   border-radius: 18px;
@@ -220,7 +226,8 @@
   outline-offset: -6.3px;
   box-shadow:
     inset 0 0 0 var(--toast-outer-inset) var(--toast-rim-muted),
-    0 0 0 calc(5px * 4 / 3 - var(--toast-outer-inset)) var(--toast-rim-muted),
+    0 0 0 calc(5px * 4 / 3 - var(--toast-outer-inset))
+      var(--toast-icon-background),
     0 0 24px -9px
       color-mix(
         in srgb,
@@ -394,6 +401,7 @@
     var(--toast-art-arrival-delay) + var(--toast-art-arrival-duration) + 250ms
   );
   --toast-spin-period: 4.5s;
+  --toast-rear-scale: calc(8 / 7);
   position: relative;
   isolation: isolate;
   overflow: visible;
@@ -444,11 +452,11 @@
   border-radius: calc(12.25px * 31 / 24);
 }
 .journal-toast-plate-arrival-back {
-  --toast-plate-size: calc(35.37px * 1.18 * 97 / 84);
+  --toast-plate-size: calc(35.37px * 1.18 * 97 / 84 * var(--toast-rear-scale));
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
 }
 .journal-toast-plate-arrival-middle {
-  --toast-plate-size: calc(37.41px * 1.18 * 97 / 84);
+  --toast-plate-size: calc(37.41px * 1.18 * 97 / 84 * var(--toast-rear-scale));
   transform: translate(1.225px, 0) rotate(15deg);
 }
 /* Continuous turns never overwrite either the finite entrance or local sway. */
@@ -494,14 +502,6 @@
 }
 [data-toast-symbol="success"] {
   --toast-glyph: var(--toast-ink);
-  --toast-tile: var(
-    --toast-icon-surface,
-    color-mix(
-      in srgb,
-      var(--color-fuchsia-950, oklch(29.3% 0.136 325.661)) 85%,
-      transparent
-    )
-  );
 }
 .journal-toast-tile {
   position: relative;
@@ -519,9 +519,7 @@
   z-index: -1;
   border-radius: inherit;
   opacity: 0.82;
-  background:
-    linear-gradient(var(--toast-tile-glaze) 0 0),
-    linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
+  background: var(--toast-icon-fill);
   box-shadow:
     inset 0 0 0 var(--toast-tile-border)
       color-mix(in srgb, var(--toast-deep-mix) 35%, #09060d),
@@ -1216,7 +1214,7 @@
   inset: var(--frame-inset);
   border-radius: calc(18px - var(--frame-inset));
   z-index: 2;
-  box-shadow: 0 0 0 var(--frame-outer) var(--toast-rim-muted);
+  box-shadow: 0 0 0 var(--frame-outer) var(--toast-icon-background);
 }
 .journal-notification-frame::after {
   content: "";
