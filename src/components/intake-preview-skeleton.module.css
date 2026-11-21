@@ -1,0 +1,560 @@
+.skeleton {
+  --skeleton-period: 6.8s;
+  --skeleton-play-state: paused;
+  --skeleton-light: var(--foreground);
+  opacity: 0.45;
+  filter: grayscale(1);
+  animation: skeleton-presence var(--skeleton-period) ease-in-out infinite;
+  animation-play-state: var(--skeleton-play-state);
+  animation-fill-mode: both;
+}
+.skeleton[data-skeleton-motion="active"] {
+  --skeleton-play-state: running;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.wash,
+.grid,
+.scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wash {
+  background: radial-gradient(
+    ellipse at 12% 50%,
+    color-mix(in srgb, var(--skeleton-light) 13%, transparent),
+    transparent 68%
+  );
+  animation: skeleton-charge var(--skeleton-period) ease-in-out infinite;
+}
+.grid {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--skeleton-light) 12%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--skeleton-light) 8%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 18px 18px;
+  opacity: 0;
+  animation: skeleton-grid var(--skeleton-period) ease-in-out infinite;
+}
+.scan {
+  inset: -20% auto -20% -45%;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent 10%,
+    color-mix(in srgb, var(--skeleton-light) 16%, transparent) 58%,
+    color-mix(in srgb, var(--skeleton-light) 76%, transparent) 65%,
+    transparent 69%
+  );
+  opacity: 0;
+  animation: skeleton-scan var(--skeleton-period)
+    cubic-bezier(0.25, 0.08, 0.22, 1) infinite;
+}
+.trace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  stroke: var(--skeleton-light);
+  stroke-linecap: round;
+}
+.trace rect {
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  animation: skeleton-circuit var(--skeleton-period)
+    cubic-bezier(0.4, 0.02, 0.24, 1) infinite;
+}
+.traceTrail {
+  stroke-width: 8;
+  stroke-dasharray: 24 76;
+  opacity: 0.2;
+}
+.traceHead {
+  stroke-width: 2.2;
+  stroke-dasharray: 11 89;
+  opacity: 0.85;
+}
+.iconFrame {
+  animation: skeleton-frame var(--skeleton-period) cubic-bezier(0.3, 0, 0.2, 1)
+    infinite;
+}
+.iconStage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+}
+.icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  overflow: visible;
+  stroke-width: 1.8;
+  animation: skeleton-glyph var(--skeleton-period)
+    cubic-bezier(0.2, 0.75, 0.25, 1) infinite;
+}
+.icon path {
+  --fragment-x: -4px;
+  --fragment-y: 3.5px;
+  transform-box: view-box;
+  transform-origin: center;
+  animation: skeleton-fragment var(--skeleton-period) ease-in-out infinite;
+}
+.icon path:nth-child(even) {
+  --fragment-x: 4px;
+  --fragment-y: -3.5px;
+  animation-delay: 0.08s;
+}
+.iconRipple,
+.iconRippleSecond,
+.iconCore,
+.sparks {
+  position: absolute;
+  pointer-events: none;
+}
+.iconRipple,
+.iconRippleSecond {
+  inset: -12px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  animation: skeleton-ripple var(--skeleton-period)
+    cubic-bezier(0.12, 0.6, 0.2, 1) infinite;
+}
+.iconRippleSecond {
+  inset: -6px;
+  border-style: dashed;
+  animation-delay: 0.2s;
+}
+.iconCore {
+  inset: -5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--skeleton-light) 32%, transparent),
+    transparent 70%
+  );
+  animation: skeleton-core var(--skeleton-period) ease-in-out infinite;
+}
+.sparks {
+  inset: 0;
+}
+.sparks i {
+  --spark-x: -27px;
+  --spark-y: -25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0;
+  animation: skeleton-spark var(--skeleton-period)
+    cubic-bezier(0.15, 0.5, 0.2, 1) infinite;
+}
+.sparks i:nth-child(2) {
+  --spark-x: 27px;
+  --spark-y: -20px;
+  animation-delay: 0.12s;
+}
+.sparks i:nth-child(3) {
+  --spark-x: 22px;
+  --spark-y: 25px;
+  width: 2px;
+  height: 2px;
+  animation-delay: 0.22s;
+}
+.sparks i:nth-child(4) {
+  --spark-x: -24px;
+  --spark-y: 22px;
+  width: 2px;
+  height: 2px;
+  animation-delay: 0.3s;
+}
+.heading,
+.bottom {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding-inline-end: var(--entry-trailing-inset);
+}
+.heading {
+  gap: 18px;
+}
+.line {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  flex: 1;
+  min-width: 0;
+  height: 10.5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted-foreground) 24%, transparent);
+  transform-origin: left center;
+  animation: skeleton-line var(--skeleton-period)
+    cubic-bezier(0.22, 0.8, 0.24, 1) infinite;
+  animation-delay: var(--line-phase);
+}
+.heading .line {
+  height: 13.65px;
+}
+.heading .line:nth-child(2) {
+  transform-origin: right center;
+}
+.segments {
+  position: absolute;
+  inset: 2px 3px;
+  display: flex;
+  gap: 5px;
+}
+.segments i {
+  flex: 1;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--skeleton-light) 26%, transparent);
+  transform-origin: left;
+  opacity: 0.1;
+  animation: skeleton-segment var(--skeleton-period) ease-in-out infinite;
+  animation-delay: var(--line-phase);
+}
+.segments i:nth-child(2) {
+  animation-delay: calc(var(--line-phase) + 0.12s);
+}
+.segments i:nth-child(3) {
+  animation-delay: calc(var(--line-phase) + 0.24s);
+}
+.lineSheen {
+  position: absolute;
+  inset: -1px 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    100deg,
+    transparent 15%,
+    var(--skeleton-light) 48%,
+    transparent 56%,
+    color-mix(in srgb, var(--skeleton-light) 28%, transparent) 65%,
+    transparent 85%
+  );
+  opacity: 0;
+  animation: skeleton-sheen var(--skeleton-period)
+    cubic-bezier(0.22, 0.05, 0.16, 1) infinite;
+  animation-delay: var(--line-phase);
+}
+
+/* Every part shares one phase clock. Activity changes pause native timelines
+   together, without frame timers, React updates or new particles being created. */
+.skeleton .wash,
+.skeleton .grid,
+.skeleton .scan,
+.skeleton .trace rect,
+.skeleton .iconFrame,
+.skeleton .icon,
+.skeleton .icon path,
+.skeleton .iconRipple,
+.skeleton .iconRippleSecond,
+.skeleton .iconCore,
+.skeleton .sparks i,
+.skeleton .line,
+.skeleton .segments i,
+.skeleton .lineSheen {
+  animation-play-state: var(--skeleton-play-state);
+  animation-fill-mode: both;
+}
+@keyframes skeleton-charge {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scaleX(0.8);
+  }
+  30% {
+    opacity: 0.8;
+    transform: scaleX(1.03);
+  }
+  62% {
+    opacity: 0.4;
+    transform: scaleX(1);
+  }
+}
+@keyframes skeleton-presence {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  18% {
+    opacity: 0.56;
+  }
+  42% {
+    opacity: 0.78;
+  }
+  55% {
+    opacity: 0.85;
+  }
+  72% {
+    opacity: 0.66;
+  }
+  88% {
+    opacity: 0.45;
+  }
+}
+@keyframes skeleton-grid {
+  0%,
+  14%,
+  78%,
+  100% {
+    opacity: 0;
+  }
+  30%,
+  48% {
+    opacity: 0.3;
+  }
+  64% {
+    opacity: 0.12;
+  }
+}
+@keyframes skeleton-scan {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateX(0) skewX(-16deg);
+  }
+  24% {
+    opacity: 0.8;
+  }
+  56% {
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: translateX(420%) skewX(-16deg);
+  }
+}
+@keyframes skeleton-circuit {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+@keyframes skeleton-frame {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+  22% {
+    transform: translateY(2px) rotate(-8deg) scale(0.92);
+  }
+  39% {
+    transform: translateY(-3px) rotate(8deg) scale(1.1);
+  }
+  49% {
+    transform: translateY(0) rotate(-2deg) scale(1);
+  }
+  68% {
+    transform: translateY(-1px) rotate(2deg) scale(1.03);
+  }
+  84% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+@keyframes skeleton-glyph {
+  0%,
+  12% {
+    transform: rotate(0) scale(0.9);
+    opacity: 0.6;
+  }
+  27% {
+    transform: rotate(-24deg) scale(0.72);
+    opacity: 0.9;
+  }
+  43% {
+    transform: rotate(105deg) scale(1.24);
+    opacity: 1;
+  }
+  50%,
+  67% {
+    transform: rotate(90deg) scale(1);
+    opacity: 0.9;
+  }
+  83% {
+    transform: rotate(180deg) scale(0.96);
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotate(360deg) scale(0.9);
+    opacity: 0.6;
+  }
+}
+@keyframes skeleton-fragment {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.8;
+  }
+  16% {
+    transform: translate(var(--fragment-x), var(--fragment-y));
+    opacity: 0.35;
+  }
+  36%,
+  69% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  82% {
+    transform: translate(
+      calc(var(--fragment-x) * -0.5),
+      calc(var(--fragment-y) * -0.5)
+    );
+    opacity: 0.55;
+  }
+}
+@keyframes skeleton-ripple {
+  0%,
+  47% {
+    transform: scale(0.42);
+    opacity: 0;
+  }
+  53% {
+    opacity: 0.65;
+  }
+  72%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@keyframes skeleton-core {
+  0%,
+  20%,
+  89%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  40% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+  61% {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+}
+@keyframes skeleton-spark {
+  0%,
+  52% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0) rotate(0);
+  }
+  58% {
+    opacity: 0.9;
+  }
+  71% {
+    opacity: 0.6;
+    transform: translate(var(--spark-x), var(--spark-y)) scale(1) rotate(90deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--spark-x) * 1.3), calc(var(--spark-y) * 1.3))
+      scale(0) rotate(160deg);
+  }
+}
+@keyframes skeleton-line {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scaleX(0.72) scaleY(0.95);
+  }
+  18% {
+    opacity: 0.75;
+    transform: scaleX(0.48) scaleY(0.82);
+  }
+  35% {
+    opacity: 1;
+    transform: scaleX(1.025) scaleY(1.08);
+  }
+  43%,
+  67% {
+    opacity: 0.95;
+    transform: scaleX(1) scaleY(1);
+  }
+  86% {
+    opacity: 0.7;
+    transform: scaleX(0.8) scaleY(0.95);
+  }
+}
+@keyframes skeleton-segment {
+  0%,
+  16%,
+  100% {
+    opacity: 0.1;
+    transform: scaleX(0.75);
+  }
+  30% {
+    opacity: 0.65;
+    transform: scaleX(1);
+  }
+  46% {
+    opacity: 0.35;
+    transform: scaleX(1);
+  }
+  66% {
+    opacity: 0.75;
+    transform: scaleX(1);
+  }
+  84% {
+    opacity: 0.15;
+    transform: scaleX(0.9);
+  }
+}
+@keyframes skeleton-sheen {
+  0%,
+  25% {
+    opacity: 0;
+    transform: translateX(-115%);
+  }
+  35% {
+    opacity: 1;
+  }
+  61% {
+    opacity: 0.65;
+  }
+  74%,
+  100% {
+    opacity: 0;
+    transform: translateX(115%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none !important;
+    opacity: 0.45;
+  }
+  .skeleton *,
+  .skeleton *::before,
+  .skeleton *::after {
+    animation: none !important;
+  }
+  .icon {
+    opacity: 0.7;
+  }
+}
