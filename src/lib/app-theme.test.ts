@@ -370,7 +370,7 @@ test("generated application and offline CSS match the documented registry", asyn
   }
 });
 
-test("Iridescence canvas keeps exact overlays and readable copy at its brightest bounded shader output", () => {
+test("the unblurred iridescent field keeps its overlays and readable copy at peak brightness", () => {
   assert.equal(APP_CANVAS_BASE, "#29213b");
   assert.equal(
     APP_CANVAS_BASE,
@@ -378,7 +378,7 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
   );
   assert.equal(APP_IRIDESCENCE.color, "#7c3aed");
   assert.equal(APP_IRIDESCENCE.speed, 0.86);
-  assert.equal(APP_IRIDESCENCE.blur, 4);
+  assert.equal(APP_IRIDESCENCE.blur, 0);
   assert.equal(APP_IRIDESCENCE.brightness, 1.5);
   assert.equal(APP_IRIDESCENCE.hueShift, 0);
   assert.equal(APP_IRIDESCENCE.saturation, 1);
@@ -398,9 +398,8 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
   assert.ok(APP_CANVAS_BACKGROUND.startsWith(APP_CANVAS_OVERLAY));
   assert.ok(APP_CANVAS_BACKGROUND.endsWith(APP_CANVAS_BASE));
 
-  // The official cosine field is bounded by 0..1 before its selected tint and
-  // default 1.5 brightness. Pointer sheen and swirl are disabled. Bound every
-  // channel independently; the blur is an average and cannot exceed this bound.
+  // The moving CSS light planes stay within the original violet field's
+  // per-channel ceiling. Bound every channel before checking the reading inks.
   const shaderCeiling: AppThemeHex = `#${APP_IRIDESCENCE.colorRgb
     .map((channel) =>
       Math.min(255, Math.ceil(channel * APP_IRIDESCENCE.brightness * 255))

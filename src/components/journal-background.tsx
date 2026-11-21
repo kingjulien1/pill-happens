@@ -1,11 +1,15 @@
-/** A single mode-aware CSS still keeps the violet field without a render loop. */
+import { Iridescence } from "./iridescence";
+
+/** The stationary viewport mesh sits above the independently moving light field. */
 export function JournalBackground() {
   return (
     <div
       className="ambient"
       data-background="iridescence"
-      data-motion-profile="still"
+      data-motion-profile="compositor"
       aria-hidden="true"
-    />
+    >
+      <Iridescence />
+    </div>
   );
 }

@@ -1158,24 +1158,26 @@ export function DeveloperGuidePage() {
             </Detail>
             <Detail
               title="The Iridescence Background"
-              context="Static Violet Field &amp; Layered Tints"
+              context="Unblurred Violet Motion &amp; Viewport Mesh"
             >
               <p>
-                <code>JournalBackground</code> paints one static CSS field at
-                the root, shared across every route and appearance mode. It
-                keeps the original <code>#7c3aed</code> violet identity and
-                layered washes without a WebGL canvas, animation clock, resize
-                observer or pointer listener. The retired{" "}
-                <code>Iridescence</code> export is a no-op compatibility entry
-                point.
+                <code>JournalBackground</code> fills the dynamic viewport across
+                routes and appearance modes. <code>Iridescence</code> moves two
+                violet light planes using compositor transforms, with no blur,
+                WebGL context, JavaScript frame clock or resize observer. Its
+                original <code>#7c3aed</code> identity and layered washes remain.
+                Hidden tabs, open dialogs and reduced-motion preferences pause
+                the field; the loading handoff uses the existing entry gate.
               </p>
               <p>
                 Dark Mode combines Pink300 at 21% opacity and Purple900 at 69%
                 opacity above the violet field. A final 39% mesh blends orchid,
-                iris, rose, lagoon and violet in unequal, off-center elliptical
-                pools, with pastel equivalents in Light Mode. These gradients
-                stay still, so an idle page needs no continuous background
-                repaint. The original React Bits attribution and MIT + Commons
+                iris, rose, lagoon and violet in unequal elliptical pools, with
+                pastel equivalents in Light Mode. The lower-left rose/fuchsia
+                pool repeats at the upper right. This unblurred mesh stays
+                fixed above the moving light and scales to the entire viewport
+                without repeating or zooming with page length. The original
+                React Bits attribution and MIT + Commons
                 Clause notice remain at{" "}
                 <code>public/licenses/react-bits.txt</code>.
               </p>

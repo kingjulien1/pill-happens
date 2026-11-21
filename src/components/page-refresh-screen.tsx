@@ -104,6 +104,8 @@ export const PAGE_REFRESH_CRITICAL_CSS = String.raw`/* Critical server-rendered 
   inset: 0;
   z-index: -1;
   background: var(--app-canvas-accent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   opacity: var(--app-canvas-accent-opacity);
   pointer-events: none;
 }

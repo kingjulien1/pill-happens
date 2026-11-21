@@ -1084,8 +1084,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         its front face. There is no ambient background field; the late-countdown
         glow remains a separate paint-only overlay. This translucent surface is
         separate from the application canvas: opaque Plum/Black
-        <code> #29213b</code> beneath the violet Iridescence field, a light 4px
-        field blur, Pink300 at 21% and Purple900 at 69%. Loading and fallback
+        <code> #29213b</code> beneath the unblurred violet light field,
+        Pink300 at 21% and Purple900 at 69%. Loading and fallback
         views share a violet still with those same washes. Semantic reading
         panels retain light/dark roles.
       </p>

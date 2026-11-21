@@ -1,26 +1,106 @@
 .field {
   position: absolute;
   inset: 0;
+  isolation: isolate;
+  contain: strict;
+  overflow: hidden;
   pointer-events: none;
-  opacity: 0;
+  background: var(--app-iridescence-color, #7c3aed);
 }
 
-.field[data-ready="true"] {
-  opacity: 1;
-}
-
-.canvas {
+/* The light is baked into two gradient textures. Only their transforms move;
+   the full-screen accent mesh and color glazes remain stationary and sharp. */
+.field::before,
+.field::after {
+  content: "";
   position: absolute;
-  inset: -12px;
-  display: block;
-  width: calc(100% + 24px);
-  height: calc(100% + 24px);
-  /* Only the light field blurs. Text, cards and the two tint layers stay crisp. */
-  filter: blur(var(--app-iridescence-blur, 4px));
+  inset: -10%;
+  filter: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transform-origin: 50% 50%;
+  animation-play-state: paused;
+}
+.field::before {
+  background:
+    radial-gradient(ellipse 76% 65% at 22% 18%, #ba57ffad, transparent 72%),
+    conic-gradient(
+      from 210deg at 42% 42%,
+      #211344,
+      #7c3aed 22%,
+      #ba57ff 34%,
+      #493aeb 46%,
+      #241044 66%,
+      #7c3aed 83%,
+      #211344
+    );
+  animation: violet-flow var(--iridescence-flow-duration)
+    cubic-bezier(0.42, 0, 0.35, 1) infinite paused;
+  animation-delay: -5s;
+}
+.field::after {
+  background:
+    radial-gradient(
+      ellipse 85% 36% at 40% 35%,
+      transparent 28%,
+      #493aeb55 36%,
+      #ba57ffed 41%,
+      #7c3aed33 46%,
+      transparent 58%
+    ),
+    radial-gradient(ellipse 58% 80% at 76% 68%, #24104499, transparent 75%);
+  animation: violet-crossflow var(--iridescence-crossflow-duration)
+    cubic-bezier(0.4, 0.02, 0.28, 1) infinite paused;
+  animation-delay: -11s;
+}
+.field[data-active="true"]::before,
+.field[data-active="true"]::after {
+  animation-play-state: var(--page-entry-play-state, running);
 }
 
+/* Pause the page behind a modal; the refresh handoff uses the entry-state gate. */
+:global(body:has([data-slot="dialog-content"][data-open])) .field::before,
+:global(body:has([data-slot="dialog-content"][data-open])) .field::after,
+:global(body:has([data-slot="drawer-popup"][data-open])) .field::before,
+:global(body:has([data-slot="drawer-popup"][data-open])) .field::after {
+  animation-play-state: paused;
+}
 .overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: var(--app-canvas-overlay);
+}
+
+@keyframes violet-flow {
+  0%,
+  100% {
+    transform: translate3d(-3%, -3%, 0) rotate(-1.2deg) scale(1.04);
+  }
+  37% {
+    transform: translate3d(4%, 2%, 0) rotate(1.2deg) scale(1.06);
+  }
+  73% {
+    transform: translate3d(-2%, 4%, 0) rotate(-0.5deg) scale(1.04);
+  }
+}
+@keyframes violet-crossflow {
+  0%,
+  100% {
+    transform: translate3d(7%, 3%, 0) rotate(1deg) scale(1.06);
+  }
+  46% {
+    transform: translate3d(-7%, -4%, 0) rotate(-1deg) scale(1.08);
+  }
+  78% {
+    transform: translate3d(2%, 5%, 0) rotate(0.5deg) scale(1.04);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field::before,
+  .field::after {
+    animation: none;
+  }
 }

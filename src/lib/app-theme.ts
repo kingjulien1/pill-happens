@@ -93,7 +93,7 @@ export function withAppAlpha(color: AppThemeHex, opacity: number): AppThemeHex {
     .padStart(2, "0")}`;
 }
 
-/** Stable opaque foundation beneath the live shader and static fallback paint. */
+/** Stable opaque foundation beneath moving light and static fallback paint. */
 export const APP_CANVAS_BASE = mixAppColors(
   APP_FOUNDATION.plum,
   APP_FOUNDATION.black,
@@ -102,7 +102,7 @@ export const APP_CANVAS_BASE = mixAppColors(
 export const APP_CANVAS_FOREGROUND = "#ffffff";
 export const APP_CANVAS_MUTED_FOREGROUND = "#ded8ec";
 
-/** Shared rendering settings for the noninteractive React Bits Iridescence field. */
+/** Shared violet-field identity, speed and bounded color settings. */
 export const APP_IRIDESCENCE = Object.freeze({
   color: "#7c3aed",
   colorRgb: Object.freeze([124 / 255, 58 / 255, 237 / 255] as const),
@@ -121,7 +121,7 @@ export const APP_IRIDESCENCE = Object.freeze({
   opacity: 1,
   mouseReact: false,
   clickSwirl: false,
-  blur: 4,
+  blur: 0,
   pinkOpacity: 0.21,
   purpleOpacity: 0.69,
 });
@@ -154,9 +154,10 @@ const canvasAccentCss = (mode: AppThemeMode) => {
   const [orchid, iris, rose, lagoon, violet] = APP_CANVAS_ACCENT[mode];
   return `
   --app-canvas-accent:
-    radial-gradient(ellipse 67% 49% at -6% 9%, ${orchid} 0%, ${orchid} 12%, transparent 78%),
-    radial-gradient(ellipse 59% 68% at 108% 28%, ${iris} 0%, transparent 76%),
-    radial-gradient(ellipse 81% 58% at 31% 112%, ${rose} 0%, transparent 77%),
+    radial-gradient(ellipse 67% 49% at 6% 9%, ${orchid} 0%, ${orchid} 12%, transparent 78%),
+    radial-gradient(ellipse 61% 57% at 94% 8%, ${rose} 0%, transparent 77%),
+    radial-gradient(ellipse 59% 68% at 96% 38%, ${iris} 0%, transparent 76%),
+    radial-gradient(ellipse 81% 58% at 8% 94%, ${rose} 0%, transparent 77%),
     radial-gradient(ellipse 42% 54% at 88% 86%, ${lagoon} 0%, transparent 74%),
     radial-gradient(ellipse 59% 73% at 41% 39%, ${violet} 0%, transparent 82%);
   --app-canvas-accent-opacity: ${APP_CANVAS_ACCENT.opacity};
