@@ -1,0 +1,103 @@
+.eye {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 1.24em;
+  height: 1.24em;
+  margin-inline-end: 2px;
+  color: inherit;
+  pointer-events: none;
+}
+.glyph,
+.lid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.glyph {
+  transform-origin: center;
+}
+.lid {
+  opacity: 0;
+}
+.burst {
+  position: absolute;
+  inset: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  overflow: visible;
+}
+.ring,
+.rays {
+  opacity: 0;
+  transform-origin: 12px 12px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .eye[data-blinking] .glyph {
+    animation: eye-blink 620ms both;
+  }
+  .eye[data-blinking] .lid {
+    animation: eye-lid 620ms both;
+  }
+  .eye[data-blinking] .ring {
+    animation: eye-ring 420ms cubic-bezier(0.16, 1, 0.3, 1) 175ms both;
+  }
+  .eye[data-blinking] .rays {
+    animation: eye-rays 420ms cubic-bezier(0.16, 1, 0.3, 1) 195ms both;
+  }
+}
+@keyframes eye-blink {
+  0%,
+  100% {
+    transform: scaleY(1);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.8, 0.2);
+  }
+  24%,
+  32% {
+    transform: scaleY(0.04);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  72% {
+    transform: scaleY(1.035);
+    animation-timing-function: ease-out;
+  }
+}
+@keyframes eye-lid {
+  0%,
+  15%,
+  48%,
+  100% {
+    opacity: 0;
+  }
+  24%,
+  32% {
+    opacity: 1;
+  }
+}
+@keyframes eye-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+  18% {
+    opacity: 0.22;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+@keyframes eye-rays {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  20% {
+    opacity: 0.16;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
