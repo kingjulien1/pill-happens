@@ -570,6 +570,16 @@
 .journal-toaster [data-toast-symbol="success"] .journal-toast-bell-check {
   stroke: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
 }
+[data-toast-symbol="update"] {
+  --toast-cloud-light: color-mix(
+    in srgb,
+    var(--color-purple-100, #f3e8ff) 66.667%,
+    var(--color-purple-200, #e9d5ff)
+  );
+}
+.journal-toast-update-cloud-halo {
+  stroke: var(--toast-cloud-light);
+}
 .journal-toaster [data-toast-symbol="update"] .journal-toast-update-arrows {
   color: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
   stroke: currentColor;

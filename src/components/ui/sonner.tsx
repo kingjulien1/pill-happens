@@ -24,8 +24,11 @@ type ToastSymbolKind =
 export const NOTIFICATION_COLLAPSE_EVENT =
   "pill-happens:collapse-notification-details";
 
-/** Local split-path CloudSync lets only the transfer arrows carry emphasis. */
+/** Split Lucide paths keep the lit cloud and emerald transfer arrows independent. */
 function CloudSync(props: SVGProps<SVGSVGElement>) {
+  const lightId = useId();
+  const cloudOutline =
+    "M20.996 15.251A4.5 4.5 0 0 0 17.495 8h-1.79a7 7 0 1 0-12.709 5.607";
   return (
     <svg
       viewBox="0 0 24 24"
@@ -36,10 +39,48 @@ function CloudSync(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      <path
-        className="journal-toast-update-cloud"
-        d="M20.996 15.251A4.5 4.5 0 0 0 17.495 8h-1.79a7 7 0 1 0-12.709 5.607"
-      />
+      <defs>
+        <radialGradient id={`${lightId}-fill`} cx="43%" cy="28%" r="76%">
+          <stop stopColor="var(--toast-cloud-light)" stopOpacity=".98" />
+          <stop
+            offset=".55"
+            stopColor="var(--toast-cloud-light)"
+            stopOpacity=".7"
+          />
+          <stop
+            offset="1"
+            stopColor="var(--toast-cloud-light)"
+            stopOpacity=".04"
+          />
+        </radialGradient>
+        <filter
+          id={`${lightId}-halo`}
+          x="-45%"
+          y="-60%"
+          width="190%"
+          height="220%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feGaussianBlur stdDeviation="1.35" />
+        </filter>
+      </defs>
+      <g className="journal-toast-update-cloud">
+        <path
+          className="journal-toast-update-cloud-halo"
+          d={cloudOutline}
+          strokeWidth="5"
+          opacity=".82"
+          filter={`url(#${lightId}-halo)`}
+        />
+        {/* The closed helper follows Lucide Cloud, shifted up to match CloudSync.
+            Only its light is visible; no extra outline competes with the arrows. */}
+        <path
+          d="M17.5 17H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+          fill={`url(#${lightId}-fill)`}
+          stroke="none"
+        />
+        <path d={cloudOutline} />
+      </g>
       <g className="journal-toast-update-arrows">
         <path d="m17 18-1.535 1.605a5 5 0 0 1-8-1.5" />
         <path d="M17 22v-4h-4" />
