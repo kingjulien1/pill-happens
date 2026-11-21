@@ -165,41 +165,57 @@
   text-align: right;
 }
 
-/* Morning's subjective answers sit below the measured sleep details. Keep the
-   native slider's touch area while reducing only the visible thumb and header. */
+/* Compact visual spacing keeps the native range's full touch area. */
+.rating[data-morning-sleep-rating] {
+  --sleep-rating-ink: color-mix(
+    in srgb,
+    var(--color-violet-300, #c4b5fd) 67%,
+    transparent
+  );
+}
 .rating[data-morning-sleep-rating] .ratingHeading {
   min-height: 20px;
   margin-bottom: -4px;
 }
-/* Keep the icon-only reset target above the slider's unchanged touch area. */
+.rating[data-morning-sleep-rating] .ratingHeading label {
+  color: var(--sleep-rating-ink);
+  font-weight: 625;
+}
 .rating[data-morning-sleep-rating] .ratingValue {
-  position: relative;
-  z-index: 1;
+  color: var(--sleep-rating-ink);
 }
-.rating[data-morning-sleep-rating] .clearRating {
-  display: inline-grid;
-  width: 20px;
-  height: 20px;
-  min-height: 20px;
-  padding: 0;
-  place-items: center;
-  text-decoration: none;
+.rating[data-morning-sleep-rating] .ratingValue strong {
+  color: inherit;
+  font-weight: 725;
 }
-.rating[data-morning-sleep-rating] .clearRating svg {
-  width: 12px;
-  height: 12px;
+.rating[data-morning-sleep-rating] .ratingValue output > span {
+  font-weight: 600;
+}
+.rating[data-morning-sleep-rating] .ratingCaptions {
+  margin-top: -7px;
+  color: var(--sleep-rating-ink);
+  font-size: 8.5px;
+  font-weight: 450;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.rating[data-morning-sleep-rating] .ratingCaptions strong {
+  font-weight: 650;
+}
+.rating[data-morning-sleep-rating] .description {
+  color: var(--sleep-rating-ink);
 }
 .rating[data-morning-sleep-rating] .range {
   --slider-fill: color-mix(
     in srgb,
-    var(--color-purple-800, #6b21a8) 50%,
-    var(--color-purple-900, #581c87)
+    var(--color-purple-400, #c084fc) 50%,
+    var(--color-purple-500, #a855f7)
   );
-  --slider-rest: var(--slider-fill);
+  --slider-rest: var(--color-purple-200, #e9d5ff);
   --slider-dot: color-mix(
     in srgb,
-    var(--color-violet-500, #8b5cf6) 50%,
-    var(--color-purple-400, #c084fc)
+    var(--color-violet-200, #ddd6fe) 50%,
+    var(--color-purple-200, #e9d5ff)
   );
 }
 .rating[data-morning-sleep-rating] .range::-webkit-slider-thumb {
@@ -214,6 +230,18 @@
   height: 7.5px;
   border: 0;
   box-shadow: none;
+}
+.rating[data-morning-sleep-rating] .range:focus-visible {
+  outline: none;
+}
+.rating[data-morning-sleep-rating]
+  .range:focus-visible::-webkit-slider-runnable-track {
+  outline: 1.5px solid var(--ring);
+  outline-offset: 2px;
+}
+.rating[data-morning-sleep-rating] .range:focus-visible::-moz-range-track {
+  outline: 1.5px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .description {
