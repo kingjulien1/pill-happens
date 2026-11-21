@@ -925,11 +925,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last 3 active seconds",
-            "A 30.625px, noninteractive Pink200 3/2/1 marker appears exactly half outside the top-left card corner.",
+            "A 34px, noninteractive 3/2/1 clock badge straddles the rounded top-left card border, with Pink200 digits and a circular remaining-time arc.",
           ],
           [
             "Bar empty",
-            "The final 1 uses the same snap/turn/shrink departure as replaced digits; its shell then fades, leaving 1,000ms active grace for a final action.",
+            "The final 1 uses the same clipped flip departure as replaced digits; its case then folds and fades, leaving 1,000ms active grace for a final action.",
           ],
         ]}
       />
@@ -1000,8 +1000,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Urgency pulse / tiny marker",
-            "1,400ms → 450ms effective; marker 520ms in / 590ms numeral / 200ms out",
-            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. The 30.625px circular marker (all spatial values scaled by 1.225) arrives with a controlled snap-and-settle. Separate outgoing/incoming numeral layers share a 340ms departure for 3→2, 2→1 and 1→completion; the shell fades after that final departure begins. Pink200 tabular text is 12.25px at weight 750 on an opaque berry face. Its values follow actual active time, including the slowed finish. Holds freeze numeral/flare motion; reduced motion keeps the truthful value with a short final fade.",
+            "1,400ms → 450ms effective; badge 480ms in / 520ms beat / 360ms out",
+            "Bar and paint-only card pulse share the 50% → 0% ramp, separate from 40% → 10% Rose color urgency. The corner clock grows from inside the card and settles across its rim. Clipped incoming digits flip into place while old digits lift away; the same 260ms departure carries the final 1 out. A circular remaining-time arc, a brief casing rebound and one bounded ring pulse follow each change. Its opaque face uses 14.5px/800 tabular digits, with a matching daytime palette. Values follow actual active time. Holds settle to a readable digit; hidden and reduced-motion badges have no running effects. Every finite animation is removed when complete, with no extra timer or frame loop.",
           ],
           [
             "Main artwork / glyph",
@@ -1124,7 +1124,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last-seconds marker",
-            "30.625×30.625px circle, left 13.475px/top −15.3125px: exactly half above the card’s top edge near its upper-left corner. Full-opacity Pink200 text at 12.25px/750, an opaque deep-berry face, Pink200 rim and restrained glow. Borders, blur, shadows, flare and travel distances all use the 1.225 multiplier. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above the first card so its corner badge stays visible.",
+            "34×34px clock, centred at 6px/6px on the rounded top-left border with translate(−50%, −50%). Pink200 14.5px/800 digits sit inside a clipped dark face and a pink/violet progress bezel. Number flips, casing recoil and a short ring pulse replace the old spinning marker. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above and 16px at the sides, preserving the cards’ width while protecting the corner badge.",
           ],
           [
             "Header / unavailable Undo",

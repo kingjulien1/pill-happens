@@ -1,88 +1,119 @@
 .badge {
-  /* Every former 25px badge measure is scaled by the same 1.225 ratio. */
-  --countdown-badge-size: 30.625px;
+  --countdown-pearl: #fff1f8;
+  --countdown-orchid: #ddd6fe;
+  --countdown-pink: #f9a8d4;
+  /* Its centre sits on the rounded corner's diagonal, across the card rim. */
   position: absolute;
-  z-index: 4;
-  top: calc(var(--countdown-badge-size) / -2);
-  left: 13.475px;
-  display: inline-grid;
-  width: var(--countdown-badge-size);
-  height: var(--countdown-badge-size);
-  place-items: center;
-  padding: 0;
-  border: 0;
+  z-index: 7;
+  top: 6px;
+  left: 6px;
+  translate: -50% -50%;
+  display: block;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: linear-gradient(rgb(252 206 232 / 0.08) 0 0), #351325;
+  background: #211025;
   color: var(--color-pink-200, #fccee8);
   box-shadow:
-    inset 0 0 0 0.735px rgb(252 206 232 / 0.7),
-    0 2.45px 7.35px -2.45px rgb(53 19 37 / 0.55),
-    0 0 11.025px -3.675px rgb(249 168 212 / 0.36);
-  font-size: 12.25px;
-  font-weight: 750;
+    0 2px 8px #150b2455,
+    0 0 12px -5px #f9a8d47a;
+  font-size: 14.5px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  letter-spacing: 0.01225em;
-  opacity: 1;
   transform-origin: center;
   pointer-events: none;
+  user-select: none;
 }
-
 .badge[data-state="hidden"],
 .badge[data-hidden="true"] {
+  opacity: 0;
   visibility: hidden;
 }
-
-.badge[data-state="hidden"] {
-  opacity: 0;
+.face {
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 28% 15%, #f9a8d42e, transparent 76%), #32142f;
+  box-shadow:
+    inset 0 0 0 1px #fbcfe833,
+    inset 0 -3px 6px #10091b55;
 }
-
-.value,
-.outgoing {
-  grid-area: 1 / 1;
-  display: inline-block;
-  transform-origin: center;
-}
-
-.outgoing {
-  opacity: 0;
-}
-
-.flare {
+.bezel {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  box-shadow:
-    inset 0 0 0 1.47px rgb(252 206 232 / 0.65),
-    0 0 11.025px rgb(249 168 212 / 0.32);
+  width: 100%;
+  height: 100%;
+  rotate: -90deg;
+}
+.track {
+  stroke: #fbcfe824;
+  stroke-width: 2;
+}
+.arc {
+  stroke-width: 2.3;
+  stroke-linecap: round;
+}
+.badge[data-paused="true"] .bezel {
+  opacity: 0.72;
+}
+.digits {
+  position: absolute;
+  inset: 5px;
+  overflow: hidden;
+  border-radius: 50%;
+  perspective: 60px;
+}
+.value,
+.outgoing {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  backface-visibility: hidden;
+  transform-origin: 50% 55%;
+}
+.outgoing {
   opacity: 0;
+}
+.pulse {
+  position: absolute;
+  inset: -5px;
+  width: 44px;
+  height: 44px;
+  overflow: visible;
+  color: var(--countdown-pink);
+  stroke: currentColor;
+  stroke-width: 1.1;
+  opacity: 0;
+  transform-origin: center;
   pointer-events: none;
 }
-
-@media (prefers-reduced-transparency: reduce) {
-  .badge {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+.pulse path {
+  stroke: var(--countdown-pearl);
+  stroke-width: 1.3;
+  stroke-linecap: round;
 }
-
 @media (prefers-color-scheme: light) {
   .badge {
-    background: var(--color-pink-100, #fce7f3);
-    color: var(--color-pink-800, #9d174d);
+    --countdown-pearl: #fdf2f8;
+    --countdown-orchid: #c4b5fd;
+    --countdown-pink: #db2777;
+    background: #fce7f3;
+    color: #831843;
     box-shadow:
-      inset 0 0 0 0.735px
-        color-mix(in srgb, var(--color-pink-600, #db2777) 35%, transparent),
-      0 2.45px 7.35px -2.45px
-        color-mix(in srgb, var(--palette-plum) 20%, transparent),
-      0 0 11.025px -3.675px
-        color-mix(in srgb, var(--palette-rose) 30%, transparent);
+      0 2px 8px #6f335b2e,
+      0 0 12px -5px #db277754;
   }
-
-  .flare {
+  .face {
+    background:
+      radial-gradient(ellipse at 28% 15%, #ffffffd9, transparent 76%), #fbcfe8;
     box-shadow:
-      inset 0 0 0 1.47px
-        color-mix(in srgb, var(--color-pink-600, #db2777) 50%, transparent),
-      0 0 11.025px color-mix(in srgb, var(--palette-rose) 40%, transparent);
+      inset 0 0 0 1px #be185d29,
+      inset 0 -3px 6px #9d174d0f;
+  }
+  .track {
+    stroke: #9d174d26;
   }
 }

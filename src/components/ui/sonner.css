@@ -107,7 +107,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap);
-  width: calc(var(--width) + 20px);
+  width: calc(var(--width) + 32px);
   height: auto;
   max-height: calc(
     100dvh - var(--notification-viewport-top) -
@@ -116,8 +116,8 @@
         env(safe-area-inset-bottom, 0px) + 8px
       )
   );
-  /* Leave room for the last-seconds badge, centered on the card top edge. */
-  padding: 18px 10px 10px;
+  /* The corner clock extends past both edges; preserve the card's own width. */
+  padding: 18px 16px 10px;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
