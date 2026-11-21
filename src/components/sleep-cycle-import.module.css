@@ -13,13 +13,21 @@
   margin: 16px 0 20px;
 }
 .heading {
+  --check-in-title-size: 22px;
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 16px;
 }
 .heading h3 {
-  margin: 0 0 7px;
+  margin: 0;
+}
+.subheading {
+  margin-bottom: 12px;
+}
+@media (min-width: 768px) {
+  .heading {
+    --check-in-title-size: 24px;
+  }
 }
 .heading p {
   display: -webkit-box;
