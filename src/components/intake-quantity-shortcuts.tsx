@@ -23,8 +23,14 @@ export function IntakeQuantityShortcuts({
   return (
     <div className={styles.root} data-intake-quantity-shortcuts>
       <div className={styles.caption} aria-hidden="true">
-        <span>Quick amounts</span>
-        <span>{disabled ? "Choose medication first" : "Tap to set"}</span>
+        <span>Quick Amounts</span>
+        <span>
+          {disabled
+            ? "Choose medication first"
+            : strengthMg > 0
+              ? `1 ${unit} = ${formatDose(strengthMg)} mg`
+              : `Amounts in ${units}`}
+        </span>
       </div>
       <div
         className={styles.options}
