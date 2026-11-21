@@ -116,7 +116,7 @@
     radial-gradient(ellipse at 28% 50%, #c084fc26, transparent 60%),
     radial-gradient(ellipse at 73% 50%, #38bdf826, transparent 60%);
   transform: scale(0.9);
-  animation: halo-breathe 2400ms ease-in-out infinite;
+  animation: none;
 }
 
 .arcWide,
@@ -135,7 +135,7 @@
   border: 1px solid color-mix(in srgb, var(--symbol-violet) 12%, transparent);
   border-top-color: color-mix(in srgb, var(--symbol-violet) 40%, transparent);
   border-bottom-color: color-mix(in srgb, var(--symbol-blue) 32%, transparent);
-  animation: arc-tilt 2400ms ease-in-out infinite;
+  animation: none;
 }
 
 .arcInner {
@@ -176,8 +176,7 @@
     color-mix(in srgb, var(--symbol-accent) 10%, transparent);
   transform: translate(var(--token-x), var(--token-y))
     rotate(var(--token-angle));
-  animation: token-dance 2400ms cubic-bezier(0.45, 0, 0.25, 1)
-    var(--token-delay, 0ms) infinite;
+  animation: none;
 }
 
 .token > svg {
@@ -243,7 +242,7 @@
   color: #5b21b6;
   box-shadow: 0 3px 14px #8b5cf629;
   transform: rotate(-5deg) scale(1);
-  animation: core-focus 2400ms ease-in-out infinite;
+  animation: none;
 }
 
 .core > svg {
@@ -262,7 +261,7 @@
     transparent 63%
   );
   transform: translateX(-100%);
-  animation: sheen-pass 2400ms ease-in-out infinite;
+  animation: none;
 }
 
 .glint {
@@ -271,7 +270,7 @@
   display: inline-flex;
   color: var(--symbol-blue);
   transform: scale(0.55) rotate(-15deg);
-  animation: glint-pop 1200ms ease-in-out infinite;
+  animation: none;
 }
 
 .glint > svg {

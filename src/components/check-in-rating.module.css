@@ -65,7 +65,11 @@
 }
 
 .range {
-  --slider-fill: color-mix(in srgb, var(--navigation-selection-ink) var(--navigation-selection-weight), var(--navigation-surface));
+  --slider-fill: color-mix(
+    in srgb,
+    var(--navigation-selection-ink) var(--navigation-selection-weight),
+    var(--navigation-surface)
+  );
   --slider-dot: color-mix(in srgb, var(--slider-fill) 70.83%, white);
   --slider-rest: color-mix(in srgb, var(--slider-fill) 48%, transparent);
   display: block;
@@ -88,8 +92,7 @@
   background: linear-gradient(
     to right,
     var(--slider-fill) 0 var(--rating-progress),
-    var(--slider-rest)
-      var(--rating-progress) 100%
+    var(--slider-rest) var(--rating-progress) 100%
   );
 }
 
@@ -100,7 +103,9 @@
   border: 0;
   border-radius: 50%;
   background: var(--slider-dot);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--menu-foreground) 45%, transparent), 0 1px 4px color-mix(in srgb, var(--foreground) 12%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--menu-foreground) 45%, transparent),
+    0 1px 4px color-mix(in srgb, var(--foreground) 12%, transparent);
   -webkit-appearance: none;
   appearance: none;
 }
@@ -123,7 +128,9 @@
   border: 0;
   border-radius: 50%;
   background: var(--slider-dot);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--menu-foreground) 45%, transparent), 0 1px 4px color-mix(in srgb, var(--foreground) 12%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--menu-foreground) 45%, transparent),
+    0 1px 4px color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
 .rating[data-rated="false"] .range::-webkit-slider-thumb {
@@ -156,6 +163,51 @@
 
 .ratingCaptions > span:last-child {
   text-align: right;
+}
+
+/* Morning's subjective answers sit below the measured sleep details. Keep the
+   native slider's touch area while reducing only the visible thumb and header. */
+.rating[data-morning-sleep-rating] .ratingHeading {
+  min-height: 20px;
+}
+.rating[data-morning-sleep-rating] .clearRating {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0;
+  place-items: center;
+  text-decoration: none;
+}
+.rating[data-morning-sleep-rating] .clearRating svg {
+  width: 12px;
+  height: 12px;
+}
+.rating[data-morning-sleep-rating] .range {
+  --slider-fill: color-mix(
+    in srgb,
+    var(--color-purple-800, #6b21a8) 50%,
+    var(--color-purple-900, #581c87)
+  );
+  --slider-rest: var(--slider-fill);
+  --slider-dot: color-mix(
+    in srgb,
+    var(--color-violet-500, #8b5cf6) 50%,
+    var(--color-purple-400, #c084fc)
+  );
+}
+.rating[data-morning-sleep-rating] .range::-webkit-slider-thumb {
+  width: 7.5px;
+  height: 7.5px;
+  margin-top: -1.75px;
+  border: 0;
+  box-shadow: none;
+}
+.rating[data-morning-sleep-rating] .range::-moz-range-thumb {
+  width: 7.5px;
+  height: 7.5px;
+  border: 0;
+  box-shadow: none;
 }
 
 .description {

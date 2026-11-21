@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IntakeCardShine } from "@/components/intake-card-shine";
 import { MedicationCard } from "@/components/medication-card";
 import { MedicationCardDose } from "@/components/medication-card-dose";
 import {
@@ -85,7 +84,6 @@ export function IntakeCard({
       data-intake-card={entry.id}
       data-intake-card-action
       data-shine-eligible={shineEligible}
-      decoration={<IntakeCardShine seed={entry.id} eligible={shineEligible} />}
       artworkControls={
         linkMedication ? (
           <Link

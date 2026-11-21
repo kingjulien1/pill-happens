@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
-  AlarmClockCheck,
-  ArrowRight,
+  ClipboardPaste,
   ImageDown,
   LoaderCircle,
   Check,
   X,
 } from "lucide-react";
+import { ActionIcon } from "./action-icon";
+import {
+  pastedSleepImage,
+  isSleepImagePasteTarget,
+  readSleepImageClipboard,
+} from "@/lib/sleep-image-clipboard";
 import { TodayActionButton } from "./today-action-button";
 import { Button } from "./ui/button";
 import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
@@ -22,6 +27,13 @@ import {
   type MorningSleepDraft,
 } from "@/lib/morning-sleep";
 import styles from "./sleep-cycle-import.module.css";
+import dialogStyles from "./responsive-modal.module.css";
+import { SleepImportAlarm } from "./sleep-import-alarm";
+import { usePendingSleepImage } from "./use-pending-sleep-image";
+import {
+  acknowledgeSleepImage,
+  getPendingSleepImage,
+} from "@/lib/shared-sleep-image";
 
 export function SleepCycleImport({
   value,
@@ -34,14 +46,25 @@ export function SleepCycleImport({
 }) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
+  const section = useRef<HTMLElement>(null);
+  const mounted = useRef(false);
   const task = useRef<AbortController | null>(null);
   const [reading, setReading] = useState(false);
+  const [pasting, setPasting] = useState(false);
   const [message, setMessage] = useState("");
   const [review, setReview] = useState<ReportValues | null>(null);
   const [count, setCount] = useState(0);
-  useEffect(() => () => task.current?.abort(), []);
+  const pendingImage = usePendingSleepImage();
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      task.current?.abort();
+    };
+  }, []);
 
-  async function load(file: File) {
+  const load = useCallback(async (file: File) => {
+    if (!mounted.current) return;
     task.current?.abort();
     const controller = new AbortController();
     task.current = controller;
@@ -52,6 +75,7 @@ export function SleepCycleImport({
     try {
       const { readSleepCycleImage } =
         await import("@/lib/read-sleep-cycle-image");
+      controller.signal.throwIfAborted();
       const result = await readSleepCycleImage(
         file,
         controller.signal,
@@ -78,6 +102,74 @@ export function SleepCycleImport({
     } finally {
       if (!controller.signal.aborted) setReading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!pendingImage || disabled || reading || pasting) return;
+    let cancelled = false;
+    // Receive the external handoff after commit; a replacement/closed form must
+    // not consume a newer file or start a duplicate reader during effect replay.
+    queueMicrotask(() => {
+      if (cancelled || getPendingSleepImage()?.id !== pendingImage.id) return;
+      void load(pendingImage.file);
+      acknowledgeSleepImage(pendingImage.id);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pendingImage, disabled, reading, pasting, load]);
+
+  useEffect(() => {
+    const paste = (event: ClipboardEvent) => {
+      if (
+        disabled ||
+        reading ||
+        pasting ||
+        event.defaultPrevented ||
+        isSleepImagePasteTarget(event.target)
+      )
+        return;
+      if (
+        !section.current ||
+        section.current.closest('[inert], [aria-hidden="true"]')
+      )
+        return;
+      const file = pastedSleepImage(event.clipboardData);
+      if (!file) return;
+      event.preventDefault();
+      void load(file);
+    };
+    document.addEventListener("paste", paste);
+    return () => document.removeEventListener("paste", paste);
+  }, [disabled, reading, pasting, load]);
+
+  async function pasteImage() {
+    if (disabled || reading || pasting) return;
+    if (!navigator.clipboard?.read) {
+      setMessage(
+        "Use your browser’s Paste command with a copied image, or choose Scan My Snooze.",
+      );
+      return;
+    }
+    setPasting(true);
+    try {
+      const file = await readSleepImageClipboard(() =>
+        navigator.clipboard.read(),
+      );
+      if (!mounted.current) return;
+      if (file) void load(file);
+      else
+        setMessage(
+          "No image on the clipboard. Copy your sleep report image, then try Paste Image again.",
+        );
+    } catch {
+      if (mounted.current)
+        setMessage(
+          "Paste wasn’t allowed. Tap Paste Image and choose Paste in the browser prompt, or choose Scan My Snooze.",
+        );
+    } finally {
+      if (mounted.current) setPasting(false);
+    }
   }
 
   function apply() {
@@ -91,20 +183,32 @@ export function SleepCycleImport({
 
   return (
     <section
+      ref={section}
       className={styles.import}
       aria-labelledby={`${id}-heading`}
-      aria-busy={reading}
+      aria-busy={reading || pasting}
+      onDragOver={(event) => {
+        if (
+          Array.from(event.dataTransfer.items).some(
+            (item) => item.kind === "file" && item.type.startsWith("image/"),
+          )
+        )
+          event.preventDefault();
+      }}
+      onDrop={(event) => {
+        const file = pastedSleepImage(event.dataTransfer);
+        if (!file) return;
+        event.preventDefault();
+        if (!disabled && !reading && !pasting) void load(file);
+      }}
     >
       <hr className={styles.separator} />
       <div className={styles.heading}>
-        <AlarmClockCheck
-          className={styles.mark}
-          size={38}
-          strokeWidth={1.8}
-          aria-hidden="true"
-        />
+        <SleepImportAlarm />
         <div>
-          <h3 id={`${id}-heading`}>Sleep, With Receipts.</h3>
+          <h3 id={`${id}-heading`} className={dialogStyles.title}>
+            Sleep, With Receipts.
+          </h3>
           <p>
             Bring your Sleep Cycle report. We’ll read the times, stages and
             score, then let you check the numbers. One less job for your morning
@@ -117,7 +221,7 @@ export function SleepCycleImport({
         hidden
         type="file"
         accept="image/*"
-        disabled={disabled || reading}
+        disabled={disabled || reading || pasting}
         onChange={(event) => {
           const file = event.target.files?.[0];
           event.target.value = "";
@@ -126,40 +230,53 @@ export function SleepCycleImport({
       />
       <TodayActionButton
         type="button"
-        className={styles.importButton}
-        radius={17}
-        disabled={disabled || reading}
-        style={{ ...getIntakeActionThemeStyle(), height: 48, minHeight: 48 }}
+        data-intake-paint="satin"
+        className={`intake-primary-cta ${styles.importButton}`}
+        radius={14.7}
+        disabled={disabled || reading || pasting}
+        style={{
+          ...getIntakeActionThemeStyle(),
+          height: 50.4,
+          minHeight: 50.4,
+        }}
         onClick={() => input.current?.click()}
       >
-        {reading ? (
-          <LoaderCircle
-            className={styles.spinner}
-            size={17}
-            style={{ color: "var(--control-ink)" }}
-            aria-hidden="true"
-          />
-        ) : (
-          <ImageDown
-            size={17}
-            style={{ color: "var(--control-ink)" }}
-            aria-hidden="true"
-          />
-        )}
-        <span>{reading ? "Reading Your Snooze…" : "Scan My Snooze"}</span>
-        <span className={styles.buttonAside}>
-          / {reading ? `${count} of 11` : "Import Report"}
+        <span className="intake-primary-row">
+          <span className="intake-primary-copy">
+            <span className="intake-primary-label">
+              {reading ? (
+                <LoaderCircle
+                  className={styles.spinner}
+                  size={14}
+                  aria-hidden="true"
+                />
+              ) : (
+                <ImageDown size={14} aria-hidden="true" />
+              )}
+              <span>{reading ? "Reading Your Snooze…" : "Scan My Snooze"}</span>
+            </span>
+            <span className="intake-primary-dot" aria-hidden="true">
+              ·
+            </span>
+            <span className="intake-primary-aside">
+              {reading ? `${count} of 11` : "Import Report"}
+            </span>
+          </span>
+          <ActionIcon name="next" className="intake-primary-next" />
         </span>
-        <ArrowRight
-          size={17}
-          style={{ color: "var(--control-ink)" }}
-          aria-hidden="true"
-        />
       </TodayActionButton>
-      <p className={styles.hint}>
-        Use the full portrait share image. It stays on this device; the readings
-        go into your editable draft.
-      </p>
+      <div className={styles.importActions}>
+        <Button
+          type="button"
+          variant="ghost"
+          className={styles.pasteButton}
+          disabled={disabled || reading || pasting}
+          onClick={() => void pasteImage()}
+        >
+          <ClipboardPaste size={14} aria-hidden="true" />
+          {pasting ? "Choose Paste…" : "Paste Image"}
+        </Button>
+      </div>
       {message && (
         <p role="status" className={styles.status}>
           {message}

@@ -111,7 +111,11 @@
 }
 
 .form {
-  --checkin-section-edge: color-mix(in srgb, var(--checkin-line) 14%, transparent);
+  --checkin-section-edge: color-mix(
+    in srgb,
+    var(--checkin-line) 14%,
+    transparent
+  );
   --checkin-feeling-selection-surface: color-mix(
     in srgb,
     var(--color-pink-300, #f9a8d4) 12%,
@@ -325,6 +329,9 @@
 .submitArea::before {
   margin-bottom: 24px;
 }
+.form[data-check-in-form="morning"] .submitArea::before {
+  border-top: 0;
+}
 .saveHint {
   margin: 18px 0 2px;
   opacity: 0.5;
@@ -393,23 +400,39 @@
   @supports (background-clip: text) or (-webkit-background-clip: text) {
     .shinyTitle {
       display: inline-block;
-      background-image: linear-gradient(126deg, var(--foreground) 26.5%, #fae8ff 50%, var(--foreground) 73.5%);
+      background-image: linear-gradient(
+        126deg,
+        var(--foreground) 26.5%,
+        #fae8ff 50%,
+        var(--foreground) 73.5%
+      );
       background-size: 300% 100%;
       background-position: 100% center;
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
-      animation: checkin-title-shine 5.2s linear infinite;
+      animation: none;
     }
   }
 }
 
 /* Sweep for 3.2 seconds, then rest at the base color for two seconds. */
 @keyframes checkin-title-shine {
-  0% { background-position: 100% center; }
-  61.54%, 100% { background-position: 0% center; }
-  0%, 61.54%, 100% { filter: drop-shadow(0 0 2px transparent); }
-  30.77% { filter: drop-shadow(0 0 2px rgb(250 232 255 / 50%)); }
+  0% {
+    background-position: 100% center;
+  }
+  61.54%,
+  100% {
+    background-position: 0% center;
+  }
+  0%,
+  61.54%,
+  100% {
+    filter: drop-shadow(0 0 2px transparent);
+  }
+  30.77% {
+    filter: drop-shadow(0 0 2px rgb(250 232 255 / 50%));
+  }
 }
 
 @property --checkin-save-angle {
@@ -425,7 +448,10 @@
   position: absolute;
   inset: calc(var(--control-surround-width) - var(--shine-width));
   padding: var(--shine-width);
-  border-radius: calc(var(--intake-card-radius, 21px) - var(--control-surround-width) + var(--shine-width));
+  border-radius: calc(
+    var(--intake-card-radius, 21px) - var(--control-surround-width) +
+      var(--shine-width)
+  );
   background: conic-gradient(
     from var(--checkin-save-angle),
     var(--checkin-section-edge),
@@ -438,20 +464,27 @@
     var(--color-purple-600, #9333ea) 91%,
     var(--checkin-section-edge)
   );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   mask-composite: exclude;
   pointer-events: none;
 }
 .submitArea [data-dialog-primary-button][data-control-style="satin"]::before {
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
+  box-shadow: 0 1px 3px
+    color-mix(in srgb, var(--control-shadow) 25%, transparent);
 }
 @media (prefers-reduced-motion: no-preference) {
   .submitArea [data-dialog-primary-button][data-control-style="satin"]::after {
-    animation: checkin-save-shine 5.2s linear infinite;
+    animation: none;
   }
 }
 @keyframes checkin-save-shine {
-  to { --checkin-save-angle: 486deg; }
+  to {
+    --checkin-save-angle: 486deg;
+  }
 }

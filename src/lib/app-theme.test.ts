@@ -4,6 +4,7 @@ import test from "node:test";
 import { format } from "prettier";
 import {
   APP_CANVAS_BASE,
+  APP_CANVAS_ACCENT,
   APP_CANVAS_BACKGROUND,
   APP_CANVAS_OVERLAY,
   APP_CANVAS_BY_MODE,
@@ -417,7 +418,7 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
       mixAppColors("#fda5d5", background, APP_IRIDESCENCE.pinkOpacity),
       APP_IRIDESCENCE.purpleOpacity,
     );
-  const backgrounds = [
+  const backgrounds: AppThemeHex[] = [
     APP_CANVAS_BASE,
     overlay("#000000"),
     overlay(APP_IRIDESCENCE.color),
@@ -433,7 +434,12 @@ test("Iridescence canvas keeps exact overlays and readable copy at its brightest
       APP_THEME_VALUES[mode]["canvas-muted-foreground"],
       APP_CANVAS_MUTED_FOREGROUND,
     );
-    for (const background of backgrounds)
+    for (const background of backgrounds.flatMap((base) => [
+      base,
+      ...APP_CANVAS_ACCENT.dark.map((pigment) =>
+        mixAppColors(pigment, base, APP_CANVAS_ACCENT.opacity),
+      ),
+    ]))
       for (const copy of [
         "canvas-foreground",
         "canvas-muted-foreground",
@@ -482,7 +488,13 @@ test("daylight canvas copy stays readable across all bounded shader channels and
     "#f3e3f0",
     APP_LIGHT_CANVAS.base,
   ] as const)
-    assert.ok(contrast(values["canvas-muted-foreground"], still) >= 4.5);
+    for (const background of [
+      still,
+      ...APP_CANVAS_ACCENT.light.map((pigment) =>
+        mixAppColors(pigment, still, APP_CANVAS_ACCENT.opacity),
+      ),
+    ])
+      assert.ok(contrast(values["canvas-muted-foreground"], background) >= 4.5);
   assert.ok(getAppCanvasCss("light").includes(APP_LIGHT_CANVAS.base));
   assert.ok(getAppCanvasCss("dark").includes(APP_CANVAS_BASE));
   const head = renderAppCanvasRules();

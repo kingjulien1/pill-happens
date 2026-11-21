@@ -14,7 +14,6 @@ import { ActionIcon } from "@/components/action-icon";
 import { JOURNAL_REFERENCE_REVEAL_EVENT } from "@/lib/journal-reference-navigation";
 import { useIntakeGroupSurface } from "@/components/use-intake-group-surface";
 import { IntakeCard } from "@/components/intake-card";
-import { settleIntakeGroupEntrance } from "@/components/intake-timeline-entrance";
 import { useIntakeStackGroupControl } from "@/components/intake-stack-controller";
 import { usePersistentIntakeStackView } from "@/components/journal-drafts";
 import { toLocalInput, type Intake, type Medication } from "@/lib/domain";
@@ -238,7 +237,6 @@ export function IntakeCardGroup({
   }, []);
 
   const applyOpen = (showing: boolean, bulk: boolean) => {
-    if (cards.current) settleIntakeGroupEntrance(cards.current);
     const from = view;
     const target = showing
       ? showIntakeStackChildren(group.entries, from)
@@ -339,7 +337,7 @@ export function IntakeCardGroup({
       data-intake-group={group.id}
       data-group-size={count}
       data-grouped={grouped}
-      data-group-entry-state={grouped ? "pending" : undefined}
+      data-group-entry-state={grouped ? "done" : undefined}
       data-expanded={open}
       data-stack-moving={display.moving}
       data-stack-head-count={view.heads.length}

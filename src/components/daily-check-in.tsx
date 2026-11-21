@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, useSyncExternalStore } from "react";
+import { useCallback, useId, useState } from "react";
 import {
   BedDouble,
   Coffee,
@@ -28,14 +28,17 @@ import {
   DraftStatus,
   useJournalWorkspace,
   usePersistentDraft,
+  useWorkspaceSnapshot,
 } from "@/components/journal-drafts";
+import type { WorkspaceSnapshot } from "@/lib/journal-drafts";
+import { shallowEqual } from "@/lib/external-store-selector";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowUpRight, LibraryBig } from "lucide-react";
 import { rememberJournalDestination } from "@/components/journal-drafts";
 import { CheckInSection } from "./check-in-section";
-import { DailyMoodPicker } from "@/components/daily-mood-picker";
 import { EveningDayRatings } from "@/components/evening-day-ratings";
 import { SmallReminders } from "@/components/small-reminders";
 import {
@@ -44,9 +47,7 @@ import {
   serializeReminders,
   type ReminderItem,
 } from "@/lib/check-in-reminders";
-import { DailyReflectionEditor } from "@/components/daily-reflection-editor";
 import { useReflectionSave } from "@/components/use-reflection-save";
-import { MorningSleepFields } from "@/components/morning-sleep-fields";
 import {
   hasMorningSleepContent,
   parseMorningSleepDraft,
@@ -87,6 +88,22 @@ import { cn } from "@/lib/utils";
 import styles from "./daily-check-in.module.css";
 import closeStyles from "./dialog-close.module.css";
 
+const DailyMoodPicker = dynamic(() =>
+  import("@/components/daily-mood-picker").then(
+    (module) => module.DailyMoodPicker,
+  ),
+);
+const DailyReflectionEditor = dynamic(() =>
+  import("@/components/daily-reflection-editor").then(
+    (module) => module.DailyReflectionEditor,
+  ),
+);
+const MorningSleepFields = dynamic(() =>
+  import("@/components/morning-sleep-fields").then(
+    (module) => module.MorningSleepFields,
+  ),
+);
+
 type CheckInProps = {
   day: string;
   checkIn?: DailyCheckIn;
@@ -125,12 +142,20 @@ export function DailyCheckInSection({
   const completion = morning
     ? getMorningCheckInCompletion(saved ? checkIn : undefined)
     : getCheckInCompletion(saved ? checkIn : undefined);
-  const snapshot = useSyncExternalStore(
-    workspace.store.subscribe,
-    workspace.store.getSnapshot,
-    workspace.store.getServerSnapshot,
+  const selectCardDraft = useCallback(
+    (snapshot: WorkspaceSnapshot) => ({
+      draft: snapshot.drafts[checkInDraftKey(day, period)]?.value,
+      openedAt: snapshot.checkInOpenedAt[checkInDraftKey(day, period)],
+      status: snapshot.status,
+    }),
+    [day, period],
   );
-  const storedDraft = snapshot.drafts[checkInDraftKey(day, period)]?.value;
+  const snapshot = useWorkspaceSnapshot(
+    workspace.store,
+    selectCardDraft,
+    shallowEqual,
+  );
+  const storedDraft = snapshot.draft;
   const hasChanges = hasCheckInDraftChanges(
     storedDraft,
     currentCheckIn,
@@ -142,7 +167,7 @@ export function DailyCheckInSection({
     draft: storedDraft,
   });
   const hint = morning ? "Still here. Take stock." : "Survived? Leave notes.";
-  const openedAt = snapshot.checkInOpenedAt[checkInDraftKey(day, period)];
+  const openedAt = snapshot.openedAt;
   const opened = getCheckInOpenedTime(openedAt, timeZone);
   const dormantProgress =
     !progress.visible && !isCheckInOpenedTimestamp(openedAt);
@@ -299,7 +324,11 @@ export function DailyCheckInSection({
         scrollKey={checkInDraftKey(targetDay, period)}
         returnFocus={returnToCard}
         headerVariant="check-in"
-        title={<span className={styles.shinyTitle}>{checkInHeading(targetDay, period)}</span>}
+        title={
+          <span className={styles.shinyTitle}>
+            {checkInHeading(targetDay, period)}
+          </span>
+        }
         headerActions={
           <Button
             type="reset"
@@ -317,7 +346,15 @@ export function DailyCheckInSection({
         }
         context={
           <JournalDialogSubheading
-            title={<time dateTime={targetDay}>{formatDay(targetDay, { weekday: "long", month: undefined, day: undefined })}</time>}
+            title={
+              <time dateTime={targetDay}>
+                {formatDay(targetDay, {
+                  weekday: "long",
+                  month: undefined,
+                  day: undefined,
+                })}
+              </time>
+            }
             detail={formatDay(targetDay, { weekday: undefined, month: "long" })}
           />
         }

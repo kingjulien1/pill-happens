@@ -16,6 +16,7 @@ import { HEADER_CONTROL_PAINT } from "@/lib/header-control-paint";
 import { useJournalWorkspace } from "@/components/journal-drafts";
 import { CardEntrySequence } from "@/components/card-entry-sequence";
 import { JournalReferenceArrival } from "@/components/journal-reference-arrival";
+import { SharedSleepImageReceiver } from "@/components/shared-sleep-image-receiver";
 import { dayKey, formatDay } from "@/lib/domain";
 import layoutStyles from "./page-layout.module.css";
 import guideStyles from "./guide-shell.module.css";
@@ -99,6 +100,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         guidePage ? "guide" : intakePage ? "timeline" : "collection"
       }
     >
+      <SharedSleepImageReceiver />
       <header
         key={path === "/" ? "today" : "shared"}
         ref={topbar}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import {
   MedicationCardBackground,
@@ -12,10 +12,6 @@ import { formatDose, type Medication } from "@/lib/domain";
 import type { MedicationRecordStats } from "@/lib/journal-reference-details";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationType } from "@/lib/medication-types";
-import {
-  getPageEntryReadiness,
-  subscribePageEntryReadiness,
-} from "@/lib/page-entry-readiness";
 import styles from "./journal-reference-details.module.css";
 import { Button } from "@/components/ui/button";
 
@@ -41,7 +37,7 @@ export function ReferenceBackLink({
   );
 }
 
-/** A finite arrival and one quiet shared loop; unseen or curtained art stays parked. */
+/** Static reference artwork keeps long medication histories inexpensive to browse. */
 export function ReferenceHero({
   artwork,
   eyebrow,
@@ -53,54 +49,8 @@ export function ReferenceHero({
   title: ReactNode;
   children?: ReactNode;
 }) {
-  const root = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const node = root.current;
-    if (!node) return;
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    let visible = false;
-    const sync = () => {
-      node.dataset.detailMotion =
-        visible &&
-        !document.hidden &&
-        getPageEntryReadiness() &&
-        !reduced.matches
-          ? "running"
-          : "paused";
-    };
-    const observer =
-      typeof IntersectionObserver === "function"
-        ? new IntersectionObserver(
-            ([entry]) => {
-              visible = entry.isIntersecting;
-              sync();
-            },
-            { threshold: 0.05 },
-          )
-        : null;
-    if (observer) observer.observe(node);
-    else {
-      visible = true;
-      sync();
-    }
-    const unsubscribe = subscribePageEntryReadiness(sync);
-    document.addEventListener("visibilitychange", sync);
-    reduced.addEventListener("change", sync);
-    return () => {
-      observer?.disconnect();
-      unsubscribe();
-      document.removeEventListener("visibilitychange", sync);
-      reduced.removeEventListener("change", sync);
-    };
-  }, []);
   return (
-    <div
-      ref={root}
-      className={styles.hero}
-      data-card-entry
-      data-reference-hero
-      data-detail-motion="paused"
-    >
+    <div className={styles.hero} data-card-entry data-reference-hero>
       <span className={styles.heroWash} aria-hidden="true" />
       <div className={styles.heroStage} aria-hidden="true">
         <span className={styles.heroHalo} />
@@ -108,26 +58,6 @@ export function ReferenceHero({
         <span className={styles.heroArrival}>
           <span className={styles.heroFloat}>{artwork}</span>
         </span>
-        {[
-          [-64, -29],
-          [51, -48],
-          [70, 18],
-          [35, 57],
-          [-47, 52],
-          [-73, 5],
-        ].map(([x, y], index) => (
-          <i
-            key={index}
-            className={styles.heroParticle}
-            style={
-              {
-                "--burst-x": `${x}px`,
-                "--burst-y": `${y}px`,
-                "--burst-delay": `${index * 32}ms`,
-              } as CSSProperties
-            }
-          />
-        ))}
       </div>
       <p className={styles.eyebrow}>{eyebrow}</p>
       <p className={styles.heroTitle}>{title}</p>

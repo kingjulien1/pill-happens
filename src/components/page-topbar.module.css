@@ -291,8 +291,8 @@
       calc(100% - var(--topbar-rule-fade)),
     transparent 100%
   );
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   filter: blur(0.35px);
   pointer-events: none;
 }

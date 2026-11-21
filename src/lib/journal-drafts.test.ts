@@ -1723,6 +1723,83 @@ test("dialog scroll survives close and reload while isolating route, form identi
   assert.deepEqual(other.getSnapshot().scrollViews, {});
 });
 
+test("page scroll checkpoints stay durable without notifying unrelated forms, and unchanged checkpoints do not write", () => {
+  const storage = memoryStorage();
+  let writes = 0;
+  const workspace = createDraftWorkspace("page_scroll_quiet");
+  workspace.hydrate({
+    getItem: storage.getItem,
+    setItem: (key, value) => {
+      writes++;
+      storage.setItem(key, value);
+    },
+  });
+  workspace.setLocation("/", "", 0);
+  let emissions = 0;
+  workspace.subscribe(() => emissions++);
+  workspace.setLocation("/", "", 140);
+  const durableWrites = writes;
+  workspace.setLocation("/", "", 140);
+  workspace.setLocation("/", "", 140);
+  assert.equal(
+    writes,
+    durableWrites,
+    "unchanged coordinates do not rewrite drafts",
+  );
+  assert.equal(emissions, 0, "scroll positions do not rerender journal forms");
+  const reopened = createDraftWorkspace("page_scroll_quiet");
+  reopened.hydrate(storage);
+  assert.equal(reopened.getSnapshot().screens["/"].scrollY, 140);
+
+  workspace.setLocation("/", "#reflection", 140);
+  assert.equal(
+    emissions,
+    1,
+    "a changed navigation target still reaches consumers",
+  );
+});
+
+test("an unchanged page location still imports changed drafts from another tab", () => {
+  const storage = memoryStorage();
+  const first = createDraftWorkspace("page_scroll_shared");
+  first.hydrate(storage);
+  first.setLocation("/", "", 140);
+  const stale = createDraftWorkspace("page_scroll_shared");
+  stale.hydrate(storage);
+  let emissions = 0;
+  stale.subscribe(() => emissions++);
+  first.setDraft("med:new", { name: "Written in the other tab" });
+  stale.setLocation("/", "", 140);
+  assert.deepEqual(stale.getSnapshot().drafts["med:new"].value, {
+    name: "Written in the other tab",
+  });
+  assert.equal(
+    emissions,
+    1,
+    "imported writing is never hidden by a quiet checkpoint",
+  );
+});
+
+test("an unchanged page location never hides damaged storage or overwrites its bytes", () => {
+  const storage = memoryStorage();
+  const workspace = createDraftWorkspace("page_scroll_damaged");
+  workspace.hydrate(storage);
+  workspace.setLocation("/", "", 140);
+  workspace.setDraft("med:new", { name: "Keep this draft" });
+  const [key] = [...storage.entries.keys()];
+  const damaged = "{unfinished workspace";
+  storage.setItem(key, damaged);
+  let emissions = 0;
+  workspace.subscribe(() => emissions++);
+  workspace.setLocation("/", "", 140);
+  assert.equal(workspace.getSnapshot().status, "error");
+  assert.equal(emissions, 1, "the save warning remains observable");
+  assert.equal(storage.getItem(key), damaged);
+  assert.deepEqual(workspace.getSnapshot().drafts["med:new"].value, {
+    name: "Keep this draft",
+  });
+});
+
 test("scroll-only writes are quiet, bounded and cannot overwrite fields or hide storage errors", () => {
   const workspace = createDraftWorkspace("journal_scroll_a");
   workspace.hydrate(memoryStorage());

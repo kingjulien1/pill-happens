@@ -72,7 +72,7 @@
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
-  animation: journal-rim-travel 17s ease-in-out infinite;
+  animation: none;
   animation-play-state: var(--journal-motion);
 }
 .editor::before {
@@ -306,8 +306,8 @@
   color: #f9f2fc;
   font-size: 13.8px;
   font-weight: 500;
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   text-align: start;
 }
 .captionRow {

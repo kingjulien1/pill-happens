@@ -134,16 +134,15 @@ export const SOURCE_GROUPS = [
   },
   {
     title: "Interaction & Effects",
-    description:
-      "The ambient field, action button, shared modals and arrival motion.",
+    description: "The static ambient field, action button and shared modals.",
     files: [
       [
         "src/components/journal-background.tsx",
-        "Root field, static fallback and input-inert host",
+        "Static root field and input-inert host",
       ],
       [
         "src/components/iridescence.tsx",
-        "Passive Iridescence shader and lifecycle",
+        "Retired renderer compatibility export",
       ],
       [
         "src/components/iridescence.module.css",
@@ -156,7 +155,7 @@ export const SOURCE_GROUPS = [
       ],
       [
         "src/components/specular-rim.tsx",
-        "WebGL rim and fallback coordination",
+        "Retired WebGL rim compatibility export",
       ],
       [
         "src/components/accent-button.tsx",
@@ -164,7 +163,7 @@ export const SOURCE_GROUPS = [
       ],
       [
         "src/components/accent-button.module.css",
-        "First-frame field, light well and rounded moving rim",
+        "Static field, light well and rounded rim",
       ],
       [
         "src/components/responsive-modal.tsx",

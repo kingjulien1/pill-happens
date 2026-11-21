@@ -1,98 +1,22 @@
-"use client";
-
-import { useEffect, useId, useRef } from "react";
-import { CardIconSettle } from "@/components/card-icon-settle";
-import scene from "./check-in-card-artwork.module.css";
+import { useId } from "react";
 import styles from "./journal-preview-artwork.module.css";
 
 /** An open book, tucked bookmark and two quiet cover layers share the check-in frame. */
 export function JournalPreviewArtwork({ paused }: { paused: boolean }) {
-  const root = useRef<HTMLSpanElement>(null);
   const id = useId();
-
-  useEffect(() => {
-    const element = root.current;
-    if (!element) return;
-    const card = element.closest<HTMLElement>("[data-card-entry]");
-    const ready = element.closest<HTMLElement>("[data-page-entry-ready]");
-    const refresh = element.closest<HTMLElement>("[data-page-refresh-content]");
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    let visible = !("IntersectionObserver" in window);
-    let frame = 0;
-    const sync = () => {
-      element.dataset.artworkActive = String(
-        visible &&
-          !paused &&
-          !document.hidden &&
-          !reduced.matches &&
-          card?.dataset.cardEntryState !== "pending" &&
-          getComputedStyle(element)
-            .getPropertyValue("--page-entry-play-state")
-            .trim() !== "paused",
-      );
-    };
-    const queue = () => {
-      if (!frame)
-        frame = requestAnimationFrame(() => {
-          frame = 0;
-          sync();
-        });
-    };
-    const intersection =
-      "IntersectionObserver" in window
-        ? new IntersectionObserver(([entry]) => {
-            visible = entry.isIntersecting;
-            sync();
-          })
-        : null;
-    intersection?.observe(element);
-    const mutations = new MutationObserver(queue);
-    for (const target of new Set([
-      document.documentElement,
-      document.body,
-      card,
-      ready,
-      refresh,
-    ]))
-      if (target)
-        mutations.observe(target, {
-          attributes: true,
-          attributeFilter: [
-            "class",
-            "style",
-            "data-card-entry-state",
-            "data-page-entry-ready",
-            "data-page-refresh-active",
-          ],
-        });
-    document.addEventListener("visibilitychange", sync);
-    reduced.addEventListener("change", queue);
-    queue();
-    return () => {
-      cancelAnimationFrame(frame);
-      intersection?.disconnect();
-      mutations.disconnect();
-      document.removeEventListener("visibilitychange", sync);
-      reduced.removeEventListener("change", queue);
-    };
-  }, [paused]);
 
   return (
     <span
-      ref={root}
-      className={`${scene.stage} ${styles.artwork}`}
+      className={styles.artwork}
       aria-hidden="true"
       data-journal-preview-artwork
-      data-artwork-active="false"
       data-artwork-dialog-open={paused}
     >
-      <span className={scene.halo} />
       <span className={`${styles.cover} ${styles.coverBack}`} />
       <span className={`${styles.cover} ${styles.coverFront}`} />
-      <span className={`${scene.arrival} ${styles.arrival}`}>
-        <span className={`${scene.tile} ${styles.tile}`} data-journal-icon-tile>
-          <span className={scene.wash} />
-          <svg className={scene.frame} viewBox="0 0 48 48" fill="none">
+      <span className={styles.arrival}>
+        <span className={styles.tile} data-journal-icon-tile>
+          <svg className={styles.frame} viewBox="0 0 48 48" fill="none">
             <defs>
               <linearGradient
                 id={id}
@@ -108,7 +32,6 @@ export function JournalPreviewArtwork({ paused }: { paused: boolean }) {
               </linearGradient>
             </defs>
             <rect
-              className={scene.frameTrace}
               x="2.5"
               y="2.5"
               width="43"
@@ -118,7 +41,7 @@ export function JournalPreviewArtwork({ paused }: { paused: boolean }) {
               stroke={`url(#${id})`}
             />
           </svg>
-          <span className={scene.symbolArrival}>
+          <span className={styles.symbol}>
             <svg
               className={styles.book}
               viewBox="0 0 32 32"
@@ -163,7 +86,6 @@ export function JournalPreviewArtwork({ paused }: { paused: boolean }) {
           </span>
         </span>
       </span>
-      <CardIconSettle owner="check-in" />
     </span>
   );
 }

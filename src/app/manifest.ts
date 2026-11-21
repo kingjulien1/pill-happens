@@ -12,6 +12,47 @@ export default function manifest(): MetadataRoute.Manifest {
     prefer_related_applications: false,
     background_color: APP_CANVAS_BASE,
     theme_color: APP_CANVAS_BASE,
+    share_target: {
+      action: "/share-sleep-report",
+      method: "POST",
+      enctype: "multipart/form-data",
+      params: {
+        files: [
+          {
+            name: "sleep-report",
+            accept: [
+              "image/png",
+              ".png",
+              "image/jpeg",
+              ".jpg",
+              ".jpeg",
+              "image/webp",
+              ".webp",
+              "image/gif",
+              ".gif",
+              "image/avif",
+              ".avif",
+              "image/heic",
+              ".heic",
+              "image/heif",
+              ".heif",
+            ],
+          },
+        ],
+      },
+    },
+    file_handlers: [
+      {
+        action: "/?open-sleep-report=1",
+        accept: {
+          "image/png": [".png"],
+          "image/jpeg": [".jpg", ".jpeg"],
+          "image/webp": [".webp"],
+          "image/gif": [".gif"],
+          "image/avif": [".avif"],
+        },
+      },
+    ],
     icons: [
       {
         src: "/icons/app/icon-192.png",

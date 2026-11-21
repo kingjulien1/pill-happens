@@ -1,8 +1,20 @@
 "use client";
 
-import { CalendarCheck, Clock3, NotebookTabs, Pill, Route, StickyNote, Sunrise, Tags } from "lucide-react";
+import {
+  CalendarCheck,
+  Clock3,
+  NotebookTabs,
+  Pill,
+  Route,
+  StickyNote,
+  Sunrise,
+  Tags,
+} from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
-import { getMedicationCategories, getMedicationCategory } from "@/lib/medication-categories";
+import {
+  getMedicationCategories,
+  getMedicationCategory,
+} from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -99,7 +111,9 @@ export function IntakeForm({
   useEffect(() => {
     onResetAvailability?.(draft.hasDraft && !busy);
   }, [onResetAvailability, draft.hasDraft, busy]);
-  const showRestoredHelp = Boolean(formId && draft.hasDraft && draft.restored && draft.status === "saved");
+  const showRestoredHelp = Boolean(
+    formId && draft.hasDraft && draft.restored && draft.status === "saved",
+  );
   useEffect(() => {
     onRestoredHint?.(showRestoredHelp);
     return () => onRestoredHint?.(false);
@@ -142,7 +156,12 @@ export function IntakeForm({
     medicationForm,
     medication?.name ?? fallbackIntake?.medicationName,
   );
-  const presets = intakeQuantityShortcuts(medicationId, data!.intakes, medication?.defaultQuantity, fallbackPresets);
+  const presets = intakeQuantityShortcuts(
+    medicationId,
+    data!.intakes,
+    medication?.defaultQuantity,
+    fallbackPresets,
+  );
   // Keep the raw draft intact until a quantity interaction explicitly replaces it.
   const unchangedOriginalQuantity = Boolean(
     intake &&
@@ -187,20 +206,22 @@ export function IntakeForm({
         delta < 0 && Number(next) < increment ? String(increment) : next,
       );
   };
-  let previewTime = "";
-  let belongsTo = "";
-  try {
-    previewTime = fromLocalInput(takenAt, timezone);
-    belongsTo = dayKey(previewTime, timezone);
-  } catch {
-    /* shown on submit */
-  }
+  const { previewTime, belongsTo } = useMemo(() => {
+    try {
+      const timestamp = fromLocalInput(takenAt, timezone);
+      return { previewTime: timestamp, belongsTo: dayKey(timestamp, timezone) };
+    } catch {
+      return { previewTime: "", belongsTo: "" };
+    }
+  }, [takenAt, timezone]);
 
   const otherEntries = useMemo(() => {
     if (!belongsTo || !medicationId) return 0;
-    return data!.intakes.filter((entry) =>
-      entry.id !== intake?.id && entry.medicationId === medicationId &&
-      dayKey(entry.takenAt, timezone) === belongsTo
+    return data!.intakes.filter(
+      (entry) =>
+        entry.id !== intake?.id &&
+        entry.medicationId === medicationId &&
+        dayKey(entry.takenAt, timezone) === belongsTo,
     ).length;
   }, [belongsTo, data, intake?.id, medicationId, timezone]);
 
@@ -236,7 +257,7 @@ export function IntakeForm({
       </form>
     );
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy) return;
     setError("");
@@ -247,6 +268,8 @@ export function IntakeForm({
       }
       // The draft stores its original instant and the zone of any edited field.
       const timestamp = intakeDraftTimestamp(draft.value);
+      // This runs only from onSubmit, so it must check the actual submit time.
+      // eslint-disable-next-line react-hooks/purity
       if (new Date(timestamp).getTime() > Date.now()) {
         setError("Choose a time that has already happened.");
         return;
@@ -365,7 +388,7 @@ export function IntakeForm({
         err instanceof Error ? err.message : "Unable to save. Try again.",
       );
     }
-  }
+  };
 
   return (
     <form
@@ -462,7 +485,10 @@ export function IntakeForm({
                     <span>{formatQuantityShortcut(amount)}</span>
                     {strength > 0 && (
                       <span className="text-[10px] leading-tight opacity-50">
-                        {formatDose(doseMg({ strengthMg: strength, quantity: amount }))} mg
+                        {formatDose(
+                          doseMg({ strengthMg: strength, quantity: amount }),
+                        )}{" "}
+                        mg
                       </span>
                     )}
                   </button>
@@ -487,36 +513,81 @@ export function IntakeForm({
         </CheckInSection>
       </fieldset>
 
-      <div className={`${checkStyles.sectionDivider} ${styles.previewDivider}`} role="separator" />
-      <section className={styles.preview} aria-labelledby="intake-preview-title">
-        <FinalLookHeading id="intake-preview-title" showIcon color={medication && getMedicationColor(medication.color)} />
-        {belongsTo && validQuantity && effectiveQuantity !== null && (medication || fallbackIntake) ? (
-          <MedicationPreview record={{
-            kind: "intake",
-            name: medication?.name ?? fallbackIntake!.medicationName,
-            medication: medication ? medicationNotificationSnapshot(medication) : undefined,
-            strengthMg: strength,
-            quantity: effectiveQuantity,
-            form: medicationForm,
-            route,
-            takenAt: previewTime,
-            timeZone: timezone,
-          }} />
+      <div
+        className={`${checkStyles.sectionDivider} ${styles.previewDivider}`}
+        role="separator"
+      />
+      <section
+        className={styles.preview}
+        aria-labelledby="intake-preview-title"
+      >
+        <FinalLookHeading
+          id="intake-preview-title"
+          showIcon
+          color={medication && getMedicationColor(medication.color)}
+        />
+        {belongsTo &&
+        validQuantity &&
+        effectiveQuantity !== null &&
+        (medication || fallbackIntake) ? (
+          <MedicationPreview
+            record={{
+              kind: "intake",
+              name: medication?.name ?? fallbackIntake!.medicationName,
+              medication: medication
+                ? medicationNotificationSnapshot(medication)
+                : undefined,
+              strengthMg: strength,
+              quantity: effectiveQuantity,
+              form: medicationForm,
+              route,
+              takenAt: previewTime,
+              timeZone: timezone,
+            }}
+          />
         ) : (
-          <p className="text-center text-sm text-muted-foreground">Choose a medication, amount and time to preview your entry.</p>
+          <p className="text-center text-sm text-muted-foreground">
+            Choose a medication, amount and time to preview your entry.
+          </p>
         )}
         {belongsTo && validQuantity && (medication || fallbackIntake) && (
-          <IntakePreviewDetails rows={[
-            { icon: NotebookTabs, text: `${otherEntries === 0 ? "No other entries" : `${otherEntries} other ${otherEntries === 1 ? "entry" : "entries"}`} for this medication on this tracking day.` },
-            { icon: CalendarCheck, text: `Tracking day · ${formatDay(belongsTo, { weekday: "long", month: "short" })}` },
-            { icon: Pill, text: `Recorded strength · ${formatDose(strength)} mg per ${type.unit}` },
-            { icon: Route, text: `Intake route · ${INTAKE_ROUTES.find((item) => item.value === route)?.label ?? "Not specified"}` },
-            { icon: Clock3, text: `Time taken · ${takenAt.slice(11, 16)} (${timezone})` },
-            ...(getMedicationCategories(medication).length ? [{
-              icon: Tags, text: `Categories · ${getMedicationCategories(medication).map((kind) => getMedicationCategory(kind).label).join(", ")}`,
-            }] : []),
-            ...(intake?.note?.trim() ? [{ icon: StickyNote, text: `Entry note · ${intake.note}` }] : []),
-          ]} />
+          <IntakePreviewDetails
+            rows={[
+              {
+                icon: NotebookTabs,
+                text: `${otherEntries === 0 ? "No other entries" : `${otherEntries} other ${otherEntries === 1 ? "entry" : "entries"}`} for this medication on this tracking day.`,
+              },
+              {
+                icon: CalendarCheck,
+                text: `Tracking day · ${formatDay(belongsTo, { weekday: "long", month: "short" })}`,
+              },
+              {
+                icon: Pill,
+                text: `Recorded strength · ${formatDose(strength)} mg per ${type.unit}`,
+              },
+              {
+                icon: Route,
+                text: `Intake route · ${INTAKE_ROUTES.find((item) => item.value === route)?.label ?? "Not specified"}`,
+              },
+              {
+                icon: Clock3,
+                text: `Time taken · ${takenAt.slice(11, 16)} (${timezone})`,
+              },
+              ...(getMedicationCategories(medication).length
+                ? [
+                    {
+                      icon: Tags,
+                      text: `Categories · ${getMedicationCategories(medication)
+                        .map((kind) => getMedicationCategory(kind).label)
+                        .join(", ")}`,
+                    },
+                  ]
+                : []),
+              ...(intake?.note?.trim()
+                ? [{ icon: StickyNote, text: `Entry note · ${intake.note}` }]
+                : []),
+            ]}
+          />
         )}
       </section>
       {error && (
@@ -553,12 +624,21 @@ export function IntakeForm({
         />
         {showRestoredHelp && (
           <p className={styles.restoredHelp}>
-            Your device kept these unfinished changes. Save Intake to log them, or use <strong>Reset draft</strong> at the top right to start fresh.
+            Your device kept these unfinished changes. Save Intake to log them,
+            or use <strong>Reset draft</strong> at the top right to start fresh.
           </p>
         )}
         <div className={styles.trackingDay}>
-          <span><CalendarCheck aria-hidden="true" />{belongsTo ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.` : "Choose a valid time."}</span>
-          <span><Sunrise aria-hidden="true" />Days begin at 06:00.</span>
+          <span>
+            <CalendarCheck aria-hidden="true" />
+            {belongsTo
+              ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.`
+              : "Choose a valid time."}
+          </span>
+          <span>
+            <Sunrise aria-hidden="true" />
+            Days begin at 06:00.
+          </span>
         </div>
       </div>
     </form>

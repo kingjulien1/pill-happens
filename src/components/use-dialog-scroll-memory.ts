@@ -101,12 +101,16 @@ export function useDialogScrollMemory<T extends HTMLElement>({
       touched = true;
       settled = true;
       restoring = false;
+      // Once the person takes control, layout/content changes must no longer
+      // observe the editor or do any work attempting to restore its position.
+      observer.disconnect();
+      mutations.disconnect();
     };
     const scroll = () => {
       if (!visible() || restoring || !settled) return;
       last = position();
       if (last.top === applied.top && last.left === applied.left) return;
-      touched = true;
+      intent();
       target = last;
       clearTimeout(timer);
       timer = setTimeout(flush, 150);
@@ -114,7 +118,6 @@ export function useDialogScrollMemory<T extends HTMLElement>({
     // Opening focus and delayed layout must not move a fresh dialog away from its top.
     restore();
     // Section shortcuts own any subsequent programmatic scroll, not this hook.
-    if (!restorePosition) intent();
     frame = requestAnimationFrame(scheduleRestore);
     const observer = new ResizeObserver(scheduleRestore);
     observer.observe(element);
@@ -125,6 +128,7 @@ export function useDialogScrollMemory<T extends HTMLElement>({
       subtree: true,
       characterData: true,
     });
+    if (!restorePosition) intent();
     void document.fonts?.ready.then(scheduleRestore);
     element.addEventListener("scroll", scroll, { passive: true });
     element.addEventListener("wheel", intent, { passive: true });

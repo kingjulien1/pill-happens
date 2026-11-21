@@ -34,7 +34,7 @@
     );
   filter: blur(24px);
   opacity: 0.72;
-  animation: streak-glow-drift 16s ease-in-out var(--streak-art-phase) infinite;
+  animation: none;
 }
 .pattern {
   inset: 0;
@@ -54,7 +54,7 @@
   border-radius: 48% 52% 66% 34%;
   opacity: 0.3;
   transform: rotate(-25deg);
-  animation: streak-orbit-turn 24s linear var(--streak-art-phase) infinite;
+  animation: none;
 }
 .orbitSecond {
   inset: 20% 10%;
@@ -71,7 +71,7 @@
   height: 100%;
   overflow: visible;
   opacity: 0.32;
-  animation: streak-wave-sway 13s ease-in-out var(--streak-art-phase) infinite;
+  animation: none;
 }
 .waves path {
   stroke: var(--streak-art-b);
@@ -89,7 +89,7 @@
   color: #ffdf20;
   opacity: 0.55;
   filter: drop-shadow(0 0 8px #ffdf2040);
-  animation: streak-star-spark 6s ease-in-out var(--star-phase) infinite;
+  animation: none;
 }
 .confetti {
   left: var(--piece-x);
@@ -100,7 +100,7 @@
   background: var(--piece-color);
   opacity: 0;
   transform: rotate(var(--piece-angle));
-  animation: streak-confetti-rise 10s ease-in-out var(--piece-phase) infinite;
+  animation: none;
 }
 .artwork > * {
   animation-play-state: paused;

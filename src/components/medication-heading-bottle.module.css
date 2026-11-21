@@ -8,81 +8,28 @@
   isolation: isolate;
 }
 
-.glyph,
-.rock {
+.glyph {
   display: grid;
   width: 38.5875px;
   height: 38.5875px;
   place-items: center;
 }
 
-.glyph {
-  position: relative;
-  z-index: 1;
-}
-
-.rock {
-  transform-origin: 50% 82%;
-}
-
-.rock svg {
+.glyph svg {
   width: 100%;
   height: 100%;
 }
 
 @media (min-width: 640px) {
-  .glyph,
-  .rock {
+  .glyph {
     width: 44.3042px;
     height: 44.3042px;
   }
 }
 
 @media (max-width: 359px) {
-  .glyph,
-  .rock {
+  .glyph {
     width: 35.7292px;
     height: 35.7292px;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .stage[data-medication-bottle-phase="waiting"] .glyph {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-
-  .stage[data-medication-bottle-phase="entering"] .glyph {
-    animation: bottle-arrival 980ms 120ms both;
-    animation-play-state: paused;
-  }
-
-  .stage[data-medication-bottle-active="true"] .glyph {
-    animation-play-state: running;
-  }
-}
-
-@keyframes bottle-arrival {
-  0% {
-    opacity: 0;
-    transform: scale(0.2) rotate(-720deg);
-    animation-timing-function: cubic-bezier(0.1, 0.62, 0.22, 1);
-  }
-  55% {
-    opacity: 1;
-    transform: scale(1.13) rotate(0deg);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.25, 1);
-  }
-  73% {
-    transform: scale(0.965) rotate(0deg);
-    animation-timing-function: cubic-bezier(0.2, 0.65, 0.3, 1);
-  }
-  88% {
-    transform: scale(1.045) rotate(0deg);
-    animation-timing-function: cubic-bezier(0.25, 0, 0.2, 1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
   }
 }

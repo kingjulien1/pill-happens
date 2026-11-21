@@ -79,7 +79,7 @@
   }
 }
 
-/* Timeline and collection cards share one blur pane and both alpha washes.
+/* Timeline and collection cards share a static reading pane and both alpha washes.
    Background images paint front-to-back: medication tint, pink, then glass. */
 .card:global(.intake-log-card):is(
     [data-intake-card],
@@ -143,9 +143,9 @@
   :global(.intake-card-glass) {
   background:
     linear-gradient(var(--entry-surface-base) 0 0),
-    linear-gradient(var(--entry-glass-pink) 0 0), transparent;
-  -webkit-backdrop-filter: blur(96px);
-  backdrop-filter: blur(96px);
+    linear-gradient(var(--entry-glass-pink) 0 0), var(--entry-intake-base);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 @supports not (

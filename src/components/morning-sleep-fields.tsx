@@ -188,38 +188,6 @@ export function MorningSleepFields({
     <div className={styles.fields} data-morning-sleep-fields>
       <SleepCycleImport value={value} onChange={onChange} disabled={disabled} />
       <CheckInSection
-        caption="How the Night Felt"
-        context="Sleep Quality"
-        detail="1–10 · Optional"
-        headingId={`${id}-ratings-heading`}
-      >
-        <section
-          className={styles.section}
-          aria-labelledby={`${id}-ratings-heading`}
-          data-check-in-section="morning-ratings"
-        >
-          <p className={styles.hint}>
-            Slide or tap to rate. Leave anything blank.
-          </p>
-          <div className={styles.ratings}>
-            {RATINGS.map((rating) => (
-              <CheckInRating
-                key={rating.key}
-                id={`${id}-${rating.key}`}
-                name={rating.key}
-                label={rating.label}
-                low={rating.low}
-                high={rating.high}
-                morning
-                value={value[rating.key]}
-                disabled={disabled}
-                onChange={(next) => setField(rating.key, next)}
-              />
-            ))}
-          </div>
-        </section>
-      </CheckInSection>
-      <CheckInSection
         caption="The Night’s Timeline"
         context="Overnight"
         detail="24-hour clock"
@@ -291,7 +259,37 @@ export function MorningSleepFields({
           </p>
         </section>
       </CheckInSection>
+      <CheckInSection
+        caption="How the Night Felt"
+        context="Sleep Quality"
+        detail="Beyond the stats"
+        headingId={`${id}-ratings-heading`}
+      >
+        <section
+          className={styles.section}
+          aria-labelledby={`${id}-ratings-heading`}
+          data-check-in-section="morning-ratings"
+        >
+          <div className={styles.ratings}>
+            {RATINGS.map((rating) => (
+              <CheckInRating
+                key={rating.key}
+                id={`${id}-${rating.key}`}
+                name={rating.key}
+                label={rating.label}
+                low={rating.low}
+                high={rating.high}
+                morning
+                value={value[rating.key]}
+                disabled={disabled}
+                onChange={(next) => setField(rating.key, next)}
+              />
+            ))}
+          </div>
+        </section>
+      </CheckInSection>
       <SleepScoreSummary
+        ratingsHeadingId={`${id}-ratings-heading`}
         value={value}
         disabled={disabled}
         onChange={(next) => onChange(withSleepStageTotals(next))}

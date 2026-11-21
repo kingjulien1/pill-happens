@@ -54,7 +54,10 @@ import {
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
 import { Button } from "@/components/ui/button";
-import { ActionIcon } from "@/components/action-icon";
+import {
+  nextNotificationWake,
+  NOTIFICATION_CHECKPOINT_INTERVAL,
+} from "@/lib/notification-scheduling";
 
 export type JournalNotificationDetails = {
   /** Display-only snapshots of the actual affected records, never live editors. */
@@ -197,6 +200,7 @@ export function JournalNotification({
     hidden: true,
   });
   const clock = useRef<NotificationClock | null>(null);
+  const refreshClock = useRef<() => void>(() => {});
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const alive = useRef(false);
   const leaving = useRef(false);
@@ -263,6 +267,7 @@ export function JournalNotification({
     if (value) pauseReasons.current.add(reason);
     else pauseReasons.current.delete(reason);
     clock.current?.pause(reason, value);
+    refreshClock.current();
   }, []);
 
   const blurHeldFocus = useCallback(() => {
@@ -355,9 +360,80 @@ export function JournalNotification({
       else pauseReasons.current.delete(reason);
       readingClock.pause(reason, value);
     };
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let lastCheckpoint = -Infinity;
+    let paintedProgress = -1;
+    let paintedUrgency = -1;
+    let disposed = false;
+    let inViewport = true;
+    const flag = (name: string, value: string | boolean) => {
+      const next = String(value);
+      if (element.dataset[name] !== next) element.dataset[name] = next;
+    };
+    const tick = () => {
+      clearTimeout(timer);
+      if (disposed) return;
+      const snapshot = readingClock.snapshot();
+      const hidden = element.dataset.motionPaused === "true";
+      flag("paused", snapshot.paused);
+      flag("countdownComplete", snapshot.complete);
+      flag(
+        "progressPhase",
+        snapshot.complete
+          ? "complete"
+          : snapshot.timeUntilComplete <= 3_000
+            ? "final"
+            : snapshot.progress > 0.6
+              ? "start"
+              : "middle",
+      );
+      // The progress rail is the only continuously changing paint. Scaling it
+      // avoids layout and keeps inherited card variables out of the hot path.
+      const bar = progress.current;
+      if (!hidden && bar) {
+        if (paintedProgress !== snapshot.progress) {
+          bar.style.transform = `scaleX(${snapshot.progress})`;
+          paintedProgress = snapshot.progress;
+        }
+        if (paintedUrgency !== snapshot.colorUrgency) {
+          bar.style.setProperty(
+            "--notification-urgency",
+            String(snapshot.colorUrgency),
+          );
+          paintedUrgency = snapshot.colorUrgency;
+        }
+      }
+      const seconds =
+        !hidden && !snapshot.complete && snapshot.timeUntilComplete <= 3_000
+          ? Math.max(1, Math.ceil(snapshot.timeUntilComplete / 1_000))
+          : null;
+      setCounter((previous) =>
+        previous.seconds === seconds &&
+        previous.paused === snapshot.paused &&
+        previous.hidden === hidden
+          ? previous
+          : { seconds, paused: snapshot.paused, hidden },
+      );
+      const now = performance.now();
+      if (
+        Number.isFinite(duration) &&
+        now - lastCheckpoint >= NOTIFICATION_CHECKPOINT_INTERVAL
+      ) {
+        lastCheckpoint = now;
+        onCheckpoint?.();
+      }
+      if (snapshot.expired && !leaving.current && isCurrent()) {
+        leaving.current = true;
+        onRequestDismiss("timeout");
+      }
+      const delay = nextNotificationWake(snapshot, !hidden);
+      if (delay !== null && !leaving.current) timer = setTimeout(tick, delay);
+    };
     const syncNative = () => {
-      element.dataset.motionPaused = String(
-        document.hidden ||
+      flag(
+        "motionPaused",
+        !inViewport ||
+          document.hidden ||
           (outer?.dataset.front === "false" &&
             outer?.dataset.expanded === "false") ||
           outer?.dataset.mounted === "false" ||
@@ -365,12 +441,13 @@ export function JournalNotification({
       );
       setPause("hidden", document.hidden);
       if (document.hidden) clearPointers();
-      // Each mounted notice owns its lifetime, even behind the visible stack.
+      // Rear notices still advance their own lifetime, without repainting.
       setPause("unmounted", outer?.dataset.mounted === "false");
       if (outer?.dataset.removed === "true") {
         setPause("removed", true);
         setReversed(true);
       }
+      tick();
     };
     const observer = new MutationObserver(syncNative);
     if (outer)
@@ -384,91 +461,28 @@ export function JournalNotification({
           "data-removed",
         ],
       });
+    const intersection = new IntersectionObserver(([entry]) => {
+      inViewport = entry.isIntersecting;
+      syncNative();
+    });
+    intersection.observe(element);
     document.addEventListener("visibilitychange", syncNative);
     window.addEventListener("pointerup", releasePointer);
     window.addEventListener("pointercancel", releasePointer);
     window.addEventListener("blur", clearPointers);
+    refreshClock.current = tick;
     syncNative();
-    let pulseAnimations: CSSAnimation[] = [];
-    const tick = () => {
-      const snapshot = readingClock.snapshot();
-      element.style.setProperty(
-        "--notification-remaining",
-        String(snapshot.progress),
-      );
-      element.dataset.paused = String(snapshot.paused);
-      element.dataset.countdownComplete = String(snapshot.complete);
-      element.style.setProperty(
-        "--notification-urgency",
-        String(snapshot.colorUrgency),
-      );
-      element.style.setProperty(
-        "--notification-pulse-urgency",
-        String(snapshot.pulseUrgency),
-      );
-      element.style.setProperty(
-        "--notification-card-urgency",
-        String(snapshot.cardUrgency),
-      );
-      // Keep pulse phase intact while urgency accelerates, rather than repeatedly
-      // changing CSS duration and jumping its current pose.
-      // A live reduced-motion change cancels CSS animations; rediscover the new
-      // instances if motion is enabled again during this countdown.
-      if (pulseAnimations.some((animation) => animation.playState === "idle"))
-        pulseAnimations = [];
-      if (!pulseAnimations.length && snapshot.pulseUrgency > 0)
-        pulseAnimations = element
-          .getAnimations({ subtree: true })
-          .filter(
-            (animation): animation is CSSAnimation =>
-              typeof CSSAnimation !== "undefined" &&
-              animation instanceof CSSAnimation &&
-              [
-                "journal-notification-countdown-pulse",
-                "journal-notification-card-breathe",
-              ].includes(animation.animationName),
-          );
-      for (const animation of pulseAnimations)
-        animation.updatePlaybackRate(
-          1 + snapshot.pulseUrgency * (1400 / 450 - 1),
-        );
-      element.dataset.progressPhase = snapshot.complete
-        ? "complete"
-        : snapshot.timeUntilComplete <= 3_000
-          ? "final"
-          : snapshot.progress > 0.6
-            ? "start"
-            : "middle";
-      const seconds =
-        !snapshot.complete && snapshot.timeUntilComplete <= 3_000
-          ? Math.max(1, Math.ceil(snapshot.timeUntilComplete / 1_000))
-          : null;
-      const hidden = element.dataset.motionPaused === "true";
-      setCounter((previous) =>
-        previous.seconds === seconds &&
-        previous.paused === snapshot.paused &&
-        previous.hidden === hidden
-          ? previous
-          : { seconds, paused: snapshot.paused, hidden },
-      );
-      onCheckpoint?.();
-      if (progress.current)
-        progress.current.style.inlineSize = `${snapshot.progress * 100}%`;
-      if (snapshot.expired && !leaving.current && isCurrent()) {
-        leaving.current = true;
-        onRequestDismiss("timeout");
-      }
-    };
-    const interval = setInterval(tick, 50);
-    tick();
     return () => {
       alive.current = false;
       observer.disconnect();
+      intersection.disconnect();
       document.removeEventListener("visibilitychange", syncNative);
       window.removeEventListener("pointerup", releasePointer);
       window.removeEventListener("pointercancel", releasePointer);
       window.removeEventListener("blur", clearPointers);
-      clearInterval(interval);
+      disposed = true;
+      clearTimeout(timer);
+      if (refreshClock.current === tick) refreshClock.current = () => {};
       for (const timer of timers.current) clearTimeout(timer);
       timers.current = [];
       clock.current = null;
@@ -834,10 +848,21 @@ export function JournalNotification({
   const facts = details?.facts?.slice(0, 4) ?? [];
   function policyCount(key: string, singular: string, plural: string) {
     const value = facts.find((fact) => fact.label === key)?.value;
-    const count = typeof value === "string" || typeof value === "number"
-      ? String(value).match(/^\d+\b/)?.[0]
-      : undefined;
-    return <small className="journal-policy-count">{count ? <><b>{count}</b> {count === "1" ? singular : plural}</> : "Across your journal"}</small>;
+    const count =
+      typeof value === "string" || typeof value === "number"
+        ? String(value).match(/^\d+\b/)?.[0]
+        : undefined;
+    return (
+      <small className="journal-policy-count">
+        {count ? (
+          <>
+            <b>{count}</b> {count === "1" ? singular : plural}
+          </>
+        ) : (
+          "Across your journal"
+        )}
+      </small>
+    );
   }
 
   const previewRecord = details?.preview?.after ?? details?.preview?.before;
@@ -934,9 +959,6 @@ export function JournalNotification({
       data-paused="true"
       data-motion-paused="true"
       data-timer-mode={Number.isFinite(duration) ? "countdown" : "indefinite"}
-      style={
-        { "--notification-remaining": initialReading.progress } as CSSProperties
-      }
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") pause("hover", true);
       }}
@@ -1009,9 +1031,8 @@ export function JournalNotification({
           <span
             ref={progress}
             className="journal-notification-countdown-bar"
-            style={{ inlineSize: `${initialReading.progress * 100}%` }}
+            style={{ transform: `scaleX(${initialReading.progress})` }}
           />
-          <span className="journal-notification-countdown-sheen" />
         </div>
       </div>
       <NotificationCountdownBadge
@@ -1019,7 +1040,6 @@ export function JournalNotification({
         paused={counter.paused}
         hidden={counter.hidden}
       />
-      <span className="journal-notification-urgency-glow" aria-hidden="true" />
       <span className="journal-notification-closed-wash" aria-hidden="true" />
       <span className="journal-notification-frame" aria-hidden="true" />
       <span className="journal-notification-footer-fade" aria-hidden="true" />
@@ -1085,48 +1105,117 @@ export function JournalNotification({
             ) : details?.preview ? (
               <NotificationChangePreview preview={details.preview} />
             ) : medicationPolicy ? (
-              <section className="journal-medication-policy" aria-label="How medication edits work">
+              <section
+                className="journal-medication-policy"
+                aria-label="How medication edits work"
+              >
                 <header className="journal-policy-intro">
                   <h3>One edit. The math follows.</h3>
-                  <p>Correct a medication in your library and its past entries pick up the change. Your journal handles the arithmetic.</p>
+                  <p>
+                    Correct a medication in your library and its past entries
+                    pick up the change. Your journal handles the arithmetic.
+                  </p>
                 </header>
                 <section className="journal-medication-policy-alert">
                   <header>
-                    <RotateCcwClock className="journal-policy-clock" size={17} strokeWidth={2.65} aria-hidden="true" />
+                    <RotateCcwClock
+                      className="journal-policy-clock"
+                      size={17}
+                      strokeWidth={2.65}
+                      aria-hidden="true"
+                    />
                     <h4>History</h4>
                     <span>· &nbsp; Edit Policy</span>
                     {policyCount("Entries", "Entry", "Entries")}
                   </header>
-                  <p>Change a strength and each linked dose is recalculated from the quantity you logged. Daily totals for that medication follow suit.</p>
+                  <p>
+                    Change a strength and each linked dose is recalculated from
+                    the quantity you logged. Daily totals for that medication
+                    follow suit.
+                  </p>
                 </section>
-                <div className="journal-policy-disclosure" data-open={policyOpen}>
-                  <div className="journal-policy-reveal" aria-hidden="true"><div><hr /></div></div>
-                  <button type="button" className="journal-policy-toggle" aria-expanded={policyOpen} aria-controls={policyId} onClick={() => setPolicyOpen(!policyOpen)}>
-                    {policyOpen ? <ChevronsUp size={14} /> : <ListFilter size={14} />}
+                <div
+                  className="journal-policy-disclosure"
+                  data-open={policyOpen}
+                >
+                  <div className="journal-policy-reveal" aria-hidden="true">
+                    <div>
+                      <hr />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="journal-policy-toggle"
+                    aria-expanded={policyOpen}
+                    aria-controls={policyId}
+                    onClick={() => setPolicyOpen(!policyOpen)}
+                  >
+                    {policyOpen ? (
+                      <ChevronsUp size={14} />
+                    ) : (
+                      <ListFilter size={14} />
+                    )}
                     {policyOpen ? "Hide edit details" : "See what changes"}
                   </button>
-                  <div className="journal-policy-reveal" id={policyId} aria-hidden={!policyOpen}><div>
+                  <div
+                    className="journal-policy-reveal"
+                    id={policyId}
+                    aria-hidden={!policyOpen}
+                  >
+                    <div>
                       <dl className="journal-policy-stats">
                         <div>
-                          <dt><PillBottle />Dose Totals</dt>
-                          <dd>{policyCount("Dose totals", "Medication", "Medications")}</dd>
-                          <dd className="journal-policy-description">Each dose uses the updated strength multiplied by the quantity recorded for that intake. The daily total adds those doses together.</dd>
+                          <dt>
+                            <PillBottle />
+                            Dose Totals
+                          </dt>
+                          <dd>
+                            {policyCount(
+                              "Dose totals",
+                              "Medication",
+                              "Medications",
+                            )}
+                          </dd>
+                          <dd className="journal-policy-description">
+                            Each dose uses the updated strength multiplied by
+                            the quantity recorded for that intake. The daily
+                            total adds those doses together.
+                          </dd>
                         </div>
                         <div>
-                          <dt><BookOpenText />Medication Library</dt>
-                          <dd>{policyCount("Library", "Medication", "Medications")}</dd>
-                          <dd className="journal-policy-description">Rename a medication or change its symbol in the library. Earlier intake cards show the updated name and appearance wherever that medication was logged.</dd>
+                          <dt>
+                            <BookOpenText />
+                            Medication Library
+                          </dt>
+                          <dd>
+                            {policyCount(
+                              "Library",
+                              "Medication",
+                              "Medications",
+                            )}
+                          </dd>
+                          <dd className="journal-policy-description">
+                            Rename a medication or change its symbol in the
+                            library. Earlier intake cards show the updated name
+                            and appearance wherever that medication was logged.
+                          </dd>
                         </div>
                       </dl>
-                  </div></div>
+                    </div>
+                  </div>
                 </div>
               </section>
             ) : facts.length ? (
               <div>
-                {kind === "info" && <p className="journal-notification-facts-intro">{message}</p>}
+                {kind === "info" && (
+                  <p className="journal-notification-facts-intro">{message}</p>
+                )}
                 <dl className="journal-notification-facts">
                   {facts.map((fact, index) => (
-                    <div key={index}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
+                    <div key={index}>
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
                   ))}
                 </dl>
               </div>

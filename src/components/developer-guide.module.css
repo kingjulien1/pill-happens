@@ -14,8 +14,8 @@
   .contributionSteps,
   .resourceLink,
   .codeBlock {
-    -webkit-backdrop-filter: blur(32px);
-    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 

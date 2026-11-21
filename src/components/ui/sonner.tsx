@@ -72,8 +72,15 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
           <rect x="-10" y="-14" width="44" height="23" />
         </clipPath>
       </defs>
-      <ellipse className="journal-bulb-halo" cx="12" cy="7" rx="14" ry="13"
-        fill={`url(#${haloId})`} stroke="none" />
+      <ellipse
+        className="journal-bulb-halo"
+        cx="12"
+        cy="7"
+        rx="14"
+        ry="13"
+        fill={`url(#${haloId})`}
+        stroke="none"
+      />
       <path
         className="journal-bulb-glass"
         d="M9 18c0-2.2-.7-3.3-2.2-5A7 7 0 1 1 17.2 13c-1.5 1.7-2.2 2.8-2.2 5Z"
@@ -89,7 +96,11 @@ function NotificationBulb(props: SVGProps<SVGSVGElement>) {
       <g clipPath={`url(#${haloId}-crown)`}>
         <g className="journal-bulb-echo-rays" strokeWidth="1.15">
           {[-67.5, -22.5, 22.5, 67.5].map((angle) => (
-            <path key={angle} d="M12 -1v-2" transform={`rotate(${angle} 12 9)`} />
+            <path
+              key={angle}
+              d="M12 -1v-2"
+              transform={`rotate(${angle} 12 9)`}
+            />
           ))}
         </g>
       </g>
@@ -135,7 +146,7 @@ function BellCheck(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** Finite arrival and independent ambient layers; Sonner owns the outer card. */
+/** Static layered artwork; short arrival feedback never runs an idle render loop. */
 export function ToastSymbol({
   kind,
   variant,
@@ -158,9 +169,6 @@ export function ToastSymbol({
         className="journal-toast-art-arrival"
         key={`${kind}-${variant ?? "default"}`}
       >
-        <span className="journal-toast-halo" />
-        <span className="journal-toast-halo journal-toast-halo-echo" />
-        <span className="journal-toast-flash" />
         <span className="journal-toast-plate-arrival journal-toast-plate-arrival-middle">
           <span className="journal-toast-plate-spin journal-toast-plate-spin-middle">
             <span className="journal-toast-plate journal-toast-plate-middle" />
@@ -180,17 +188,6 @@ export function ToastSymbol({
               strokeWidth={kind === "success" ? 2.9 : 2.8}
             />
           </span>
-        </span>
-        <span className="journal-toast-sparks">
-          {Array.from({ length: 8 }, (_, index) => (
-            <span
-              key={index}
-              className="journal-toast-spark-position"
-              style={{ "--spark-index": index } as CSSProperties}
-            >
-              <span className="journal-toast-spark" />
-            </span>
-          ))}
         </span>
       </span>
     </span>
@@ -310,33 +307,47 @@ export function Toaster({
   useEffect(() => {
     const element = region.current;
     if (!element) return;
+    const syncHost = (host: HTMLElement) => {
+      const hidden =
+        host.dataset.visible === "false" || host.dataset.removed === "true";
+      if (hidden && host.contains(document.activeElement))
+        focusNotificationFront(element);
+      if (host.inert !== hidden) host.inert = hidden;
+    };
     const syncVisibility = () => {
       element
         .querySelectorAll<HTMLElement>("[data-sonner-toast]")
-        .forEach((host) => {
-          const hidden =
-            host.dataset.visible === "false" || host.dataset.removed === "true";
-          if (hidden && host.contains(document.activeElement))
-            focusNotificationFront(element);
-          host.inert = hidden;
-        });
+        .forEach(syncHost);
       if (!expanded)
         element
           .querySelectorAll<HTMLElement>("[data-sonner-toaster]")
           .forEach((list) => {
-            list.scrollTop = 0;
+            if (list.scrollTop) list.scrollTop = 0;
           });
     };
     const observer = new MutationObserver((records) => {
       if (
         records.some(
           (record) =>
-            record.type === "attributes" ||
-            (record.target instanceof Element &&
-              record.target.matches("[data-sonner-toaster], section")),
+            record.type === "childList" &&
+            record.target instanceof Element &&
+            record.target.matches("[data-sonner-toaster], section"),
         )
-      )
+      ) {
         syncVisibility();
+        return;
+      }
+      // A changed native host cannot affect another host's inert state. Avoid
+      // rescanning an uncapped stack for each individual visibility mutation.
+      const changed = new Set<HTMLElement>();
+      for (const record of records)
+        if (
+          record.type === "attributes" &&
+          record.target instanceof HTMLElement &&
+          record.target.matches("[data-sonner-toast]")
+        )
+          changed.add(record.target);
+      changed.forEach(syncHost);
     });
     observer.observe(element, {
       childList: true,

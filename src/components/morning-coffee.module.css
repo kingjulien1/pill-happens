@@ -1,27 +1,3 @@
-/* The three short strokes of the Lucide Coffee glyph are its steam. */
-@media (prefers-reduced-motion: no-preference) {
-  .coffee {
-    overflow: visible;
-  }
-  .coffee path:is(:nth-child(1), :nth-child(2), :nth-child(4)) {
-    animation: writing-steam 3.6s ease-in-out infinite;
-    animation-play-state: var(--coffee-motion, running);
-  }
-  .coffee path:nth-child(2) {
-    animation-delay: -1.2s;
-  }
-  .coffee path:nth-child(4) {
-    animation-delay: -2.4s;
-  }
-}
-@keyframes writing-steam {
-  0%,
-  100% {
-    transform: translateY(0.4px);
-    opacity: 0.65;
-  }
-  50% {
-    transform: translateY(-1.5px);
-    opacity: 1;
-  }
+.coffee {
+  overflow: visible;
 }

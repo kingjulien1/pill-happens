@@ -132,16 +132,36 @@ export const APP_CANVAS_OVERLAY = [
   `linear-gradient(oklch(82.3% 0.12 346.018 / ${APP_IRIDESCENCE.pinkOpacity}) 0 0)`,
 ].join(", ");
 
-// A single translucent layer composites these overlapping pigments at a constant 7%.
-const fuchsia300 = "oklch(83.3% 0.145 321.434)";
-const violet400 = "oklch(70.2% 0.183 293.541)";
-const canvasAccentCss = `
-  --app-canvas-accent: radial-gradient(ellipse 66% 44% at 13% 17%, ${fuchsia300} 10%, transparent 90%),
-    radial-gradient(ellipse 54% 62% at 80% 39%, ${violet400} 14%, transparent 88%),
-    radial-gradient(ellipse 78% 51% at 71% 96%, ${fuchsia300} 8%, transparent 89%),
-    ${violet400};
-  --app-canvas-accent-opacity: 0.07;
+/** One static mesh layer; its opacity applies once to the whole pigment stack. */
+export const APP_CANVAS_ACCENT = Object.freeze({
+  opacity: 0.39,
+  dark: Object.freeze([
+    "#a21caf",
+    "#4338ca",
+    "#be123c",
+    "#0f766e",
+    "#7c3aed",
+  ] as const),
+  light: Object.freeze([
+    "#f0abfc",
+    "#a5b4fc",
+    "#fda4af",
+    "#99f6e4",
+    "#c4b5fd",
+  ] as const),
+});
+const canvasAccentCss = (mode: AppThemeMode) => {
+  const [orchid, iris, rose, lagoon, violet] = APP_CANVAS_ACCENT[mode];
+  return `
+  --app-canvas-accent:
+    radial-gradient(ellipse 67% 49% at -6% 9%, ${orchid} 0%, ${orchid} 12%, transparent 78%),
+    radial-gradient(ellipse 59% 68% at 108% 28%, ${iris} 0%, transparent 76%),
+    radial-gradient(ellipse 81% 58% at 31% 112%, ${rose} 0%, transparent 77%),
+    radial-gradient(ellipse 42% 54% at 88% 86%, ${lagoon} 0%, transparent 74%),
+    radial-gradient(ellipse 59% 73% at 41% 39%, ${violet} 0%, transparent 82%);
+  --app-canvas-accent-opacity: ${APP_CANVAS_ACCENT.opacity};
 `;
+};
 
 /** A smooth violet still keeps critical, offline and unsupported-WebGL views coherent. */
 export const APP_CANVAS_BACKGROUND = [
@@ -150,7 +170,7 @@ export const APP_CANVAS_BACKGROUND = [
   APP_CANVAS_BASE,
 ].join(", ");
 export const APP_CANVAS_CSS = `
-  ${canvasAccentCss}
+  ${canvasAccentCss("dark")}
   --app-canvas-base: ${APP_CANVAS_BASE};
   --app-canvas-background: ${APP_CANVAS_BACKGROUND};
   --app-canvas-overlay: ${APP_CANVAS_OVERLAY};
@@ -205,7 +225,7 @@ export function getAppCanvasCss(mode: AppThemeMode): string {
   if (mode === "dark") return APP_CANVAS_CSS;
   const canvas = APP_CANVAS_BY_MODE.light;
   return `
-  ${canvasAccentCss}
+  ${canvasAccentCss("light")}
   --app-canvas-base: ${canvas.base};
   --app-canvas-background: ${canvas.background};
   --app-canvas-overlay: ${canvas.overlay};
@@ -958,6 +978,10 @@ ${Object.entries(APP_HARMONY)
   .join("\n")}
 ${APP_PALETTE.map((color) => `  --palette-${color.id}: ${color.hex};`).join("\n")}
 ${values("light", "  ")}
+  --dialog-control-wash: color-mix(in srgb, var(--foreground) 6%, transparent);
+  --navigation-surface: var(--menu-surface);
+  --navigation-highlight: #8051b2;
+  --navigation-paint: radial-gradient(ellipse 90% 38% at 0% 0%, #ec48990b, transparent), var(--navigation-surface);
   --radius: 1rem;
   --medication-symbol-mix: 35%;
 }
@@ -967,6 +991,8 @@ ${values("light", "  ")}
     color-scheme: dark;
 ${getAppCanvasCss("dark")}
 ${values("dark", "    ")}
+    --navigation-surface: #211625;
+    --navigation-highlight: #c4b5fd;
     --medication-symbol-mix: 55%;
   }
 }

@@ -548,18 +548,24 @@ export function createDraftWorkspace(scope: string) {
   // A clean local snapshot is not a write: another tab may have changed or
   // cleared its drafts since this instance last read the shared workspace.
   const dirtyDrafts = new Map<string, DraftRecord | null>();
+  let latestCache: {
+    raw: string | null;
+    workspace: SavedWorkspace;
+    damaged: boolean;
+  } | null = null;
+  const draftBytes = new WeakMap<DraftRecord, number>();
   const emit = () => listeners.forEach((listener) => listener());
-  const serialized = () =>
-    JSON.stringify({
-      version: state.version,
-      scope,
-      drafts: state.drafts,
-      screens: state.screens,
-      stackViews: state.stackViews,
-      scrollViews: state.scrollViews,
-      checkInOpenedAt: state.checkInOpenedAt,
-      lastPath: state.lastPath,
-    });
+  const savedWorkspace = (): SavedWorkspace => ({
+    version: state.version,
+    scope,
+    drafts: state.drafts,
+    screens: state.screens,
+    stackViews: state.stackViews,
+    scrollViews: state.scrollViews,
+    checkInOpenedAt: state.checkInOpenedAt,
+    lastPath: state.lastPath,
+  });
+  const serialized = () => JSON.stringify(savedWorkspace());
   const sameRecords = <T>(a: Record<string, T>, b: Record<string, T>) => {
     const keys = Object.keys(a);
     return (
@@ -567,16 +573,22 @@ export function createDraftWorkspace(scope: string) {
       keys.every(
         (entry) =>
           Object.hasOwn(b, entry) &&
-          JSON.stringify(a[entry]) === JSON.stringify(b[entry]),
+          (Object.is(a[entry], b[entry]) ||
+            JSON.stringify(a[entry]) === JSON.stringify(b[entry])),
       )
     );
   };
   const readLatest = (candidate: DraftStorage) => {
     const raw = candidate.getItem(key);
-    if (raw === null) return { workspace: fresh(scope), damaged: false };
+    if (latestCache && raw === latestCache.raw) return latestCache;
+    if (raw === null) {
+      latestCache = { raw, workspace: fresh(scope), damaged: false };
+      return latestCache;
+    }
     const latest = parseWorkspace(raw, scope);
     if (!latest) throw new Error("The saved draft workspace is unavailable.");
-    return latest;
+    latestCache = { raw, ...latest };
+    return latestCache;
   };
   const mergeProtected = (latest: SavedWorkspace) => {
     const drafts = { ...latest.drafts };
@@ -602,13 +614,20 @@ export function createDraftWorkspace(scope: string) {
     if (changed) state = { ...state, drafts, checkInOpenedAt };
     return { changed, overflow };
   };
+  const bytesForDraft = (record: DraftRecord) => {
+    let bytes = draftBytes.get(record);
+    if (bytes === undefined) {
+      bytes = jsonBytes(record.value);
+      draftBytes.set(record, bytes);
+    }
+    return bytes;
+  };
   const assertBudget = (raw: string) => {
     if (
       utf8Length(raw) > MAX_WORKSPACE ||
       Object.keys(state.drafts).length > MAX_DRAFTS ||
       Object.entries(state.drafts).some(
-        ([draftKey, draft]) =>
-          jsonBytes(draft.value) > draftByteLimit(draftKey),
+        ([draftKey, draft]) => bytesForDraft(draft) > draftByteLimit(draftKey),
       )
     )
       throw new Error("Draft storage is full.");
@@ -631,6 +650,9 @@ export function createDraftWorkspace(scope: string) {
       assertBudget(raw);
       if (storage) {
         storage.setItem(key, raw);
+        // A byte-identical read is already validated; another tab's changed
+        // bytes still take the full parse/validation/merge path before writing.
+        latestCache = { raw, workspace: savedWorkspace(), damaged: false };
         dirtyDrafts.clear();
         status =
           damaged || (preserveError && previousStatus === "error")
@@ -701,6 +723,7 @@ export function createDraftWorkspace(scope: string) {
           const parsed = parseWorkspace(raw, scope);
           if (parsed) {
             saved = parsed.workspace;
+            latestCache = { raw, ...parsed };
             if (parsed.damaged) status = "error";
           } else status = "error";
         }
@@ -850,18 +873,52 @@ export function createDraftWorkspace(scope: string) {
     setLocation(path: string, hash: string, scrollY: number) {
       if (!safeWorkspacePath(path)) return;
       const observedAt = Date.now();
+      const previous = state.screens[path];
+      const previousStatus = state.status;
+      const nextHash = safeWorkspaceHash(hash);
+      const nextY = Math.max(
+        0,
+        Math.min(Number.isFinite(scrollY) ? scrollY : 0, 100_000),
+      );
+      const previousOpened = state.checkInOpenedAt;
       // Bootstrap/navigation observes only the screen actually being restored,
       // not every dormant dialog remembered elsewhere in the workspace.
       observeCheckInOpened(screen(path).dialog, observedAt);
+      const openedChanged = state.checkInOpenedAt !== previousOpened;
+      if (
+        previous &&
+        state.lastPath === path &&
+        previous.hash === nextHash &&
+        previous.scrollY === nextY &&
+        !openedChanged &&
+        state.status === "saved" &&
+        dirtyDrafts.size === 0
+      ) {
+        // A no-op may still import another tab's protected changes. Only skip
+        // when the durable bytes are still the exact validated snapshot.
+        try {
+          if (
+            storage &&
+            latestCache &&
+            storage.getItem(key) === latestCache.raw
+          )
+            return;
+        } catch {
+          /* The ordinary persistence path reports this storage failure. */
+        }
+      }
+      const notify =
+        !previous ||
+        state.lastPath !== path ||
+        previous.hash !== nextHash ||
+        openedChanged ||
+        state.status !== previousStatus;
       const screens = {
         ...state.screens,
         [path]: {
           ...screen(path),
-          hash: safeWorkspaceHash(hash),
-          scrollY: Math.max(
-            0,
-            Math.min(Number.isFinite(scrollY) ? scrollY : 0, 100_000),
-          ),
+          hash: nextHash,
+          scrollY: nextY,
           updatedAt: observedAt,
         },
       };
@@ -872,7 +929,7 @@ export function createDraftWorkspace(scope: string) {
         if (oldest) delete screens[oldest];
       }
       state = { ...state, screens, lastPath: path };
-      persist(true);
+      persist(true, notify);
     },
     openDialog(path: string, dialog: RememberedDialog) {
       if (!safeWorkspacePath(path)) return;

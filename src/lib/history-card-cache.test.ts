@@ -3,6 +3,7 @@ import test from "node:test";
 import { emptyData, type AppData, type Medication } from "./domain";
 import {
   buildHistoryCardSummary,
+  createHistoryCardIndex,
   historyCardCacheable,
   historyCardCacheKey,
   historyCardSource,
@@ -66,6 +67,92 @@ function memory() {
   };
   return { records, storage };
 }
+
+test("shared history indexes preserve tracking boundaries, intake ordering and first check-in precedence", () => {
+  const data = journal();
+  data.intakes.push(
+    {
+      ...data.intakes[0],
+      id: "day-before-reset",
+      takenAt: "2026-10-25T04:30:00Z",
+      createdAt: "2026-10-26T12:00:00Z",
+    },
+    {
+      ...data.intakes[0],
+      id: "day-after-reset",
+      takenAt: "2026-10-25T05:30:00Z",
+      createdAt: "2026-10-24T12:00:00Z",
+    },
+  );
+  data.dailyCheckIns!.push(
+    { ...data.dailyCheckIns![0], period: "morning", day: "2026-11-12" },
+    { ...data.dailyCheckIns![0], energy: 5 },
+  );
+  const originalOrder = data.intakes.map((intake) => intake.id);
+  const index = createHistoryCardIndex(data);
+  for (const day of [...index.days, "2026-11-11"]) {
+    assert.deepEqual(
+      historyCardSource(data, day, index),
+      historyCardSource(data, day),
+    );
+    assert.deepEqual(
+      buildHistoryCardSummary(data, day, historyCardSource(data, day, index)),
+      buildHistoryCardSummary(data, day),
+    );
+  }
+  assert.deepEqual(
+    data.intakes.map((intake) => intake.id),
+    originalOrder,
+  );
+  assert.equal(index.entries.get("2026-10-24")![0].id, "day-before-reset");
+  assert.equal(index.entries.get("2026-10-25")![0].id, "day-after-reset");
+  assert.equal(index.evening.get("2026-11-13"), data.dailyCheckIns![0]);
+});
+
+test("indexed cache policy keeps exactly the same newest-three protection across rollover and changed membership", () => {
+  const data = journal();
+  data.dailyCheckIns!.push({ ...data.dailyCheckIns![0], day: "2026-11-12" });
+  const changed = structuredClone(data);
+  changed.intakes = changed.intakes.filter(
+    (intake) => intake.id !== "intake-16",
+  );
+  for (const snapshot of [data, changed]) {
+    const index = createHistoryCardIndex(snapshot);
+    for (const now of [
+      "2026-11-16",
+      "2026-11-17",
+      "2026-11-18",
+      new Date("2026-11-17T04:30:00Z"),
+      new Date("2026-11-17T06:00:00Z"),
+    ]) {
+      for (const day of [...index.days, "2026-11-11", "invalid"]) {
+        assert.equal(
+          historyCardCacheable(snapshot, day, now, index),
+          historyCardCacheable(snapshot, day, now),
+          `${day} at ${now}`,
+        );
+      }
+    }
+  }
+});
+
+test("a history index cannot supply another server snapshot's stale amounts or cache policy", () => {
+  const data = journal();
+  const index = createHistoryCardIndex(data);
+  const changed = structuredClone(data);
+  changed.intakes[0].quantity = 2;
+  changed.intakes = changed.intakes.filter(
+    (intake) => intake.id !== "intake-16",
+  );
+  assert.deepEqual(
+    historyCardSource(changed, "2026-11-13", index),
+    historyCardSource(changed, "2026-11-13"),
+  );
+  assert.equal(
+    historyCardCacheable(changed, "2026-11-13", "2026-11-17", index),
+    historyCardCacheable(changed, "2026-11-13", "2026-11-17"),
+  );
+});
 
 test("the newest three recorded past days and today's day never use snapshots", () => {
   const data = journal();

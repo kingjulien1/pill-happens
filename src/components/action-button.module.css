@@ -157,8 +157,8 @@
   overflow: hidden;
   border-radius: inherit;
   background: var(--action-base);
-  -webkit-backdrop-filter: blur(var(--action-blur));
-  backdrop-filter: blur(var(--action-blur));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 .filled[data-slot="button"] {
   position: relative;
@@ -209,7 +209,7 @@
       var(--action-rim-1)
     );
   transform-origin: 48% 52%;
-  animation: action-tint-drift 16s ease-in-out infinite;
+  animation: none;
   animation-play-state: var(
     --accent-play-state,
     var(--intake-effects-play-state, running)
@@ -271,7 +271,7 @@
     );
   opacity: var(--action-field-opacity);
   transform-origin: center;
-  animation: action-field-drift 18s ease-in-out infinite;
+  animation: none;
   animation-play-state: var(
     --intake-effects-play-state,
     var(--action-paint-visibility, running)
@@ -369,7 +369,7 @@
       var(--action-rim-3) 240deg,
       var(--action-rim-1)
     );
-    animation: action-rim-turn 6.8s linear infinite;
+    animation: none;
     transform: translate(-50%, -50%);
     animation-play-state: var(
       --intake-effects-play-state,

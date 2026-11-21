@@ -34,8 +34,8 @@
   border-radius: 12px;
   background: color-mix(in srgb, var(--surface-reading) 94%, transparent);
   color: var(--surface-reading-foreground);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: 0 4px 18px
     color-mix(in srgb, var(--app-canvas-base) 12%, transparent);
   font-size: 12px;

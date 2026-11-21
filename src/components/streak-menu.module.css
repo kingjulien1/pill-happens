@@ -199,8 +199,8 @@
   border: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
   border-radius: 12px;
   background: color-mix(in srgb, var(--popover) 68%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 .stats dt {
   display: flex;

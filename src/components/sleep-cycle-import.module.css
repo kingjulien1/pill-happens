@@ -15,16 +15,11 @@
 .heading {
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: 16px;
 }
 .heading h3 {
   margin: 0 0 7px;
-  font-size: clamp(22px, 5.5vw, 28px);
-  line-height: 1.15;
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  color: var(--foreground);
 }
 .heading p {
   display: -webkit-box;
@@ -36,23 +31,86 @@
   font-size: 11px;
   line-height: 1.7;
 }
-.mark {
-  color: var(--color-pink-300);
-  transform-origin: 50% 85%;
-}
-.import .importButton {
-  gap: 9px;
+.import
+  .importButton.importButton[data-slot="button"][data-control-style="satin"] {
+  --action-face-inset: 4.2px;
+  --action-outer-line: 1.1669px;
+  --action-inner-line: 2.8px;
+  --action-inner-gap: 0.175px;
+  --action-frame-fine-width: 1.05px;
+  --action-surround: var(--control-secondary);
+  --action-reduced-surround: var(--action-surround);
+  --control-face-edge: var(--control-ink);
   width: 100%;
-  font-size: 12px;
-  font-weight: 650;
+  border-radius: 14.7px;
+  padding-block: 7px;
+  font-size: 10.85px;
+  font-weight: 675;
+  box-shadow:
+    inset 0 0 0 var(--action-outer-line) var(--control-edge),
+    0 8.4px 21px -8.4px var(--control-shadow),
+    0 2.1px 5.6px var(--control-shadow);
 }
-.importButton svg {
-  color: inherit;
+.import .importButton[data-control-style="satin"]::before {
+  box-shadow:
+    inset 0 0 0 var(--action-inner-line) var(--control-face-edge),
+    0 0.7px 2.1px color-mix(in srgb, var(--control-shadow) 25%, transparent);
 }
-.buttonAside {
-  opacity: 0.65;
-  font-size: 10px;
-  font-weight: 500;
+.import .importButton[data-control-style="satin"] :global(.intake-primary-row) {
+  grid-template-columns: minmax(0, 1fr) 16.1px;
+  column-gap: 8.4px;
+  padding-inline-end: 1.4px;
+}
+.import
+  .importButton[data-control-style="satin"]
+  :global(.intake-primary-copy) {
+  gap: 5.6px;
+}
+.import
+  .importButton[data-control-style="satin"]
+  :global(.intake-primary-label) {
+  gap: 7.7px;
+}
+.import
+  .importButton[data-control-style="satin"]
+  :global(.intake-primary-label)
+  > svg {
+  width: 14px;
+  height: 14px;
+}
+.import
+  .importButton[data-control-style="satin"]
+  :global(.intake-primary-next) {
+  width: 16.1px;
+  height: 16.1px;
+}
+.importActions {
+  display: flex;
+  justify-content: center;
+}
+.import .pasteButton {
+  min-height: 40px;
+  gap: 7px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  background: color-mix(in srgb, var(--color-violet-400) 8%, transparent);
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.import .pasteButton svg {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 359px) {
+  .import
+    .importButton[data-control-style="satin"]
+    :global(.intake-primary-copy) {
+    gap: 4.2px;
+  }
+  .import
+    .importButton[data-control-style="satin"]
+    :global(.intake-primary-label) {
+    gap: 5.6px;
+  }
 }
 .hint,
 .status {
@@ -96,33 +154,9 @@
   gap: 8px;
   margin-top: 15px;
 }
-@media (prefers-color-scheme: light) {
-  .mark {
-    color: var(--color-purple-700);
-  }
-}
 @media (prefers-reduced-motion: no-preference) {
-  .mark {
-    animation: sleepy-clock 7s ease-in-out infinite;
-  }
   .spinner {
     animation: reading-turn 1.8s linear infinite;
-  }
-}
-@keyframes sleepy-clock {
-  0%,
-  70%,
-  100% {
-    transform: rotate(0);
-  }
-  78% {
-    transform: rotate(-7deg);
-  }
-  85% {
-    transform: rotate(5deg);
-  }
-  92% {
-    transform: rotate(-2deg);
   }
 }
 @keyframes reading-turn {

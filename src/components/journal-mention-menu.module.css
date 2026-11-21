@@ -215,7 +215,7 @@
   color: var(--menu-foreground);
 }
 .orbit > svg {
-  animation: mention-symbol 1.6s ease-in-out infinite;
+  animation: none;
 }
 .orbit i {
   position: absolute;

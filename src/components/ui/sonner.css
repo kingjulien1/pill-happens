@@ -11,8 +11,6 @@
     var(--color-mauve-900, oklch(21.2% 0.019 322.12)) 31%,
     transparent
   );
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 220ms ease;
 }
@@ -205,9 +203,9 @@
     linear-gradient(var(--toast-countdown-tint) 0 0),
     linear-gradient(var(--toast-deep-overlay) 0 0);
   background: var(--toast-cover), var(--toast-surface-layers);
-  /* Blur only the scene behind the glass; text, artwork and frames stay crisp. */
-  -webkit-backdrop-filter: blur(96px);
-  backdrop-filter: blur(96px);
+  /* Static layered color avoids a large live backdrop surface on Safari. */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   color: var(--toast-ink);
   /* Anchor the inner edge 6.3px inside the face. The wider pink band
      displaces the muted rim outward, beyond the measured card if needed. */
@@ -228,7 +226,7 @@
     0 3px 10px -5px var(--toast-shadow);
   text-align: left;
 }
-.journal-notification[data-timer-mode="countdown"] {
+.journal-notification[data-timer-mode="countdown"][data-progress-phase="final"] {
   --toast-countdown-tint: color-mix(
     in srgb,
     color-mix(
@@ -236,7 +234,7 @@
         var(--color-pink-800, #9d174d),
         var(--color-rose-800, #9f1239)
       )
-      clamp(0%, calc(17% - var(--notification-remaining, 1) * 51%), 17%),
+      17%,
     transparent
   );
 }
@@ -408,7 +406,6 @@
     color-mix(in srgb, var(--toast-soft) 13%, transparent) 45%,
     transparent 72%
   );
-  filter: blur(7px);
   opacity: 0.78;
   content: "";
 }
@@ -542,7 +539,6 @@
   overflow: visible;
   color: #fde68a;
   stroke: #e6c743;
-  filter: drop-shadow(0 0 1px #fde0479d) drop-shadow(0 0 4px #facc1559);
 }
 .journal-bulb-halo {
   opacity: 0.7885;
@@ -676,7 +672,9 @@
   --frame-outer: calc((5px * 4 / 3 - var(--toast-outer-inset)) * 7 / 6);
   --frame-inset: calc(6.3px - var(--frame-inner) - var(--frame-middle));
   outline-width: var(--frame-inner);
-  box-shadow: 0 0 24px -9px #f472b67a, 0 12px 28px -16px var(--toast-shadow),
+  box-shadow:
+    0 0 24px -9px #f472b67a,
+    0 12px 28px -16px var(--toast-shadow),
     0 3px 10px -5px var(--toast-shadow);
 }
 .journal-notification,
@@ -1065,7 +1063,8 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(var(--toast-wash-pale) 0 0),
+  background:
+    linear-gradient(var(--toast-wash-pale) 0 0),
     linear-gradient(var(--toast-wash-pink) 0 0),
     linear-gradient(var(--toast-wash-purple) 0 0), var(--toast-wash-base);
   opacity: var(--toast-wash-opacity);
@@ -1101,14 +1100,19 @@
   background:
     linear-gradient(to top, var(--toast-wash-pale), #f9a8d400 28%),
     linear-gradient(to top, var(--toast-wash-pink), #f472b600 45%),
-    linear-gradient(to top, var(--toast-wash-purple), #c026d30f 36%, #c026d300 70%),
+    linear-gradient(
+      to top,
+      var(--toast-wash-purple),
+      #c026d30f 36%,
+      #c026d300 70%
+    ),
     linear-gradient(to top, var(--toast-wash-base), #701a755c 50%, #701a7500);
   opacity: 0;
   transition: opacity var(--toast-expand);
   pointer-events: none;
 }
 .journal-notification[data-expanded="true"] .journal-notification-footer-fade {
-  opacity: calc(var(--toast-wash-opacity) * .85);
+  opacity: calc(var(--toast-wash-opacity) * 0.85);
 }
 /* Reveal the open surface through a soft moving edge behind the content. */
 @media (prefers-reduced-motion: no-preference) {
@@ -1116,22 +1120,26 @@
     --toast-reveal-mask: linear-gradient(to bottom, transparent 34%, #000 66%);
     -webkit-mask: var(--toast-reveal-mask) center bottom / 100% 300% no-repeat;
     mask: var(--toast-reveal-mask) center bottom / 100% 300% no-repeat;
-    transition: mask-position 620ms cubic-bezier(.48, .04, .2, 1);
+    transition: mask-position 620ms cubic-bezier(0.48, 0.04, 0.2, 1);
     transition-property: -webkit-mask-position, mask-position;
   }
-  .journal-notification[data-expanded="true"] .journal-notification-closed-wash {
+  .journal-notification[data-expanded="true"]
+    .journal-notification-closed-wash {
     opacity: var(--toast-wash-opacity);
     -webkit-mask-position: center top;
     mask-position: center top;
     transition-duration: 980ms;
   }
-  .journal-notification[data-expanded="true"] .journal-notification-footer-fade {
+  .journal-notification[data-expanded="true"]
+    .journal-notification-footer-fade {
     transition: opacity 680ms 200ms ease-in-out;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .journal-notification-closed-wash,
-  .journal-notification-footer-fade { transition: none; }
+  .journal-notification-footer-fade {
+    transition: none;
+  }
 }
 .journal-notification-header {
   position: relative;
@@ -1313,22 +1321,35 @@
   color: #351531;
   gap: 4px;
 }
-.journal-notification .journal-notification-revert:enabled .journal-notification-revert-symbol {
+.journal-notification
+  .journal-notification-revert:enabled
+  .journal-notification-revert-symbol {
   border: 1px solid #ffdcf5;
   outline: 0;
   border-radius: 11px;
   background: linear-gradient(155deg, #ffe2f4, #e7b1e6);
-  box-shadow: inset 0 1px 0 #fff8, 0 3px 0 #89527e, 0 5px 8px #260e2b44;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  box-shadow:
+    inset 0 1px 0 #fff8,
+    0 3px 0 #89527e,
+    0 5px 8px #260e2b44;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
-.journal-notification .journal-notification-revert:enabled .journal-notification-revert-label {
+.journal-notification
+  .journal-notification-revert:enabled
+  .journal-notification-revert-label {
   color: var(--toast-ink);
   font-weight: 700;
   font-size: 9px;
 }
-.journal-notification .journal-notification-revert:enabled:active .journal-notification-revert-symbol {
+.journal-notification
+  .journal-notification-revert:enabled:active
+  .journal-notification-revert-symbol {
   transform: translateY(2px);
-  box-shadow: inset 0 1px 3px #69315833, 0 1px 0 #89527e;
+  box-shadow:
+    inset 0 1px 3px #69315833,
+    0 1px 0 #89527e;
 }
 .journal-notification .journal-notification-revert:focus-visible {
   outline: 2px solid var(--toast-ink);
@@ -1462,7 +1483,9 @@
   position: relative;
   display: block;
   overflow: hidden;
-  inline-size: calc(var(--notification-remaining, 1) * 100%);
+  inline-size: 100%;
+  transform-origin: left center;
+  transform: scaleX(1);
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(
@@ -1473,7 +1496,7 @@
   );
   box-shadow: 0 0 8px
     color-mix(in srgb, var(--countdown-center) 45%, transparent);
-  transition: inline-size 60ms linear;
+  transition: transform 200ms linear;
 }
 /* The middle phase carries one quiet thread inside the remaining segment.
    The final phase lets the existing clock-driven rose pulse own the emphasis. */
@@ -1663,55 +1686,9 @@
     animation: journal-notification-countdown-ignite 650ms ease-out 200ms both;
     animation-play-state: var(--notification-motion-play-state, running);
   }
-  .journal-toaster [data-mounted="true"] .journal-notification-countdown-sheen {
-    animation: journal-notification-countdown-thread 760ms
-      cubic-bezier(0.2, 0.7, 0.2, 1) 270ms both;
-    animation-play-state: var(--notification-motion-play-state, running);
-  }
-  .journal-notification-countdown-bar {
-    animation: journal-notification-countdown-pulse
-      var(--notification-pulse-duration, 1400ms) ease-in-out infinite;
-    animation-play-state: var(--notification-motion-play-state, running);
-  }
-  .journal-notification[data-progress-phase="middle"]
-    .journal-notification-countdown-bar::before {
-    animation: journal-notification-countdown-drift 5200ms
-      cubic-bezier(0.45, 0, 0.25, 1) infinite;
-    animation-play-state: var(--notification-motion-play-state, running);
-  }
-  .journal-notification[data-progress-phase="final"]
-    .journal-notification-countdown-bar::after {
-    box-shadow: 0 0 6px
-      color-mix(in srgb, var(--countdown-rose) 40%, transparent);
-  }
-  .journal-notification-urgency-glow {
-    animation: journal-notification-card-breathe
-      var(--notification-pulse-duration, 1400ms) ease-in-out infinite;
-    animation-play-state: var(--notification-motion-play-state, running);
-  }
   .journal-notification[data-paused="true"]
-    :is(
-      .journal-notification-countdown-bar,
-      .journal-notification-urgency-glow,
-      .journal-notification-last-seconds
-    ) {
-    animation-play-state: paused;
-  }
-  .journal-notification[data-paused="true"]
-    :is(
-      .journal-notification-countdown-arrival,
-      .journal-notification-countdown-sheen
-    ),
-  .journal-notification[data-paused="true"]
-    .journal-notification-countdown-arrival::before,
-  .journal-notification[data-paused="true"]
-    .journal-notification-countdown-bar::before {
-    animation-play-state: paused;
-  }
-  .journal-notification:not([data-phase="idle"])
-    .journal-notification-urgency-glow {
-    animation: none;
-    opacity: 0;
+    .journal-notification-countdown-bar {
+    transition: none;
   }
   .journal-toaster [data-mounted="true"] .journal-toast-art-arrival {
     animation: journal-toast-art-arrive var(--toast-art-arrival-duration)
@@ -1721,20 +1698,6 @@
     animation: journal-toast-glyph-reveal 720ms cubic-bezier(0.2, 0.8, 0.2, 1)
       160ms both;
   }
-  .journal-toaster [data-mounted="true"] .journal-toast-halo {
-    animation: journal-toast-settle-ring 760ms ease-out 590ms both;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-halo-echo {
-    animation-duration: 900ms;
-    animation-delay: 710ms;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-flash {
-    animation: journal-toast-threshold-flash 620ms ease-out 620ms both;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-spark {
-    animation: journal-toast-spark-burst 640ms ease-out
-      calc(640ms + var(--spark-index) * 18ms) both;
-  }
   .journal-toaster [data-mounted="true"] .journal-toast-plate-arrival-back {
     animation: journal-toast-back-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
       120ms backwards;
@@ -1743,89 +1706,10 @@
     animation: journal-toast-middle-unfold 940ms cubic-bezier(0.22, 1, 0.36, 1)
       180ms backwards;
   }
-  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin {
-    animation: journal-toast-plate-turn var(--toast-spin-period)
-      cubic-bezier(0.36, 0.22, 0.64, 0.78) var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-plate-spin-middle {
-    animation-direction: reverse;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-plate {
-    animation: journal-toast-plate-breathe
-      calc(var(--toast-spin-period) * 12 / 5) ease-in-out
-      var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-plate-middle {
-    animation-direction: reverse;
-  }
-  .journal-toaster [data-mounted="true"] .journal-toast-tile {
-    animation: journal-toast-tile-breathe 9.6s ease-in-out
-      var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="update"]
-    .journal-toast-update-arrows {
-    animation: journal-toast-update-sync 2.8s cubic-bezier(0.45, 0, 0.55, 1)
-      var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="update"]
-    .journal-toast-update-cloud {
-    animation: journal-toast-update-cloud 5.6s ease-in-out
-      var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="success"]
-    .journal-toast-glyph {
-    transform-origin: 50% 14%;
-    animation: journal-notification-bell-ring 4.8s
-      cubic-bezier(0.45, 0, 0.55, 1) var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="info"]
-    .journal-toast-glyph {
-    transform-origin: 50% 80%;
-    animation: journal-bulb-charge 4.6s ease-in-out infinite;
-  }
-  .journal-toaster [data-mounted="true"] .journal-bulb-halo {
-    animation: journal-bulb-halo 4.6s ease-in-out infinite;
-  }
-  .journal-toaster [data-mounted="true"] .journal-bulb-glass {
-    animation: journal-bulb-light 4.6s ease-in-out infinite;
-  }
-  .journal-toaster [data-mounted="true"] .journal-bulb-rays {
-    animation: journal-bulb-radiate 4.6s ease-in-out infinite;
-  }
-  .journal-toaster [data-mounted="true"] .journal-bulb-echo-rays {
-    animation: journal-bulb-echo 4.6s ease-out infinite;
-  }
+  /* Animate work in progress, rather than every idle notification surface. */
   [data-toast-symbol="loading"] .journal-toast-glyph {
-    animation: journal-toast-turn 2.4s cubic-bezier(0.4, 0.15, 0.55, 0.85)
-      infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="success"]
-    .journal-toast-bell-rings {
-    animation: journal-toast-bell-rings-window 4.8s linear
-      var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="success"]
-    .journal-toast-bell-ring-mark {
-    animation: journal-toast-bell-ring-left 200ms cubic-bezier(0.3, 0, 0.7, 1)
-      var(--toast-ambient-delay) infinite;
-  }
-  .journal-toaster
-    [data-mounted="true"]
-    [data-toast-symbol="success"]
-    .journal-toast-bell-ring-right {
-    animation-name: journal-toast-bell-ring-right;
+    animation: journal-toast-turn 900ms linear infinite;
+    animation-play-state: var(--notification-motion-play-state, running);
   }
   :is(
       .journal-notification-revert,
@@ -1972,57 +1856,7 @@
     transform: scale(0.9);
   }
 }
-@keyframes journal-notification-countdown-thread {
-  0% {
-    opacity: 0;
-    transform: translateX(0);
-  }
-  18% {
-    opacity: 0.9;
-  }
-  68% {
-    opacity: 0.72;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(650%);
-  }
-}
-@keyframes journal-notification-countdown-drift {
-  0%,
-  26% {
-    opacity: 0;
-    transform: translateX(0);
-  }
-  42% {
-    opacity: 0.22;
-  }
-  66%,
-  100% {
-    opacity: 0;
-    transform: translateX(480%);
-  }
-}
-@keyframes journal-notification-countdown-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    filter: brightness(1);
-  }
-  50% {
-    opacity: calc(1 - var(--notification-pulse-urgency, 0) * 0.24);
-    filter: brightness(calc(1 + var(--notification-pulse-urgency, 0) * 0.2));
-  }
-}
-@keyframes journal-notification-card-breathe {
-  0%,
-  100% {
-    opacity: calc(var(--notification-card-urgency, 0) * 0.12);
-  }
-  50% {
-    opacity: calc(var(--notification-card-urgency, 0) * 0.36);
-  }
-}
+
 @keyframes journal-notification-card-arrive {
   0% {
     opacity: 0;
@@ -2124,50 +1958,10 @@
     transform: translate(1.225px, 0) rotate(15deg);
   }
 }
-@keyframes journal-toast-plate-turn {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes journal-toast-tile-breathe {
-  0%,
-  100% {
-    transform: scale(1) rotate(0deg);
-  }
-  25% {
-    transform: scale(1.018) rotate(0.55deg);
-  }
-  50% {
-    transform: scale(0.992) rotate(-0.4deg);
-  }
-  75% {
-    transform: scale(1.012) rotate(0.3deg);
-  }
-}
+
 /* The sync arrows make a deliberate held-threshold turn while the cloud only
    breathes enough to keep the illustration alive without competing for focus. */
-@keyframes journal-toast-update-sync {
-  0%,
-  12% {
-    transform: rotate(0deg) scale(1);
-  }
-  46% {
-    transform: rotate(185deg) scale(1.08);
-  }
-  57% {
-    transform: rotate(176deg) scale(0.97);
-  }
-  68% {
-    transform: rotate(182deg) scale(1.02);
-  }
-  92%,
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
-}
+
 @keyframes journal-toast-update-cloud {
   0%,
   100% {
@@ -2179,68 +1973,7 @@
     transform: translateY(-0.7px) scale(1.025);
   }
 }
-@keyframes journal-toast-plate-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  28% {
-    transform: scale(1.055);
-  }
-  74% {
-    transform: scale(0.95);
-  }
-}
-@keyframes journal-toast-settle-ring {
-  0% {
-    opacity: 0;
-    transform: scale(0.75);
-  }
-  24% {
-    opacity: 0.55;
-    transform: scale(1);
-  }
-  92% {
-    opacity: 0;
-    transform: scale(1.22);
-  }
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-}
-@keyframes journal-toast-threshold-flash {
-  0% {
-    opacity: 0;
-    transform: scale(0.45);
-  }
-  26% {
-    opacity: 0.66;
-    transform: scale(1.08);
-  }
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-}
-@keyframes journal-toast-spark-burst {
-  0% {
-    opacity: 0;
-    transform: translateY(3.675px) scale(0.3);
-  }
-  24% {
-    opacity: 0.85;
-    transform: translateY(-3px) scale(1.05);
-  }
-  92% {
-    opacity: 0;
-    transform: translateY(-13px) scale(0.2);
-  }
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-}
+
 @keyframes journal-toast-turn {
   to {
     transform: rotate(360deg);
@@ -2249,114 +1982,26 @@
 /* Fast → slow → fast ringing. Neutral seam velocities match at −104.17°/s;
    every peak turns smoothly, without an idle range or a loop-reset jump. */
 /* Charge for 1s, hold until 3.9s, then dim and settle. */
-@keyframes journal-bulb-charge {
-  0%,
-  95.65%,
-  100% {
-    transform: none;
-    color: #fde68a;
-  }
-  6.09% {
-    transform: rotate(-5deg) scale(0.94);
-    color: #facc15;
-  }
-  12.17% {
-    transform: rotate(4deg) scale(0.9);
-  }
-  16.52% {
-    transform: rotate(-2deg) scale(1.08);
-    color: #fde047;
-  }
-  19.13% {
-    transform: rotate(1deg) scale(0.99);
-  }
-  21.74%,
-  84.78% {
-    transform: none;
-    color: #fff3a3;
-  }
-}
-@keyframes journal-bulb-light {
-  0%,
-  95.65%,
-  100% {
-    fill-opacity: 0;
-    filter: drop-shadow(0 0 0 transparent);
-  }
-  17.39% {
-    fill-opacity: 0.46;
-    filter: drop-shadow(0 0 0 transparent);
-  }
-  21.74% {
-    fill-opacity: 0.98;
-  }
-  33.04%,
-  84.78% {
-    fill-opacity: 0.98;
-    filter: drop-shadow(0 0 3px currentColor);
-  }
-}
+
 /* The first rays open at 0.8s and release at 3.8s, just before dimming. */
-@keyframes journal-bulb-radiate {
-  0%, 17.39% { opacity: 0; stroke-dashoffset: 1; transform: scale(1); }
-  27.83%, 82.61% { opacity: 1; stroke-dashoffset: 0; transform: scale(1); color: #fff8ca; }
-  88% { opacity: 0; }
-  94%, 100% { opacity: 0; transform: scale(1.34); }
-}
+
 /* Rays appear at 1.2s and finish fading at 3.7s: 200ms inside either
    edge of the bright hold. Each burst finishes its outward drift unseen. */
-@keyframes journal-bulb-echo {
-  0%, 26.087%, 61.522% { opacity: 0; transform: scale(.96); }
-  32%, 39%, 67.435%, 74.435% { opacity: .85; transform: scale(1); }
-  45%, 80.435% { opacity: 0; }
-  51%, 86.435%, 100% { opacity: 0; transform: scale(1.38); }
-}
-@keyframes journal-bulb-halo {
-  0%, 13.91%, 100% { opacity: 0; }
-  27.83%, 94.52% { opacity: .7885; }
-}
 
-@keyframes journal-notification-bell-ring {
-  0% {
-    transform: rotate(0);
-    animation-timing-function: cubic-bezier(0.2, 0.4, 0.4, 1);
-  }
-  100% {
-    transform: rotate(0);
-  }
-  6% {
-    transform: rotate(-15deg);
-  }
-  16% {
-    transform: rotate(16deg);
-  }
-  32% {
-    transform: rotate(-12deg);
-  }
-  58% {
-    transform: rotate(11deg);
-  }
-  80% {
-    transform: rotate(-14deg);
-  }
-  94% {
-    transform: rotate(15deg);
-    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.6);
-  }
-}
-/* The fast wing crosses the seam continuously; the slow middle stays clear. */
-@keyframes journal-toast-bell-rings-window {
+@keyframes journal-bulb-halo {
   0%,
-  12%,
-  88%,
+  13.91%,
   100% {
-    opacity: 1;
-  }
-  18%,
-  82% {
     opacity: 0;
   }
+  27.83%,
+  94.52% {
+    opacity: 0.7885;
+  }
 }
+
+/* The fast wing crosses the seam continuously; the slow middle stays clear. */
+
 /* Twenty-four matched vibrations per bell cycle keep both marks in phase. */
 @keyframes journal-toast-bell-ring-left {
   0%,
@@ -2450,13 +2095,14 @@
   }
 }
 
-/* Daylight notifications use rose paper; the animated bell remains a dark tile. */
+/* Daylight notifications use rose paper; the icon keeps its dark tile. */
 @media (prefers-color-scheme: light) {
   .journal-toaster[data-sonner-toaster],
   .journal-toaster[data-sonner-toaster][data-sonner-theme] {
-    --toast-ink: #fff5fb;
-    --toast-muted: #eeddeb;
+    --toast-ink: var(--foreground, #35213f);
+    --toast-muted: var(--muted-foreground, #68546f);
     --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 86%, transparent);
+    --toast-deep-overlay: transparent;
     --toast-surface: var(--popover);
     --toast-surface-layers:
       linear-gradient(
@@ -2556,27 +2202,27 @@
 
   .journal-notification {
     --toast-wash-pink: transparent;
-    --toast-wash-pale: color-mix(in srgb, var(--color-pink-200, #fbcfe8) 26%, transparent);
-    --toast-wash-purple: color-mix(in srgb, var(--color-purple-200, #e9d5ff) 26%, transparent);
-    --toast-wash-base: color-mix(in srgb, var(--surface-raised) 94%, transparent);
+    --toast-wash-pale: color-mix(
+      in srgb,
+      var(--color-pink-200, #fbcfe8) 26%,
+      transparent
+    );
+    --toast-wash-purple: color-mix(
+      in srgb,
+      var(--color-purple-200, #e9d5ff) 26%,
+      transparent
+    );
+    --toast-wash-base: color-mix(
+      in srgb,
+      var(--surface-raised) 94%,
+      transparent
+    );
   }
   .journal-notification-footer-fade {
     background:
-      linear-gradient(
-        to top,
-        var(--toast-wash-pale),
-        transparent 45%
-      ),
-      linear-gradient(
-        to top,
-        var(--toast-wash-purple),
-        transparent 72%
-      ),
-      linear-gradient(
-        to top,
-        var(--toast-wash-base),
-        transparent
-      );
+      linear-gradient(to top, var(--toast-wash-pale), transparent 45%),
+      linear-gradient(to top, var(--toast-wash-purple), transparent 72%),
+      linear-gradient(to top, var(--toast-wash-base), transparent);
   }
 
   .journal-notification-footer-copy {
@@ -2645,8 +2291,11 @@
   gap: 12px;
   padding: 3px clamp(4px, 2vw, 12px) 0;
 }
-.journal-policy-intro { text-align: center; }
-.journal-policy-intro h3, .journal-medication-policy-alert h4 {
+.journal-policy-intro {
+  text-align: center;
+}
+.journal-policy-intro h3,
+.journal-medication-policy-alert h4 {
   margin: 0;
   color: var(--toast-ink);
   font-size: 16px;
@@ -2657,8 +2306,12 @@
   margin: 5px auto;
   text-wrap: pretty;
 }
-.journal-policy-intro h3 { font-weight: 800; }
-.journal-medication-policy-alert h4 { font-weight: 720; }
+.journal-policy-intro h3 {
+  font-weight: 800;
+}
+.journal-medication-policy-alert h4 {
+  font-weight: 720;
+}
 @media (prefers-reduced-motion: no-preference) {
   [data-expanded="true"] .journal-policy-clock {
     animation: journal-policy-clock-in 680ms 350ms both;
@@ -2666,25 +2319,49 @@
   }
 }
 @keyframes journal-policy-clock-in {
-  0% { opacity: 0; transform: rotate(145deg) scale(.25); }
-  58% { opacity: 1; transform: rotate(-16deg) scale(1.24); }
-  80% { transform: rotate(5deg) scale(.94); }
-  100% { transform: rotate(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: rotate(145deg) scale(0.25);
+  }
+  58% {
+    opacity: 1;
+    transform: rotate(-16deg) scale(1.24);
+  }
+  80% {
+    transform: rotate(5deg) scale(0.94);
+  }
+  100% {
+    transform: rotate(0) scale(1);
+  }
 }
 .journal-medication-policy-alert {
   padding: 13px;
   border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: 16px;
-  background: linear-gradient(color-mix(in srgb, var(--color-mauve-950, #0c090c) 24%, transparent) 0 0), color-mix(in srgb, var(--card) 37%, transparent);
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--color-mauve-950, #0c090c) 24%, transparent) 0 0
+    ),
+    color-mix(in srgb, var(--card) 37%, transparent);
 }
-.journal-medication-policy-alert header, .journal-policy-stats dt {
+.journal-medication-policy-alert header,
+.journal-policy-stats dt {
   display: flex;
   align-items: center;
   gap: 7px;
 }
-.journal-medication-policy-alert header small { margin-inline-start: auto; }
-.journal-policy-count { white-space: nowrap; font-size: 11px; }
-.journal-policy-count b { color: var(--toast-ink); font-size: 15px; margin-inline-end: 3px; }
+.journal-medication-policy-alert header small {
+  margin-inline-start: auto;
+}
+.journal-policy-count {
+  white-space: nowrap;
+  font-size: 11px;
+}
+.journal-policy-count b {
+  color: var(--toast-ink);
+  font-size: 15px;
+  margin-inline-end: 3px;
+}
 .journal-medication-policy-alert p {
   margin: 9px 0 0;
   display: -webkit-box;
@@ -2692,12 +2369,37 @@
   -webkit-line-clamp: 4;
   overflow: hidden;
 }
-.journal-policy-stats { display: grid; gap: 15px; margin: 0; }
-.journal-policy-stats > div { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 4px 8px; }
-.journal-policy-stats dt { color: var(--toast-ink); font-size: 13px; font-weight: 650; }
-.journal-policy-stats svg { width: 14px; height: 14px; flex: none; }
-.journal-policy-stats dd { margin: 0; }
-.journal-policy-description { opacity: .5833; grid-column: 1 / -1; font-size: 12px; line-height: 1.5; text-wrap: pretty; }
+.journal-policy-stats {
+  display: grid;
+  gap: 15px;
+  margin: 0;
+}
+.journal-policy-stats > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 8px;
+}
+.journal-policy-stats dt {
+  color: var(--toast-ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+.journal-policy-stats svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.journal-policy-stats dd {
+  margin: 0;
+}
+.journal-policy-description {
+  opacity: 0.5833;
+  grid-column: 1 / -1;
+  font-size: 12px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
 [data-medication-policy] .journal-notification-details-inner::before,
 [data-medication-policy] .journal-notification-footer::before,
 .journal-medication-policy hr {
@@ -2707,28 +2409,47 @@
   height: 1px;
   margin: 2px auto 22px;
   border: 0;
-  background: linear-gradient(90deg, transparent, var(--toast-rim-muted) 8% 92%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--toast-rim-muted) 8% 92%,
+    transparent
+  );
 }
 .journal-medication-policy hr {
-  opacity: .6667;
+  opacity: 0.6667;
   margin-block: 2px;
 }
-[data-medication-policy] .journal-notification-footer { border: 0; padding-top: 0; }
-[data-medication-policy] .journal-notification-footer::before { margin: 0 auto 5px; }
+[data-medication-policy] .journal-notification-footer {
+  border: 0;
+  padding-top: 0;
+}
+[data-medication-policy] .journal-notification-footer::before {
+  margin: 0 auto 5px;
+}
 
-.journal-policy-disclosure { text-align: center; }
+.journal-policy-disclosure {
+  text-align: center;
+}
 .journal-policy-reveal {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 280ms ease, opacity 280ms ease;
+  transition:
+    grid-template-rows 280ms ease,
+    opacity 280ms ease;
 }
-.journal-policy-reveal > div { min-height: 0; overflow: hidden; }
+.journal-policy-reveal > div {
+  min-height: 0;
+  overflow: hidden;
+}
 .journal-policy-disclosure[data-open="true"] .journal-policy-reveal {
   grid-template-rows: 1fr;
   opacity: 1;
 }
-.journal-policy-disclosure hr { margin: 2px auto 8px; }
+.journal-policy-disclosure hr {
+  margin: 2px auto 8px;
+}
 .journal-policy-toggle {
   display: inline-flex;
   align-items: center;
@@ -2740,8 +2461,15 @@
   font-size: 12px;
   cursor: pointer;
 }
-.journal-policy-toggle:focus-visible { outline: 2px solid currentColor; }
-.journal-policy-disclosure .journal-policy-stats { padding-top: 16px; text-align: start; }
+.journal-policy-toggle:focus-visible {
+  outline: 2px solid currentColor;
+}
+.journal-policy-disclosure .journal-policy-stats {
+  padding-top: 16px;
+  text-align: start;
+}
 @media (prefers-reduced-motion: reduce) {
-  .journal-policy-reveal { transition: none; }
+  .journal-policy-reveal {
+    transition: none;
+  }
 }

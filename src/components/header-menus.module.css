@@ -350,7 +350,7 @@
   opacity: var(--navigation-paint-opacity);
   content: "";
   pointer-events: none;
-  animation: navigationPigmentFlow 16s ease-in-out infinite alternate;
+  animation: none;
   animation-play-state: paused;
   transition: opacity 180ms ease;
 }

@@ -1,15 +1,11 @@
-import { Iridescence } from "@/components/iridescence";
-
-/** The same tinted still remains beneath the passive live field and during SSR. */
+/** A single mode-aware CSS still keeps the violet field without a render loop. */
 export function JournalBackground() {
   return (
     <div
       className="ambient"
       data-background="iridescence"
-      data-motion-profile="passive"
+      data-motion-profile="still"
       aria-hidden="true"
-    >
-      <Iridescence />
-    </div>
+    />
   );
 }

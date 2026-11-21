@@ -16,6 +16,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
@@ -33,7 +34,12 @@ import {
   useJournalWorkspace,
   usePersistentDraft,
 } from "@/components/journal-drafts";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { PageHeading, PageSurface } from "@/components/page-heading";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
@@ -57,7 +63,6 @@ import {
   MedicationListHeading,
   MedicationsHeading,
 } from "@/components/medications-heading";
-import { IntakeForm } from "@/components/intake-form";
 import { IntakeAction } from "@/components/intake-action";
 import { IntakeCardGroup } from "@/components/intake-card-group";
 import { IntakeTimelineEntrance } from "@/components/intake-timeline-entrance";
@@ -74,11 +79,9 @@ import { PageTopFade, TodayTopFade } from "@/components/today-top-fade";
 import { PageActionDock } from "@/components/page-action-dock";
 import { DayTimeMarker } from "@/components/day-time-marker";
 import { cn } from "@/lib/utils";
-import {
-  GoalForm,
-  MedicationForm,
-  type MedicationDraftAvailability,
-  type MedicationFormControls,
+import type {
+  MedicationDraftAvailability,
+  MedicationFormControls,
 } from "@/components/manage-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,6 +103,17 @@ import {
 } from "@/lib/domain";
 
 type HistoryView = { limit: number; expandedWeeks?: string[] };
+
+// Form/catalog/editor code is loaded only when its dialog is opened.
+const IntakeForm = dynamic(() =>
+  import("@/components/intake-form").then((module) => module.IntakeForm),
+);
+const MedicationForm = dynamic(() =>
+  import("@/components/manage-forms").then((module) => module.MedicationForm),
+);
+const GoalForm = dynamic(() =>
+  import("@/components/manage-forms").then((module) => module.GoalForm),
+);
 
 function historyView(value: unknown): value is HistoryView {
   return Boolean(
@@ -219,10 +233,18 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       context={
         <JournalDialogSubheading
           title={intake.medicationName}
-          detail={<time dateTime={intake.takenAt}>{new Intl.DateTimeFormat("en-GB", {
-            timeZone: data?.settings.timezone, day: "numeric", month: "short",
-            hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-          }).format(new Date(intake.takenAt))}</time>}
+          detail={
+            <time dateTime={intake.takenAt}>
+              {new Intl.DateTimeFormat("en-GB", {
+                timeZone: data?.settings.timezone,
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+                hourCycle: "h23",
+              }).format(new Date(intake.takenAt))}
+            </time>
+          }
         />
       }
       description="Adjust the medication, route or amount to match what you took. The date and time determine which tracking day this entry belongs to."
@@ -507,7 +529,15 @@ function LogIntakeDialog({
       headerVariant="check-in"
       context={
         <JournalDialogSubheading
-          title={<time dateTime={day}>{formatDay(day, { weekday: "long", month: undefined, day: undefined })}</time>}
+          title={
+            <time dateTime={day}>
+              {formatDay(day, {
+                weekday: "long",
+                month: undefined,
+                day: undefined,
+              })}
+            </time>
+          }
           detail={formatDay(day, { weekday: undefined, month: "long" })}
         />
       }
@@ -519,14 +549,28 @@ function LogIntakeDialog({
       headerActions={
         <TooltipProvider>
           <Tooltip open={showResetHint && canReset} triggerId={resetId}>
-            <TooltipTrigger id={resetId} type="reset" render={
-              <Button type="reset" form={formId} variant="ghost" size="icon" rim={false}
-                className={closeStyles.control} data-restored-hint={showResetHint || undefined}
-                disabled={!canReset} aria-label="Reset intake draft">
-                <ActionIcon name="retry" className="size-[18px]" />
-              </Button>
-            } />
-            <TooltipContent side="bottom" align="end">Clear this draft and start fresh.</TooltipContent>
+            <TooltipTrigger
+              id={resetId}
+              type="reset"
+              render={
+                <Button
+                  type="reset"
+                  form={formId}
+                  variant="ghost"
+                  size="icon"
+                  rim={false}
+                  className={closeStyles.control}
+                  data-restored-hint={showResetHint || undefined}
+                  disabled={!canReset}
+                  aria-label="Reset intake draft"
+                >
+                  <ActionIcon name="retry" className="size-[18px]" />
+                </Button>
+              }
+            />
+            <TooltipContent side="bottom" align="end">
+              Clear this draft and start fresh.
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       }
@@ -648,7 +692,9 @@ export function MedicationsPage() {
   useEffect(() => {
     if (!data || historyNoticeShown.current) return;
     historyNoticeShown.current = true;
-    const linkedMedications = new Set(data.intakes.map((entry) => entry.medicationId)).size;
+    const linkedMedications = new Set(
+      data.intakes.map((entry) => entry.medicationId),
+    ).size;
     toast.info(
       "Strength changes recalculate past doses and totals. Logged quantities, times and notes stay as entered.",
       {
@@ -663,7 +709,10 @@ export function MedicationsPage() {
           facts: [
             { label: "Entries", value: String(data.intakes.length) },
             { label: "Library", value: String(data.medications.length) },
-            { label: "Dose totals", value: `${linkedMedications} logged medication${linkedMedications === 1 ? "" : "s"}` },
+            {
+              label: "Dose totals",
+              value: `${linkedMedications} logged medication${linkedMedications === 1 ? "" : "s"}`,
+            },
           ],
           links: [{ label: "Medication Library", href: "/medications" }],
           footer:

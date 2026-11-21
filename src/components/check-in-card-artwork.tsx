@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { CardIconSettle } from "@/components/card-icon-settle";
 import { MedicationCardIconFrame } from "@/components/medication-card-icon";
 import { EveningMoon } from "@/components/evening-moon";
 import { MorningCoffee } from "@/components/morning-coffee";
@@ -9,69 +5,20 @@ import styles from "./check-in-card-artwork.module.css";
 
 export const CHECK_IN_CARD_COLOR = "tw-violet-400";
 
-/** A small illustrated companion; the card remains the only interactive target. */
+/** Repeated card artwork stays still and needs no per-card activity observers. */
 export function CheckInCardArtwork({
   period,
-  replayKey,
-  dialogOpen = false,
 }: {
   period: "morning" | "evening";
   replayKey: string;
   dialogOpen?: boolean;
 }) {
   return (
-    <ArtworkScene
-      key={`${period}:${replayKey}`}
-      period={period}
-      dialogOpen={dialogOpen}
-    />
-  );
-}
-
-/** A keyed scene owns its arrival and the later ambient handoff together. */
-function ArtworkScene({
-  period,
-  dialogOpen,
-}: {
-  period: "morning" | "evening";
-  dialogOpen: boolean;
-}) {
-  const [ambientReady, setAmbientReady] = useState(false);
-  const [entryReady, setEntryReady] = useState(false);
-  const morning = period === "morning";
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const resetAmbient = () => {
-      setAmbientReady(false);
-      setEntryReady(false);
-    };
-    reduced.addEventListener("change", resetAmbient);
-    return () => reduced.removeEventListener("change", resetAmbient);
-  }, []);
-
-  return (
     <span
       className={styles.stage}
       data-check-in-artwork={period}
-      data-artwork-dialog-open={dialogOpen}
-      data-artwork-ambient-ready={ambientReady}
       aria-hidden="true"
     >
-      <span
-        className={styles.entryGate}
-        data-check-in-entry-gate
-        onAnimationEnd={(event) => {
-          if (event.target === event.currentTarget) setEntryReady(true);
-        }}
-      />
-      <span
-        className={styles.ambientGate}
-        data-check-in-ambient-gate
-        onAnimationEnd={(event) => {
-          if (event.target === event.currentTarget) setAmbientReady(true);
-        }}
-      />
       <span className={styles.arrival}>
         <MedicationCardIconFrame
           color={CHECK_IN_CARD_COLOR}
@@ -82,31 +29,15 @@ function ArtworkScene({
           }}
           data-check-in-icon-tile
         >
-          <span className={styles.symbolArrival}>
-            <span className={styles.symbolFloat}>
-              {morning ? (
-                <MorningCoffee className={styles.coffee} />
-              ) : (
-                <EveningMoon
-                  dialogOpen={dialogOpen}
-                  ambientReady={ambientReady}
-                  entryReady={entryReady}
-                />
-              )}
-            </span>
+          <span className={styles.symbolFloat}>
+            {period === "morning" ? (
+              <MorningCoffee className={styles.coffee} />
+            ) : (
+              <EveningMoon />
+            )}
           </span>
         </MedicationCardIconFrame>
       </span>
-      {morning && (
-        <>
-          <CardIconSettle owner="check-in" />
-          <svg className={styles.flourish} viewBox="0 0 56 56" fill="none">
-            <path d="M47 4v4m-2-2h4" />
-            <path d="M5 44v3m-1.5-1.5h3" />
-            <circle cx="49" cy="47" r="1.1" fill="currentColor" stroke="none" />
-          </svg>
-        </>
-      )}
     </span>
   );
 }

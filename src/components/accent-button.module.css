@@ -78,7 +78,7 @@
   opacity: var(--action-field-opacity);
   transform: translate(-50%, -50%) rotate(12deg);
   transform-origin: center;
-  animation: warm-field 26s linear infinite;
+  animation: none;
   animation-play-state: var(--accent-play-state);
 }
 
@@ -150,7 +150,7 @@
     var(--accent-rim-one)
   );
   transform: translate(-50%, -50%) rotate(0deg);
-  animation: warm-edge 8s linear -2s infinite;
+  animation: none;
   animation-play-state: var(--accent-play-state);
 }
 

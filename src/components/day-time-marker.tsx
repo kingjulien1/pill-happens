@@ -1,7 +1,11 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-import { useJournalWorkspace } from "@/components/journal-drafts";
+import { useCallback } from "react";
+import {
+  useJournalWorkspace,
+  useWorkspaceSnapshot,
+} from "@/components/journal-drafts";
+import type { WorkspaceSnapshot } from "@/lib/journal-drafts";
 import { checkInDraftKey } from "@/lib/check-in-draft";
 import type { DailyCheckIn } from "@/lib/daily-check-in";
 import { getDayBoundaryTimes } from "@/lib/day-boundary-times";
@@ -20,12 +24,12 @@ export function DayTimeMarker({
   const morning = position === "start";
   const period = morning ? "morning" : "evening";
   const { store } = useJournalWorkspace();
-  const snapshot = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
+  const selectDraft = useCallback(
+    (snapshot: WorkspaceSnapshot) =>
+      snapshot.drafts[checkInDraftKey(day, period)]?.value,
+    [day, period],
   );
-  const rawDraft = snapshot.drafts[checkInDraftKey(day, period)]?.value;
+  const rawDraft = useWorkspaceSnapshot(store, selectDraft);
   const times = getDayBoundaryTimes(
     morning
       ? { morning: checkIn, morningDraft: rawDraft }

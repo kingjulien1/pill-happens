@@ -640,8 +640,8 @@ export function DeveloperGuidePage() {
                 boundaries and focus rings remain distinct on rose/lilac paper;
                 selected ratings use deep semantic primary ink. The root uses
                 <code> {APP_LIGHT_CANVAS.base}</code> Rose/Lilac paper with a
-                protective 90% glaze over the same passive violet shader. Dark
-                Mode keeps its original deeper field and exact overlays. Local
+                protective 90% glaze over the static violet field. Dark Mode
+                keeps its original deeper field and exact overlays. Local
                 surfaces follow Light, Dark or System. Editing the light
                 registry does not recolor personal medication symbols or change
                 the dark role values. The live tables and inspectors below read
@@ -667,8 +667,8 @@ export function DeveloperGuidePage() {
                 theme-color metadata follows the selected mode, including a
                 manual selection opposite to the device. Offline restores that
                 same device-local preference without reading journal data. Mode
-                changes retain the shader instance and phase without modifying
-                medication data, drafts or a notification timer.
+                changes update CSS colors without allocating a GPU context or
+                modifying medication data, drafts or a notification timer.
               </p>
             </Detail>
             <Detail
@@ -1158,69 +1158,38 @@ export function DeveloperGuidePage() {
             </Detail>
             <Detail
               title="The Iridescence Background"
-              context="Violet Field &amp; Layered Tints"
+              context="Static Violet Field &amp; Layered Tints"
             >
               <p>
-                <code>JournalBackground</code> mounts one passive React Bits
-                Iridescence field at the root, shared across every route and
-                appearance mode. The native WebGL2 shader uses
-                <code> #7c3aed</code> with speed 0.86, detail 8 and brightness
-                1.5. Mouse reaction and click swirls are disabled; there are no
-                pointer listeners or interaction textures. Source is pinned to
-                revision <code>d01aa91</code>, with its David Haz attribution
-                and MIT + Commons Clause notice preserved at
-                <code> public/licenses/react-bits.txt</code>.
+                <code>JournalBackground</code> paints one static CSS field at
+                the root, shared across every route and appearance mode. It
+                keeps the original <code>#7c3aed</code> violet identity and
+                layered washes without a WebGL canvas, animation clock, resize
+                observer or pointer listener. The retired{" "}
+                <code>Iridescence</code> export is a no-op compatibility entry
+                point.
               </p>
               <p>
-                Dark Mode paint order is deliberate: the field first receives a
-                light
-                <strong> 4px blur</strong>, then Pink300 at exactly
-                <strong> 21% opacity</strong>, then Purple900 at exactly
-                <strong> 69% opacity</strong>. Only the canvas blurs; text,
-                cards and controls remain sharp. A 12px overscan keeps blurred
-                edges outside the viewport. The frozen
-                <code> APP_IRIDESCENCE</code> settings and shared
-                <code> APP_CANVAS_OVERLAY</code> keep the live field and
-                fallback washes in agreement. The ready layer contains both the
-                opaque shader and its washes, preventing an extra tint over the
-                still when WebGL is unavailable.
+                Dark Mode combines Pink300 at 21% opacity and Purple900 at 69%
+                opacity above the violet field. A final 39% mesh blends orchid,
+                iris, rose, lagoon and violet in unequal, off-center elliptical
+                pools, with pastel equivalents in Light Mode. These gradients
+                stay still, so an idle page needs no continuous background
+                repaint. The original React Bits attribution and MIT + Commons
+                Clause notice remain at{" "}
+                <code>public/licenses/react-bits.txt</code>.
               </p>
               <p>
-                A final 7% wash blends Fuchsia300 and Violet400 in offset
-                elliptical pools above the field. It drifts on a 34-second loop
-                in both appearances. Reduced motion, the refresh screen and the
-                offline page show the still gradient.
-              </p>
-              <p>
-                Hidden documents and offscreen backgrounds pause their animation
-                clock without consuming hidden time. Live reduced-motion changes
-                settle on a still frame; disabling the preference resumes the
-                field without a jump. Context loss immediately reveals the CSS
-                fallback, and restoration rebuilds GPU resources. Unmounting
-                cancels frames, disconnects observers and releases the context.
-                Mobile rendering is capped at DPR 1.25 and 750,000 backing-store
-                pixels; desktop uses DPR 1.5 and 1,800,000 pixels. This limits
-                GPU work without changing the shader’s aspect ratio or motion
-                speed on slower devices.
-              </p>
-              <p>
-                APP_CANVAS_BY_MODE pairs the live overlay, still, foundation and
-                reading inks for each appearance. Dark Mode retains its
-                Plum/Black <code>#29213b</code> base, White primary copy and
-                Lilac secondary copy. Light Mode uses
-                <code> {APP_LIGHT_CANVAS.base}</code> paper, Plum
-                <code> {APP_LIGHT_CANVAS.foreground}</code> copy and muted Plum
-                <code> {APP_LIGHT_CANVAS.mutedForeground}</code>. A 90% paper
-                glaze bounds the entire shader before quiet Rose/Lilac radial
-                reflections. Unit checks exhaust every independent RGB bound and
-                radial extreme for normal-copy contrast, including fallback
-                colors. The same registry supplies pre-hydration, loading,
-                offline and unsupported-WebGL views and mode-aware browser
-                chrome. No shader reinitialization is needed when mode changes.
-                Semantic cards, dialogs, menus and reading panels follow
-                Appearance. Mobile dock fades, medication artwork, check-in
-                motion and the notification surface remain independent of the
-                root field.
+                APP_CANVAS_BY_MODE pairs the still field, foundation and reading
+                inks for each appearance. Dark Mode retains its Plum/Black
+                <code> #29213b</code> base, White primary copy and Lilac
+                secondary copy. Light Mode uses{" "}
+                <code>{APP_LIGHT_CANVAS.base}</code> paper, Plum{" "}
+                <code>{APP_LIGHT_CANVAS.foreground}</code> copy and muted Plum{" "}
+                <code>{APP_LIGHT_CANVAS.mutedForeground}</code>. The same
+                registry supplies pre-hydration, loading, offline and browser
+                chrome. Mode changes update CSS variables; cards, dialogs, menus
+                and reading panels follow Appearance.
               </p>
             </Detail>
             <Detail title="A Dock That Leaves Room" context="Mobile Actions">
@@ -1294,14 +1263,14 @@ export function DeveloperGuidePage() {
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
                 shadows retain the raised face. Log Intake uses a larger face
-                with a 6px inset, a 1⅔px surface edge and a 4px inner line.
-                Its outer SpecularCardBorder is shared with the Morning and
-                Evening cards: a 3px gap, 3.733px purple/pink rim, three brighter
-                stops and the same glow. Mobile keeps the shader inside the
-                native button through PrimaryButton’s decoration slot; desktop
-                uses the same sibling SVG and 5.46s highlight loop to avoid
-                Safari clipping. The transparent surround remains independent
-                of that outer border.
+                with a 6px inset, a 1⅔px surface edge and a 4px inner line. Its
+                outer SpecularCardBorder is shared with the Morning and Evening
+                cards: a 3px gap, 3.733px purple/pink rim, three brighter stops
+                and the same glow. Mobile uses a static CSS rim through
+                PrimaryButton’s decoration slot; desktop uses a static sibling
+                SVG to avoid Safari clipping. Neither creates a canvas or
+                repeating animation. The transparent surround remains
+                independent of that outer border.
               </p>
               <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
@@ -1393,12 +1362,11 @@ export function DeveloperGuidePage() {
                 the upper edge of the Wake-Up time value. Lilac and Pink200
                 supply its light, with a faint Rose wash near the top right. The
                 top fade uses 55% opacity in Dark Mode and 64% in Light Mode.
-                Its absolute paint scrolls
-                away with the header. ResizeObserver, viewport changes and font
-                readiness keep its endpoint aligned without changing the page
-                layout or intercepting input. The Medications page reuses
-                PageTopFade with its heading as the measured endpoint. Both top
-                fades are hidden at desktop widths.
+                Its absolute paint scrolls away with the header. ResizeObserver,
+                viewport changes and font readiness keep its endpoint aligned
+                without changing the page layout or intercepting input. The
+                Medications page reuses PageTopFade with its heading as the
+                measured endpoint. Both top fades are hidden at desktop widths.
               </p>
             </Detail>
             <Detail title="Canvas & Color Layers" context="Intake Cards">
@@ -1406,13 +1374,14 @@ export function DeveloperGuidePage() {
                 Intake, Morning/Evening check-in, medication-library and Past
                 Days cards share <code>MedicationCardBackground</code> and the
                 selectors in <code>card-frame.module.css</code>. One clipped
-                pane applies 96px standard/Safari backdrop blur. Dark Mode
-                layers an 8% Pink200 wash and a 6% selected-color wash over
-                transparent glass, using canvas-paired ink. Light Mode places 5%
-                Pink and selected-color washes over an 82% reading-paper veil
-                and switches to the paired reading ink. Reduced transparency and
-                unsupported backdrop filtering use an opaque paired base. Folded
-                rear copy stays hidden through stack state.
+                pane uses a static theme reading base instead of backdrop blur.
+                Dark Mode layers an 8% Pink200 wash and a 6% selected-color wash
+                over transparent glass, using canvas-paired ink. Light Mode
+                places 5% Pink and selected-color washes over an 82%
+                reading-paper veil and switches to the paired reading ink.
+                Reduced transparency and unsupported backdrop filtering use an
+                opaque paired base. Folded rear copy stays hidden through stack
+                state.
               </p>
               <p>
                 Intake, Morning/Evening, medication-library and Past Days cards
@@ -1459,17 +1428,10 @@ export function DeveloperGuidePage() {
                 text.
               </p>
               <p>
-                After page-entry readiness, the artwork tile grows and fades
-                into place over 760ms, rebounding through 1.10, 0.97, 1.035 and
-                its final scale. The glyph starts 120ms later, turns 720° over
-                980ms and uses the same scale rebound. Its first playful rock
-                waits another 250ms after that entrance finishes. Each 920ms
-                rock follows a nonlinear path. Later starts are randomized three
-                to six seconds apart, measured start to start: the rest after
-                completion subtracts the rock’s 920ms duration. Visibility,
-                hidden tabs and page readiness gate playback; an observer also
-                holds it while any dialog or drawer portal is open. Resuming
-                chooses a fresh delay. Reduced motion shows the settled artwork.
+                The medication heading uses a static Lucide bottle in the same
+                responsive footprint and primary ink. It is visible at first
+                paint without a delayed entrance, recurring shake timer or
+                document-wide dialog observer.
               </p>
               <p>
                 The Medications heading keeps its palette visible on phones
@@ -1757,11 +1719,11 @@ export function DeveloperGuidePage() {
                 including both guides’ wider content caps. Its 2px thickness and
                 20.8%-opacity canvas foreground stay consistent across the
                 middle, a 35% relative visibility reduction from 32%; a 0.35px
-                blur softens the line over a 12px standard/Safari backdrop blur.
-                Only the first and last clamp(18px, 5%, 32px) fade to
-                transparent, preserving its quiet glass edge. Existing 16px
-                vertical clearance increases to 20px from 640px, with safe-area
-                padding and guide sidebar offsets unchanged.
+                blur softens the line over a static theme surface. Only the
+                first and last clamp(18px, 5%, 32px) fade to transparent,
+                preserving its quiet glass edge. Existing 16px vertical
+                clearance increases to 20px from 640px, with safe-area padding
+                and guide sidebar offsets unchanged.
               </p>
               <p>
                 Appearance is a browser preference, separate from journal data.
@@ -2006,28 +1968,28 @@ export function DeveloperGuidePage() {
                 animated coffee/moon artwork. Intake, check-in,
                 medication-library and Past Days artwork use a 6px inward glass
                 rim at 28% combined alpha (20% selected color plus 8% primary
-                ink), with 96px standard/Safari backdrop blur. Its opaque face
-                is clipped to a 6px-padded content box to expose the glass ring.
-                The 1px saturated family-400/500 inner rim stays at 78%, inset
-                6.75px with a 9.25px radius and a 0.75px gap. Morning uses a
-                warm Rose400 identity while Evening uses a cool Violet400
+                ink), with static tint layers instead of backdrop blur. Its
+                opaque face is clipped to a 6px-padded content box to expose the
+                glass ring. The 1px saturated family-400/500 inner rim stays at
+                78%, inset 6.75px with a 9.25px radius and a 0.75px gap. Morning
+                uses a warm Rose400 identity while Evening uses a cool Violet400
                 identity through the same MedicationCardBase, card-frame
                 borders, 96px glass pane and the same faint selected-color tint
                 as a matching intake. Both share the mode-specific washes, light
                 reading veil and reduced-transparency fallback. Their former
                 independent background and drawn icon-frame overlays are
-                removed; coffee steam, moon movement and the delayed ambient
-                handoff remain. Standalone previews retain their 3.5px outer
-                frame. The shared base retains a 48px tile. One inner
-                entrance owner animates the whole fan, while the quantity label
-                enters separately and grouped disclosure never remounts its
-                frames. Recorded intake faces now paint a centred 60px surface
-                around that anchor, retaining the 6px outer stroke and the
-                glyph’s original coordinates. The saturated inner ring grows
-                outward to 1.85px while preserving its inner edge; a matching
-                ring sits two thirds into the outer rim. A 37% overlay uses that
-                same family pigment. These intake-only styles also cover
-                historical entries, notification snapshots and Final Look.
+                removed. Coffee, moon and book artwork now stay still without
+                activity observers or an ambient handoff. Standalone previews
+                retain their 3.5px outer frame. The shared base retains a 48px
+                tile. One inner entrance owner animates the whole fan, while the
+                quantity label enters separately and grouped disclosure never
+                remounts its frames. Recorded intake faces now paint a centred
+                60px surface around that anchor, retaining the 6px outer stroke
+                and the glyph’s original coordinates. The saturated inner ring
+                grows outward to 1.85px while preserving its inner edge; a
+                matching ring sits two thirds into the outer rim. A 37% overlay
+                uses that same family pigment. These intake-only styles also
+                cover historical entries, notification snapshots and Final Look.
               </p>
               <p>
                 The recorded-intake heading rail starts with an atomic route and
@@ -2267,14 +2229,14 @@ export function DeveloperGuidePage() {
                 ownership of nested locks, gutter compensation and cleanup; no
                 fixed-body or second scroll-lock manager is added. Dialog and
                 drawer scrollers contain overscroll, while backdrop touch
-                gestures cannot pan the page. Every dialog and modal drawer
-                shares a 20px backdrop blur, including the Safari-prefixed
-                filter. A separate 36% color mix uses #4b1f0cd9 in dark mode and
-                #fad3a7 in light mode. The dark source color keeps its original
-                alpha before the 36% mix; this yields about 30.6% effective
-                alpha, while the light overlay is 36%. Manual Appearance choices
-                and system mode resolve through the same prepaint flag; nested
-                dialogs keep their existing lock and dismissal behavior.
+                gestures cannot pan the page. Every dialog and modal drawer uses
+                a static color veil instead of live backdrop blur. A separate
+                36% color mix uses #4b1f0cd9 in dark mode and #fad3a7 in light
+                mode. The dark source color keeps its original alpha before the
+                36% mix; this yields about 30.6% effective alpha, while the
+                light overlay is 36%. Manual Appearance choices and system mode
+                resolve through the same prepaint flag; nested dialogs keep
+                their existing lock and dismissal behavior.
               </p>
               <p>
                 Shared close controls use a 36px rounded-square face with 8px
@@ -2349,23 +2311,13 @@ export function DeveloperGuidePage() {
                 measurements.
               </p>
               <p>
-                Every actual intake group and Past Days week group shares the
-                existing 24px glass blur at 78% effect opacity. Above it, static
-                Pink300 at 6% and Purple300 at 8% form separate tint layers. The
-                8/3px frame stroke is painted inward with an inset box-shadow,
-                avoiding WebKit rounding a fractional native border down to 2px.
-                Its pigment mixes 84% card foreground and 16% Pink400, then uses
-                22% opacity. No border/outset increases layout. Pink begins
-                fading about 62% through the last visible card and reaches zero
-                at the glass bottom; Purple starts at 50% and ends around 92%
-                through that card. Hidden/capped cards do not determine these
-                endpoints. useIntakeGroupSurface observes visible slot
-                transforms, natural heights, label and surface sizes, with a
-                requestAnimationFrame loop only during disclosure movement. The
-                old animated medication gradient and 11% cup wash are removed.
-                Existing entry timing fades the static shell together; reduced
-                transparency removes blur and reduced motion settles the
-                surface.
+                Intake groups and Past Days week groups retain static theme
+                washes and inward borders. Their CSS fade stops follow the group
+                surface without scanning or measuring every card during
+                disclosure. useIntakeGroupSurface observes only the label width
+                for the notch. No backdrop-filter or continuous frame loop is
+                mounted on repeated card surfaces. Collapse and Reveal retain
+                their short, direct transitions and keyboard behavior.
               </p>
               <p>
                 Stack presentation is saved per journal and day in the existing
@@ -2475,9 +2427,11 @@ export function DeveloperGuidePage() {
                   Continuous Effects
                 </dt>
                 <dd>
-                  Pause work when hidden, out of view or disabled where the
-                  component supports it. Clean up animation frames, listeners,
-                  observers and graphics resources.
+                  Prefer static CSS/SVG for ambient decoration. Keep running
+                  clocks local to active work: finite visible notifications
+                  update at 5 Hz using scaleX; paused and indefinite notices do
+                  not poll, and hidden notices sleep until their expiry. Clean
+                  up every scheduled deadline, listener and observer.
                 </dd>
               </div>
               <div>
@@ -2492,68 +2446,14 @@ export function DeveloperGuidePage() {
                   One-Time Arrivals
                 </dt>
                 <dd>
-                  Use bounded, finite effects. Related cards retain a 180ms
-                  interval between starts. Each daily log now has one mixed
-                  IntakeTimelineEntrance owner for check-ins, intake heads,
-                  folded undercards and the empty state. Its stable outer
-                  data-log-entry-scope is excluded from the ordinary page-card
-                  controller; the nested intake grid has no second controller.
-                  Before reserving starts, it waits for the shared data,
-                  workspace and idle-curtain boundary. The same finite CSS
-                  play-state gate prevents progress and other nested entrances
-                  from finishing under the loader. After the existing two
-                  measurement frames and 60ms, one DOM-order query gathers
-                  pending visible cards, so observer callback order cannot start
-                  a lower check-in or another group first. Only main faces
-                  reserve the shared 180ms start cadence: standalone cards,
-                  check-ins, the empty state and the top card of each group. A
-                  group head advances the sequence exactly like a standalone
-                  card; the next main starts one step later, without waiting for
-                  the head’s 1140ms arrival to finish. Each group has an
-                  independent absolute rear clock seeded at its head’s start
-                  plus 180ms. The first rear and the next main may start
-                  together; later rears retain their own 180ms cascade while
-                  consuming no global slots. Late-visible rears continue their
-                  local clock, and a rear-only batch never extends the main
-                  queue. Visible orphan rears can enter without waiting for an
-                  offscreen head. Main arrivals remain 1140ms and rear previews
-                  960ms. Each group’s decorative surface starts on the next
-                  local 180ms beat after its last scheduled exposed face starts,
-                  while the cards finish their own entrances. The surface
-                  gathers over 360ms and the control follows 40ms later with a
-                  360ms rebound and 240ms paired chevron greeting. This shell
-                  reveal consumes no global card slot and does not delay the
-                  next card. Hidden/capped faces cannot block it. Interaction,
-                  disclosure, cancellation, hidden tabs and reduced motion
-                  settle the shell immediately. Hidden/capped and offscreen
-                  faces do not reserve global slots. Detaching, scrolling out,
-                  interacting, backgrounding and reduced motion still settle
-                  affected faces. Once no main is running, unused global
-                  reservations clear even if rear tails continue; effect cleanup
-                  also resets the idle clock. A stable owner and
-                  intake-ID/check-in-day-period identities prevent replay or
-                  editor remounts on clock updates, drafts and dialogs. The
-                  17:00 Evening availability is sampled on refresh or a new
-                  visit. Check-in spacing is inert and adds no queue slot or
-                  completion barrier. Its right-side progress rail replays
-                  number and artwork together on that card’s dialog open/close
-                  or completion changes, without replaying the whole card or
-                  remounting an editor. The copy shares a gentle 1560ms
-                  fade/scale/shift/rotation rebound with the existing artwork’s
-                  timing, including its 38% and 65% peaks. Return delays remain
-                  180ms desktop and 400ms mobile; the shared entry-readiness
-                  play-state gate and reduced-motion static result remain. Stack
-                  disclosure still settles all target faces and visible
-                  neighbors before layout moves; restored-open groups retain
-                  fully painted content. Other card lists keep their existing
-                  page-scoped cadence and viewport batches. Page, dialog,
-                  drawer, menu, tooltip, search-result, milestone and toast
-                  openings retain their shorter individual durations. Exits,
-                  disclosure movement, input waits and ambient loops keep their
-                  own timing. Scroll reveals wait inside the usable viewport.
-                  The streak spotlight waits for that same readiness before
-                  starting its timer or consuming its history-entry marker, then
-                  clears its particles after the unchanged 3.36 seconds.
+                  Page and intake timeline cards render immediately. Their
+                  wrappers no longer install page-wide mutation/intersection
+                  observers, scroll listeners or stagger queues. Group frames
+                  start in the ready state, so scrolling never has to wait for
+                  entrance choreography. Short dialog, menu, tooltip, toast and
+                  direct-interaction transitions remain. Work indicators run
+                  only while the associated operation is pending. Decorative
+                  shader, repeated rim, glow and artwork loops are static.
                 </dd>
               </div>
               <div>
@@ -2840,10 +2740,10 @@ export function DeveloperGuidePage() {
                 symbol.
               </p>
               <p>
-                Swallowed entries store the <code>oral</code> route. Today,
-                Past Days, previews and route selectors resolve it to Lucide’s
-                Mouth icon at render time. The original SVG URL also serves
-                that artwork for older references.
+                Swallowed entries store the <code>oral</code> route. Today, Past
+                Days, previews and route selectors resolve it to Lucide’s Mouth
+                icon at render time. The original SVG URL also serves that
+                artwork for older references.
               </p>
             </Detail>
             <Detail
@@ -3020,144 +2920,114 @@ export function DeveloperGuidePage() {
                   do not automatically classify a medication.
                 </li>
                 <li>
-                  The morning card and writing dialog share a Lucide coffee mug.
-                  On the card it tips into place, rebounds, then settles as the
-                  three steam strokes begin their staggered loop. Reduced motion
-                  shows the settled mug.
-                </li>
-                <li>
-                  EveningMoon owns its entrance and permanent motion together. A
-                  2.4-second curved approach grows and rolls into the first
-                  floating swing, with matching pose, velocity and acceleration
-                  at the handoff. The 10.8-second nonlinear loop slows near its
-                  raised turning points and gathers speed through the center; a
-                  small lagging tilt keeps the crescent from moving like a rigid
-                  metronome. Browser-native animation timelines preserve phase
-                  when the page is hidden, the card goes offscreen or a dialog
-                  opens, and are cancelled on unmount. The moon shares the mug’s
-                  pale Rose200 ink while retaining its Violet artwork frame.
-                  Short-lived colored stars keep their separate bounded
-                  scheduler and wait until the entrance has completed. Reduced
-                  motion shows a still crescent and static stars. No per-frame
-                  React render or JavaScript animation loop is needed. The
-                  sampled motion model is cached and immutable; focused unit
-                  checks protect the entrance handoff, loop seam, bounded travel
-                  and trailing tilt.
-                </li>
-                <li>
-                  Check-in tiles retain their 1560ms arrival. Morning keeps its
-                  spin-and-settle illustration response; its steam opens 300ms
-                  later through the existing nonvisual ambient clock. Evening
-                  receives a separate nonvisual entry signal at the tile’s
-                  start, so the moon’s own entrance flows directly into its loop
-                  instead of waiting for the older shared spin or ambient pause.
-                  Evening omits that shared symbol animation and settle
-                  flourish. A keyed scene replays both clocks, while page/dialog
-                  pauses hold their progress.
+                  The morning card and writing dialog share a static Lucide
+                  coffee mug. Evening uses a still crescent with two small
+                  stars. Their existing Rose200 ink, Violet frames and
+                  illustration dimensions stay consistent without activity
+                  observers, animation-gate state, native timelines or random
+                  star timers.
                 </li>
                 <li>
                   Morning and Evening check-ins share the same large-logo
                   layout: an 80px frame, 21px corners and a 48px artwork tile in
                   a 56px stage. Both use a quiet translucent face above the
-                  flowing page background with a shared check-in color. The
-                  mixed rim and
-                  2⅔px identity band paint inward; the identity alpha follows
-                  the light/dark recipe above. Filled coffee and crescent
-                  artwork distinguish the periods. Both illustrations sit on a
-                  dark tile. The sleep and mood summaries use the shared card
-                  foreground in both appearances. The steam, stars and entry
-                  motion retain their own timing. Details and icon stages
-                  remain 56px, the tile 48px
-                  and symbol holder 30px. A single two-thirds scale on the
-                  illustration owner makes both scenes exactly one third
-                  smaller, including their steam, stars and motion travel. The
-                  moon’s 30px source becomes 20px visually without changing the
-                  shared tile, card measurements, 11px artwork-to-copy clearance
-                  (7px below 360px) or 8px trailing inset. SavedCheckInHeading
-                  now separates opening history from save history. Its primary
-                  HH:mm is the first recorded opening on this device, using the
-                  intake time class: 13.5px/700 rounded-system type at roughly
-                  75% foreground visibility. The 5ch time column and shared text
-                  gap lead the 15px/650 title with its 20px line box and 15px
-                  top inset. Unknown first openings display an em dash with an
-                  explanatory accessible label; createdAt is never substituted
-                  for an opening. Under the primary time, the latest successful
-                  updatedAt uses 9px/475 type, 36% foreground visibility, a 12px
-                  line and 1px vertical gap. Only this saved-update display may
-                  fall back to a validated legacy createdAt. No valid save means
-                  no secondary timestamp. The heading shifts 3px left, or 2px
-                  below 360px. The static 11px/550 lower invitation starts on
-                  the title’s vertical line: “Still here. Take stock.” for
-                  Morning and “Survived? Leave notes.” for Evening. It never
-                  changes into a response excerpt or claims that a local edit
-                  has been saved. Both content rows remain single-line and
-                  truncate before the right-hand summary. The upper row pairs a
-                  bed or smile with an icon for an empty, drafted or saved
-                  check-in. The lower row uses the intake card’s number and unit
-                  styles for recorded sleep duration or the selected mood count.
-                  An unanswered field offers Add sleep or Add moods. Changed
-                  drafts take precedence, including cleared values. The whole
-                  card opens its editor. The former animated indicator remains
-                  available in <code>CheckInCardProgress</code>.
-                  First-open observations live in the
-                  authenticated journal-scoped local workspace’s checkInOpenedAt
-                  map, using the existing day/period draft keys. openDialog
-                  records the current instant once. setLocation also observes a
-                  restored already-open check-in only on the screen actually
-                  visited; dormant saved screens are not retrospectively marked
-                  opened. Existing version-1 workspaces may omit the map.
-                  Validated dates, periods and epoch-millisecond timestamps keep
-                  invalid metadata separate from valid drafts. The bounded map
-                  retains 8,192 observations without evicting earlier history;
-                  quota failures remain visible through the existing storage
-                  status. Every local workspace write reconciles the latest
-                  validated same-journal opening history, retaining the earliest
-                  instant per day and period. An older tab’s location or
-                  pagehide write cannot replace that history with an empty map.
-                  Close/reopen, refresh, draft reset and successful-save cleanup
-                  preserve the opening record. This is device-local tracking
-                  from now on, not cloud persistence or reconstructed history.
-                  It neither creates a response nor grants completion or a save;
-                  only a successful Save Check-In or reflection PATCH advances
-                  the secondary saved-update time. Neither card has an extra
-                  greeting, date, inline title icon, trailing chevron or
-                  external section buttons. Zero outer margins and the intake
-                  timeline’s 8px item gap remain. When actual intakes are
-                  adjacent, a 4px inert spacer gives 12px visible clearance.
-                  Empty/reflection-only days add none, and a final check-in has
-                  no outside bottom spacer. The spacer has no artwork, observer
-                  or entry-queue slot. One stable outer timeline owns the mixed
-                  entrance sequence; its nested intake grid is passive,
-                  preserving stack layout without two controllers reserving
-                  entries out of order. Morning starts at 06:00 above the list.
-                  At 17:00, Evening appears below the final intake while Morning
-                  stays above the list until the next 06:00 reset. The layout
-                  samples availability on refresh or navigation back to this
-                  view; it adds no cutoff timer and stays stable during the
-                  visit. A new tracking day or timezone resamples eligibility
-                  while retaining the same keyed editors and the shared
-                  day-reset clock. Both check-in hints stay on the lower row,
-                  aligned with the title rather than the time column. Past-day
-                  Morning precedes the intake list and Evening follows it.
-                  Position is independent of draft or saved status. A keyed
-                  editor keeps the open period and original day across rollover.
-                  The shared Your Morning, Your Words / Your Day, Your Words
-                  doorway pairs a gently steaming coffee icon with reading and library
-                  controls. Its writing action uses the Today button frame with
-                  the check-in section’s fuchsia-violet inner edge. Copy Writing
-                  and Refresh sit on opposite sides of the paragraph count.
-                  The morning and evening sections share an 8% tinted gradient,
-                  an introductory caption and two small footer notes.
-                  Local word, character and reading
-                  statistics use one unboxed single line beneath it: 10.5px
-                  values, 10px labels and a 14px line height. The surrounding
-                  11.5px/600 guidance uses an 18px line to explain Markdown,
-                  draft continuity, reading, the saved-Journal threshold and the
-                  separate Save Check-In action. Reading opens safe rendered
-                  Markdown from the current draft; Edit entry closes the reader
-                  before returning to the same writer. Manual Refresh
-                  synchronizes saved journal data without replacing unfinished
-                  draft fields or making an AI request. The existing
+                  static page background with a shared check-in color. The mixed
+                  rim and 2⅔px identity band paint inward; the identity alpha
+                  follows the light/dark recipe above. Filled coffee and
+                  crescent artwork distinguish the periods. Both illustrations
+                  sit on a dark tile. The sleep and mood summaries use the
+                  shared card foreground in both appearances. Both illustrations
+                  stay still without a motion scheduler. Details and icon stages
+                  remain 56px, the tile 48px and symbol holder 30px. A single
+                  two-thirds scale on the illustration owner makes both scenes
+                  exactly one third smaller, including the crescent’s static
+                  stars. The moon’s 30px source becomes 20px visually without
+                  changing the shared tile, card measurements, 11px
+                  artwork-to-copy clearance (7px below 360px) or 8px trailing
+                  inset. SavedCheckInHeading now separates opening history from
+                  save history. Its primary HH:mm is the first recorded opening
+                  on this device, using the intake time class: 13.5px/700
+                  rounded-system type at roughly 75% foreground visibility. The
+                  5ch time column and shared text gap lead the 15px/650 title
+                  with its 20px line box and 15px top inset. Unknown first
+                  openings display an em dash with an explanatory accessible
+                  label; createdAt is never substituted for an opening. Under
+                  the primary time, the latest successful updatedAt uses 9px/475
+                  type, 36% foreground visibility, a 12px line and 1px vertical
+                  gap. Only this saved-update display may fall back to a
+                  validated legacy createdAt. No valid save means no secondary
+                  timestamp. The heading shifts 3px left, or 2px below 360px.
+                  The static 11px/550 lower invitation starts on the title’s
+                  vertical line: “Still here. Take stock.” for Morning and
+                  “Survived? Leave notes.” for Evening. It never changes into a
+                  response excerpt or claims that a local edit has been saved.
+                  Both content rows remain single-line and truncate before the
+                  right-hand summary. The upper row pairs a bed or smile with an
+                  icon for an empty, drafted or saved check-in. The lower row
+                  uses the intake card’s number and unit styles for recorded
+                  sleep duration or the selected mood count. An unanswered field
+                  offers Add sleep or Add moods. Changed drafts take precedence,
+                  including cleared values. The whole card opens its editor. The
+                  former animated indicator remains available in{" "}
+                  <code>CheckInCardProgress</code>. First-open observations live
+                  in the authenticated journal-scoped local workspace’s
+                  checkInOpenedAt map, using the existing day/period draft keys.
+                  openDialog records the current instant once. setLocation also
+                  observes a restored already-open check-in only on the screen
+                  actually visited; dormant saved screens are not
+                  retrospectively marked opened. Existing version-1 workspaces
+                  may omit the map. Validated dates, periods and
+                  epoch-millisecond timestamps keep invalid metadata separate
+                  from valid drafts. The bounded map retains 8,192 observations
+                  without evicting earlier history; quota failures remain
+                  visible through the existing storage status. Every local
+                  workspace write reconciles the latest validated same-journal
+                  opening history, retaining the earliest instant per day and
+                  period. An older tab’s location or pagehide write cannot
+                  replace that history with an empty map. Close/reopen, refresh,
+                  draft reset and successful-save cleanup preserve the opening
+                  record. This is device-local tracking from now on, not cloud
+                  persistence or reconstructed history. It neither creates a
+                  response nor grants completion or a save; only a successful
+                  Save Check-In or reflection PATCH advances the secondary
+                  saved-update time. Neither card has an extra greeting, date,
+                  inline title icon, trailing chevron or external section
+                  buttons. Zero outer margins and the intake timeline’s 8px item
+                  gap remain. When actual intakes are adjacent, a 4px inert
+                  spacer gives 12px visible clearance. Empty/reflection-only
+                  days add none, and a final check-in has no outside bottom
+                  spacer. The spacer has no artwork, observer or entry-queue
+                  slot. One stable outer timeline owns the mixed entrance
+                  sequence; its nested intake grid is passive, preserving stack
+                  layout without two controllers reserving entries out of order.
+                  Morning starts at 06:00 above the list. At 17:00, Evening
+                  appears below the final intake while Morning stays above the
+                  list until the next 06:00 reset. The layout samples
+                  availability on refresh or navigation back to this view; it
+                  adds no cutoff timer and stays stable during the visit. A new
+                  tracking day or timezone resamples eligibility while retaining
+                  the same keyed editors and the shared day-reset clock. Both
+                  check-in hints stay on the lower row, aligned with the title
+                  rather than the time column. Past-day Morning precedes the
+                  intake list and Evening follows it. Position is independent of
+                  draft or saved status. A keyed editor keeps the open period
+                  and original day across rollover. The shared Your Morning,
+                  Your Words / Your Day, Your Words doorway pairs a gently
+                  steaming coffee icon with reading and library controls. Its
+                  writing action uses the Today button frame with the check-in
+                  section’s fuchsia-violet inner edge. Copy Writing and Refresh
+                  sit on opposite sides of the paragraph count. The morning and
+                  evening sections share an 8% tinted gradient, an introductory
+                  caption and two small footer notes. Local word, character and
+                  reading statistics use one unboxed single line beneath it:
+                  10.5px values, 10px labels and a 14px line height. The
+                  surrounding 11.5px/600 guidance uses an 18px line to explain
+                  Markdown, draft continuity, reading, the saved-Journal
+                  threshold and the separate Save Check-In action. Reading opens
+                  safe rendered Markdown from the current draft; Edit entry
+                  closes the reader before returning to the same writer. Manual
+                  Refresh synchronizes saved journal data without replacing
+                  unfinished draft fields or making an AI request. The existing
                   ReflectionDialog and independent saving controls retain their
                   launcher ref. Writing supports up to 100,000 characters. Done
                   returns to the check-in with the draft; Save Check-In saves
@@ -3693,15 +3563,14 @@ export function DeveloperGuidePage() {
                 JournalPreviewCard composes MedicationCardBase with a quiet
                 accent wash, 21px corners, a neutral 4px inward rim and a 1.5px
                 inner color band at 32% opacity; no border grows outside the
-                card. Its JournalPreviewArtwork reuses the check-in’s 56px
-                stage, 48px tile and 30px motion wrapper around a 32px open
-                book. Colored pages, a tucked bookmark and a small glint breathe
-                slowly after the shared arrival/settle response. Rose, Lilac,
-                Iris, Apricot, Orchid and Aqua pairs are chosen by a stable
-                FNV-1a hash of the entry ID, so edits, filtering and pagination
-                keep the same colors without hydration randomness. Artwork
-                pauses offscreen, when hidden, while the reader is open and
-                under reduced motion.
+                card. Its JournalPreviewArtwork reuses the check-in’s 56px stage
+                and 48px tile around a 32px open book. Colored pages, a tucked
+                bookmark and a small glint stay still. Rose, Lilac, Iris,
+                Apricot, Orchid and Aqua pairs are chosen by a stable FNV-1a
+                hash of the entry ID, so edits, filtering and pagination keep
+                the same colors without hydration randomness. The static
+                illustration needs no observer, activity scheduler or animation
+                layer as journal results accumulate.
               </p>
               <p>
                 The pure <code>journal-preview-references</code> helper reuses
@@ -3931,14 +3800,13 @@ export function DeveloperGuidePage() {
                 controls share their background and inset border treatment.
                 Removable selections stay beneath the scrolling palette during
                 searches. Any number of distinct registered feelings can be
-                selected. rankDailyMoods counts each mood once per saved check-in
-                and sorts the registry by descending usage. The picker reverses
-                that order for its least-used-first view, then filters to active
-                or selected IDs.
-                Equal-frequency choices use a deterministic day-seeded shuffle.
-                Shuffle gives those ties a new seeded mix. Searching and
-                shuffling reset only the results viewport, preserving selected
-                moods and the parent form scroll.
+                selected. rankDailyMoods counts each mood once per saved
+                check-in and sorts the registry by descending usage. The picker
+                reverses that order for its least-used-first view, then filters
+                to active or selected IDs. Equal-frequency choices use a
+                deterministic day-seeded shuffle. Shuffle gives those ties a new
+                seeded mix. Searching and shuffling reset only the results
+                viewport, preserving selected moods and the parent form scroll.
               </p>
               <p>
                 The default Evening completion catalog excludes Sleep, while an
@@ -3957,9 +3825,9 @@ export function DeveloperGuidePage() {
                 Your Day, Your Mood contains the mood picker and Energy/Stress
                 ratings in one section. Its outside heading matches Your Day,
                 Your Words. A divider separates the two parts within their
-                shared frame. Family metadata supplies the
-                related choice colors. Selection feedback respects reduced
-                motion, and hover effects apply to desktop fine pointers.
+                shared frame. Family metadata supplies the related choice
+                colors. Selection feedback respects reduced motion, and hover
+                effects apply to desktop fine pointers.
               </p>
             </Detail>
             <Detail
@@ -4098,10 +3966,10 @@ export function DeveloperGuidePage() {
                 uses preventScroll and a visible header target or the popup
                 itself, so a lower field cannot pull the initial view down.
                 Writing Space’s independent source and preview panes keep
-                positions only while the current popup remains open. A new
-                popup or closing and reopening starts fresh;
-                legacy workspace and public-dialog scroll offsets are ignored.
-                Color inspections still retain their preview, format and filters.
+                positions only while the current popup remains open. A new popup
+                or closing and reopening starts fresh; legacy workspace and
+                public-dialog scroll offsets are ignored. Color inspections
+                still retain their preview, format and filters.
               </p>
               <p>
                 Drafts have no age expiry and remain on that browser or
@@ -4462,9 +4330,9 @@ export function DeveloperGuidePage() {
               <p>
                 Components use Next.js, React, Tailwind CSS and Base UI/shadcn
                 patterns, with Phosphor and Lucide icon systems. The optional
-                Grainient renderer and active specular effect retain their
-                upstream attribution in source. Review those source notices and
-                the upstream terms when reusing third-party material.
+                Grainient renderer and retired React Bits effects retain their
+                upstream attribution and license notices. Review those notices
+                and the upstream terms when reusing third-party material.
               </p>
               <div className={styles.upstreamLinks}>
                 <ExternalLink href="https://nextjs.org/docs">

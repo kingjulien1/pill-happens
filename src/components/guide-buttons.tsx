@@ -1235,17 +1235,16 @@ export function GuideButtons() {
           <div className={styles.detailBody}>
             <p>
               Decorative layers are hidden from assistive technology and do not
-              own pointer interaction. A complete CSS surface and fallback edge
-              are available before animated rendering. The text stays on a
-              separate foreground layer, so a moving highlight cannot change the
-              meaning or availability of the action.
+              own pointer interaction. A complete CSS surface and edge are
+              available at first paint. Static decorative borders need no
+              canvas, GPU context or animation scheduler; functional pending
+              spinners still report work in progress.
             </p>
             <p>
               The explicit intake appearance owns the opaque dark-pink face,
               Pink600 inner band at 74% and thirty-percent pink perimeter. Its
-              CSS rim makes one turn every 6.8 seconds. Today and Add Medication
-              opt into SpecularRim for the equivalent GPU edge; when that canvas
-              renders, the adjacent CSS fallback becomes invisible. The main
+              CSS rim stays still. Today and Add Medication use the same CSS/SVG
+              edge without mounting the retired SpecularRim renderer. The main
               CTA’s icons and “Jot it!” use full-opacity Pink200, independently
               of its primary label. Accent keeps its default icon slots and
               pending spinner, but no separate aura, gradient field or finish

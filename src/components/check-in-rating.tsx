@@ -4,6 +4,7 @@ import { useRef, type CSSProperties, type ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import styles from "./check-in-rating.module.css";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 /** A native optional rating, shared by Morning sleep and Evening check-ins. */
 export function CheckInRating({
@@ -50,20 +51,22 @@ export function CheckInRating({
           {label}
         </Label>
         <div className={styles.ratingValue}>
-          <output
-            htmlFor={id}
-            data-check-in-rating-value
-            data-morning-rating-value={morning ? "" : undefined}
-          >
-            {rated ? (
-              <>
-                <strong>{value}</strong>
-                <span> / 10</span>
-              </>
-            ) : (
-              "Not rated"
-            )}
-          </output>
+          {(rated || !morning) && (
+            <output
+              htmlFor={id}
+              data-check-in-rating-value
+              data-morning-rating-value={morning ? "" : undefined}
+            >
+              {rated ? (
+                <>
+                  <strong>{value}</strong>
+                  <span> / 10</span>
+                </>
+              ) : (
+                "Not rated"
+              )}
+            </output>
+          )}
           {rated && (
             <Button
               variant="ghost"
@@ -77,7 +80,7 @@ export function CheckInRating({
                 range.current?.focus();
               }}
             >
-              Clear
+              {morning ? <X size={12} aria-hidden="true" /> : "Clear"}
             </Button>
           )}
         </div>

@@ -116,7 +116,7 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .liveDot::before {
-    animation: live-dot-glow 3.8s cubic-bezier(.45, 0, .3, 1) infinite;
+    animation: none;
   }
 }
 @keyframes live-dot-glow {
@@ -183,13 +183,13 @@
 }
 
 .showcase[data-preview-motion="on"] .previewSway {
-  animation: preview-sway 7s ease-in-out infinite;
+  animation: none;
 }
 
 .showcase[data-preview-motion="on"]
   .iconSurface
   :global([data-medication-mark]) {
-  animation: preview-glyph-play 4.8s ease-in-out infinite;
+  animation: none;
 }
 
 .symbolLabelRow {

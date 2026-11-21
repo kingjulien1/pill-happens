@@ -41,28 +41,14 @@
   opacity: 0.88;
 }
 
-.light {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-/* The three-stop CSS fallback is also the first paint before the shader. */
-@property --specular-card-rim-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
+/* A static three-stop gradient preserves the former shader's palette. */
 .frame::after {
   position: absolute;
   inset: 0;
   padding: inherit;
   border-radius: inherit;
   background: conic-gradient(
-    from var(--specular-card-rim-angle, 0deg),
+    from 0deg,
     var(--intake-rim-stop-1),
     var(--intake-rim-stop-2) 33%,
     var(--intake-rim-stop-3) 67%,
@@ -78,10 +64,6 @@
   mask-composite: exclude;
   content: "";
 }
-.frame:has(> [data-rendered="true"])::after {
-  visibility: hidden;
-}
-
 /* Purple400 at 46% and Pink400 at 54% share the check-in card's quiet halo. */
 .frame::before {
   position: absolute;
@@ -121,26 +103,5 @@
     stroke: color-mix(in srgb, currentColor 32%, white);
     stroke-dasharray: 12 88;
     stroke-linecap: round;
-  }
-}
-
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .highlight {
-    animation: travel-perimeter 5.46s linear infinite;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .frame:has(> [data-rendered="false"][data-fallback-active="true"])::after {
-    animation: specular-card-rim-turn 5.46s linear infinite;
-  }
-}
-@keyframes travel-perimeter {
-  to {
-    stroke-dashoffset: -100;
-  }
-}
-@keyframes specular-card-rim-turn {
-  to {
-    --specular-card-rim-angle: 360deg;
   }
 }

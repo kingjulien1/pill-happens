@@ -85,6 +85,29 @@
   font-size: 10px;
   line-height: 1.6;
 }
+
+/* Keep the night-rating title and its useful aside intact on narrow phones. */
+@media (max-width: 359px) {
+  .section:has(> .frame > [data-check-in-section="morning-ratings"])
+    > .header
+    > .caption {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 5px;
+  }
+  .section:has(> .frame > [data-check-in-section="morning-ratings"]) .labelRow {
+    display: contents;
+  }
+  .section:has(> .frame > [data-check-in-section="morning-ratings"])
+    .contextGroup {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .section:has(> .frame > [data-check-in-section="morning-ratings"]) .detail {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
 .frame > fieldset {
   padding: 10px 12px 12px;
 }
@@ -118,7 +141,7 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-check-in-form] .frame::before {
-    animation: breathe-rim 4.2s cubic-bezier(0.42, 0.03, 0.22, 1) infinite;
+    animation: none;
   }
   [data-check-in-form] .frame::before {
     --rest: -10.375px;

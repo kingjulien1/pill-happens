@@ -14,10 +14,6 @@ import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
 import { TodayActionButton } from "@/components/today-action-button";
 
 import { useJournal } from "@/components/journal-provider";
-import {
-  getPageEntryReadiness,
-  subscribePageEntryReadiness,
-} from "@/lib/page-entry-readiness";
 import { reflectionStats } from "@/lib/reflection-writing";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { MarkdownMark } from "./markdown-mark";
@@ -51,7 +47,6 @@ export function DailyReflectionEditor({
   savedAt?: string;
   saving: ReflectionSaveControls;
 }) {
-  const editor = useRef<HTMLElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshFinished, setRefreshFinished] = useState(false);
@@ -80,46 +75,6 @@ export function DailyReflectionEditor({
       if (refreshToast.current !== null) toast.dismiss(refreshToast.current);
     };
   }, []);
-
-  // Ambient decoration follows visibility/readiness; writing and reading stay still.
-  useEffect(() => {
-    const node = editor.current;
-    if (!node) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let visible = false;
-    const sync = () => {
-      node.dataset.journalActive = String(
-        visible &&
-          !document.hidden &&
-          !reduced.matches &&
-          getPageEntryReadiness() &&
-          !open,
-      );
-    };
-    const observer =
-      typeof IntersectionObserver === "undefined"
-        ? null
-        : new IntersectionObserver(
-            (entries) => {
-              visible = entries.at(-1)?.isIntersecting ?? false;
-              sync();
-            },
-            { threshold: 0.01 },
-          );
-    if (observer) observer.observe(node);
-    else visible = true;
-    const unsubscribe = subscribePageEntryReadiness(sync);
-    document.addEventListener("visibilitychange", sync);
-    reduced.addEventListener("change", sync);
-    sync();
-    return () => {
-      observer?.disconnect();
-      unsubscribe();
-      document.removeEventListener("visibilitychange", sync);
-      reduced.removeEventListener("change", sync);
-      node.dataset.journalActive = "false";
-    };
-  }, [open]);
 
   // Provider.refresh resolves after updating its error state, including on failure.
   // Use the committed result rather than claiming success from Promise<void>.
@@ -220,7 +175,6 @@ export function DailyReflectionEditor({
 
   return (
     <section
-      ref={editor}
       className={styles.editor}
       aria-label={`${period === "morning" ? "Morning" : "Evening"} journal writing`}
       data-journal-card

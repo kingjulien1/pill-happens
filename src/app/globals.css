@@ -84,8 +84,8 @@
     color-mix(in srgb, var(--palette-plum) 85.098%, transparent) 36%,
     transparent
   );
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 @media (prefers-color-scheme: light) {
@@ -168,26 +168,9 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 .ambient::after {
   content: "";
   position: absolute;
-  inset: -9%;
+  inset: 0;
   background: var(--app-canvas-accent);
   opacity: var(--app-canvas-accent-opacity);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ambient::after {
-    animation: canvas-accent-drift 34s ease-in-out infinite;
-  }
-  @keyframes canvas-accent-drift {
-    0%,
-    100% {
-      transform: none;
-    }
-    36% {
-      transform: translate(4%, -2%) scale(1.035, 1.08);
-    }
-    70% {
-      transform: translate(-3%, 4%) scale(1.07, 1.02);
-    }
-  }
 }
 @keyframes enter {
   from {
@@ -220,7 +203,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   border: 1px solid var(--border);
   box-shadow: 0 4px 28px
     color-mix(in srgb, var(--palette-ink) 1.176%, transparent);
-  backdrop-filter: blur(16px);
+  backdrop-filter: none;
 }
 .canvas-copy {
   color: var(--canvas-foreground);
@@ -304,10 +287,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   position: absolute;
   z-index: 0;
   inset: 0;
-  -webkit-backdrop-filter: blur(var(--intake-group-blur, 24px))
-    saturate(var(--intake-group-saturation, 1.08));
-  backdrop-filter: blur(var(--intake-group-blur, 24px))
-    saturate(var(--intake-group-saturation, 1.08));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   opacity: var(--intake-group-glass-opacity, 0.78);
   pointer-events: none;
 }
@@ -323,7 +304,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   bottom: 12px;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--color-purple-800, #6b21a8) 30%, transparent) 33.333%,
+    color-mix(in srgb, var(--color-purple-800, #6b21a8) 30%, transparent)
+      33.333%,
     transparent 100%
   );
 }
@@ -1291,8 +1273,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   filter: blur(4px);
   opacity: 0;
   transform: translate3d(-160%, 0, 0) skewX(-18deg);
-  animation: intake-card-rare-shine var(--intake-shine-cycle) linear
-    var(--intake-shine-wait) infinite;
+  animation: none;
   animation-play-state: paused;
   pointer-events: none;
 }
@@ -1370,8 +1351,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
       transparent 80%
     );
   opacity: 0.12;
-  animation: history-card-edge-breathe 23s ease-in-out var(--day-phase, 0s)
-    infinite;
+  animation: none;
 }
 .history-card-glass {
   position: absolute;
@@ -1388,8 +1368,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
       color-mix(in srgb, var(--palette-peach) 3.922%, transparent)
     ),
     color-mix(in srgb, var(--palette-peach) 18%, transparent);
-  -webkit-backdrop-filter: blur(72px) saturate(1.1);
-  backdrop-filter: blur(72px) saturate(1.1);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--palette-peach) 45.882%, transparent),
     inset 1px 0 0 color-mix(in srgb, var(--palette-peach) 14.902%, transparent),
@@ -1409,8 +1389,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     linear-gradient(128deg, var(--day-color-a), var(--day-color-d));
   transform-origin: 44px 44px;
   transform: rotate(-3deg) scale(1.08);
-  animation: history-card-mesh-drift 17s ease-in-out var(--day-phase, 0s)
-    infinite;
+  animation: none;
 }
 .history-card-pattern {
   position: absolute;
@@ -1435,8 +1414,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   fill: none;
   transform-origin: 44px 44px;
   opacity: 0.45;
-  animation: history-card-curve-drift 21s ease-in-out var(--day-phase, 0s)
-    infinite;
+  animation: none;
 }
 .history-card-curves path {
   stroke: var(--day-color-b);
@@ -1490,7 +1468,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   border-radius: 50%;
   opacity: 0.52;
   transform: translate(-50%, -50%) rotate(var(--day-orbit-angle, 0deg));
-  animation: history-card-orbit 18s linear var(--day-phase, 0s) infinite;
+  animation: none;
 }
 .history-card-bead {
   position: absolute;
@@ -1523,15 +1501,13 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   background: var(--day-color-a);
   opacity: 0.55;
   transform: translate(-58%, -46%) rotate(-14deg);
-  animation: history-card-sticker-rock-a 13s ease-in-out var(--day-phase, 0s)
-    infinite;
+  animation: none;
 }
 .history-card-sticker--b {
   background: linear-gradient(135deg, var(--day-color-c), var(--day-color-d));
   opacity: 0.58;
   transform: translate(-42%, -54%) rotate(13deg);
-  animation: history-card-sticker-rock-b 19s ease-in-out var(--day-phase, 0s)
-    infinite;
+  animation: none;
 }
 .history-card-mark {
   position: relative;
@@ -1554,8 +1530,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 .history-card-confetti--c {
   position: absolute;
   z-index: 1;
-  animation: history-card-confetti-drift 16s ease-in-out var(--day-phase, 0s)
-    infinite;
+  animation: none;
 }
 .history-card-confetti--a {
   top: 1px;
@@ -1854,8 +1829,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   );
   border: 1px solid var(--medication-control-edge);
   background: var(--empty-intake-wash);
-  -webkit-backdrop-filter: blur(48px);
-  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow:
     inset 0 1px 1px
       color-mix(in srgb, var(--palette-peach) 34.902%, transparent),
@@ -2238,8 +2213,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   color: var(--empty-intake-copy);
 }
 .empty-intake-card {
-  -webkit-backdrop-filter: blur(48px);
-  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow:
     inset 0 1px 1px
       color-mix(in srgb, var(--palette-peach) 34.902%, transparent),
@@ -2413,7 +2388,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     );
   filter: blur(15px);
   opacity: 0.3;
-  animation: brand-glow 6.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: none;
 }
 .brand-corona {
   position: absolute;
@@ -2452,7 +2427,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     color-mix(in srgb, var(--brand-tone-emerald) 50.196%, transparent) 278deg,
     transparent 335deg 360deg
   );
-  animation: brand-corona-turn 6.4s linear infinite;
+  animation: none;
 }
 .brand-bar {
   position: relative;
@@ -2464,8 +2439,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   outline-offset: -1px;
   background: var(--brand-base);
   color: var(--brand-copy);
-  -webkit-backdrop-filter: blur(96px);
-  backdrop-filter: blur(96px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: none;
 }
 .brand-bar::before {
@@ -2493,7 +2468,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     50% 50%,
     50% 50%,
     50% 50%;
-  animation: brand-fill-flow 18s ease-in-out infinite;
+  animation: none;
 }
 .brand-bar > * {
   position: relative;
@@ -2518,7 +2493,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   filter: blur(1px);
   opacity: 0;
   transform: translateX(-150%) skewX(-22deg);
-  animation: brand-sheen 8.4s ease-in-out infinite;
+  animation: none;
 }
 .brand-lockup:focus-visible::before {
   outline-color: color-mix(in srgb, var(--brand-copy) 85%, transparent);
@@ -2706,8 +2681,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     ),
     color-mix(in srgb, var(--card) 82%, transparent);
   color: var(--foreground);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow:
     inset 0 0.5625px 0 color-mix(in srgb, var(--palette-white) 10%, transparent),
     0 1.6875px 6.75px color-mix(in srgb, var(--palette-black) 10%, transparent);
@@ -2906,8 +2881,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     0 16px 40px color-mix(in srgb, var(--palette-ink) 16.863%, transparent),
     0 4px 12px color-mix(in srgb, var(--palette-rust) 7.059%, transparent),
     0 0 0 1px color-mix(in srgb, var(--palette-flame) 3.137%, transparent);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   transform-origin: var(--transform-origin);
   transition:
     opacity 140ms ease,
@@ -2944,8 +2919,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   box-shadow:
     0 12px 28px color-mix(in srgb, var(--palette-ink) 14.902%, transparent),
     0 2px 6px color-mix(in srgb, var(--palette-ink) 7.843%, transparent);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 .brand-navigation::before {
   content: none;
@@ -3004,8 +2979,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   [data-slot="dialog-content"],
   [data-slot="drawer-popup"],
   [data-slot="select-content"] {
-    -webkit-backdrop-filter: blur(40px);
-    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 /* Only the inner surface clips; exterior light stays outside filtered layers. */
@@ -3074,7 +3049,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .empty-intake-card .empty-intake-dashes {
-    animation: empty-intake-dash-flow 1.2s linear infinite paused;
+    animation: none;
   }
   .empty-intake-card:hover .empty-intake-dashes {
     animation-play-state: running;
@@ -3144,10 +3119,15 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   }
 
   .intake-dock {
-    --intake-dock-fade-base: color-mix(
+    --intake-dock-fade-pigment: color-mix(
       in srgb,
       var(--palette-plum) 85%,
       var(--color-purple-900, #581c87)
+    );
+    --intake-dock-fade-base: color-mix(
+      in srgb,
+      var(--intake-dock-fade-pigment) 60%,
+      var(--color-mauve-950, #0c090c)
     );
     --intake-dock-fade-violet: var(--color-violet-900, #4c1d95);
     --intake-dock-fade-rose: var(--color-fuchsia-900, #701a75);
@@ -3173,7 +3153,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 
   .intake-dock::before {
     z-index: -2;
-    height: 148%;
+    height: 174.64%;
     background: linear-gradient(
       to top,
       var(--intake-dock-fade-base) 0%,
@@ -3189,7 +3169,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 
   .intake-dock::after {
     z-index: -1;
-    height: 118%;
+    height: 139.24%;
     background:
       radial-gradient(
         ellipse at 15% 100%,
@@ -3584,8 +3564,8 @@ input[type="time"] {
   background: color-mix(in srgb, var(--palette-black) 12%, transparent);
   box-shadow: inset 0 1px 0
     color-mix(in srgb, var(--palette-white) 7%, transparent);
-  -webkit-backdrop-filter: blur(32px) saturate(1.1);
-  backdrop-filter: blur(32px) saturate(1.1);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .intake-action-summary-row {

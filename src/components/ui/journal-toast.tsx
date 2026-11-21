@@ -1,6 +1,7 @@
 "use client";
 
 import { isValidElement, type ReactNode } from "react";
+import { NOTIFICATION_CHECKPOINT_INTERVAL } from "@/lib/notification-scheduling";
 import { toast as sonnerToast, type ExternalToast, type ToastT } from "sonner";
 import {
   JournalNotification,
@@ -158,7 +159,8 @@ function checkpoint(entry: LiveNotice, force = false) {
   )
     return;
   const now = Date.now();
-  if (!force && now - entry.lastSaved < 500) return;
+  if (!force && now - entry.lastSaved < NOTIFICATION_CHECKPOINT_INTERVAL)
+    return;
   entry.lastSaved = now;
   const clock = entry.clock.checkpoint();
   if (!force && clock.elapsedActive === entry.lastElapsed) return;

@@ -1,8 +1,7 @@
-import { SpecularRim } from "@/components/specular-rim";
 import { cn } from "@/lib/utils";
 import styles from "./specular-card-border.module.css";
 
-/** Mobile paint belongs inside the button; desktop paint is its Safari-safe sibling. */
+/** Static mobile paint belongs inside the button; desktop keeps its Safari-safe sibling. */
 export function SpecularCardBorder({ desktop = false }: { desktop?: boolean }) {
   if (desktop)
     return (
@@ -28,8 +27,6 @@ export function SpecularCardBorder({ desktop = false }: { desktop?: boolean }) {
       data-specular-frame
       data-specular-card-border="mobile"
       aria-hidden="true"
-    >
-      <SpecularRim palette="triad" glow={false} className={styles.light} />
-    </span>
+    />
   );
 }

@@ -30,7 +30,12 @@ import {
   type DraftStorageStatus,
   type DraftWorkspace,
   type RememberedDialog,
+  type WorkspaceSnapshot,
 } from "@/lib/journal-drafts";
+import {
+  createSnapshotSelector,
+  shallowEqual,
+} from "@/lib/external-store-selector";
 import { Button } from "@/components/ui/button";
 
 export type { RememberedDialog } from "@/lib/journal-drafts";
@@ -52,6 +57,27 @@ type WorkspaceContext = {
 };
 const Context = createContext<WorkspaceContext | null>(null);
 
+/** Subscribe to the fields this consumer actually displays, rather than every keystroke. */
+export function useWorkspaceSnapshot<Selection>(
+  store: DraftWorkspace,
+  select: (snapshot: WorkspaceSnapshot) => Selection,
+  equal: (left: Selection, right: Selection) => boolean = Object.is,
+) {
+  const getters = useMemo(() => {
+    const selected = createSnapshotSelector(select, equal);
+    const serverSelected = createSnapshotSelector(select, equal);
+    return {
+      getSnapshot: () => selected(store.getSnapshot()),
+      getServerSnapshot: () => serverSelected(store.getServerSnapshot()),
+    };
+  }, [store, select, equal]);
+  return useSyncExternalStore(
+    store.subscribe,
+    getters.getSnapshot,
+    getters.getServerSnapshot,
+  );
+}
+
 export function JournalDraftProvider({
   scope,
   children,
@@ -60,12 +86,17 @@ export function JournalDraftProvider({
   children: ReactNode;
 }) {
   const store = useMemo(() => createDraftWorkspace(scope), [scope]);
-  const snapshot = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
-  );
   const path = usePathname();
+  const selectWorkspace = useCallback(
+    (snapshot: WorkspaceSnapshot) => ({
+      hydrated: snapshot.hydrated,
+      ready: snapshot.ready,
+      dialog: snapshot.screens[path]?.dialog ?? null,
+      instance: snapshot.screens[path]?.dialogInstance ?? 0,
+    }),
+    [path],
+  );
+  const snapshot = useWorkspaceSnapshot(store, selectWorkspace, shallowEqual);
   const router = useRouter();
   const { data } = useJournal();
   const bootstrapped = useRef(false);
@@ -193,6 +224,7 @@ export function JournalDraftProvider({
     if (!snapshot.ready) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
     const save = () => {
+      if (timer !== null) clearTimeout(timer);
       timer = null;
       const destination = explicitDestination.current;
       if (destination) store.setLocation(destination, "", 0);
@@ -204,7 +236,8 @@ export function JournalDraftProvider({
         );
     };
     const scroll = () => {
-      if (timer === null) timer = setTimeout(save, 120);
+      if (timer !== null) clearTimeout(timer);
+      timer = setTimeout(save, 240);
     };
     const leave = () => {
       if (timer !== null) clearTimeout(timer);
@@ -232,9 +265,12 @@ export function JournalDraftProvider({
     };
   }, [rememberDestination, snapshot.ready, store]);
 
-  const storedDialog = snapshot.screens[path]?.dialog ?? null;
-  const instance = snapshot.screens[path]?.dialogInstance ?? 0;
-  const dialog = storedDialog && safeRememberedDialog(storedDialog, path);
+  const storedDialog = snapshot.dialog;
+  const instance = snapshot.instance;
+  const dialog = useMemo(
+    () => storedDialog && safeRememberedDialog(storedDialog, path),
+    [path, storedDialog],
+  );
   const openDialog = useCallback(
     (next: RememberedDialog) => store.openDialog(path, next),
     [path, store],
@@ -245,20 +281,25 @@ export function JournalDraftProvider({
     [instance, path, store],
   );
 
-  return (
-    <Context.Provider
-      value={{
-        store,
-        ready: snapshot.ready,
-        dialog,
-        openDialog,
-        closeDialog,
-        rememberDestination,
-      }}
-    >
-      {children}
-    </Context.Provider>
+  const value = useMemo(
+    () => ({
+      store,
+      ready: snapshot.ready,
+      dialog,
+      openDialog,
+      closeDialog,
+      rememberDestination,
+    }),
+    [
+      store,
+      snapshot.ready,
+      dialog,
+      openDialog,
+      closeDialog,
+      rememberDestination,
+    ],
   );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 
 export function useOptionalJournalWorkspace() {
@@ -283,14 +324,17 @@ export function usePersistentIntakeStackView(
     members: readonly string[];
     view: IntakeStackView;
   } | null>(null);
-  const snapshot = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
+  const selectView = useCallback(
+    (snapshot: WorkspaceSnapshot) => ({
+      saved: snapshot.stackViews[day] ?? EMPTY_INTAKE_STACK_VIEW,
+      status: snapshot.status,
+    }),
+    [day],
   );
+  const snapshot = useWorkspaceSnapshot(store, selectView, shallowEqual);
   const memory =
     fallback?.store === store && fallback.day === day ? fallback : null;
-  const saved = snapshot.stackViews[day] ?? EMPTY_INTAKE_STACK_VIEW;
+  const saved = snapshot.saved;
   const members = memory && new Set(memory.members);
   const retained = memory
     ? {
@@ -325,19 +369,15 @@ export function usePersistentIntakeStackView(
 /** One quiet notice per day, only when device persistence is unavailable. */
 export function StackViewStorageStatus() {
   const { store } = useJournalWorkspace();
-  const snapshot = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
-  );
-  if (snapshot.status === "saved") return null;
+  const status = useWorkspaceSnapshot(store, (snapshot) => snapshot.status);
+  if (status === "saved") return null;
   return (
     <p
       role="status"
       className="canvas-copy mt-3 text-center text-[10px] leading-relaxed text-muted-foreground"
-      data-stack-view-storage-status={snapshot.status}
+      data-stack-view-storage-status={status}
     >
-      {snapshot.status === "memory"
+      {status === "memory"
         ? "Stack views are kept for this visit; device storage is unavailable."
         : "Stack views are kept for this visit; saved views may not survive reopening."}
     </p>
@@ -350,11 +390,14 @@ export function usePersistentDraft<T>(
   validate: (value: unknown) => value is T,
 ) {
   const { store } = useJournalWorkspace();
-  const snapshot = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
+  const selectDraft = useCallback(
+    (snapshot: WorkspaceSnapshot) => ({
+      draft: snapshot.drafts[key],
+      status: snapshot.status,
+    }),
+    [key],
   );
+  const snapshot = useWorkspaceSnapshot(store, selectDraft, shallowEqual);
   const [baseline, setBaseline] = useState(() => ({ key, value: initial() }));
   const [restored, setRestored] = useState(() => {
     try {
@@ -367,10 +410,10 @@ export function usePersistentDraft<T>(
     }
   });
   const fallback = baseline.key === key ? baseline.value : initial();
-  const saved = snapshot.drafts[key]?.value;
+  const saved = snapshot.draft?.value;
   let hasDraft = false;
   try {
-    hasDraft = Object.hasOwn(snapshot.drafts, key) && validate(saved);
+    hasDraft = snapshot.draft !== undefined && validate(saved);
   } catch {
     /* Invalid stored input uses fresh defaults. */
   }
@@ -395,7 +438,7 @@ export function usePersistentDraft<T>(
     hasDraft,
     restored,
     status:
-      Object.hasOwn(snapshot.drafts, key) && !hasDraft
+      snapshot.draft !== undefined && !hasDraft
         ? ("error" as const)
         : snapshot.status,
     clearDraft: () => store.clearDraft(key),

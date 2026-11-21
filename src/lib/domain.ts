@@ -100,6 +100,8 @@ export function emptyData(): AppData {
 }
 
 const formatters = new Map<string, Intl.DateTimeFormat>();
+const dayFormatters = new Map<string, Intl.DateTimeFormat>();
+const doseFormatter = new Intl.NumberFormat("en", { maximumFractionDigits: 8 });
 
 function localParts(input: Date | string, timeZone: string) {
   const date = input instanceof Date ? input : new Date(input);
@@ -118,6 +120,8 @@ function localParts(input: Date | string, timeZone: string) {
       second: "2-digit",
       hourCycle: "h23",
     });
+    if (formatters.size >= 32)
+      formatters.delete(formatters.keys().next().value!);
     formatters.set(timeZone, formatter);
   }
   const parts = Object.fromEntries(
@@ -224,9 +228,7 @@ export function goalForDay(
 }
 
 export function formatDose(value: number): string {
-  return new Intl.NumberFormat("en", { maximumFractionDigits: 8 }).format(
-    value,
-  );
+  return doseFormatter.format(value);
 }
 
 /** A date key has no timezone: render it as the same calendar day everywhere. */
@@ -235,13 +237,22 @@ export function formatDay(
   options?: Intl.DateTimeFormatOptions,
 ): string {
   if (!isValidDayKey(key)) throw new RangeError("Invalid day.");
-  return new Intl.DateTimeFormat("en", {
+  const resolved: Intl.DateTimeFormatOptions = {
     weekday: "long",
     month: "long",
     day: "numeric",
     ...options,
     timeZone: "UTC",
-  }).format(new Date(`${key}T12:00:00.000Z`));
+  };
+  const signature = JSON.stringify(resolved);
+  let formatter = dayFormatters.get(signature);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en", resolved);
+    if (dayFormatters.size >= 32)
+      dayFormatters.delete(dayFormatters.keys().next().value!);
+    dayFormatters.set(signature, formatter);
+  }
+  return formatter.format(new Date(`${key}T12:00:00.000Z`));
 }
 
 export function toLocalInput(input: Date | string, timeZone: string): string {

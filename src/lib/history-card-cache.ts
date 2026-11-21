@@ -1,4 +1,9 @@
-import { checkInForDay, getCheckInPeriod, journalDays } from "./daily-check-in";
+import {
+  checkInForDay,
+  getCheckInPeriod,
+  journalDays,
+  type DailyCheckIn,
+} from "./daily-check-in";
 import {
   getCheckInCompletion,
   getMorningCheckInCompletion,
@@ -10,6 +15,7 @@ import {
   formatDose,
   isValidDayKey,
   type AppData,
+  type Intake,
 } from "./domain";
 import { getMedicationColor } from "./medication-appearance";
 import { countPills } from "./pill-counts";
@@ -17,19 +23,62 @@ import { countPills } from "./pill-counts";
 export const HISTORY_CARD_CACHE_VERSION = 1;
 const namespace = `pill-happens:history-cards:v${HISTORY_CARD_CACHE_VERSION}`;
 
+const byIntakeTime = (a: Intake, b: Intake) =>
+  Date.parse(a.takenAt) - Date.parse(b.takenAt) || a.id.localeCompare(b.id);
+
+/** One timezone pass shared by the cards rendering the same immutable server snapshot. */
+export function createHistoryCardIndex(data: AppData) {
+  const entries = new Map<string, Intake[]>();
+  const morning = new Map<string, DailyCheckIn>();
+  const evening = new Map<string, DailyCheckIn>();
+  const recordedDays = new Set<string>();
+  for (const intake of data.intakes) {
+    const day = dayKey(intake.takenAt, data.settings.timezone);
+    const grouped = entries.get(day);
+    if (grouped) grouped.push(intake);
+    else entries.set(day, [intake]);
+    recordedDays.add(day);
+  }
+  for (const grouped of entries.values()) grouped.sort(byIntakeTime);
+  for (const checkIn of data.dailyCheckIns ?? []) {
+    const period = getCheckInPeriod(checkIn) === "morning" ? morning : evening;
+    // Match checkInForDay's first-record precedence, including legacy Evening.
+    if (!period.has(checkIn.day)) period.set(checkIn.day, checkIn);
+    if (isValidDayKey(checkIn.day)) recordedDays.add(checkIn.day);
+  }
+  return {
+    data,
+    entries,
+    morning,
+    evening,
+    recordedDays,
+    days: [...recordedDays].sort((a, b) => b.localeCompare(a)),
+  };
+}
+
+export type HistoryCardIndex = ReturnType<typeof createHistoryCardIndex>;
+
 /** Only visible counts, artwork identities and accessible labels are cached.
  * Journal writing, passwords and authentication material never enter this record. */
-export function historyCardSource(data: AppData, day: string) {
-  const entries = dayIntakes(data, day).sort(
-    (a, b) =>
-      Date.parse(a.takenAt) - Date.parse(b.takenAt) || a.id.localeCompare(b.id),
-  );
+export function historyCardSource(
+  data: AppData,
+  day: string,
+  index?: HistoryCardIndex,
+) {
+  const indexed = index?.data === data ? index : null;
+  const entries = indexed
+    ? (indexed.entries.get(day) ?? [])
+    : dayIntakes(data, day).sort(byIntakeTime);
   const ids = new Set(entries.map((entry) => entry.medicationId));
   const medications = data.medications.filter((medication) =>
     ids.has(medication.id),
   );
-  const morning = checkInForDay(data.dailyCheckIns, day, "morning");
-  const evening = checkInForDay(data.dailyCheckIns, day);
+  const morning = indexed
+    ? indexed.morning.get(day)
+    : checkInForDay(data.dailyCheckIns, day, "morning");
+  const evening = indexed
+    ? indexed.evening.get(day)
+    : checkInForDay(data.dailyCheckIns, day);
   const checkIn = evening ?? morning;
   const completion =
     checkIn && getCheckInPeriod(checkIn) === "morning"
@@ -226,11 +275,22 @@ export function historyCardCacheable(
   data: AppData,
   day: string,
   now: Date | string,
+  index?: HistoryCardIndex,
 ) {
   // Hooks pass the stable tracking-day key, not a new Date on each clock tick.
   const today =
     typeof now === "string" ? now : dayKey(now, data.settings.timezone);
   if (!isValidDayKey(day) || !isValidDayKey(today)) return false;
+  if (index?.data === data) {
+    if (day >= today || !index.recordedDays.has(day)) return false;
+    let recent = 0;
+    for (const recorded of index.days) {
+      if (recorded >= today) continue;
+      // Every older recorded day can cache; these three always remain live.
+      if (++recent === 3) return day < recorded;
+    }
+    return false;
+  }
   const past = journalDays(
     data.intakes,
     data.dailyCheckIns,

@@ -24,8 +24,8 @@
     ),
     var(--reader-paper);
   color: var(--reader-ink);
-  -webkit-backdrop-filter: blur(40px);
-  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: 0 24px 100px #1e123d40;
 }
 .header {

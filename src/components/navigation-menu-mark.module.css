@@ -22,7 +22,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .line {
-    animation: menu-line-ripple 18s ease-in-out var(--line-delay) infinite;
+    animation: none;
     animation-play-state: var(--page-entry-play-state, running);
   }
 

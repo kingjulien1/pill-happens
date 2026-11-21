@@ -199,7 +199,7 @@
       var(--action-rim-1)
     );
     transform: translate(-50%, -50%);
-    animation: shared-rim-turn 6.8s linear infinite;
+    animation: none;
     animation-play-state: var(
       --intake-effects-play-state,
       var(--action-paint-visibility, running)
