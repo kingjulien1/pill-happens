@@ -304,7 +304,6 @@
     transparent
   );
   color: #f9f2fc;
-  font-size: 13.8px;
   font-weight: 500;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -336,7 +335,7 @@
   line-height: 1.5;
 }
 .snapshot,
-.guidance:not(.introduction),
+.guidance,
 .stats,
 .stat > span {
   font-size: 12px;
