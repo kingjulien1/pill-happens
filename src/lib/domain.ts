@@ -167,14 +167,39 @@ export function dayKey(input: Date | string, timeZone: string): string {
   return Number(parts.hour) < 6 ? shiftDayKey(key, -1) : key;
 }
 
-export function dayIntakes(data: AppData, key: string): Intake[] {
-  return data.intakes
-    .filter((entry) => dayKey(entry.takenAt, data.settings.timezone) === key)
-    .sort(
+type DayIntakeIndex = {
+  days: Map<string, Intake[]>;
+  totals: Map<string, DailyTotal[]>;
+};
+const dayIndexes = new WeakMap<
+  readonly Intake[],
+  Map<string, DayIntakeIndex>
+>();
+/** Live values follow immutable server snapshots, never a time-based cache. */
+function dayIntakeIndex(data: AppData): DayIntakeIndex {
+  let byZone = dayIndexes.get(data.intakes);
+  if (!byZone) dayIndexes.set(data.intakes, (byZone = new Map()));
+  const cached = byZone.get(data.settings.timezone);
+  if (cached) return cached;
+  const result: DayIntakeIndex = { days: new Map(), totals: new Map() };
+  for (const entry of data.intakes) {
+    const day = dayKey(entry.takenAt, data.settings.timezone);
+    let records = result.days.get(day);
+    if (!records) result.days.set(day, (records = []));
+    records.push(entry);
+  }
+  for (const records of result.days.values())
+    records.sort(
       (a, b) =>
         Date.parse(a.createdAt) - Date.parse(b.createdAt) ||
         a.id.localeCompare(b.id),
     );
+  if (byZone.size >= 2) byZone.delete(byZone.keys().next().value!);
+  byZone.set(data.settings.timezone, result);
+  return result;
+}
+export function dayIntakes(data: AppData, key: string): Intake[] {
+  return [...(dayIntakeIndex(data).days.get(key) ?? [])];
 }
 
 function cleanDecimal(value: number): number {
@@ -189,6 +214,10 @@ export function doseMg(
 
 /** Medication totals remain separate; there is no dose equivalence conversion. */
 export function totalsForDay(data: AppData, key: string): DailyTotal[] {
+  const index = dayIntakeIndex(data);
+  if (!index.days.has(key)) return [];
+  const cached = index.totals.get(key);
+  if (cached) return cached.map((total) => ({ ...total }));
   const totals = new Map<string, DailyTotal>();
   for (const intake of dayIntakes(data, key)) {
     const current = totals.get(intake.medicationId) ?? {
@@ -201,7 +230,30 @@ export function totalsForDay(data: AppData, key: string): DailyTotal[] {
     current.count += 1;
     totals.set(intake.medicationId, current);
   }
-  return [...totals.values()];
+  const result = [...totals.values()];
+  index.totals.set(key, result);
+  return result.map((total) => ({ ...total }));
+}
+
+const goalIndexes = new WeakMap<readonly Goal[], Map<string, Goal[]>>();
+function indexedGoals(goals: readonly Goal[]) {
+  const cached = goalIndexes.get(goals);
+  if (cached) return cached;
+  const index = new Map<string, Goal[]>();
+  for (const goal of goals) {
+    let records = index.get(goal.medicationId);
+    if (!records) index.set(goal.medicationId, (records = []));
+    records.push(goal);
+  }
+  for (const records of index.values())
+    records.sort(
+      (a, b) =>
+        b.startsOn.localeCompare(a.startsOn) ||
+        Date.parse(b.createdAt) - Date.parse(a.createdAt) ||
+        b.id.localeCompare(a.id),
+    );
+  goalIndexes.set(goals, index);
+  return index;
 }
 
 /** Newer effective dates supersede older goals without rewriting history. */
@@ -210,16 +262,9 @@ export function goalForDay(
   medicationId: string,
   key: string,
 ): Goal | undefined {
-  const latest = data.goals
-    .filter(
-      (goal) => goal.medicationId === medicationId && goal.startsOn <= key,
-    )
-    .sort(
-      (a, b) =>
-        b.startsOn.localeCompare(a.startsOn) ||
-        Date.parse(b.createdAt) - Date.parse(a.createdAt) ||
-        b.id.localeCompare(a.id),
-    )[0];
+  const latest = indexedGoals(data.goals)
+    .get(medicationId)
+    ?.find((goal) => goal.startsOn <= key);
   // Once superseded, an older goal never silently becomes active again.
   // An expired newest goal leaves no active maximum until another is added.
   return latest && (!latest.endsOn || latest.endsOn >= key)

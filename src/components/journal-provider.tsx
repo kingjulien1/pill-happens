@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -13,6 +14,10 @@ import {
   clearJournalNotifications,
   toast,
 } from "@/components/ui/journal-toast";
+import {
+  createDailyDerivedCache,
+  type DailyDerivedValues,
+} from "@/lib/daily-derived-values";
 import type { AppData } from "@/lib/domain";
 import { probeSession, recoverSession } from "@/lib/session-recovery";
 import { checkInForDay } from "@/lib/daily-check-in";
@@ -39,6 +44,7 @@ type JournalContext = {
   notificationScope: string;
   data: AppData | null;
   now: Date | null;
+  derived?: DailyDerivedValues;
   error: string | null;
   refresh: () => Promise<void>;
   mutate: (
@@ -63,6 +69,18 @@ export function JournalProvider({
 }) {
   const [data, setData] = useState<AppData | null>(null);
   const [now, setNow] = useState<Date | null>(null);
+  const cache = useMemo(
+    () => createDailyDerivedCache(notificationScope),
+    [notificationScope],
+  );
+  const [derived, setDerived] = useState<DailyDerivedValues>();
+  const acceptData = useCallback(
+    (next: AppData) => {
+      setDerived(cache.get(next));
+      setData(next);
+    },
+    [cache],
+  );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
@@ -89,7 +107,9 @@ export function JournalProvider({
     // Finish any pending checkpoint before deleting this journal's queue.
     unbindNotifications();
     clearJournalNotifications(notificationScope);
-  }, [notificationScope, unbindNotifications]);
+    cache.clear();
+    setDerived(undefined);
+  }, [notificationScope, unbindNotifications, cache]);
 
   const refresh = useCallback(() => {
     if (signingOut.current) return Promise.resolve();
@@ -132,7 +152,7 @@ export function JournalProvider({
           throw new Error(body.error || "Your journal couldn't be loaded.");
         if (controller.signal.aborted || signingOut.current) return;
         if (!pending.current && startedAtRevision === revision.current) {
-          setData(body);
+          acceptData(body);
           setNow(new Date());
         }
         setError(null);
@@ -150,7 +170,17 @@ export function JournalProvider({
     })();
     refreshRequest.current = { controller, promise };
     return promise;
-  }, [clearNotifications]);
+  }, [clearNotifications, acceptData]);
+
+  useEffect(() => {
+    if (
+      data &&
+      now &&
+      derived &&
+      (derived.expiresAt <= now.getTime() || derived.createdAt > now.getTime())
+    )
+      void refresh();
+  }, [data, now, derived, refresh]);
 
   useEffect(() => {
     const update = () => setNow(new Date());
@@ -272,7 +302,7 @@ export function JournalProvider({
         if (!res.ok)
           throw new Error(result.error || "Your change couldn't be saved.");
         const { _undo: receipt, ...nextData } = result;
-        setData(nextData);
+        acceptData(nextData);
         // New intake timestamps can be later than the last minute tick.
         setNow(new Date());
         setError(null);
@@ -321,7 +351,7 @@ export function JournalProvider({
         setBusy(false);
       }
     },
-    [clearNotifications, notificationScope],
+    [clearNotifications, notificationScope, acceptData],
   );
 
   useEffect(() => {
@@ -366,6 +396,7 @@ export function JournalProvider({
           if (response.status === 401) {
             const session = await recoverSession({ signal: controller.signal });
             if (session === "unauthenticated") {
+              clearNotifications();
               setData(null);
               window.location.replace("/login");
             }
@@ -408,7 +439,7 @@ export function JournalProvider({
             input.note,
             saved,
           );
-          setData(result);
+          acceptData(result);
           setNow(new Date());
           setError(null);
           return acknowledgement;
@@ -431,7 +462,7 @@ export function JournalProvider({
       reflectionRequest.current = work;
       return work;
     },
-    [],
+    [acceptData, clearNotifications],
   );
 
   const signOut = async () => {
@@ -464,6 +495,7 @@ export function JournalProvider({
         notificationScope,
         data,
         now,
+        derived: derived?.scope === notificationScope ? derived : undefined,
         error,
         refresh,
         mutate,

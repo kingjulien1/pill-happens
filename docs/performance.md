@@ -99,3 +99,11 @@ caches are bounded to 32 configurations. A same-machine synthetic sample of
 8ms. These are formatting benchmarks, not an iPhone frame-rate guarantee.
 
 These changes must be published before an installed production PWA can use them.
+
+## Daily aggregates and snapshot indexes — November 21
+
+A follow-up audit caches all-time sleep samples and usage-based medication,
+route, quantity and mood preferences until the next local 06:00. Live dose totals,
+effective goals, journal day lists and saved Journal metadata reuse immutable
+source indexes instead of a daily TTL. See [cache coverage and invalidation](derived-values-cache.md)
+for the scope, boundaries and storage behavior.

@@ -3,6 +3,7 @@
 import { useCallback, useId, useState } from "react";
 import {
   BedDouble,
+  FlaskConical,
   Coffee,
   Moon,
   BookOpen,
@@ -21,6 +22,7 @@ import {
   CHECK_IN_CARD_COLOR,
   CheckInCardArtwork,
 } from "@/components/check-in-card-artwork";
+import { recordedSleepAverage } from "@/lib/daily-derived-values";
 import { getCheckInCardMetric } from "@/lib/check-in-card-metric";
 import { getCheckInCardProgress } from "@/lib/check-in-card-progress";
 import { useJournal } from "@/components/journal-provider";
@@ -119,7 +121,7 @@ export function DailyCheckInSection({
   period = "evening",
   intakeSpacing,
 }: CheckInProps) {
-  const { data, busy } = useJournal();
+  const { data, busy, derived } = useJournal();
   const workspace = useJournalWorkspace();
   const morning = period === "morning";
   const title = `${morning ? "Morning" : "Evening"} Check-In`;
@@ -178,6 +180,9 @@ export function DailyCheckInSection({
     period,
     currentCheckIn,
     hasChanges && isCheckInDraft(storedDraft) ? storedDraft : undefined,
+    morning
+      ? (derived?.sleepAverage ?? recordedSleepAverage(data?.dailyCheckIns))
+      : undefined,
   );
   const MetricIcon = morning ? BedDouble : Smile;
   const StateIcon = hasChanges ? PencilLine : saved ? BookOpenCheck : BookOpen;
@@ -288,10 +293,19 @@ export function DailyCheckInSection({
                 </span>
               </div>
               <span
-                className="intake-card-total"
+                className={cn(
+                  "intake-card-total",
+                  "sample" in metric && metric.sample && styles.sampleMetric,
+                )}
+                data-sleep-sample={
+                  ("sample" in metric && metric.sample) || undefined
+                }
                 aria-hidden="true"
                 title={metric.description}
               >
+                {"sample" in metric && metric.sample && (
+                  <FlaskConical aria-hidden="true" />
+                )}
                 <span className="intake-card-total-value">
                   {metric.value || "\u200b"}
                 </span>
@@ -392,7 +406,7 @@ function CheckInForm({
   checkIn?: DailyCheckIn;
   onSaved: () => void;
 }) {
-  const { data, mutate, busy } = useJournal();
+  const { data, mutate, busy, derived } = useJournal();
   const { store } = useJournalWorkspace();
   const [submitting, setSubmitting] = useState(false);
   const locked = busy || submitting;
@@ -690,6 +704,7 @@ function CheckInForm({
               >
                 <legend className="sr-only">Today Felt Like</legend>
                 <DailyMoodPicker
+                  cachedUsage={derived?.moodUsage}
                   value={moods}
                   onChange={(value) => setField("moods", value)}
                   checkIns={data?.dailyCheckIns}

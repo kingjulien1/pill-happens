@@ -96,10 +96,17 @@ export function journalEntryTitle(value: string, day: string) {
   });
 }
 
+const savedLibraries = new WeakMap<
+  readonly DailyCheckIn[],
+  JournalLibraryEntry[]
+>();
+
 /** Newest saved version wins before eligibility; local drafts are never a source. */
 export function journalLibraryEntries(
   checkIns: readonly DailyCheckIn[] | undefined,
 ): JournalLibraryEntry[] {
+  const cached = checkIns && savedLibraries.get(checkIns);
+  if (cached) return [...cached];
   const candidates = [...(checkIns ?? [])].sort((a, b) => {
     const first = versionTime(a);
     const second = versionTime(b);
@@ -132,7 +139,7 @@ export function journalLibraryEntries(
       });
     }
   }
-  return entries.sort(
+  const result = entries.sort(
     (a, b) =>
       b.day.localeCompare(a.day) ||
       (versionTime(a.checkIn) === versionTime(b.checkIn)
@@ -141,6 +148,8 @@ export function journalLibraryEntries(
           ? -1
           : 1),
   );
+  if (checkIns) savedLibraries.set(checkIns, result);
+  return [...result];
 }
 
 /** Open the existing writer without replacing any unfinished field or version marker. */

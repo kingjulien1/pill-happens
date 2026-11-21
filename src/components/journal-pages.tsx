@@ -626,7 +626,7 @@ export function TodayPage() {
 }
 
 export function MedicationsPage() {
-  const { data, mutate, busy, notificationScope } = useJournal();
+  const { data, derived, mutate, busy, notificationScope } = useJournal();
   const search = useSearchParams();
   const medicationReferences = search.getAll("medication");
   const ingredientReferences = search.getAll("ingredient");
@@ -734,6 +734,7 @@ export function MedicationsPage() {
         : true,
     ),
     data.intakes,
+    derived?.medicationUsage,
   );
   const medications = hasReference
     ? rankedMedications

@@ -1826,19 +1826,32 @@ function moodRank(value: string, seed: string) {
   return hash >>> 0;
 }
 
+const moodUsages = new WeakMap<
+  readonly Pick<DailyCheckIn, "moods">[],
+  Readonly<Record<string, number>>
+>();
+export function dailyMoodUsage(
+  checkIns: readonly Pick<DailyCheckIn, "moods">[],
+) {
+  const cached = moodUsages.get(checkIns);
+  if (cached) return cached;
+  const usage: Record<string, number> = Object.create(null);
+  for (const checkIn of checkIns)
+    for (const value of new Set(checkIn.moods))
+      usage[value] = (usage[value] ?? 0) + 1;
+  moodUsages.set(checkIns, usage);
+  return usage;
+}
+
 export function rankDailyMoods(
   checkIns: readonly Pick<DailyCheckIn, "moods">[] = [],
   seed = "daily-moods",
+  cachedUsage?: Readonly<Record<string, number>>,
 ) {
-  const usage = new Map<DailyMood, number>();
-  for (const checkIn of checkIns) {
-    for (const value of new Set(checkIn.moods)) {
-      usage.set(value, (usage.get(value) ?? 0) + 1);
-    }
-  }
+  const usage = cachedUsage ?? dailyMoodUsage(checkIns);
   return [...DAILY_MOODS].sort(
     (left, right) =>
-      (usage.get(right.value) ?? 0) - (usage.get(left.value) ?? 0) ||
+      (usage[right.value] ?? 0) - (usage[left.value] ?? 0) ||
       moodRank(left.value, seed) - moodRank(right.value, seed) ||
       left.value.localeCompare(right.value),
   );
@@ -1910,16 +1923,32 @@ export function canCheckIn(
   return local.slice(0, 10) > day || local.slice(11) >= "17:00";
 }
 
+const emptyCheckIns: readonly DailyCheckIn[] = [];
+const dayLists = new WeakMap<
+  readonly { takenAt: string }[],
+  WeakMap<readonly DailyCheckIn[], Map<string, string[]>>
+>();
+
 /** Include reflection-only days in history, without counting them as intakes. */
 export function journalDays(
   intakes: readonly { takenAt: string }[],
   checkIns: readonly DailyCheckIn[] | undefined,
   timeZone: string,
 ) {
-  return [
+  const records = checkIns ?? emptyCheckIns;
+  let byRecords = dayLists.get(intakes);
+  if (!byRecords) dayLists.set(intakes, (byRecords = new WeakMap()));
+  let byZone = byRecords.get(records);
+  if (!byZone) byRecords.set(records, (byZone = new Map()));
+  const cached = byZone.get(timeZone);
+  if (cached) return [...cached];
+  const result = [
     ...new Set([
       ...intakes.map((intake) => dayKey(intake.takenAt, timeZone)),
-      ...(checkIns ?? []).map((checkIn) => checkIn.day).filter(isValidDayKey),
+      ...records.map((checkIn) => checkIn.day).filter(isValidDayKey),
     ]),
   ].sort((a, b) => b.localeCompare(a));
+  if (byZone.size >= 2) byZone.delete(byZone.keys().next().value!);
+  byZone.set(timeZone, result);
+  return [...result];
 }

@@ -24,11 +24,13 @@ export function IntakeRouteSelect({
   value,
   onValueChange,
   disabled = false,
+  routes = INTAKE_ROUTES,
 }: {
   id?: string;
   value?: IntakeRoute;
   onValueChange: (route: IntakeRoute) => void;
   disabled?: boolean;
+  routes?: readonly (typeof INTAKE_ROUTES)[number][];
 }) {
   const selected = INTAKE_ROUTES.find((route) => route.value === value);
   const label = selected?.label ?? "Choose route";
@@ -66,7 +68,7 @@ export function IntakeRouteSelect({
         sideOffset={6}
       >
         <ChoiceMenuHeader title="Intake Route" count={INTAKE_ROUTES.length} />
-        {INTAKE_ROUTES.map((route) => {
+        {routes.map((route) => {
           const current = route.value === value;
           return (
             <SelectItem

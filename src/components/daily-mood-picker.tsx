@@ -25,20 +25,23 @@ export function DailyMoodPicker({
   checkIns,
   seed,
   disabled = false,
+  cachedUsage,
 }: {
   value: readonly DailyMood[];
   onChange: (value: DailyMood[]) => void;
   checkIns?: readonly Pick<DailyCheckIn, "moods">[];
   seed: string;
   disabled?: boolean;
+  cachedUsage?: Readonly<Record<string, number>>;
 }) {
   const id = useId();
   const viewport = useRef<HTMLDivElement>(null);
   const [mix, setMix] = useState(0);
   const [query, setQuery] = useState("");
   const ranked = useMemo(
-    () => rankDailyMoods(checkIns, `${seed}:${mix}`).slice().reverse(),
-    [checkIns, seed, mix],
+    () =>
+      rankDailyMoods(checkIns, `${seed}:${mix}`, cachedUsage).slice().reverse(),
+    [checkIns, seed, mix, cachedUsage],
   );
   const results = ranked.filter(
     (mood) =>

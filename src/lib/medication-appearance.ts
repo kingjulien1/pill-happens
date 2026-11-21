@@ -31,6 +31,10 @@ export const MEDICATION_COLORS = [
   ...TAILWIND_MEDICATION_COLORS,
 ] as const;
 
+const colorsByValue = new Map<string, (typeof MEDICATION_COLORS)[number]>(
+  MEDICATION_COLORS.map((color) => [color.value, color]),
+);
+
 export type MedicationColor = (typeof MEDICATION_COLORS)[number]["value"];
 
 export const MEDICATION_ICON_NAMES = [
@@ -73,8 +77,5 @@ export function isMedicationIcon(value: string): boolean {
 
 /** Unknown or missing appearance values render with the original default color. */
 export function getMedicationColor(value?: string) {
-  return (
-    MEDICATION_COLORS.find((color) => color.value === value) ??
-    MEDICATION_COLORS[0]
-  );
+  return colorsByValue.get(value ?? "") ?? MEDICATION_COLORS[0];
 }

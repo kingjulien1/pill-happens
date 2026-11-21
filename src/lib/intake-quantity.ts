@@ -1,3 +1,5 @@
+import { intakeHistoryIndex } from "./intake-history-index";
+
 export const MIN_INTAKE_QUANTITY = 0.000001;
 export const MAX_INTAKE_QUANTITY = 10_000;
 /** Editor precision is independent of a medication's quantity-step setting. */
@@ -161,27 +163,47 @@ export function formatQuantityShortcut(quantity: number): string {
 }
 
 /** Rank exact, editable quantities by use, then by most recent intake. */
+const quantityRanks = new WeakMap<object, number[]>();
+const editableShortcut = (n: number) =>
+  Number.isFinite(n) &&
+  n >= MIN_EDITABLE_INTAKE_QUANTITY &&
+  n <= MAX_INTAKE_QUANTITY &&
+  Number(n.toFixed(INTAKE_QUANTITY_DECIMAL_PLACES)) === n;
+
+export function rankedIntakeQuantities(
+  medicationId: string,
+  entries: readonly {
+    medicationId: string;
+    quantity: number;
+    takenAt: string;
+  }[],
+): readonly number[] {
+  const usage = intakeHistoryIndex(entries).quantities.get(medicationId);
+  if (!usage) return [];
+  const cached = quantityRanks.get(usage);
+  if (cached) return cached;
+  const ranked = [...usage]
+    .filter(([n]) => editableShortcut(n))
+    .sort(([a, x], [b, y]) => y.count - x.count || y.latest - x.latest || a - b)
+    .map(([n]) => n);
+  quantityRanks.set(usage, ranked);
+  return ranked;
+}
+
 export function intakeQuantityShortcuts(
   medicationId: string,
-  entries: readonly { medicationId: string; quantity: number; takenAt: string }[],
+  entries: readonly {
+    medicationId: string;
+    quantity: number;
+    takenAt: string;
+  }[],
   defaultQuantity: number | undefined,
   fallback: readonly number[],
+  cachedRank?: readonly number[],
 ) {
-  const usage = new Map<number, { count: number; latest: number }>();
-  const editable = (n: number) =>
-    n >= MIN_EDITABLE_INTAKE_QUANTITY && n <= MAX_INTAKE_QUANTITY &&
-    Number(n.toFixed(INTAKE_QUANTITY_DECIMAL_PLACES)) === n;
-
-  for (const entry of entries) {
-    if (entry.medicationId !== medicationId || !editable(entry.quantity)) continue;
-    const stat = usage.get(entry.quantity) ?? { count: 0, latest: 0 };
-    stat.count++;
-    stat.latest = Math.max(stat.latest, Date.parse(entry.takenAt) || 0);
-    usage.set(entry.quantity, stat);
-  }
-  const ranked = [...usage].sort(([a, x], [b, y]) =>
-    y.count - x.count || y.latest - x.latest || a - b
-  ).map(([quantity]) => quantity);
-  const choices = new Set([...ranked, defaultQuantity ?? 1, ...fallback].filter(editable));
+  const ranked = cachedRank ?? rankedIntakeQuantities(medicationId, entries);
+  const choices = new Set(
+    [...ranked, defaultQuantity ?? 1, ...fallback].filter(editableShortcut),
+  );
   return [...choices].slice(0, 5).sort((a, b) => a - b);
 }

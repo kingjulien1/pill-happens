@@ -535,13 +535,14 @@ export function MedicationForm({
 }
 
 export function GoalForm({ onSaved }: { onSaved: () => void }) {
-  const { data, mutate, busy } = useJournal();
+  const { data, mutate, busy, derived } = useJournal();
   const id = useId();
   const medications =
     data?.medications.filter((medication) => !medication.archived) ?? [];
   const medicationOptions = sortMedicationsByUsage(
     medications,
     data?.intakes ?? [],
+    derived?.medicationUsage,
   );
   const freshGoal = (): GoalDraft => ({
     medicationId: medications[0]?.id ?? "",

@@ -56,7 +56,11 @@ import {
   type Intake,
 } from "@/lib/domain";
 import { Label } from "@/components/ui/label";
-import { INTAKE_ROUTES, preferredIntakeRoute } from "@/lib/intake-routes";
+import {
+  INTAKE_ROUTES,
+  preferredIntakeRoute,
+  sortIntakeRoutesByUsage,
+} from "@/lib/intake-routes";
 import { IntakeRouteSelect } from "@/components/intake-route-select";
 import {
   MIN_EDITABLE_INTAKE_QUANTITY,
@@ -90,12 +94,20 @@ export function IntakeForm({
   /** The editing owner can place a secondary action beside safe draft feedback. */
   footerAction?: ReactNode;
 }) {
-  const { data, mutate, busy } = useJournal();
-  const medications = data!.medications.filter(
-    (m) => !m.archived || m.id === intake?.medicationId,
+  const { data, mutate, busy, derived } = useJournal();
+  const medications = useMemo(
+    () =>
+      data!.medications.filter(
+        (m) => !m.archived || m.id === intake?.medicationId,
+      ),
+    [data, intake?.medicationId],
   );
   // Sorting choices never selects a medication for a fresh draft.
-  const medicationOptions = sortMedicationsByUsage(medications, data!.intakes);
+  const medicationOptions = sortMedicationsByUsage(
+    medications,
+    data!.intakes,
+    derived?.medicationUsage,
+  );
   const timezone = data!.settings.timezone;
   const draft = usePersistentDraft(
     intake ? `intake:edit:${intake.id}` : `intake:new:${initialDay ?? "today"}`,
@@ -121,12 +133,16 @@ export function IntakeForm({
   }, [onRestoredHint, showRestoredHelp]);
   const { medicationId } = draft.value;
   const quantity = medicationId ? draft.value.quantity : "";
+  const preferredRoute = (id: string) =>
+    derived
+      ? (derived.intakePreferences[id]?.route ?? "oral")
+      : preferredIntakeRoute(id, data!.intakes);
   const route =
     draft.value.route ??
     (intake
       ? (intake.route ?? "unspecified")
       : medicationId
-        ? preferredIntakeRoute(medicationId, data!.intakes)
+        ? preferredRoute(medicationId)
         : undefined);
   const takenAt = intakeDraftDisplayTime(draft.value, timezone);
   const setQuantity = (value: string) =>
@@ -165,6 +181,9 @@ export function IntakeForm({
     data!.intakes,
     medication?.defaultQuantity,
     fallbackPresets,
+    derived
+      ? (derived.intakePreferences[medicationId]?.quantities ?? [])
+      : undefined,
   );
   // Keep the raw draft intact until a quantity interaction explicitly replaces it.
   const unchangedOriginalQuantity = Boolean(
@@ -441,8 +460,7 @@ export function IntakeForm({
                         !intake && value !== current.medicationId
                           ? ((!current.medicationId
                               ? current.route
-                              : undefined) ??
-                            preferredIntakeRoute(value, data!.intakes))
+                              : undefined) ?? preferredRoute(value))
                           : current.route,
                       quantity:
                         !intake && value !== current.medicationId
@@ -459,6 +477,14 @@ export function IntakeForm({
                 <Label htmlFor="intake-route">Intake route</Label>
                 <IntakeRouteSelect
                   value={route}
+                  routes={sortIntakeRoutesByUsage(
+                    medicationId,
+                    data!.intakes,
+                    derived
+                      ? (derived.intakePreferences[medicationId]?.routes ??
+                          derived.routes)
+                      : undefined,
+                  )}
                   disabled={busy}
                   onValueChange={(value) =>
                     draft.setValue((current) => ({ ...current, route: value }))
