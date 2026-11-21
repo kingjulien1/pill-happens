@@ -16,6 +16,23 @@
   padding-inline-end: 8.75px;
 }
 
+.amountHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.amountHint {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: right;
+}
+.amountHint strong {
+  font-weight: 600;
+}
+
 .previewDivider {
   margin-block: 24px;
 }

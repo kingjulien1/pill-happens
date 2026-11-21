@@ -70,6 +70,7 @@ import {
   intakeQuantityShortcuts,
   normalizeIntakeQuantityForEditor,
   hasIntakeQuantityEditorPrecisionLoss,
+  formatQuantityShortcut,
 } from "@/lib/intake-quantity";
 
 import { CheckInSection } from "./check-in-section";
@@ -502,9 +503,24 @@ export function IntakeForm({
               </p>
             )}
             <div className="form-field">
-              <Label id="intake-quantity-label" htmlFor="intake-quantity">
-                Amount Taken
-              </Label>
+              <div className={styles.amountHeading}>
+                <Label id="intake-quantity-label" htmlFor="intake-quantity">
+                  Amount Taken
+                </Label>
+                <span
+                  id="intake-amount-step-hint"
+                  className={styles.amountHint}
+                >
+                  {medication || fallbackIntake ? (
+                    <>
+                      <strong>± {formatQuantityShortcut(increment)}</strong> per
+                      tap
+                    </>
+                  ) : (
+                    "Quantity → dose"
+                  )}
+                </span>
+              </div>
               <IntakeAmountField
                 value={editorQuantity}
                 onChange={setQuantity}
@@ -514,6 +530,7 @@ export function IntakeForm({
                 form={medicationForm ?? "other"}
                 categories={getMedicationCategories(medication)}
                 unit={visibleQuantity === 1 ? type.unit : type.units}
+                strengthMg={strength}
                 calculatedDose={calculatedDose}
                 originalQuantityPreserved={originalQuantityPreserved}
                 disabled={busy || (!medication && !fallbackIntake)}

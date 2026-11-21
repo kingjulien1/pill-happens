@@ -10,6 +10,8 @@ import type { IntakeRoute } from "@/lib/intake-routes";
 import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatDose } from "@/lib/domain";
+import { getMedicationType } from "@/lib/medication-types";
 import {
   MAX_INTAKE_QUANTITY,
   MIN_EDITABLE_INTAKE_QUANTITY,
@@ -33,6 +35,7 @@ export function IntakeAmountField({
   route,
   form,
   categories,
+  strengthMg,
   calculatedDose,
   originalQuantityPreserved = false,
   disabled = false,
@@ -47,6 +50,7 @@ export function IntakeAmountField({
   route?: IntakeRoute;
   form: MedicationType;
   categories: MedicationCategory[];
+  strengthMg: number;
   calculatedDose: number | null;
   originalQuantityPreserved?: boolean;
   disabled?: boolean;
@@ -90,6 +94,7 @@ export function IntakeAmountField({
         data-dialog-corner="compact"
         data-intake-amount-step="decrease"
         aria-label="Decrease amount"
+        aria-describedby="intake-amount-step-hint"
         disabled={
           disabled ||
           composition !== null ||
@@ -98,103 +103,139 @@ export function IntakeAmountField({
         }
         onClick={() => onStep(-increment)}
       >
-        <ActionIcon name="subtract" className="size-3.5" />
+        <ActionIcon name="subtract" weight="bold" className="size-3.5" />
       </Button>
       <label className={styles.center} htmlFor="intake-quantity">
-        {originalQuantityPreserved && (
-          <span
-            className={styles.approximate}
-            title={legacyDescription}
-            aria-hidden="true"
-            data-intake-amount-approximate
-          >
-            ≈
-          </span>
-        )}
-        <Input
-          id="intake-quantity"
-          value={shown}
-          onChange={(event) => {
-            const nativeComposing =
-              "isComposing" in event.nativeEvent &&
-              event.nativeEvent.isComposing === true;
-            if (composing.current || nativeComposing)
-              setComposition(event.target.value);
-            else commit(event.target.value);
-          }}
-          onCompositionStart={() => {
-            composing.current = true;
-            setComposition(value);
-          }}
-          onCompositionEnd={(event) => {
-            composing.current = false;
-            setComposition(null);
-            commit(event.currentTarget.value);
-          }}
-          type="text"
-          inputMode="decimal"
-          autoComplete="off"
-          spellCheck={false}
-          maxLength={256}
-          role="spinbutton"
-          aria-labelledby="intake-quantity-label"
-          aria-describedby={
-            empty
-              ? undefined
-              : `intake-amount-dose${originalQuantityPreserved ? " intake-amount-original" : ""}`
-          }
-          aria-valuemin={
-            originalQuantityPreserved && parsed === 0
-              ? 0
-              : MIN_EDITABLE_INTAKE_QUANTITY
-          }
-          aria-valuemax={MAX_INTAKE_QUANTITY}
-          aria-valuenow={parsed ?? undefined}
-          aria-valuetext={`${originalQuantityPreserved ? "Approximately " : ""}${shown} ${unit}`}
-          aria-invalid={invalid || undefined}
-          disabled={disabled}
-          required
-          className={styles.valueInput}
-          style={
-            {
-              width: `calc(${Math.max(1, Math.min(shown.length, 8))}ch + 2px)`,
-            } as CSSProperties
-          }
-          onKeyDown={(event) => {
-            if (
-              !composing.current &&
-              !event.nativeEvent.isComposing &&
-              parsed !== null &&
-              (event.key === "ArrowUp" || event.key === "ArrowDown")
-            ) {
-              event.preventDefault();
-              if (event.key === "ArrowUp") onStep(increment);
-              else if (parsed > increment) onStep(-increment);
+        <span className={styles.quantityGroup}>
+          {originalQuantityPreserved && (
+            <span
+              className={styles.approximate}
+              title={legacyDescription}
+              aria-hidden="true"
+              data-intake-amount-approximate
+            >
+              ≈
+            </span>
+          )}
+          <Input
+            id="intake-quantity"
+            value={shown}
+            onChange={(event) => {
+              const nativeComposing =
+                "isComposing" in event.nativeEvent &&
+                event.nativeEvent.isComposing === true;
+              if (composing.current || nativeComposing)
+                setComposition(event.target.value);
+              else commit(event.target.value);
+            }}
+            onCompositionStart={() => {
+              composing.current = true;
+              setComposition(value);
+            }}
+            onCompositionEnd={(event) => {
+              composing.current = false;
+              setComposition(null);
+              commit(event.currentTarget.value);
+            }}
+            type="text"
+            inputMode="decimal"
+            autoComplete="off"
+            spellCheck={false}
+            maxLength={256}
+            role="spinbutton"
+            aria-labelledby="intake-quantity-label"
+            aria-describedby={
+              empty
+                ? undefined
+                : `intake-amount-calculation intake-amount-dose${originalQuantityPreserved ? " intake-amount-original" : ""}`
             }
-          }}
-        />
+            aria-valuemin={
+              originalQuantityPreserved && parsed === 0
+                ? 0
+                : MIN_EDITABLE_INTAKE_QUANTITY
+            }
+            aria-valuemax={MAX_INTAKE_QUANTITY}
+            aria-valuenow={parsed ?? undefined}
+            aria-valuetext={`${originalQuantityPreserved ? "Approximately " : ""}${shown} ${unit}`}
+            aria-invalid={invalid || undefined}
+            disabled={disabled}
+            required
+            className={styles.valueInput}
+            style={
+              {
+                width: `calc(${Math.max(1, Math.min(shown.length, 8))}ch + 2px)`,
+              } as CSSProperties
+            }
+            onKeyDown={(event) => {
+              if (
+                !composing.current &&
+                !event.nativeEvent.isComposing &&
+                parsed !== null &&
+                (event.key === "ArrowUp" || event.key === "ArrowDown")
+              ) {
+                event.preventDefault();
+                if (event.key === "ArrowUp") onStep(increment);
+                else if (parsed > increment) onStep(-increment);
+              }
+            }}
+          />
+          {!empty && (
+            <span className={styles.iconGroup}>
+              <IntakeRouteIcon
+                route={route}
+                className={styles.glyph}
+                strokeWidth={2.5}
+              />
+              <span role="img" aria-label={getMedicationType(form).label}>
+                <MedicationTypeIcon
+                  type={form}
+                  className={styles.glyph}
+                  strokeWidth={2.5}
+                />
+              </span>
+            </span>
+          )}
+        </span>
         {!empty && (
           <>
-            <IntakeRouteIcon route={route} className={styles.glyph} />
-            <MedicationTypeIcon type={form} className={styles.glyph} />
-            <span className={styles.unit} title={unit} data-intake-amount-unit>
-              {unit}
+            <span className={styles.doseGroup}>
+              <span
+                id="intake-amount-calculation"
+                className={styles.calculation}
+                title={`Strength per ${getMedicationType(form).unit}: ${formatDose(strengthMg)} mg`}
+                aria-label={`Multiplied by ${formatDose(strengthMg)} milligrams per ${getMedicationType(form).unit}`}
+              >
+                <span aria-hidden="true">×</span>{" "}
+                <strong>{formatDose(strengthMg)}</strong> <span>mg</span>
+              </span>
+              <span className={styles.separator} aria-hidden="true">
+                ·
+              </span>
+              <span
+                id="intake-amount-dose"
+                className={styles.dose}
+                title={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose} mg`}
+                data-intake-amount-dose
+                aria-label={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose === "—" ? "not available" : `${dose} milligrams`}`}
+              >
+                <strong>{doseRounded ? `≈${dose}` : dose}</strong>{" "}
+                <span>mg</span>
+              </span>
             </span>
-            <span className={styles.separator} aria-hidden="true">
-              ·
-            </span>
-            <span
-              id="intake-amount-dose"
-              className={styles.dose}
-              title={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose} mg`}
-              data-intake-amount-dose
-              aria-label={`Calculated dose: ${doseRounded ? "approximately " : ""}${dose === "—" ? "not available" : `${dose} milligrams`}`}
-            >
-              <strong>{doseRounded ? `≈${dose}` : dose}</strong> <span>mg</span>
-            </span>
-            {categories.map((kind) => (
-              <MedicationIndicatorMark key={kind} kind={kind} size={14} />
-            ))}
+            {categories.length > 0 && (
+              <span className={styles.iconGroup}>
+                {categories.map((kind) => (
+                  <MedicationIndicatorMark
+                    key={kind}
+                    kind={kind}
+                    size={14}
+                    strokeWidth={2.5}
+                    outline
+                    className={styles.categoryGlyph}
+                  />
+                ))}
+              </span>
+            )}
           </>
         )}
         {originalQuantityPreserved && (
@@ -211,6 +252,7 @@ export function IntakeAmountField({
         data-dialog-corner="compact"
         data-intake-amount-step="increase"
         aria-label="Increase amount"
+        aria-describedby="intake-amount-step-hint"
         disabled={
           disabled ||
           composition !== null ||
@@ -219,7 +261,7 @@ export function IntakeAmountField({
         }
         onClick={() => onStep(increment)}
       >
-        <ActionIcon name="add" className="size-3.5" />
+        <ActionIcon name="add" weight="bold" className="size-3.5" />
       </Button>
     </div>
   );
