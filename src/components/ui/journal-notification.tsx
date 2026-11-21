@@ -944,13 +944,17 @@ export function JournalNotification({
         </div>
         <p className="journal-update-fine-print">
           <ShieldCheck aria-hidden="true" />
-          No journal records are removed. Need the longer version?{" "}
-          <Link href="/guide#app" prefetch={false} onClick={followRelatedLink}>
-            Open the app guide
-          </Link>
-          .
+          <span>No saved journal records are removed during updates.</span>
         </p>
       </div>
+      <Link
+        className="journal-update-guide-link"
+        href="/guide#app"
+        prefetch={false}
+        onClick={followRelatedLink}
+      >
+        Open the app guide
+      </Link>
     </section>
   );
   return (

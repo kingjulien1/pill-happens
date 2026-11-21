@@ -831,7 +831,7 @@
 .journal-update-panel {
   display: grid;
   gap: 10px;
-  padding: 11px;
+  padding: 11px 11px 5px;
   border-radius: 12px;
   background:
     linear-gradient(
@@ -998,13 +998,32 @@
   line-height: 1.35;
 }
 .journal-update-fine-print {
-  padding-top: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 8px 0;
   border-top: 1px solid color-mix(in srgb, var(--toast-ink) 9%, transparent);
-  color: color-mix(in srgb, var(--toast-ink) 52%, transparent);
-  font-size: 8.5px;
+  color: color-mix(in srgb, var(--toast-ink) 62%, transparent);
+  font-size: 9px;
+  text-align: center;
+  white-space: nowrap;
 }
-.journal-update-fine-print a {
+.journal-update-fine-print > svg {
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  color: inherit;
+}
+.journal-update-fine-print > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.journal-update-guide-link {
+  justify-self: end;
+  margin: 2px 12px 0;
   color: var(--toast-detail-muted);
+  font-size: 9.5px;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
