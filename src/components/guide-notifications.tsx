@@ -470,7 +470,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ["warning", "Warning / TriangleAlert", "Amber"],
           ["info", "Info / Info", "Sky"],
           ["loading", "Loading / LoaderCircle", "Violet"],
-          ["update", "Update / Sparkles", "Fuchsia"],
+          ["update", "Update / Sparkles", "Amber"],
         ]}
       />
       <p>
@@ -1138,8 +1138,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         Successful saves use BellCheck; Error, Info, Warning and Loading keep
         fitting status symbols on their Mauve tile. Update uses a split
-        CloudSync drawing: Emerald600 arrows perform a held-threshold turn while
-        the cloud only breathes subtly. Its expanded card replaces generic
+        CloudSync drawing: Emerald600 arrows make a steady 2.6-second turn
+        around their own center. The cloud’s light is one third softer, with a
+        small irregular drift on a 7.6-second loop. Icon artwork paints above
+        the rest of its card, and the Update badge uses Amber. Its expanded card
+        replaces generic
         actions with a Pink300-tinted handoff panel, two compact build/record
         stats, Apply Now / Update Later choices and visual patch notes. Their
         accents retain useful distinctions. AppearanceToaster follows the

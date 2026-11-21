@@ -65,20 +65,22 @@ function CloudSync(props: SVGProps<SVGSVGElement>) {
         </filter>
       </defs>
       <g className="journal-toast-update-cloud">
-        <path
-          className="journal-toast-update-cloud-halo"
-          d={cloudOutline}
-          strokeWidth="5"
-          opacity=".82"
-          filter={`url(#${lightId}-halo)`}
-        />
-        {/* The closed helper follows Lucide Cloud, shifted up to match CloudSync.
-            Only its light is visible; no extra outline competes with the arrows. */}
-        <path
-          d="M17.5 17H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
-          fill={`url(#${lightId}-fill)`}
-          stroke="none"
-        />
+        <g className="journal-toast-update-cloud-light" opacity={2 / 3}>
+          <path
+            className="journal-toast-update-cloud-halo"
+            d={cloudOutline}
+            strokeWidth="5"
+            opacity=".82"
+            filter={`url(#${lightId}-halo)`}
+          />
+          {/* The closed helper follows Lucide Cloud, shifted up to match CloudSync.
+              Only its light is visible; the actual cloud stroke stays crisp. */}
+          <path
+            d="M17.5 17H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+            fill={`url(#${lightId}-fill)`}
+            stroke="none"
+          />
+        </g>
         <path d={cloudOutline} />
       </g>
       <g className="journal-toast-update-arrows">

@@ -44,8 +44,8 @@
 }
 
 .badge[data-notification-status="update"] {
-  --status-tone: var(--color-fuchsia-400, #ed6aff);
-  --status-ink: var(--color-fuchsia-200, #f6cfff);
+  --status-tone: var(--color-amber-400, #ffb900);
+  --status-ink: var(--color-amber-200, #fee685);
 }
 
 /* The wrapper avoids Badge's direct-child SVG size rule without overriding it. */
@@ -96,7 +96,7 @@
   }
 
   .badge[data-notification-status="update"] {
-    --status-tone: var(--color-fuchsia-600, #c026d3);
-    --status-ink: var(--color-fuchsia-800, #86198f);
+    --status-tone: var(--color-amber-600, #d97706);
+    --status-ink: var(--color-amber-800, #92400e);
   }
 }

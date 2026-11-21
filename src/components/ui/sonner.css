@@ -292,6 +292,8 @@
 .journal-toaster[data-sonner-toaster]
   [data-sonner-toast][data-styled="true"]
   [data-icon] {
+  position: relative;
+  z-index: 5;
   grid-column: 1;
   grid-row: 1;
   display: grid;
@@ -362,7 +364,7 @@
   --heading-status-ink: var(--color-violet-200, #ddd6ff);
 }
 .journal-toast-heading-status[data-notification-status="update"] {
-  --heading-status-ink: var(--color-fuchsia-200, #f6cfff);
+  --heading-status-ink: var(--color-amber-200, #fee685);
 }
 .journal-toast-heading-text {
   min-width: 0;
@@ -391,6 +393,8 @@
   );
   --toast-spin-period: 4.5s;
   position: relative;
+  isolation: isolate;
+  overflow: visible;
   display: block;
   flex: none;
   width: 49px;
@@ -499,9 +503,11 @@
 }
 .journal-toast-tile {
   position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   isolation: isolate;
+  overflow: visible;
 }
 .journal-toast-tile::before {
   content: "";
@@ -520,6 +526,8 @@
     0 4px 9px #190d2345;
 }
 .journal-toast-glyph-enter {
+  position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 27.5625px;
@@ -527,11 +535,14 @@
   color: var(--toast-glyph);
 }
 .journal-toaster .journal-toast-glyph {
+  position: relative;
+  z-index: 3;
   display: block;
   flex: none;
   width: 27.5625px;
   height: 27.5625px;
   stroke-width: 2.8;
+  overflow: visible;
 }
 .journal-toaster [data-toast-symbol="info"] .journal-toast-glyph {
   width: 22.05px;
@@ -583,7 +594,8 @@
 .journal-toaster [data-toast-symbol="update"] .journal-toast-update-arrows {
   color: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
   stroke: currentColor;
-  transform-origin: 12px 16px;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 .journal-toaster [data-toast-symbol="update"] .journal-toast-update-cloud {
   transform-origin: 12px 12px;
@@ -732,6 +744,8 @@
   padding: 12px 8px 16px 15px;
 }
 .journal-notification-art {
+  position: relative;
+  z-index: 2;
   display: block;
   flex: 0 0 49px;
 }
@@ -1198,7 +1212,8 @@
 }
 .journal-notification-header {
   position: relative;
-  z-index: 1;
+  /* Clear the frame, expanded content and countdown without escaping the card. */
+  z-index: 5;
 }
 .journal-notification-tools {
   display: flex;
@@ -1773,10 +1788,10 @@
       180ms backwards;
   }
   .journal-toaster [data-toast-symbol="update"] .journal-toast-update-arrows {
-    animation: journal-toast-update-sync 3.2s linear infinite;
+    animation: journal-toast-update-sync 2.6s linear infinite;
   }
   .journal-toaster [data-toast-symbol="update"] .journal-toast-update-cloud {
-    animation: journal-toast-update-cloud 5.6s ease-in-out infinite;
+    animation: journal-toast-update-cloud 7.6s ease-in-out infinite;
   }
   /* Animate work in progress, rather than every idle notification surface. */
   [data-toast-symbol="loading"] .journal-toast-glyph {
@@ -2031,24 +2046,31 @@
   }
 }
 
-/* A soft diagonal drift stays under one SVG unit; sync arrows turn independently. */
+/* Uneven waypoints suggest a small organic drift; only the arrows rotate. */
 @keyframes journal-toast-update-cloud {
   0%,
   100% {
-    transform: translate(-0.3px, 0.35px);
+    transform: translate(-0.28px, 0.32px);
   }
-  50% {
-    transform: translate(0.3px, -0.35px);
+  17% {
+    transform: translate(0.45px, -0.18px);
+  }
+  36% {
+    transform: translate(-0.12px, -0.52px);
+  }
+  58% {
+    transform: translate(-0.5px, 0.08px);
+  }
+  77% {
+    transform: translate(0.22px, 0.5px);
+  }
+  91% {
+    transform: translate(0.46px, 0.04px);
   }
 }
 @keyframes journal-toast-update-sync {
   0% {
     transform: rotate(0deg);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
-  }
-  50% {
-    transform: rotate(180deg);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
   }
   100% {
     transform: rotate(360deg);
@@ -2225,7 +2247,7 @@
     --heading-status-ink: var(--color-violet-800, #5b21b6);
   }
   .journal-toast-heading-status[data-notification-status="update"] {
-    --heading-status-ink: var(--color-fuchsia-800, #86198f);
+    --heading-status-ink: var(--color-amber-800, #92400e);
   }
 
   .journal-toaster
