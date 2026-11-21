@@ -5,7 +5,7 @@ import { useSleepScoreMotion } from "./use-sleep-score-motion";
 import styles from "./sleep-score-ring.module.css";
 
 const ARC = "M55.653283 184.346717 A91 91 0 1 1 184.346717 184.346717";
-/** Score edits stay native; the visible dial owns one bounded decorative layer. */
+/** Native score edits stay inside the SVG dial and its softly lit arc. */
 export function SleepScoreRing({
   id,
   score,

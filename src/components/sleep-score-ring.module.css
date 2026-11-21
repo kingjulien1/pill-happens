@@ -75,12 +75,12 @@
 }
 .glow {
   stroke-width: 27;
-  opacity: 0.82;
+  opacity: 0.74;
 }
 .bloom {
   fill: none;
   stroke-width: 42;
-  opacity: 0.58;
+  opacity: 0.52;
 }
 .filled {
   opacity: 1;
@@ -211,13 +211,6 @@
   opacity: 0.85;
   transform-box: view-box;
   transform-origin: center;
-}
-.particles {
-  position: fixed;
-  z-index: 60;
-  pointer-events: none;
-  user-select: none;
-  contain: strict;
 }
 @media (prefers-reduced-motion: no-preference) {
   .dial[data-active="true"] .arcGlow {
