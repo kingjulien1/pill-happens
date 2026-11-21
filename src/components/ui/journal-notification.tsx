@@ -790,7 +790,7 @@ export function JournalNotification({
           kind === "info"))
     ) {
       const ActionIcon = acknowledge ? Check : expanded ? Minimize2 : Info;
-      const label = acknowledge ? "Got it" : expanded ? "Collapse" : "Details";
+      const label = acknowledge ? "Okay" : expanded ? "Collapse" : "Details";
       return (
         <Button
           type="button"
@@ -836,7 +836,7 @@ export function JournalNotification({
           <RefreshCcw />
         </span>
         <span className="journal-notification-revert-label" aria-hidden="true">
-          Freshen Up
+          Reload
         </span>
       </Button>
     );

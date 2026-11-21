@@ -28,6 +28,9 @@
   pointer-events: auto;
 }
 .journal-toaster[data-sonner-toaster] {
+  --toast-tile-size: 35.94px;
+  --toast-tile-radius: 12.25px;
+  --toast-tile-border: 2.25px;
   --toast-ink: var(--palette-white);
   --toast-muted: color-mix(in srgb, var(--toast-ink) 70%, transparent);
   --toast-detail-muted: color-mix(in srgb, var(--toast-ink) 88%, transparent);
@@ -386,7 +389,6 @@
   --toast-ambient-delay: calc(
     var(--toast-art-arrival-delay) + var(--toast-art-arrival-duration) + 250ms
   );
-  --toast-tile-size: 35.94px;
   --toast-spin-period: 4.5s;
   position: relative;
   display: block;
@@ -425,7 +427,7 @@
 .journal-toast-tile {
   width: var(--toast-tile-size);
   height: var(--toast-tile-size);
-  border-radius: 12.25px;
+  border-radius: var(--toast-tile-radius);
 }
 .journal-toast-plate-arrival {
   position: absolute;
@@ -514,7 +516,8 @@
     linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
   box-shadow:
     inset 0 1px 0 #fff7fc26,
-    inset 0 0 0 2.25px color-mix(in srgb, var(--toast-accent) 46%, transparent),
+    inset 0 0 0 var(--toast-tile-border)
+      color-mix(in srgb, var(--toast-accent) 46%, transparent),
     0 4px 9px #190d2345;
 }
 .journal-toast-glyph-enter {
@@ -1249,7 +1252,7 @@
 }
 .journal-notification .journal-notification-revert {
   display: inline-grid;
-  grid-template-rows: 36.167px 12px;
+  grid-template-rows: var(--toast-tile-size) 12px;
   gap: 2px;
   width: 44px;
   min-width: 44px;
@@ -1278,8 +1281,8 @@
 }
 .journal-notification-revert-symbol {
   display: grid;
-  width: 36.167px;
-  height: 36.167px;
+  width: var(--toast-tile-size);
+  height: var(--toast-tile-size);
   place-items: center;
   border: 0;
   border-radius: 9px;
@@ -1304,6 +1307,12 @@
   border: 2px solid var(--toast-pink-edge);
   box-sizing: border-box;
 }
+.journal-notification .journal-notification-revert-symbol {
+  border: 0;
+  outline: 0;
+  border-radius: var(--toast-tile-radius);
+  box-shadow: inset 0 0 0 var(--toast-tile-border) currentColor;
+}
 .journal-notification .journal-notification-revert-symbol > svg {
   width: 21.96px;
   height: 21.96px;
@@ -1311,12 +1320,17 @@
 }
 .journal-notification-revert-label {
   color: var(--toast-muted);
-  font-size: 8.5px;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 8px;
   font-weight: 550;
   line-height: 12px;
   white-space: nowrap;
 }
-/* A raised key and its caption form one thumb target. */
+/* Match the illustration face while keeping the caption in one thumb target. */
 .journal-notification .journal-notification-revert:enabled {
   color: #351531;
   gap: 4px;
@@ -1324,14 +1338,14 @@
 .journal-notification
   .journal-notification-revert:enabled
   .journal-notification-revert-symbol {
-  border: 1px solid #ffdcf5;
+  border: 0;
   outline: 0;
-  border-radius: 11px;
+  border-radius: var(--toast-tile-radius);
   background: linear-gradient(155deg, #ffe2f4, #e7b1e6);
   box-shadow:
     inset 0 1px 0 #fff8,
-    0 3px 0 #89527e,
-    0 5px 8px #260e2b44;
+    inset 0 0 0 var(--toast-tile-border) currentColor,
+    0 4px 9px #190d2345;
   transition:
     transform 120ms ease,
     box-shadow 120ms ease;
@@ -1339,9 +1353,9 @@
 .journal-notification
   .journal-notification-revert:enabled
   .journal-notification-revert-label {
-  color: var(--toast-ink);
+  color: color-mix(in srgb, var(--toast-ink) 78%, transparent);
   font-weight: 700;
-  font-size: 9px;
+  font-size: 8px;
 }
 .journal-notification
   .journal-notification-revert:enabled:active
@@ -1349,7 +1363,7 @@
   transform: translateY(2px);
   box-shadow:
     inset 0 1px 3px #69315833,
-    0 1px 0 #89527e;
+    inset 0 0 0 var(--toast-tile-border) currentColor;
 }
 .journal-notification .journal-notification-revert:focus-visible {
   outline: 2px solid var(--toast-ink);
@@ -1383,7 +1397,7 @@
     var(--color-zinc-300, #d4d4d8) 4%,
     transparent
   );
-  box-shadow: none;
+  box-shadow: inset 0 0 0 var(--toast-tile-border) currentColor;
 }
 .journal-notification
   [data-undo-state="unavailable"]
