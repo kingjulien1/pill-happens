@@ -59,7 +59,10 @@ export function IntakeMedicationSelect({
                 <span className="min-w-0 truncate" title={selected.name}>
                   {selected.name}
                 </span>
-                <span className="shrink-0 text-xs">
+                <span
+                  className="shrink-0 text-xs"
+                  data-intake-medication-strength
+                >
                   · {formatDose(selected.strengthMg)} mg
                   {isMeteredMedicationType(selected.form) ? " / pump" : ""}
                 </span>

@@ -31,7 +31,8 @@
   padding-block: 0;
   padding-inline-start: 14px;
   border-radius: var(--dialog-radius-control, 12px);
-  font-size: 16px;
+  font-size: var(--intake-input-font-size, 16px);
+  font-weight: var(--intake-input-font-weight, 400);
   line-height: 1.2;
   text-align: left;
   -webkit-appearance: none;
@@ -196,7 +197,7 @@
 
 @media (min-width: 768px) {
   .field .input {
-    font-size: 14px;
+    font-size: var(--intake-input-font-size, 14px);
   }
 }
 

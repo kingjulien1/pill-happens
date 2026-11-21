@@ -403,7 +403,7 @@ export function IntakeForm({
       id={formId}
       onReset={handleReset}
       onSubmit={submit}
-      className={checkStyles.form}
+      className={`${checkStyles.form} ${styles.inputTypography}`}
       data-intake-form
     >
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-7">

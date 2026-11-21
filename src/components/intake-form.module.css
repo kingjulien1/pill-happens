@@ -308,3 +308,19 @@
 .detailsStack[data-open="true"] .disclosureRow {
   margin-top: -2.2px;
 }
+
+/* Timing owns the reference scale; all editable intake fields share it. */
+.inputTypography {
+  --intake-input-font-size: 16px;
+  --intake-input-font-weight: 400;
+}
+.inputTypography [data-slot="select-trigger"],
+.inputTypography [data-intake-medication-strength] {
+  font-size: var(--intake-input-font-size);
+  font-weight: var(--intake-input-font-weight);
+}
+@media (min-width: 768px) {
+  .inputTypography {
+    --intake-input-font-size: 14px;
+  }
+}
