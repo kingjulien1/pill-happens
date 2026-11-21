@@ -178,11 +178,11 @@
   margin-bottom: -4px;
 }
 .rating[data-morning-sleep-rating] .ratingHeading label {
-  color: var(--sleep-rating-ink);
+  color: var(--foreground);
   font-weight: 625;
 }
 .rating[data-morning-sleep-rating] .ratingValue {
-  color: var(--sleep-rating-ink);
+  color: var(--foreground);
 }
 .rating[data-morning-sleep-rating] .ratingValue strong {
   color: inherit;
@@ -212,10 +212,27 @@
     var(--color-purple-500, #a855f7)
   );
   --slider-rest: var(--color-purple-200, #e9d5ff);
+  --slider-fill-end: var(--color-fuchsia-800, #8a0194);
   --slider-dot: color-mix(
     in srgb,
     var(--color-violet-200, #ddd6fe) 50%,
     var(--color-purple-200, #e9d5ff)
+  );
+}
+/* End the filled gradient at the selected value, before the quiet track. */
+.rating[data-morning-sleep-rating] .range::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    var(--slider-fill) 0%,
+    var(--slider-fill-end) var(--rating-progress),
+    var(--slider-rest) var(--rating-progress) 100%
+  );
+}
+.rating[data-morning-sleep-rating] .range::-moz-range-progress {
+  background: linear-gradient(
+    to right,
+    var(--slider-fill),
+    var(--slider-fill-end)
   );
 }
 .rating[data-morning-sleep-rating] .range::-webkit-slider-thumb {
