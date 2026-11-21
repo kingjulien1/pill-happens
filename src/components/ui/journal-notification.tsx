@@ -30,6 +30,7 @@ import {
   MoonStar,
   PillBottle,
   RefreshCcw,
+  Rocket,
   ShieldCheck,
   Target,
   Undo2,
@@ -842,10 +843,10 @@ export function JournalNotification({
         }}
       >
         <span className="journal-notification-revert-symbol" aria-hidden="true">
-          <RefreshCcw />
+          <Rocket />
         </span>
         <span className="journal-notification-revert-label" aria-hidden="true">
-          Reload
+          Apply
         </span>
       </Button>
     );
@@ -952,14 +953,6 @@ export function JournalNotification({
           <span>No saved journal records are removed during updates.</span>
         </p>
       </div>
-      <Link
-        className="journal-update-guide-link"
-        href="/guide#app"
-        prefetch={false}
-        onClick={followRelatedLink}
-      >
-        Open the app guide
-      </Link>
     </section>
   );
   return (

@@ -1124,7 +1124,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Header / unavailable Undo",
-            "Header actions share a 36px tile, 22px icon and small caption. Got it dismisses an information notice. Freshen Up applies an available update. Undo reverses a confirmed change and stays disabled on success notices without a reversal. Information notices omit footer Undo.",
+            "Header actions use a 30.5px face, 18.6px icon and 7.5px caption with a 2px gap inside a centered 44px touch target. Okay dismisses an information notice. Apply launches an available update with a Rocket icon. Undo reverses a confirmed change and stays disabled on success notices without a reversal. Information notices omit footer Undo.",
           ],
           [
             "Expanded backdrop / footer",
