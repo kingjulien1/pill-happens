@@ -25,6 +25,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { IntakeDialogReveal } from "@/components/intake-dialog-reveal";
 import { cn } from "@/lib/utils";
 import { useDialogScrollMemory } from "@/components/use-dialog-scroll-memory";
 import type { PublicDialogScrollKey } from "@/lib/dialog-scroll-memory";
@@ -55,7 +56,7 @@ export function ResponsiveModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: ReactNode;
-  headerVariant?: "medication" | "check-in";
+  headerVariant?: "medication" | "check-in" | "intake";
   /** Native header controls share the close button’s action rail. */
   headerActions?: ReactNode;
   context?: ReactNode;
@@ -89,6 +90,8 @@ export function ResponsiveModal({
     onOpenChange(next);
   };
   const medicationHeader = headerVariant === "medication";
+  const intakeHeader = headerVariant === "intake";
+  const journalHeader = headerVariant === "check-in" || intakeHeader;
   const headerContent = (
     titleNode: ReactNode,
     closeNode: ReactNode,
@@ -97,7 +100,7 @@ export function ResponsiveModal({
     <div
       className={cn(
         styles.headingRow,
-        headerVariant === "check-in" && styles.checkInHeader,
+        journalHeader && styles.checkInHeader,
         medicationHeader && styles.medicationHeader,
       )}
       data-modal-header
@@ -145,10 +148,12 @@ export function ResponsiveModal({
           className={cn(
             "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
             styles.dialog,
-            headerVariant === "check-in" && styles.checkInSurface,
+            journalHeader && styles.checkInSurface,
+            intakeHeader && styles.intakeSurface,
             medicationHeader && styles.medicationDialog,
           )}
         >
+          {intakeHeader && open && <IntakeDialogReveal />}
           <DialogHeader
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
           >
@@ -175,14 +180,16 @@ export function ResponsiveModal({
       <DrawerContent
         className={cn(
           "rounded-t-[var(--dialog-radius-surface)]",
-          headerVariant === "check-in" && styles.checkInSurface,
+          journalHeader && styles.checkInSurface,
+          intakeHeader && styles.intakeSurface,
         )}
         finalFocus={returnFocus}
       >
+        {intakeHeader && open && <IntakeDialogReveal />}
         <div
           ref={setScrollElement}
           data-dialog-scroll
-          data-base-ui-swipe-ignore={headerVariant === "check-in" ? "" : undefined}
+          data-base-ui-swipe-ignore={journalHeader ? "" : undefined}
           className={cn(
             "min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]",
             styles.scrollBody,

@@ -229,7 +229,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
       title="Edit Intake"
-      headerVariant="check-in"
+      headerVariant="intake"
       context={
         <JournalDialogSubheading
           title={intake.medicationName}
@@ -526,7 +526,7 @@ function LogIntakeDialog({
       }}
       scrollKey={`intake:new:${historical ? day : "today"}`}
       title={<span className="block truncate pe-2">Jot That Dose</span>}
-      headerVariant="check-in"
+      headerVariant="intake"
       context={
         <JournalDialogSubheading
           title={

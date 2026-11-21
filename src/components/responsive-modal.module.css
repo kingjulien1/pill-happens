@@ -124,6 +124,59 @@
   bottom: calc(-1 * var(--fade-tail));
   background: linear-gradient(to bottom, color-mix(in srgb, var(--fade-ink) 67%, transparent), transparent);
 }
+.intakeSurface {
+  isolation: isolate;
+  --intake-opening-duration: 120ms;
+}
+.intakeSurface[data-slot="drawer-popup"] {
+  --intake-opening-duration: 540ms;
+}
+.intakeSurface:has([data-intake-form]) .checkInHeader::before {
+  /* Extend the entire gradient, including its header height, by 18 1/3%. */
+  bottom: auto;
+  height: calc((100% + 48px + var(--fade-tail)) * 71 / 60);
+}
+.intakeRevealClip {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.intakeRevealVeil {
+  position: absolute;
+  inset: 0;
+  background: var(--color-mauve-950, #0c090c);
+  animation: intake-background-reveal 1600ms cubic-bezier(.42, 0, .28, 1)
+    calc(var(--intake-opening-duration) + 200ms) both;
+}
+.intakeRevealVeil::before {
+  content: "";
+  position: absolute;
+  inset: -52px 0 auto;
+  height: 52px;
+  background: linear-gradient(to bottom, transparent, var(--color-mauve-950, #0c090c));
+}
+@keyframes intake-background-reveal {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--intake-reveal-travel, 100%));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intakeRevealClip {
+    display: none;
+  }
+}
 .checkInSurface .scrollBody {
   --dialog-scroll-gutter: 14px;
   padding-inline: var(--dialog-scroll-gutter);
