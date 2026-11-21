@@ -637,7 +637,7 @@ function CheckInForm({
         headingId={`${id}-journal-heading`}
         description={
           morning
-            ? "What woke up with you: a worry, a dream, or one thing you need today? Leave a note for your less foggy self."
+            ? undefined
             : "Pick the moment that stuck, what it did to you, and what you want to leave here. Tomorrow can read the case notes."
         }
         detail={

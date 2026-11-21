@@ -164,7 +164,7 @@ export function DailyReflectionEditor({
         : "A little space for what's on your mind.";
   const snapshotDetail = !hasWriting
     ? period === "morning"
-      ? "What’s on your mind, and what would make today easier?"
+      ? "A dream, a worry, or what would make today easier—leave a note for your less foggy self."
       : "What happened, what hurt, and what you’d do differently."
     : draftStatus === "error" || draftStatus === "memory"
       ? "These edits are in this open page. Keep it open until they're saved."
@@ -188,17 +188,19 @@ export function DailyReflectionEditor({
       <p className={styles.snapshot} data-journal-snapshot>
         {snapshotTitle} {snapshotDetail}
       </p>
-      <p
-        className={`${styles.guidance} ${styles.introduction}`}
-        data-journal-introduction
-      >
-        <Info size={20} aria-hidden="true" />
-        <span>
-          {period === "morning"
-            ? "A thought, a dream, a worry—give each its own line. Use Markdown headings or lists if it gets longer; close the editor to return to this check-in."
-            : "Separate what happened from how it felt. A short list works; a rant is admissible. Use Markdown for structure, then close the editor to return here."}
-        </span>
-      </p>
+      {period === "evening" && (
+        <p
+          className={`${styles.guidance} ${styles.introduction}`}
+          data-journal-introduction
+        >
+          <Info size={20} aria-hidden="true" />
+          <span>
+            Separate what happened from how it felt. A short list works; a rant
+            is admissible. Use Markdown for structure, then close the editor to
+            return here.
+          </span>
+        </p>
+      )}
       <ReflectionDialog
         id={id}
         value={value}
