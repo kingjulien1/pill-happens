@@ -1,5 +1,6 @@
 .surface {
   --dialog-surface-paint: var(--popover);
+  --dialog-mauve-opacity: 14%;
   --dialog-top-fade-opacity: 67%;
   --dialog-top-fade-end: min(55%, 180px);
   --dialog-bottom-fade-strength: 0.79;
@@ -9,10 +10,14 @@
    scroll position without a curtain element, observer or animation timeline. */
 .surface[data-slot][data-dialog-surface] {
   --dialog-mauve: var(--color-mauve-950, #0c090c);
-  --dialog-mauve-wash: color-mix(in srgb, var(--dialog-mauve) 67%, transparent);
+  --dialog-mauve-wash: color-mix(
+    in srgb,
+    var(--dialog-mauve) var(--dialog-mauve-opacity),
+    transparent
+  );
   --drawer-bleed-background: color-mix(
     in srgb,
-    var(--dialog-mauve) 67%,
+    var(--dialog-mauve) var(--dialog-mauve-opacity),
     var(--navigation-surface, var(--popover))
   );
   isolation: isolate;
