@@ -599,7 +599,7 @@ export function IntakeForm({
         <FinalLookHeading
           id="intake-preview-title"
           showIcon
-          color={getMedicationColor(medication?.color ?? "tw-neutral-400")}
+          color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
         />
         {belongsTo &&
         validQuantity &&

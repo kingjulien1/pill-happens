@@ -74,12 +74,20 @@ export function IntakePreviewSkeleton() {
   return (
     <MedicationCardBase
       readOnly
-      color="tw-neutral-400"
+      color="tw-mauve-400"
       data-intake-card=""
       data-intake-preview-skeleton
       data-skeleton-motion="paused"
       aria-label="Intake preview. Choose a medication to see your entry."
       className={styles.skeleton}
+      style={
+        {
+          "--entry-surface-base":
+            "color-mix(in srgb, var(--preview-empty-surface, var(--color-mauve-600, #594c5b)) 78%, transparent)",
+          "--entry-glass-pink": "transparent",
+          "--entry-intake-base": "transparent",
+        } as CSSProperties
+      }
       decoration={
         <span ref={scene} className={styles.scene} aria-hidden="true">
           <span className={styles.wash} />
@@ -115,9 +123,14 @@ export function IntakePreviewSkeleton() {
           aria-hidden="true"
         >
           <MedicationCardIconFrame
-            color="tw-neutral-400"
+            color="tw-mauve-400"
             className={styles.iconFrame}
             data-skeleton-artwork
+            style={{
+              color: "var(--skeleton-light)",
+              backgroundColor:
+                "var(--preview-empty-surface, var(--color-mauve-600, #594c5b))",
+            }}
           >
             <span className={styles.iconStage}>
               <span className={styles.iconRipple} />

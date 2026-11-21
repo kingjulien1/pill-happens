@@ -1,9 +1,8 @@
 .skeleton {
   --skeleton-period: 6.8s;
   --skeleton-play-state: paused;
-  --skeleton-light: var(--foreground);
-  opacity: 0.45;
-  filter: grayscale(1);
+  --skeleton-light: var(--preview-empty-muted, var(--color-mauve-200, #e8e3e8));
+  opacity: 0.68;
   animation: skeleton-presence var(--skeleton-period) ease-in-out infinite;
   animation-play-state: var(--skeleton-play-state);
   animation-fill-mode: both;
@@ -207,7 +206,7 @@
   height: 10.5px;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--muted-foreground) 24%, transparent);
+  background: color-mix(in srgb, var(--skeleton-light) 44%, transparent);
   transform-origin: left center;
   animation: skeleton-line var(--skeleton-period)
     cubic-bezier(0.22, 0.8, 0.24, 1) infinite;
@@ -295,22 +294,22 @@
 @keyframes skeleton-presence {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.68;
   }
   18% {
-    opacity: 0.56;
+    opacity: 0.75;
   }
   42% {
-    opacity: 0.78;
+    opacity: 0.88;
   }
   55% {
-    opacity: 0.85;
+    opacity: 0.95;
   }
   72% {
-    opacity: 0.66;
+    opacity: 0.82;
   }
   88% {
-    opacity: 0.45;
+    opacity: 0.68;
   }
 }
 @keyframes skeleton-grid {
@@ -547,7 +546,7 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation: none !important;
-    opacity: 0.45;
+    opacity: 0.78;
   }
   .skeleton *,
   .skeleton *::before,
