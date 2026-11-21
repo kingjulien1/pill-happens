@@ -302,6 +302,7 @@
 
 .headerDate {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
   margin-top: 4px;
@@ -311,6 +312,7 @@
   letter-spacing: -0.025em;
 }
 .headerDate small {
+  white-space: nowrap;
   font-size: max(10px, 0.625em);
   font-weight: 400;
   letter-spacing: normal;

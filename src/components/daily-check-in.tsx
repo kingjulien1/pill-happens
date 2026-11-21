@@ -61,7 +61,7 @@ import {
   type DailyCheckIn,
   type DailyCheckInPeriod,
 } from "@/lib/daily-check-in";
-import { checkInHeading } from "@/lib/check-in-headings";
+import { checkInDatePrefix, checkInHeading } from "@/lib/check-in-headings";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
 import { formatDay } from "@/lib/domain";
 import {
@@ -362,11 +362,13 @@ export function DailyCheckInSection({
           <JournalDialogSubheading
             title={
               <time dateTime={targetDay}>
+                {checkInDatePrefix(targetDay, period)}{" "}
                 {formatDay(targetDay, {
                   weekday: "long",
                   month: undefined,
                   day: undefined,
-                })}
+                })}{" "}
+                {morning ? "Morning" : "Evening"}
               </time>
             }
             detail={formatDay(targetDay, { weekday: undefined, month: "long" })}

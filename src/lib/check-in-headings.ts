@@ -47,12 +47,95 @@ const headings = {
   ],
 } as const;
 
-/** The tracking day doubles as the seed, including when reopening a past entry. */
-export function checkInHeading(day: string, period: DailyCheckInPeriod) {
+const datePrefixes = [
+  "Regrettably",
+  "Allegedly",
+  "Gravely",
+  "Ominously",
+  "Posthumously",
+  "Technically Alive",
+  "Still Haunted",
+  "Lightly Cursed",
+  "Freshly Doomed",
+  "Barely Corporeal",
+  "Reluctantly Present",
+  "Contractually Alive",
+  "Legally Breathing",
+  "Suspiciously Alive",
+  "Inexplicably Breathing",
+  "Professionally Haunted",
+  "Chronically Mortal",
+  "Terminally Tired",
+  "Existentially Inconvenienced",
+  "Morbidly Punctual",
+  "Spiritually Expired",
+  "Emotionally Embalmed",
+  "Socially Deceased",
+  "Elegantly Decomposing",
+  "Politely Possessed",
+  "Functionally Undead",
+  "Moderately Damned",
+  "Tastefully Macabre",
+  "Cautiously Reanimated",
+  "Recently Exhumed",
+  "Freshly Resurrected",
+  "Questionably Sentient",
+  "Delightfully Doomed",
+  "Unreasonably Mortal",
+  "Mildly Apocalyptic",
+  "Casually Catastrophic",
+  "Premium Dread",
+  "Budget Apocalypse",
+  "Complimentary Doom",
+  "Artisanal Despair",
+  "Locally Haunted",
+  "Ethically Cursed",
+  "Organically Doomed",
+  "Sustainably Haunted",
+  "Responsibly Possessed",
+  "Painfully Canonical",
+  "Narratively Expendable",
+  "Plot-Armored",
+  "Sequel Pending",
+  "Obituary Pending",
+  "Autopsy Deferred",
+  "Afterlife Adjacent",
+  "Crypt Certified",
+  "Coffin Adjacent",
+  "Graveyard Approved",
+  "Doom Sponsored",
+  "Ghost Managed",
+  "Skeleton Operated",
+  "Spectrally Supervised",
+  "Haunting Included",
+  "Dread Included",
+  "Warranty Voided",
+  "Refund Denied",
+  "Mercy Backordered",
+  "Doom Delayed",
+  "Soul Buffering",
+  "Skeleton Loading",
+  "Cursed Again",
+  "Unfortunately Canon",
+  "Unwillingly Renewed",
+  "Begrudgingly Reanimated",
+  "Administratively Undead",
+] as const;
+
+function dailyChoice<T>(choices: readonly T[], seed: string): T {
   let hash = 2166136261;
-  for (const character of `${period}:${day}`) {
+  for (const character of seed) {
     hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
   }
-  const choices = headings[period];
   return choices[(hash >>> 0) % choices.length];
+}
+
+/** The tracking day doubles as the seed, including when reopening a past entry. */
+export function checkInHeading(day: string, period: DailyCheckInPeriod) {
+  return dailyChoice<string>(headings[period], `${period}:${day}`);
+}
+
+/** A separate seed gives each period its own stable daily date introduction. */
+export function checkInDatePrefix(day: string, period: DailyCheckInPeriod) {
+  return dailyChoice(datePrefixes, `${period}:date-prefix:${day}`);
 }
