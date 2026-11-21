@@ -438,11 +438,11 @@
   border-radius: calc(12.25px * 31 / 24);
 }
 .journal-toast-plate-arrival-back {
-  --toast-plate-size: 35.37px;
+  --toast-plate-size: calc(35.37px * 1.18);
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
 }
 .journal-toast-plate-arrival-middle {
-  --toast-plate-size: 37.41px;
+  --toast-plate-size: calc(37.41px * 1.18);
   transform: translate(1.225px, 0) rotate(15deg);
 }
 /* Continuous turns never overwrite either the finite entrance or local sway. */
@@ -515,9 +515,8 @@
     linear-gradient(var(--toast-tile-glaze) 0 0),
     linear-gradient(var(--toast-tile-overlay) 0 0), var(--toast-tile);
   box-shadow:
-    inset 0 1px 0 #fff7fc26,
     inset 0 0 0 var(--toast-tile-border)
-      color-mix(in srgb, var(--toast-accent) 46%, transparent),
+      color-mix(in srgb, var(--toast-deep-mix) 35%, #09060d),
     0 4px 9px #190d2345;
 }
 .journal-toast-glyph-enter {
