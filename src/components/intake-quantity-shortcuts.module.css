@@ -20,28 +20,52 @@
   opacity: 0.65;
   font-size: 9px;
 }
+.browser {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.browser .pageButton {
+  --dialog-button-radius: var(--dialog-radius-compact, 8px);
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dialog-radius-compact, 8px);
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  color: color-mix(in srgb, var(--foreground) 76%, transparent);
+  box-shadow: none;
+}
+.pageButton > svg {
+  width: 14px;
+  height: 14px;
+}
 .options {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
-  padding: 4px;
+  padding: 3px;
   border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-  border-radius: 13px;
+  border-radius: 11px;
   background: color-mix(in srgb, var(--foreground) 3%, transparent);
 }
 .option {
   position: relative;
   display: flex;
   min-width: 0;
-  min-height: 52px;
+  min-height: 39px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 7px 2px;
+  gap: 2px;
+  padding: 5px 1px;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: 7px;
   background: transparent;
   color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
@@ -52,26 +76,26 @@
     color 160ms ease;
 }
 .quantity {
-  font-size: clamp(12px, 3.2vw, 15px);
+  font-size: clamp(10px, 2.8vw, 13px);
   font-weight: 650;
   line-height: 1.2;
   white-space: nowrap;
 }
 .quantity[data-long] {
-  font-size: 11px;
+  font-size: clamp(8px, 2.2vw, 10px);
 }
 .dose {
   display: inline-flex;
   align-items: baseline;
   gap: 2px;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
   opacity: 0.6;
 }
 .dose > span {
-  font-size: 8px;
+  font-size: 7px;
 }
 .option[aria-pressed="true"] {
   border-color: color-mix(
@@ -90,7 +114,8 @@
 .option[aria-pressed="true"] .dose {
   opacity: 0.8;
 }
-.option:focus-visible {
+.option:focus-visible,
+.pageButton:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
@@ -99,9 +124,33 @@
   opacity: 0.5;
 }
 @media (hover: hover) and (pointer: fine) {
+  .browser .pageButton:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--foreground) 7%, transparent);
+  }
   .option:hover:not(:disabled):not([aria-pressed="true"]) {
     background: color-mix(in srgb, var(--foreground) 6%, transparent);
     color: var(--foreground);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .option {
+    animation: amount-reveal 180ms cubic-bezier(0.2, 0.8, 0.25, 1);
+  }
+  .options[data-direction="left"] {
+    --amount-reveal-offset: -7px;
+  }
+  .options[data-direction="right"] {
+    --amount-reveal-offset: 7px;
+  }
+}
+@keyframes amount-reveal {
+  from {
+    opacity: 0;
+    transform: translateX(var(--amount-reveal-offset, 7px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 @media (prefers-reduced-motion: reduce) {

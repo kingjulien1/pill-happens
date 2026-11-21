@@ -522,6 +522,8 @@ export function IntakeForm({
               />
               <IntakeQuantityShortcuts
                 amounts={presets}
+                increment={increment}
+                resetKey={medicationId}
                 disabled={busy || (!medication && !fallbackIntake)}
                 value={medication || fallbackIntake ? visibleQuantity : null}
                 strengthMg={strength}
