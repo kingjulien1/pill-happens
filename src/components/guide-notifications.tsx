@@ -1080,7 +1080,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         wide, with three visible notices and a 10px gap. Mobile side offsets are
         16px and top offsets include the safe area. The entire card keeps
         <code> --toast-fuchsia-surface</code>: Fuchsia950 at 47% color alpha
-        above a strong 96px standard/Safari backdrop blur. A 50/50
+        above a strong 32px standard/Safari backdrop blur. A 50/50
         Fuchsia950–Purple950 mix at 67% covers the Pink300 highlight. During the final third of the
         countdown, a Pink800 and Rose800 wash rises from 0% to 17%. Page content behind it is softened while the
         notification’s own text and controls stay sharp. Reduced transparency
@@ -1120,7 +1120,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Surface / countdown",
-            "Card uses Fuchsia950 at 47% alpha above 96px standard/Safari backdrop blur, a Pink300 highlight at 11%, then a 67% Fuchsia950/Purple950 depth layer. Icon tiles add Fuchsia900 at 69% over their original bases; the front face adds the same mixed depth color at 78% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
+            "Card uses a translucent Fuchsia950 surface at 65% of its 47% alpha above one 32px standard/Safari backdrop blur, a Pink300 highlight at 11%, then a 67% Fuchsia950/Purple950 depth layer. Icon tiles add Fuchsia900 at 69% over their original bases; the front face adds the same mixed depth color at 78% and a 2.25px inward accent rim. Separate owners control arrival, ambient art, countdown and final rose pulse; pause and reduced-motion gates cover every layer.",
           ],
           [
             "Last-seconds marker",
@@ -1148,8 +1148,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         small irregular drift on a 7.6-second loop. Icon artwork paints above
         the rest of its card, and the Update badge uses Amber. Its expanded card
         replaces generic
-        actions with a Pink300-tinted handoff panel, two compact build/record
-        stats, Apply Now / Update Later choices and visual patch notes. Their
+        actions with a Pink300-tinted overview, a separate handoff section with
+        two compact build/record stats, a full-size Apply Now main action and a
+        Later icon button. Three summary cards sit outside the overview at the
+        bottom, followed by the journal-safety message. The base surface uses a
+        single 32px backdrop blur; reduced transparency keeps an opaque surface. Their
         accents retain useful distinctions. AppearanceToaster follows the
         resolved appearance context. These values describe the current
         presentation; they do not certify every text/background combination for

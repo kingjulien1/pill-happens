@@ -15,6 +15,7 @@ import {
 } from "react";
 import {
   ArrowUpRight,
+  ArrowRight,
   BookOpenText,
   CalendarDays,
   Check,
@@ -58,6 +59,8 @@ import {
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
 import { Button } from "@/components/ui/button";
+import { TodayActionButton } from "@/components/today-action-button";
+import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
 import {
   nextNotificationWake,
   NOTIFICATION_CHECKPOINT_INTERVAL,
@@ -814,30 +817,55 @@ export function JournalNotification({
     mode: "now" | "later",
   ) => {
     if (!isAction(value)) return null;
-    const ApplyIcon = mode === "now" ? RefreshCcw : Coffee;
-    const label = mode === "now" ? "Apply Now" : "Update Later";
+    const onClick = (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (leaving.current) return;
+      value.onClick(event);
+      if (mode === "later" || !event.defaultPrevented)
+        onRequestDismiss(mode === "later" ? "cancel" : "action");
+    };
+    if (mode === "now")
+      return (
+        <TodayActionButton
+          type="button"
+          className="intake-primary-cta journal-update-apply"
+          data-intake-paint="satin"
+          data-journal-write
+          data-update-choice="now"
+          style={{ ...getIntakeActionThemeStyle(), height: 72, minHeight: 72 }}
+          disabled={phase !== "idle"}
+          aria-label="Apply update now and reload"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={onClick}
+        >
+          <span className="intake-primary-row">
+            <span className="intake-primary-copy">
+              <span className="intake-primary-label">
+                <Rocket size={21} aria-hidden="true" />
+                <span>Apply Now</span>
+              </span>
+            </span>
+            <ArrowRight className="intake-primary-next" aria-hidden="true" />
+          </span>
+        </TodayActionButton>
+      );
     return (
       <Button
         variant="ghost"
-        size="sm"
+        size="icon"
         type="button"
-        className="journal-update-choice"
-        data-update-choice={mode}
+        className="journal-update-later"
+        data-update-choice="later"
+        disabled={phase !== "idle" || !dismissible}
+        aria-label="Update later, when the app closes or reloads"
+        title="Keep using this version; update on the next close or reload"
         onPointerDown={(event) => event.stopPropagation()}
-        onClick={(event) => {
-          event.stopPropagation();
-          if (leaving.current) return;
-          value.onClick(event);
-          if (mode === "later" || !event.defaultPrevented)
-            onRequestDismiss(mode === "later" ? "cancel" : "action");
-        }}
+        onClick={onClick}
       >
-        <ApplyIcon aria-hidden="true" />
-        <span>{label}</span>
-        <ArrowUpRight
-          className="journal-update-choice-arrow"
-          aria-hidden="true"
-        />
+        <span className="journal-update-later-face">
+          <Coffee aria-hidden="true" />
+        </span>
+        <span>Later</span>
       </Button>
     );
   };
@@ -940,36 +968,43 @@ export function JournalNotification({
     : (details?.footer ?? defaultFooter[kind]);
   const updatePanel = kind === "update" && (
     <section className="journal-update-section" aria-label="Update Details">
-      <header className="journal-update-panel-header">
-        <span className="journal-update-panel-title">
-          <strong>Ready To Switch</strong>
-          <span aria-hidden="true">·</span>
-          <span>Draft-Safe</span>
-        </span>
-        <span
-          className="journal-update-stats"
-          aria-label="One build, zero records changed"
-        >
-          <span>
-            <strong>1</strong> Build
-          </span>
-          <span aria-hidden="true">/</span>
-          <span>
-            <strong>0</strong> Records
-          </span>
-        </span>
-      </header>
       <div className="journal-update-panel">
         <div className="journal-update-intro">
           <CloudDownload aria-hidden="true" />
-          <p>
-            The new app files are staged. Pick the hand-off that fits what
-            you’re doing now. Apply Now reloads the app, so save your current
-            entry first. Update Later keeps you here and switches versions when
-            the app closes or reloads. Your saved journal records stay put; only
-            the app gets a change of clothes.
-          </p>
+          <div>
+            <h4>New Version. Same Journal.</h4>
+            <p>
+              The new app files are downloaded and ready. Your entries stay
+              right where you left them; this is a refresh for the app, not a
+              rewrite of your history. Save any open entry before switching.
+            </p>
+          </div>
         </div>
+      </div>
+      <section className="journal-update-handoff" aria-label="Update Timing">
+        <header className="journal-update-panel-header">
+          <span className="journal-update-panel-title">
+            <strong>Ready To Switch</strong>
+            <span aria-hidden="true">·</span>
+            <span>Draft-Safe</span>
+          </span>
+          <span
+            className="journal-update-stats"
+            aria-label="One build, zero records changed"
+          >
+            <span>
+              <strong>1</strong> Build
+            </span>
+            <span aria-hidden="true">/</span>
+            <span>
+              <strong>0</strong> Records
+            </span>
+          </span>
+        </header>
+        <p className="journal-update-handoff-description">
+          All saved up? Apply Now reloads into the new version. Your current
+          page will refresh, so finish the thought before freshening the app.
+        </p>
         <div
           className="journal-update-choices"
           role="group"
@@ -978,34 +1013,38 @@ export function JournalNotification({
           {renderUpdateChoice(action, "now")}
           {renderUpdateChoice(cancel, "later")}
         </div>
-        <div className="journal-update-notes" aria-label="Update Notes">
-          <div>
-            <RefreshCcw aria-hidden="true" />
-            <span>
-              <strong>App Shell</strong>
-              <small>Latest interface files are ready.</small>
-            </span>
-          </div>
-          <div>
-            <Database aria-hidden="true" />
-            <span>
-              <strong>Your Journal</strong>
-              <small>Saved records stay exactly where they are.</small>
-            </span>
-          </div>
-          <div>
-            <ShieldCheck aria-hidden="true" />
-            <span>
-              <strong>Safe Handoff</strong>
-              <small>Finish any open draft before applying now.</small>
-            </span>
-          </div>
-        </div>
-        <p className="journal-update-fine-print">
-          <ShieldCheck aria-hidden="true" />
-          <span>No saved journal records are removed during updates.</span>
+        <p className="journal-update-handoff-note">
+          <strong>Later</strong> keeps this version open. The update takes over
+          when you next close or reload the app—no mid-sentence plot twist.
         </p>
+      </section>
+      <div className="journal-update-notes" aria-label="Update Notes">
+        <div>
+          <RefreshCcw aria-hidden="true" />
+          <span>
+            <strong>App Shell</strong>
+            <small>Latest interface files are ready.</small>
+          </span>
+        </div>
+        <div>
+          <Database aria-hidden="true" />
+          <span>
+            <strong>Your Journal</strong>
+            <small>Saved records stay exactly where they are.</small>
+          </span>
+        </div>
+        <div>
+          <ShieldCheck aria-hidden="true" />
+          <span>
+            <strong>Safe Handoff</strong>
+            <small>Finish any open draft before applying now.</small>
+          </span>
+        </div>
       </div>
+      <p className="journal-update-fine-print">
+        <ShieldCheck aria-hidden="true" />
+        <span>No saved journal records are removed during updates.</span>
+      </p>
     </section>
   );
   return (
