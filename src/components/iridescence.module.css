@@ -41,16 +41,11 @@
   animation-delay: -5s;
 }
 .field::after {
-  background:
-    radial-gradient(
-      ellipse 85% 36% at 40% 35%,
-      transparent 28%,
-      #493aeb55 36%,
-      #ba57ffed 41%,
-      #7c3aed33 46%,
-      transparent 58%
-    ),
-    radial-gradient(ellipse 58% 80% at 76% 68%, #24104499, transparent 75%);
+  background: radial-gradient(
+    ellipse 58% 80% at 76% 68%,
+    #24104499,
+    transparent 75%
+  );
   animation: violet-crossflow var(--iridescence-crossflow-duration)
     cubic-bezier(0.4, 0.02, 0.28, 1) infinite paused;
   animation-delay: -11s;
