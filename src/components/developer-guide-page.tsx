@@ -3011,23 +3011,23 @@ export function DeveloperGuidePage() {
                   rather than the time column. Past-day Morning precedes the
                   intake list and Evening follows it. Position is independent of
                   draft or saved status. A keyed editor keeps the open period
-                  and original day across rollover. The shared Your Morning,
-                  Your Words / Your Day, Your Words doorway pairs a gently
-                  steaming coffee icon with reading and library controls. Its
-                  writing action uses the Today button frame with the check-in
-                  section’s fuchsia-violet inner edge. Copy Writing and Refresh
-                  sit on opposite sides of the paragraph count. The morning and
-                  evening sections share an 8% tinted gradient, an introductory
-                  caption and two small footer notes. Local word, character and
-                  reading statistics use one unboxed single line beneath it:
-                  10.5px values, 10px labels and a 14px line height. The
-                  surrounding 11.5px/600 guidance uses an 18px line to explain
-                  Markdown, draft continuity, reading, the saved-Journal
-                  threshold and the separate Save Check-In action. Reading opens
-                  safe rendered Markdown from the current draft; Edit entry
-                  closes the reader before returning to the same writer. Manual
-                  Refresh synchronizes saved journal data without replacing
-                  unfinished draft fields or making an AI request. The existing
+                  and original day across rollover. The shared Before the Day
+                  Bites / Today, for the Record doorway pairs a gently steaming
+                  coffee icon with reading and library controls. Its writing
+                  action uses the Today button frame with the check-in section’s
+                  fuchsia-violet inner edge. Copy Writing and Refresh sit on
+                  opposite sides of the paragraph count. The morning and evening
+                  sections share an 8% tinted gradient, an introductory caption
+                  and two small footer notes. Local word, character and reading
+                  statistics use one unboxed single line beneath it: 10.5px
+                  values, 10px labels and a 14px line height. The surrounding
+                  11.5px/600 guidance uses an 18px line to explain Markdown,
+                  draft continuity, reading, the saved-Journal threshold and the
+                  separate Save Check-In action. Reading opens safe rendered
+                  Markdown from the current draft; Edit entry closes the reader
+                  before returning to the same writer. Manual Refresh
+                  synchronizes saved journal data without replacing unfinished
+                  draft fields or making an AI request. The existing
                   ReflectionDialog and independent saving controls retain their
                   launcher ref. Writing supports up to 100,000 characters. Done
                   returns to the check-in with the draft; Save Check-In saves
@@ -3660,9 +3660,9 @@ export function DeveloperGuidePage() {
                 values and Save; both estimates remain one compact row.
               </p>
               <p>
-                The Morning dialog starts with Your Morning, Your Words,
-                followed by its five optional sleep ratings, schedule,
-                interruptions and duration fields. Its card keeps first opening
+                The Morning dialog starts with Before the Day Bites, followed by
+                report import, times and sleep stages, the overnight summary,
+                and five optional sleep ratings. Its card keeps first opening
                 separate from latest saved update, with an em dash only when
                 opening history is unknown. Both period cards retain their
                 Rose/Violet identity frames and dark artwork tiles, with
@@ -3822,9 +3822,9 @@ export function DeveloperGuidePage() {
                 five-point scale metadata until edited.
               </p>
               <p>
-                Your Day, Your Mood contains the mood picker and Energy/Stress
-                ratings in one section. Its outside heading matches Your Day,
-                Your Words. A divider separates the two parts within their
+                Emotional Autopsy contains the mood picker and Energy/Stress
+                ratings in one section. Its outside heading matches Today, for
+                the Record. A divider separates the two parts within their
                 shared frame. Family metadata supplies the related choice
                 colors. Selection feedback respects reduced motion, and hover
                 effects apply to desktop fine pointers.

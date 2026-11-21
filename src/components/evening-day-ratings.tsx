@@ -74,7 +74,7 @@ export function EveningDayRatings({
       <div className={styles.heading}>
         <h3 id={`${id}-heading`}>
           <Drama size={16} strokeWidth={2.1} aria-hidden="true" />
-          How Your Day Felt
+          What Today Cost
         </h3>
         {comparison.previousDay && deltas.length ? (
           <div
@@ -102,7 +102,7 @@ export function EveningDayRatings({
           </div>
         ) : (
           <span className={styles.scale} title={comparisonLabel}>
-            1–10 scale
+            Set your baseline
           </span>
         )}
       </div>
@@ -112,8 +112,8 @@ export function EveningDayRatings({
           name="energy"
           label="Energy"
           value={checkInRatingForSlider(energy, energyScale)}
-          low="Low"
-          high="Full"
+          low="Drained"
+          high="Charged"
           disabled={disabled}
           onChange={onEnergyChange}
           icon={
@@ -130,8 +130,8 @@ export function EveningDayRatings({
           name="stress"
           label="Stress"
           value={checkInRatingForSlider(stress, stressScale)}
-          low="Low"
-          high="High"
+          low="At ease"
+          high="Overloaded"
           disabled={disabled}
           onChange={onStressChange}
           icon={<WavesIcon size={15} weight="bold" aria-hidden="true" />}

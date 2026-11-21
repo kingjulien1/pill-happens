@@ -104,9 +104,9 @@ export function SleepScoreSummary({
   return (
     <div className={styles.wrapper}>
       <div className={styles.heading}>
-        <h3 id={`${id}-heading`}>The Night, In Numbers</h3>
+        <h3 id={`${id}-heading`}>The Overnight Evidence</h3>
         <span>
-          Sleep Cycle <span aria-hidden="true">·</span> Night recap
+          Tracker <span aria-hidden="true">·</span> Your context
         </span>
       </div>
       <section
@@ -116,11 +116,11 @@ export function SleepScoreSummary({
       >
         <div className={styles.topline}>
           <div>
-            <span>Overnight window</span>
+            <span>Bedtime → waking</span>
             <strong>{windowLabel}</strong>
           </div>
           <div>
-            <span>Report details</span>
+            <span>Readings entered</span>
             <strong>
               {presentReadings}
               <span> / 4</span>
@@ -141,7 +141,7 @@ export function SleepScoreSummary({
             />
           </div>
           <div className={styles.readings}>
-            <p className={styles.groupLabel}>From your report</p>
+            <p className={styles.groupLabel}>Tracker readings</p>
             <dl className={styles.stats}>
               {readings.map((reading) => (
                 <div
@@ -158,7 +158,7 @@ export function SleepScoreSummary({
             </dl>
           </div>
           <div className={styles.totals}>
-            <p className={styles.groupLabel}>From your night</p>
+            <p className={styles.groupLabel}>Time-based totals</p>
             <dl className={styles.stats}>
               <div>
                 <dt>Total asleep</dt>
@@ -183,8 +183,8 @@ export function SleepScoreSummary({
 
         <div className={styles.stageSummary}>
           <div className={styles.stageHeading}>
-            <strong>Your sleep, split</strong>
-            <span>Light + dream + deep</span>
+            <strong>How Your Sleep Adds Up</strong>
+            <span>Asleep time only</span>
           </div>
           <div
             className={styles.stageBar}
@@ -222,8 +222,8 @@ export function SleepScoreSummary({
         </div>
         <footer className={styles.footer}>
           <p>
-            The score is your tracker’s. Efficiency is time asleep ÷ time in
-            bed. Neither gets the final word on how you feel.
+            Efficiency is time asleep ÷ time in bed. The score comes from your
+            tracker; your ratings below capture what the numbers miss.
           </p>
           {ratingsHeadingId && (
             <button
@@ -231,7 +231,7 @@ export function SleepScoreSummary({
               className={styles.feelingsLink}
               onClick={revisitFeelings}
             >
-              Your side of the story <span aria-hidden="true">↗</span>
+              Add your verdict <span aria-hidden="true">↗</span>
             </button>
           )}
         </footer>

@@ -207,12 +207,12 @@ export function SleepCycleImport({
         <SleepImportAlarm />
         <div>
           <h3 id={`${id}-heading`} className={dialogStyles.title}>
-            Sleep, With Receipts.
+            Let the Report Talk.
           </h3>
           <p>
-            Bring your Sleep Cycle report. We’ll read the times, stages and
-            score, then let you check the numbers. One less job for your morning
-            brain.
+            Upload or paste your Sleep Cycle image to bring in the times, stages
+            and score. Review the readings before applying them—the graph can
+            testify, but you get to correct it.
           </p>
         </div>
       </div>

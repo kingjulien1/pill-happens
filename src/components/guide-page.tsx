@@ -709,11 +709,11 @@ export function GuidePage() {
             </p>
             <p>
               <strong>Evening reflection.</strong> Browse{" "}
-              {DAILY_MOOD_CHOICES.length}{" "}
-              feelings with Lucide symbols. Search by word and pick every feeling
-              that fits. Shuffle remixes choices used equally often. Selected
-              feelings stay below the palette while you search. Add optional
-              Energy, Stress and Small Reminders answers.
+              {DAILY_MOOD_CHOICES.length} feelings with Lucide symbols. Search
+              by word and pick every feeling that fits. Shuffle remixes choices
+              used equally often. Selected feelings stay below the palette while
+              you search. Add optional Energy and Stress ratings, then note what
+              helped in Worth a Repeat.
             </p>
             <div
               className={styles.moodList}
@@ -731,17 +731,17 @@ export function GuidePage() {
                 <dt
                   id={guideHeadingId("guide-checkin", "Your Day, Your Words")}
                   data-guide-outline-level="2"
-                  data-guide-outline-label={"Your Day, Your Words"}
+                  data-guide-outline-label={"Today, for the Record"}
                 >
-                  Your Day, Your Words
+                  Today, for the Record
                 </dt>
                 <dd>
                   A roomy journal entry, up to{" "}
                   {DAILY_REFLECTION_MAX_LENGTH.toLocaleString("en-GB")}{" "}
-                  characters. Morning calls this Your Morning, Your Words. Both
-                  open the same writing space with Markdown formatting, Preview,
-                  Read and a Markdown download. Watch the writing save status;
-                  Done returns to the check-in.
+                  characters. Morning calls this Before the Day Bites. Both open
+                  the same writing space with Markdown formatting, Preview, Read
+                  and a Markdown download. Watch the writing save status; Done
+                  returns to the check-in.
                 </dd>
               </div>
               <div>

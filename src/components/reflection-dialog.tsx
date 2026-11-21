@@ -794,8 +794,8 @@ export function ReflectionDialog({
               data-writing-heading
             >
               {period === "morning"
-                ? "Your Morning, Your Words"
-                : "Your Day, Your Words"}
+                ? "Before the Day Bites"
+                : "Today, for the Record"}
             </DialogTitle>
             <DialogDescription
               className={styles.description}

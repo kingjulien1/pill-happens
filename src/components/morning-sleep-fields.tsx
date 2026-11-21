@@ -188,9 +188,10 @@ export function MorningSleepFields({
     <div className={styles.fields} data-morning-sleep-fields>
       <SleepCycleImport value={value} onChange={onChange} disabled={disabled} />
       <CheckInSection
-        caption="The Night’s Timeline"
-        context="Overnight"
-        detail="24-hour clock"
+        caption="Bed to Daylight"
+        context="Times & delays"
+        detail="Local · 24h"
+        description="Bedtime and waking define your time in bed. Asleep After is the wait before sleep; Awake is the total time you spent awake."
         headingId={`${id}-timeline-heading`}
       >
         <section
@@ -230,8 +231,9 @@ export function MorningSleepFields({
         </section>
       </CheckInSection>
       <CheckInSection
-        caption="The Sleep Breakdown"
-        detail="From your report"
+        caption="Where the Night Went"
+        detail="Hours & minutes"
+        description="Enter the stage durations from your report. Light + Dream + Deep fill your total sleep automatically; time spent falling asleep stays separate."
         headingId={`${id}-duration-heading`}
       >
         <section
@@ -254,8 +256,8 @@ export function MorningSleepFields({
             />
           </div>
           <p className={styles.hint}>
-            10 h 30 min minus Light + Dream + Deep Sleep, with a minimum of 0 h
-            0 min.
+            More Sleep You Wanted is the gap between your stage total and your
+            10 h 30 min target. It stops at zero if you’ve already reached it.
           </p>
         </section>
       </CheckInSection>
@@ -266,10 +268,10 @@ export function MorningSleepFields({
         onChange={(next) => onChange(withSleepStageTotals(next))}
       />
       <CheckInSection
-        caption="How the Night Felt"
+        caption="Did Sleep Do Its Job?"
         detail={
-          <span title="Higher numbers mean more of each feeling, not necessarily better sleep.">
-            More ≠ better
+          <span title="Rate how you feel now. High sleepiness means sleepier, not better rested; follow each slider’s end labels.">
+            Body &gt; graph
           </span>
         }
         headingId={`${id}-ratings-heading`}

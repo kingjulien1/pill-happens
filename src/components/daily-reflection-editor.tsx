@@ -154,14 +154,18 @@ export function DailyReflectionEditor({
   };
 
   const snapshotTitle = !hasWriting
-    ? "A fresh page, at your pace."
+    ? period === "morning"
+      ? "First thoughts. No filter."
+      : "File today’s incident report."
     : saving.status === "saved"
       ? "Your words, kept together."
       : saving.status === "saving"
         ? "Your page is catching up."
         : "A little space for what's on your mind.";
   const snapshotDetail = !hasWriting
-    ? "A few words or a whole chapter. There's room for both."
+    ? period === "morning"
+      ? "What’s on your mind, and what would make today easier?"
+      : "What happened, what hurt, and what you’d do differently."
     : draftStatus === "error" || draftStatus === "memory"
       ? "These edits are in this open page. Keep it open until they're saved."
       : saving.message;
@@ -190,9 +194,9 @@ export function DailyReflectionEditor({
       >
         <Info size={20} aria-hidden="true" />
         <span>
-          Use headings, lists and Markdown to give a longer entry some shape.
-          Closing the writing space brings you back to this check-in with your
-          draft.
+          {period === "morning"
+            ? "A thought, a dream, a worry—give each its own line. Use Markdown headings or lists if it gets longer; close the editor to return to this check-in."
+            : "Separate what happened from how it felt. A short list works; a rant is admissible. Use Markdown for structure, then close the editor to return here."}
         </span>
       </p>
       <ReflectionDialog
@@ -232,7 +236,9 @@ export function DailyReflectionEditor({
                 <span className="intake-primary-dot" aria-hidden="true">
                   ·
                 </span>
-                <span className="intake-primary-aside">Pen it!</span>
+                <span className="intake-primary-aside">
+                  {period === "morning" ? "Spill" : "Vent"}
+                </span>
               </span>
               <ActionIcon name="next" className="intake-primary-next" />
             </span>
@@ -240,8 +246,8 @@ export function DailyReflectionEditor({
         }
       />
       <p className={styles.guidance} data-journal-guidance>
-        You can reopen your draft to keep writing. Use Save Check-In to keep the
-        rest of your answers with this day.
+        Writing saves separately from your ratings. Use Save Check-In to keep
+        the rest of your answers with this day.
       </p>
       <hr className={styles.divider} />
       <div className={styles.captionRow}>

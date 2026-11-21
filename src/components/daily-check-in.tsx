@@ -631,14 +631,14 @@ function CheckInForm({
             ) : (
               <Moon aria-hidden="true" />
             )}
-            Your {morning ? "Morning" : "Day"}, Your Words
+            {morning ? "Before the Day Bites" : "Today, for the Record"}
           </>
         }
         headingId={`${id}-journal-heading`}
         description={
           morning
-            ? "What was on your mind when you woke up? Start with the thought that stayed with you."
-            : "What stayed with you today? Pick one moment you’d like to remember."
+            ? "What woke up with you: a worry, a dream, or one thing you need today? Leave a note for your less foggy self."
+            : "Pick the moment that stuck, what it did to you, and what you want to leave here. Tomorrow can read the case notes."
         }
         detail={
           <Link
@@ -650,7 +650,7 @@ function CheckInForm({
             }}
           >
             <LibraryBig size={14} aria-hidden="true" />
-            All journals
+            Past pages
             <ArrowUpRight size={12} className="opacity-60" aria-hidden="true" />
           </Link>
         }
@@ -683,16 +683,17 @@ function CheckInForm({
             caption={
               <>
                 <Moon aria-hidden="true" />
-                Your Day, Your Mood
+                Emotional Autopsy
               </>
             }
             headingId={`${id}-feelings-heading`}
-            context="Room for mixed feelings."
+            context="What lingered?"
             detail={
               <>
                 <strong>{DAILY_MOOD_CHOICES.length}</strong> feelings
               </>
             }
+            description="Pick as many feelings as fit, including the contradictory ones. A bad moment doesn’t have to become the verdict on your whole day."
           >
             <section
               className={styles.feelingsSection}
@@ -733,11 +734,11 @@ function CheckInForm({
             caption={
               <>
                 <ActionIcon name="sparkle" />
-                Small Reminders
+                Worth a Repeat
               </>
             }
             headingId={`${id}-helped-heading`}
-            context="What Helped"
+            context="What worked"
             detail={`${remindersCount(helped)} ${remindersCount(helped) === 1 ? "Item" : "Items"}`}
           >
             <SmallReminders

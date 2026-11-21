@@ -67,8 +67,8 @@ function ReminderInput({
       aria-label={`Reminder ${index + 1}`}
       placeholder={
         index
-          ? "Another thing worth keeping…"
-          : "Something that helped, however small…"
+          ? "What else helped—and how?"
+          : "A ten-minute walk cleared my head…"
       }
       enterKeyHint="next"
       onChange={(event) => onEdit(item.id, event.target.value)}
@@ -298,8 +298,9 @@ export function SmallReminders({
       data-check-in-section="helped"
     >
       <p className={styles.hint}>
-        Keep the little things that helped. Add one at a time, then put them in
-        the order that feels right.
+        Name the thing and why it helped: a walk, a person, a meal, a boundary.
+        Future you may need the recipe when memory becomes an unreliable
+        witness.
       </p>
       <ol className={styles.list} ref={list} aria-label="Small reminders">
         {rows.map((item, index) => (
