@@ -293,7 +293,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         details reveals a saved-change preview or explanatory context, plus
         links and actions. When several cards are folded together, the first
         activation only fans the stack open; activate a card again for its
-        details. A real Undo stays in the card header and also appears in the
+        details. You can also pull a closed card down about 113px: release when
+        the cue lights up to spring its details open, or retract to cancel.
+        In a scrollable open stack, pull from the main icon so text remains
+        available for scrolling. Reduced motion opens details without the spring.
+        A real Undo stays in the card header and also appears in the
         action footer while details are open. Information notices offer Got it in the header. Warnings, errors and
         loading notices offer Details when there is no reversal. An opened stack has no card-count cap
         and scrolls within the viewport. Use the shared journal facade for every

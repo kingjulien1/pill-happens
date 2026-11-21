@@ -1,0 +1,100 @@
+.indicator {
+  --pull-progress: 0;
+  position: absolute;
+  z-index: 6;
+  top: -4px;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  translate: -50% -50%;
+  opacity: 0;
+  pointer-events: none;
+  color: var(--color-pink-200, #fccee8);
+}
+.face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid #f9a8d45c;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #c4b5fd24, #f9a8d419), #251029;
+  box-shadow: 0 3px 10px #160b2666;
+  transform: scale(calc(0.6 + var(--pull-progress) * 0.4))
+    rotate(calc(-30deg + var(--pull-progress) * 30deg));
+}
+.indicator[data-ready="true"] .face {
+  box-shadow:
+    0 0 16px -2px #f9a8d487,
+    inset 0 0 0 1px #ddd6fe55;
+  border-color: #fbcfe8;
+}
+.dial {
+  position: absolute;
+  inset: -3px;
+  width: 36px;
+  height: 36px;
+  rotate: -90deg;
+  stroke-width: 1.4;
+}
+.track {
+  stroke: #c4b5fd26;
+}
+.progress {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--pull-progress) * 100);
+}
+.glyph {
+  width: 18px;
+  height: 18px;
+}
+.burst {
+  position: absolute;
+  inset: -9px;
+  width: 52px;
+  height: 52px;
+  overflow: visible;
+  stroke: currentColor;
+}
+.ripple,
+.rays {
+  opacity: 0;
+  transform-origin: 20px 20px;
+}
+.ripple {
+  stroke: #ddd6fe;
+  stroke-width: 1.4;
+}
+.rays {
+  stroke-linecap: round;
+  stroke-width: 1.3;
+  stroke-dasharray: 6;
+}
+.caption {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 6px);
+  translate: 0 -50%;
+  padding: 3px 6px;
+  border: 1px solid #f9a8d433;
+  border-radius: 7px;
+  background: #251029ed;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.ready,
+.indicator[data-ready="true"] .pulling {
+  display: none;
+}
+.indicator[data-ready="true"] .ready {
+  display: inline;
+}
+@media (prefers-reduced-motion: reduce) {
+  .face {
+    transform: none;
+  }
+}

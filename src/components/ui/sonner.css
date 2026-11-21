@@ -735,6 +735,34 @@
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
+.journal-notification[data-expanded="false"] .journal-notification-summary {
+  touch-action: none;
+}
+.journal-toaster-scroll
+  .journal-notification[data-expanded="false"]
+  .journal-notification-summary {
+  touch-action: pan-y;
+}
+.journal-toaster-scroll
+  .journal-notification[data-expanded="false"]
+  .journal-notification-art {
+  touch-action: none;
+}
+.journal-notification[data-notification-pull] {
+  will-change: translate;
+}
+.journal-notification[data-notification-pull="opening"]
+  .journal-notification-details {
+  transition:
+    grid-template-rows 500ms cubic-bezier(0.14, 1.08, 0.25, 1),
+    opacity 230ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-notification[data-notification-pull="opening"]
+    .journal-notification-details {
+    transition: none;
+  }
+}
 .journal-notification-summary-content {
   display: flex;
   align-items: center;

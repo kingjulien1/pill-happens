@@ -45,6 +45,8 @@ import {
 } from "@/components/ui/sonner";
 import { NotificationCountdownBadge } from "@/components/ui/notification-countdown-badge";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
+import { NotificationPullIndicator } from "@/components/ui/notification-pull-indicator";
+import { useNotificationPull } from "@/components/ui/use-notification-pull";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
 import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
 import type { JournalToastKind } from "@/components/ui/journal-toast";
@@ -185,6 +187,7 @@ export function JournalNotification({
   onDetachedUndoFailure,
 }: JournalNotificationProps) {
   const root = useRef<HTMLDivElement>(null);
+  const pullIndicator = useRef<HTMLSpanElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
   const [initialReading] = useState(() =>
     (suppliedClock ?? new NotificationClock(duration)).snapshot(),
@@ -589,6 +592,56 @@ export function JournalNotification({
     if (!next) setPolicyOpen(false);
     setExpanded(next);
   };
+
+  useNotificationPull({
+    root,
+    indicator: pullIndicator,
+    enabled: phase === "idle" && undoState !== "pending",
+    expanded,
+    canStart: (event) => {
+      const card = root.current;
+      const host = card?.closest<HTMLElement>("[data-sonner-toast]");
+      if (
+        !isCurrent() ||
+        leaving.current ||
+        expandedRef.current ||
+        card?.closest('[inert],[aria-hidden="true"]') ||
+        (!stack.expanded && host?.dataset.front === "false")
+      )
+        return false;
+      // An open fan keeps native touch scrolling over its text. The artwork
+      // remains a small pull handle; a single/folded card accepts its summary.
+      return (
+        event.type !== "pointerdown" ||
+        event.pointerType !== "touch" ||
+        !stack.expanded ||
+        Boolean(
+          event.target instanceof Element &&
+          event.target.closest(".journal-notification-art"),
+        )
+      );
+    },
+    onExpand: () => {
+      if (
+        !isCurrent() ||
+        leaving.current ||
+        phase !== "idle" ||
+        expandedRef.current
+      )
+        return false;
+      if (needsStackReveal) stack.reveal();
+      expandedRef.current = true;
+      pause("expanded", true);
+      setExpanded(true);
+      return true;
+    },
+    consumeClick: () => {
+      suppressClick.current = true;
+      heldGesture.current = true;
+    },
+    pause: (value) => pause("pull", value),
+    resetNative: cancelNativeSwipe,
+  });
 
   const runUndo = async (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -1047,6 +1100,7 @@ export function JournalNotification({
       <span className="journal-notification-closed-wash" aria-hidden="true" />
       <span className="journal-notification-frame" aria-hidden="true" />
       <span className="journal-notification-footer-fade" aria-hidden="true" />
+      <NotificationPullIndicator ref={pullIndicator} />
       <div className="journal-notification-header">
         <button
           type="button"
