@@ -376,8 +376,8 @@ export function DailyCheckInSection({
         }
         description={
           morning
-            ? "A little space for last night and how you’re waking up. Start anywhere; every field is optional."
-            : "Your evening journal: room for your thoughts, moods and the details you want to keep. Every field is optional."
+            ? "A little space for last night and how you’re waking up. Import a sleep report or enter what you know; every field is optional. Review the readings before saving, and come back later if the fog clears."
+            : "A little space for what happened, how it felt and what helped. Write freely or pick the feelings that fit; every field is optional. Save what matters now, and come back later if the plot starts making sense."
         }
       >
         {open && (
