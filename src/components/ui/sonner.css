@@ -447,11 +447,11 @@
   border-radius: calc(12.25px * 31 / 24);
 }
 .journal-toast-plate-arrival-back {
-  --toast-plate-size: calc(35.37px * 1.18 * 97 / 84 * var(--toast-rear-scale));
+  --toast-plate-size: calc(35.37px * 1.18 * 97 / 84 * var(--toast-rear-scale) * 5 / 6);
   transform: translate(-1.225px, 1.225px) rotate(-18deg);
 }
 .journal-toast-plate-arrival-middle {
-  --toast-plate-size: calc(37.41px * 1.18 * 97 / 84 * var(--toast-rear-scale));
+  --toast-plate-size: calc(37.41px * 1.18 * 97 / 84 * var(--toast-rear-scale) * 4 / 5);
   transform: translate(1.225px, 0) rotate(15deg);
 }
 /* Continuous turns never overwrite either the finite entrance or local sway. */
