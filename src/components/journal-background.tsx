@@ -1,6 +1,6 @@
 import { Iridescence } from "./iridescence";
 
-/** The stationary viewport mesh sits above the independently moving light field. */
+/** The accent mesh sits between the base light field and its subtle top layer. */
 export function JournalBackground() {
   return (
     <div
@@ -10,6 +10,12 @@ export function JournalBackground() {
       aria-hidden="true"
     >
       <Iridescence />
+      <div
+        className="ambient-iridescence-overlay"
+        data-background-layer="iridescence-overlay"
+      >
+        <Iridescence />
+      </div>
     </div>
   );
 }
