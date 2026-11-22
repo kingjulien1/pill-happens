@@ -2,6 +2,7 @@
 
 import { isValidElement, type ReactNode } from "react";
 import { NOTIFICATION_CHECKPOINT_INTERVAL } from "@/lib/notification-scheduling";
+import { intakeNotificationText } from "@/lib/intake-notification-text";
 import { toast as sonnerToast, type ExternalToast, type ToastT } from "sonner";
 import {
   JournalNotification,
@@ -230,7 +231,7 @@ function requestExit(
 }
 
 function show(entry: LiveNotice) {
-  const { id, kind, heading, body, duration, dismissible, options } = entry;
+  const { id, kind, duration, dismissible, options } = entry;
   const hostId =
     (entry.hostId ??= `notice-host-${globalThis.crypto?.randomUUID?.() ?? issueTime()}`);
   const {
@@ -246,6 +247,12 @@ function show(entry: LiveNotice) {
   void _heading;
   void _persistence;
   void _journalScope;
+  const intakeText =
+    kind === "success" && details?.preview
+      ? intakeNotificationText(details.preview)
+      : undefined;
+  const heading = intakeText?.heading ?? entry.heading;
+  const body = intakeText?.message ?? entry.body;
   entry.version = exits.begin(id);
   const version = entry.version;
   const current = () => live.get(id) === entry && exits.isCurrent(id, version);

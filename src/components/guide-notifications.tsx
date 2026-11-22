@@ -673,6 +673,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         invented records and its Undo only updates local React state; it never
         calls the journal API.
       </p>
+      <p>
+        Successful intake previews also supply the two main text rows. A new
+        entry reads “10 mg recorded for Ritalin.” An edit reads “15 mg intake
+        updated for Ritalin.” The secondary row uses the recorded quantity,
+        strength, time, date and route, with changed values first for edits.
+        This copy is derived once when presenting the confirmed snapshot,
+        including restored notices. Time-only or route-only edits do not claim
+        that the dose changed. Removals and notices without a usable intake
+        snapshot retain their caller-provided text.
+      </p>
 
       <Heading id="expanded-tools" level={3}>
         Expanded Actions &amp; Page Backdrop
