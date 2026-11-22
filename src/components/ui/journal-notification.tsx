@@ -19,7 +19,7 @@ import {
   BookOpenText,
   CalendarDays,
   Check,
-  Coffee,
+  ClockFading,
   ListFilter,
   ChevronsUp,
   CloudDownload,
@@ -31,7 +31,6 @@ import {
   MoonStar,
   PillBottle,
   RefreshCcw,
-  Rocket,
   ShieldCheck,
   Target,
   Undo2,
@@ -45,6 +44,7 @@ import {
   type NotificationCollapseDetail,
 } from "@/components/ui/sonner";
 import { NotificationCountdownBadge } from "@/components/ui/notification-countdown-badge";
+import { NotificationRocket } from "@/components/ui/notification-rocket";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
 import { NotificationPullIndicator } from "@/components/ui/notification-pull-indicator";
 import { useNotificationPull } from "@/components/ui/use-notification-pull";
@@ -922,8 +922,11 @@ export function JournalNotification({
           <span className="intake-primary-row">
             <span className="intake-primary-copy">
               <span className="intake-primary-label">
-                <Rocket size={21} aria-hidden="true" />
-                <span>Apply Now</span>
+                <NotificationRocket />
+                <span className="journal-update-choice-copy">
+                  <span>Apply Now</span>
+                  <small>Reload into the update</small>
+                </span>
               </span>
             </span>
             <ArrowRight className="intake-primary-next" aria-hidden="true" />
@@ -931,23 +934,31 @@ export function JournalNotification({
         </TodayActionButton>
       );
     return (
-      <Button
-        variant="ghost"
-        size="icon"
+      <TodayActionButton
         type="button"
-        className="journal-update-later"
+        className="intake-primary-cta journal-update-later"
+        data-intake-paint="satin"
         data-update-choice="later"
+        style={{ ...getIntakeActionThemeStyle(), height: 72, minHeight: 72 }}
         disabled={phase !== "idle" || !dismissible}
         aria-label="Update later, when the app closes or reloads"
         title="Keep using this version; update on the next close or reload"
         onPointerDown={(event) => event.stopPropagation()}
         onClick={onClick}
       >
-        <span className="journal-update-later-face">
-          <Coffee aria-hidden="true" />
+        <span className="intake-primary-row">
+          <span className="intake-primary-copy">
+            <span className="intake-primary-label">
+              <ClockFading aria-hidden="true" />
+              <span className="journal-update-choice-copy">
+                <span>Later</span>
+                <small>Keep this version</small>
+              </span>
+            </span>
+          </span>
+          <ArrowRight className="intake-primary-next" aria-hidden="true" />
         </span>
-        <span>Later</span>
-      </Button>
+      </TodayActionButton>
     );
   };
 
@@ -958,7 +969,7 @@ export function JournalNotification({
         variant="ghost"
         size="icon"
         type="button"
-        className={`journal-notification-revert ${footer ? "journal-update-footer-action" : "journal-update-header-action"}`}
+        className={`journal-notification-tool ${footer ? "journal-update-footer-action" : "journal-update-header-action"}`}
         data-update-choice={footer ? "footer" : undefined}
         aria-label="Apply update and reload"
         title="Apply update and reload"
@@ -972,10 +983,24 @@ export function JournalNotification({
           if (!event.defaultPrevented) onRequestDismiss("action");
         }}
       >
-        <span className="journal-notification-revert-symbol" aria-hidden="true">
-          <Rocket />
+        <span
+          className={
+            footer
+              ? "journal-notification-revert-symbol"
+              : "journal-notification-tool-symbol"
+          }
+          aria-hidden="true"
+        >
+          <NotificationRocket />
         </span>
-        <span className="journal-notification-revert-label" aria-hidden="true">
+        <span
+          className={
+            footer
+              ? "journal-notification-revert-label"
+              : "journal-notification-tool-label"
+          }
+          aria-hidden="true"
+        >
           Apply
         </span>
       </Button>
@@ -1061,7 +1086,16 @@ export function JournalNotification({
         <div className="journal-update-intro">
           <CloudDownload aria-hidden="true" />
           <div>
-            <h4>New Version. Same Journal.</h4>
+            <div className="journal-update-intro-heading">
+              <h4>New Version. Same Journal.</h4>
+              <span
+                className="journal-update-availability"
+                title="The update files are downloaded to this device"
+              >
+                <Check aria-hidden="true" />
+                On device
+              </span>
+            </div>
             <p>
               The new app files are downloaded and ready. Your entries stay
               right where you left them; this is a refresh for the app, not a
