@@ -1,9 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useId, useMemo, type ReactNode } from "react";
 import {
   BedDouble,
   ArrowRightLeft,
+  ArrowRight,
   BadgeCheck,
   BookOpen,
   CalendarDays,
@@ -13,6 +14,9 @@ import {
   MoonStar,
   Target,
   Trash2,
+  Pill,
+  Route,
+  Scale,
   Waves,
   Zap,
   type LucideIcon,
@@ -23,11 +27,17 @@ import { MedicationCardDose } from "@/components/medication-card-dose";
 import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { DAILY_MOODS } from "@/lib/daily-check-in";
 import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
+import { getMedicationType } from "@/lib/medication-types";
 import type {
   NotificationChangePreview as ChangePreview,
   NotificationPreviewRecord,
 } from "@/lib/notification-change-preview";
 import { notificationChangeSummary } from "@/lib/notification-change-preview";
+import {
+  intakeUpdatePreview,
+  type IntakeSnapshot,
+  type IntakeUpdateField,
+} from "@/lib/intake-update-preview";
 import styles from "./notification-change-preview.module.css";
 
 /** Actual card presentation, backed only by confirmed immutable display data. */
@@ -37,6 +47,14 @@ export function NotificationChangePreview({
   preview: ChangePreview;
 }) {
   if (!preview.before && !preview.after) return null;
+  if (preview.before?.kind === "intake" && preview.after?.kind === "intake")
+    return (
+      <IntakeUpdatePreview
+        before={preview.before}
+        after={preview.after}
+        medicationChanged={preview.medicationChanged}
+      />
+    );
   const compared = Boolean(preview.before && preview.after);
   const SummaryIcon = compared
     ? ArrowRightLeft
@@ -129,8 +147,10 @@ function SnapshotCaption({
 
 export function MedicationPreview({
   record,
+  mark,
 }: {
   record: Extract<NotificationPreviewRecord, { kind: "intake" | "medication" }>;
+  mark?: (field: IntakeUpdateField | "total", content: ReactNode) => ReactNode;
 }) {
   const intake = record.kind === "intake";
   const medication = record.medication;
@@ -153,6 +173,7 @@ export function MedicationPreview({
       intakeRoute={intake ? record.route : undefined}
       formPresentation={intake ? "icon" : "text"}
       className={styles.medication}
+      renderDetail={mark}
       data-notification-record={record.kind}
       data-notification-snapshot-card
       data-intake-card={intake ? "" : undefined}
@@ -168,7 +189,7 @@ export function MedicationPreview({
             title={time + " · " + record.timeZone}
             data-intake-time
           >
-            {time}
+            {mark ? mark("time", time) : time}
           </time>
         ) : undefined
       }
@@ -178,9 +199,169 @@ export function MedicationPreview({
           strengthMg={strength}
           form={form}
           source={intake ? "recorded" : "default"}
+          renderValue={mark}
         />
       }
     />
+  );
+}
+
+const changeIcons = {
+  time: Clock3,
+  quantity: Scale,
+  strength: Pill,
+  form: Pill,
+  route: Route,
+  name: ArrowRightLeft,
+};
+
+function IntakeUpdatePreview({
+  before,
+  after,
+  medicationChanged,
+}: {
+  before: IntakeSnapshot;
+  after: IntakeSnapshot;
+  medicationChanged?: boolean;
+}) {
+  const id = useId();
+  const update = useMemo(
+    () => intakeUpdatePreview(before, after, medicationChanged),
+    [before, after, medicationChanged],
+  );
+  const mark = (field: IntakeUpdateField | "total", content: ReactNode) => {
+    const row = update.rows.find((item) => item.field === field);
+    const change = field === "total" ? update.total : row;
+    if (update.switched || !change) return content;
+    return (
+      <span
+        className={styles.changed}
+        data-intake-change={field}
+        role="group"
+        aria-label={`${row?.label ?? "Total Dose"}: ${change.after}`}
+        tabIndex={0}
+        aria-describedby={`${id}-${field}`}
+      >
+        {content}
+      </span>
+    );
+  };
+  return (
+    <div
+      className={styles.root}
+      data-notification-change-preview
+      data-notification-intake-update
+    >
+      {update.switched ? (
+        <aside
+          className={`${styles.historyBubble} ${styles.medicationSwitch}`}
+          role="note"
+          aria-labelledby={`${id}-title`}
+          data-medication-switch
+        >
+          <h4 id={`${id}-title`}>
+            <ArrowRightLeft aria-hidden="true" />
+            Medication Changed
+          </h4>
+          <div className={styles.switchNames}>
+            <span>
+              <small>Previously</small>
+              <strong>{before.name}</strong>
+              <small>
+                {formatDose(before.strengthMg)} mg ·{" "}
+                {before.form
+                  ? getMedicationType(before.form).label
+                  : "Type not set"}
+              </small>
+            </span>
+            <ArrowRight aria-hidden="true" />
+            <span>
+              <small>Now</small>
+              <strong>{after.name}</strong>
+              <small>
+                {formatDose(after.strengthMg)} mg ·{" "}
+                {after.form
+                  ? getMedicationType(after.form).label
+                  : "Type not set"}
+              </small>
+            </span>
+          </div>
+          <p>Same entry. New medication.</p>
+        </aside>
+      ) : update.rows.length ? (
+        <aside
+          className={styles.historyBubble}
+          role="note"
+          aria-labelledby={`${id}-title`}
+          data-intake-update-history
+        >
+          <header className={styles.historyHeader}>
+            <h4 id={`${id}-title`}>
+              <History aria-hidden="true" />
+              Update History
+            </h4>
+            <span>
+              {update.rows.length}{" "}
+              {update.rows.length === 1 ? "change" : "changes"}
+            </span>
+          </header>
+          <div className={styles.historyColumns} aria-hidden="true">
+            <span>Just this edit</span>
+            <span>Previous → Saved</span>
+          </div>
+          <dl className={styles.historyRows}>
+            {update.rows.map((row) => {
+              const Icon = changeIcons[row.field];
+              return (
+                <div
+                  key={row.field}
+                  id={`${id}-${row.field}`}
+                  data-intake-history-field={row.field}
+                >
+                  <dt>
+                    <Icon aria-hidden="true" />
+                    {row.label}
+                  </dt>
+                  <dd className={styles.previous}>
+                    <span className="sr-only">Previously </span>
+                    {row.before}
+                  </dd>
+                  <ArrowRight aria-hidden="true" />
+                  <dd className={styles.current}>
+                    <span className="sr-only">Saved as </span>
+                    {row.after}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+          {update.total && (
+            <div className={styles.historyTotal} id={`${id}-total`}>
+              <span>Total Dose</span>
+              <span>
+                <span className={styles.previous}>
+                  <span className="sr-only">Previously </span>
+                  {update.total.before}
+                </span>
+                <ArrowRight aria-hidden="true" />
+                <strong>
+                  <span className="sr-only">Saved as </span>
+                  {update.total.after}
+                </strong>
+              </span>
+            </div>
+          )}
+        </aside>
+      ) : null}
+      <section
+        className={styles.snapshot}
+        aria-label="Updated intake"
+        data-notification-snapshot="after"
+      >
+        <SnapshotCaption label="Updated" record={after} />
+        <MedicationPreview record={after} mark={mark} />
+      </section>
+    </div>
   );
 }
 

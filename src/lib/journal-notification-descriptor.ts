@@ -100,6 +100,7 @@ export const journalNotificationDescriptor = z.object({
         .object({
           before: previewRecord.optional(),
           after: previewRecord.optional(),
+          medicationChanged: z.boolean().optional(),
         })
         .optional(),
       paragraphs: z.array(text).optional(),

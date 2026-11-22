@@ -3,6 +3,241 @@
   min-width: 0;
   gap: 16px;
 }
+.historyBubble {
+  --history-surface: color-mix(
+    in srgb,
+    var(--color-mauve-950, #1c141d) 94%,
+    var(--color-rose-300, #fda4af)
+  );
+  position: relative;
+  width: min(100%, 420px);
+  min-width: 0;
+  margin: 0 auto 1px;
+  padding: 11px 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-rose-300, #fda4af) 32%, transparent);
+  border-radius: 14px;
+  background: var(--history-surface);
+  color: var(--toast-ink, var(--foreground));
+  box-shadow: 0 6px 18px -9px #160a1e66;
+}
+.historyBubble::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 5px);
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  border-right: inherit;
+  border-bottom: inherit;
+  border-radius: 0 0 3px 0;
+  background: var(--history-surface);
+  transform: rotate(45deg);
+}
+.historyHeader,
+.historyBubble h4,
+.historyColumns,
+.historyTotal,
+.historyTotal > span:last-child {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+.historyHeader,
+.historyColumns,
+.historyTotal {
+  justify-content: space-between;
+  gap: 10px;
+}
+.historyBubble h4 {
+  gap: 6px;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 750;
+  line-height: 17px;
+}
+.historyBubble h4 svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--color-rose-300, #fda4af);
+  stroke-width: 2.3;
+}
+.historyHeader > span,
+.historyColumns {
+  color: var(--toast-muted, var(--muted-foreground));
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 13px;
+}
+.historyHeader > span {
+  flex: none;
+}
+.historyColumns {
+  margin-top: 4px;
+  padding-bottom: 5px;
+}
+.historyRows {
+  margin: 0;
+}
+.historyRows > div {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 64px minmax(0, 1fr) 10px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  padding: 7px 0;
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-rose-300, #fda4af) 12%, transparent);
+}
+.historyRows dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.historyRows dt svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  color: var(--color-rose-300, #fda4af);
+  stroke-width: 2;
+}
+.historyRows dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 9.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.previous {
+  color: var(--toast-muted, var(--muted-foreground));
+  font-weight: 450;
+}
+.current {
+  color: var(--toast-ink, var(--foreground));
+  font-weight: 650;
+}
+.historyRows > div > svg,
+.historyTotal svg {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  color: var(--color-rose-300, #fda4af);
+  opacity: 0.7;
+  stroke-width: 2;
+}
+.historyTotal {
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-rose-300, #fda4af) 16%, transparent);
+  padding-top: 8px;
+  margin-top: 1px;
+  font-size: 9px;
+}
+.historyTotal > span:first-child {
+  color: var(--toast-muted, var(--muted-foreground));
+}
+.historyTotal > span:last-child {
+  gap: 7px;
+}
+.historyTotal strong {
+  font-size: 10px;
+  font-weight: 700;
+}
+.medicationSwitch {
+  width: min(100%, 330px);
+  text-align: center;
+}
+.medicationSwitch h4 {
+  justify-content: center;
+}
+.switchNames {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 13px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.switchNames > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.switchNames small {
+  color: var(--toast-muted, var(--muted-foreground));
+  font-size: 8px;
+  line-height: 1.4;
+}
+.switchNames strong {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.switchNames > svg {
+  width: 13px;
+  height: 13px;
+  color: var(--color-rose-300, #fda4af);
+  stroke-width: 2.3;
+}
+.root .medicationSwitch p {
+  margin: 7px 0 0;
+  color: var(--toast-muted, var(--muted-foreground));
+  font-size: 8.5px;
+  line-height: 1.4;
+}
+.changed {
+  --medication-detail-ink: var(--color-rose-800, #9f1239);
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 3px;
+  border-radius: 6px;
+  background: var(--color-rose-300, #fda4af);
+  color: var(--medication-detail-ink);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-rose-800, #9f1239) 12%, transparent);
+  font-weight: 650;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+.changed:focus-visible {
+  outline: 2px solid var(--color-rose-200, #fecdd3);
+  outline-offset: 2px;
+}
+/* Preserve the ingredient clearance while giving marked dose arithmetic enough
+   room on the narrow notification card. Other card views keep their own ratio. */
+.root:global([data-notification-intake-update])
+  .medication
+  :global(.intake-card-dose-group) {
+  max-width: calc(100% - 30px);
+}
+@media (prefers-color-scheme: light) {
+  .historyBubble {
+    --history-surface: var(--color-rose-50, #fff1f2);
+    border-color: var(--color-rose-200, #fecdd3);
+    box-shadow: 0 6px 18px -9px #63324a30;
+  }
+  .historyBubble h4 svg,
+  .historyRows dt svg,
+  .historyRows > div > svg,
+  .historyTotal svg,
+  .switchNames > svg {
+    color: var(--color-rose-800, #9f1239);
+  }
+}
+@media (max-width: 359px) {
+  .historyBubble {
+    padding-inline: 9px;
+  }
+  .historyRows > div {
+    grid-template-columns: 64px minmax(0, 1fr) 9px minmax(0, 1fr);
+    gap: 4px;
+  }
+}
 .root > p.summary {
   display: grid;
   grid-template-columns: 13px minmax(0, 1fr);

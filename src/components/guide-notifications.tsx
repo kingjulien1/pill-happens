@@ -683,6 +683,18 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         that the dose changed. Removals and notices without a usable intake
         snapshot retain their caller-provided text.
       </p>
+      <p>
+        Updated intakes show one saved card beneath a pinned Update History
+        tooltip. Rounded Rose300 marks with Rose800 ink identify changed time,
+        quantity, strength, type and route values. Each focusable mark refers to
+        its Previous → Saved history row; a calculated total is marked only if
+        that total changed. The tooltip stays in the notification’s scroll and
+        focus boundary, with no hover requirement or floating portal. Medication
+        switches instead show a centered Medication Changed note and the new
+        card. Their identity flag comes from comparing confirmed medication IDs;
+        no IDs are added to the display snapshots. Existing saved notices without
+        that flag use their recorded name change as the switch indication.
+      </p>
 
       <Heading id="expanded-tools" level={3}>
         Expanded Actions &amp; Page Backdrop

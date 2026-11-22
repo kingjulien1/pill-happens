@@ -60,6 +60,8 @@ export type NotificationPreviewRecord =
 export type NotificationChangePreview = {
   before?: NotificationPreviewRecord;
   after?: NotificationPreviewRecord;
+  /** Compare confirmed medication IDs without persisting those identifiers. */
+  medicationChanged?: boolean;
 };
 
 /** Describe only differences carried by the confirmed, display-only snapshots. */

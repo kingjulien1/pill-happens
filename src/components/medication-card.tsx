@@ -57,7 +57,15 @@ type MedicationCardProps = Omit<
   intakeRoute?: IntakeRoute;
   /** Library and recorded cards share the outline rail; only intakes add a route. */
   formPresentation?: "text" | "icon" | "library";
+  /** Optional presentation-only marks for a confirmed edit preview. */
+  renderDetail?: (
+    field: "name" | "route" | "form",
+    content: ReactNode,
+  ) => ReactNode;
 };
+
+const plainDetail = (_field: "name" | "route" | "form", content: ReactNode) =>
+  content;
 
 /** The same two single-line rows compose actual entries and saved medications. */
 export function MedicationCard({
@@ -71,6 +79,7 @@ export function MedicationCard({
   decoration,
   formPresentation = "text",
   intakeRoute,
+  renderDetail = plainDetail,
   className,
   ...props
 }: MedicationCardProps) {
@@ -121,7 +130,7 @@ export function MedicationCard({
           {leading}
           <div className="intake-card-title-group" data-intake-title-group>
             <h3 className="intake-card-name" title={name} data-intake-name>
-              {name}
+              {renderDetail("name", name)}
             </h3>
           </div>
           {(indicators.length > 0 || iconPresentation) && (
@@ -142,17 +151,23 @@ export function MedicationCard({
                           )?.label
                         }
                       >
-                        <IntakeRouteIcon
-                          route={intakeRoute}
-                          strokeWidth={2.5}
-                        />
+                        {renderDetail(
+                          "route",
+                          <IntakeRouteIcon
+                            route={intakeRoute}
+                            strokeWidth={2.5}
+                          />,
+                        )}
                       </span>
                     )}
                     <span className={styles.form} title={typeLabel}>
-                      <MedicationFormGlyph
-                        form={form ?? "other"}
-                        strokeWidth={2.5}
-                      />
+                      {renderDetail(
+                        "form",
+                        <MedicationFormGlyph
+                          form={form ?? "other"}
+                          strokeWidth={2.5}
+                        />,
+                      )}
                     </span>
                   </span>
                   {indicators.length > 0 && (

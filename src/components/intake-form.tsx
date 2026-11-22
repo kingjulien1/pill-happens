@@ -382,6 +382,12 @@ export function IntakeForm({
               ? {
                   preview: {
                     ...(beforePreview ? { before: beforePreview } : {}),
+                    ...(intake
+                      ? {
+                          medicationChanged:
+                            intake.medicationId !== savedEntry.medicationId,
+                        }
+                      : {}),
                     after: intakeNotificationSnapshot(
                       savedEntry,
                       saved.data.medications.find(

@@ -25,7 +25,7 @@
   svg {
   width: 13px;
   height: 13px;
-  color: var(--card-foreground) !important;
+  color: var(--medication-detail-ink, var(--card-foreground)) !important;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.5;

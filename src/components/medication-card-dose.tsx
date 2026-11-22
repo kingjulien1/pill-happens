@@ -1,9 +1,15 @@
 import { doseMg, formatDose } from "@/lib/domain";
+import type { ReactNode } from "react";
 import {
   getMedicationType,
   isMeteredMedicationType,
   type MedicationType,
 } from "@/lib/medication-types";
+
+const plainValue = (
+  _field: "quantity" | "strength" | "total",
+  content: ReactNode,
+) => content;
 
 /** Identical dose composition; only the source (recorded/default) is different. */
 export function MedicationCardDose({
@@ -11,11 +17,13 @@ export function MedicationCardDose({
   strengthMg,
   form,
   source = "recorded",
+  renderValue = plainValue,
 }: {
   quantity: number;
   strengthMg: number;
   form?: MedicationType;
   source?: "recorded" | "default";
+  renderValue?: typeof plainValue;
 }) {
   const units = getMedicationType(form);
   const metered = isMeteredMedicationType(form);
@@ -30,10 +38,13 @@ export function MedicationCardDose({
         data-medication-strength={isDefault || undefined}
         title={`${isDefault ? "Default: " : ""}${calculation}`}
       >
-        {formatDose(quantity)}
-        {metered ? ` ${quantity === 1 ? units.unit : units.units}` : ""} ×{" "}
+        {renderValue(
+          "quantity",
+          `${formatDose(quantity)}${metered ? ` ${quantity === 1 ? units.unit : units.units}` : ""}`,
+        )}{" "}
+        ×{" "}
         <span data-medication-strength-value={isDefault || undefined}>
-          {formatDose(strengthMg)}
+          {renderValue("strength", formatDose(strengthMg))}
         </span>
         <span className="intake-card-mg">{"\u2009"}mg</span>
       </span>
@@ -49,7 +60,7 @@ export function MedicationCardDose({
           data-intake-total-value={!isDefault || undefined}
           data-medication-default-dose-value={isDefault || undefined}
         >
-          {total}
+          {renderValue("total", total)}
         </span>
         <span className="intake-card-total-unit">mg</span>
       </span>

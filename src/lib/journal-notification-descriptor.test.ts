@@ -42,6 +42,21 @@ test("a confirmed intake, links and original Undo expiry round-trip as data", ()
   assert.deepEqual(journalNotificationDescriptor.parse(value), notice);
 });
 
+test("medication switches preserve the confirmed identity comparison without record IDs", () => {
+  for (const medicationChanged of [true, false]) {
+    const value = structuredClone(notice);
+    const preview = {
+      ...value.details.preview,
+      before: value.details.preview.after,
+      medicationChanged,
+    };
+    value.details.preview = preview;
+    const parsed = journalNotificationDescriptor.parse(value);
+    assert.equal(parsed.details?.preview?.medicationChanged, medicationChanged);
+    assert.equal(JSON.stringify(parsed).includes("medicationId"), false);
+  }
+});
+
 test("restored previews reject invalid calendar dates, timezones and dose data", () => {
   for (const patch of [
     { takenAt: "not a date" },
