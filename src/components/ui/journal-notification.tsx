@@ -917,23 +917,22 @@ export function JournalNotification({
           data-intake-paint="satin"
           data-journal-write
           data-update-choice="now"
-          style={{ ...getIntakeActionThemeStyle(), height: 72, minHeight: 72 }}
+          radius={16}
+          style={{ ...getIntakeActionThemeStyle(), height: 58, minHeight: 58 }}
           disabled={phase !== "idle"}
           aria-label="Apply update now and reload"
           onPointerDown={(event) => event.stopPropagation()}
           onClick={onClick}
         >
-          <span className="intake-primary-row">
-            <span className="intake-primary-copy">
-              <span className="intake-primary-label">
+          <span className="journal-update-choice-copy">
+            <span className="journal-update-choice-heading">
+              <span className="journal-update-choice-label">
                 <NotificationRocket />
-                <span className="journal-update-choice-copy">
-                  <span>Apply Now</span>
-                  <small>Reload into the update</small>
-                </span>
+                <span>Apply Now</span>
               </span>
+              <ArrowRight className="intake-primary-next" aria-hidden="true" />
             </span>
-            <ArrowRight className="intake-primary-next" aria-hidden="true" />
+            <small>Reload into the update</small>
           </span>
         </TodayActionButton>
       );
@@ -943,24 +942,22 @@ export function JournalNotification({
         className="intake-primary-cta journal-update-later"
         data-intake-paint="satin"
         data-update-choice="later"
-        style={{ ...getIntakeActionThemeStyle(), height: 72, minHeight: 72 }}
+        radius={16}
+        style={{ ...getIntakeActionThemeStyle(), height: 58, minHeight: 58 }}
         disabled={phase !== "idle" || !dismissible}
         aria-label="Update later, when the app closes or reloads"
         title="Keep using this version; update on the next close or reload"
         onPointerDown={(event) => event.stopPropagation()}
         onClick={onClick}
       >
-        <span className="intake-primary-row">
-          <span className="intake-primary-copy">
-            <span className="intake-primary-label">
+        <span className="journal-update-choice-copy">
+          <span className="journal-update-choice-heading">
+            <span className="journal-update-choice-label">
               <ClockFading aria-hidden="true" />
-              <span className="journal-update-choice-copy">
-                <span>Later</span>
-                <small>Keep this version</small>
-              </span>
+              <span>Later</span>
             </span>
           </span>
-          <ArrowRight className="intake-primary-next" aria-hidden="true" />
+          <small>Keep this version</small>
         </span>
       </TodayActionButton>
     );
@@ -1156,29 +1153,53 @@ export function JournalNotification({
           when you next close or reload the app—no mid-sentence plot twist.
         </p>
       </section>
-      <div className="journal-update-notes" aria-label="Update Notes">
-        <div>
-          <RefreshCcw aria-hidden="true" />
-          <span>
-            <strong>App Shell</strong>
-            <small>Latest interface files are ready.</small>
-          </span>
+      <section className="journal-update-notes" aria-label="Update Preflight">
+        <header>
+          <h5>The Handoff, Unpacked</h5>
+          <span>Three things to know</span>
+        </header>
+        <div className="journal-update-note-list">
+          <article className="journal-update-note" data-update-note="files">
+            <span className="journal-update-note-icon" aria-hidden="true">
+              <RefreshCcw />
+            </span>
+            <div className="journal-update-note-copy">
+              <h6>App Files</h6>
+              <p>The new interface is downloaded to this device.</p>
+            </div>
+            <span className="journal-update-note-status">
+              <span>Ready</span>
+              <small>On device</small>
+            </span>
+          </article>
+          <article className="journal-update-note" data-update-note="journal">
+            <span className="journal-update-note-icon" aria-hidden="true">
+              <Database />
+            </span>
+            <div className="journal-update-note-copy">
+              <h6>Your Journal</h6>
+              <p>Saved entries stay put. Your history isn’t replaced.</p>
+            </div>
+            <span className="journal-update-note-status">
+              <span>Unchanged</span>
+              <small>Saved records</small>
+            </span>
+          </article>
+          <article className="journal-update-note" data-update-note="drafts">
+            <span className="journal-update-note-icon" aria-hidden="true">
+              <ShieldCheck />
+            </span>
+            <div className="journal-update-note-copy">
+              <h6>Open Drafts</h6>
+              <p>Finish and save any open entry before you reload.</p>
+            </div>
+            <span className="journal-update-note-status">
+              <span>Save First</span>
+              <small>Before Apply</small>
+            </span>
+          </article>
         </div>
-        <div>
-          <Database aria-hidden="true" />
-          <span>
-            <strong>Your Journal</strong>
-            <small>Saved records stay exactly where they are.</small>
-          </span>
-        </div>
-        <div>
-          <ShieldCheck aria-hidden="true" />
-          <span>
-            <strong>Safe Handoff</strong>
-            <small>Finish any open draft before applying now.</small>
-          </span>
-        </div>
-      </div>
+      </section>
       <p className="journal-update-fine-print">
         Saved entries stay put. Save your draft, then Apply—or choose Later to
         keep writing.

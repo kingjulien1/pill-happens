@@ -1194,10 +1194,15 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         the rest of its card, and the Update badge uses Amber. Its expanded card
         replaces generic
         actions with a Pink300-tinted overview, a separate handoff section with
-        two compact build/record stats, a full-size Apply Now main action and a
-        quieter full-size Later companion with a fading-clock icon. The
+        two compact build/record stats and a 2:1 row of 58px Apply Now and Later
+        buttons. Their 12px main labels sit above unchanged 8.5px captions;
+        the rocket and fading-clock glyphs retain their 21px size. A 3px face
+        inset halves the middle band, with thinner touching edges and a small
+        overlap from the inner line. The
         overview’s “On device” status confirms that the files are downloaded.
-        Three summary cards share its surface and text colors at the bottom,
+        Three compact preflight rows follow, with connected icon tiles,
+        individual violet/pink/amber accents, clear descriptions and separate
+        right-aligned statuses for app files, saved records and open drafts,
         followed by a centered, two-sentence journal-safety note. Its
         86% / 44ch width cap and two-line clamp share the handoff description’s
         typography. Header Apply, footer Apply and Undo use the same square icon frame,
