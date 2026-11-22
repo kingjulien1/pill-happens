@@ -701,6 +701,19 @@
     0 12px 28px -16px var(--toast-shadow),
     0 3px 10px -5px var(--toast-shadow);
 }
+.journal-update-exit-trails {
+  display: none;
+  pointer-events: none;
+}
+.journal-notification[data-phase="update-launch"] {
+  pointer-events: none;
+}
+.journal-toaster
+  [data-sonner-toast]:has(
+    .journal-notification[data-kind="update"]:not([data-phase="idle"])
+  ) {
+  pointer-events: none;
+}
 .journal-notification,
 .journal-notification * {
   -webkit-user-select: none;
@@ -2102,6 +2115,58 @@
       cubic-bezier(0.55, 0.02, 0.8, 0.35) both;
     pointer-events: none;
   }
+  .journal-notification[data-phase="update-launch"] {
+    transform-origin: 42% 55%;
+    animation: journal-notification-update-launch
+      var(--notification-update-exit-duration, 1540ms) linear both;
+  }
+  .journal-notification[data-phase="update-launch"]::after {
+    border-color: color-mix(
+      in srgb,
+      var(--color-fuchsia-300, #f0abfc) 75%,
+      white
+    );
+    box-shadow: 0 0 18px -3px
+      color-mix(in srgb, var(--color-fuchsia-400, #e879f9) 45%, transparent);
+    animation: journal-update-charge
+      var(--notification-update-exit-duration, 1540ms) linear both;
+  }
+  .journal-notification[data-phase="update-launch"]
+    .journal-update-exit-trails {
+    position: absolute;
+    display: block;
+    z-index: -1;
+    inset: 0;
+  }
+  .journal-update-exit-trails i {
+    position: absolute;
+    top: 24%;
+    left: 7%;
+    width: 74%;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--toast-soft) 32%,
+      var(--toast-bright) 85%,
+      transparent
+    );
+    transform-origin: right center;
+    opacity: 0;
+    animation: journal-update-trail
+      var(--notification-update-exit-duration, 1540ms) linear both;
+  }
+  .journal-update-exit-trails i:nth-child(2) {
+    top: 50%;
+    width: 85%;
+    animation-delay: 20ms;
+  }
+  .journal-update-exit-trails i:nth-child(3) {
+    top: 76%;
+    width: 62%;
+    animation-delay: 40ms;
+  }
   .journal-toast-symbol[data-toast-reversed="true"] {
     animation: journal-toast-art-reverse 300ms cubic-bezier(0.4, 0, 0.85, 0.35)
       both;
@@ -2151,6 +2216,110 @@
   }
   to {
     stroke-dashoffset: -100;
+  }
+}
+/* One bounded launch owns the entire card, including its intact icon stack. */
+@keyframes journal-notification-update-launch {
+  0% {
+    opacity: 1;
+    transform: perspective(900px) translate3d(0, 0, 0) rotate(0) rotateY(0)
+      scale(1, 1);
+    animation-timing-function: cubic-bezier(0.16, 0.8, 0.25, 1);
+  }
+  14% {
+    opacity: 1;
+    transform: perspective(900px) translate3d(10px, 3px, 0) rotate(6deg)
+      rotateY(-5deg) scale(1.02, 1.02);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.15, 1);
+  }
+  32% {
+    transform: perspective(900px) translate3d(-10px, -2px, 0) rotate(-7.5deg)
+      rotateY(6deg) scale(0.99, 0.99);
+    animation-timing-function: cubic-bezier(0.22, 0.75, 0.3, 1);
+  }
+  46% {
+    transform: perspective(900px) translate3d(-4px, 4px, 0) rotate(-2.5deg)
+      rotateY(2deg) scale(0.97, 0.96);
+    animation-timing-function: cubic-bezier(0.35, 0, 0.7, 1);
+  }
+  65%,
+  72% {
+    transform: perspective(900px) translate3d(-10px, 7px, 0) rotate(-4.5deg)
+      rotateY(5deg) scale(0.93, 0.9);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.3);
+  }
+  78% {
+    transform: perspective(900px) translate3d(-24px, 9px, 0) rotate(-9deg)
+      rotateY(4deg) scale(0.98, 1.02);
+    animation-timing-function: cubic-bezier(0.12, 0.6, 0.2, 1);
+  }
+  82% {
+    opacity: 1;
+    transform: perspective(900px) translate3d(8px, -3px, 0) rotate(4deg)
+      rotateY(-3deg) scale(1.035, 0.96);
+    animation-timing-function: cubic-bezier(0.35, 0, 0.8, 0.2);
+  }
+  93% {
+    opacity: 0.6;
+    transform: perspective(900px)
+      translate3d(
+        calc(var(--notification-update-exit-x, 700px) * 0.64),
+        calc(var(--notification-update-exit-y, -120px) * 0.8),
+        0
+      )
+      rotate(28deg) rotateY(-17deg) scale(0.35, 0.35);
+    animation-timing-function: cubic-bezier(0.1, 0.4, 0.2, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(900px)
+      translate3d(
+        var(--notification-update-exit-x, 700px),
+        var(--notification-update-exit-y, -120px),
+        0
+      )
+      rotate(55deg) rotateY(-26deg) scale(0.045, 0.045);
+  }
+}
+@keyframes journal-update-charge {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  65%,
+  72% {
+    opacity: 0.9;
+    transform: scale(1.018);
+  }
+  78% {
+    opacity: 0.65;
+    transform: scale(1.06);
+  }
+  88%,
+  100% {
+    opacity: 0;
+    transform: scale(1.16);
+  }
+}
+@keyframes journal-update-trail {
+  0%,
+  70% {
+    opacity: 0;
+    transform: translateX(12px) scaleX(0.1);
+  }
+  78% {
+    opacity: 0.3;
+    transform: translateX(-12px) scaleX(0.6);
+  }
+  85% {
+    opacity: 0.65;
+    transform: translateX(-70px) scaleX(1.8);
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: translateX(-180px) scaleX(2.2);
   }
 }
 @keyframes journal-notification-countdown-unfold {

@@ -157,7 +157,7 @@ const persistent = `"use client";
 
 import { toast } from "@/components/ui/journal-toast";
 
-export function showUpdateNotice(reloadIfReady: () => boolean) {
+export function showUpdateNotice(canApply: () => boolean, apply: () => void) {
   return toast.update("Finish your current entry before reloading.", {
     persistence: false,
     id: "pwa-update",
@@ -166,10 +166,11 @@ export function showUpdateNotice(reloadIfReady: () => boolean) {
     action: {
       label: "Apply Now",
       onClick(event) {
-        // The caller checks its current worker/draft state and starts reload.
-        if (!reloadIfReady()) event.preventDefault();
+        // Guard synchronously; commit only after the complete visual exit.
+        if (!canApply()) event.preventDefault();
       },
     },
+    afterActionExit: apply,
     cancel: { label: "Update Later", onClick() {} },
     details: {
       paragraphs: ["A new version is ready when you are."],
@@ -830,12 +831,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         code={persistent}
       />
       <p>
-        Supply a synchronous guard that starts the worker-aware reload only when
-        ready; the production implementation is in{" "}
+        Supply a synchronous action guard and put the worker-aware reload in
+        <code> afterActionExit</code>; the production implementation is in{" "}
         <Source path="src/components/pwa-provider.tsx">PwaProvider</Source>. An
         action calls its handler, then exits unless the event was prevented.
+        Only the current notice can run its deferred commit after the exit;
+        replacement, scope changes or cancellation discard it. Update Apply
+        collapses details first, then tilts right and left, charges and flicks
+        away before activating the waiting worker. The full icon stays with the
+        card throughout. A bounded fallback covers missing animation-end events.
         Cancel calls its handler and exits regardless of preventDefault. These
-        callbacks are synchronous; use <code>undo.onUndo</code> for a tracked
+        action and cancel handlers are synchronous; use <code>undo.onUndo</code> for a tracked
         asynchronous reversal.
       </p>
 
@@ -1066,6 +1072,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         window. Native swipes use Sonner’s directional exit instead. Do not
         assert exact DOM-removal time from the custom budget. Hover styling is
         limited to desktop fine-hover pointers; mobile has none.
+      </p>
+      <p>
+        Update Apply uses a separate <strong>1,540ms</strong> launch after any
+        280ms detail collapse. Completion follows the card’s own animation-end
+        event, with a 200ms fallback margin and an 80ms static reduced-motion
+        handoff. One bounded extension lets a late-painted launch finish before
+        the fallback commits. Its measured exit vector clears the viewport to the right;
+        charge light and three short trails share that single finite timeline.
+        It creates no render loop. Later and ordinary dismissals keep the normal
+        exit, with their icon stack intact until the whole card leaves.
       </p>
 
       <Heading id="visuals">Visual Reference &amp; Alpha Math</Heading>

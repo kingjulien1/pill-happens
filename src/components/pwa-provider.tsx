@@ -140,14 +140,16 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
         },
         action: {
           label: "Reload",
-          onClick: () => {
-            if (!registration?.waiting) {
-              window.location.reload();
-              return;
-            }
-            reloadRequested = true;
-            registration.waiting.postMessage({ type: "SKIP_WAITING" });
-          },
+          onClick: () => undefined,
+        },
+        afterActionExit: () => {
+          if (!active) return;
+          if (!registration?.waiting) {
+            window.location.reload();
+            return;
+          }
+          reloadRequested = true;
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
         },
         cancel: {
           label: "Update Later",

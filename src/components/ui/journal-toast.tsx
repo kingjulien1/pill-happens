@@ -37,6 +37,8 @@ export type JournalToastOptions = ExternalToast & {
   persistence?: false;
   /** Fences a late async result to the journal that initiated its request. */
   journalScope?: string;
+  /** Commit a guarded action only after its current card completes its exit. */
+  afterActionExit?: () => void;
 };
 export type { JournalNotificationDetails, JournalNotificationUndo };
 type ToastMessage = Parameters<typeof sonnerToast>[0];
@@ -112,6 +114,7 @@ function describe(
     options.persistence === false ||
     entry.kind === "loading" ||
     entry.kind === "update" ||
+    options.afterActionExit ||
     options.action ||
     options.cancel
   )
@@ -237,6 +240,7 @@ function show(entry: LiveNotice) {
     variant,
     persistence: _persistence,
     journalScope: _journalScope,
+    afterActionExit,
     ...nativeOptions
   } = options;
   void _heading;
@@ -263,6 +267,7 @@ function show(entry: LiveNotice) {
     } finally {
       sonnerToast.dismiss(hostId);
     }
+    if (reason === "action") afterActionExit?.();
   };
   sonnerToast.custom(
     () => (

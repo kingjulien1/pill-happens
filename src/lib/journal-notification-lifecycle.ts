@@ -255,6 +255,13 @@ export const NOTIFICATION_EXIT_TIMING = {
   reducedDepart: 80,
 } as const;
 
+/** Update handoff follows its final visual frame, with a bounded event fallback. */
+export const NOTIFICATION_UPDATE_EXIT_TIMING = {
+  launch: 1_540,
+  fallbackGrace: 200,
+  reducedDepart: 80,
+} as const;
+
 /** An in-flight server change outlives its card; a late rejection still needs a visible outcome. */
 export async function settleNotificationUndo({
   undo,

@@ -53,6 +53,7 @@ import type { NotificationChangePreview as NotificationChangePreviewData } from 
 import type { JournalToastKind } from "@/components/ui/journal-toast";
 import {
   NOTIFICATION_EXIT_TIMING,
+  NOTIFICATION_UPDATE_EXIT_TIMING,
   NotificationClock,
   settleNotificationUndo,
   type NotificationExitReason,
@@ -506,7 +507,10 @@ export function JournalNotification({
   ]);
 
   useEffect(() => {
+    let removeAnimationEnd = () => {};
     const clear = () => {
+      removeAnimationEnd();
+      removeAnimationEnd = () => {};
       for (const timer of timers.current) clearTimeout(timer);
       timers.current = [];
     };
@@ -531,14 +535,91 @@ export function JournalNotification({
       setExpanded(false);
       setPhase(hadDetails ? "collapsing" : "anticipate");
       const beginExit = () => {
-        const bounds = root.current?.getBoundingClientRect();
+        const card = root.current;
+        const bounds = card?.getBoundingClientRect();
+        if (kind === "update" && reason === "action") {
+          if (bounds && card) {
+            card.style.setProperty(
+              "--notification-update-exit-x",
+              `${Math.max(window.innerWidth - bounds.left + 96, bounds.width + 160)}px`,
+            );
+            card.style.setProperty(
+              "--notification-update-exit-y",
+              `${-Math.min(200, Math.max(80, bounds.height * 1.4))}px`,
+            );
+            card.style.setProperty(
+              "--notification-update-exit-duration",
+              `${NOTIFICATION_UPDATE_EXIT_TIMING.launch}ms`,
+            );
+          }
+          let completed = false;
+          const complete = () => {
+            if (completed) return;
+            completed = true;
+            clear();
+            if (alive.current && isCurrent()) onExitComplete(reason);
+          };
+          const onAnimationEnd = (event: AnimationEvent) => {
+            if (
+              event.target === card &&
+              event.animationName === "journal-notification-update-launch"
+            )
+              complete();
+          };
+          if (!reduced && card) {
+            card.addEventListener("animationend", onAnimationEnd);
+            removeAnimationEnd = () =>
+              card.removeEventListener("animationend", onAnimationEnd);
+          }
+          let extendedForPaint = false;
+          const fallback = () => {
+            const launch = card
+              ?.getAnimations()
+              .find(
+                (animation) =>
+                  "animationName" in animation &&
+                  animation.animationName ===
+                    "journal-notification-update-launch",
+              );
+            const elapsed = launch?.currentTime;
+            // A busy collapse can defer the first painted frame. Allow one
+            // bounded extension rather than cutting off an active launch.
+            if (
+              !reduced &&
+              !extendedForPaint &&
+              !document.hidden &&
+              launch?.playState === "running" &&
+              typeof elapsed === "number" &&
+              elapsed < NOTIFICATION_UPDATE_EXIT_TIMING.launch
+            ) {
+              extendedForPaint = true;
+              later(
+                complete,
+                Math.ceil(NOTIFICATION_UPDATE_EXIT_TIMING.launch - elapsed) +
+                  NOTIFICATION_UPDATE_EXIT_TIMING.fallbackGrace,
+              );
+              return;
+            }
+            complete();
+          };
+          setPhase("update-launch");
+          later(
+            fallback,
+            reduced
+              ? NOTIFICATION_UPDATE_EXIT_TIMING.reducedDepart
+              : NOTIFICATION_UPDATE_EXIT_TIMING.launch +
+                  NOTIFICATION_UPDATE_EXIT_TIMING.fallbackGrace,
+          );
+          return;
+        }
         if (bounds)
           root.current?.style.setProperty(
             "--notification-exit-y",
             `${-Math.max(bounds.bottom + 64, bounds.height + 96)}px`,
           );
         setPhase("anticipate");
-        setReversed(true);
+        // The complete artwork leaves with the card. Native swipes still own
+        // their separate reverse; starting it here hid the icon too early.
         later(
           () => {
             setPhase("depart");
@@ -560,7 +641,7 @@ export function JournalNotification({
       clear();
       detach();
     };
-  }, [isCurrent, onExitComplete, registerExit]);
+  }, [isCurrent, kind, onExitComplete, registerExit]);
 
   const closeDetails = useCallback(() => {
     if (phase !== "idle" || leaving.current || !expandedRef.current) return;
@@ -915,6 +996,7 @@ export function JournalNotification({
         className="journal-notification-revert journal-update-header-action"
         aria-label="Apply update and reload"
         title="Apply update and reload"
+        disabled={phase !== "idle"}
         onPointerDown={(event) => event.stopPropagation()}
         onClick={(event) => {
           event.stopPropagation();
@@ -1159,6 +1241,13 @@ export function JournalNotification({
         </svg>
       </span>
       <span className="journal-notification-footer-fade" aria-hidden="true" />
+      {kind === "update" && (
+        <span className="journal-update-exit-trails" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+      )}
       <NotificationPullIndicator ref={pullIndicator} />
       <div className="journal-notification-header">
         <button
