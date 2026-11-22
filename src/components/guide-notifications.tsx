@@ -669,29 +669,34 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         Preview content occupies the labelled, inert-when-closed details region.
         When present it replaces free-form paragraphs and facts, while relevant
-        links and action/cancel controls remain available. Other record types
-        use a short summary after the top separator; the main notification
-        heading stays 14px, weight 650. Their captions use three columns: the
-        stage stays independently centered above the card while the date or
-        status sits to the right. Before uses History, After and Saved use
-        BadgeCheck, and Removed uses Trash2. Dates omit the year. Intake routes
+        links and action/cancel controls remain available. Medication, check-in,
+        goal, timezone and removal receipts share a heading, a contextual
+        subheading and one saved or removed record. Updates add compact
+        Previous → Saved tiles for the display values that changed. Guidance
+        explains the record’s effect and the Undo actually available. Intake routes
         appear inside their actual MedicationCard rail with a dot and matching
         form/category glyphs rather than as a loose caption outside the card.
         Check-ins, goals and timezone changes use compact visual summaries;
-        journal prose stays out of previews. Non-graphic notices show up to four
-        facts, or one context paragraph when there are no facts. The playground
+        journal prose stays out of previews. Notices without a record use the
+        same heading hierarchy, tonal fact tiles and every supplied explanation
+        paragraph. Full error messages stay readable in expanded content;
+        fallback copy never invents a saved draft or a successful action. The playground
         above constructs both sides from invented records and its Undo only
         updates local React state; it never calls the journal API.
       </p>
       <p>
-        Successful intake previews also supply the two main text rows. A new
+        Confirmed record previews also supply the two main text rows. A new
         entry reads “10 mg recorded for Ritalin.” An edit reads “15 mg intake
         updated for Ritalin.” The secondary row uses the recorded quantity,
         strength, time, date and route, with changed values first for edits.
         This copy is derived once when presenting the confirmed snapshot,
         including restored notices. Time-only or route-only edits do not claim
-        that the dose changed. Removals and notices without a usable intake
-        snapshot retain their caller-provided text.
+        that the dose changed. Other records summarize the actual medication,
+        strength, archive state, check-in period and metrics, daily maximum or
+        timezone. Removal summaries name the removed amount. Unsupported
+        snapshots retain the caller’s copy; equal display fields never imply an
+        unchanged save. Refresh, clipboard, image, link and error notices have
+        concise outcome headings with the essential context on their second row.
       </p>
       <p>
         Created and updated intakes share a receipt layout around one saved
@@ -724,17 +729,19 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         tile, a 17px glyph and an 8.5px caption within a 52px-wide, at least
         47px-high target. Intake receipts place Entry and Medication
         destinations in their main content; Undo, Collapse and Dismiss remain
-        footer tools. The same Undo slot stays present without a callback,
+        footer tools. Record notices keep their Undo slot without a callback,
         native-disabled and gray. A real Undo uses the original callback,
         pending guard and failure handling; it is never inferred from a preview.
         Collapse returns focus to the summary before its details become inert.
         Following a normal destination link also collapses details without
         cancelling navigation; modified clicks keep their native new-tab
         behavior. A 9px footer at 50% ink alpha gives brief context. Typed
-        previews use short record-specific copy or explain the real Undo.
-        Notices without a preview may use caller-provided footer context. Caller
-        prose, facts and footer remain suppressed when a typed preview is
-        present; the old reading-paused filler is removed. Action/cancel
+        previews explain their real Undo in the receipt. Completed non-record
+        actions, such as copying writing or refreshing, use Okay rather than a
+        disabled Undo. Their supplied footer guidance lives in the main content,
+        without duplicate navigation prose. Record receipts reuse the caller’s
+        useful context alongside their saved card and structured recap, without
+        repeating facts already on that card. Action/cancel
         controls retain their original behavior in a separate centered row when
         supplied. A final Dismiss tool sits at the far edge. From an expanded
         card it collapses the reading panel first, waits 150ms, then uses the
@@ -749,12 +756,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         zero at the full height. Fuchsia600 starts at 18% and ends at 70% of
         that height; Pink400 starts at 10% and ends at 45%; Pink300 starts at 7%
         and ends at 28%. All paint stays behind the live tools and text, never
-        changing their hit targets. Both footer lines use the available width with 8px of inline padding. Below the brief footer context, an 8.5px
-        note at 39% ink alpha explains that snapshots may differ from later
-        edits. It names relevant destinations from the notice’s existing links
-        and offers a Daily Log link, without awkwardly turning action labels
-        into prose. Notices without a preview also receive a quiet Daily Log
-        note; it does not invent a saved result or comparison.
+        changing their hit targets. Update and medication-policy notices keep
+        one brief footer context line, using the available width with 8px of
+        inline padding. Other receipts explain snapshots and available Undo in
+        their main content. Navigation stays in the existing destination tools
+        or intake destination tiles, without a second set of repeated links.
       </p>
       <p>
         While a mounted, visible notification has expanded idle details and is

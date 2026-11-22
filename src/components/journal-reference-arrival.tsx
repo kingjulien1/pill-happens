@@ -99,10 +99,10 @@ export function JournalReferenceArrival() {
       toast.info(message, {
         journalScope: notificationScope,
         heading: intake
-          ? "Linked intake"
+          ? "Couldn’t open this intake."
           : medication
-            ? "Linked medication"
-            : "Linked check-in",
+            ? "Couldn’t open this medication."
+            : "Couldn’t open this check-in.",
         details: {
           paragraphs: [
             intake

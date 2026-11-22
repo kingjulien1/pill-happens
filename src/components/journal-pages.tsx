@@ -697,11 +697,11 @@ export function MedicationsPage() {
       data.intakes.map((entry) => entry.medicationId),
     ).size;
     toast.info(
-      "Strength changes recalculate past doses and totals. Logged quantities, times and notes stay as entered.",
+      "Strength edits recalculate doses · Logged details stay as entered",
       {
         id: "medication-history-policy",
         journalScope: notificationScope,
-        heading: "Edits Update All Past Logs",
+        heading: "Medication edits update history.",
         duration: 18_000,
         details: {
           paragraphs: [
@@ -773,7 +773,9 @@ export function MedicationsPage() {
         {
           journalScope: saved.notificationScope,
           ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
-          heading: "Medication library",
+          heading: medication.archived
+            ? "Medication restored."
+            : "Medication archived.",
           details: {
             ...(updatedMedication
               ? {
@@ -1270,7 +1272,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           toast.success("Timezone updated for your journal.", {
             journalScope: saved.notificationScope,
             ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
-            heading: "Journal settings",
+            heading: "Journal timezone updated.",
             details: {
               preview: {
                 ...(beforePreview ? { before: beforePreview } : {}),
@@ -1373,9 +1375,14 @@ function JournalPreferences() {
     try {
       await signOut();
     } catch {
-      toast.error("Unable to sign out. Please try again.", {
+      toast.error("Check your connection, then try again from Preferences.", {
         journalScope: notificationScope,
-        heading: "Sign-out unsuccessful",
+        heading: "Sign-out not confirmed.",
+        details: {
+          paragraphs: [
+            "The app could not confirm that sign-out finished. Keep this page open and try signing out again when your connection is available.",
+          ],
+        },
       });
     } finally {
       setSaving(false);

@@ -38,7 +38,7 @@ import type {
   NotificationChangePreview as ChangePreview,
   NotificationPreviewRecord,
 } from "@/lib/notification-change-preview";
-import { notificationChangeSummary } from "@/lib/notification-change-preview";
+import { recordNotificationContent } from "@/lib/record-notification-content";
 import {
   intakeUpdatePreview,
   type IntakeSnapshot,
@@ -57,11 +57,13 @@ export function NotificationChangePreview({
   intakeLinks,
   onFollowLink,
   canUndo = false,
+  paragraphs,
 }: {
   preview: ChangePreview;
   intakeLinks?: IntakeReceiptDestinations;
   onFollowLink?: (event: MouseEvent<HTMLAnchorElement>) => void;
   canUndo?: boolean;
+  paragraphs?: ReactNode[];
 }) {
   if (!preview.before && !preview.after) return null;
   if (
@@ -78,92 +80,155 @@ export function NotificationChangePreview({
         canUndo={canUndo}
       />
     );
-  const compared = Boolean(preview.before && preview.after);
-  const SummaryIcon = compared
-    ? ArrowRightLeft
-    : preview.before
-      ? Trash2
-      : BadgeCheck;
   return (
-    <div className={styles.root} data-notification-change-preview>
-      <p className={styles.summary} data-notification-change-summary>
-        <SummaryIcon aria-hidden="true" />
-        <span>{notificationChangeSummary(preview)}</span>
-      </p>
-      {preview.before && (
-        <section
-          className={styles.snapshot}
-          aria-label={compared ? "Before change" : "Removed"}
-          data-notification-snapshot="before"
-        >
-          <SnapshotCaption
-            label={compared ? "Before" : "Removed"}
-            record={preview.before}
-          />
-          <RecordPreview record={preview.before} />
-        </section>
-      )}
-      {preview.after && (
-        <section
-          className={styles.snapshot}
-          aria-label={compared ? "After change" : "Saved"}
-          data-notification-snapshot="after"
-        >
-          <SnapshotCaption
-            label={compared ? "After" : "Saved"}
-            record={preview.after}
-          />
-          <RecordPreview record={preview.after} />
-        </section>
-      )}
-    </div>
+    <RecordReceiptPreview
+      preview={preview}
+      canUndo={canUndo}
+      paragraphs={paragraphs}
+    />
   );
 }
 
-function SnapshotCaption({
-  label,
-  record,
+function RecordReceiptPreview({
+  preview,
+  canUndo,
+  paragraphs,
 }: {
-  label: string;
-  record: NotificationPreviewRecord;
+  preview: ChangePreview;
+  canUndo: boolean;
+  paragraphs?: ReactNode[];
 }) {
-  let context: ReactNode = null;
-  let title: string | undefined;
-  if (record.kind === "intake") {
-    const localDay = toLocalInput(record.takenAt, record.timeZone).slice(0, 10);
-    const date = formatDay(localDay, {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-    title = date;
-    context = <time dateTime={localDay}>{date}</time>;
-  } else if (record.kind === "medication") {
-    context = record.medication.archived ? "Archived" : "Active";
-  } else if (record.kind === "check-in") {
-    context = (
-      <time dateTime={record.day}>
-        {formatDay(record.day, {
-          month: "short",
-          day: "numeric",
-        })}
-      </time>
+  const content = useMemo(() => recordNotificationContent(preview), [preview]);
+  const id = useId();
+  if (!content)
+    return (
+      <section className={`${styles.root} ${styles.receipt}`}>
+        <header className={styles.receiptIntro}>
+          <div className={styles.receiptHeading}>
+            <div>
+              <h3>Saved details</h3>
+            </div>
+          </div>
+          <p>Open your journal to review the current saved details.</p>
+        </header>
+      </section>
     );
-  }
-  const StageIcon =
-    label === "Before" ? History : label === "Removed" ? Trash2 : BadgeCheck;
+  const record = preview.after ?? preview.before!;
+  const extraContext =
+    paragraphs
+      ?.slice(1)
+      .filter(
+        (paragraph) =>
+          !(typeof paragraph === "string" && /^Undo\b/i.test(paragraph)),
+      ) ?? [];
+  const Icon =
+    content.operation === "removed"
+      ? Trash2
+      : content.operation === "updated"
+        ? PencilLine
+        : BadgeCheck;
   return (
-    <div className={styles.caption}>
-      <span className={styles.stage}>
-        <StageIcon aria-hidden="true" />
-        {label}
-      </span>
-      {context && (
-        <span className={styles.context} title={title}>
-          {record.kind !== "medication" && <CalendarDays aria-hidden="true" />}
-          {context}
-        </span>
+    <div
+      className={`${styles.root} ${styles.receipt} ${styles.recordReceipt}`}
+      data-notification-change-preview
+      data-record-receipt={record.kind}
+    >
+      <header className={styles.receiptIntro}>
+        <div className={styles.receiptHeading}>
+          <div>
+            <span className={styles.receiptKicker}>
+              <Icon aria-hidden="true" />
+              {content.category} · {content.operation}
+            </span>
+            <h3>{content.title}</h3>
+          </div>
+        </div>
+        <div className={styles.receiptContext}>
+          <strong>{content.primary}</strong>
+          <span className={styles.contextSlash} aria-hidden="true">
+            /
+          </span>
+          <span>{content.secondary}</span>
+        </div>
+        <p>{paragraphs?.[0] ?? content.message}</p>
+      </header>
+      <section
+        className={styles.receiptStage}
+        aria-label={
+          content.operation === "removed" ? "Removed record" : "Saved record"
+        }
+        data-notification-snapshot={preview.after ? "after" : "before"}
+      >
+        <RecordPreview record={record} />
+      </section>
+      {content.changes.length > 0 && (
+        <section
+          className={styles.changeRecap}
+          aria-labelledby={`${id}-changes`}
+          data-record-change-recap
+        >
+          <header className={styles.recapHeading}>
+            <h4 id={`${id}-changes`}>
+              <History aria-hidden="true" />
+              The changed pieces
+            </h4>
+            <span>Previous → Saved</span>
+          </header>
+          <dl className={styles.changeStories}>
+            {content.changes.map((change) => (
+              <div
+                key={change.label}
+                className={styles.changeStory}
+                data-wide={
+                  Math.max(change.before.length, change.after.length) > 35 ||
+                  undefined
+                }
+              >
+                <dt>{change.label}</dt>
+                <dd className={styles.storyPrevious} title={change.before}>
+                  <span>Was</span>
+                  <span className={styles.changeValue}>{change.before}</span>
+                </dd>
+                <dd className={styles.storyCurrent} title={change.after}>
+                  <ArrowRight aria-hidden="true" />
+                  <span className="sr-only">Saved as </span>
+                  <span className={styles.changeValue}>{change.after}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       )}
+      <aside className={styles.correctionNote} role="note">
+        <Info aria-hidden="true" />
+        <div>
+          <h4>Keep in mind</h4>
+          <p>{content.guidance}</p>
+          {extraContext.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+      </aside>
+      <p className={styles.receiptUndo}>
+        <Undo2 aria-hidden="true" />
+        <span>
+          {canUndo ? (
+            <>
+              <strong>Undo</strong>{" "}
+              {content.operation === "removed"
+                ? "restores this removed record."
+                : content.operation === "saved"
+                  ? "reverses this addition."
+                  : "restores the previous saved values."}
+            </>
+          ) : (
+            "Undo isn’t available for this notice."
+          )}
+        </span>
+      </p>
+      <p className={styles.receiptFootnote}>
+        Snapshot of this change · Related pages show your current journal.
+      </p>
     </div>
   );
 }
@@ -617,7 +682,7 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
             {record.period === "morning" ? "Morning" : "Evening"} Check-In
           </strong>
           <span className={styles.moods}>
-            {moods.map((mood) => (
+            {moods.slice(0, 4).map((mood) => (
               <span
                 key={mood.value}
                 role="img"
@@ -627,6 +692,14 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
                 <DailyMoodIcon mood={mood.value} size={14} />
               </span>
             ))}
+            {moods.length > 4 && (
+              <span
+                className={styles.moodOverflow}
+                aria-label={`${moods.length - 4} more feelings`}
+              >
+                +{moods.length - 4}
+              </span>
+            )}
           </span>
         </div>
         <div className={styles.metrics}>

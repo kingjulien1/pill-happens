@@ -299,7 +299,7 @@ export function MedicationForm({
       toast.success(medication ? "Medication updated." : "Medication added.", {
         journalScope: saved.notificationScope,
         ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
-        heading: "Medication library",
+        heading: medication ? "Medication updated." : "Medication added.",
         details: {
           ...(savedMedication
             ? {
@@ -609,7 +609,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       toast.success("Your goal has been saved.", {
         journalScope: saved.notificationScope,
         ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
-        heading: "Daily goal",
+        heading: "Daily maximum saved.",
         details: {
           ...(savedGoal
             ? {

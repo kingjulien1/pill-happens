@@ -83,10 +83,10 @@ export function DailyReflectionEditor({
     const toastId = refreshToast.current;
     refreshToast.current = null;
     if (refreshError)
-      toast.error("Couldn't refresh your journal. Your writing is unchanged.", {
+      toast.error("Saved records could not be loaded · Current writing kept", {
         journalScope: notificationScope,
         id: toastId,
-        heading: "Refresh unsuccessful",
+        heading: "Refresh not confirmed.",
         details: {
           paragraphs: [
             "The latest saved journal could not be loaded. Your current writing has not been replaced. Check your connection, then use Refresh Journal to try again.",
@@ -97,25 +97,22 @@ export function DailyReflectionEditor({
         },
       });
     else
-      toast.success(
-        "Journal refreshed. Your writing is right where you left it.",
-        {
-          journalScope: notificationScope,
-          id: toastId,
-          heading: "Journal refreshed",
-          details: {
-            paragraphs: [
-              "The latest saved records have been loaded. Your current writing stays in the editor, ready for you to continue.",
-            ],
-            links: [
-              { label: "Browse your journals", href: "/journal" },
-              { label: "Drafts and saving", href: "/guide#daily-log" },
-            ],
-            footer:
-              "Use the writing editor’s save status to check whether your latest words have been saved.",
-          },
+      toast.success("Latest saved records loaded · Current writing kept", {
+        journalScope: notificationScope,
+        id: toastId,
+        heading: "Journal refreshed.",
+        details: {
+          paragraphs: [
+            "The latest saved records have been loaded. Your current writing stays in the editor, ready for you to continue.",
+          ],
+          links: [
+            { label: "Browse your journals", href: "/journal" },
+            { label: "Drafts and saving", href: "/guide#daily-log" },
+          ],
+          footer:
+            "Use the writing editor’s save status to check whether your latest words have been saved.",
         },
-      );
+      });
   }, [refreshFinished, refreshError, notificationScope]);
 
   const refreshJournal = async () => {
@@ -125,17 +122,20 @@ export function DailyReflectionEditor({
     setRefreshing(true);
     setRefreshFinished(false);
     setRefreshFailed(false);
-    refreshToast.current = toast.loading("Refreshing your journal…", {
-      journalScope: notificationScope,
-      persistence: false,
-      heading: "Checking for updates",
-      details: {
-        paragraphs: [
-          "Loading the latest saved records. Your writing stays in place while the journal checks for updates.",
-        ],
-        footer: "This refresh does not submit the check-in form.",
+    refreshToast.current = toast.loading(
+      "Loading saved records · Your editor stays in place",
+      {
+        journalScope: notificationScope,
+        persistence: false,
+        heading: "Refreshing your journal…",
+        details: {
+          paragraphs: [
+            "Loading the latest saved records. Your writing stays in place while the journal checks for updates.",
+          ],
+          footer: "This refresh does not submit the check-in form.",
+        },
       },
-    });
+    );
     try {
       await refresh();
     } catch {
@@ -264,14 +264,28 @@ export function DailyReflectionEditor({
           onClick={async () => {
             try {
               await navigator.clipboard.writeText(value);
-              toast.success("Writing copied.", {
-                journalScope: notificationScope,
-              });
-            } catch {
-              toast.error(
-                "Clipboard unavailable. Open the editor to select and copy your writing.",
-                { journalScope: notificationScope },
+              toast.success(
+                `${stats.words} words · ${stats.characters} characters on your clipboard`,
+                {
+                  journalScope: notificationScope,
+                  heading: "Writing copied.",
+                  details: {
+                    paragraphs: [
+                      "Paste the copied text wherever you need it. Copying does not change your entry or its save status.",
+                    ],
+                  },
+                },
               );
+            } catch {
+              toast.error("Open the editor to select and copy your writing.", {
+                journalScope: notificationScope,
+                heading: "Clipboard unavailable.",
+                details: {
+                  paragraphs: [
+                    "This browser could not write to the clipboard. You can still open the writing editor, select the text and copy it yourself.",
+                  ],
+                },
+              });
             }
           }}
         >

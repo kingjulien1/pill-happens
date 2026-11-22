@@ -31,12 +31,20 @@ const kinds = [
 ] as const;
 
 const summaries: Record<JournalToastKind, string> = {
-  success: "An example change, neatly noted.",
-  error: "An example error. Nothing needs fixing here.",
-  info: "A little context, with room for the details.",
-  warning: "A sample heads-up, without the actual drama.",
-  loading: "An example wait. Clear demos when you’re ready.",
-  update: "A sample update, already dressed for the occasion.",
+  success: "Simulated save completed · Your journal was not changed",
+  error: "Simulated failure · Review the example details",
+  info: "Example context · Your journal was not changed",
+  warning: "Example requires review · No action has been taken",
+  loading: "Simulated request running · Clear demos to stop it",
+  update: "Example files ready · This demo does not reload the app",
+};
+const headings: Record<JournalToastKind, string> = {
+  success: "Example save confirmed.",
+  error: "Example request failed.",
+  info: "An example journal notice.",
+  warning: "Example details need review.",
+  loading: "Example request running…",
+  update: "Example update ready.",
 };
 
 const sampleMedication: NotificationMedicationSnapshot = {
@@ -102,7 +110,7 @@ export function GuideNotificationDemo() {
     toast[kind](summaries[kind], {
       persistence: false,
       id: own(kind),
-      heading: `Demo ${kind}`,
+      heading: headings[kind],
       ...(kind === "update" ? { duration: Infinity } : {}),
       details: {
         paragraphs: [

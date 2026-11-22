@@ -338,7 +338,7 @@ export function JournalProvider({
         if (reportError)
           toast.error(message, {
             journalScope: notificationScope,
-            heading: "Journal change unsuccessful",
+            heading: "Save not confirmed.",
             details: {
               paragraphs: [
                 "The server could not confirm this change. Any open form keeps its draft so you can review the inputs and try again.",

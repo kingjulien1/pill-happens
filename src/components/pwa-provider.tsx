@@ -122,7 +122,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
       if (announced === waiting && updateToastVisible) return;
       announced = waiting;
       updateToastVisible = true;
-      toast.update("Reload when you’ve finished your current entry.", {
+      toast.update("Files downloaded · Apply now or keep this version open", {
         persistence: false,
         heading: "App update ready",
         id: "pwa-update",
@@ -132,14 +132,13 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
             "A newer app version is staged. Apply it now or let the app switch versions the next time this page closes and opens.",
           ],
           links: [{ label: "App and offline guide", href: "/guide#app" }],
-          footer:
-            "The page reloads only when you choose Reload; this update does not remove saved journal records.",
+          footer: "Apply reloads the app. Saved journal records are kept.",
         },
         onDismiss: () => {
           updateToastVisible = false;
         },
         action: {
-          label: "Reload",
+          label: "Apply",
           onClick: () => undefined,
         },
         afterActionExit: () => {

@@ -49,8 +49,14 @@ export function SharedSleepImageReceiver() {
     if (!data || !now || !ready || busy) return;
     const fail = (message: string) =>
       toast.info(message, {
-        heading: "Choose Your Sleep Report",
+        heading: "Sleep report not opened.",
         duration: 15_000,
+        details: {
+          paragraphs: [
+            "Open Morning Check-In to choose or paste a Sleep Cycle report. Use its full portrait share image so the importer can read the times and sleep stages together.",
+          ],
+          links: [{ label: "Open Today", href: "/" }],
+        },
       });
     const open = (file: File) => {
       if (!mounted.current) return;
@@ -128,8 +134,13 @@ export function SharedSleepImageReceiver() {
     queue.setConsumer((launch) => {
       const files = launch.files ?? [];
       if (files.length > 1) {
-        toast.info("Open one sleep report at a time.", {
-          heading: "One Night, One Report",
+        toast.info("Only one image can be imported at a time.", {
+          heading: "Choose one sleep report.",
+          details: {
+            paragraphs: [
+              "Open the report for one night, review its readings, then apply the values to your Morning Check-In. Import another night separately.",
+            ],
+          },
         });
         return;
       }
@@ -169,7 +180,14 @@ export function SharedSleepImageReceiver() {
               error instanceof Error
                 ? error.message
                 : "Choose the report in Morning Check-In to try again.",
-              { heading: "Couldn’t Open This Image" },
+              {
+                heading: "Image could not open.",
+                details: {
+                  paragraphs: [
+                    "Choose or paste the report from Morning Check-In instead. Its readings stay in a review step until you apply them to your draft.",
+                  ],
+                },
+              },
             );
         });
     });

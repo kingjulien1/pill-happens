@@ -257,6 +257,68 @@
   margin: 0;
   overflow-wrap: anywhere;
 }
+.changeStory[data-wide="true"] {
+  grid-column: 1 / -1;
+}
+.changeValue {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.receipt .receiptIntro > p.contextMessage,
+.recordReceipt .receiptIntro > p {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+.factBoard {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.factBoard > div {
+  min-width: 0;
+  padding: 10px 11px;
+  border-radius: 11px;
+  background: var(--toast-quiet-fill);
+  box-shadow: inset 0 0 0 1px var(--toast-rim-muted);
+}
+.factBoard dt {
+  color: var(--toast-muted);
+  font-size: 9px;
+  line-height: 14px;
+}
+.factBoard dd {
+  margin: 4px 0 0;
+  color: var(--toast-ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.contextBody {
+  display: grid;
+  min-width: 0;
+  gap: 11px;
+  padding: 1px 3px;
+}
+.receipt .contextBody p {
+  margin: 0;
+  color: var(--toast-detail-muted);
+  font-size: 10.5px;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+.moodOverflow {
+  flex: none;
+  color: var(--toast-detail-muted);
+  font-size: 9px;
+  font-weight: 600;
+}
 .storyPrevious {
   display: flex;
   align-items: baseline;
@@ -619,86 +681,13 @@
     padding-inline: 8px;
   }
 }
-.root > p.summary {
-  display: grid;
-  grid-template-columns: 13px minmax(0, 1fr);
-  align-items: start;
-  gap: 7px;
-  margin: 0 2px 6px;
-  color: var(--toast-ink, var(--canvas-foreground));
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.5;
-  text-wrap: pretty;
-}
-.summary > svg {
-  width: 13px;
-  height: 13px;
-  margin-top: 3px;
-  color: var(--toast-soft, var(--canvas-foreground));
-  stroke-width: 2;
-}
-.snapshot {
-  min-width: 0;
-}
-.caption {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  min-width: 0;
-  align-items: center;
-  gap: 7px;
-  margin: 0 3px 9px;
-  color: var(--toast-muted, var(--canvas-muted-foreground));
-  font-size: 9px;
-  line-height: 14px;
-}
-.stage {
-  grid-column: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex: none;
-  color: var(--toast-ink, var(--canvas-foreground));
-  font-weight: 650;
-  font-size: 10px;
-}
-.stage svg,
-.context > svg {
-  width: 12px;
-  height: 12px;
-  flex: none;
-  stroke-width: 2;
-}
-.context {
-  grid-column: 3;
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.context > svg {
-  width: 10px;
-  height: 10px;
-}
-.context > time {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 /* The original shared frame, two rows, quantity artwork and dose own this card.
    Its semantic base keeps library copy readable over the notification surface. */
 .medication:global(.medication-card-base):not([data-intake-card]) {
-  background: var(--background);
+  background: var(--toast-quiet-fill);
 }
 .panel {
-  --panel-edge: color-mix(in srgb, var(--card-foreground) 12%, transparent);
+  --panel-edge: color-mix(in srgb, var(--toast-soft) 22%, transparent);
   display: grid;
   min-width: 0;
   min-height: 68px;
@@ -707,8 +696,14 @@
   gap: 10px;
   padding: 10px;
   border-radius: 16px;
-  background: var(--card);
-  color: var(--card-foreground);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--toast-soft) 8%, transparent),
+      transparent
+    ),
+    var(--toast-quiet-fill);
+  color: var(--toast-ink);
   box-shadow: inset 0 0 0 1px var(--panel-edge);
 }
 .panel[data-notification-record="goal"] {
@@ -743,8 +738,8 @@
   height: 40px;
   place-items: center;
   border-radius: 13px;
-  background: color-mix(in srgb, var(--card-foreground) 6%, transparent);
-  color: var(--card-foreground);
+  background: color-mix(in srgb, var(--toast-soft) 12%, transparent);
+  color: var(--toast-ink);
 }
 .symbol svg {
   width: 24px;
@@ -756,6 +751,8 @@
   height: 56px;
 }
 .moods {
+  max-width: 48%;
+  overflow: hidden;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -769,7 +766,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 5px 9px;
-  color: var(--muted-foreground);
+  color: var(--toast-detail-muted);
   font-size: 10px;
   line-height: 14px;
 }
@@ -792,14 +789,14 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  color: var(--muted-foreground);
+  color: var(--toast-detail-muted);
   font-size: 9px;
   line-height: 14px;
 }
 .goalAmount {
   min-width: 0;
   flex: none;
-  color: var(--card-foreground);
+  color: var(--toast-ink);
   font-size: 14px;
   font-weight: 650;
   line-height: 18px;
@@ -807,18 +804,18 @@
 }
 .goalAmount small {
   margin-inline-start: 3px;
-  color: var(--muted-foreground);
+  color: var(--toast-detail-muted);
   font-size: 9px;
   font-weight: 500;
 }
 .detailLabel {
-  color: var(--muted-foreground);
+  color: var(--toast-detail-muted);
   font-size: 9px;
   line-height: 12px;
 }
 .timezone {
   min-width: 0;
-  color: var(--card-foreground);
+  color: var(--toast-ink);
   font-size: 12px;
   font-weight: 650;
   line-height: 17px;

@@ -2,7 +2,7 @@
 
 import { isValidElement, type ReactNode } from "react";
 import { NOTIFICATION_CHECKPOINT_INTERVAL } from "@/lib/notification-scheduling";
-import { intakeNotificationText } from "@/lib/intake-notification-text";
+import { recordNotificationContent } from "@/lib/record-notification-content";
 import { toast as sonnerToast, type ExternalToast, type ToastT } from "sonner";
 import {
   JournalNotification,
@@ -247,12 +247,12 @@ function show(entry: LiveNotice) {
   void _heading;
   void _persistence;
   void _journalScope;
-  const intakeText =
+  const recordText =
     kind === "success" && details?.preview
-      ? intakeNotificationText(details.preview)
+      ? recordNotificationContent(details.preview)
       : undefined;
-  const heading = intakeText?.heading ?? entry.heading;
-  const body = intakeText?.message ?? entry.body;
+  const heading = recordText?.heading ?? entry.heading;
+  const body = recordText?.message ?? entry.body;
   entry.version = exits.begin(id);
   const version = entry.version;
   const current = () => live.get(id) === entry && exits.isCurrent(id, version);

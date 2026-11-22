@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   isValidElement,
   useCallback,
@@ -50,6 +49,7 @@ import { NotificationPullIndicator } from "@/components/ui/notification-pull-ind
 import { useNotificationPull } from "@/components/ui/use-notification-pull";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
 import { NotificationUnchanged } from "@/components/ui/notification-unchanged";
+import { NotificationContext } from "@/components/ui/notification-context";
 import unchangedStyles from "./notification-unchanged.module.css";
 import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
 import type { JournalToastKind } from "@/components/ui/journal-toast";
@@ -118,17 +118,6 @@ export type JournalNotificationProps = {
   onExitComplete: (reason: NotificationExitReason) => void;
   isCurrent: () => boolean;
   onDetachedUndoFailure: (error: unknown) => void;
-};
-
-const defaultContext: Record<JournalToastKind, string> = {
-  success: "The change is saved in your journal.",
-  error:
-    "The change wasn’t confirmed. Your unsaved inputs stay in their draft.",
-  info: "Review the notice above for the latest journal update.",
-  warning: "Review this notice before continuing.",
-  loading:
-    "The action is still running. This notice will update when it finishes.",
-  update: "Finish your current entry before reloading to the new version.",
 };
 
 const defaultFooter: Record<JournalToastKind, string> = {
@@ -1011,7 +1000,9 @@ export function JournalNotification({
   };
 
   const renderHeaderAction = () => {
-    const acknowledge = kind === "info" && dismissible;
+    const acknowledge =
+      (kind === "info" || (kind === "success" && !undo && !details?.preview)) &&
+      dismissible;
     if (
       acknowledge ||
       (!undo &&
@@ -1050,7 +1041,6 @@ export function JournalNotification({
     return renderUpdateApplyIcon();
   };
 
-  const paragraphs = details?.paragraphs ?? [defaultContext[kind]];
   const medicationPolicy =
     id === "medication-history-policy" && kind === "info";
   const facts = details?.facts?.slice(0, 4) ?? [];
@@ -1073,7 +1063,6 @@ export function JournalNotification({
     );
   }
 
-  const previewRecord = details?.preview?.after ?? details?.preview?.before;
   const unchanged = variant === "unchanged";
   const intakeReceipt = !unchanged && isIntakeReceipt(details?.preview);
   const receiptDestinations = intakeReceipt
@@ -1086,15 +1075,7 @@ export function JournalNotification({
   const footerLinks = intakeReceipt
     ? details?.links?.filter((link) => !receiptHrefs.includes(link.href))
     : details?.links;
-  const footerCopy = previewRecord
-    ? undo
-      ? "Undo reverses this saved change."
-      : previewRecord.kind === "check-in"
-        ? "Your writing stays in the full check-in."
-        : previewRecord.kind === "medication"
-          ? "Medication settings apply to linked entries."
-          : "Tracking days begin at 06:00."
-    : (details?.footer ?? defaultFooter[kind]);
+  const footerCopy = details?.footer ?? defaultFooter[kind];
   const updatePanel = kind === "update" && (
     <section className="journal-update-section" aria-label="Update Details">
       <div className="journal-update-panel">
@@ -1378,6 +1359,7 @@ export function JournalNotification({
                 intakeLinks={receiptDestinations}
                 onFollowLink={followRelatedLink}
                 canUndo={Boolean(undo)}
+                paragraphs={details.paragraphs}
               />
             ) : medicationPolicy ? (
               <section
@@ -1480,26 +1462,14 @@ export function JournalNotification({
                   </div>
                 </div>
               </section>
-            ) : facts.length ? (
-              <div>
-                {kind === "info" && (
-                  <p className="journal-notification-facts-intro">{message}</p>
-                )}
-                <dl className="journal-notification-facts">
-                  {facts.map((fact, index) => (
-                    <div key={index}>
-                      <dt>{fact.label}</dt>
-                      <dd>{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            ) : paragraphs.length ? (
-              <div className="journal-notification-context">
-                <Info aria-hidden="true" />
-                <p>{paragraphs[0]}</p>
-              </div>
-            ) : null}
+            ) : (
+              <NotificationContext
+                kind={kind}
+                heading={heading}
+                message={message}
+                details={details}
+              />
+            )}
           </div>
           {undoError && (
             <p className="journal-notification-error" role="alert">
@@ -1544,7 +1514,7 @@ export function JournalNotification({
                 );
               })}
               {kind !== "info" &&
-                (undo || kind === "success") &&
+                (undo || (kind === "success" && Boolean(details?.preview))) &&
                 renderUndo(true)}
               {kind === "update" && renderUpdateApplyIcon(true)}
               <Button
@@ -1596,48 +1566,9 @@ export function JournalNotification({
                 </span>
               </Button>
             </div>
-            {!intakeReceipt && !unchanged && (
+            {(medicationPolicy || kind === "update") && (
               <span className="journal-notification-footer-copy">
                 {footerCopy}
-              </span>
-            )}
-            {!intakeReceipt && !unchanged && (
-              <span className="journal-notification-footer-note">
-                {details?.preview ? "These cards capture this change. " : null}
-                {details?.links?.length ? (
-                  <>
-                    Open{" "}
-                    {details.links.slice(0, 2).map((link, index) => (
-                      <span key={link.href}>
-                        {index > 0 && " or "}
-                        <a
-                          href={link.href}
-                          aria-label={link.label}
-                          tabIndex={expanded ? 0 : -1}
-                          onPointerDown={(event) => event.stopPropagation()}
-                          onClick={followRelatedLink}
-                        >
-                          {linkPresentation(
-                            link.href,
-                            link.label,
-                          ).caption.toLowerCase()}
-                        </a>
-                      </span>
-                    ))}{" "}
-                    for the latest details.{" "}
-                  </>
-                ) : null}
-                Find your entries and drafts in your{" "}
-                <Link
-                  href="/"
-                  prefetch={false}
-                  tabIndex={expanded ? 0 : -1}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={followRelatedLink}
-                >
-                  daily log
-                </Link>
-                .
               </span>
             )}
             {kind !== "update" && (cancel || action) && (
