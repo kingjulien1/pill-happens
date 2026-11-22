@@ -419,7 +419,7 @@ export function MedicationAppearanceFields({
                 spellCheck={false}
                 placeholder="Find its symbol…"
                 enterKeyHint="search"
-                className="h-10 rounded-xl pr-10 pl-9 text-base md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
+                className="h-11 rounded-xl pr-10 pl-9 text-base md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
               />
               {query && (
                 <Button
@@ -733,7 +733,10 @@ export function MedicationAppearanceFields({
             data-preview-content
           >
             <header className={styles.previewHeader} data-preview-header>
-              <FinalLookHeading id={`${id}-preview-title`} color={selectedColor} />
+              <FinalLookHeading
+                id={`${id}-preview-title`}
+                color={selectedColor}
+              />
               <span className={styles.colorChip} data-preview-color-chip>
                 <span
                   aria-hidden="true"

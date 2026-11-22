@@ -69,6 +69,10 @@
 .card .summary {
   display: block;
   flex: 1 1 0;
+  /* Clip the complete summary as a unit, including its nested status text. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .summary strong {

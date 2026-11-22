@@ -140,6 +140,10 @@
 .action[data-control-style="satin"] :global(.intake-primary-label) {
   gap: 11px;
 }
+.action[data-control-style="satin"] :global(.intake-primary-label) > svg {
+  /* Plain leading glyphs must follow the satin face's contrast pair too. */
+  color: var(--control-ink);
+}
 .action[data-control-style="satin"] :global(.intake-primary-aside),
 .action[data-control-style="satin"] :global(.intake-primary-next) {
   color: var(--control-secondary);

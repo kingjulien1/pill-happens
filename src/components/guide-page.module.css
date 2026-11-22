@@ -545,9 +545,9 @@
 }
 
 .intro h1 {
-  font-size: 32px;
+  font-size: var(--page-heading-size);
   font-weight: 700;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
   line-height: 1.1;
   text-wrap: balance;
 }
@@ -894,7 +894,7 @@
     padding-bottom: 24px;
   }
   .intro h1 {
-    font-size: 38px;
+    font-size: var(--page-heading-size);
   }
   .intro > p {
     font-size: 14px;

@@ -3,6 +3,15 @@
 @import "./theme.css";
 @import "./dialog-shape.css";
 
+:root {
+  --page-heading-size: clamp(22px, 6.2vw, 26px);
+}
+@media (min-width: 640px) {
+  :root {
+    --page-heading-size: 28px;
+  }
+}
+
 @custom-variant dark (@media (prefers-color-scheme: dark));
 @custom-variant hover {
   @media (min-width: 768px) and (hover: hover) and (pointer: fine) {

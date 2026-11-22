@@ -54,7 +54,7 @@ export function MedicationTypeSelect({
         title={label}
         data-medication-type-select
         data-compact-choice-trigger
-        className="h-10 w-full rounded-xl px-3 text-xs data-[size=default]:h-10"
+        className="h-11 w-full rounded-xl px-3 text-base md:text-sm data-[size=default]:h-11"
       >
         <SelectValue>
           <MedicationChoiceIcon kind="type" value={value} />

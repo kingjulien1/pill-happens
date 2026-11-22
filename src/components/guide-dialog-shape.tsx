@@ -20,7 +20,7 @@ const tiers = [
     value: 12,
     token: "--dialog-radius-control",
     className: "controlSample",
-    use: "Standard 40px fields, selects, the amount-stepper shell, time reset and close controls.",
+    use: "40px intake/check-in fields, 44px general form controls, the amount-stepper shell, time reset and close controls.",
     reason:
       "A clear, rounded rectangle at control height, with enough straight edge to avoid the capsule silhouette.",
   },
@@ -124,9 +124,11 @@ export function GuideDialogShape() {
       <p>
         Consistency means a shared rule and recognizable silhouette. It does not
         mean giving a 32px choice and a spacious dialog the same raw number.
-        Their different heights need three deliberate roles:{" "}
-        <strong>21px</strong> for a surface, <strong>12px</strong> for a
-        standard control and <strong>8px</strong> for a compact choice.
+        Medication, goal and sign-in forms use 44px controls; the compact intake
+        and check-in fields retain their 40px height. Their different sizes
+        share three deliberate corner roles: <strong>21px</strong> for a
+        surface, <strong>12px</strong> for a standard control and{" "}
+        <strong>8px</strong> for a compact choice.
       </p>
 
       <Heading>The Shape In Context</Heading>

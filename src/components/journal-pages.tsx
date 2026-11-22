@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { FlaskConical, Leaf, Pill, X } from "lucide-react";
+import { ArrowUpRight, FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { toast } from "@/components/ui/journal-toast";
@@ -41,10 +41,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ResponsiveModal } from "@/components/responsive-modal";
-import { PageHeading, PageSurface } from "@/components/page-heading";
+import { PageEmptyState, PageHeading } from "@/components/page-heading";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
 import closeStyles from "./dialog-close.module.css";
-import layoutStyles from "./page-layout.module.css";
+import goalStyles from "./goals-page.module.css";
 import {
   countOpioidPills,
   countPills,
@@ -71,6 +71,7 @@ import {
   HistoryDayHeading,
   HistoryHeading,
 } from "@/components/history-heading";
+import historyStyles from "./history-heading.module.css";
 import { HistoryWeekGroup } from "@/components/history-week-group";
 import { groupHistoryWeeks, visibleHistoryWeeks } from "@/lib/history-weeks";
 import { EmptyIntakeStack } from "@/components/empty-intake-stack";
@@ -152,15 +153,12 @@ function EmptyState({
   children: React.ReactNode;
 }) {
   return (
-    <PageSurface className="flex flex-col items-center px-7 py-9 text-center">
-      <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-foreground/70">
-        <ActionIcon name={icon} className="size-7" weight="duotone" />
-      </div>
-      <h3 className="text-sm font-medium">{title}</h3>
-      <div className="mt-2 max-w-[270px] text-xs leading-[1.9] text-muted-foreground">
-        {children}
-      </div>
-    </PageSurface>
+    <PageEmptyState
+      icon={<ActionIcon name={icon} weight="duotone" />}
+      title={title}
+    >
+      {children}
+    </PageEmptyState>
   );
 }
 
@@ -1086,7 +1084,7 @@ export function GoalsPage() {
           keep sight of it.
         </EmptyState>
       ) : (
-        <div className="space-y-4">
+        <div className={goalStyles.list}>
           {goals.map((goal) => {
             const med = data.medications.find(
               (m) => m.id === goal.medicationId,
@@ -1100,7 +1098,7 @@ export function GoalsPage() {
             return (
               <article
                 key={goal.id}
-                className={`${layoutStyles.surface} p-5 ${medicationClassHighlights(med)}`}
+                className={`${goalStyles.card} ${medicationClassHighlights(med)}`}
                 data-benzodiazepine={
                   med?.isBenzodiazepine === true || undefined
                 }
@@ -1109,7 +1107,7 @@ export function GoalsPage() {
                   med,
                 )}
               >
-                <div className="mb-4 flex items-center gap-3">
+                <div className={goalStyles.header}>
                   <MedicationIcon
                     color={med?.color}
                     icon={med?.icon}
@@ -1118,14 +1116,24 @@ export function GoalsPage() {
                     isOpioid={med?.isOpioid === true}
                     small
                   />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                      <h2 className="min-w-0 truncate text-sm font-medium">
-                        {med?.name ?? "Medication"}
+                  <div className={goalStyles.identity}>
+                    <div className={goalStyles.name}>
+                      <h2>
+                        {med ? (
+                          <Link
+                            className={goalStyles.medicationLink}
+                            href={`/medications/${encodeURIComponent(med.id)}`}
+                          >
+                            <span>{med.name}</span>
+                            <ArrowUpRight size={13} aria-hidden="true" />
+                          </Link>
+                        ) : (
+                          "Medication"
+                        )}
                       </h2>
                       <MedicationClassBadges medication={med} />
                     </div>
-                    <p className="mt-1 text-[10px] text-muted-foreground">
+                    <p className={goalStyles.context}>
                       {current
                         ? "Current daily maximum"
                         : future
@@ -1143,21 +1151,24 @@ export function GoalsPage() {
                     <ActionIcon name="delete" />
                   </Button>
                 </div>
-                <div className="flex items-end justify-between gap-3">
-                  <p className="text-[28px] font-semibold leading-none tracking-tight tabular-nums">
+                <div className={goalStyles.amountRow}>
+                  <p className={goalStyles.amount}>
                     {formatDose(goal.dailyLimitMg)}
-                    <span className="ml-1.5 font-sans text-xs tracking-normal text-muted-foreground">
-                      mg / day
-                    </span>
+                    <span>mg / day</span>
                   </p>
-                  <span className="rounded-full bg-primary/7 px-2.5 py-1 text-[9px] text-foreground">
+                  <span
+                    className={goalStyles.status}
+                    data-current={current || undefined}
+                  >
                     {current ? "Active" : future ? "Upcoming" : "Past"}
                   </span>
                 </div>
                 {current && (
-                  <div className="mt-5">
-                    <div className="mb-2 flex justify-between text-[10px] text-muted-foreground">
-                      <span>{formatDose(taken)} mg logged today</span>
+                  <div className={goalStyles.progress}>
+                    <div className={goalStyles.progressLabel}>
+                      <span>
+                        <strong>{formatDose(taken)} mg</strong> logged today
+                      </span>
                       <span>
                         {goal.dailyLimitMg === 0
                           ? taken > 0
@@ -1166,9 +1177,19 @@ export function GoalsPage() {
                           : `${Math.round(usagePercent(taken, goal.dailyLimitMg))}%`}
                       </span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-primary/10">
+                    <div
+                      className={goalStyles.track}
+                      role="progressbar"
+                      aria-label={`${med?.name ?? "Medication"} daily maximum`}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.min(
+                        Math.round(usagePercent(taken, goal.dailyLimitMg)),
+                        100,
+                      )}
+                      aria-valuetext={`${formatDose(taken)} mg recorded; daily maximum ${formatDose(goal.dailyLimitMg)} mg`}
+                    >
                       <div
-                        className="h-full rounded-full bg-primary/65"
                         style={{
                           width: `${Math.min(usagePercent(taken, goal.dailyLimitMg), 100)}%`,
                         }}
@@ -1176,22 +1197,37 @@ export function GoalsPage() {
                     </div>
                   </div>
                 )}
-                <p className="mt-4 border-t border-border/60 pt-3 text-[10px] leading-relaxed text-muted-foreground">
-                  From{" "}
-                  {formatDay(goal.startsOn, {
-                    weekday: undefined,
-                    month: "short",
-                    year: "numeric",
-                  })}
-                  {goal.endsOn
-                    ? ` until ${formatDay(goal.endsOn, { weekday: undefined, month: "short", year: "numeric" })}`
-                    : " · ongoing"}
-                </p>
-                {goal.note && (
-                  <p className="mt-2 text-[11px] leading-relaxed break-words text-muted-foreground">
-                    {goal.note}
-                  </p>
-                )}
+                <dl className={goalStyles.dates}>
+                  <div>
+                    <dt>Starts</dt>
+                    <dd>
+                      <time dateTime={goal.startsOn}>
+                        {formatDay(goal.startsOn, {
+                          weekday: undefined,
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </time>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Ends</dt>
+                    <dd>
+                      {goal.endsOn ? (
+                        <time dateTime={goal.endsOn}>
+                          {formatDay(goal.endsOn, {
+                            weekday: undefined,
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </time>
+                      ) : (
+                        "Ongoing"
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+                {goal.note && <p className={goalStyles.note}>{goal.note}</p>}
               </article>
             );
           })}
@@ -1319,7 +1355,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           maxLength={128}
           list="timezones"
           required
-          className="h-10 rounded-xl px-3 text-base md:text-sm"
+          className="h-11 rounded-xl px-3 text-base md:text-sm"
         />
         <datalist id="timezones">
           {[
@@ -1335,7 +1371,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
             <option key={zone} value={zone} />
           ))}
         </datalist>
-        <p className="text-[10px] leading-relaxed text-muted-foreground">
+        <p className="text-xs leading-relaxed text-muted-foreground">
           Use an IANA timezone such as Europe/Vienna. Daylight-saving changes
           are handled automatically.
         </p>
@@ -1397,7 +1433,7 @@ function JournalPreferences() {
           size="sm"
           nativeButton={false}
           render={<a href="/api/export" download />}
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground h-auto p-0"
+          className="flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground h-auto p-0"
         >
           <ActionIcon name="export" className="size-4" />
           Export journal
@@ -1406,7 +1442,7 @@ function JournalPreferences() {
         <Button
           variant="ghost"
           size="sm"
-          className="flex min-h-11 items-center gap-1.5 text-[10px] text-muted-foreground hover:text-foreground p-0 font-normal"
+          className="flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground p-0 font-medium"
           onClick={() => openDialog({ kind: "preferences" })}
         >
           <ActionIcon name="settings" className="size-4" />
@@ -1554,14 +1590,17 @@ export function DayPage({ day }: { day: string }) {
           }
         />
       </div>
-      <div className="canvas-copy flex items-center justify-between gap-3 border-t pt-4">
+      <nav
+        className={historyStyles.dayNavigation}
+        aria-label="Daily log navigation"
+      >
         <Button
           navigation
           variant="ghost"
           size="sm"
           nativeButton={false}
           render={<Link href={`/history/${shiftDayKey(day, -1)}`} />}
-          className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground h-auto p-0"
+          className={`${historyStyles.dayPrevious} h-auto`}
         >
           <ActionIcon name="back" className="size-4" />
           Previous day
@@ -1569,7 +1608,7 @@ export function DayPage({ day }: { day: string }) {
         {!isFuture && (
           <Button
             variant="ghost"
-            className="h-11 gap-1 text-[10px] text-foreground"
+            className={historyStyles.dayAdd}
             onClick={() => openDialog({ kind: "intake-new", day })}
           >
             <ActionIcon name="create" className="size-4.5" />
@@ -1583,13 +1622,13 @@ export function DayPage({ day }: { day: string }) {
             size="sm"
             nativeButton={false}
             render={<Link href={`/history/${shiftDayKey(day, 1)}`} />}
-            className="flex min-h-11 items-center gap-1 text-[10px] text-muted-foreground h-auto p-0"
+            className={`${historyStyles.dayNext} h-auto`}
           >
             Next day
             <ActionIcon name="next" className="size-4" />
           </Button>
         )}
-      </div>
+      </nav>
       <LogIntakeDialog
         open={open}
         day={day}

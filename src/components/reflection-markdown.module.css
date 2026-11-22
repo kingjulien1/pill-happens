@@ -33,18 +33,18 @@
   line-height: 1.35;
   letter-spacing: -0.02em;
 }
-.prose h1 {
+.prose [data-markdown-level="1"] {
   font-size: 1.85em;
 }
-.prose h2 {
+.prose [data-markdown-level="2"] {
   font-size: 1.5em;
 }
-.prose h3 {
+.prose [data-markdown-level="3"] {
   font-size: 1.2em;
 }
-.prose h4,
-.prose h5,
-.prose h6 {
+.prose [data-markdown-level="4"],
+.prose [data-markdown-level="5"],
+.prose [data-markdown-level="6"] {
   font-size: 1em;
 }
 .prose strong {

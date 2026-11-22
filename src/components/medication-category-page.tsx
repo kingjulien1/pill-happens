@@ -63,7 +63,7 @@ export function MedicationCategoryPage({
       <ReferenceHero
         artwork={<MedicationIndicatorMark kind={category} size={76} />}
         eyebrow="One of your saved categories"
-        title={metadata.label}
+        title={`${details.medications.length} Saved ${details.medications.length === 1 ? "Medication" : "Medications"}`}
       >
         {details.medications.length
           ? `${details.medications.length} saved ${details.medications.length === 1 ? "medication" : "medications"}${archived ? `, including ${archived} archived` : ""}. Follow a name to its ingredients, recorded routes and full history.`

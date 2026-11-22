@@ -39,8 +39,18 @@ export function PageHeading({
             </span>
           )}
           <div className={styles.headingCopy}>
-            {context && <p className={styles.context}>{context}</p>}
-            <h1 className={titleClassName ?? styles.title} data-page-heading-title>
+            {context && (
+              <p
+                className={styles.context}
+                title={typeof context === "string" ? context : undefined}
+              >
+                {context}
+              </p>
+            )}
+            <h1
+              className={titleClassName ?? styles.title}
+              data-page-heading-title
+            >
               {title}
             </h1>
             {subtitle}
@@ -63,4 +73,28 @@ export function PageSurface({
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
   return <div {...props} className={cn(styles.surface, className)} />;
+}
+
+/** Empty collections and missing details share one readable, quiet state. */
+export function PageEmptyState({
+  icon,
+  title,
+  children,
+  className,
+  ...props
+}: Omit<HTMLAttributes<HTMLDivElement>, "title"> & {
+  icon?: ReactNode;
+  title: ReactNode;
+}) {
+  return (
+    <PageSurface {...props} className={cn(styles.empty, className)}>
+      {icon && (
+        <span className={styles.emptyIcon} aria-hidden="true">
+          {icon}
+        </span>
+      )}
+      <h2 className={styles.emptyTitle}>{title}</h2>
+      <div className={styles.emptyDescription}>{children}</div>
+    </PageSurface>
+  );
 }

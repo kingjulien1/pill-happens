@@ -106,7 +106,7 @@ export function ResponsiveModal({
     >
       <div className={styles.headingCopy}>
         {titleNode}
-        {context && !medicationHeader && (
+        {context && !medicationHeader && !journalHeader && (
           <p className={styles.context}>{context}</p>
         )}
       </div>
@@ -119,6 +119,9 @@ export function ResponsiveModal({
         {headerActions}
         {closeNode}
       </div>
+      {context && journalHeader && (
+        <p className={cn(styles.context, styles.fullContext)}>{context}</p>
+      )}
       {descriptionNode}
     </div>
   );

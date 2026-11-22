@@ -16,7 +16,7 @@
   gap: 4px;
   margin: 0;
   padding: 0;
-  color: var(--muted-foreground);
+  color: var(--canvas-muted-foreground);
   font-size: 10px;
   line-height: 1.5;
 }
@@ -28,7 +28,7 @@
   white-space: nowrap;
 }
 .headerStats strong {
-  color: var(--foreground);
+  color: var(--canvas-foreground);
   font-size: 14px;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
@@ -109,11 +109,11 @@
 }
 .earnedCard,
 .earnedHero {
+  --milestone-card-edge: color-mix(in srgb, var(--primary) 30%, var(--border));
   border: 0;
   background: var(--card);
   color: var(--card-foreground);
-  box-shadow: inset 0 0 0 2.5px
-    color-mix(in srgb, var(--primary) 30%, var(--border));
+  box-shadow: inset 0 0 0 2.5px var(--milestone-card-edge);
 }
 .cardForeground {
   position: relative;
@@ -125,6 +125,14 @@
   padding: 18px 14px;
 }
 .medallion {
+  --medallion-edge: color-mix(in srgb, var(--milestone-spark) 70%, transparent);
+  --medallion-highlight: color-mix(
+    in srgb,
+    var(--palette-peach) 27.059%,
+    transparent
+  );
+  --medallion-halo: color-mix(in srgb, var(--milestone-accent) 9%, transparent);
+  --medallion-shadow: color-mix(in srgb, var(--milestone-pop) 14%, transparent);
   position: relative;
   display: flex;
   width: 68px;
@@ -134,7 +142,7 @@
   justify-content: center;
   flex-direction: column;
   gap: 2px;
-  border: 1px solid color-mix(in srgb, var(--milestone-spark) 70%, transparent);
+  border: 1px solid var(--medallion-edge);
   border-radius: 21px;
   background: linear-gradient(
     145deg,
@@ -142,9 +150,9 @@
     color-mix(in srgb, var(--milestone-pop) 12%, var(--card))
   );
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--palette-peach) 27.059%, transparent),
-    0 0 0 4px color-mix(in srgb, var(--milestone-accent) 9%, transparent),
-    0 5px 15px color-mix(in srgb, var(--milestone-pop) 14%, transparent);
+    inset 0 1px 0 var(--medallion-highlight),
+    0 0 0 4px var(--medallion-halo),
+    0 5px 15px var(--medallion-shadow);
   transform: rotate(-5deg);
 }
 .medallionEmoji {
@@ -395,12 +403,12 @@
 }
 .backLink {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 44px;
   align-items: center;
   gap: 6px;
   margin-bottom: 12px;
   color: var(--muted-foreground);
-  font-size: 10px;
+  font-size: 12px;
 }
 .detailHero {
   position: relative;
@@ -990,8 +998,12 @@
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .earnedCard:hover {
-    box-shadow: inset 0 0 0 2.5px
-      color-mix(in srgb, var(--primary) 55%, var(--border));
+    --milestone-card-edge: color-mix(
+      in srgb,
+      var(--primary) 55%,
+      var(--border)
+    );
+    box-shadow: inset 0 0 0 2.5px var(--milestone-card-edge);
   }
   .upcomingCard:hover,
   .dayGrid a:hover,
@@ -1022,14 +1034,24 @@
 @media (prefers-color-scheme: light) {
   .earnedCard,
   .earnedHero {
+    --milestone-card-edge: color-mix(
+      in srgb,
+      var(--primary) 22%,
+      var(--border)
+    );
+    --milestone-card-shadow: color-mix(
+      in srgb,
+      var(--foreground) 6%,
+      transparent
+    );
     background: linear-gradient(
       145deg,
       color-mix(in srgb, var(--milestone-accent) 9%, var(--surface-raised)),
       color-mix(in srgb, var(--milestone-pop) 8%, var(--card))
     );
     box-shadow:
-      inset 0 0 0 2.5px color-mix(in srgb, var(--primary) 22%, var(--border)),
-      0 7px 23px color-mix(in srgb, var(--foreground) 6%, transparent);
+      inset 0 0 0 2.5px var(--milestone-card-edge),
+      0 7px 23px var(--milestone-card-shadow);
   }
 
   .medallion,

@@ -1,6 +1,6 @@
 "use client";
 
-import { PageHeading } from "@/components/page-heading";
+import { PageEmptyState, PageHeading } from "@/components/page-heading";
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, BookOpenText, Search, X } from "lucide-react";
@@ -156,19 +156,19 @@ export function JournalLibraryPage() {
           ))}
         </div>
       ) : (
-        <div className={styles.empty} data-journal-empty>
-          <BookOpenText aria-hidden="true" strokeWidth={1.5} />
-          <h2>
-            {search
+        <PageEmptyState
+          data-journal-empty
+          icon={<BookOpenText strokeWidth={1.75} />}
+          title={
+            search
               ? "No page found that thought"
-              : "A page will find its way here"}
-          </h2>
-          <p>
-            {search
-              ? "Try another word, a date or a shorter phrase. Your saved pages are still right here."
-              : "Write a little longer in any check-in. Once your saved writing passes 100 words, it has a place here too."}
-          </p>
-        </div>
+              : "A page will find its way here"
+          }
+        >
+          {search
+            ? "Try another word, a date or a shorter phrase. Your saved pages are still right here."
+            : "Write a little longer in any check-in. Once your saved writing passes 100 words, it has a place here too."}
+        </PageEmptyState>
       )}
 
       {filtered.length > limit && (
@@ -183,10 +183,12 @@ export function JournalLibraryPage() {
           <ArrowDown aria-hidden="true" size={15} /> More pages
         </Button>
       )}
-      <p className={styles.footnote}>
-        Saved writing with more than 100 words appears here. Shorter notes and
-        unfinished drafts stay with their daily check-in.
-      </p>
+      {entries.length > 0 && (
+        <p className={styles.footnote}>
+          Saved writing with more than 100 words appears here. Shorter notes and
+          unfinished drafts stay with their daily check-in.
+        </p>
+      )}
       {selected && (
         <ReflectionReaderDialog
           open={readerOpen}

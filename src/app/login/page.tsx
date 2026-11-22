@@ -26,14 +26,14 @@ export default async function LoginPage() {
         aria-hidden="true"
       />
       <header className="canvas-copy mb-6 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-[length:var(--page-heading-size)] font-bold leading-tight tracking-[-0.03em]">
           <HeadingText
             title="Sign In"
             context="Private Journal"
             className="justify-center"
           />
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-3 text-sm leading-relaxed text-canvas-muted-foreground">
           Open the journal linked to your password.
         </p>
       </header>

@@ -6,15 +6,15 @@
 }
 .label {
   color: var(--foreground);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
 }
 .trigger {
   display: flex;
   width: 100%;
   min-width: 0;
-  height: 40px;
+  height: 44px;
   align-items: center;
   gap: var(--content-min-gap-secondary, 6.5px);
   padding-block: 0;
@@ -24,16 +24,16 @@
   background: transparent;
   color: var(--foreground);
   text-align: left;
-  font-size: 12px;
+  font-size: 16px;
 }
 .trigger:disabled {
   opacity: 0.5;
 }
 .trigger .triggerIcon {
-  --medication-indicator-mark-size: 18px;
+  --medication-indicator-mark-size: 23px;
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: 23px;
+  height: 23px;
 }
 .trigger .triggerIcon > svg {
   width: 14px;
@@ -197,5 +197,11 @@
   .done {
     background: color-mix(in srgb, var(--primary) 7%, var(--menu-surface));
     color: var(--menu-foreground);
+  }
+}
+
+@media (min-width: 768px) {
+  .trigger {
+    font-size: 14px;
   }
 }

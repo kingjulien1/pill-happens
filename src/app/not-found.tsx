@@ -1,44 +1,29 @@
 import Link from "next/link";
 import { ActionIcon } from "@/components/action-icon";
-import { HeadingText } from "@/components/heading-text";
 import { BrandMark } from "@/components/brand";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
-import { getBrandThemeStyle } from "@/lib/action-button-system";
+import { PublicStatus } from "@/components/public-status";
 
 export default function NotFound() {
   return (
-    <main className="page-enter mx-auto flex min-h-[80dvh] max-w-sm flex-col items-center justify-center px-6 py-14 text-center">
-      <div
-        className="mb-5 flex size-14 items-center justify-center rounded-[1.3rem] border"
-        data-brand-icon-surface
-        style={{
-          ...getBrandThemeStyle(),
-          backgroundColor: "var(--brand-surface)",
-          color: "var(--brand-copy)",
-          borderColor: "color-mix(in srgb, var(--brand-copy) 67%, transparent)",
-        }}
-      >
-        <BrandMark className="size-6" />
-      </div>
-      <h1 className="canvas-copy text-2xl font-semibold tracking-tight">
-        <HeadingText
-          title="Page Not Found"
-          context="404"
-          className="justify-center"
-        />
-      </h1>
-      <p className="mt-2 max-w-64 text-sm leading-relaxed text-canvas-muted-foreground">
-        Let’s head back to your daily journal.
-      </p>
-      <DialogPrimaryButton
-        navigation
-        nativeButton={false}
-        render={<Link href="/" />}
-        className="mt-6 w-full"
-        leadingIcon={<ActionIcon name="back" />}
-      >
-        Back to today
-      </DialogPrimaryButton>
-    </main>
+    <PublicStatus
+      icon={<BrandMark />}
+      context="404 · A wrong turn"
+      title="Page Not Found"
+      actions={
+        <DialogPrimaryButton
+          navigation
+          nativeButton={false}
+          render={<Link href="/" />}
+          className="w-full"
+          leadingIcon={<ActionIcon name="back" />}
+        >
+          Back to today
+        </DialogPrimaryButton>
+      }
+    >
+      This link doesn’t lead to a page. Your daily journal is a good place to
+      pick things up.
+    </PublicStatus>
   );
 }

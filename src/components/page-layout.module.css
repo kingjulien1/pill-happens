@@ -39,14 +39,15 @@
 }
 .identity {
   display: flex;
+  flex: 1 1 150px;
   min-width: 0;
   align-items: center;
   gap: 12px;
 }
 .headingIcon {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex: none;
   place-items: center;
   border-radius: 13px;
@@ -67,20 +68,24 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .title {
   margin: 0;
   color: var(--canvas-foreground);
-  font-size: 32px;
+  font-size: var(--page-heading-size);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.045em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   overflow-wrap: anywhere;
 }
 .actions {
   --foreground: var(--canvas-foreground);
   --muted-foreground: var(--canvas-muted-foreground);
   display: flex;
+  flex: 0 0 auto;
   margin-inline-start: auto;
   min-width: 0;
   max-width: 100%;
@@ -106,14 +111,47 @@
   color: var(--card-foreground);
   box-shadow: inset 0 0 0 2.5px var(--border);
 }
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px 24px;
+  text-align: center;
+}
+.emptyIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.emptyIcon > svg {
+  width: 26px;
+  height: 26px;
+}
+.emptyTitle {
+  max-width: 28ch;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+.emptyDescription {
+  max-width: 46ch;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
 @media (min-width: 640px) {
   .shell {
     padding-inline: max(32px, env(safe-area-inset-left))
       max(32px, env(safe-area-inset-right));
     padding-top: 40px;
-  }
-  .title {
-    font-size: 38px;
   }
   .description {
     font-size: 14px;
@@ -130,17 +168,24 @@
   }
 
   .headingIcon {
+    --heading-icon-edge: color-mix(in srgb, var(--primary) 20%, transparent);
+    --heading-icon-shadow: color-mix(
+      in srgb,
+      var(--foreground) 4%,
+      transparent
+    );
     background: color-mix(in srgb, var(--primary) 8%, var(--surface-raised));
     color: var(--primary);
     box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent),
-      0 3px 10px color-mix(in srgb, var(--foreground) 4%, transparent);
+      inset 0 0 0 1px var(--heading-icon-edge),
+      0 3px 10px var(--heading-icon-shadow);
   }
 
   .surface {
+    --surface-shadow: color-mix(in srgb, var(--foreground) 5%, transparent);
     background: linear-gradient(145deg, var(--surface-raised), var(--card));
     box-shadow:
       inset 0 0 0 2.5px var(--border),
-      0 7px 24px color-mix(in srgb, var(--foreground) 5%, transparent);
+      0 7px 24px var(--surface-shadow);
   }
 }

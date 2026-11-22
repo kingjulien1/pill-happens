@@ -248,7 +248,7 @@ export function LoginForm() {
             aria-describedby={
               error ? "password-hint login-error" : "password-hint"
             }
-            className="h-10 rounded-xl bg-background/40 px-3 text-base md:text-sm"
+            className="h-11 rounded-xl bg-background/40 px-3 text-base md:text-sm"
           />
           <p
             id="password-hint"

@@ -18,7 +18,7 @@ import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { ActionIcon } from "@/components/action-icon";
 import { MedicationClassBadges } from "@/components/medication-class-badge";
 import { Button } from "@/components/ui/button";
-import { PageHeading } from "@/components/page-heading";
+import { PageEmptyState, PageHeading } from "@/components/page-heading";
 import { useJournal } from "@/components/journal-provider";
 import { StreakArtwork } from "@/components/streak-artwork";
 import { StreakSpotlight } from "@/components/streak-spotlight";
@@ -703,7 +703,15 @@ export function StreakMilestonePage({ target }: { target: number }) {
   if (!milestone)
     return (
       <div className={styles.page}>
-        <p>This milestone isn’t available.</p>
+        <PageHeading
+          title="Streaks"
+          context="Your milestones"
+          icon={<TrophyIcon weight="bold" />}
+        />
+        <PageEmptyState title="This milestone isn’t available.">
+          Return to your streaks to see the milestones connected to your
+          recorded days.
+        </PageEmptyState>
         <Button
           navigation
           variant="ghost"

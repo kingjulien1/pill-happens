@@ -7,7 +7,7 @@ import {
   MedicationCardBackground,
   MedicationCardIcon,
 } from "@/components/medication-card-base";
-import { PageSurface } from "@/components/page-heading";
+import { PageEmptyState } from "@/components/page-heading";
 import { formatDose, type Medication } from "@/lib/domain";
 import type { MedicationRecordStats } from "@/lib/journal-reference-details";
 import { getMedicationColor } from "@/lib/medication-appearance";
@@ -91,10 +91,9 @@ export function ReferenceEmpty({
   children: ReactNode;
 }) {
   return (
-    <PageSurface className={styles.panel} data-card-entry>
-      <h2 className={styles.sectionTitle}>{title}</h2>
-      <p className={styles.body}>{children}</p>
-    </PageSurface>
+    <PageEmptyState title={title} data-card-entry>
+      {children}
+    </PageEmptyState>
   );
 }
 

@@ -8,11 +8,11 @@
 }
 
 .appearance {
+  --appearance-edge: color-mix(in srgb, var(--foreground) 12%, transparent);
   padding: 18px 12px 10px;
   border-radius: var(--dialog-radius-surface);
   background: var(--muted);
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--palette-white) 50%, transparent);
+  box-shadow: inset 0 0 0 1px var(--appearance-edge);
 }
 
 .previewSection {
@@ -91,7 +91,11 @@
   line-height: inherit;
 }
 
-.liveLabel { display: inline-flex; align-items: center; gap: 5px; }
+.liveLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 .liveDot {
   position: relative;
   isolation: isolate;
@@ -112,7 +116,7 @@
   border-radius: inherit;
   background-color: inherit;
   filter: blur(1.5px);
-  opacity: .28;
+  opacity: 0.28;
 }
 @media (prefers-reduced-motion: no-preference) {
   .liveDot::before {
@@ -120,10 +124,23 @@
   }
 }
 @keyframes live-dot-glow {
-  0%, 100% { transform: scale(.9); opacity: .08; }
-  45% { transform: scale(1.7); opacity: .52; }
-  86% { transform: scale(2.6); opacity: 0; }
-  87% { transform: scale(.9); opacity: 0; }
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.08;
+  }
+  45% {
+    transform: scale(1.7);
+    opacity: 0.52;
+  }
+  86% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  87% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
 }
 
 .titleSeparator {
@@ -657,7 +674,8 @@
       var(--surface-sunken) 58%,
       var(--surface-reading)
     );
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 85%, transparent);
+    box-shadow: inset 0 1px 0
+      color-mix(in srgb, var(--surface-raised) 85%, transparent);
   }
 
   .appearance :global([data-appearance-results]),

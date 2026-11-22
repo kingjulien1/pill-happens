@@ -1,0 +1,183 @@
+.list {
+  display: grid;
+  gap: 18px;
+}
+.card {
+  position: relative;
+  min-width: 0;
+  padding: 22px;
+  border-radius: var(--entry-card-radius, 21px);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: inset 0 0 0 2.5px var(--border);
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.identity {
+  min-width: 0;
+  flex: 1;
+}
+.name {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.name h2 {
+  min-width: 0;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.medicationLink {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+.medicationLink span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.medicationLink > svg {
+  flex: none;
+  opacity: 0.5;
+}
+.medicationLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.context {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+.amountRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.amount {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.amount > span {
+  margin-left: 7px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 5px 9px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.status[data-current] {
+  background: color-mix(in srgb, var(--primary) 16%, var(--card));
+  color: var(--foreground);
+}
+.status[data-current]::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.progress {
+  margin-top: 22px;
+}
+.progressLabel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-bottom: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.progressLabel strong {
+  color: var(--foreground);
+  font-weight: 650;
+}
+.track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+}
+.track > div {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+}
+.dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.dates > div {
+  min-width: 0;
+}
+.dates > div:last-child {
+  text-align: right;
+}
+.dates dt {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.dates dd {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.6;
+}
+.note {
+  margin: 14px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 640px) {
+  .card {
+    padding: 24px;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .medicationLink:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}

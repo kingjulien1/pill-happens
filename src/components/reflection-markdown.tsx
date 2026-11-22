@@ -40,6 +40,14 @@ export function ReflectionMarkdown({
         ]}
         skipHtml
         components={{
+          // The surrounding page/dialog owns its heading. Keep the writer's
+          // visual hierarchy without introducing another document-level h1.
+          h1: ({ children }) => <h2 data-markdown-level="1">{children}</h2>,
+          h2: ({ children }) => <h3 data-markdown-level="2">{children}</h3>,
+          h3: ({ children }) => <h4 data-markdown-level="3">{children}</h4>,
+          h4: ({ children }) => <h5 data-markdown-level="4">{children}</h5>,
+          h5: ({ children }) => <h6 data-markdown-level="5">{children}</h6>,
+          h6: ({ children }) => <h6 data-markdown-level="6">{children}</h6>,
           a: ({ href, children, title }) => {
             if (!href) return <span>{children}</span>;
             const reference = parseJournalMentionHref(href);

@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { ArrowRight, ImageDown } from "lucide-react";
+import { PublicStatus } from "@/components/public-status";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import {
   isSleepImageToken,
   rememberSleepImage,
@@ -17,9 +20,25 @@ export default function SleepImageLanding() {
     window.location.replace(`/?sleep-import=${encodeURIComponent(token)}`);
   }, []);
   return (
-    <main style={{ padding: 24 }}>
-      <p role="status">Opening your sleep report…</p>
-      <Link href="/">Continue to your journal</Link>
-    </main>
+    <PublicStatus
+      live
+      icon={<ImageDown />}
+      context="Morning check-in · Image import"
+      title="Opening Your Sleep Report"
+      actions={
+        <DialogPrimaryButton
+          navigation
+          nativeButton={false}
+          render={<Link href="/" />}
+          className="w-full"
+          trailingIcon={<ArrowRight />}
+        >
+          Continue to Journal
+        </DialogPrimaryButton>
+      }
+    >
+      Taking your image to the morning check-in. You’ll review the readings
+      before anything is applied to your draft.
+    </PublicStatus>
   );
 }

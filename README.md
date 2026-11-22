@@ -16,6 +16,8 @@ Header branding, navigation and the loading core share Pink950 beneath a Mauve90
 
 Today and individual history timelines use a **510px** content cap; collection screens use **760px**. Guides have a wider responsive reading shell, native in-page navigation and an outline rail from 1024px. Mobile gutters, scrollable tables/code, safe areas and touch targets keep the references usable on a phone. Regenerate with `npm run theme:generate`; verify with `npm run theme:check`.
 
+Collection and guide titles share `--page-heading-size` (22–26px on phones, 28px from 640px). `PageHeading`, `PageSurface`, and `PageEmptyState` own their common opening, supporting surface, and empty-state styles. Medication, goal, preferences, and sign-in controls use a 44px height with 16px editable text on phones; the deliberately compact intake/check-in controls retain their own geometry. Detail summaries use compact artwork/copy grids, and narrow daily-history navigation separates day links from the add action. See the [project design review](docs/design-review.md) for coverage and verification.
+
 ## The experience
 
 - **Password journals:** an existing password opens its journal. A new password opens a confirmation drawer/dialog showing the exact value; only confirmation creates the separate empty journal. Anyone with the same exact password can open the same journal.

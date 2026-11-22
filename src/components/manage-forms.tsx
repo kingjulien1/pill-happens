@@ -66,9 +66,9 @@ import {
 
 const forms = MEDICATION_TYPES;
 
-const inputClass = "h-10 rounded-xl px-3 text-base md:text-sm";
+const inputClass = "h-11 rounded-xl px-3 text-base md:text-sm";
 const selectClass =
-  "h-10 w-full rounded-xl px-3 text-sm data-[size=default]:h-10";
+  "h-11 w-full rounded-xl px-3 text-base md:text-sm data-[size=default]:h-11";
 const iconError = "Choose an icon or enter one emoji.";
 
 /** Native arrows keep fine saved decimals while using the requested increment. */
@@ -358,7 +358,7 @@ export function MedicationForm({
     <form onSubmit={save} className="flex min-w-0 flex-col gap-4">
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
         <div
-          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(112px,1fr)] items-end gap-3"
+          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(128px,1fr)] items-end gap-3"
           data-medication-identity-fields
         >
           <div className="flex min-w-0 flex-col gap-2">
@@ -387,7 +387,7 @@ export function MedicationForm({
         </div>
 
         <div
-          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(112px,1fr)] items-end gap-3"
+          className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(128px,1fr)] items-end gap-3"
           data-medication-classification-fields
         >
           <div className="flex min-w-0 flex-col gap-2">

@@ -100,6 +100,12 @@
 .checkInHeader .title {
   font-size: var(--check-in-title-size);
 }
+.checkInHeader .fullContext {
+  grid-column: 1 / -1;
+  /* Keep the original small title-to-date gap; the date owns the whole row. */
+  margin-block-start: -16px;
+  padding-inline-end: 8px;
+}
 @media (min-width: 768px) {
   .checkInHeader {
     --check-in-title-size: 24px;
