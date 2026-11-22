@@ -28,7 +28,6 @@
   animation: skeleton-edge-flash var(--skeleton-period) ease-out infinite;
 }
 .wash,
-.grid,
 .scan {
   position: absolute;
   inset: 0;
@@ -41,22 +40,6 @@
     transparent 68%
   );
   animation: skeleton-charge var(--skeleton-period) ease-in-out infinite;
-}
-.grid {
-  background-image:
-    linear-gradient(
-      to right,
-      color-mix(in srgb, var(--skeleton-light) 12%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--skeleton-light) 8%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 18px 18px;
-  opacity: 0;
-  animation: skeleton-grid var(--skeleton-period) ease-in-out infinite;
 }
 .scan {
   inset: -20% auto -20% -45%;
@@ -150,46 +133,26 @@
   animation-delay: 0.1s;
 }
 .iconFrame {
-  animation: skeleton-frame var(--skeleton-period) cubic-bezier(0.3, 0, 0.2, 1)
-    infinite;
+  animation: skeleton-frame var(--skeleton-period)
+    cubic-bezier(0.22, 0.8, 0.24, 1) infinite;
 }
 /* The empty artwork has a real fill; no moving backdrop filter is needed. */
 .skeleton[data-intake-preview-skeleton] .iconFrame:global(.intake-card-mark) {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-.frameAura,
-.orbit,
-.orbitSecond {
+.frameAura {
   position: absolute;
+  inset: -5px;
+  border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-}
-.frameAura {
-  inset: -10px;
-  border-radius: 50%;
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--skeleton-light) 44%, transparent),
+    color-mix(in srgb, var(--skeleton-light) 30%, transparent),
     transparent 70%
   );
   animation: skeleton-aura var(--skeleton-period) ease-in-out infinite;
-}
-.orbit,
-.orbitSecond {
-  --orbit-direction: 1;
-  inset: -3px;
-  border: 1px solid var(--skeleton-light);
-  border-radius: 20px;
-  animation: skeleton-orbit var(--skeleton-period)
-    cubic-bezier(0.2, 0.8, 0.22, 1) infinite;
-}
-.orbitSecond {
-  --orbit-direction: -1;
-  inset: 1px;
-  border-style: dashed;
-  border-radius: 17px;
-  animation-delay: 0.09s;
 }
 .iconStage {
   position: relative;
@@ -205,140 +168,35 @@
   overflow: visible;
   stroke-width: 1.8;
   animation: skeleton-glyph var(--skeleton-period)
-    cubic-bezier(0.2, 0.75, 0.25, 1) infinite;
+    cubic-bezier(0.22, 0.8, 0.24, 1) infinite;
 }
-.icon path {
-  --fragment-x: -4px;
-  --fragment-y: 3.5px;
-  transform-box: view-box;
-  transform-origin: center;
-  animation: skeleton-fragment var(--skeleton-period) ease-in-out infinite;
-}
-.icon path:nth-child(even) {
-  --fragment-x: 4px;
-  --fragment-y: -3.5px;
-  animation-delay: 0.08s;
-}
-.iconRipple,
-.iconRippleSecond,
-.iconShock,
-.iconCore,
-.sparks,
-.rays {
+.iconRipple {
   position: absolute;
-  pointer-events: none;
-}
-.iconRipple,
-.iconRippleSecond,
-.iconShock {
-  inset: -12px;
-  border: 1.5px solid currentColor;
+  inset: -2px;
+  border: 1px solid currentColor;
   border-radius: 50%;
+  pointer-events: none;
   opacity: 0;
   animation: skeleton-ripple var(--skeleton-period)
-    cubic-bezier(0.12, 0.6, 0.2, 1) infinite;
+    cubic-bezier(0.22, 0.8, 0.24, 1) infinite;
 }
-.iconRippleSecond {
-  inset: -6px;
-  border-style: dashed;
-  animation-delay: 0.2s;
-}
-.iconShock {
-  inset: -16px;
-  border-width: 2px;
-  animation-delay: 0.12s;
-}
-.iconCore {
-  inset: -5px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--skeleton-light) 32%, transparent),
-    transparent 70%
-  );
-  animation: skeleton-core var(--skeleton-period) ease-in-out infinite;
-}
-.sparks,
 .rays {
+  position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 .rays i {
   position: absolute;
   top: 50%;
-  left: calc(50% - 1px);
-  width: 2px;
-  height: 8px;
+  left: calc(50% - 0.625px);
+  width: 1.25px;
+  height: 3px;
   border-radius: 999px;
   background: currentColor;
   transform-origin: 50% 0;
   opacity: 0;
   animation: skeleton-ray var(--skeleton-period)
-    cubic-bezier(0.16, 0.8, 0.22, 1) infinite;
-}
-.rays i:nth-child(even) {
-  height: 5px;
-  animation-delay: 0.07s;
-}
-.sparks i {
-  --spark-x: -32px;
-  --spark-y: -29px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4px;
-  height: 4px;
-  border-radius: 1px;
-  background: currentColor;
-  opacity: 0;
-  animation: skeleton-spark var(--skeleton-period)
-    cubic-bezier(0.15, 0.5, 0.2, 1) infinite;
-}
-.sparks i:nth-child(2) {
-  --spark-x: 34px;
-  --spark-y: -25px;
-  animation-delay: 0.12s;
-}
-.sparks i:nth-child(3) {
-  --spark-x: 28px;
-  --spark-y: 32px;
-  width: 2px;
-  height: 2px;
-  animation-delay: 0.22s;
-}
-.sparks i:nth-child(4) {
-  --spark-x: -31px;
-  --spark-y: 27px;
-  width: 2px;
-  height: 2px;
-  animation-delay: 0.3s;
-}
-.sparks i:nth-child(5) {
-  --spark-x: -42px;
-  --spark-y: -3px;
-  width: 5px;
-  height: 2px;
-  animation-delay: 0.04s;
-}
-.sparks i:nth-child(6) {
-  --spark-x: 41px;
-  --spark-y: 4px;
-  width: 5px;
-  height: 2px;
-  animation-delay: 0.16s;
-}
-.sparks i:nth-child(7) {
-  --spark-x: -5px;
-  --spark-y: -37px;
-  width: 2px;
-  height: 5px;
-  animation-delay: 0.08s;
-}
-.sparks i:nth-child(8) {
-  --spark-x: 7px;
-  --spark-y: 37px;
-  width: 2px;
-  height: 5px;
-  animation-delay: 0.2s;
+    cubic-bezier(0.22, 0.8, 0.24, 1) infinite;
 }
 .heading,
 .bottom {
@@ -446,22 +304,14 @@
 /* Every part shares one phase clock. Activity changes pause native timelines
    together, without frame timers, React updates or new particles being created. */
 .skeleton .wash,
-.skeleton .grid,
 .skeleton .scan,
 .skeleton .scene::after,
 .skeleton .trace rect,
 .skeleton .iconFrame,
 .skeleton .frameAura,
-.skeleton .orbit,
-.skeleton .orbitSecond,
 .skeleton .icon,
-.skeleton .icon path,
 .skeleton .iconRipple,
-.skeleton .iconRippleSecond,
-.skeleton .iconShock,
-.skeleton .iconCore,
 .skeleton .rays i,
-.skeleton .sparks i,
 .skeleton .edgeFlares i::before,
 .skeleton .edgeFlares i::after,
 .skeleton .line,
@@ -480,7 +330,7 @@
     transform: scaleX(0.8);
   }
   30% {
-    opacity: 0.8;
+    opacity: 0.45;
     transform: scaleX(1.03);
   }
   62% {
@@ -507,21 +357,6 @@
   }
   88% {
     opacity: 0.68;
-  }
-}
-@keyframes skeleton-grid {
-  0%,
-  14%,
-  78%,
-  100% {
-    opacity: 0;
-  }
-  30%,
-  48% {
-    opacity: 0.3;
-  }
-  64% {
-    opacity: 0.12;
   }
 }
 @keyframes skeleton-scan {
@@ -578,142 +413,113 @@
     stroke-dashoffset: 150;
   }
 }
+
+/* Quiet pulses share the line animations’ settling beats, with no spin or shake. */
 @keyframes skeleton-frame {
   0%,
   100% {
-    transform: translateY(0) rotate(0) scale(1);
+    transform: scale(1);
   }
-  24% {
-    transform: translateY(2px) rotate(-12deg) scale(0.86);
+  18% {
+    transform: scale(0.985);
   }
-  41% {
-    transform: translateY(-3px) rotate(11deg) scale(1.14);
+  35% {
+    transform: scale(1.025);
   }
-  49% {
-    transform: translateY(1px) rotate(-5deg) scale(0.97);
+  43%,
+  69% {
+    transform: scale(1);
   }
-  56% {
-    transform: translateY(-1px) rotate(3deg) scale(1.06);
+  54% {
+    transform: scale(1.012);
   }
-  66% {
-    transform: translateY(0) rotate(-1deg) scale(0.995);
-  }
-  84% {
-    transform: translateY(0) rotate(0) scale(1);
+  61% {
+    transform: scale(0.995);
   }
 }
 @keyframes skeleton-glyph {
   0%,
-  12% {
-    transform: rotate(0) scale(0.9);
-    opacity: 0.6;
-  }
-  27% {
-    transform: rotate(-24deg) scale(0.72);
-    opacity: 0.9;
-  }
-  43% {
-    transform: rotate(105deg) scale(1.24);
-    opacity: 1;
-  }
-  50%,
-  67% {
-    transform: rotate(90deg) scale(1);
-    opacity: 0.9;
-  }
-  83% {
-    transform: rotate(180deg) scale(0.96);
-    opacity: 0.8;
-  }
   100% {
-    transform: rotate(360deg) scale(0.9);
-    opacity: 0.6;
+    opacity: 0.65;
+    transform: scale(0.96);
+  }
+  18% {
+    opacity: 0.72;
+    transform: scale(0.92);
+  }
+  35% {
+    opacity: 0.95;
+    transform: scale(1.04);
+  }
+  43%,
+  69% {
+    opacity: 0.88;
+    transform: scale(1);
+  }
+  54% {
+    opacity: 0.95;
+    transform: scale(1.025);
+  }
+  61% {
+    opacity: 0.86;
+    transform: scale(0.99);
+  }
+  86% {
+    opacity: 0.7;
+    transform: scale(0.97);
   }
 }
-@keyframes skeleton-fragment {
+@keyframes skeleton-aura {
   0%,
+  18%,
+  78%,
   100% {
-    transform: translate(0, 0);
-    opacity: 0.8;
+    opacity: 0;
+    transform: scale(0.94);
   }
-  16% {
-    transform: translate(var(--fragment-x), var(--fragment-y));
-    opacity: 0.35;
+  35% {
+    opacity: 0.12;
+    transform: scale(1);
   }
-  36%,
+  54% {
+    opacity: 0.24;
+    transform: scale(1.06);
+  }
   69% {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
-  82% {
-    transform: translate(
-      calc(var(--fragment-x) * -0.5),
-      calc(var(--fragment-y) * -0.5)
-    );
-    opacity: 0.55;
+    opacity: 0;
+    transform: scale(1.12);
   }
 }
 @keyframes skeleton-ripple {
   0%,
-  46% {
-    transform: scale(0.28);
+  49% {
     opacity: 0;
+    transform: scale(0.88);
   }
-  50% {
-    transform: scale(0.56);
-    opacity: 0.92;
+  54% {
+    opacity: 0.24;
+    transform: scale(1.08);
   }
-  56% {
-    transform: scale(1.42);
-    opacity: 0.6;
-  }
-  67%,
+  66%,
   100% {
-    transform: scale(2.15);
     opacity: 0;
+    transform: scale(1.5);
   }
 }
-@keyframes skeleton-core {
+@keyframes skeleton-ray {
   0%,
-  20%,
-  89%,
+  49% {
+    opacity: 0;
+    transform: rotate(var(--ray-angle)) translateY(-10px) scaleY(0);
+  }
+  54% {
+    opacity: 0.28;
+    transform: rotate(var(--ray-angle)) translateY(-14px) scaleY(1);
+  }
+  66%,
   100% {
     opacity: 0;
-    transform: scale(0.5);
-  }
-  40% {
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
-  61% {
-    opacity: 0.45;
-    transform: scale(0.9);
-  }
-}
-@keyframes skeleton-spark {
-  0%,
-  48% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0) rotate(0);
-  }
-  53% {
-    opacity: 1;
-    transform: translate(
-        calc(var(--spark-x) * 0.28),
-        calc(var(--spark-y) * 0.28)
-      )
-      scale(1.35) rotate(28deg);
-  }
-  61% {
-    opacity: 0.78;
-    transform: translate(var(--spark-x), var(--spark-y)) scale(0.8)
-      rotate(110deg);
-  }
-  72%,
-  100% {
-    opacity: 0;
-    transform: translate(calc(var(--spark-x) * 1.2), calc(var(--spark-y) * 1.2))
-      scale(0) rotate(190deg);
+    transform: rotate(var(--ray-angle)) translateY(-21px) scaleY(0.2);
   }
 }
 @keyframes skeleton-line {
@@ -793,71 +599,6 @@
     transform: translateX(115%);
   }
 }
-@keyframes skeleton-aura {
-  0%,
-  22%,
-  76%,
-  100% {
-    opacity: 0;
-    transform: scale(0.65);
-  }
-  40% {
-    opacity: 0.45;
-    transform: scale(0.94);
-  }
-  51% {
-    opacity: 0.9;
-    transform: scale(1.2);
-  }
-  65% {
-    opacity: 0.18;
-    transform: scale(1.4);
-  }
-}
-@keyframes skeleton-orbit {
-  0%,
-  16% {
-    opacity: 0;
-    transform: rotate(calc(-25deg * var(--orbit-direction))) scale(0.82);
-  }
-  35% {
-    opacity: 0.3;
-    transform: rotate(calc(28deg * var(--orbit-direction))) scale(0.96);
-  }
-  49% {
-    opacity: 0.64;
-    transform: rotate(calc(66deg * var(--orbit-direction))) scale(1.06);
-  }
-  61% {
-    opacity: 0.25;
-    transform: rotate(calc(104deg * var(--orbit-direction))) scale(1.22);
-  }
-  72%,
-  100% {
-    opacity: 0;
-    transform: rotate(calc(145deg * var(--orbit-direction))) scale(1.34);
-  }
-}
-@keyframes skeleton-ray {
-  0%,
-  47% {
-    opacity: 0;
-    transform: rotate(var(--ray-angle)) translateY(-14px) scaleY(0);
-  }
-  52% {
-    opacity: 0.9;
-    transform: rotate(var(--ray-angle)) translateY(-27px) scaleY(1.3);
-  }
-  60% {
-    opacity: 0.45;
-    transform: rotate(var(--ray-angle)) translateY(-39px) scaleY(0.6);
-  }
-  68%,
-  100% {
-    opacity: 0;
-    transform: rotate(var(--ray-angle)) translateY(-46px) scaleY(0);
-  }
-}
 @keyframes skeleton-edge-burst {
   0%,
   55% {
@@ -865,13 +606,13 @@
     transform: scale(0.1) rotate(-20deg);
   }
   59% {
-    opacity: 0.85;
+    opacity: 0.35;
     transform: scale(0.8) rotate(20deg);
   }
   70%,
   100% {
     opacity: 0;
-    transform: scale(2.3) rotate(70deg);
+    transform: scale(1.6) rotate(40deg);
   }
 }
 @keyframes skeleton-edge-flash {
@@ -882,10 +623,10 @@
     opacity: 0;
   }
   59% {
-    opacity: 0.7;
+    opacity: 0.32;
   }
   65% {
-    opacity: 0.12;
+    opacity: 0.08;
   }
 }
 @keyframes skeleton-line-pulse {

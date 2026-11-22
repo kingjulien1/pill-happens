@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
-import { SquareDashed } from "lucide-react";
+import { Pill } from "lucide-react";
 import { MedicationCardBase } from "./medication-card-base";
 import { MedicationCardIconFrame } from "./medication-card-icon";
 import styles from "./intake-preview-skeleton.module.css";
@@ -92,7 +92,6 @@ export function IntakePreviewSkeleton() {
       decoration={
         <span ref={scene} className={styles.scene} aria-hidden="true">
           <span className={styles.wash} />
-          <span className={styles.grid} />
           <span className={styles.scan} data-skeleton-scan />
           <svg
             className={styles.trace}
@@ -159,33 +158,20 @@ export function IntakePreviewSkeleton() {
             }}
           >
             <span className={styles.frameAura} />
-            <span className={styles.orbit} />
-            <span className={styles.orbitSecond} />
             <span className={styles.iconStage}>
               <span className={styles.iconRipple} />
-              <span className={styles.iconRippleSecond} />
-              <span className={styles.iconShock} />
-              <span className={styles.iconCore} />
-              <SquareDashed className={styles.icon} data-skeleton-glyph />
+              <Pill className={styles.icon} data-skeleton-glyph />
               <span className={styles.rays}>
-                {Array.from({ length: 8 }, (_, index) => (
+                {Array.from({ length: 4 }, (_, index) => (
                   <i
                     key={index}
                     style={
-                      { "--ray-angle": `${index * 45}deg` } as CSSProperties
+                      {
+                        "--ray-angle": `${45 + index * 90}deg`,
+                      } as CSSProperties
                     }
                   />
                 ))}
-              </span>
-              <span className={styles.sparks}>
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
               </span>
             </span>
           </MedicationCardIconFrame>
