@@ -1,10 +1,11 @@
 "use client";
 
-import { useId, useMemo, type ReactNode } from "react";
+import { useId, useMemo, type MouseEvent, type ReactNode } from "react";
 import {
   BedDouble,
   ArrowRightLeft,
   ArrowRight,
+  ArrowUpRight,
   BadgeCheck,
   BookOpen,
   CalendarDays,
@@ -17,6 +18,11 @@ import {
   Pill,
   Route,
   Scale,
+  Info,
+  NotebookPen,
+  PencilLine,
+  PillBottle,
+  Undo2,
   Waves,
   Zap,
   type LucideIcon,
@@ -38,21 +44,38 @@ import {
   type IntakeSnapshot,
   type IntakeUpdateField,
 } from "@/lib/intake-update-preview";
+import {
+  intakeReceiptDestinations,
+  intakeReceiptMeta,
+  type IntakeReceiptDestinations,
+} from "@/lib/intake-receipt";
 import styles from "./notification-change-preview.module.css";
 
 /** Actual card presentation, backed only by confirmed immutable display data. */
 export function NotificationChangePreview({
   preview,
+  intakeLinks,
+  onFollowLink,
+  canUndo = false,
 }: {
   preview: ChangePreview;
+  intakeLinks?: IntakeReceiptDestinations;
+  onFollowLink?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  canUndo?: boolean;
 }) {
   if (!preview.before && !preview.after) return null;
-  if (preview.before?.kind === "intake" && preview.after?.kind === "intake")
+  if (
+    preview.after?.kind === "intake" &&
+    (!preview.before || preview.before.kind === "intake")
+  )
     return (
-      <IntakeUpdatePreview
+      <IntakeReceiptPreview
         before={preview.before}
         after={preview.after}
         medicationChanged={preview.medicationChanged}
+        destinations={intakeLinks}
+        onFollowLink={onFollowLink}
+        canUndo={canUndo}
       />
     );
   const compared = Boolean(preview.before && preview.after);
@@ -215,24 +238,35 @@ const changeIcons = {
   name: ArrowRightLeft,
 };
 
-function IntakeUpdatePreview({
+function IntakeReceiptPreview({
   before,
   after,
   medicationChanged,
+  destinations = intakeReceiptDestinations(),
+  onFollowLink,
+  canUndo,
 }: {
-  before: IntakeSnapshot;
+  before?: IntakeSnapshot;
   after: IntakeSnapshot;
   medicationChanged?: boolean;
+  destinations?: IntakeReceiptDestinations;
+  onFollowLink?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  canUndo: boolean;
 }) {
   const id = useId();
+  const meta = useMemo(() => intakeReceiptMeta(after), [after]);
   const update = useMemo(
-    () => intakeUpdatePreview(before, after, medicationChanged),
+    () =>
+      before
+        ? intakeUpdatePreview(before, after, medicationChanged)
+        : undefined,
     [before, after, medicationChanged],
   );
+  const count = update?.switched ? 1 : (update?.rows.length ?? 0);
   const mark = (field: IntakeUpdateField | "total", content: ReactNode) => {
-    const row = update.rows.find((item) => item.field === field);
-    const change = field === "total" ? update.total : row;
-    if (update.switched || !change) return content;
+    const row = update?.rows.find((item) => item.field === field);
+    const change = field === "total" ? update?.total : row;
+    if (!update || update.switched || !change) return content;
     return (
       <span
         className={styles.changed}
@@ -246,23 +280,116 @@ function IntakeUpdatePreview({
       </span>
     );
   };
+  const EntryIcon =
+    destinations.entry.kind === "entry" ? NotebookPen : CalendarDays;
+  const KickerIcon = before ? PencilLine : BadgeCheck;
   return (
     <div
-      className={styles.root}
+      className={`${styles.root} ${styles.receipt}`}
       data-notification-change-preview
-      data-notification-intake-update
+      data-intake-receipt={before ? "updated" : "created"}
+      data-notification-intake-update={before ? "" : undefined}
     >
-      {update.switched ? (
+      <header className={styles.receiptIntro}>
+        <div className={styles.receiptHeading}>
+          <div>
+            <span className={styles.receiptKicker}>
+              <KickerIcon aria-hidden="true" />
+              {before ? "Updated intake" : "Saved intake"}
+            </span>
+            <h3>
+              {before ? "Your edit, in place." : "Logged & accounted for."}
+            </h3>
+          </div>
+          <span className={styles.receiptCount}>
+            <strong>{before ? count : 1}</strong>
+            <span>
+              {before
+                ? update?.switched
+                  ? "switch"
+                  : count === 1
+                    ? "change"
+                    : "changes"
+                : "entry"}
+            </span>
+          </span>
+        </div>
+        <div
+          className={styles.receiptContext}
+          data-intake-receipt-context
+          title={`Taken in ${after.timeZone}`}
+        >
+          <strong>{meta.weekday}</strong>
+          <span className={styles.contextSlash} aria-hidden="true">
+            /
+          </span>
+          <time dateTime={after.takenAt}>{meta.date}</time>
+          <span aria-hidden="true">·</span>
+          <time dateTime={after.takenAt}>
+            <Clock3 aria-hidden="true" />
+            {meta.clock}
+          </time>
+        </div>
+        <p>
+          {!before
+            ? "Saved with the amount, route and time shown below. Open the entry if any detail needs correcting."
+            : update?.switched
+              ? "The medication has changed on this intake. This is the saved version of the same entry."
+              : count
+                ? "This is the saved version. Rose marks point to edited values; the recap below keeps their previous values in view."
+                : "The entry was saved again with the same recorded values. You can still open it to make a correction."}
+        </p>
+      </header>
+
+      <section
+        className={styles.receiptStage}
+        aria-label={before ? "Updated intake" : "Saved intake"}
+        data-notification-snapshot="after"
+      >
+        <MedicationPreview record={after} mark={mark} />
+        <dl className={styles.receiptFacts}>
+          <div>
+            <dt>
+              <Route aria-hidden="true" />
+              Taken via
+            </dt>
+            <dd>{meta.route}</dd>
+          </div>
+          <div>
+            <dt>
+              <Pill aria-hidden="true" />
+              Medication type
+            </dt>
+            <dd>{meta.form}</dd>
+          </div>
+        </dl>
+        <p className={styles.trackingHint}>
+          <CalendarDays aria-hidden="true" />
+          <span>
+            {meta.previousCalendarDay ? (
+              <>
+                Before 06:00 · Filed under <strong>{meta.trackingDate}</strong>
+              </>
+            ) : (
+              <>
+                Tracking days begin at <strong>06:00</strong>
+              </>
+            )}
+          </span>
+        </p>
+      </section>
+
+      {before && update?.switched ? (
         <aside
-          className={`${styles.historyBubble} ${styles.medicationSwitch}`}
+          className={`${styles.medicationSwitch} ${styles.receiptSwitch}`}
           role="note"
-          aria-labelledby={`${id}-title`}
+          aria-labelledby={`${id}-switch`}
           data-medication-switch
         >
-          <h4 id={`${id}-title`}>
+          <span className={styles.switchGlyph}>
             <ArrowRightLeft aria-hidden="true" />
-            Medication Changed
-          </h4>
+          </span>
+          <h4 id={`${id}-switch`}>Medication changed. Still one intake.</h4>
           <div className={styles.switchNames}>
             <span>
               <small>Previously</small>
@@ -286,48 +413,41 @@ function IntakeUpdatePreview({
               </small>
             </span>
           </div>
-          <p>Same entry. New medication.</p>
         </aside>
-      ) : update.rows.length ? (
-        <aside
-          className={styles.historyBubble}
-          role="note"
-          aria-labelledby={`${id}-title`}
+      ) : update && update.rows.length > 0 ? (
+        <section
+          className={styles.changeRecap}
+          aria-labelledby={`${id}-changes`}
           data-intake-update-history
         >
-          <header className={styles.historyHeader}>
-            <h4 id={`${id}-title`}>
+          <header className={styles.recapHeading}>
+            <h4 id={`${id}-changes`}>
               <History aria-hidden="true" />
-              Update History
+              The changed pieces
             </h4>
-            <span>
-              {update.rows.length}{" "}
-              {update.rows.length === 1 ? "change" : "changes"}
-            </span>
-          </header>
-          <div className={styles.historyColumns} aria-hidden="true">
-            <span>Just this edit</span>
             <span>Previous → Saved</span>
-          </div>
-          <dl className={styles.historyRows}>
+          </header>
+          <dl className={styles.changeStories}>
             {update.rows.map((row) => {
               const Icon = changeIcons[row.field];
               return (
                 <div
                   key={row.field}
                   id={`${id}-${row.field}`}
+                  className={styles.changeStory}
                   data-intake-history-field={row.field}
+                  data-change-field={row.field}
                 >
                   <dt>
                     <Icon aria-hidden="true" />
                     {row.label}
                   </dt>
-                  <dd className={styles.previous}>
-                    <span className="sr-only">Previously </span>
+                  <dd className={styles.storyPrevious}>
+                    <span>Was</span>
                     {row.before}
                   </dd>
-                  <ArrowRight aria-hidden="true" />
-                  <dd className={styles.current}>
+                  <dd className={styles.storyCurrent}>
+                    <ArrowRight aria-hidden="true" />
                     <span className="sr-only">Saved as </span>
                     {row.after}
                   </dd>
@@ -336,8 +456,11 @@ function IntakeUpdatePreview({
             })}
           </dl>
           {update.total && (
-            <div className={styles.historyTotal} id={`${id}-total`}>
-              <span>Total Dose</span>
+            <div className={styles.receiptTotal} id={`${id}-total`}>
+              <span>
+                <strong>Total dose</strong>
+                <small>Quantity × strength</small>
+              </span>
               <span>
                 <span className={styles.previous}>
                   <span className="sr-only">Previously </span>
@@ -351,16 +474,89 @@ function IntakeUpdatePreview({
               </span>
             </div>
           )}
-        </aside>
+        </section>
       ) : null}
-      <section
-        className={styles.snapshot}
-        aria-label="Updated intake"
-        data-notification-snapshot="after"
-      >
-        <SnapshotCaption label="Updated" record={after} />
-        <MedicationPreview record={after} mark={mark} />
+
+      <section className={styles.receiptNext} aria-labelledby={`${id}-next`}>
+        <header className={styles.recapHeading}>
+          <h4 id={`${id}-next`}>Need a second look?</h4>
+          <span>Your next steps</span>
+        </header>
+        <div className={styles.receiptDestinations}>
+          <a
+            className={styles.receiptDestination}
+            data-receipt-destination="entry"
+            href={destinations.entry.href}
+            aria-label={`${destinations.entry.kind === "entry" ? "Open this intake" : destinations.entry.kind === "day" ? "Open this day" : "Open daily log"} · ${destinations.entry.label}`}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={onFollowLink}
+          >
+            <span className={styles.destinationTitle}>
+              <EntryIcon aria-hidden="true" />
+              <strong>
+                {destinations.entry.kind === "entry"
+                  ? "Open this intake"
+                  : destinations.entry.kind === "day"
+                    ? "Open this day"
+                    : "Open daily log"}
+              </strong>
+              <ArrowUpRight aria-hidden="true" />
+            </span>
+            <span>
+              {destinations.entry.kind === "entry"
+                ? "Jump to the highlighted entry to review or edit it."
+                : "Find this intake, then open it to make a correction."}
+            </span>
+          </a>
+          <a
+            className={styles.receiptDestination}
+            data-receipt-destination="medication"
+            href={destinations.medication.href}
+            aria-label={`Medication page · ${destinations.medication.label}`}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={onFollowLink}
+          >
+            <span className={styles.destinationTitle}>
+              <PillBottle aria-hidden="true" />
+              <strong>Medication page</strong>
+              <ArrowUpRight aria-hidden="true" />
+            </span>
+            <span>
+              Review the strength, type and saved defaults for your medication.
+            </span>
+          </a>
+        </div>
       </section>
+
+      <aside className={styles.correctionNote} role="note">
+        <Info aria-hidden="true" />
+        <div>
+          <h4>One intake or the whole medication?</h4>
+          <p>
+            Edit the entry for a quantity, route or time correction. Changing a
+            medication’s strength also recalculates its earlier logged doses and
+            totals.
+          </p>
+        </div>
+      </aside>
+      <p className={styles.receiptUndo}>
+        <Undo2 aria-hidden="true" />
+        <span>
+          {canUndo ? (
+            <>
+              The <strong>Undo</strong> button below{" "}
+              {before
+                ? "restores the previous saved values for this intake."
+                : "removes only this newly saved intake."}
+            </>
+          ) : (
+            "Undo isn’t available here. You can still correct the entry from its day."
+          )}
+        </span>
+      </p>
+      <p className={styles.receiptFootnote}>
+        This is a snapshot of this save. Open the entry for its latest details.
+      </p>
     </div>
   );
 }

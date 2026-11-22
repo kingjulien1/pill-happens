@@ -63,6 +63,10 @@ import { Button } from "@/components/ui/button";
 import { TodayActionButton } from "@/components/today-action-button";
 import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
 import {
+  intakeReceiptDestinations,
+  isIntakeReceipt,
+} from "@/lib/intake-receipt";
+import {
   nextNotificationWake,
   NOTIFICATION_CHECKPOINT_INTERVAL,
 } from "@/lib/notification-scheduling";
@@ -1071,6 +1075,17 @@ export function JournalNotification({
   }
 
   const previewRecord = details?.preview?.after ?? details?.preview?.before;
+  const intakeReceipt = isIntakeReceipt(details?.preview);
+  const receiptDestinations = intakeReceipt
+    ? intakeReceiptDestinations(details?.links)
+    : undefined;
+  const receiptHrefs = [
+    receiptDestinations?.entry?.href,
+    receiptDestinations?.medication?.href,
+  ];
+  const footerLinks = intakeReceipt
+    ? details?.links?.filter((link) => !receiptHrefs.includes(link.href))
+    : details?.links;
   const footerCopy = previewRecord
     ? undo
       ? "Undo reverses this saved change."
@@ -1330,7 +1345,12 @@ export function JournalNotification({
             {updatePanel ? (
               updatePanel
             ) : details?.preview ? (
-              <NotificationChangePreview preview={details.preview} />
+              <NotificationChangePreview
+                preview={details.preview}
+                intakeLinks={receiptDestinations}
+                onFollowLink={followRelatedLink}
+                canUndo={Boolean(undo)}
+              />
             ) : medicationPolicy ? (
               <section
                 className="journal-medication-policy"
@@ -1464,7 +1484,7 @@ export function JournalNotification({
               role="group"
               aria-label="Related Actions"
             >
-              {details?.links?.map((link) => {
+              {footerLinks?.map((link) => {
                 const { Icon: LinkIcon, caption } = linkPresentation(
                   link.href,
                   link.label,
@@ -1548,46 +1568,50 @@ export function JournalNotification({
                 </span>
               </Button>
             </div>
-            <span className="journal-notification-footer-copy">
-              {footerCopy}
-            </span>
-            <span className="journal-notification-footer-note">
-              {details?.preview ? "These cards capture this change. " : null}
-              {details?.links?.length ? (
-                <>
-                  Open{" "}
-                  {details.links.slice(0, 2).map((link, index) => (
-                    <span key={link.href}>
-                      {index > 0 && " or "}
-                      <a
-                        href={link.href}
-                        aria-label={link.label}
-                        tabIndex={expanded ? 0 : -1}
-                        onPointerDown={(event) => event.stopPropagation()}
-                        onClick={followRelatedLink}
-                      >
-                        {linkPresentation(
-                          link.href,
-                          link.label,
-                        ).caption.toLowerCase()}
-                      </a>
-                    </span>
-                  ))}{" "}
-                  for the latest details.{" "}
-                </>
-              ) : null}
-              Find your entries and drafts in your{" "}
-              <Link
-                href="/"
-                prefetch={false}
-                tabIndex={expanded ? 0 : -1}
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={followRelatedLink}
-              >
-                daily log
-              </Link>
-              .
-            </span>
+            {!intakeReceipt && (
+              <span className="journal-notification-footer-copy">
+                {footerCopy}
+              </span>
+            )}
+            {!intakeReceipt && (
+              <span className="journal-notification-footer-note">
+                {details?.preview ? "These cards capture this change. " : null}
+                {details?.links?.length ? (
+                  <>
+                    Open{" "}
+                    {details.links.slice(0, 2).map((link, index) => (
+                      <span key={link.href}>
+                        {index > 0 && " or "}
+                        <a
+                          href={link.href}
+                          aria-label={link.label}
+                          tabIndex={expanded ? 0 : -1}
+                          onPointerDown={(event) => event.stopPropagation()}
+                          onClick={followRelatedLink}
+                        >
+                          {linkPresentation(
+                            link.href,
+                            link.label,
+                          ).caption.toLowerCase()}
+                        </a>
+                      </span>
+                    ))}{" "}
+                    for the latest details.{" "}
+                  </>
+                ) : null}
+                Find your entries and drafts in your{" "}
+                <Link
+                  href="/"
+                  prefetch={false}
+                  tabIndex={expanded ? 0 : -1}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onClick={followRelatedLink}
+                >
+                  daily log
+                </Link>
+                .
+              </span>
+            )}
             {kind !== "update" && (cancel || action) && (
               <span className="journal-notification-actions">
                 {renderAction(cancel, true)}
