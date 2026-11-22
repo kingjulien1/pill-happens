@@ -2261,7 +2261,11 @@ export function DeveloperGuidePage() {
                 overflow-y: auto so Base UI locks the actual viewport instead of
                 relying on body overflow propagation in Safari. Base UI retains
                 ownership of nested locks, gutter compensation and cleanup; no
-                fixed-body or second scroll-lock manager is added. Dialog and
+                fixed-body or second scroll-lock manager is added. Expanded
+                notifications share that reference-counted lock; their gesture
+                boundary blocks pans over headers, scroll edges and the page.
+                Outside presses stay on the shield until release, then collapse
+                the notification without clicking through. Dialog and
                 drawer scrollers contain overscroll, while backdrop touch
                 gestures cannot pan the page. Every dialog and modal drawer uses
                 a static color veil instead of live backdrop blur. A separate

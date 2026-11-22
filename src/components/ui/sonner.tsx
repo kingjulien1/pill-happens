@@ -15,6 +15,7 @@ import {
 import { Toaster as Sonner, useSonner, type ToasterProps } from "sonner";
 import { CircleAlert, RefreshCcw, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNotificationModal } from "@/components/ui/use-notification-modal";
 import { NOTIFICATION_DEFAULT_DURATION } from "@/lib/journal-notification-lifecycle";
 import "./sonner.css";
 
@@ -319,6 +320,23 @@ export function Toaster({
   }, []);
   const reveal = useCallback(() => setStackOpen(true), []);
   const expanded = Boolean(props.expand || (stackOpen && count > 1));
+  const outsidePointers = useRef(new Set<number>());
+  const [outsideHeld, setOutsideHeld] = useState(false);
+  const modalOpen = useNotificationModal(region, expanded, outsideHeld);
+  const outsideRelease = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const collapseOutside = () => {
+    clearTimeout(outsideRelease.current);
+    // Keep the shield in place through pointerup and its synthesized click.
+    // Collapsing on pointerdown would expose the page mid-gesture on iOS.
+    outsideRelease.current = setTimeout(() => {
+      window.dispatchEvent(new Event(NOTIFICATION_COLLAPSE_EVENT));
+      collapse();
+      setOutsideHeld(false);
+    }, 0);
+  };
+  useEffect(() => () => clearTimeout(outsideRelease.current), []);
   const stack = useMemo(
     () => ({
       expanded,
@@ -459,6 +477,7 @@ export function Toaster({
         ref={region}
         style={{ display: "contents" }}
         data-notification-stack-expanded={expanded}
+        data-notification-modal={modalOpen}
         onFocusCapture={(event) => {
           // The list hotkey and keyboard focus entering a folded rear face both
           // need the uncapped view. Pointer focus still consumes just the first
@@ -517,7 +536,32 @@ export function Toaster({
           onPointerDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            window.dispatchEvent(new Event(NOTIFICATION_COLLAPSE_EVENT));
+            clearTimeout(outsideRelease.current);
+            outsidePointers.current.add(event.pointerId);
+            setOutsideHeld(true);
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerUp={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            outsidePointers.current.delete(event.pointerId);
+            if (!outsidePointers.current.size) collapseOutside();
+          }}
+          onPointerCancel={(event) => {
+            event.stopPropagation();
+            outsidePointers.current.delete(event.pointerId);
+            if (!outsidePointers.current.size) collapseOutside();
+          }}
+          onLostPointerCapture={(event) => {
+            if (
+              outsidePointers.current.delete(event.pointerId) &&
+              !outsidePointers.current.size
+            )
+              collapseOutside();
+          }}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
           }}
         />
         <Sonner

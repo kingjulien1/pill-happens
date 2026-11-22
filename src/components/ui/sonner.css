@@ -14,16 +14,8 @@
   opacity: 0;
   transition: opacity 220ms ease;
 }
-/* One visual-only viewport veil; native Sonner stack expansion is unrelated. */
-[data-notification-stack-expanded]:has(
-    .journal-toaster
-      [data-sonner-toast][data-mounted="true"][data-visible="true"]:is(
-        [data-front="true"],
-        [data-expanded="true"]
-      ):not([data-removed="true"])
-      .journal-notification[data-expanded="true"][data-phase="idle"]
-  )
-  > .journal-notification-backdrop {
+/* The modal owner holds both the viewport lock and the outside-gesture shield. */
+[data-notification-modal="true"] > .journal-notification-backdrop {
   opacity: 1;
   pointer-events: auto;
 }
@@ -111,7 +103,7 @@
   padding: 18px 16px 10px;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: none;
   touch-action: pan-y;
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--toast-soft) 35%, transparent)
@@ -826,7 +818,7 @@
   min-height: 0;
   max-height: calc(82.875dvh - var(--details-viewport-top, 0px));
   overflow: hidden;
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
   scrollbar-width: none;
   touch-action: pan-y;
 }

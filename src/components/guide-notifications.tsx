@@ -1148,7 +1148,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Expanded backdrop / footer",
-            "One interactive viewport veil per owning wrapper: Mauve900 at 31%, 4px blur, 220ms fade. It blocks page controls and outside press collapses details without dismissing the card. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(200px, 59.2%) at two-thirds opacity: Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
+            "One viewport shield per owning wrapper: Mauve900 at 31% with a 220ms fade. Expanded cards and revealed stacks share Base UI’s reference-counted page scroll lock with dialogs. Touch and wheel guards allow notification scrolling while blocking pans on the header, at scroll boundaries and outside the card. The shield captures an outside press through its release and consumes the click before collapsing without dismissing. Focus stays inside the notification while expanded. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(200px, 59.2%) at two-thirds opacity: Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
           ],
           [
             "Artwork / bell",
