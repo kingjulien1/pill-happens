@@ -1116,7 +1116,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         rows={[
           [
             "Artwork scale",
-            "49px illustration rail and 48.59px front tile with a separate inner accent ring. Violet and pink rear plates use independent fill and border opacity, with the pink plate nearest the front. A radial accent glow sits behind all three layers. The front tile keeps a slow 9.6s scale-and-tilt breath after arrival. The 27.5625px glyph uses 2.9 stroke for success and 2.8 for other kinds. Summary left padding is 15px on desktop and 14px on phones.",
+            "The complete 49px artwork renders at 8/7 scale in a reserved 56px rail: the front tile, glyph, rear cards, borders and glow all grow together. The 35.94px face renders at about 41.07px, and the 27.5625px glyph at 31.5px. Violet and pink rear plates retain independent opacity and opposite turns. Arrival and exit transforms stay on their original owners. Summary left padding remains 15px on desktop and 14px on phones.",
           ],
           [
             "Main text / context",
@@ -1144,7 +1144,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Header / unavailable Undo",
-            "Header actions paint one raised 44px key around the existing 30.5px icon stage, 18.6px glyph and 7.5px caption with a 2px gap. A lavender face, pink highlight, double edge and lower ledge distinguish it from the card; Light Mode uses a plum key with pale ink. Hover lifts the paint on closed cards, pressing depresses it, and the hit area stays still. Reduced motion keeps the key stationary. Pending and completed Undo retain the key, with a green completion finish; unavailable Undo stays quiet and disabled. Okay acknowledges info and Details/Collapse reveal or close context. Update Apply instead uses a 30px raised tile, 17px glyph and the standard 8.5px caption below; its footer counterpart matches the outlined Undo tool.",
+            "All header and footer icon actions share the same 30px square tile, 9px radius, 2px border and inward 2px outline. Lucide glyphs are 17px with 2.25 stroke, and captions sit 3px below at 8.5px/500. A 52px-wide, at-least-47px-high control preserves the touch target. Undo and Apply use this same frame rather than circular or raised keys. Pending Undo spins its standard-size loader; completion turns green; unavailable Undo stays quiet and disabled. Okay acknowledges information and Details/Collapse toggles context.",
           ],
           [
             "Expanded backdrop / footer",
@@ -1171,8 +1171,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Three summary cards share its surface and text colors at the bottom,
         followed by a centered, two-sentence journal-safety note. Its
         86% / 44ch width cap and two-line clamp share the handoff description’s
-        typography. Header Apply keeps a raised icon tile with a separate
-        standard tool caption; footer Apply uses Undo’s quieter outlined tile.
+        typography. Header Apply, footer Apply and Undo use the same square icon frame,
+        stroke weight and separate caption as the other tools.
         All Apply rockets have fixed-size glyphs with gently banking flight and
         staggered exhaust lines and particles. These CSS loops pause with
         hidden content or inactive notifications and respect reduced motion.

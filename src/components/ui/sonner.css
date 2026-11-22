@@ -28,6 +28,7 @@
   pointer-events: auto;
 }
 .journal-toaster[data-sonner-toaster] {
+  --toast-art-rail: 56px;
   --toast-tile-size: 35.94px;
   --toast-tile-radius: 12.25px;
   --toast-tile-border: 2.25px;
@@ -261,7 +262,7 @@
 }
 .journal-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
   display: grid;
-  grid-template-columns: 49px minmax(0, 1fr) auto;
+  grid-template-columns: var(--toast-art-rail) minmax(0, 1fr) auto;
   align-items: center;
   gap: 5px 10px;
   min-height: 69px;
@@ -307,8 +308,8 @@
   grid-row: 1;
   display: grid;
   place-items: center;
-  width: 49px;
-  height: 49px;
+  width: var(--toast-art-rail);
+  height: var(--toast-art-rail);
   margin: 0;
 }
 .journal-toaster[data-sonner-toaster]
@@ -393,7 +394,8 @@
   text-shadow: none;
 }
 
-/* The enlarged 27.5625px glyph keeps the existing compact 49px illustration rail. */
+/* Enlarge the complete artwork by one seventh, independently of arrival/exit
+   transforms; its 56px rail reserves the new visual footprint. */
 .journal-toast-symbol {
   --toast-art-arrival-duration: 1320ms;
   --toast-art-arrival-delay: 90ms;
@@ -402,6 +404,7 @@
   );
   --toast-spin-period: 4.5s;
   --toast-rear-scale: calc(8 / 7);
+  scale: calc(8 / 7);
   position: relative;
   isolation: isolate;
   overflow: visible;
@@ -672,8 +675,8 @@
   );
 }
 .journal-toaster .sonner-loader {
-  width: 49px;
-  height: 49px;
+  width: var(--toast-art-rail);
+  height: var(--toast-art-rail);
 }
 
 /* The native summary and optional real revert action occupy separate grid cells. */
@@ -787,8 +790,10 @@
 .journal-notification-art {
   position: relative;
   z-index: 2;
-  display: block;
-  flex: 0 0 49px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 var(--toast-art-rail);
+  height: var(--toast-art-rail);
 }
 .journal-notification-copy {
   display: grid;
@@ -1452,7 +1457,8 @@
 .journal-notification-dismiss {
   margin-inline-start: auto;
 }
-.journal-notification .journal-notification-tool {
+.journal-notification
+  :is(.journal-notification-tool, .journal-notification-revert) {
   display: grid;
   flex: none;
   align-content: start;
@@ -1474,7 +1480,7 @@
   transition: color 160ms ease;
 }
 .journal-notification-tool-symbol,
-.journal-notification-tool .journal-notification-revert-symbol {
+.journal-notification-revert-symbol {
   display: grid;
   place-items: center;
   width: 30px;
@@ -1484,13 +1490,15 @@
   background: var(--toast-quiet-fill);
   transition: background-color 160ms ease;
 }
-.journal-notification .journal-notification-tool-symbol > svg {
+.journal-notification
+  :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol)
+  > svg {
   width: 17px;
   height: 17px;
   stroke-width: 2.25;
 }
 .journal-notification-tool-label,
-.journal-notification-tool .journal-notification-revert-label {
+.journal-notification-revert-label {
   display: block;
   max-width: 52px;
   overflow: hidden;
@@ -1501,11 +1509,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.journal-notification .journal-notification-tool:disabled {
+.journal-notification
+  :is(.journal-notification-tool, .journal-notification-revert):disabled {
   opacity: 0.65;
   cursor: default;
 }
-.journal-notification .journal-notification-tool[data-undo-state="done"] {
+.journal-notification
+  :is(
+    .journal-notification-tool,
+    .journal-notification-revert
+  )[data-undo-state="done"] {
   color: var(--color-emerald-300, #6ee7b7);
 }
 .journal-notification-actions {
@@ -1542,91 +1555,7 @@
   width: 12px;
   height: 12px;
 }
-.journal-notification
-  :is(.journal-notification-revert, .journal-update-header-action) {
-  --toast-key-top: #eae4ff;
-  --toast-key-bottom: #c4b3e6;
-  --toast-key-ink: #362046;
-  --toast-key-edge: #846b9f;
-  --toast-key-hover-edge: #c4abd9;
-  --toast-key-foot: #775583;
-  --toast-key-highlight: #fff5fa9c;
-  --toast-key-shadow: #180d275c;
-}
-.journal-notification
-  .journal-update-header-action
-  .journal-notification-tool-symbol {
-  border: 0;
-  outline: 0;
-  background: linear-gradient(
-    150deg,
-    var(--toast-key-top),
-    var(--toast-key-bottom)
-  );
-  color: var(--toast-key-ink);
-  box-shadow:
-    inset 0 0 0 1.5px var(--toast-key-edge),
-    inset 0 0 0 3px var(--toast-key-highlight),
-    0 2px 0 var(--toast-key-foot),
-    0 4px 7px -3px var(--toast-key-shadow);
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
-}
-.journal-notification
-  .journal-update-header-action:enabled:active
-  .journal-notification-tool-symbol {
-  transform: translateY(1px);
-  box-shadow:
-    inset 0 0 0 1.5px var(--toast-key-edge),
-    inset 0 0 0 3px var(--toast-key-highlight),
-    0 1px 0 var(--toast-key-foot);
-}
-.journal-notification .journal-notification-revert {
-  --toast-action-face-size: 30.5px;
-  --toast-action-radius: 10.4px;
-  --toast-action-rim: 1.9px;
-  --toast-action-glyph-size: 18.6px;
-  --toast-action-glyph-stroke: 2.6;
-  --toast-action-label-size: 7.5px;
-  --toast-action-label-height: 10px;
-  position: relative;
-  isolation: isolate;
-  display: inline-grid;
-  grid-template-rows: var(--toast-action-face-size) var(
-      --toast-action-label-height
-    );
-  gap: 2px;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
-  align-self: center;
-  align-content: center;
-  justify-items: center;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--toast-key-ink);
-  box-shadow: none;
-  cursor: pointer;
-  transition:
-    color 160ms ease,
-    opacity 160ms ease;
-}
-.journal-notification-revert-symbol {
-  display: grid;
-  width: var(--toast-action-face-size, var(--toast-tile-size));
-  height: var(--toast-action-face-size, var(--toast-tile-size));
-  place-items: center;
-  border: 0;
-  border-radius: 9px;
-  background: var(--toast-quiet-fill);
-  box-shadow: none;
-  transition: background-color 160ms ease;
-}
+/* Header actions and the main footer action share the ordinary tool frame. */
 .journal-notification
   :is(.journal-notification-revert-symbol, .journal-notification-tool-symbol) {
   outline: 2px solid
@@ -1644,156 +1573,9 @@
   border: 2px solid var(--toast-pink-edge);
   box-sizing: border-box;
 }
-.journal-notification .journal-notification-revert-symbol {
-  border: 0;
-  outline: 0;
-  border-radius: var(--toast-action-radius, var(--toast-tile-radius));
-  box-shadow: inset 0 0 0 var(--toast-action-rim, var(--toast-tile-border))
-    currentColor;
-}
-.journal-notification .journal-notification-revert-symbol > svg {
-  width: var(--toast-action-glyph-size, 21.96px);
-  height: var(--toast-action-glyph-size, 21.96px);
-  stroke-width: var(--toast-action-glyph-stroke, 3.05);
-}
-.journal-notification-revert-label {
-  color: var(--toast-muted);
-  display: block;
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: var(--toast-action-label-size, 8px);
-  font-weight: 550;
-  line-height: var(--toast-action-label-height, 12px);
-  white-space: nowrap;
-}
-/* One raised key includes the icon and caption; its 44px hit area stays still
-   while only the paint and content move during hover/press. */
-.journal-notification
-  .journal-notification-revert:not([data-undo-state="unavailable"])::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  border-radius: 12px 12px 10px 10px;
-  background:
-    radial-gradient(ellipse 90% 55% at 8% 0%, #fce7f35c, transparent 72%),
-    linear-gradient(150deg, var(--toast-key-top), var(--toast-key-bottom));
-  box-shadow:
-    inset 0 0 0 1.25px var(--toast-key-edge),
-    inset 0 2px 0 var(--toast-key-highlight),
-    inset 0 -1.5px 0 var(--toast-key-foot),
-    0 2.5px 0 var(--toast-key-foot),
-    0 5px 9px -2px var(--toast-key-shadow);
-  pointer-events: none;
-  transition:
-    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 160ms ease;
-}
-.journal-notification
-  .journal-notification-revert:not([data-undo-state="unavailable"])::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 2.5px;
-  border: 0 solid var(--toast-key-highlight);
-  border-top-width: 0.75px;
-  border-inline-width: 0.5px;
-  border-radius: 9px 9px 8px 8px;
-  opacity: 0.6;
-  pointer-events: none;
-  transition:
-    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 160ms ease;
-}
-.journal-notification
-  .journal-notification-revert
-  .journal-notification-revert-symbol {
-  border: 0;
-  outline: 0;
-  border-radius: var(--toast-action-radius, var(--toast-tile-radius));
-  background: transparent;
-  box-shadow: none;
-}
-.journal-notification
-  .journal-notification-revert
-  .journal-notification-revert-label {
-  color: color-mix(in srgb, var(--toast-key-ink) 80%, transparent);
-  font-weight: 700;
-  font-size: var(--toast-action-label-size, 8px);
-}
-.journal-notification .journal-notification-revert > span {
-  transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-@media (hover: hover) and (pointer: fine) {
-  .journal-notification[data-expanded="false"]
-    .journal-notification-revert:enabled:hover::before {
-    transform: translateY(-1px);
-    box-shadow:
-      inset 0 0 0 1.25px var(--toast-key-hover-edge),
-      inset 0 2px 0 var(--toast-key-highlight),
-      inset 0 -1.5px 0 var(--toast-key-foot),
-      0 3.5px 0 var(--toast-key-foot),
-      0 6px 11px -2px var(--toast-key-shadow);
-  }
-  .journal-notification[data-expanded="false"]
-    .journal-notification-revert:enabled:hover::after,
-  .journal-notification[data-expanded="false"]
-    .journal-notification-revert:enabled:hover
-    > span {
-    transform: translateY(-1px);
-  }
-}
-.journal-notification[data-expanded]
-  .journal-notification-revert:enabled:active::before {
-  transform: translateY(1.25px);
-  box-shadow:
-    inset 0 0 0 1.25px var(--toast-key-edge),
-    inset 0 2px 4px var(--toast-key-shadow),
-    0 0.5px 0 var(--toast-key-foot);
-}
-.journal-notification[data-expanded]
-  .journal-notification-revert:enabled:active::after,
-.journal-notification[data-expanded]
-  .journal-notification-revert:enabled:active
-  > span {
-  transform: translateY(1.25px);
-}
-@media (prefers-color-scheme: light) {
-  .journal-notification
-    :is(.journal-notification-revert, .journal-update-header-action) {
-    --toast-key-top: #6e548f;
-    --toast-key-bottom: #4f375f;
-    --toast-key-ink: #fff2fb;
-    --toast-key-edge: #a084be;
-    --toast-key-hover-edge: #ceb4e4;
-    --toast-key-foot: #352044;
-    --toast-key-highlight: #f4e4ff6b;
-    --toast-key-shadow: #41264f42;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .journal-notification .journal-notification-revert::before,
-  .journal-notification .journal-notification-revert::after,
-  .journal-notification .journal-notification-revert > span {
-    transform: none !important;
-  }
-}
 .journal-notification .journal-notification-revert:focus-visible {
   outline: 2px solid var(--toast-ink);
   outline-offset: 3px;
-}
-.journal-notification .journal-notification-revert:disabled {
-  opacity: 0.78;
-  cursor: default;
-}
-.journal-notification .journal-notification-revert[data-undo-state="done"] {
-  --toast-key-top: #ddf8eb;
-  --toast-key-bottom: #bae4d2;
-  --toast-key-ink: #175139;
-  --toast-key-edge: #6b9f86;
-  --toast-key-foot: #527b64;
 }
 /* An absent reversal stays visible as a quiet native-disabled affordance.
    Resolve its ink once instead of multiplying generic disabled opacity. */
@@ -1816,8 +1598,8 @@
     var(--color-zinc-300, #d4d4d8) 4%,
     transparent
   );
-  box-shadow: inset 0 0 0 var(--toast-action-rim, var(--toast-tile-border))
-    currentColor;
+  border-color: currentColor;
+  outline-color: currentColor;
 }
 .journal-notification
   [data-undo-state="unavailable"]
