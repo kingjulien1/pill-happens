@@ -951,6 +951,37 @@ export function JournalNotification({
     );
   };
 
+  const renderUpdateApplyIcon = (footer = false) => {
+    if (!isAction(action)) return null;
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        type="button"
+        className={`journal-notification-revert ${footer ? "journal-update-footer-action" : "journal-update-header-action"}`}
+        data-update-choice={footer ? "footer" : undefined}
+        aria-label="Apply update and reload"
+        title="Apply update and reload"
+        disabled={phase !== "idle"}
+        tabIndex={footer && !expanded ? -1 : undefined}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (leaving.current) return;
+          action.onClick(event);
+          if (!event.defaultPrevented) onRequestDismiss("action");
+        }}
+      >
+        <span className="journal-notification-revert-symbol" aria-hidden="true">
+          <Rocket />
+        </span>
+        <span className="journal-notification-revert-label" aria-hidden="true">
+          Apply
+        </span>
+      </Button>
+    );
+  };
+
   const renderHeaderAction = () => {
     const acknowledge = kind === "info" && dismissible;
     if (
@@ -988,31 +1019,7 @@ export function JournalNotification({
       );
     }
     if (kind !== "update" || !isAction(action)) return renderUndo();
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        type="button"
-        className="journal-notification-revert journal-update-header-action"
-        aria-label="Apply update and reload"
-        title="Apply update and reload"
-        disabled={phase !== "idle"}
-        onPointerDown={(event) => event.stopPropagation()}
-        onClick={(event) => {
-          event.stopPropagation();
-          if (leaving.current) return;
-          action.onClick(event);
-          if (!event.defaultPrevented) onRequestDismiss("action");
-        }}
-      >
-        <span className="journal-notification-revert-symbol" aria-hidden="true">
-          <Rocket />
-        </span>
-        <span className="journal-notification-revert-label" aria-hidden="true">
-          Apply
-        </span>
-      </Button>
-    );
+    return renderUpdateApplyIcon();
   };
 
   const paragraphs = details?.paragraphs ?? [defaultContext[kind]];
@@ -1124,8 +1131,8 @@ export function JournalNotification({
         </div>
       </div>
       <p className="journal-update-fine-print">
-        <ShieldCheck aria-hidden="true" />
-        <span>No saved journal records are removed during updates.</span>
+        Saved entries stay put. Save your draft, then Apply—or choose Later to
+        keep writing.
       </p>
     </section>
   );
@@ -1477,6 +1484,7 @@ export function JournalNotification({
               {kind !== "info" &&
                 (undo || kind === "success") &&
                 renderUndo(true)}
+              {kind === "update" && renderUpdateApplyIcon(true)}
               <Button
                 variant="ghost"
                 size="icon"

@@ -1167,7 +1167,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         actions with a Pink300-tinted overview, a separate handoff section with
         two compact build/record stats, a full-size Apply Now main action and a
         Later icon button. Three summary cards sit outside the overview at the
-        bottom, followed by the journal-safety message. The base surface uses a
+        bottom, followed by a centered, two-sentence journal-safety note. Its
+        86% / 44ch width cap and two-line clamp share the handoff description’s
+        typography. The footer repeats Apply using the header’s raised key and
+        the same guarded launch/handoff, beside Collapse and Dismiss. The base surface uses a
         single 32px backdrop blur; reduced transparency keeps an opaque surface. Their
         accents retain useful distinctions. AppearanceToaster follows the
         resolved appearance context. These values describe the current

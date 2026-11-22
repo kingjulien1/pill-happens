@@ -1,6 +1,6 @@
 /* Only public installation assets belong in this cache. Journal data stays online. */
 const CACHE_PREFIX = "pill-happens-public-";
-const CACHE_NAME = `${CACHE_PREFIX}v70`;
+const CACHE_NAME = `${CACHE_PREFIX}v71`;
 const OFFLINE_URL = "/offline.html";
 const PUBLIC_FILES = [
   OFFLINE_URL,
