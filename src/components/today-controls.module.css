@@ -82,6 +82,15 @@
   --action-reduced-surround: transparent;
 }
 
+/* Main Log Intake: retain the outboard rim and its 3px gap. The face reaches
+   the host edge, so there is no extra outline or painted band between them. */
+.action[data-intake-paint="satin"][data-log-intake-rim] {
+  --action-face-inset: 0px;
+  --action-outer-line: 0px;
+  --action-inner-line: 1.667px;
+  --control-face-edge: var(--check-in-icon-background);
+}
+
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
   --control-surround-width: var(--action-face-inset, 10px);
   isolation: isolate;
@@ -115,6 +124,9 @@
     inset 0 0 0 var(--action-inner-line, 1px) var(--control-face-edge),
     0 1px 3px color-mix(in srgb, var(--control-shadow) 25%, transparent);
   pointer-events: none;
+}
+.action[data-control-style="satin"][data-log-intake-rim]::before {
+  box-shadow: inset 0 0 0 var(--action-inner-line) var(--control-face-edge);
 }
 
 .action[data-control-style="satin"] :global(.intake-primary-row) {

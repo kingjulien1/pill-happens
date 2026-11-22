@@ -1264,11 +1264,16 @@ export function DeveloperGuidePage() {
                 border at 29% opacity. Its former bright reflections are
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
-                shadows retain the raised face. Log Intake uses a larger face
-                with a 6px inset, a 1⅔px surface edge and a 4px inner line. Its
+                shadows retain the raised face. Main Log Intake brings its face
+                to the 80px host edge and keeps one 1⅔px inner line in the shared
+                Evening icon background color. Its redundant pale middle
+                outline and intervening painted band are removed. Its
                 outer SpecularCardBorder is shared with the Morning and Evening
                 cards: a 3px gap, 3.733px purple/pink rim, three brighter stops
-                and the same glow. Mobile uses a static CSS rim through
+                and the same glow. That outside rim stays fixed; matching
+                concentric curves keep the 3px clear gap equal along all sides
+                and corners. Other satin actions keep their existing inset.
+                Mobile uses a static CSS rim through
                 PrimaryButton’s decoration slot; desktop uses a static sibling
                 SVG to avoid Safari clipping. Neither creates a canvas or
                 repeating animation. The transparent surround remains

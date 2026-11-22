@@ -257,6 +257,11 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 
 :root {
   --intake-card-radius: 21px;
+  --check-in-icon-background: color-mix(
+    in srgb,
+    var(--color-violet-950, #2e1065) 88%,
+    var(--color-fuchsia-950, #4a044e)
+  );
 }
 .intake-group {
   position: relative;

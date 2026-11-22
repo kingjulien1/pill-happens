@@ -1,11 +1,7 @@
 .stage {
   --art-ink: var(--color-rose-200, #fecdd3);
   --art-soft: var(--color-violet-400, #a78bfa);
-  --check-in-art-base: color-mix(
-    in srgb,
-    var(--color-violet-950, #2e1065) 88%,
-    var(--color-fuchsia-950, #4a044e)
-  );
+  --check-in-art-base: var(--check-in-icon-background);
   --art-return-delay: 180ms;
   --art-start: var(
     --check-in-art-delay,
