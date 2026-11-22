@@ -3167,6 +3167,11 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
     );
     --intake-dock-fade-violet: var(--color-violet-900, #4c1d95);
     --intake-dock-fade-rose: var(--color-fuchsia-900, #701a75);
+    --intake-dock-fade-mauve: color-mix(
+      in srgb,
+      var(--color-mauve-950, #0c090c) 37%,
+      transparent
+    );
     --intake-dock-fade-strength: 0.74;
     --canvas-foreground: var(--palette-white);
     --canvas-muted-foreground: color-mix(
@@ -3206,6 +3211,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   .intake-dock::after {
     z-index: -1;
     height: 139.24%;
+    /* A darker base beneath the color washes, strongest at the screen edge. */
     background:
       radial-gradient(
         ellipse at 15% 100%,
@@ -3216,7 +3222,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
         ellipse at 88% 100%,
         color-mix(in srgb, var(--intake-dock-fade-violet) 18%, transparent),
         transparent 80%
-      );
+      ),
+      linear-gradient(to top, var(--intake-dock-fade-mauve), transparent);
     -webkit-mask-image: linear-gradient(
       to top,
       #000 0%,
