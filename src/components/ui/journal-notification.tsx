@@ -1260,27 +1260,7 @@ export function JournalNotification({
         hidden={counter.hidden}
       />
       <span className="journal-notification-closed-wash" aria-hidden="true" />
-      <span className="journal-notification-frame" aria-hidden="true">
-        <svg className="journal-notification-specular" focusable="false">
-          <rect
-            width="100%"
-            height="100%"
-            className="journal-notification-specular-track"
-          />
-          <rect
-            width="100%"
-            height="100%"
-            pathLength="100"
-            className="journal-notification-specular-sheen"
-          />
-          <rect
-            width="100%"
-            height="100%"
-            pathLength="100"
-            className="journal-notification-specular-core"
-          />
-        </svg>
-      </span>
+      <span className="journal-notification-frame" aria-hidden="true" />
       <span className="journal-notification-footer-fade" aria-hidden="true" />
       {kind === "update" && (
         <span className="journal-update-exit-trails" aria-hidden="true">

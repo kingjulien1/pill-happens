@@ -1131,8 +1131,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
             "General detail context uses 88% ink alpha in both modes. A generated change summary uses full primary ink at 13px, weight 700, immediately after the top divider. The preview grid has 16px gaps; three-column captions keep History/Before, BadgeCheck/After or Saved, and Trash2/Removed independently centered above their original shared cards, with yearless dates or status at the right.",
           ],
           [
-            "Layered frame / specular rim",
-            "The inner pink edge and expansion-only middle band keep their geometry. The 2.83px outer rim uses the check-in specular triad, replacing Purple400 with Fuchsia400 in its 78%/22% mix with Pink400. The base mixes 92% pigment with black; the sheen mixes 68% pigment with white; the short core mixes 24% pigment with white, all at 88% opacity. A 12% perimeter sheen and nested 3% core sweep every 5.46s on an SVG, following the existing visibility pause gate; reduced motion keeps them static. The SVG follows the former outer shadow without changing layout or adding a shader, timer or frame loop.",
+            "Static layered frame",
+            "The inner pink edge and expansion-only middle band retain their existing geometry. The static outer rim uses the front icon’s resolved background color, including its transparency. An outward box shadow restores the earlier layered frame with its 18px corners and restrained Pink400 exterior glow; the rim has no moving highlights.",
           ],
           [
             "Surface / countdown",
