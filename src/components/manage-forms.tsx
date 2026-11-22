@@ -298,6 +298,7 @@ export function MedicationForm({
       draft.clearDraft();
       toast.success(medication ? "Medication updated." : "Medication added.", {
         journalScope: saved.notificationScope,
+        ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
         heading: "Medication library",
         details: {
           ...(savedMedication
@@ -607,6 +608,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       draft.clearDraft();
       toast.success("Your goal has been saved.", {
         journalScope: saved.notificationScope,
+        ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
         heading: "Daily goal",
         details: {
           ...(savedGoal

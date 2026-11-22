@@ -13,7 +13,12 @@ import {
   type SVGProps,
 } from "react";
 import { Toaster as Sonner, useSonner, type ToasterProps } from "sonner";
-import { CircleAlert, RefreshCcw, TriangleAlert } from "lucide-react";
+import {
+  CircleAlert,
+  CircleEqual,
+  RefreshCcw,
+  TriangleAlert,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotificationModal } from "@/components/ui/use-notification-modal";
 import { NOTIFICATION_DEFAULT_DURATION } from "@/lib/journal-notification-lifecycle";
@@ -199,10 +204,10 @@ export function ToastSymbol({
   reversed = false,
 }: {
   kind: ToastSymbolKind;
-  variant?: "intake-saved";
+  variant?: "intake-saved" | "unchanged";
   reversed?: boolean;
 }) {
-  const Icon = symbols[kind];
+  const Icon = variant === "unchanged" ? CircleEqual : symbols[kind];
   return (
     <span
       className="journal-toast-symbol"

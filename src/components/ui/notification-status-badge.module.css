@@ -47,6 +47,10 @@
   --status-tone: var(--color-amber-400, #ffb900);
   --status-ink: var(--color-amber-200, #fee685);
 }
+.badge[data-notification-status="unchanged"] {
+  --status-tone: var(--color-mauve-300, #d1c8d2);
+  --status-ink: var(--color-mauve-100, #f3f1f3);
+}
 
 /* The wrapper avoids Badge's direct-child SVG size rule without overriding it. */
 .glyph {
@@ -98,5 +102,9 @@
   .badge[data-notification-status="update"] {
     --status-tone: var(--color-amber-600, #d97706);
     --status-ink: var(--color-amber-800, #92400e);
+  }
+  .badge[data-notification-status="unchanged"] {
+    --status-tone: var(--color-mauve-500, #7b6a7e);
+    --status-ink: var(--color-mauve-800, #332635);
   }
 }

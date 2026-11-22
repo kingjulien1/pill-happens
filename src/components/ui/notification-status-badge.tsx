@@ -1,6 +1,7 @@
 import {
   CircleAlert,
   CircleCheck,
+  Equal,
   Info,
   LoaderCircle,
   Sparkles,
@@ -20,8 +21,9 @@ export const NOTIFICATION_STATUS_REGISTRY = {
   info: { label: "Info", Icon: Info },
   loading: { label: "Loading", Icon: LoaderCircle },
   update: { label: "Update", Icon: Sparkles },
+  unchanged: { label: "Same", Icon: Equal },
 } as const satisfies Record<
-  JournalToastKind,
+  JournalToastKind | "unchanged",
   { label: string; Icon: LucideIcon }
 >;
 

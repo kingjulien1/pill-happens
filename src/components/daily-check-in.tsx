@@ -554,6 +554,7 @@ function CheckInForm({
             : "Your day, saved.",
         {
           journalScope: result.notificationScope,
+          ...(result.unchanged ? { variant: "unchanged" as const } : {}),
           heading: `${period === "morning" ? "Morning" : "Evening"} check-in`,
           undo: result.undo
             ? { onUndo: result.undo, receipt: result.receipt }

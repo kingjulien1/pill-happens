@@ -1,0 +1,191 @@
+.notice.notice:global([data-variant="unchanged"]) {
+  --toast-deep-mix: var(--color-mauve-900, #211922);
+  --toast-deep-overlay: color-mix(
+    in srgb,
+    var(--toast-deep-mix) 76%,
+    transparent
+  );
+  --toast-surface-layers: linear-gradient(
+    color-mix(in srgb, var(--color-mauve-600, #594c5b) 65%, transparent) 0 0
+  );
+  --toast-icon-fill: var(--color-mauve-700, #463948);
+  --toast-icon-background: color-mix(
+    in srgb,
+    var(--color-mauve-500, #7b6a7e) 79%,
+    transparent
+  );
+  --toast-tile: var(--toast-icon-fill);
+  --toast-soft: var(--color-mauve-200, #e8e3e8);
+  --toast-accent: var(--color-mauve-300, #d1c8d2);
+  --toast-bright: var(--color-mauve-100, #f3f1f3);
+  --toast-pink-edge: color-mix(in srgb, var(--toast-accent) 38%, transparent);
+  --toast-rim-muted: color-mix(in srgb, var(--toast-soft) 22%, transparent);
+  --toast-quiet-fill: color-mix(in srgb, var(--toast-soft) 8%, transparent);
+}
+.notice :global(.journal-notification-closed-wash) {
+  background: color-mix(
+    in srgb,
+    var(--color-mauve-600, #594c5b) 64%,
+    transparent
+  );
+}
+.notice :global(.journal-notification-footer-fade) {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--toast-deep-mix) 55%, transparent),
+    transparent
+  );
+}
+.notice :global(.journal-toast-plate-back) {
+  --plate-pigment: var(--color-mauve-400, #ad9aaf);
+}
+.notice :global(.journal-toast-plate-middle) {
+  --plate-pigment: var(--color-mauve-500, #7b6a7e);
+}
+.notice.notice
+  :global([data-toast-variant="unchanged"])
+  :global(.journal-toast-glyph) {
+  width: 27.5625px;
+  height: 27.5625px;
+  top: 0;
+  color: var(--toast-ink);
+  stroke: currentColor;
+}
+.notice :global(.journal-toast-heading-dot) {
+  background: var(--toast-accent);
+}
+.notice.notice :global(.journal-notification-tool-symbol),
+.notice.notice :global(.journal-notification-revert-symbol) {
+  outline: 1px solid var(--toast-pink-edge);
+  outline-offset: -3px;
+}
+.panel {
+  --still-ink: var(--color-mauve-100, #f3f1f3);
+  --still-muted: var(--color-mauve-200, #e8e3e8);
+  --still-edge: color-mix(in srgb, var(--still-muted) 22%, transparent);
+  position: relative;
+  display: flex;
+  min-height: 258px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0 3px;
+  padding: 25px 22px 23px;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 50% 0%,
+      color-mix(in srgb, var(--still-muted) 12%, transparent),
+      transparent 80%
+    ),
+    linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--color-mauve-600, #594c5b) 88%, transparent),
+      color-mix(in srgb, var(--color-mauve-700, #463948) 85%, transparent)
+    ),
+    var(--toast-quiet-fill);
+  box-shadow: inset 0 0 0 1px var(--still-edge);
+  color: var(--still-ink);
+  text-align: center;
+}
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid;
+  border-color: color-mix(in srgb, var(--still-muted) 6%, transparent);
+  border-radius: 15px;
+  pointer-events: none;
+}
+.emblem {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 15px;
+  color: var(--still-ink);
+}
+.emblem > span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--still-muted) 13%, transparent),
+    transparent 72%
+  );
+}
+.emblem > svg {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  stroke-width: 1.15;
+}
+.eyebrow {
+  color: color-mix(in srgb, var(--still-muted) 74%, transparent);
+  font-size: 8px;
+  font-weight: 550;
+  line-height: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.panel h3 {
+  margin: 5px 0 0;
+  color: var(--still-ink);
+  font-size: 23px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+}
+.notice .panel p {
+  max-width: 26ch;
+  margin: 8px 0 0;
+  color: color-mix(in srgb, var(--still-muted) 82%, transparent);
+  font-size: 11px;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+.seal {
+  margin-top: 20px;
+  padding-top: 8px;
+  border-top: 1px solid;
+  border-top-color: var(--still-edge);
+  color: color-mix(in srgb, var(--still-muted) 52%, transparent);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 12px;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 359px) {
+  /* The heading already states the result; keep it whole on narrow phones. */
+  .notice :global(.journal-toast-heading-status) {
+    display: none;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .notice.notice:global([data-variant="unchanged"]) {
+    --toast-deep-mix: var(--color-mauve-200, #e8e3e8);
+    --toast-icon-fill: var(--color-mauve-100, #f3f1f3);
+    --toast-icon-background: color-mix(
+      in srgb,
+      var(--color-mauve-400, #ad9aaf) 55%,
+      transparent
+    );
+    --toast-soft: var(--color-mauve-600, #594c5b);
+    --toast-accent: var(--color-mauve-500, #7b6a7e);
+    --toast-bright: var(--color-mauve-700, #463948);
+    --toast-surface-layers: linear-gradient(
+      color-mix(in srgb, var(--color-mauve-100, #f3f1f3) 85%, transparent) 0 0
+    );
+  }
+  .panel {
+    --still-ink: var(--color-mauve-900, #211922);
+    --still-muted: var(--color-mauve-700, #463948);
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 0%, #ffffff50, transparent 80%),
+      color-mix(in srgb, var(--color-mauve-200, #e8e3e8) 93%, transparent);
+  }
+}

@@ -45,7 +45,11 @@ export type UndoMetadata = {
   expiresAt: string;
   entityId?: string;
 };
-export type UndoableAppData = AppData & { _undo?: UndoMetadata };
+export type UndoableAppData = AppData & {
+  _undo?: UndoMetadata;
+  /** Response-only confirmation from the winning atomic save, never journal data. */
+  _unchanged?: true;
+};
 type StateRepository = Pick<JournalRepository, "readState" | "mutateState">;
 
 function copy<T>(value: T): T {
@@ -154,12 +158,25 @@ export async function mutateJournalStateWithUndo(
     state.intakes = withCurrentMedicationDetails(state).intakes;
     change = { before, after: snapshot(state, target) };
   });
-  if (
-    secret.length < 32 ||
-    !change ||
-    isDeepStrictEqual(change.before, change.after)
-  )
-    return data;
+  if (!change) return data;
+  // A check-in's version may advance on Save even when every answer is equal.
+  // Compare complete records (including private writing), not display snapshots.
+  const content = (record: UndoRecord) => {
+    if (!record) return record;
+    if (target.kind === "intake")
+      return {
+        ...record,
+        takenAt: Date.parse(String(record.takenAt)),
+        route: record.route ?? "unspecified",
+      };
+    if (target.kind !== "check-in") return record;
+    const { updatedAt: _version, ...fields } = record;
+    void _version;
+    return fields;
+  };
+  if (isDeepStrictEqual(content(change.before), content(change.after)))
+    return { ...data, _unchanged: true };
+  if (secret.length < 32) return data;
   const undo = encodeReceipt(
     {
       version: 1,

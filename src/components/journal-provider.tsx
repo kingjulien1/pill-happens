@@ -33,6 +33,8 @@ export type JournalMutationResult = {
   /** Fence notices from async results to the journal that started the request. */
   notificationScope: string;
   data: AppData;
+  /** Explicit server confirmation; missing Undo alone never means unchanged. */
+  unchanged?: boolean;
   entityId?: string;
   /** Sensitive, journal-scoped receipt; its original server expiry is retained. */
   receipt?: { token: string; expiresAt: string };
@@ -301,7 +303,7 @@ export function JournalProvider({
         }
         if (!res.ok)
           throw new Error(result.error || "Your change couldn't be saved.");
-        const { _undo: receipt, ...nextData } = result;
+        const { _undo: receipt, _unchanged, ...nextData } = result;
         acceptData(nextData);
         // New intake timestamps can be later than the last minute tick.
         setNow(new Date());
@@ -309,6 +311,7 @@ export function JournalProvider({
         return {
           notificationScope,
           data: nextData as AppData,
+          ...(_unchanged === true ? { unchanged: true } : {}),
           ...(typeof receipt?.token === "string" &&
           typeof receipt?.expiresAt === "string"
             ? {

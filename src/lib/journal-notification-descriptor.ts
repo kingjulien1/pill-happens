@@ -93,7 +93,7 @@ export const journalNotificationDescriptor = z.object({
   heading: text,
   message: text,
   dismissible: z.boolean(),
-  variant: z.literal("intake-saved").optional(),
+  variant: z.enum(["intake-saved", "unchanged"]).optional(),
   details: z
     .object({
       preview: z

@@ -191,6 +191,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       store.clearDraft(`intake:edit:${intake.id}`);
       toast.success("Entry removed from your daily log.", {
         journalScope: saved.notificationScope,
+        ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
         heading: "Intake removed",
         details: {
           ...(beforePreview ? { preview: { before: beforePreview } } : {}),
@@ -771,6 +772,7 @@ export function MedicationsPage() {
           : "Medication archived. Past entries are saved.",
         {
           journalScope: saved.notificationScope,
+          ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
           heading: "Medication library",
           details: {
             ...(updatedMedication
@@ -1022,6 +1024,7 @@ export function GoalsPage() {
       setDeleting(null);
       toast.success("Goal removed. Your entries stay saved.", {
         journalScope: saved.notificationScope,
+        ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
         heading: "Goal removed",
         details: {
           ...(beforePreview ? { preview: { before: beforePreview } } : {}),
@@ -1266,6 +1269,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           draft.clearDraft();
           toast.success("Timezone updated for your journal.", {
             journalScope: saved.notificationScope,
+            ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
             heading: "Journal settings",
             details: {
               preview: {

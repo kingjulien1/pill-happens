@@ -376,7 +376,11 @@ export function IntakeForm({
         {
           journalScope: saved.notificationScope,
           heading: intake ? "Intake updated" : "Intake saved",
-          ...(!intake ? { variant: "intake-saved" as const } : {}),
+          ...(saved.unchanged
+            ? { variant: "unchanged" as const }
+            : !intake
+              ? { variant: "intake-saved" as const }
+              : {}),
           details: {
             ...(savedEntry
               ? {

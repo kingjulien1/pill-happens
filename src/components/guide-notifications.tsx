@@ -34,7 +34,7 @@ export type JournalToastOptions = ExternalToast & {
   heading?: ReactNode;
   details?: JournalNotificationDetails;
   undo?: JournalNotificationUndo;
-  variant?: "intake-saved";
+  variant?: "intake-saved" | "unchanged";
 };`;
 
 const basic = `"use client";
@@ -532,7 +532,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "variant",
-            "Only intake-saved is registered as saved-intake context. It shares the two-tone success BellCheck; it is not an Undo guarantee.",
+            "intake-saved supplies saved-intake context. unchanged is used only for an explicit server-confirmed no-change result; it becomes an informational notice with a neutral Same badge and no Undo.",
           ],
           [
             "id",
@@ -595,6 +595,17 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         but only enabled when the provider supplies its callback. Other notices
         retain a native-disabled gray control; absence of a receipt does not
         imply that no data was changed.
+      </p>
+      <p>
+        A server-confirmed unchanged save uses the informational
+        <code> unchanged</code> variant: “Nothing changed.”, a neutral Same badge,
+        an oversized centered equal-sign icon and a Mauve-gray panel. The
+        existing record links stay available, without a comparison, change
+        recap or Undo. The outcome comes from complete record values captured
+        in the winning atomic save, including private notes; equal display
+        snapshots or a missing receipt alone never trigger it. Check-in version
+        timestamps do not count as answer changes. The response-only flag stays
+        out of saved journal data, and the display variant survives restoration.
       </p>
 
       <Heading id="previews" level={3}>

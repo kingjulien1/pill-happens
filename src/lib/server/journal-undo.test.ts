@@ -425,6 +425,8 @@ test("no-op mutations and unconfigured development do not offer fake undo", asyn
   const f = fixture();
   const unchanged = await f.save({ kind: "intake", id: intake.id }, () => {});
   assert.equal(unchanged._undo, undefined);
+  assert.equal(unchanged._unchanged, true);
+  assert.equal("_unchanged" in f.state(), false);
   const dev = await mutateJournalStateWithUndo(
     f.repository,
     "journal-a",
@@ -437,6 +439,64 @@ test("no-op mutations and unconfigured development do not offer fake undo", asyn
   );
   assert.equal(dev._undo, undefined);
   assert.equal(dev.settings.timezone, "Europe/London");
+  assert.equal(dev._unchanged, undefined);
+});
+
+test("unchanged outcomes compare all saved content, not just visible preview values", async () => {
+  const f = fixture();
+  const changedNote = await f.save(
+    { kind: "intake", id: intake.id },
+    (state) => {
+      state.intakes[0].note =
+        "A different private note, with the same visible dose.";
+    },
+  );
+  assert.equal(changedNote._unchanged, undefined);
+  assert.ok(changedNote._undo);
+  const checkInVersion = await f.save(
+    { kind: "check-in", day: checkIn.day, period: "morning" },
+    (state) => {
+      state.dailyCheckIns![0].updatedAt = new Date(now).toISOString();
+    },
+  );
+  assert.equal(checkInVersion._unchanged, true);
+  assert.equal(checkInVersion._undo, undefined);
+  const writing = await f.save(
+    { kind: "check-in", day: checkIn.day, period: "morning" },
+    (state) => {
+      state.dailyCheckIns![0].note = "Later synthetic writing";
+    },
+  );
+  assert.equal(writing._unchanged, undefined);
+  assert.ok(writing._undo);
+  const equivalentTime = await f.save(
+    { kind: "intake", id: intake.id },
+    (state) => {
+      state.intakes[0].takenAt = new Date(intake.takenAt).toISOString();
+      state.intakes[0].route = "unspecified";
+    },
+  );
+  assert.equal(equivalentTime._unchanged, true);
+});
+
+test("the winning atomic attempt owns the unchanged outcome under concurrent edits", async () => {
+  const f = fixture();
+  f.race((state) => {
+    state.intakes[0].quantity = 2;
+  });
+  const changed = await f.save({ kind: "intake", id: intake.id }, (state) => {
+    state.intakes[0].quantity = 1;
+  });
+  assert.equal(changed._unchanged, undefined);
+  assert.ok(changed._undo);
+  f.race((state) => {
+    state.intakes[0].quantity = 2;
+  });
+  const unchanged = await f.save({ kind: "intake", id: intake.id }, (state) => {
+    state.intakes[0].quantity = 2;
+  });
+  assert.equal(unchanged._unchanged, true);
+  assert.equal(unchanged._undo, undefined);
 });
 
 test("large Unicode check-in writing remains reversible through response-body receipts", async () => {
@@ -505,6 +565,20 @@ test("real Postgres CAS receipts capture the winning attempt and never enter sto
     now,
   );
   assert.equal((await repository.readState("personal")).intakes[0].quantity, 2);
+  const unchanged = await mutateJournalStateWithUndo(
+    repository,
+    "personal",
+    { kind: "intake", id: intake.id },
+    () => {},
+    secret,
+    now,
+  );
+  assert.equal(unchanged._unchanged, true);
+  assert.equal(unchanged._undo, undefined);
+  assert.equal(
+    Object.hasOwn(await repository.readState("personal"), "_unchanged"),
+    false,
+  );
   assert.equal(
     Object.hasOwn(await repository.readState("personal"), "_undo"),
     false,

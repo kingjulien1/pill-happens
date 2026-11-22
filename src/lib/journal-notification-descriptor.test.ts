@@ -42,6 +42,24 @@ test("a confirmed intake, links and original Undo expiry round-trip as data", ()
   assert.deepEqual(journalNotificationDescriptor.parse(value), notice);
 });
 
+test("unchanged notices retain their informational treatment and destinations after restoring", () => {
+  const value = {
+    ...notice,
+    kind: "info",
+    variant: "unchanged",
+    heading: "Nothing changed.",
+    message: "Your saved details already match.",
+    undo: undefined,
+  };
+  const restored = journalNotificationDescriptor.parse(
+    JSON.parse(JSON.stringify(value)),
+  );
+  assert.equal(restored.variant, "unchanged");
+  assert.equal(restored.kind, "info");
+  assert.equal(restored.undo, undefined);
+  assert.deepEqual(restored.details?.links, notice.details.links);
+});
+
 test("medication switches preserve the confirmed identity comparison without record IDs", () => {
   for (const medicationChanged of [true, false]) {
     const value = structuredClone(notice);

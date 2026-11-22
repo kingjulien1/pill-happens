@@ -49,6 +49,8 @@ import { NotificationStatusBadge } from "@/components/ui/notification-status-bad
 import { NotificationPullIndicator } from "@/components/ui/notification-pull-indicator";
 import { useNotificationPull } from "@/components/ui/use-notification-pull";
 import { NotificationChangePreview } from "@/components/notification-change-preview";
+import { NotificationUnchanged } from "@/components/ui/notification-unchanged";
+import unchangedStyles from "./notification-unchanged.module.css";
 import type { NotificationChangePreview as NotificationChangePreviewData } from "@/lib/notification-change-preview";
 import type { JournalToastKind } from "@/components/ui/journal-toast";
 import {
@@ -101,7 +103,7 @@ export type JournalNotificationProps = {
   onUndoPending?: (pending: boolean) => void;
   details?: JournalNotificationDetails;
   undo?: JournalNotificationUndo;
-  variant?: "intake-saved";
+  variant?: "intake-saved" | "unchanged";
   icon?: ReactNode;
   dismissible: boolean;
   action?: ExternalToast["action"];
@@ -1072,7 +1074,8 @@ export function JournalNotification({
   }
 
   const previewRecord = details?.preview?.after ?? details?.preview?.before;
-  const intakeReceipt = isIntakeReceipt(details?.preview);
+  const unchanged = variant === "unchanged";
+  const intakeReceipt = !unchanged && isIntakeReceipt(details?.preview);
   const receiptDestinations = intakeReceipt
     ? intakeReceiptDestinations(details?.links)
     : undefined;
@@ -1209,7 +1212,7 @@ export function JournalNotification({
   return (
     <div
       ref={root}
-      className="journal-notification"
+      className={`journal-notification${unchanged ? ` ${unchangedStyles.notice}` : ""}`}
       data-notification-id={id}
       data-notification-host-id={nativeHostId}
       data-kind={kind}
@@ -1340,7 +1343,9 @@ export function JournalNotification({
                     className="journal-toast-heading-dot"
                     aria-hidden="true"
                   />
-                  <NotificationStatusBadge status={kind} />
+                  <NotificationStatusBadge
+                    status={unchanged ? "unchanged" : kind}
+                  />
                 </span>
               </span>
               <span className="journal-notification-description" id={messageId}>
@@ -1363,7 +1368,9 @@ export function JournalNotification({
       >
         <div className="journal-notification-details-inner">
           <div className="journal-notification-main">
-            {updatePanel ? (
+            {unchanged ? (
+              <NotificationUnchanged />
+            ) : updatePanel ? (
               updatePanel
             ) : details?.preview ? (
               <NotificationChangePreview
@@ -1589,12 +1596,12 @@ export function JournalNotification({
                 </span>
               </Button>
             </div>
-            {!intakeReceipt && (
+            {!intakeReceipt && !unchanged && (
               <span className="journal-notification-footer-copy">
                 {footerCopy}
               </span>
             )}
-            {!intakeReceipt && (
+            {!intakeReceipt && !unchanged && (
               <span className="journal-notification-footer-note">
                 {details?.preview ? "These cards capture this change. " : null}
                 {details?.links?.length ? (

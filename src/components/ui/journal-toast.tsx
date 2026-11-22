@@ -33,7 +33,7 @@ export type JournalToastOptions = ExternalToast & {
   heading?: ReactNode;
   details?: JournalNotificationDetails;
   undo?: JournalNotificationUndo;
-  variant?: "intake-saved";
+  variant?: "intake-saved" | "unchanged";
   /** Browser-only examples, live requests and service workers cannot be replayed. */
   persistence?: false;
   /** Fences a late async result to the journal that initiated its request. */
@@ -370,6 +370,16 @@ function notify(
   message: ToastMessage,
   options: JournalToastOptions = {},
 ) {
+  if (kind === "success" && options.variant === "unchanged") {
+    kind = "info";
+    message = "Already saved just like this.";
+    options = {
+      ...options,
+      heading: "No changes.",
+      description: undefined,
+      undo: undefined,
+    };
+  }
   const description =
     options.description === undefined ? message : options.description;
   const duration =
