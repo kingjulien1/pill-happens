@@ -1167,7 +1167,11 @@ export function DeveloperGuidePage() {
                 WebGL context, JavaScript frame clock or resize observer. Its
                 original <code>#7c3aed</code> identity and layered washes remain.
                 Hidden tabs, open dialogs and reduced-motion preferences pause
-                the field; the loading handoff uses the existing entry gate.
+                the page field; the loading handoff uses the existing entry gate.
+                The sleep recap reuses a surface-scoped field at 17% opacity,
+                above Mauve950 and soft highlights, beneath the same canvas mesh
+                at 12%. Its heading sits outside the card. Surface motion stays
+                local to the visible card and pauses offscreen or when inert.
               </p>
               <p>
                 Dark Mode combines Pink300 at 21% opacity and Purple900 at 69%

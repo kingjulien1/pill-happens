@@ -3,6 +3,10 @@
   margin-bottom: 14px;
 }
 .section {
+  /* This deliberately dark recap keeps readable copy in either app mode. */
+  --foreground: var(--color-mauve-50, #faf5fa);
+  --muted-foreground: var(--color-violet-200, #ddd6fe);
+  --ring: var(--color-violet-200, #ddd6fe);
   --recap-line: color-mix(
     in srgb,
     var(--color-violet-300, #c4b5fd) 17%,
@@ -20,24 +24,48 @@
   border: 1px solid;
   border-color: var(--recap-line);
   border-radius: var(--dialog-radius-surface, 24px);
-  background:
-    radial-gradient(ellipse 90% 45% at 50% 16%, #a78bfa16, transparent),
-    radial-gradient(ellipse 70% 60% at 100% 100%, #ec48990b, transparent),
-    color-mix(
-      in srgb,
-      var(--navigation-surface, var(--popover)) 94%,
-      var(--color-mauve-950, #0c090c)
-    );
+  background: var(--color-mauve-950, #0c090c);
+  color-scheme: dark;
   box-shadow: inset 0 1px 0
     color-mix(in srgb, var(--foreground) 5%, transparent);
   color: var(--foreground);
+}
+.backdrop {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.highlight,
+.iridescence,
+.accent {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.highlight {
+  background:
+    radial-gradient(ellipse 95% 55% at 18% 8%, #a78bfa24, transparent 75%),
+    radial-gradient(ellipse 75% 65% at 100% 90%, #d946ef17, transparent 78%);
+}
+.iridescence {
+  opacity: 0.17;
+}
+.accent {
+  background: var(--app-canvas-accent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.12;
 }
 .topline {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 9px;
+  margin-bottom: 14px;
+  padding-inline: 4px;
 }
 .topline h3 {
   min-width: 0;
@@ -270,18 +298,5 @@
   }
   .stageLegend {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (prefers-color-scheme: light) {
-  .section {
-    --recap-line: color-mix(
-      in srgb,
-      var(--color-violet-700, #6d28d9) 15%,
-      transparent
-    );
-    background:
-      radial-gradient(ellipse 90% 45% at 50% 16%, #a78bfa1f, transparent),
-      radial-gradient(ellipse 70% 60% at 100% 100%, #ec489910, transparent),
-      var(--popover);
   }
 }

@@ -7,6 +7,7 @@ import {
   type MorningSleepDraft,
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
+import { Iridescence } from "./iridescence";
 import styles from "./sleep-score-summary.module.css";
 
 function duration(minutes: number | null | undefined) {
@@ -78,16 +79,23 @@ export function SleepScoreSummary({
   const validStageTotal = stageTotal !== null && stageTotal <= 1440;
   return (
     <div className={styles.wrapper}>
+      <div className={styles.topline}>
+        <h3 id={`${id}-heading`}>The Night, In Numbers</h3>
+        <span>
+          Sleep Cycle <span aria-hidden="true">·</span> Night recap
+        </span>
+      </div>
       <section
         className={styles.section}
         aria-labelledby={`${id}-heading`}
         data-sleep-score-summary
       >
-        <div className={styles.topline}>
-          <h3 id={`${id}-heading`}>The Night, In Numbers</h3>
-          <span>
-            Sleep Cycle <span aria-hidden="true">·</span> Night recap
-          </span>
+        <div className={styles.backdrop} aria-hidden="true">
+          <span className={styles.highlight} />
+          <div className={styles.iridescence}>
+            <Iridescence scope="surface" />
+          </div>
+          <span className={styles.accent} />
         </div>
 
         <div className={styles.overview}>

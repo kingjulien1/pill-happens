@@ -185,17 +185,6 @@
   text-transform: uppercase;
   pointer-events: none;
 }
-@media (prefers-color-scheme: light) {
-  .dial {
-    --score-violet: #8b5cf6;
-    --score-iris: #6366f1;
-    --score-orchid: #c084fc;
-  }
-  .number > span {
-    color: #7e22ce;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .progress,
   .maskStroke,

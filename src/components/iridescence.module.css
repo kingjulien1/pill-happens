@@ -56,10 +56,18 @@
 }
 
 /* Pause the page behind a modal; the refresh handoff uses the entry-state gate. */
-:global(body:has([data-slot="dialog-content"][data-open])) .field::before,
-:global(body:has([data-slot="dialog-content"][data-open])) .field::after,
-:global(body:has([data-slot="drawer-popup"][data-open])) .field::before,
-:global(body:has([data-slot="drawer-popup"][data-open])) .field::after {
+:global(body:has([data-slot="dialog-content"][data-open]))
+  .field[data-iridescence-scope="page"]::before,
+:global(body:has([data-slot="dialog-content"][data-open]))
+  .field[data-iridescence-scope="page"]::after,
+:global(body:has([data-slot="drawer-popup"][data-open]))
+  .field[data-iridescence-scope="page"]::before,
+:global(body:has([data-slot="drawer-popup"][data-open]))
+  .field[data-iridescence-scope="page"]::after,
+:global([inert]) .field::before,
+:global([inert]) .field::after,
+:global([data-closed]) .field::before,
+:global([data-closed]) .field::after {
   animation-play-state: paused;
 }
 .overlay {
