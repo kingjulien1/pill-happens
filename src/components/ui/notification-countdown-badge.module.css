@@ -1,24 +1,17 @@
 .badge {
-  --countdown-pearl: #fff1f8;
-  --countdown-orchid: #ddd6fe;
-  --countdown-pink: #f9a8d4;
-  /* Its centre sits on the rounded corner's diagonal, across the card rim. */
+  /* Keep the compact dial centred on the same card corner. */
   position: absolute;
   z-index: 7;
   top: 6px;
   left: 6px;
   translate: -50% -50%;
   display: block;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #211025;
-  color: var(--color-pink-200, #fccee8);
-  box-shadow:
-    0 2px 8px #150b2455,
-    0 0 12px -5px #f9a8d47a;
-  font-size: 14.5px;
-  font-weight: 800;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  color: #fff1f2;
+  font-size: 14px;
+  font-weight: 750;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   transform-origin: center;
@@ -30,40 +23,62 @@
   opacity: 0;
   visibility: hidden;
 }
+.lighting {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  color: #fecdd3;
+}
+.glow {
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 46% 40%,
+    currentColor,
+    transparent 68%
+  );
+  opacity: 0.46;
+  pointer-events: none;
+}
 .face {
   position: absolute;
-  inset: 4px;
-  border-radius: inherit;
-  background:
-    radial-gradient(ellipse at 28% 15%, #f9a8d42e, transparent 76%), #32142f;
-  box-shadow:
-    inset 0 0 0 1px #fbcfe833,
-    inset 0 -3px 6px #10091b55;
+  inset: 1px;
+  border-radius: 9px;
+  background: linear-gradient(145deg, #ffffff0d, #ffffff00 70%), #211025f5;
+  box-shadow: 0 2px 5px #150b2440;
 }
 .bezel {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  rotate: -90deg;
+  overflow: visible;
 }
 .track {
-  stroke: #fbcfe824;
-  stroke-width: 2;
+  stroke: #fecdd326;
+  stroke-width: 1;
 }
 .arc {
-  stroke-width: 2.3;
+  stroke: currentColor;
+  stroke-width: 1.5;
   stroke-linecap: round;
+}
+.glint {
+  stroke: #fff1f2;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0;
 }
 .badge[data-paused="true"] .bezel {
   opacity: 0.72;
 }
 .digits {
   position: absolute;
-  inset: 5px;
+  inset: 4px;
   overflow: hidden;
-  border-radius: 50%;
-  perspective: 60px;
+  border-radius: 6px;
+  perspective: 65px;
 }
 .value,
 .outgoing {
@@ -72,48 +87,8 @@
   display: grid;
   place-items: center;
   backface-visibility: hidden;
-  transform-origin: 50% 55%;
+  transform-origin: 50% 50% -6px;
 }
 .outgoing {
   opacity: 0;
-}
-.pulse {
-  position: absolute;
-  inset: -5px;
-  width: 44px;
-  height: 44px;
-  overflow: visible;
-  color: var(--countdown-pink);
-  stroke: currentColor;
-  stroke-width: 1.1;
-  opacity: 0;
-  transform-origin: center;
-  pointer-events: none;
-}
-.pulse path {
-  stroke: var(--countdown-pearl);
-  stroke-width: 1.3;
-  stroke-linecap: round;
-}
-@media (prefers-color-scheme: light) {
-  .badge {
-    --countdown-pearl: #fdf2f8;
-    --countdown-orchid: #c4b5fd;
-    --countdown-pink: #db2777;
-    background: #fce7f3;
-    color: #831843;
-    box-shadow:
-      0 2px 8px #6f335b2e,
-      0 0 12px -5px #db277754;
-  }
-  .face {
-    background:
-      radial-gradient(ellipse at 28% 15%, #ffffffd9, transparent 76%), #fbcfe8;
-    box-shadow:
-      inset 0 0 0 1px #be185d29,
-      inset 0 -3px 6px #9d174d0f;
-  }
-  .track {
-    stroke: #9d174d26;
-  }
 }

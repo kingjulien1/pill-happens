@@ -193,6 +193,7 @@ export function JournalNotification({
   );
   const [counter, setCounter] = useState<{
     seconds: number | null;
+    remainingMs: number;
     paused: boolean;
     hidden: boolean;
   }>({
@@ -200,6 +201,7 @@ export function JournalNotification({
       !initialReading.complete && initialReading.timeUntilComplete <= 3_000
         ? Math.max(1, Math.ceil(initialReading.timeUntilComplete / 1_000))
         : null,
+    remainingMs: initialReading.timeUntilComplete,
     paused: true,
     hidden: true,
   });
@@ -416,7 +418,12 @@ export function JournalNotification({
         previous.paused === snapshot.paused &&
         previous.hidden === hidden
           ? previous
-          : { seconds, paused: snapshot.paused, hidden },
+          : {
+              seconds,
+              remainingMs: snapshot.timeUntilComplete,
+              paused: snapshot.paused,
+              hidden,
+            },
       );
       const now = performance.now();
       if (
@@ -1276,6 +1283,7 @@ export function JournalNotification({
       </div>
       <NotificationCountdownBadge
         seconds={counter.seconds}
+        remainingMs={counter.remainingMs}
         paused={counter.paused}
         hidden={counter.hidden}
       />
