@@ -6,7 +6,7 @@ import {
 } from "@/lib/page-entry-readiness";
 
 import { useCallback, useRef, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
@@ -302,7 +302,8 @@ export function IntakeAction({
         data-intake-action-note
         data-intake-entry-part="footer"
       >
-        Your journal, your pace, your way.
+        <Sparkles strokeWidth={2.75} aria-hidden="true" />
+        <span>Your journal, your pace, your way.</span>
       </p>
     </div>
   );

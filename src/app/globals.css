@@ -3523,11 +3523,11 @@ input[type="time"] {
     transform: translate3d(0, 12px, 0);
   }
   70% {
-    opacity: 1;
+    opacity: var(--intake-note-opacity, 1);
     transform: translate3d(0, -0.5px, 0);
   }
   100% {
-    opacity: 1;
+    opacity: var(--intake-note-opacity, 1);
     transform: none;
   }
 }
@@ -3598,12 +3598,9 @@ input[type="time"] {
   }
 }
 
-/* Quiet, non-interactive supporting copy keeps its existing 10px clearance. */
-.intake-action-note[data-intake-action-note] {
-  color: color-mix(in srgb, var(--canvas-muted-foreground) 56%, transparent);
-}
+/* With the parent's 7px gap, the tagline clears the button by 22.5px. */
 .intake-action-content > .intake-action-note {
-  margin-block-start: 3px;
+  margin-block-start: 15.5px;
 }
 
 /* One quiet strip: total at the start, category quantities at the far end. */
@@ -3786,18 +3783,27 @@ input[type="time"] {
   }
 }
 .intake-action-note {
+  --intake-note-opacity: 0.67;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0 12px;
+  gap: 7px;
   margin: 0;
-  color: color-mix(in srgb, var(--canvas-muted-foreground) 50%, transparent);
-  font-size: 11.5px;
-  font-weight: 450;
+  color: var(--color-violet-400);
+  opacity: var(--intake-note-opacity);
+  font-size: calc(11.5px * 31 / 24);
+  font-weight: 700;
   line-height: 1.5;
   text-align: center;
   text-shadow: none;
+}
+.intake-action-note > svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+.intake-action-note > span {
+  min-width: 0;
 }
 @media (max-width: 767px) {
   .intake-primary-cta[data-slot="button"] {

@@ -88,7 +88,20 @@
   --action-face-inset: 0px;
   --action-outer-line: 0px;
   --action-inner-line: calc(1.667px * 2.5);
-  --control-face-edge: var(--check-in-icon-background);
+  --action-inner-detail-width: calc(var(--action-inner-line) * 17 / 24);
+  --action-inner-detail-color: color-mix(
+    in srgb,
+    var(--color-mauve-500) 86%,
+    var(--color-violet-950) 14%
+  );
+  --control-face: var(--control-face-dark);
+  --control-ink: color-mix(
+    in srgb,
+    var(--color-mauve-950) 50%,
+    var(--color-mauve-900) 50%
+  );
+  --control-secondary: var(--color-mauve-700);
+  --control-face-edge: var(--color-mauve-700);
 }
 
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
@@ -126,7 +139,11 @@
   pointer-events: none;
 }
 .action[data-control-style="satin"][data-log-intake-rim]::before {
-  box-shadow: inset 0 0 0 var(--action-inner-line) var(--control-face-edge);
+  box-shadow:
+    inset 0 0 0 var(--action-inner-line) var(--control-face-edge),
+    inset 0 0 0
+      calc(var(--action-inner-line) + var(--action-inner-detail-width))
+      var(--action-inner-detail-color);
 }
 
 .action[data-control-style="satin"] :global(.intake-primary-row) {
@@ -186,13 +203,17 @@
 .action[data-log-intake-rim]
   :global(.intake-primary-label)
   > :global(.intake-log-symbol) {
-  width: 23px;
-  height: 23px;
+  width: calc(23px * 97 / 84);
+  height: calc(23px * 97 / 84);
   border-radius: 0;
   background: none;
   box-shadow: none;
   color: var(--control-secondary);
   scale: none;
+}
+.action[data-log-intake-rim] :global(.intake-log-symbol-pill) {
+  width: 100%;
+  height: 100%;
 }
 
 /* Pink tools keep their original glass geometry; only their local paint changes. */
