@@ -1,15 +1,35 @@
 .dialog[data-reflection-dialog] {
   --writer-top-gap: max(12px, env(safe-area-inset-top));
-  --writer-neutral: var(--surface-reading-foreground);
-  --writer-on-neutral: var(--background);
+  --writer-neutral: var(--foreground);
+  --check-in-title-size: 22px;
   --writer-neutral-fill: color-mix(
     in srgb,
-    var(--writer-neutral) 9%,
+    var(--navigation-highlight) 6%,
     transparent
   );
   --writer-action-fill: color-mix(
     in srgb,
-    var(--palette-apricot) 8%,
+    var(--navigation-highlight) 8%,
+    transparent
+  );
+  --writer-tool-edge: color-mix(
+    in srgb,
+    var(--navigation-highlight) 18%,
+    transparent
+  );
+  --writer-tool-selected: color-mix(
+    in srgb,
+    var(--navigation-highlight) 24%,
+    transparent
+  );
+  --writer-footer-violet: color-mix(
+    in srgb,
+    var(--color-violet-400) 18%,
+    transparent
+  );
+  --writer-footer-pink: color-mix(
+    in srgb,
+    var(--color-pink-400) 7%,
     transparent
   );
   inset: calc(var(--writer-visible-top, 0px) + var(--writer-top-gap)) 0 auto;
@@ -27,10 +47,8 @@
   padding: 0;
   /* The fullscreen workspace meets the viewport along its bottom edge. */
   border-radius: var(--dialog-radius-surface) var(--dialog-radius-surface) 0 0;
-  --dialog-surface-paint:
-    linear-gradient(var(--surface-reading), var(--surface-reading)),
-    var(--background);
-  color: var(--surface-reading-foreground);
+  --dialog-surface-paint: var(--navigation-paint);
+  color: var(--foreground);
   translate: none;
 }
 .scrollContent {
@@ -58,55 +76,36 @@
   flex: 0 0 auto;
   flex-direction: column;
   align-items: stretch;
-  padding: calc(24px * 7 / 12) max(18px, env(safe-area-inset-right)) 16px
+  padding: 28px max(18px, env(safe-area-inset-right)) 24px
     max(18px, env(safe-area-inset-left));
-  border-bottom: 1px solid var(--glass-border);
   background: none;
 }
 .titleRow {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr) 44px;
-  align-items: center;
-  column-gap: 10px;
-  margin-block-end: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 8px;
+  margin-block-start: -8px;
+  margin-inline-end: -8px;
 }
-.context {
-  display: flex;
-  min-width: 0;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 7px;
-  margin: 0;
-  color: color-mix(in srgb, var(--surface-reading-foreground) 82%, transparent);
-  font-size: 12.5px;
-  font-weight: 550;
-  line-height: 1.45;
-}
-.context time {
-  flex: none;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.contextSeparator {
-  flex: none;
-  opacity: 0.55;
-}
-.periodLabel {
-  overflow: hidden;
-  min-width: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.headerActions {
+  gap: 2px;
 }
 .title {
   min-width: 0;
   margin: 0;
+  padding-block-start: 8px;
   outline: none;
-  font-size: 22px;
+  color: var(--foreground);
+  font-size: var(--check-in-title-size);
   font-weight: 650;
   letter-spacing: -0.025em;
-  line-height: 1.3;
+  line-height: 28px;
+}
+.context {
+  min-width: 0;
+  margin: -4px 0 0;
 }
 .description {
   display: -webkit-box;
@@ -114,17 +113,16 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
   overflow: hidden;
-  width: 100%;
-  max-width: none;
-  margin: 12px 0 0;
-  padding: 0;
-  color: color-mix(in srgb, var(--surface-reading-foreground) 85%, transparent);
-  font-size: 14px;
-  font-weight: 500;
+  min-width: 0;
+  margin: 24px 0 0;
+  color: var(--muted-foreground);
+  opacity: 0.67;
+  font-size: 12px;
+  font-weight: 450;
   line-height: 1.65;
 }
 .iconControl {
-  --writer-action-size: 33px;
+  --writer-action-size: 36px;
   position: relative;
   width: var(--writer-action-size);
   min-width: var(--writer-action-size);
@@ -132,44 +130,36 @@
   min-height: var(--writer-action-size);
   flex: 0 0 auto;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--writer-neutral) 12%, transparent);
+  border: 1px solid var(--writer-tool-edge);
   border-radius: var(--dialog-radius-compact);
   background: var(--writer-action-fill);
-  color: var(--surface-reading-foreground);
-  box-shadow: 0 1px 3px
-    color-mix(in srgb, var(--writer-neutral) 4%, transparent);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  color: var(--foreground);
+  box-shadow: none;
   transition:
-    background 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+.iconControl.modeControl {
+  width: auto;
+  gap: 6px;
+  padding-inline: 10px;
+  border-color: transparent;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 600;
+}
+.modeControl[aria-pressed="true"] {
+  background: var(--writer-tool-selected);
+  color: var(--foreground);
 }
 .doneIcon {
   width: 18px;
   height: 18px;
 }
-@media (prefers-color-scheme: dark) {
-  .dialog[data-reflection-dialog] {
-    --writer-neutral: var(--surface-reading-foreground);
-    --writer-on-neutral: var(--background);
-    --writer-neutral-fill: color-mix(
-      in srgb,
-      var(--writer-neutral) 14%,
-      transparent
-    );
-    --writer-action-fill: color-mix(
-      in srgb,
-      var(--palette-apricot) 14%,
-      transparent
-    );
-  }
-}
 @media (hover: hover) and (pointer: fine) {
   .iconControl:not(:disabled):hover {
-    background: color-mix(in srgb, var(--writer-neutral) 15%, transparent);
-    box-shadow: 0 2px 7px
-      color-mix(in srgb, var(--writer-neutral) 7%, transparent);
+    background: var(--writer-tool-selected);
   }
 }
 .iconControl:not(:disabled):active {
@@ -520,15 +510,30 @@
   min-width: 0;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 7px;
-  margin: 10px max(14px, env(safe-area-inset-right)) 0
-    max(14px, env(safe-area-inset-left));
-  padding: 8px;
-  border: 1px solid color-mix(in srgb, var(--writer-neutral) 9%, transparent);
+  gap: 8px;
+  margin: 0 max(18px, env(safe-area-inset-right)) 0
+    max(18px, env(safe-area-inset-left));
+  padding: 14px 10px 6px;
+  border: 1px solid var(--writer-tool-edge);
   border-radius: var(--dialog-radius-control);
   background: var(--writer-neutral-fill);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+}
+.toolsCaption {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-inline: 2px;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.toolsHint {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 450;
 }
 .actionsRow {
   display: flex;
@@ -551,7 +556,7 @@
 }
 .iconControl[aria-expanded="true"],
 .iconControl[data-writing-split][aria-pressed="true"] {
-  background: color-mix(in srgb, var(--writer-neutral) 19%, transparent);
+  background: var(--writer-tool-selected);
 }
 /* Writing and preview share one neutral palette; the glyph carries the mode. */
 .modePulse {
@@ -724,29 +729,31 @@
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--writer-neutral) 18%, transparent)
-    transparent;
-  padding: 4px 1px 5px;
+  scrollbar-width: none;
+  padding: 9px 0 3px;
+  border-block-start: 1px solid var(--writer-tool-edge);
+}
+.toolbar::-webkit-scrollbar {
+  display: none;
 }
 .toolbar button {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
-  min-height: 30px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   flex: 0 0 auto;
   padding: 0;
   border: 0;
   border-radius: var(--dialog-radius-compact);
-  background: color-mix(in srgb, var(--writer-neutral) 7%, transparent);
-  color: var(--surface-reading-foreground);
+  background: transparent;
+  color: var(--foreground);
   transition:
     background 180ms ease,
     color 180ms ease;
 }
 .toolbar button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--writer-neutral) 88%, transparent);
-  color: var(--writer-on-neutral);
+  background: var(--writer-tool-selected);
+  color: var(--foreground);
 }
 .toolbar button:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--writer-neutral) 65%, transparent);
@@ -821,7 +828,7 @@
   overflow: hidden;
   overscroll-behavior: contain;
   resize: none;
-  padding: 12px 22px 30px;
+  padding: 24px 22px 36px;
   border: 0;
   border-radius: 0;
   outline: none;
@@ -847,7 +854,7 @@
   min-height: 0;
   flex: 1 0 auto;
   overflow: visible;
-  padding: 12px 22px 30px;
+  padding: 24px 22px 36px;
   scrollbar-width: none;
 }
 .workspace[data-view="preview"] .previewContent > :first-child {
@@ -864,71 +871,88 @@
   line-height: 1.8;
 }
 .footer {
-  --writer-footer-ink: var(--surface-reading-foreground);
-  --writer-footer-muted: color-mix(
+  --writer-footer-ink: var(--foreground);
+  --writer-footer-muted: var(--muted-foreground);
+  --writer-footer-edge: color-mix(
     in srgb,
-    var(--writer-footer-ink) 76%,
+    var(--navigation-highlight) 22%,
     transparent
   );
+  position: relative;
   display: flex;
   min-width: 0;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 5px;
-  padding: 12px max(18px, env(safe-area-inset-right))
-    max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
-  border-top: 1px solid var(--glass-border);
-  background: linear-gradient(
-    0deg,
-    color-mix(in srgb, var(--palette-apricot) 50%, transparent) 0%,
-    color-mix(in srgb, var(--palette-apricot) 38%, transparent) 18%,
-    color-mix(in srgb, var(--palette-apricot) 24%, transparent) 42%,
-    color-mix(in srgb, var(--palette-apricot) 10%, transparent) 68%,
-    color-mix(in srgb, var(--palette-apricot) 2.5%, transparent) 87%,
-    color-mix(in srgb, var(--palette-apricot) 0%, transparent) 100%
-  );
+  padding: 14px max(18px, env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background:
+    radial-gradient(
+      ellipse at 18% 115%,
+      var(--writer-footer-pink),
+      transparent 72%
+    ),
+    linear-gradient(to top, var(--writer-footer-violet), transparent);
   color: var(--writer-footer-ink);
+}
+.footer::before {
+  position: absolute;
+  inset: 0 18px auto;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--writer-footer-edge) 12%,
+    var(--writer-footer-edge) 88%,
+    transparent
+  );
+  content: "";
+  pointer-events: none;
 }
 .footerBody {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 3px;
+  gap: 10px;
+}
+.dialog[data-reflection-dialog] .returnButton[data-dialog-primary-button] {
+  margin-block-start: 2px;
+  font-size: 16px;
 }
 .persistence {
   display: flex;
   min-width: 0;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 16px;
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--writer-footer-edge);
 }
 .cloudState,
 .draftState {
   display: inline-flex;
   min-width: 0;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   line-height: 1.5;
 }
 .cloudState > span,
 .draftState > span {
-  overflow: hidden;
   min-width: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .cloudState {
   flex: 1 1 auto;
   color: var(--writer-footer-ink);
-  font-size: 11.5px;
+  font-size: 10px;
   font-weight: 550;
 }
 .cloudState:not([data-reflection-save-status="saved"]) {
   color: color-mix(in srgb, var(--writer-footer-ink) 55%, #808080);
 }
 .draftState {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   justify-content: flex-end;
+  text-align: end;
   color: var(--writer-footer-muted);
   font-size: 10px;
   font-weight: 450;
@@ -963,7 +987,7 @@
   border: 0;
   padding: 0;
   color: var(--writer-footer-muted);
-  font-size: 9.25px;
+  font-size: 10px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
 }
@@ -988,7 +1012,7 @@
 }
 .wordStat strong {
   color: var(--writer-footer-ink);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 650;
   line-height: 1.25;
 }
@@ -1013,9 +1037,14 @@
   display: inline;
 }
 .footerHint {
-  margin: 8px 0 0;
-  color: color-mix(in srgb, var(--writer-footer-ink) 58%, transparent);
-  font-size: 9.25px;
+  width: 100%;
+  max-width: 56ch;
+  align-self: center;
+  margin: 0;
+  padding-inline: 8px;
+  color: var(--writer-footer-muted);
+  opacity: 0.67;
+  font-size: 10px;
   font-weight: 450;
   line-height: 1.6;
   text-align: center;
@@ -1043,8 +1072,9 @@
 }
 @media (min-width: 768px) {
   .dialog[data-reflection-dialog] {
+    --check-in-title-size: 24px;
     inset: 50% auto auto 50%;
-    width: min(1040px, calc(100vw - 48px));
+    width: min(960px, calc(100vw - 48px));
     height: min(88dvh, 900px);
     max-height: calc(100dvh - 48px);
     border: 1px solid var(--glass-border);
@@ -1053,35 +1083,29 @@
     translate: -50% -50%;
   }
   .header {
-    padding: calc(30px * 7 / 12) 26px 20px;
+    padding: 36px 28px 28px;
   }
   .title {
-    font-size: 24px;
-  }
-  .context {
-    font-size: 13px;
-  }
-  .context time {
-    font-size: 13.5px;
+    line-height: 30px;
   }
   .description {
-    font-size: 14.5px;
+    max-width: 76ch;
   }
   .controls {
     --writer-tool-gap: 5px;
-    margin-inline: 20px;
+    margin-inline: 28px;
     padding: 11px;
   }
   .writingArea,
   .previewContent {
-    padding-inline: 32px;
+    padding-inline: 40px;
   }
 
   .footer {
-    padding: 13px 26px 16px;
+    padding: 16px 28px 20px;
   }
   .cloudState {
-    font-size: 12px;
+    font-size: 11px;
   }
   .draftState,
   .stats,
@@ -1118,25 +1142,13 @@
     translate: none;
   }
   .dialog[data-short-viewport="true"] .header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 44px;
-    align-items: center;
-    gap: 8px;
-    padding: calc(10px * 7 / 12) 18px 10px;
-  }
-  .dialog[data-short-viewport="true"] .titleRow {
-    display: contents;
-  }
-  .dialog[data-short-viewport="true"]
-    .titleRow
-    > :global([data-dialog-corner="control"]) {
-    grid-area: 1 / 2;
+    padding: 12px 18px 10px;
   }
   .dialog[data-short-viewport="true"] .title {
-    grid-area: 1 / 1;
-    font-size: 17px;
+    font-size: 18px;
   }
-  .dialog[data-short-viewport="true"] :is(.context, .description) {
+  .dialog[data-short-viewport="true"]
+    :is(.context, .description, .toolsCaption) {
     display: none;
   }
   .dialog[data-short-viewport="true"] .controls {
@@ -1158,10 +1170,10 @@
     gap: 6px;
   }
   .cloudState {
-    font-size: 11px;
+    font-size: 10px;
   }
   .cloudState[data-reflection-save-status="saved"] {
-    flex: none;
+    flex: 1 1 auto;
   }
   .draftState {
     font-size: 9.5px;
@@ -1183,65 +1195,13 @@
   }
 }
 
-/* A writing desk: calm paper, compact rose tools, and a softer blush footer. */
-@media (prefers-color-scheme: light) {
-  .dialog[data-reflection-dialog] {
-    --writer-neutral: var(--surface-reading-foreground);
-    --writer-neutral-fill: color-mix(
-      in srgb,
-      var(--primary) 5%,
-      var(--surface-reading)
-    );
-    --writer-action-fill: color-mix(
-      in srgb,
-      var(--primary) 7%,
-      var(--surface-reading)
-    );
-    background: var(--surface-reading);
+@media (max-height: 600px) {
+  .footerHint,
+  .persistence {
+    display: none;
   }
-
-  .controls {
-    background: var(--writer-neutral-fill);
-    border-color: color-mix(in srgb, var(--primary) 15%, transparent);
-  }
-
-  .iconControl {
-    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-  }
-
-  .iconControl[aria-expanded="true"],
-  .iconControl[data-writing-split][aria-pressed="true"] {
-    background: color-mix(in srgb, var(--primary) 13%, var(--surface-raised));
-    color: var(--primary);
-  }
-
-  .toolbar button[aria-pressed="true"] {
-    background: var(--primary);
-    color: var(--primary-foreground);
-  }
-
-  .workspace[data-view="split"] .previewPane {
-    background: color-mix(
-      in srgb,
-      var(--surface-reading) 94%,
-      var(--palette-lilac)
-    );
-  }
-
-  .footer {
-    background: linear-gradient(
-      0deg,
-      color-mix(
-        in srgb,
-        var(--color-pink-200, #fbcfe8) 40%,
-        var(--surface-reading)
-      ),
-      color-mix(in srgb, var(--color-pink-200, #fbcfe8) 15%, transparent) 60%,
-      transparent
-    );
-  }
-
-  .footerHint {
-    color: var(--muted-foreground);
+  .dialog[data-reflection-dialog] .returnButton[data-dialog-primary-button] {
+    height: 56px !important;
+    min-height: 56px !important;
   }
 }

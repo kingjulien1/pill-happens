@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, type RefObject } from "react";
-import { PencilLine, X } from "lucide-react";
+import { useMemo, useRef, type RefObject } from "react";
+import { Check, PencilLine, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -10,6 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ReflectionMarkdown } from "@/components/reflection-markdown";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { JournalDialogSubheading } from "@/components/journal-dialog-subheading";
+import { reflectionStats } from "@/lib/reflection-writing";
 import { formatDay } from "@/lib/domain";
 import closeStyles from "./dialog-close.module.css";
 import styles from "./reflection-reader-dialog.module.css";
@@ -33,6 +36,7 @@ export function ReflectionReaderDialog({
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const pendingEdit = useRef<(() => void) | null>(null);
+  const stats = useMemo(() => reflectionStats(value), [value]);
   return (
     <Dialog
       open={open}
@@ -57,11 +61,8 @@ export function ReflectionReaderDialog({
         <header className={styles.header}>
           <div className={styles.heading}>
             <DialogTitle ref={heading} tabIndex={-1} className={styles.title}>
-              Journal page
+              Your Journal.
             </DialogTitle>
-            <p className={styles.date}>
-              <time dateTime={day}>{formatDay(day, { year: "numeric" })}</time>
-            </p>
           </div>
           <div className={styles.controls}>
             {onEdit && (
@@ -97,14 +98,44 @@ export function ReflectionReaderDialog({
               <X aria-hidden="true" strokeWidth={2.2} />
             </DialogClose>
           </div>
-          <DialogDescription className="sr-only">
-            Read your writing. Edit returns to the writing space without
-            changing this page.
+          <p className={styles.date}>
+            <JournalDialogSubheading
+              title={
+                <time dateTime={day}>
+                  {formatDay(day, { month: undefined, day: undefined })}
+                </time>
+              }
+              detail={formatDay(day, { weekday: undefined, year: "numeric" })}
+            />
+          </p>
+          <DialogDescription className={styles.description}>
+            {onEdit
+              ? "Your saved page, with room to read. Use the pencil to open its check-in and continue writing."
+              : "Your saved journal page, formatted for reading."}
           </DialogDescription>
         </header>
         <article className={styles.body} data-reflection-reader-scroll>
           <ReflectionMarkdown value={value} day={day} />
         </article>
+        <footer className={styles.footer} data-dialog-fade-footer>
+          <div className={styles.stats} aria-label="Reading statistics">
+            <span>
+              <strong>{stats.words.toLocaleString("en-GB")}</strong>{" "}
+              {stats.words === 1 ? "word" : "words"}
+            </span>
+            <span>
+              {stats.readingMinutes ? `~${stats.readingMinutes}` : "0"} min read
+            </span>
+          </div>
+          <DialogPrimaryButton
+            type="button"
+            className={styles.returnButton}
+            onClick={() => onOpenChange(false)}
+            leadingIcon={<Check strokeWidth={2.5} aria-hidden="true" />}
+          >
+            Done Reading
+          </DialogPrimaryButton>
+        </footer>
       </DialogContent>
     </Dialog>
   );

@@ -21,6 +21,7 @@ import {
   Bold,
   Code,
   Columns2,
+  CornerDownLeft,
   CloudBackup,
   CloudAlert,
   CloudCheck,
@@ -54,6 +55,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { JournalDialogSubheading } from "@/components/journal-dialog-subheading";
 import closeStyles from "./dialog-close.module.css";
 import { useDialogScrollMemory } from "@/components/use-dialog-scroll-memory";
 import type { ReflectionSaveControls } from "@/components/use-reflection-save";
@@ -758,56 +761,76 @@ export function ReflectionDialog({
         >
           <header className={styles.header} data-writing-header>
             <div className={styles.titleRow}>
-              <p className={styles.context} data-writing-context>
-                <time dateTime={day} data-writing-date>
-                  {formatDay(day, { weekday: "long", month: "short" })}
-                </time>
-                <span className={styles.contextSeparator} aria-hidden="true">
-                  ·
-                </span>
-                <span className={styles.periodLabel}>
-                  {period === "morning"
-                    ? "Morning Reflection"
-                    : "Evening Reflection"}
-                </span>
-              </p>
-              <DialogClose
-                disabled={finishing}
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    className={closeStyles.control}
-                    data-dialog-corner="control"
-                    aria-label="Close writing space"
-                  />
-                }
+              <DialogTitle
+                ref={title}
+                tabIndex={-1}
+                className={styles.title}
+                data-writing-heading
               >
-                <X strokeWidth={2.2} aria-hidden="true" />
-              </DialogClose>
+                {period === "morning" ? "Morning Pages." : "Day, Debriefed."}
+              </DialogTitle>
+              <div
+                className={`${closeStyles.actions} ${styles.headerActions}`}
+                onPointerDownCapture={blurWritingInput}
+                onClickCapture={blurWritingInput}
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className={closeStyles.control}
+                  disabled={finishing}
+                  aria-label="Markdown syntax help"
+                  aria-expanded={help}
+                  ref={helpButton}
+                  aria-haspopup="dialog"
+                  data-dialog-corner="control"
+                  data-writing-info
+                  title="Markdown syntax help"
+                  onClick={() => setHelp(true)}
+                >
+                  <Info strokeWidth={2.2} aria-hidden="true" />
+                </Button>
+                <DialogClose
+                  disabled={finishing}
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      type="button"
+                      className={closeStyles.control}
+                      data-dialog-corner="control"
+                      aria-label="Close writing space"
+                    />
+                  }
+                >
+                  <X strokeWidth={2.2} aria-hidden="true" />
+                </DialogClose>
+              </div>
             </div>
-            <DialogTitle
-              ref={title}
-              tabIndex={-1}
-              className={styles.title}
-              data-writing-heading
-            >
-              {period === "morning"
-                ? "Before the Day Bites"
-                : "Today, for the Record"}
-            </DialogTitle>
+            <p className={styles.context} data-writing-context>
+              <JournalDialogSubheading
+                title={
+                  <time dateTime={day} data-writing-date>
+                    {formatDay(day, {
+                      weekday: "long",
+                      month: undefined,
+                      day: undefined,
+                    })}{" "}
+                    {period === "morning" ? "Morning" : "Evening"}
+                  </time>
+                }
+                detail={formatDay(day, { weekday: undefined, month: "long" })}
+              />
+            </p>
             <DialogDescription
               className={styles.description}
               data-writing-description
             >
-              Write in Markdown and read it as a page. Give a passing thought a
-              line, or let a longer story take its time. Headings, lists and
-              emphasis help your words find their shape. Switch to preview
-              whenever you want a quieter view. Your writing is kept in this
-              check-in’s draft as you go. Save a fresh journal copy with the
-              save icon, or let autosave catch the next pause. Mood, sleep and
-              the rest of your check-in stay yours to finish when you’re ready.
+              {period === "morning"
+                ? "First thoughts, unfinished dreams, or the thing already on your mind—give them a little room."
+                : "Keep the good bits, unload the rest. Your day doesn’t need a neat ending to deserve a page."}{" "}
+              Write in Markdown; switch to Read to see it take shape.
             </DialogDescription>
           </header>
           <div
@@ -815,6 +838,10 @@ export function ReflectionDialog({
             inert={finishing || undefined}
             data-writing-tools
           >
+            <div className={styles.toolsCaption}>
+              <span>Writing Desk</span>
+              <span className={styles.toolsHint}>Markdown</span>
+            </div>
             <div
               className={styles.actionsRow}
               onPointerDownCapture={blurWritingInput}
@@ -825,23 +852,29 @@ export function ReflectionDialog({
                 <Button
                   type="button"
                   variant="secondary"
+                  className={`${styles.iconControl} ${styles.modeControl}`}
+                  aria-label="Write reflection"
+                  aria-pressed={view === "write"}
+                  onClick={() => changeMode("write")}
+                  data-writing-edit
+                >
+                  <Pencil
+                    className={styles.controlGlyph}
+                    strokeWidth={2.2}
+                    aria-hidden="true"
+                  />
+                  <span>Write</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
                   size="icon"
                   className={`${styles.iconControl} ${styles.modeControl}`}
                   data-mode={view}
-                  aria-label={
-                    view === "preview"
-                      ? "Return to writing"
-                      : "Show reading preview"
-                  }
-                  title={
-                    view === "preview"
-                      ? "Return to writing"
-                      : "Show reading preview"
-                  }
+                  aria-label="Read reflection"
+                  title="Show reading preview"
                   aria-pressed={view === "preview"}
-                  onClick={() =>
-                    changeMode(view === "preview" ? "write" : "preview")
-                  }
+                  onClick={() => changeMode("preview")}
                   data-writing-toggle
                 >
                   <span
@@ -854,27 +887,20 @@ export function ReflectionDialog({
                         : undefined
                     }
                   >
-                    {view === "preview" ? (
-                      <Eye
-                        className={styles.controlGlyph}
-                        strokeWidth={2.6}
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <Pencil
-                        className={styles.controlGlyph}
-                        strokeWidth={2.6}
-                        aria-hidden="true"
-                      />
-                    )}
+                    <Eye
+                      className={styles.controlGlyph}
+                      strokeWidth={2.2}
+                      aria-hidden="true"
+                    />
                   </span>
+                  <span>Read</span>
                 </Button>
                 {wide && (
                   <Button
                     type="button"
                     variant="secondary"
                     size="icon"
-                    className={styles.iconControl}
+                    className={`${styles.iconControl} ${styles.modeControl}`}
                     aria-label="Split writing and preview"
                     title="Split writing and preview"
                     aria-pressed={view === "split"}
@@ -885,11 +911,14 @@ export function ReflectionDialog({
                   >
                     <Columns2
                       className={styles.controlGlyph}
-                      strokeWidth={2.6}
+                      strokeWidth={2.2}
                       aria-hidden="true"
                     />
+                    <span>Split</span>
                   </Button>
                 )}
+              </div>
+              <div className={styles.actionGroup}>
                 <Button
                   type="button"
                   variant="secondary"
@@ -919,45 +948,6 @@ export function ReflectionDialog({
                       data-writing-save-icon="bookmark"
                     />
                   )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="icon"
-                  className={`${styles.iconControl} ${styles.done}`}
-                  aria-label="Done writing"
-                  title="Done writing"
-                  onClick={completeWriting}
-                  disabled={disabled || finishing}
-                  aria-busy={finishing || undefined}
-                  data-writing-done
-                >
-                  <CloudCheck
-                    className={styles.doneIcon}
-                    strokeWidth={2.6}
-                    aria-hidden="true"
-                  />
-                </Button>
-              </div>
-              <div className={styles.actionGroup}>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="icon"
-                  className={styles.iconControl}
-                  aria-label="Markdown syntax help"
-                  aria-expanded={help}
-                  ref={helpButton}
-                  aria-haspopup="dialog"
-                  data-writing-info
-                  title="Markdown syntax help"
-                  onClick={() => setHelp(true)}
-                >
-                  <Info
-                    className={styles.controlGlyph}
-                    strokeWidth={2.6}
-                    aria-hidden="true"
-                  />
                 </Button>
                 <Button
                   type="button"
@@ -1161,8 +1151,86 @@ export function ReflectionDialog({
             {finishing ? "Returning to your check-in…" : ""}
           </span>
         </div>
-        <footer className={styles.footer} data-writing-footer>
+        <footer
+          className={styles.footer}
+          data-writing-footer
+          data-dialog-fade-footer
+        >
           <div className={styles.footerBody}>
+            <div
+              className={styles.stats}
+              role="group"
+              aria-label="Writing statistics"
+              data-writing-statistics
+            >
+              <div className={styles.statsLeading} data-writing-reading-stats>
+                <span className={styles.wordStat}>
+                  <strong>{numberFormat.format(stats.words)}</strong>{" "}
+                  {stats.words === 1 ? "word" : "words"}
+                </span>
+                <span className={styles.statSeparator} aria-hidden="true">
+                  ·
+                </span>
+                <span className={styles.readingStat}>
+                  {stats.readingMinutes
+                    ? `~${stats.readingMinutes} min read`
+                    : "0 min read"}
+                </span>
+              </div>
+              <div className={styles.statsTrailing}>
+                <span
+                  id={`${id}-limit`}
+                  className={styles.characterStat}
+                  data-near-limit={remaining <= 200}
+                >
+                  <strong>{numberFormat.format(stats.characters)}</strong> /{" "}
+                  {numberFormat.format(DAILY_REFLECTION_MAX_LENGTH)} chars
+                </span>
+                {stats.headings > 0 && (
+                  <span className={styles.headingStat}>
+                    {stats.headings}{" "}
+                    {stats.headings === 1 ? "heading" : "headings"}
+                  </span>
+                )}
+              </div>
+            </div>
+            <DialogPrimaryButton
+              type="button"
+              className={`${styles.returnButton} ${styles.done}`}
+              onClick={completeWriting}
+              disabled={disabled || finishing}
+              aria-busy={finishing || undefined}
+              aria-label="Back to Check-In"
+              aria-describedby={`${id}-save-hint`}
+              leadingIcon={
+                <CornerDownLeft
+                  className={styles.doneIcon}
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+              }
+              data-writing-done
+            >
+              {finishing ? "Back to Your Check-In…" : "Back to Check-In"}
+            </DialogPrimaryButton>
+            <span
+              className={styles.feedback}
+              role="status"
+              data-writing-feedback
+            >
+              {feedback ||
+                (remaining === 0
+                  ? "Character limit reached. You can still edit your entry."
+                  : "")}
+            </span>
+            <p
+              id={`${id}-save-hint`}
+              className={styles.footerHint}
+              title={savedAt ? `Last check-in save: ${savedAt}` : undefined}
+            >
+              Writing saves separately. Back returns to your draft; Save
+              Check-In keeps your other answers with this day.
+            </p>
             <div className={styles.persistence} data-writing-persistence>
               <span
                 className={styles.cloudState}
@@ -1204,57 +1272,7 @@ export function ReflectionDialog({
                 />
               </span>
             </div>
-            <div
-              className={styles.stats}
-              role="group"
-              aria-label="Writing statistics"
-              data-writing-statistics
-            >
-              <div className={styles.statsLeading} data-writing-reading-stats>
-                <span className={styles.wordStat}>
-                  <strong>{numberFormat.format(stats.words)}</strong>{" "}
-                  {stats.words === 1 ? "word" : "words"}
-                </span>
-                <span className={styles.statSeparator} aria-hidden="true">
-                  ·
-                </span>
-                <span className={styles.readingStat}>
-                  {stats.readingMinutes
-                    ? `~${stats.readingMinutes} min read`
-                    : "0 min read"}
-                </span>
-              </div>
-              <div className={styles.statsTrailing}>
-                <span
-                  id={`${id}-limit`}
-                  className={styles.characterStat}
-                  data-near-limit={remaining <= 200}
-                >
-                  <strong>{numberFormat.format(stats.characters)}</strong> /{" "}
-                  {numberFormat.format(DAILY_REFLECTION_MAX_LENGTH)} chars
-                </span>
-                {stats.headings > 0 && (
-                  <span className={styles.headingStat}>
-                    {stats.headings}{" "}
-                    {stats.headings === 1 ? "heading" : "headings"}
-                  </span>
-                )}
-              </div>
-            </div>
           </div>
-          <span className={styles.feedback} role="status" data-writing-feedback>
-            {feedback ||
-              (remaining === 0
-                ? "Character limit reached. You can still edit your entry."
-                : "")}
-          </span>
-          <p
-            id={`${id}-save-hint`}
-            className={styles.footerHint}
-            title={savedAt ? `Last check-in save: ${savedAt}` : undefined}
-          >
-            Writing saves separately. Save Check-In keeps the rest together.
-          </p>
         </footer>
       </DialogContent>
       {open &&

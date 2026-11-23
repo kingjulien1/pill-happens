@@ -1,7 +1,23 @@
 .dialog[data-reflection-reader] {
-  --reader-paper: var(--surface-reading);
-  --reader-ink: var(--surface-reading-foreground);
+  --check-in-title-size: 24px;
+  --reader-ink: var(--foreground);
   --reader-muted: var(--muted-foreground);
+  --reader-edge: color-mix(
+    in srgb,
+    var(--navigation-highlight) 22%,
+    transparent
+  );
+  --reader-footer-violet: color-mix(
+    in srgb,
+    var(--color-violet-400) 18%,
+    transparent
+  );
+  --reader-footer-pink: color-mix(
+    in srgb,
+    var(--color-pink-400) 7%,
+    transparent
+  );
+  --dialog-surface-paint: var(--navigation-paint);
   display: flex;
   width: min(760px, calc(100vw - 48px));
   max-width: none;
@@ -13,139 +29,149 @@
   overscroll-behavior: contain;
   scrollbar-width: none;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--reader-ink) 14%, transparent);
-  border-radius: 24px;
-  --dialog-surface-paint:
-    radial-gradient(ellipse at 0% 0%, #a78bfa24, transparent 65%),
-    radial-gradient(
-      ellipse at 100% 100%,
-      color-mix(in srgb, var(--palette-apricot) 10%, transparent),
-      transparent 65%
-    ),
-    var(--reader-paper);
+  border: 1px solid var(--reader-edge);
+  border-radius: var(--dialog-radius-surface);
   color: var(--reader-ink);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
   box-shadow: 0 24px 100px #1e123d40;
+}
+.dialog::-webkit-scrollbar {
+  display: none;
 }
 .header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   flex: none;
-  align-items: center;
-  gap: 11px;
-  padding: calc(18px * 7 / 12) 22px 18px;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--reader-ink) 12%, transparent);
+  align-items: start;
+  gap: 0 8px;
+  padding: 28px 28px 24px;
 }
 .heading {
   min-width: 0;
+  padding-block-start: 8px;
 }
 .title {
   margin: 0;
   outline: none;
   color: var(--reader-ink);
-  font-size: 24px;
+  font-size: var(--check-in-title-size);
   font-weight: 650;
   line-height: 30px;
   letter-spacing: -0.025em;
 }
 .date {
-  margin: 2px 0 0;
-  color: var(--reader-muted);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: -4px 0 0;
 }
 .controls {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  margin-inline-end: -8px;
 }
 .control {
-  --foreground: var(--reader-ink);
   color: var(--reader-ink);
-  cursor: pointer;
 }
-.control:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 3px;
+.description {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 24px 0 0;
+  color: var(--reader-muted);
+  opacity: 0.67;
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1.65;
 }
 .body {
   --foreground: var(--reader-ink);
   --muted-foreground: var(--reader-muted);
+  position: relative;
   min-width: 0;
   min-height: 0;
   flex: none;
   overflow: visible;
-  padding: 25px clamp(22px, 6vw, 48px) 36px;
+  margin-inline: 28px;
+  padding: 28px 0 36px;
+}
+.body::before,
+.footer::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--reader-edge) 12%,
+    var(--reader-edge) 88%,
+    transparent
+  );
+  content: "";
+  pointer-events: none;
 }
 .body > div {
   font-size: 15.5px;
   line-height: 1.9;
 }
-@media (prefers-color-scheme: dark) {
-  .dialog[data-reflection-reader] {
-    --reader-paper: var(--surface-reading);
-    --reader-ink: var(--surface-reading-foreground);
-    --reader-muted: var(--muted-foreground);
-    --dialog-surface-paint:
-      radial-gradient(ellipse at 0% 0%, #8b5cf626, transparent 65%),
-      radial-gradient(
-        ellipse at 100% 100%,
-        color-mix(in srgb, var(--palette-apricot) 10%, transparent),
-        transparent 65%
-      ),
-      var(--reader-paper);
-  }
+.footer {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 28px max(24px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(
+      ellipse at 18% 115%,
+      var(--reader-footer-pink),
+      transparent 72%
+    ),
+    linear-gradient(to top, var(--reader-footer-violet), transparent);
+}
+.footer::before {
+  inset-inline: 28px;
+}
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--reader-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.stats strong {
+  color: var(--reader-ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+.dialog[data-reflection-reader] .returnButton[data-dialog-primary-button] {
+  margin-block-start: 0;
+  font-size: 16px;
 }
 @media (max-width: 767px) {
   .dialog[data-reflection-reader] {
+    --check-in-title-size: 22px;
     top: max(12px, env(safe-area-inset-top));
     bottom: max(12px, env(safe-area-inset-bottom));
     left: 50%;
-    width: calc(100vw - 24px);
+    width: calc(100vw - 28px);
     max-height: none;
     translate: -50% 0;
-    border-radius: 21px;
   }
   .header {
-    gap: 8px;
-    padding: calc(15px * 7 / 12) 16px 15px;
+    padding: 20px 18px 24px;
   }
   .title {
-    font-size: 22px;
     line-height: 28px;
   }
   .body {
-    padding: 20px 20px 28px;
+    margin-inline: 18px;
+    padding-block: 24px 32px;
   }
-  .body > div {
-    font-size: 15px;
-    line-height: 1.85;
+  .footer {
+    padding-inline: 18px;
   }
-}
-@media (hover: hover) and (pointer: fine) {
-  .control:hover::before {
-    background: #a78bfa2b;
-  }
-}
-
-.dialog[data-reflection-reader]::-webkit-scrollbar {
-  display: none;
-}
-
-@media (prefers-color-scheme: light) {
-  .dialog[data-reflection-reader] {
-    background:
-      radial-gradient(
-        ellipse at 0% 0%,
-        color-mix(in srgb, var(--palette-lilac) 10%, transparent),
-        transparent 65%
-      ),
-      var(--reader-paper);
-    border-color: color-mix(in srgb, var(--primary) 16%, transparent);
-    box-shadow: 0 22px 72px -22px
-      color-mix(in srgb, var(--palette-plum) 24%, transparent);
+  .footer::before {
+    inset-inline: 18px;
   }
 }
