@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 
-/** Keep the frame notch and wash fades tied to real, locally measured faces. */
+/** Join intake controls precisely; legacy history washes retain their own stops. */
 export function useIntakeGroupSurface(enabled: boolean) {
   const groupRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
@@ -21,6 +21,42 @@ export function useIntakeGroupSurface(enabled: boolean) {
       if (group.style.getPropertyValue(name) !== next)
         group.style.setProperty(name, next);
     };
+    if (group.hasAttribute("data-intake-group")) {
+      const measureJoin = () => {
+        if (disposed) return;
+        // The joined frame/control fade without transforms. Read fractional
+        // edges so high-DPI Safari never gets an offsetWidth rounding gap.
+        const control = label.getBoundingClientRect();
+        const surface = glass.getBoundingClientRect();
+        if (control.width <= 0 || surface.width <= 0) return;
+        write("--intake-group-toggle-width", control.width);
+        write("--intake-group-notch-left", control.left - surface.left);
+        write("--intake-group-notch-right", control.right - surface.left);
+        write("--intake-group-join-bottom", surface.bottom - control.top);
+      };
+      measureJoin();
+      const sizes = new Map<Element, string>();
+      const resize = new ResizeObserver((entries) => {
+        let changed = false;
+        for (const entry of entries) {
+          // Disclosure changes only height. Both bottom edges travel together,
+          // so a height-only frame update needs no geometry reads or writes.
+          const size =
+            entry.target === glass
+              ? String(entry.contentRect.width)
+              : `${entry.contentRect.width}:${entry.contentRect.height}`;
+          if (sizes.get(entry.target) !== size) changed = true;
+          sizes.set(entry.target, size);
+        }
+        if (changed) measureJoin();
+      });
+      resize.observe(label);
+      resize.observe(glass);
+      return () => {
+        disposed = true;
+        resize.disconnect();
+      };
+    }
     const measure = () => {
       // offset geometry excludes page/card entrance transforms. The slot's own
       // matrix includes only its current disclosure translation and scale.

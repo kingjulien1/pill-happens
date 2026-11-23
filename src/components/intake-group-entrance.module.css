@@ -1,66 +1,155 @@
-/* Only the decorative frame and control move. Card compositor layers stay alone. */
+/* The joined outlines stay still. Only their material gets the spring impulse. */
 @media (prefers-reduced-motion: no-preference) {
   .group[data-group-entry-state="pending"] > :is(.surface, .control) {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
   }
-
-  .group[data-group-entry-state="running"] > .surface {
-    transform-origin: 50% 20%;
-    animation: frameGather 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  .group[data-group-entry-state="running"] > :is(.surface, .control) {
+    animation: joinedFrameArrive 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-play-state: var(--page-entry-play-state, running);
   }
-
-  .group[data-group-entry-state="running"] > .control {
-    transform-origin: 50% 25%;
-    animation: controlSettle 360ms cubic-bezier(0.22, 1, 0.36, 1) 40ms both;
+  .group[data-group-entry-state="running"] .reveal {
+    animation: diagonalMaterial var(--group-fill-duration, 1000ms)
+      cubic-bezier(0.24, 0.08, 0.24, 1) var(--group-fill-delay, 700ms) both;
     animation-play-state: var(--page-entry-play-state, running);
   }
-
+  .group[data-group-entry-state="running"] .buttonSurface {
+    animation: buttonMaterialBounce var(--group-button-duration, 850ms)
+      cubic-bezier(0.2, 0.6, 0.3, 1) var(--group-button-delay, 1700ms) both;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
+  .group[data-group-entry-state="running"] .buttonMaterial {
+    animation: buttonMaterialAppear 120ms ease-out
+      var(--group-button-delay, 1700ms) both;
+    animation-play-state: var(--page-entry-play-state, running);
+  }
   .group[data-group-entry-state="running"] .chevron {
     animation: chevronGreet 240ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
     animation-play-state: var(--page-entry-play-state, running);
   }
-
   .group[data-group-entry-state="running"] .chevron:last-child {
     animation-delay: 100ms;
   }
-}
-
-@keyframes frameGather {
-  0% {
-    opacity: 0;
-    transform: translateY(-3px) scale(0.994, 0.97);
+  /* Analytic damped spring sampled at 17ms: mass 1, stiffness 576,
+     damping 11.52, initial velocity 12. Native easing needs no JS clock. */
+  @supports (animation-timing-function: linear(0, 1)) {
+    .group[data-group-entry-state="running"] .buttonSurface {
+      animation-name: buttonMaterialSpring;
+      animation-timing-function: linear(
+        0,
+        0.2572,
+        0.5793,
+        0.9069,
+        1.1901,
+        1.3946,
+        1.5039,
+        1.5186,
+        1.4534,
+        1.3322,
+        1.183,
+        1.033,
+        0.9049,
+        0.8136,
+        0.7664,
+        0.7625,
+        0.7946,
+        0.8516,
+        0.9207,
+        0.9892,
+        1.0472,
+        1.0878,
+        1.1082,
+        1.1087,
+        1.093,
+        1.0662,
+        1.0343,
+        1.0029,
+        0.9767,
+        0.9587,
+        0.95,
+        0.9503,
+        0.9579,
+        0.9705,
+        0.9853,
+        0.9996,
+        1.0114,
+        1.0194,
+        1.0231,
+        1.0227,
+        1.019,
+        1.0131,
+        1.0063,
+        0.9998,
+        0.9944,
+        0.9909,
+        0.9893,
+        0.9896,
+        0.9914,
+        0.9942,
+        1
+      );
+    }
   }
-  70% {
+}
+@keyframes joinedFrameArrive {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
-    transform: translateY(0.5px) scale(1.001, 1.003);
+  }
+}
+@keyframes diagonalMaterial {
+  from {
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 0);
+  }
+  to {
+    opacity: var(--group-layer-opacity);
+    clip-path: polygon(0 0, 220% 0, 0 220%);
+  }
+}
+@keyframes buttonMaterialAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: var(--group-layer-opacity);
+  }
+}
+@keyframes buttonMaterialSpring {
+  from {
+    transform: scale(0.68, 0.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+/* Older engines retain the same outward pop, inside gap and settling cadence. */
+@keyframes buttonMaterialBounce {
+  0% {
+    transform: scale(0.68, 0.08);
+  }
+  14% {
+    transform: scale(1.17, 1.48);
+  }
+  30% {
+    transform: scale(0.924, 0.782);
+  }
+  46% {
+    transform: scale(1.035, 1.1);
+  }
+  61% {
+    transform: scale(0.984, 0.954);
+  }
+  78% {
+    transform: scale(1.007, 1.02);
   }
   100% {
-    opacity: 1;
-    transform: none;
+    transform: scale(1);
   }
 }
-
-@keyframes controlSettle {
-  0% {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.92);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(1px) scale(1.025);
-  }
-  82% {
-    transform: translateY(-0.5px) scale(0.995);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @keyframes chevronGreet {
   0% {
     opacity: 0.35;

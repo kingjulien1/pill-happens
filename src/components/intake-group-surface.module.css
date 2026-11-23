@@ -1,0 +1,195 @@
+/* All three pigments live in one alpha-controlled plane; blur stays separate. */
+.group {
+  --intake-group-fill-mauve: color-mix(
+    in srgb,
+    var(--color-mauve-900) 5.5%,
+    transparent
+  );
+  --intake-group-fill-indigo: color-mix(
+    in srgb,
+    var(--color-indigo-950) 18%,
+    transparent
+  );
+  --intake-group-fill-purple: color-mix(
+    in srgb,
+    var(--color-purple-800) 14%,
+    transparent
+  );
+  --intake-group-color-stack:
+    linear-gradient(var(--intake-group-fill-purple) 0 0),
+    linear-gradient(var(--intake-group-fill-indigo) 0 0),
+    linear-gradient(var(--intake-group-fill-mauve) 0 0);
+}
+.blur,
+.colors {
+  position: absolute;
+  inset: var(--intake-group-border-width);
+  border-radius: calc(
+    var(--intake-card-radius) - var(--intake-group-border-width)
+  );
+  pointer-events: none;
+  opacity: var(--group-layer-opacity);
+}
+.blur {
+  --group-layer-opacity: 1;
+  z-index: 0;
+  background: none;
+  -webkit-backdrop-filter: blur(48px);
+  backdrop-filter: blur(48px);
+}
+.colors {
+  --group-layer-opacity: 0.67;
+  z-index: 1;
+  background: var(--intake-group-color-stack);
+}
+/* Keep the label's material independent: its 84% wash never stacks on 67%. */
+.group :global(.intake-group-glass) > :is(.blur, .colors) {
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000
+        calc(
+          100% - var(--intake-group-join-bottom, 12px) +
+            var(--intake-group-border-width)
+        ),
+      transparent 0
+    ),
+    linear-gradient(
+      to right,
+      #000
+        calc(
+          var(--intake-group-notch-left, 0px) - var(--intake-group-border-width)
+        ),
+      transparent 0
+        calc(
+          var(--intake-group-notch-right, 100%) -
+            var(--intake-group-border-width)
+        ),
+      #000 0
+    );
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000
+        calc(
+          100% - var(--intake-group-join-bottom, 12px) +
+            var(--intake-group-border-width)
+        ),
+      transparent 0
+    ),
+    linear-gradient(
+      to right,
+      #000
+        calc(
+          var(--intake-group-notch-left, 0px) - var(--intake-group-border-width)
+        ),
+      transparent 0
+        calc(
+          var(--intake-group-notch-right, 100%) -
+            var(--intake-group-border-width)
+        ),
+      #000 0
+    );
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+}
+/* Replace the notch's full stroke width, rather than layering two translucent
+   borders on top of one another at the join. */
+.group :global(.intake-group-glass)::after {
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000 calc(100% - var(--intake-group-border-width)),
+      transparent 0
+    ),
+    linear-gradient(
+      to right,
+      #000
+        calc(
+          var(--intake-group-notch-left, 0px) + var(--intake-group-border-width)
+        ),
+      transparent 0
+        calc(
+          var(--intake-group-notch-right, 100%) -
+            var(--intake-group-border-width)
+        ),
+      #000 0
+    );
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 calc(100% - var(--intake-group-border-width)),
+      transparent 0
+    ),
+    linear-gradient(
+      to right,
+      #000
+        calc(
+          var(--intake-group-notch-left, 0px) + var(--intake-group-border-width)
+        ),
+      transparent 0
+        calc(
+          var(--intake-group-notch-right, 100%) -
+            var(--intake-group-border-width)
+        ),
+      #000 0
+    );
+}
+.group :global(.intake-group-label),
+.group :global(.intake-group-toggle):hover :global(.intake-group-label) {
+  background: none;
+  box-shadow: none;
+}
+.group :global(.intake-group-label)::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--intake-group-border-width)
+    var(--intake-group-border);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000
+      calc(
+        var(--intake-group-join-bottom, 12px) - var(--intake-group-border-width)
+      ),
+    transparent 0 var(--intake-group-join-bottom, 12px),
+    #000 0
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000
+      calc(
+        var(--intake-group-join-bottom, 12px) - var(--intake-group-border-width)
+      ),
+    transparent 0 var(--intake-group-join-bottom, 12px),
+    #000 0
+  );
+  pointer-events: none;
+}
+.buttonSurface {
+  position: absolute;
+  z-index: 0;
+  inset: var(--intake-group-border-width);
+  border-radius: calc(9px - var(--intake-group-border-width));
+  transform-origin: center;
+  pointer-events: none;
+}
+.buttonSurface > :is(.blur, .colors) {
+  inset: 0;
+  border-radius: inherit;
+}
+.buttonSurface > .colors {
+  --group-layer-opacity: 0.84;
+}
+.group :global(.intake-group-label) > :not(.buttonSurface) {
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .blur {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

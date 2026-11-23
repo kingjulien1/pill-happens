@@ -2347,20 +2347,23 @@ export function DeveloperGuidePage() {
                 keeps a 44px native touch area and a compact measured label
                 notch. The sentence reads naturally—Reveal 3 intakes, Collapse 3
                 intakes, or the corresponding days wording—with only the number
-                emphasized. Both side chevrons use a heavier stroke. The control
-                has no background; its rim matches the group frame without
-                changing layout or the hit target. Keyboard focus stays visible,
-                and changing open state preserves the count and intrinsic label
-                measurements.
+                emphasized. Both side chevrons use a heavier stroke. Intake
+                controls join the frame with one shared translucent stroke,
+                without changing layout or the hit target. Keyboard focus stays
+                visible, and changing open state preserves the count and intrinsic
+                label measurements.
               </p>
               <p>
-                Intake groups and Past Days week groups retain static theme
-                washes and inward borders. Their CSS fade stops follow the group
-                surface without scanning or measuring every card during
-                disclosure. useIntakeGroupSurface observes only the label width
-                for the notch. No backdrop-filter or continuous frame loop is
-                mounted on repeated card surfaces. Collapse and Reveal retain
-                their short, direct transitions and keyboard behavior.
+                Intake group outlines arrive in 400ms. After a 300ms pause,
+                separate blur and color planes reveal diagonally over 1000ms.
+                The 48px blur remains independent of the three color washes at
+                67% opacity. The control follows with an 850ms damped spring and
+                the same color stack at 84%. Native CSS easing owns the impulse,
+                overshoot, inside gap and settling; no JavaScript spring clock
+                runs. Fractional frame and label edges keep both joins closed.
+                Height-only disclosure updates need no geometry reads. Past
+                Days week groups retain their existing theme washes. Collapse
+                and Reveal retain their direct transitions and keyboard behavior.
               </p>
               <p>
                 Stack presentation is saved per journal and day in the existing

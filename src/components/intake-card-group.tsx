@@ -10,7 +10,7 @@ import {
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
-import { ActionIcon } from "@/components/action-icon";
+import { ChevronDown } from "lucide-react";
 import { JOURNAL_REFERENCE_REVEAL_EVENT } from "@/lib/journal-reference-navigation";
 import { useIntakeGroupSurface } from "@/components/use-intake-group-surface";
 import { IntakeCard } from "@/components/intake-card";
@@ -22,6 +22,8 @@ import type { IntakeGroup } from "@/lib/intake-groups";
 import { getMedicationClasses } from "@/lib/medication-classification";
 import entranceStyles from "@/components/intake-group-entrance.module.css";
 import spacingStyles from "@/components/intake-group-spacing.module.css";
+import surfaceStyles from "@/components/intake-group-surface.module.css";
+import { INTAKE_GROUP_SURFACE_TIMING } from "@/lib/intake-group-entrance";
 import {
   EMPTY_INTAKE_STACK_VIEW,
   INTAKE_GROUP_SPACING_PX,
@@ -319,11 +321,15 @@ export function IntakeCardGroup({
   return (
     <div
       ref={groupRef}
-      className={`intake-group ${entranceStyles.group} ${spacingStyles.base} ${spacingStyles.group}`}
+      className={`intake-group ${entranceStyles.group} ${spacingStyles.base} ${spacingStyles.group} ${surfaceStyles.group}`}
       style={
         grouped
           ? ({
               "--intake-group-space": `${INTAKE_GROUP_SPACING_PX}px`,
+              "--group-fill-delay": `${INTAKE_GROUP_SURFACE_TIMING.fillDelay}ms`,
+              "--group-fill-duration": `${INTAKE_GROUP_SURFACE_TIMING.fill}ms`,
+              "--group-button-delay": `${INTAKE_GROUP_SURFACE_TIMING.buttonDelay}ms`,
+              "--group-button-duration": `${INTAKE_GROUP_SURFACE_TIMING.button}ms`,
             } as CSSProperties)
           : undefined
       }
@@ -355,8 +361,10 @@ export function IntakeCardGroup({
           className={`intake-group-glass ${entranceStyles.surface}`}
           aria-hidden="true"
         >
-          <div className="intake-group-blur" />
-          <div className="intake-group-wash intake-group-wash--intakes" />
+          <span className={`${surfaceStyles.blur} ${entranceStyles.reveal}`} />
+          <span
+            className={`${surfaceStyles.colors} ${entranceStyles.reveal}`}
+          />
         </div>
       )}
       <div
@@ -423,12 +431,23 @@ export function IntakeCardGroup({
             >
               <span ref={labelRef} className="intake-group-label">
                 <span
+                  className={`${surfaceStyles.buttonSurface} ${entranceStyles.buttonSurface}`}
+                  data-intake-group-entrance-part="finish"
+                  aria-hidden="true"
+                >
+                  <span
+                    className={`${surfaceStyles.blur} ${entranceStyles.buttonMaterial}`}
+                  />
+                  <span
+                    className={`${surfaceStyles.colors} ${entranceStyles.buttonMaterial}`}
+                  />
+                </span>
+                <span
                   className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
                   aria-hidden="true"
                 >
-                  <ActionIcon
-                    name="expand"
-                    weight="bold"
+                  <ChevronDown
+                    strokeWidth={3.25}
                     className="intake-group-chevron"
                   />
                 </span>
@@ -440,9 +459,8 @@ export function IntakeCardGroup({
                   className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
                   aria-hidden="true"
                 >
-                  <ActionIcon
-                    name="expand"
-                    weight="bold"
+                  <ChevronDown
+                    strokeWidth={3.25}
                     className="intake-group-chevron"
                   />
                 </span>

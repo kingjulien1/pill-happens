@@ -469,11 +469,12 @@ export function IntakeTimelineEntrance({
 
     const onEnd = (event: AnimationEvent) => {
       if (
+        event.type === "animationend" &&
         event.target instanceof HTMLElement &&
-        event.target.dataset.intakeGroupEntrancePart === "control"
+        event.target.dataset.intakeGroupEntrancePart === "finish"
       ) {
         const group = event.target.closest<HTMLElement>("[data-intake-group]");
-        if (group) finishGroup(group);
+        if (group?.dataset.groupEntryState === "running") finishGroup(group);
         return;
       }
       if (
