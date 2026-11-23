@@ -2,10 +2,10 @@
   --art-ink: var(--color-rose-200, #fecdd3);
   --art-soft: var(--color-violet-400, #a78bfa);
   --check-in-art-base: var(--check-in-icon-background);
-  --art-return-delay: 180ms;
+  --art-entry-delay: 180ms;
   --art-start: var(
     --check-in-art-delay,
-    calc(var(--card-entry-delay, 0ms) + var(--art-return-delay))
+    calc(var(--card-entry-delay, 0ms) + var(--art-entry-delay))
   );
   --art-entry-end: calc(var(--art-start) + 1560ms);
   --art-loop-start: calc(var(--art-entry-end) + 300ms);
@@ -97,17 +97,13 @@
 
 @media (max-width: 767px) {
   .stage {
-    --art-return-delay: 400ms;
+    --art-entry-delay: 400ms;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   /* Keep both clocks parked until this card and the refresh curtain are ready. */
   :global([data-card-entry-state="pending"]) .stage {
-    --art-play: paused;
-  }
-
-  .stage[data-artwork-dialog-open="true"] {
     --art-play: paused;
   }
 

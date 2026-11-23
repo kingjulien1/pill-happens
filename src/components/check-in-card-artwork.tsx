@@ -12,30 +12,16 @@ export const CHECK_IN_CARD_COLOR = "tw-violet-400";
 /** A small illustrated companion; the card remains the only interactive target. */
 export function CheckInCardArtwork({
   period,
-  replayKey,
-  dialogOpen = false,
+  day,
 }: {
   period: "morning" | "evening";
-  replayKey: string;
-  dialogOpen?: boolean;
+  day: string;
 }) {
-  return (
-    <ArtworkScene
-      key={`${period}:${replayKey}`}
-      period={period}
-      dialogOpen={dialogOpen}
-    />
-  );
+  return <ArtworkScene key={`${day}:${period}`} period={period} />;
 }
 
-/** A keyed scene owns its arrival and the later ambient handoff together. */
-function ArtworkScene({
-  period,
-  dialogOpen,
-}: {
-  period: "morning" | "evening";
-  dialogOpen: boolean;
-}) {
+/** One day’s scene owns its arrival and the later ambient handoff together. */
+function ArtworkScene({ period }: { period: "morning" | "evening" }) {
   const [ambientReady, setAmbientReady] = useState(false);
   const [entryReady, setEntryReady] = useState(false);
   const morning = period === "morning";
@@ -54,7 +40,6 @@ function ArtworkScene({
     <span
       className={styles.stage}
       data-check-in-artwork={period}
-      data-artwork-dialog-open={dialogOpen}
       data-artwork-ambient-ready={ambientReady}
       aria-hidden="true"
     >
@@ -88,7 +73,6 @@ function ArtworkScene({
                 <MorningCoffee className={styles.coffee} />
               ) : (
                 <EveningMoon
-                  dialogOpen={dialogOpen}
                   ambientReady={ambientReady}
                   entryReady={entryReady}
                 />

@@ -84,7 +84,6 @@ import {
 } from "@/lib/check-in-completion";
 import {
   getCheckInOpenedTime,
-  isCheckInOpenedTimestamp,
   getCheckInUpdatedTime,
 } from "@/lib/check-in-logged-time";
 import { cn } from "@/lib/utils";
@@ -172,11 +171,8 @@ export function DailyCheckInSection({
   const hint = morning ? "Still here. Take stock." : "Survived? Leave notes.";
   const openedAt = snapshot.openedAt;
   const opened = getCheckInOpenedTime(openedAt, timeZone);
-  const dormantProgress =
-    !progress.visible && !isCheckInOpenedTimestamp(openedAt);
-  // Only this card's editor may replay its artwork; restored older days stay scoped.
+  // Dialog visibility and draft progress must never replace the card's artwork.
   const ownDialogOpen = open && targetDay === day;
-  const artworkReplayKey = `${day}:${period}:${ownDialogOpen}:${progress.visible}:${progress.percent}:${dormantProgress}`;
   const metric = getCheckInCardMetric(
     period,
     currentCheckIn,
@@ -239,13 +235,7 @@ export function DailyCheckInSection({
           color={CHECK_IN_CARD_COLOR}
           decoration={<SpecularCardBorder />}
           icon={morning ? "sun" : "moon-star"}
-          leadingArtwork={
-            <CheckInCardArtwork
-              period={period}
-              replayKey={artworkReplayKey}
-              dialogOpen={ownDialogOpen}
-            />
-          }
+          leadingArtwork={<CheckInCardArtwork period={period} day={day} />}
           className={cn(styles.card, "check-in-icon-theme")}
           data-check-in-card
           data-check-in-dialog-open={ownDialogOpen}

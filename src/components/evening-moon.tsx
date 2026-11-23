@@ -39,11 +39,9 @@ type EveningStar = {
 
 /** One captured arc continues directly into a gently suspended, travelling moon. */
 export function EveningMoon({
-  dialogOpen = false,
   ambientReady = true,
   entryReady = true,
 }: {
-  dialogOpen?: boolean;
   ambientReady?: boolean;
   entryReady?: boolean;
 }) {
@@ -103,7 +101,7 @@ export function EveningMoon({
 
   useEffect(() => {
     for (const animation of motion.current) {
-      // The completed capture keeps its fill; resuming a hidden/dialog-paused
+      // The completed capture keeps its fill; resuming a hidden/paused
       // moon must never restart that finite animation behind the live drift.
       if (animation.playState === "finished") continue;
       if (view.active) animation.play();
@@ -198,7 +196,6 @@ export function EveningMoon({
       if (disposed) return;
       const nextMoving =
         entryReady &&
-        !dialogOpen &&
         !document.hidden &&
         !reducedMotion.matches &&
         visible &&
@@ -253,7 +250,6 @@ export function EveningMoon({
           "data-card-entry-state",
           "data-page-refresh-active",
           "data-page-entry-ready",
-          "data-artwork-dialog-open",
         ],
       }),
     );
@@ -270,7 +266,7 @@ export function EveningMoon({
       document.removeEventListener("visibilitychange", syncActivity);
       reducedMotion.removeEventListener("change", syncActivity);
     };
-  }, [ambientReady, dialogOpen, entryReady, loopReady]);
+  }, [ambientReady, entryReady, loopReady]);
 
   return (
     <span

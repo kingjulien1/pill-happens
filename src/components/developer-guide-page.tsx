@@ -2008,8 +2008,11 @@ export function DeveloperGuidePage() {
                 as a matching intake. Both share the mode-specific washes, light
                 reading veil and reduced-transparency fallback. Their former
                 independent background and drawn icon-frame overlays are
-                removed. Coffee, moon and book artwork now stay still without
-                activity observers or an ambient handoff. Standalone previews
+                removed. Coffee and moon scenes keep a stable day/period identity;
+                opening, editing, saving and closing check-in dialogs never
+                remount their artwork or replay its entrance. Their existing
+                animation timelines continue uninterrupted. Book artwork stays
+                static. Standalone previews
                 retain their 3.5px outer frame. The shared base retains a 48px
                 tile. One inner entrance owner animates the whole fan, while the
                 quantity label enters separately and grouped disclosure never
