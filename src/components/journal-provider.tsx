@@ -18,7 +18,7 @@ import {
   createDailyDerivedCache,
   type DailyDerivedValues,
 } from "@/lib/daily-derived-values";
-import type { AppData } from "@/lib/domain";
+import type { AppData, Intake } from "@/lib/domain";
 import { probeSession, recoverSession } from "@/lib/session-recovery";
 import { checkInForDay } from "@/lib/daily-check-in";
 import {
@@ -36,6 +36,8 @@ export type JournalMutationResult = {
   /** Explicit server confirmation; missing Undo alone never means unchanged. */
   unchanged?: boolean;
   entityId?: string;
+  /** Previous record captured inside the winning atomic intake save. */
+  intakeChange?: { id: string; before?: Intake };
   /** Sensitive, journal-scoped receipt; its original server expiry is retained. */
   receipt?: { token: string; expiresAt: string };
   /** A short-lived, server-checked reversal of this exact successful change. */
@@ -303,7 +305,12 @@ export function JournalProvider({
         }
         if (!res.ok)
           throw new Error(result.error || "Your change couldn't be saved.");
-        const { _undo: receipt, _unchanged, ...nextData } = result;
+        const {
+          _undo: receipt,
+          _unchanged,
+          _intakeChange,
+          ...nextData
+        } = result;
         acceptData(nextData);
         // New intake timestamps can be later than the last minute tick.
         setNow(new Date());
@@ -312,6 +319,9 @@ export function JournalProvider({
           notificationScope,
           data: nextData as AppData,
           ...(_unchanged === true ? { unchanged: true } : {}),
+          ...(typeof _intakeChange?.id === "string"
+            ? { intakeChange: _intakeChange as { id: string; before?: Intake } }
+            : {}),
           ...(typeof receipt?.token === "string" &&
           typeof receipt?.expiresAt === "string"
             ? {

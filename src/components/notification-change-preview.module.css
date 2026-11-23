@@ -654,11 +654,6 @@
 }
 /* Preserve the ingredient clearance while giving marked dose arithmetic enough
    room on the narrow notification card. Other card views keep their own ratio. */
-.root:global([data-notification-intake-update])
-  .medication
-  :global(.intake-card-dose-group) {
-  max-width: calc(100% - 30px);
-}
 @media (prefers-color-scheme: light) {
   .storyCurrent svg,
   .receiptTotal svg,

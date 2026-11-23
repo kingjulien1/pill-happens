@@ -699,23 +699,28 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         concise outcome headings with the essential context on their second row.
       </p>
       <p>
-        Created and updated intakes share a receipt layout around one saved
-        card. Its heading has a weekday / full date and time subheading,
-        followed by the recorded route, medication type and tracking-day
-        context. Updates add a compact recap beneath the card: rounded Rose300
-        marks with Rose800 ink identify edited values, and each focusable mark
-        describes its Previous → Saved tile. A calculated total is marked only
-        if it changed. Medication switches instead show a centered note with the
-        previous and saved medication names. Their identity flag comes from
-        comparing confirmed medication IDs; no IDs are added to display
-        snapshots. Older notices without that flag use their recorded name
-        change. Two destination tiles reuse the exact entry and medication
-        links, including the existing highlighted-entry query. These links move
-        out of the footer to avoid duplication. Correction guidance
-        distinguishes editing one intake from medication-wide strength changes,
-        and describes only the Undo action actually available. The receipt stays
-        within the notification’s scroll and focus boundary, with no floating
-        portal or additional ambient loop.
+        Intake receipts begin with the confirmed saved card, without an
+        introductory heading or repeated facts. Emerald200/300 marks use a 4:3
+        mix with Emerald700/800 ink. Four pixels of paint-only padding and
+        slightly heavier text and strokes never change the card’s geometry.
+        The complete quantity × strength and total row is one amount change.
+        Permanently open cream-paper history callouts connect above top-row
+        values and below the amount, with Previous → Saved values and a short
+        field explanation. They stay inside the reading panel without a portal
+        or animation loop. The recap uses one half-width tile style for every
+        field. Entry and Medication retain their exact destination links in the
+        footer. Undo explains its operation in a tooltip, followed by brief
+        snapshot guidance below the action row.
+      </p>
+      <p>
+        Changing an intake’s medication atomically removes the original record
+        and creates a new intake with a fresh ID and creation time. The new
+        intake uses the saved notification; its single Undo restores the
+        original and removes the replacement together. Later edits to either
+        record block that reversal. Normal edits keep their ID. Response-only
+        intake confirmation supplies the winning server before-state and saved
+        ID, so concurrent saves cannot produce stale history. Confirmation and
+        Undo metadata never become journal data.
       </p>
 
       <Heading id="expanded-tools" level={3}>
@@ -727,16 +732,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         accessible label: Entry, Medication, Check-In, Day, Goals, Today,
         Journal and Guide receive fitting symbols. Each tool has a 30px tonal
         tile, a 17px glyph and an 8.5px caption within a 52px-wide, at least
-        47px-high target. Intake receipts place Entry and Medication
-        destinations in their main content; Undo, Collapse and Dismiss remain
-        footer tools. Record notices keep their Undo slot without a callback,
+        47px-high target. Intake receipts keep Entry, Medication, Undo, Collapse and Dismiss
+        together in the footer. Record notices keep their Undo slot without a callback,
         native-disabled and gray. A real Undo uses the original callback,
         pending guard and failure handling; it is never inferred from a preview.
         Collapse returns focus to the summary before its details become inert.
         Following a normal destination link also collapses details without
         cancelling navigation; modified clicks keep their native new-tab
-        behavior. A 9px footer at 50% ink alpha gives brief context. Typed
-        previews explain their real Undo in the receipt. Completed non-record
+        behavior. A 9px footer at 50% ink alpha gives brief context. Intake
+        previews explain Undo in a tooltip; other record previews keep their
+        operation guidance in the receipt. Completed non-record
         actions, such as copying writing or refreshing, use Okay rather than a
         disabled Undo. Their supplied footer guidance lives in the main content,
         without duplicate navigation prose. Record receipts reuse the caller’s
@@ -756,11 +761,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         zero at the full height. Fuchsia600 starts at 18% and ends at 70% of
         that height; Pink400 starts at 10% and ends at 45%; Pink300 starts at 7%
         and ends at 28%. All paint stays behind the live tools and text, never
-        changing their hit targets. Update and medication-policy notices keep
+        changing their hit targets. Update, medication-policy and intake notices keep
         one brief footer context line, using the available width with 8px of
         inline padding. Other receipts explain snapshots and available Undo in
-        their main content. Navigation stays in the existing destination tools
-        or intake destination tiles, without a second set of repeated links.
+        their main content. Navigation stays in the existing destination tools,
+        without a second set of repeated links.
       </p>
       <p>
         While a mounted, visible notification has expanded idle details and is
@@ -1272,7 +1277,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       </p>
       <p>
         Undo supports intake, medication, goal, settings and a
-        day/period-specific check-in. Removing a medication that gained linked
+        day/period-specific check-in, plus atomic intake replacement pairs. Removing a medication that gained linked
         records is refused; restoring an intake or goal requires its medication.
         Medication history is reconciled again. Repeating an undo is harmless
         when the target already equals its before-state; tokens are not a

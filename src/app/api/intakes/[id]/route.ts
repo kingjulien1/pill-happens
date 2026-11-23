@@ -1,6 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { api, ApiError, jsonBody } from "@/lib/server/api";
 import { mutateStateWithUndo } from "@/lib/server/store";
 import { intakeSchema } from "@/lib/server/validation";
+import { intakeEditMutation } from "@/lib/server/intake-edit";
 
 export const runtime = "nodejs";
 
@@ -12,23 +14,11 @@ export function PATCH(request: Request, context: Context) {
     async () => {
       const { id } = await context.params;
       const input = intakeSchema.parse(await jsonBody(request));
-      return mutateStateWithUndo({ kind: "intake", id }, (state) => {
-        const intake = state.intakes.find((item) => item.id === id);
-        if (!intake) throw new ApiError(404, "This intake was not found.");
-        if (input.medicationId !== intake.medicationId) {
-          const medication = state.medications.find(
-            (item) => item.id === input.medicationId && !item.archived,
-          );
-          if (!medication)
-            throw new ApiError(400, "Choose an active medication.");
-          intake.medicationName = medication.name;
-          intake.medicationForm = medication.form;
-          intake.strengthMg = medication.strengthMg;
-        }
-        Object.assign(intake, input, {
-          takenAt: new Date(input.takenAt).toISOString(),
-        });
+      const edit = intakeEditMutation(id, input, {
+        id: randomUUID(),
+        createdAt: new Date().toISOString(),
       });
+      return mutateStateWithUndo(edit.target, edit.mutate);
     },
     { mutation: true },
   );

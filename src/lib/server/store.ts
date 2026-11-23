@@ -7,7 +7,7 @@ import { mutateJournalState, readJournalState } from "./journal-state";
 import {
   mutateJournalStateWithUndo,
   undoJournalMutation,
-  type UndoTarget,
+  type UndoTargetSource,
   type UndoableAppData,
 } from "./journal-undo";
 
@@ -34,7 +34,7 @@ export async function mutateState(
 
 /** Optional response metadata is never part of the persisted journal document. */
 export async function mutateStateWithUndo(
-  target: UndoTarget,
+  target: UndoTargetSource,
   mutate: (state: AppData) => void,
 ): Promise<UndoableAppData> {
   return mutateJournalStateWithUndo(

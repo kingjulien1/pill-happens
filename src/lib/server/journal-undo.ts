@@ -15,6 +15,11 @@ export const UNDO_BODY_MAX_BYTES = 2_000_000;
 
 const targetSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("intake"), id: z.string().min(1).max(160) }),
+  z.object({
+    kind: z.literal("intake-replacement"),
+    id: z.string().min(1).max(160),
+    previousId: z.string().min(1).max(160),
+  }),
   z.object({ kind: z.literal("medication"), id: z.string().min(1).max(160) }),
   z.object({ kind: z.literal("goal"), id: z.string().min(1).max(160) }),
   z.object({ kind: z.literal("settings") }),
@@ -26,6 +31,8 @@ const targetSchema = z.discriminatedUnion("kind", [
 ]);
 
 export type UndoTarget = z.infer<typeof targetSchema>;
+/** Resolve against the winning atomic save, including any contention retry. */
+export type UndoTargetSource = UndoTarget | ((state: AppData) => UndoTarget);
 type UndoRecord = Record<string, unknown> | null;
 const recordSchema = z.record(z.string(), z.unknown()).nullable();
 const receiptSchema = z.object({
@@ -47,6 +54,8 @@ export type UndoMetadata = {
 };
 export type UndoableAppData = AppData & {
   _undo?: UndoMetadata;
+  /** Confirm the winning intake save even when no Undo receipt is available. */
+  _intakeChange?: { id: string; before?: Intake };
   /** Response-only confirmation from the winning atomic save, never journal data. */
   _unchanged?: true;
 };
@@ -58,6 +67,11 @@ function copy<T>(value: T): T {
 }
 
 function snapshot(state: AppData, target: UndoTarget): UndoRecord {
+  if (target.kind === "intake-replacement")
+    return {
+      previous: snapshot(state, { kind: "intake", id: target.previousId }),
+      replacement: snapshot(state, { kind: "intake", id: target.id }),
+    };
   const value =
     target.kind === "settings"
       ? state.settings
@@ -145,20 +159,42 @@ function readReceipt(
 export async function mutateJournalStateWithUndo(
   repository: StateRepository,
   journalId: string,
-  target: UndoTarget,
+  targetSource: UndoTargetSource,
   mutate: (state: AppData) => void,
   secret: string,
   now = Date.now(),
 ): Promise<UndoableAppData> {
-  let change: { before: UndoRecord; after: UndoRecord } | undefined;
-  const data = await mutateJournalState(repository, journalId, (state) => {
-    const before = snapshot(state, target);
-    mutate(state);
-    // Include the same derived medication details that the repository will save.
-    state.intakes = withCurrentMedicationDetails(state).intakes;
-    change = { before, after: snapshot(state, target) };
-  });
+  let change:
+    { target: UndoTarget; before: UndoRecord; after: UndoRecord } | undefined;
+  let data: UndoableAppData = await mutateJournalState(
+    repository,
+    journalId,
+    (state) => {
+      const target =
+        typeof targetSource === "function" ? targetSource(state) : targetSource;
+      const before = snapshot(state, target);
+      mutate(state);
+      // Include the same derived medication details that the repository will save.
+      state.intakes = withCurrentMedicationDetails(state).intakes;
+      change = { target, before, after: snapshot(state, target) };
+    },
+  );
   if (!change) return data;
+  const { target } = change;
+  if (target.kind === "intake" || target.kind === "intake-replacement") {
+    const before =
+      target.kind === "intake" ? change.before : change.before?.previous;
+    const after =
+      target.kind === "intake" ? change.after : change.after?.replacement;
+    if (after)
+      data = {
+        ...data,
+        _intakeChange: {
+          id: target.id,
+          ...(before ? { before: copy(before) as unknown as Intake } : {}),
+        },
+      };
+  }
   // A check-in's version may advance on Save even when every answer is equal.
   // Compare complete records (including private writing), not display snapshots.
   const content = (record: UndoRecord) => {
@@ -181,7 +217,6 @@ export async function mutateJournalStateWithUndo(
     {
       version: 1,
       journalId,
-      target,
       ...change,
       issuedAt: now,
       expiresAt: now + UNDO_TTL_MS,
@@ -209,6 +244,21 @@ function restoreRecord(state: AppData, target: UndoTarget, before: UndoRecord) {
   const conflict = (message: string) => {
     throw new ApiError(409, message);
   };
+  if (target.kind === "intake-replacement") {
+    // Both records were compared before this point. Restore the pair together,
+    // never deleting a replacement first and attempting a second write later.
+    restoreRecord(
+      state,
+      { kind: "intake", id: target.id },
+      (before?.replacement ?? null) as UndoRecord,
+    );
+    restoreRecord(
+      state,
+      { kind: "intake", id: target.previousId },
+      (before?.previous ?? null) as UndoRecord,
+    );
+    return;
+  }
   if (target.kind === "settings") {
     if (!before) conflict("The earlier settings are no longer available.");
     state.settings = copy(before) as AppData["settings"];
@@ -280,7 +330,7 @@ function restoreRecord(state: AppData, target: UndoTarget, before: UndoRecord) {
   );
 }
 
-/** Compare and invert one record atomically, preserving all unrelated journal edits. */
+/** Compare and invert one record (or replacement pair), preserving unrelated edits. */
 export async function undoJournalMutation(
   repository: StateRepository,
   journalId: string,

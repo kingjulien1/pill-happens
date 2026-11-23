@@ -14,8 +14,9 @@ import {
   undoJournalMutation,
   UNDO_TTL_MS,
   type UndoableAppData,
-  type UndoTarget,
+  type UndoTargetSource,
 } from "./journal-undo";
+import { intakeEditMutation } from "./intake-edit";
 
 const secret = "Synthetic undo tests only. Not an application secret.";
 const now = Date.parse("2026-11-14T12:00:00Z");
@@ -93,7 +94,7 @@ function fixture() {
     race: (change: (state: AppData) => void) => {
       contender = change;
     },
-    save: (target: UndoTarget, change: (state: AppData) => void) =>
+    save: (target: UndoTargetSource, change: (state: AppData) => void) =>
       mutateJournalStateWithUndo(
         repository,
         "journal-a",
@@ -599,4 +600,207 @@ test("real Postgres CAS receipts capture the winning attempt and never enter sto
     Object.hasOwn(await repository.readState("personal"), "_undo"),
     false,
   );
+});
+
+const replacementMedication: Medication = {
+  ...medication,
+  id: "med-b",
+  name: "Replacement capsule",
+  strengthMg: 25,
+  form: "capsule",
+};
+const replacementIdentity = {
+  id: "replacement-intake",
+  createdAt: "2026-11-14T12:00:00Z",
+};
+const replacementInput = {
+  medicationId: replacementMedication.id,
+  quantity: 2,
+  route: "oral" as const,
+  takenAt: "2026-11-14T11:10:00+01:00",
+  note: "Preserved writing",
+};
+
+test("a medication switch atomically replaces the intake and one Undo restores the original pair", async () => {
+  const f = fixture();
+  f.concurrent((state) => state.medications.push(replacementMedication));
+  const edit = intakeEditMutation(
+    intake.id,
+    replacementInput,
+    replacementIdentity,
+  );
+  const saved = await f.save(edit.target, edit.mutate);
+  assert.equal(saved._undo?.entityId, replacementIdentity.id);
+  assert.deepEqual(saved._intakeChange, {
+    id: replacementIdentity.id,
+    before: intake,
+  });
+  assert.equal(Object.hasOwn(f.state(), "_intakeChange"), false);
+  assert.equal(saved.intakes.length, 1);
+  assert.deepEqual(saved.intakes[0], {
+    ...replacementInput,
+    ...replacementIdentity,
+    takenAt: "2026-11-14T10:10:00.000Z",
+    medicationName: replacementMedication.name,
+    medicationForm: replacementMedication.form,
+    strengthMg: replacementMedication.strengthMg,
+  });
+  assert.equal(
+    saved.intakes.some((entry) => entry.id === intake.id),
+    false,
+  );
+  f.concurrent((state) =>
+    state.intakes.push({ ...intake, id: "unrelated-intake" }),
+  );
+  const restored = await f.undo(saved);
+  assert.deepEqual(
+    restored.intakes.find((entry) => entry.id === intake.id),
+    intake,
+  );
+  assert.equal(
+    restored.intakes.some((entry) => entry.id === replacementIdentity.id),
+    false,
+  );
+  assert.ok(restored.intakes.some((entry) => entry.id === "unrelated-intake"));
+  assert.deepEqual(
+    (await f.undo(saved)).intakes,
+    restored.intakes,
+    "repeated Undo is idempotent",
+  );
+});
+
+test("editing the same medication keeps the original ID and creation time", async () => {
+  const f = fixture();
+  const edit = intakeEditMutation(
+    intake.id,
+    { ...replacementInput, medicationId: medication.id },
+    replacementIdentity,
+  );
+  const saved = await f.save(edit.target, edit.mutate);
+  assert.equal(saved._undo?.entityId, intake.id);
+  assert.equal(saved.intakes[0].createdAt, intake.createdAt);
+  assert.equal(saved.intakes[0].quantity, 2);
+  assert.deepEqual((await f.undo(saved)).intakes, [intake]);
+  const unchanged = intakeEditMutation(
+    intake.id,
+    { ...intake, takenAt: "2026-11-14T10:00:00+01:00" },
+    replacementIdentity,
+  );
+  assert.equal(
+    (await f.save(unchanged.target, unchanged.mutate))._unchanged,
+    true,
+  );
+});
+
+test("a failed replacement never deletes the original intake", async () => {
+  for (const archived of [false, true]) {
+    const f = fixture();
+    if (archived)
+      f.concurrent((state) =>
+        state.medications.push({ ...replacementMedication, archived: true }),
+      );
+    const edit = intakeEditMutation(
+      intake.id,
+      replacementInput,
+      replacementIdentity,
+    );
+    await assert.rejects(() => f.save(edit.target, edit.mutate), status(400));
+    assert.deepEqual(f.state().intakes, [intake]);
+  }
+});
+
+test("replacement Undo protects later changes to either record", async () => {
+  for (const changedOriginal of [false, true]) {
+    const f = fixture();
+    f.concurrent((state) => state.medications.push(replacementMedication));
+    const edit = intakeEditMutation(
+      intake.id,
+      replacementInput,
+      replacementIdentity,
+    );
+    const saved = await f.save(edit.target, edit.mutate);
+    f.concurrent((state) => {
+      if (changedOriginal) state.intakes.push({ ...intake, quantity: 3 });
+      else state.intakes[0].quantity = 3;
+    });
+    const latest = f.state();
+    await assert.rejects(() => f.undo(saved), status(409));
+    assert.deepEqual(f.state(), latest);
+  }
+});
+
+test("replacement Undo rolls back entirely when its original medication is unavailable", async () => {
+  const f = fixture();
+  f.concurrent((state) => state.medications.push(replacementMedication));
+  const edit = intakeEditMutation(
+    intake.id,
+    replacementInput,
+    replacementIdentity,
+  );
+  const saved = await f.save(edit.target, edit.mutate);
+  f.concurrent((state) => {
+    state.medications = state.medications.filter(
+      (entry) => entry.id !== medication.id,
+    );
+  });
+  const latest = f.state();
+  await assert.rejects(() => f.undo(saved), status(409));
+  assert.deepEqual(
+    f.state(),
+    latest,
+    "the replacement remains saved when Undo cannot restore the original",
+  );
+});
+
+test("the replacement decision and receipt are recalculated against the winning concurrent save", async () => {
+  const f = fixture();
+  f.concurrent((state) => state.medications.push(replacementMedication));
+  f.race((state) => {
+    state.intakes[0].medicationId = replacementMedication.id;
+    state.intakes[0].quantity = 3;
+  });
+  const edit = intakeEditMutation(
+    intake.id,
+    replacementInput,
+    replacementIdentity,
+  );
+  const saved = await f.save(edit.target, edit.mutate);
+  assert.equal(
+    saved._undo?.entityId,
+    intake.id,
+    "the winning save is a normal edit of the already changed medication",
+  );
+  assert.equal(saved.intakes.length, 1);
+  const restored = await f.undo(saved);
+  assert.equal(restored.intakes[0].quantity, 3);
+  assert.equal(restored.intakes[0].medicationId, replacementMedication.id);
+  assert.equal(
+    saved._intakeChange?.before?.quantity,
+    3,
+    "history uses the winning server version, not a stale client snapshot",
+  );
+});
+
+test("replacement confirmation is returned without signing and never becomes stored journal data", async () => {
+  const f = fixture();
+  f.concurrent((state) => state.medications.push(replacementMedication));
+  const edit = intakeEditMutation(
+    intake.id,
+    replacementInput,
+    replacementIdentity,
+  );
+  const saved = await mutateJournalStateWithUndo(
+    f.repository,
+    "journal-a",
+    edit.target,
+    edit.mutate,
+    "",
+    now,
+  );
+  assert.equal(saved._undo, undefined);
+  assert.deepEqual(saved._intakeChange, {
+    id: replacementIdentity.id,
+    before: intake,
+  });
+  assert.equal(Object.hasOwn(f.state(), "_intakeChange"), false);
 });

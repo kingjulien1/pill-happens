@@ -1,5 +1,6 @@
 import { doseMg, formatDose } from "@/lib/domain";
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import {
   getMedicationType,
   isMeteredMedicationType,
@@ -18,12 +19,15 @@ export function MedicationCardDose({
   form,
   source = "recorded",
   renderValue = plainValue,
+  decoration,
 }: {
   quantity: number;
   strengthMg: number;
   form?: MedicationType;
   source?: "recorded" | "default";
   renderValue?: typeof plainValue;
+  /** One zero-layout-cost mark for the complete recorded dose calculation. */
+  decoration?: HTMLAttributes<HTMLDivElement>;
 }) {
   const units = getMedicationType(form);
   const metered = isMeteredMedicationType(form);
@@ -31,7 +35,11 @@ export function MedicationCardDose({
   const calculation = `${formatDose(quantity)}${metered ? ` ${quantity === 1 ? units.unit : units.units}` : ""} × ${formatDose(strengthMg)} mg`;
   const isDefault = source === "default";
   return (
-    <div className="intake-card-dose-group" data-dose-source={source}>
+    <div
+      {...decoration}
+      className={cn("intake-card-dose-group", decoration?.className)}
+      data-dose-source={source}
+    >
       <span
         className="intake-card-amount"
         data-intake-dose={!isDefault || undefined}

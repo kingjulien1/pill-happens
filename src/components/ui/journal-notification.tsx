@@ -62,12 +62,15 @@ import {
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { TodayActionButton } from "@/components/today-action-button";
 import { getIntakeActionThemeStyle } from "@/lib/action-button-system";
-import {
-  intakeReceiptDestinations,
-  isIntakeReceipt,
-} from "@/lib/intake-receipt";
+import { isIntakeReceipt } from "@/lib/intake-receipt";
 import {
   nextNotificationWake,
   NOTIFICATION_CHECKPOINT_INTERVAL,
@@ -795,53 +798,79 @@ export function JournalNotification({
   };
 
   const displayedUndoState = undo ? undoState : "unavailable";
-  const renderUndo = (footer = false) => (
-    <Button
-      variant="ghost"
-      size="icon"
-      type="button"
-      className={
-        footer
-          ? "journal-notification-tool journal-notification-footer-undo"
-          : "journal-notification-revert journal-notification-undo"
-      }
-      data-undo-state={displayedUndoState}
-      disabled={displayedUndoState !== "ready" || phase !== "idle"}
-      aria-busy={displayedUndoState === "pending"}
-      aria-label={
-        !undo
-          ? "Undo unavailable for this notice"
-          : undoState === "pending"
-            ? (undo.pendingLabel ?? "Undoing change")
-            : undoState === "done"
-              ? (undo.successLabel ?? "Change undone")
-              : (undo.label ?? "Undo change")
-      }
-      title={
-        undo?.label ??
-        (undo ? "Undo change" : "Undo unavailable for this notice")
-      }
-      onPointerDown={(event) => event.stopPropagation()}
-      onClick={undo ? runUndo : undefined}
-    >
-      <span className="journal-notification-revert-symbol" aria-hidden="true">
-        {displayedUndoState === "pending" ? (
-          <LoaderCircle />
-        ) : displayedUndoState === "done" ? (
-          <Check />
-        ) : (
-          <Undo2 />
-        )}
-      </span>
-      <span className="journal-notification-revert-label" aria-hidden="true">
-        {displayedUndoState === "pending"
-          ? "Undoing"
-          : displayedUndoState === "done"
-            ? "Undone"
-            : "Undo"}
-      </span>
-    </Button>
-  );
+  const renderUndo = (footer = false) => {
+    const button = (
+      <Button
+        variant="ghost"
+        size="icon"
+        type="button"
+        className={
+          footer
+            ? "journal-notification-tool journal-notification-footer-undo"
+            : "journal-notification-revert journal-notification-undo"
+        }
+        data-undo-state={displayedUndoState}
+        disabled={displayedUndoState !== "ready" || phase !== "idle"}
+        aria-busy={displayedUndoState === "pending"}
+        aria-label={
+          !undo
+            ? "Undo unavailable for this notice"
+            : undoState === "pending"
+              ? (undo.pendingLabel ?? "Undoing change")
+              : undoState === "done"
+                ? (undo.successLabel ?? "Change undone")
+                : (undo.label ?? "Undo change")
+        }
+        title={
+          details?.preview?.after?.kind === "intake" && undo
+            ? undefined
+            : (undo?.label ??
+              (undo ? "Undo change" : "Undo unavailable for this notice"))
+        }
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={undo ? runUndo : undefined}
+      >
+        <span className="journal-notification-revert-symbol" aria-hidden="true">
+          {displayedUndoState === "pending" ? (
+            <LoaderCircle />
+          ) : displayedUndoState === "done" ? (
+            <Check />
+          ) : (
+            <Undo2 />
+          )}
+        </span>
+        <span className="journal-notification-revert-label" aria-hidden="true">
+          {displayedUndoState === "pending"
+            ? "Undoing"
+            : displayedUndoState === "done"
+              ? "Undone"
+              : "Undo"}
+        </span>
+      </Button>
+    );
+    if (!undo || details?.preview?.after?.kind !== "intake") return button;
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger render={button} />
+          <TooltipContent
+            side="top"
+            className="journal-intake-undo-hint"
+            positionerClassName="journal-notification-tooltip-positioner"
+          >
+            <span>
+              The <strong>Undo</strong> button below{" "}
+              {details.preview.before?.kind === "intake"
+                ? "restores the previous saved values for this intake."
+                : undo.label === "Undo Replacement"
+                  ? "restores the original intake and removes this replacement."
+                  : "removes only this newly saved intake."}
+            </span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   const collapseDetails = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -1084,17 +1113,12 @@ export function JournalNotification({
 
   const unchanged = variant === "unchanged";
   const intakeReceipt = !unchanged && isIntakeReceipt(details?.preview);
-  const receiptDestinations = intakeReceipt
-    ? intakeReceiptDestinations(details?.links)
-    : undefined;
-  const receiptHrefs = [
-    receiptDestinations?.entry?.href,
-    receiptDestinations?.medication?.href,
-  ];
-  const footerLinks = intakeReceipt
-    ? details?.links?.filter((link) => !receiptHrefs.includes(link.href))
-    : details?.links;
-  const footerCopy = details?.footer ?? defaultFooter[kind];
+  const footerLinks = details?.links;
+  const footerCopy = intakeReceipt
+    ? undo?.label === "Undo Replacement"
+      ? "New medication, new entry. Undo brings back the original intake."
+      : "Saved snapshot · Open Entry to review or correct this intake."
+    : (details?.footer ?? defaultFooter[kind]);
   const updatePanel = kind === "update" && (
     <section className="journal-update-section" aria-label="Update Details">
       <div className="journal-update-panel">
@@ -1377,8 +1401,6 @@ export function JournalNotification({
             ) : details?.preview ? (
               <NotificationChangePreview
                 preview={details.preview}
-                intakeLinks={receiptDestinations}
-                onFollowLink={followRelatedLink}
                 canUndo={Boolean(undo)}
                 paragraphs={details.paragraphs}
               />
@@ -1587,7 +1609,7 @@ export function JournalNotification({
                 </span>
               </Button>
             </div>
-            {(medicationPolicy || kind === "update") && (
+            {(medicationPolicy || kind === "update" || intakeReceipt) && (
               <span className="journal-notification-footer-copy">
                 {footerCopy}
               </span>

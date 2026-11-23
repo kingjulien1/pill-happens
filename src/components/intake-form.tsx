@@ -370,7 +370,6 @@ export function IntakeForm({
       // The draft stores its original instant and the zone of any edited field.
       const timestamp = intakeDraftTimestamp(timing.draft);
       // This runs only from onSubmit, so it must check the actual submit time.
-      // eslint-disable-next-line react-hooks/purity
       if (new Date(timestamp).getTime() > Date.now()) {
         setError("Choose a time that has already happened.");
         return;
@@ -382,13 +381,6 @@ export function IntakeForm({
         );
         return;
       }
-      const beforePreview = intake
-        ? intakeNotificationSnapshot(
-            intake,
-            data!.medications.find((item) => item.id === intake.medicationId),
-            timezone,
-          )
-        : undefined;
       const saved = await mutate(
         intake ? `intakes/${intake.id}` : "intakes",
         {
@@ -402,30 +394,44 @@ export function IntakeForm({
         intake ? "PATCH" : "POST",
       );
       const savedDay = dayKey(timestamp, timezone);
-      const savedTime = new Intl.DateTimeFormat("en-GB", {
-        timeZone: timezone,
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-      }).format(new Date(timestamp));
-      const name = medication?.name ?? fallbackIntake!.medicationName;
-      const savedId = saved.entityId ?? intake?.id;
+      const savedId =
+        saved.intakeChange?.id ??
+        saved.entityId ??
+        (intake && saved.data.intakes.some((entry) => entry.id === intake.id)
+          ? intake.id
+          : undefined);
       const savedEntry = savedNotificationRecord(
         data!.intakes,
         saved.data.intakes,
         savedId,
       );
+      // A medication switch replaces the original record atomically. Its new ID,
+      // receipt and notification all belong to the newly created intake.
+      const previousEntry = saved.intakeChange?.before ?? intake;
+      const updated = Boolean(
+        previousEntry && savedEntry?.id === previousEntry.id,
+      );
+      const replaced = Boolean(previousEntry && !updated && savedEntry);
+      const beforePreview = updated
+        ? intakeNotificationSnapshot(
+            previousEntry!,
+            data!.medications.find(
+              (item) => item.id === previousEntry!.medicationId,
+            ),
+            timezone,
+          )
+        : undefined;
       const dayHref = `/history/${savedDay}${savedId ? `?intake=${encodeURIComponent(savedId)}` : ""}`;
       toast.success(
-        intake
+        updated
           ? "Your entry is updated and back in place."
           : "Intake saved. A little more awareness, nicely logged.",
         {
           journalScope: saved.notificationScope,
-          heading: intake ? "Intake updated" : "Intake saved",
+          heading: updated ? "Intake updated" : "Intake saved",
           ...(saved.unchanged
             ? { variant: "unchanged" as const }
-            : !intake
+            : !updated
               ? { variant: "intake-saved" as const }
               : {}),
           details: {
@@ -433,10 +439,11 @@ export function IntakeForm({
               ? {
                   preview: {
                     ...(beforePreview ? { before: beforePreview } : {}),
-                    ...(intake
+                    ...(updated
                       ? {
                           medicationChanged:
-                            intake.medicationId !== savedEntry.medicationId,
+                            previousEntry!.medicationId !==
+                            savedEntry.medicationId,
                         }
                       : {}),
                     after: intakeNotificationSnapshot(
@@ -449,27 +456,13 @@ export function IntakeForm({
                   },
                 }
               : {}),
-            paragraphs: [
-              intake
-                ? "Your saved entry now uses these values. The day’s list, medication total and goal progress have been recalculated from the updated record."
-                : "This intake is now saved in your private journal. It contributes to this medication’s daily total and any goal you have set for it.",
-              "Its tracking day follows Date & Time Taken, with the day boundary at 06:00 in your journal timezone. Nearby entries may appear in the same stack; each intake remains a separate record.",
-            ],
-            facts: [
-              { label: "Medication", value: name },
-              {
-                label: "Amount",
-                value: `${formatDose(amount)} ${amount === 1 ? type.unit : type.units} × ${formatDose(strength)} mg`,
-              },
-              {
-                label: "Total",
-                value: `${formatDose(doseMg({ strengthMg: strength, quantity: amount }))} mg`,
-              },
-              {
-                label: "Taken",
-                value: `${new Intl.DateTimeFormat("en", { timeZone: timezone, month: "short", day: "numeric" }).format(new Date(timestamp))} · ${savedTime}`,
-              },
-            ],
+            ...(!savedEntry
+              ? {
+                  paragraphs: [
+                    "Your intake was saved. Open Entry to review its current values.",
+                  ],
+                }
+              : {}),
             links: [
               { label: "View Entry", href: dayHref },
               {
@@ -477,14 +470,20 @@ export function IntakeForm({
                 href: `/medications?medication=${encodeURIComponent(medicationId)}`,
               },
             ],
-            footer: intake
-              ? "Undo restores the previous saved values. Your other entries stay as they are."
-              : "Undo removes only this new entry. Your other entries stay as they are.",
+            footer: replaced
+              ? "New medication, new entry. Undo restores the original intake and removes this replacement."
+              : updated
+                ? "Undo restores the previous saved values. Your other entries stay as they are."
+                : "Undo removes only this new entry. Your other entries stay as they are.",
           },
           ...(saved.undo
             ? {
                 undo: {
-                  label: intake ? "Undo Edit" : "Undo Intake",
+                  label: updated
+                    ? "Undo Edit"
+                    : replaced
+                      ? "Undo Replacement"
+                      : "Undo Intake",
                   onUndo: saved.undo,
                   receipt: saved.receipt,
                 },

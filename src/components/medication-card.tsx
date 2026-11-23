@@ -1,6 +1,6 @@
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import { Badge } from "@/components/ui/badge";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, HTMLAttributes, ReactNode } from "react";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { MedicationQuantityBadge } from "@/components/medication-card-icon";
 import { MedicationFormGlyph } from "@/components/medication-form-glyph";
@@ -66,6 +66,10 @@ type MedicationCardProps = Omit<
     field: "name" | "route" | "form",
     content: ReactNode,
   ) => ReactNode;
+  /** Decorate an existing detail box without introducing layout wrappers. */
+  detailDecoration?: (
+    field: "name" | "route" | "form",
+  ) => HTMLAttributes<HTMLElement> | undefined;
 };
 
 const plainDetail = (_field: "name" | "route" | "form", content: ReactNode) =>
@@ -84,6 +88,7 @@ export function MedicationCard({
   formPresentation = "text",
   intakeRoute,
   renderDetail = plainDetail,
+  detailDecoration,
   className,
   ...props
 }: MedicationCardProps) {
@@ -138,7 +143,15 @@ export function MedicationCard({
         >
           {leading}
           <div className="intake-card-title-group" data-intake-title-group>
-            <h3 className="intake-card-name" title={name} data-intake-name>
+            <h3
+              {...detailDecoration?.("name")}
+              className={cn(
+                "intake-card-name",
+                detailDecoration?.("name")?.className,
+              )}
+              title={name}
+              data-intake-name
+            >
               {renderDetail("name", name)}
             </h3>
           </div>
@@ -152,7 +165,11 @@ export function MedicationCard({
                   <span className={styles.intakeTypes}>
                     {formPresentation === "icon" && (
                       <span
-                        className={styles.route}
+                        {...detailDecoration?.("route")}
+                        className={cn(
+                          styles.route,
+                          detailDecoration?.("route")?.className,
+                        )}
                         title={
                           INTAKE_ROUTES.find(
                             (route) =>
@@ -169,7 +186,14 @@ export function MedicationCard({
                         )}
                       </span>
                     )}
-                    <span className={styles.form} title={typeLabel}>
+                    <span
+                      {...detailDecoration?.("form")}
+                      className={cn(
+                        styles.form,
+                        detailDecoration?.("form")?.className,
+                      )}
+                      title={typeLabel}
+                    >
                       {renderDetail(
                         "form",
                         <MedicationFormGlyph

@@ -1,0 +1,287 @@
+.receipt {
+  display: grid;
+  min-width: 0;
+  gap: 18px;
+  padding: 3px 2px 1px;
+}
+.stage {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 19px;
+}
+.card {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+/* No wrapper, font metric, margin, padding or box size changes on edited values.
+   The four-pixel paint padding can overlap neighbours without moving them. */
+.changed {
+  --change-paper: color-mix(
+    in srgb,
+    var(--color-emerald-200) 57.143%,
+    var(--color-emerald-300)
+  );
+  --medication-detail-ink: color-mix(
+    in srgb,
+    var(--color-emerald-700) 50%,
+    var(--color-emerald-800)
+  );
+  position: relative;
+  z-index: 4;
+  border-radius: 4px;
+  background: var(--change-paper);
+  color: var(--medication-detail-ink) !important;
+  box-shadow:
+    0 0 0 4px var(--change-paper),
+    0 3px 0 4px color-mix(in srgb, var(--color-emerald-950) 14%, transparent);
+  -webkit-text-stroke: 0.22px currentColor;
+}
+.changed :global(.intake-card-amount),
+.changed :global(.intake-card-total) {
+  color: inherit;
+}
+.card .changed svg,
+.card .changed svg [stroke-width] {
+  stroke-width: 2.9 !important;
+}
+.changed:focus-visible {
+  outline: 2px solid var(--color-emerald-100);
+  outline-offset: 6px;
+}
+.card :global(.intake-card-title-group),
+.card :global(.intake-card-tags) {
+  overflow: visible;
+}
+.callouts {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  align-items: start;
+}
+.callouts[data-callout-side="top"]
+  .callout:only-child:is(
+    [data-change-callout="route"],
+    [data-change-callout="form"]
+  ) {
+  grid-column: 2;
+}
+.callouts[data-callout-side="bottom"] {
+  display: flex;
+  justify-content: flex-end;
+}
+.callouts[data-callout-side="bottom"] .callout {
+  width: min(100%, 312px);
+}
+.callout {
+  min-width: 0;
+  margin: 0;
+  padding: 8px 9px 7px;
+  border: 1px solid #e0ccad;
+  border-radius: 10px;
+  background: #fff7e9;
+  color: #49382e;
+  box-shadow: 0 3px 11px #1c081c25;
+}
+.callout header,
+.callout header > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.callout header {
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 14px;
+}
+.callout header svg {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+}
+.callout header > svg {
+  width: 11px;
+  height: 11px;
+  color: #047857;
+}
+.comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 11px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+.comparison > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 14px;
+  overflow-wrap: anywhere;
+}
+.comparison small {
+  color: #806d5c;
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.comparison strong {
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 750;
+}
+.comparison > svg {
+  width: 11px;
+  height: 11px;
+  margin-top: 11px;
+  color: #99816a;
+  stroke-width: 2;
+}
+.callout p {
+  margin: 5px 0 0;
+  padding-top: 5px;
+  border-top: 1px solid #cdbb9c60;
+  color: #806d5c;
+  font-size: 8px;
+  line-height: 11px;
+}
+.connectors {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.connectors path {
+  fill: none;
+  stroke: #d4c3a5;
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+.recap {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+}
+.heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.heading h4 {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--toast-ink);
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 20px;
+}
+.heading h4 svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: var(--toast-soft);
+}
+.heading > span {
+  flex: none;
+  color: var(--toast-muted);
+  font-size: 8px;
+  line-height: 13px;
+}
+.heading > span strong {
+  color: var(--toast-soft);
+  font-size: 10px;
+  font-weight: 700;
+}
+.stories {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.story {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--toast-soft) 7%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--toast-soft) 13%, transparent);
+}
+.story dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--toast-ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.story dt svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  color: var(--toast-soft);
+  stroke-width: 2.3;
+}
+.story dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.story .old {
+  display: grid;
+  gap: 1px;
+  margin-top: 7px;
+  color: var(--toast-muted);
+  font-size: 10px;
+  line-height: 14px;
+}
+.old > span {
+  font-size: 8px;
+  line-height: 11px;
+}
+.story .saved {
+  display: flex;
+  align-items: start;
+  gap: 5px;
+  margin-top: 4px;
+  color: var(--toast-ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 17px;
+}
+.saved svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  margin-top: 3px;
+  color: var(--color-emerald-300);
+  stroke-width: 2.4;
+}
+.callout[data-change-callout="name"] .comparison {
+  grid-template-columns: 11px minmax(0, 1fr);
+}
+.callout[data-change-callout="name"] .comparison > span {
+  grid-column: 2;
+}
+.callout[data-change-callout="name"] .comparison > svg {
+  grid-column: 1;
+  grid-row: 2;
+}
