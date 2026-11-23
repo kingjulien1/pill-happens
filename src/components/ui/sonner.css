@@ -2202,6 +2202,26 @@
   .journal-toaster [data-mounted="true"] .journal-toast-plate-spin-back {
     animation-direction: normal;
   }
+  .journal-toaster
+    [data-mounted="true"]
+    [data-toast-symbol="info"]:where(:not([data-toast-variant="unchanged"]))
+    .journal-toast-glyph {
+    transform-origin: 50% 80%;
+    filter: drop-shadow(0 0 1px #fde0479d) drop-shadow(0 0 4px #facc1559);
+    animation: journal-bulb-charge 4.6s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-halo {
+    animation: journal-bulb-halo 4.6s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-glass {
+    animation: journal-bulb-light 4.6s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-rays {
+    animation: journal-bulb-radiate 4.6s ease-in-out infinite;
+  }
+  .journal-toaster [data-mounted="true"] .journal-bulb-echo-rays {
+    animation: journal-bulb-echo 4.6s ease-out infinite;
+  }
   /* Animate work in progress, rather than every idle notification surface. */
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 900ms linear infinite;
@@ -2619,12 +2639,104 @@
 /* Fast → slow → fast ringing. Neutral seam velocities match at −104.17°/s;
    every peak turns smoothly, without an idle range or a loop-reset jump. */
 /* Charge for 1s, hold until 3.9s, then dim and settle. */
-
+@keyframes journal-bulb-charge {
+  0%,
+  95.65%,
+  100% {
+    transform: none;
+    color: #fde68a;
+  }
+  6.09% {
+    transform: rotate(-5deg) scale(0.94);
+    color: #facc15;
+  }
+  12.17% {
+    transform: rotate(4deg) scale(0.9);
+  }
+  16.52% {
+    transform: rotate(-2deg) scale(1.08);
+    color: #fde047;
+  }
+  19.13% {
+    transform: rotate(1deg) scale(0.99);
+  }
+  21.74%,
+  84.78% {
+    transform: none;
+    color: #fff3a3;
+  }
+}
+@keyframes journal-bulb-light {
+  0%,
+  95.65%,
+  100% {
+    fill-opacity: 0;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  17.39% {
+    fill-opacity: 0.46;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  21.74% {
+    fill-opacity: 0.98;
+  }
+  33.04%,
+  84.78% {
+    fill-opacity: 0.98;
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+}
 /* The first rays open at 0.8s and release at 3.8s, just before dimming. */
-
+@keyframes journal-bulb-radiate {
+  0%,
+  17.39% {
+    opacity: 0;
+    stroke-dashoffset: 1;
+    transform: scale(1);
+  }
+  27.83%,
+  82.61% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+    transform: scale(1);
+    color: #fff8ca;
+  }
+  88% {
+    opacity: 0;
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: scale(1.34);
+  }
+}
 /* Rays appear at 1.2s and finish fading at 3.7s: 200ms inside either
    edge of the bright hold. Each burst finishes its outward drift unseen. */
-
+@keyframes journal-bulb-echo {
+  0%,
+  26.087%,
+  61.522% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  32%,
+  39%,
+  67.435%,
+  74.435% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  45%,
+  80.435% {
+    opacity: 0;
+  }
+  51%,
+  86.435%,
+  100% {
+    opacity: 0;
+    transform: scale(1.38);
+  }
+}
 @keyframes journal-bulb-halo {
   0%,
   13.91%,
@@ -2636,7 +2748,6 @@
     opacity: 0.7885;
   }
 }
-
 /* The fast wing crosses the seam continuously; the slow middle stays clear. */
 
 /* Twenty-four matched vibrations per bell cycle keep both marks in phase. */
