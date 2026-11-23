@@ -195,12 +195,20 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   backdrop-filter: none;
   opacity: var(--app-canvas-accent-opacity);
 }
+.ambient-mauve-overlay,
 .ambient-iridescence-overlay {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  opacity: 0.17;
   pointer-events: none;
+}
+.ambient-mauve-overlay {
+  z-index: 2;
+  background: var(--color-mauve-950, #0c090c);
+  opacity: 0.24;
+}
+.ambient-iridescence-overlay {
+  z-index: 3;
+  opacity: 0.6;
 }
 @keyframes enter {
   from {

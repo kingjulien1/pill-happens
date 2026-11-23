@@ -1,6 +1,6 @@
 import { Iridescence } from "./iridescence";
 
-/** The accent mesh sits between the base light field and its subtle top layer. */
+/** Base light, accent mesh, mauve glaze, then the foreground iridescence field. */
 export function JournalBackground() {
   return (
     <div
@@ -10,6 +10,10 @@ export function JournalBackground() {
       aria-hidden="true"
     >
       <Iridescence />
+      <div
+        className="ambient-mauve-overlay"
+        data-background-layer="mauve-glaze"
+      />
       <div
         className="ambient-iridescence-overlay"
         data-background-layer="iridescence-overlay"

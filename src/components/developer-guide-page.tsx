@@ -1171,14 +1171,16 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Dark Mode combines Pink300 at 21% opacity and Purple900 at 69%
-                opacity above the violet field. A final 39% mesh blends orchid,
-                iris, rose, lagoon and violet in unequal elliptical pools, with
-                pastel equivalents in Light Mode. The lower-left rose/fuchsia
-                pool repeats at the upper right. This unblurred mesh stays
-                fixed above the moving light and scales to the entire viewport
-                without repeating or zooming with page length. The original
-                React Bits attribution and MIT + Commons
-                Clause notice remain at{" "}
+                opacity above the violet field. A 39% mesh blends orchid, iris,
+                rose, lagoon and violet in unequal elliptical pools, with pastel
+                equivalents in Light Mode. The lower-left rose/fuchsia pool
+                repeats at the upper right. This unblurred mesh stays fixed
+                above the moving light and scales to the entire viewport without
+                repeating or zooming with page length. Above it, a full-viewport
+                Mauve950 layer at 24% opacity sits beneath the top iridescence
+                field at 60% opacity. Both light fields use the existing
+                visibility and motion-preference gates. The original React Bits
+                attribution and MIT + Commons Clause notice remain at{" "}
                 <code>public/licenses/react-bits.txt</code>.
               </p>
               <p>
