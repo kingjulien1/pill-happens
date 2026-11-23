@@ -3,7 +3,6 @@
 import {
   CalendarCheck,
   Clock3,
-  NotebookTabs,
   Pill,
   Route,
   StickyNote,
@@ -25,6 +24,7 @@ import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewDetails } from "./intake-preview-details";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
+import { IntakePreviewSummary } from "./intake-preview-summary";
 import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
@@ -50,10 +50,12 @@ import {
 } from "@/lib/intake-form-draft";
 import {
   dayKey,
+  dayIntakes,
   doseMg,
   formatDay,
   formatDose,
   fromLocalInput,
+  totalsForDay,
   type Intake,
 } from "@/lib/domain";
 import { Label } from "@/components/ui/label";
@@ -263,15 +265,31 @@ export function IntakeForm({
     route !== undefined,
   );
 
-  const otherEntries = useMemo(() => {
-    if (!belongsTo || !medicationId) return 0;
-    return data!.intakes.filter(
-      (entry) =>
-        entry.id !== intake?.id &&
-        entry.medicationId === medicationId &&
-        dayKey(entry.takenAt, timezone) === belongsTo,
-    ).length;
-  }, [belongsTo, data, intake?.id, medicationId, timezone]);
+  const daySummary = useMemo(() => {
+    if (!belongsTo || !medicationId)
+      return { count: 0, totalMg: 0, excludingEditedMg: 0 };
+    const saved = totalsForDay(data!, belongsTo).find(
+      (total) => total.medicationId === medicationId,
+    );
+    const edited = intake
+      ? dayIntakes(data!, belongsTo).find(
+          (entry) =>
+            entry.id === intake.id && entry.medicationId === medicationId,
+        )
+      : undefined;
+    const totalMg = saved?.totalMg ?? 0;
+    return {
+      count: saved?.count ?? 0,
+      totalMg,
+      excludingEditedMg: Number(
+        (totalMg - (edited ? doseMg(edited) : 0)).toFixed(8),
+      ),
+    };
+  }, [belongsTo, data, intake, medicationId]);
+  const includingDraftMg =
+    calculatedDose === null
+      ? null
+      : Number((daySummary.excludingEditedMg + calculatedDose).toFixed(8));
 
   if (!medications.length && !intake)
     return (
@@ -606,6 +624,14 @@ export function IntakeForm({
         data-preview-empty={!hasPreview || undefined}
         aria-labelledby="intake-preview-title"
       >
+        {belongsTo && (medication || fallbackIntake) && (
+          <IntakePreviewSummary
+            medicationName={medication?.name ?? fallbackIntake!.medicationName}
+            count={daySummary.count}
+            totalMg={daySummary.totalMg}
+            includingDraftMg={includingDraftMg}
+          />
+        )}
         <FinalLookHeading
           id="intake-preview-title"
           showIcon
@@ -638,10 +664,6 @@ export function IntakeForm({
           <IntakePreviewDetails
             color={getMedicationColor(medication?.color).hex}
             rows={[
-              {
-                icon: NotebookTabs,
-                text: `${otherEntries === 0 ? "No other entries" : `${otherEntries} other ${otherEntries === 1 ? "entry" : "entries"}`} for this medication on this tracking day.`,
-              },
               {
                 icon: CalendarCheck,
                 text: `Tracking day · ${formatDay(belongsTo, { weekday: "long", month: "short" })}`,
