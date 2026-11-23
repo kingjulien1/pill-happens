@@ -1353,6 +1353,7 @@ export function JournalNotification({
         aria-labelledby={headingId}
         aria-hidden={!expanded}
         inert={!expanded}
+        tabIndex={-1}
         onPointerDown={(event) => event.stopPropagation()}
       >
         <div className="journal-notification-details-inner">

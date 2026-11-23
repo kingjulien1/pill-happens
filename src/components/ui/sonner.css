@@ -913,6 +913,12 @@
   user-select: none;
   -webkit-touch-callout: none;
 }
+.journal-notification .journal-notification-details,
+.journal-notification .journal-notification-details * {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
 .journal-notification[data-timer-mode="indefinite"] {
   padding-top: 0;
 }
