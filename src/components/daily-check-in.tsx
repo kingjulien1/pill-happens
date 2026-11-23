@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import {
   BedDouble,
   FlaskConical,
@@ -10,6 +10,7 @@ import {
   BookOpenCheck,
   PencilLine,
   Smile,
+  Save,
 } from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
 import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
@@ -411,6 +412,7 @@ function CheckInForm({
   const { data, mutate, busy, derived } = useJournal();
   const { store } = useJournalWorkspace();
   const [submitting, setSubmitting] = useState(false);
+  const saveInFlight = useRef(false);
   const locked = busy || submitting;
   const morning = period === "morning";
   const id = useId();
@@ -476,9 +478,8 @@ function CheckInForm({
     helped.trim() ||
     (morning && hasMorningSleepContent(morningSleep));
 
-  async function save(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (locked) return;
+  async function save(stayOpen = false) {
+    if (locked || saveInFlight.current) return;
     const parsedMorning = morning ? parseMorningSleepDraft(morningSleep) : null;
     if (parsedMorning?.error) {
       setError(parsedMorning.error);
@@ -493,6 +494,7 @@ function CheckInForm({
       return;
     }
     setError("");
+    saveInFlight.current = true;
     setSubmitting(true);
     let saved = false;
     try {
@@ -535,6 +537,10 @@ function CheckInForm({
         day,
         period,
       );
+      if (!savedCheckIn)
+        throw new Error(
+          "Your save could not be confirmed. Your draft is still kept here; please try again.",
+        );
       saved = true;
       // A different tab may have continued writing during this request. Import
       // its latest record before clearing only the exact draft we submitted.
@@ -544,8 +550,17 @@ function CheckInForm({
           submittedRecord,
           store.getSnapshot().drafts[key],
         )
-      )
-        draft.clearDraft();
+      ) {
+        if (stayOpen) {
+          // Keep the raw fields/editor state and advance the confirmed writing
+          // base. Clearing alone would restore this form's pre-save defaults.
+          draft.resetDraft({
+            ...draft.value,
+            note: savedCheckIn.note,
+            reflectionBaseUpdatedAt: savedCheckIn.updatedAt,
+          });
+        } else draft.clearDraft();
+      }
       toast.success(
         checkIn
           ? "Check-in updated."
@@ -569,7 +584,9 @@ function CheckInForm({
                 }
               : {}),
             paragraphs: [
-              "Your writing and check-in details are saved for this tracking day. Reopen the check-in whenever you want to add or change something.",
+              stayOpen
+                ? "Your writing and check-in details are saved for this tracking day. This dialog stays open; keep editing and save again whenever you’re ready."
+                : "Your writing and check-in details are saved for this tracking day. Reopen the check-in whenever you want to add or change something.",
             ],
             facts: [
               { label: "Tracking day", value: formatDay(day) },
@@ -596,7 +613,7 @@ function CheckInForm({
           },
         },
       );
-      onSaved();
+      if (!stayOpen) onSaved();
     } catch (error) {
       // Server conflicts and concurrent local edits both keep the full draft.
       setError(
@@ -605,7 +622,8 @@ function CheckInForm({
           : "Your check-in could not be saved. Your draft is still kept here.",
       );
     } finally {
-      if (!saved) {
+      saveInFlight.current = false;
+      if (!saved || stayOpen) {
         reflectionSave.resume();
         setSubmitting(false);
       }
@@ -616,7 +634,10 @@ function CheckInForm({
     <form
       id={formId}
       className={styles.form}
-      onSubmit={save}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void save();
+      }}
       onReset={(event) => {
         event.preventDefault();
         if (!locked) reset();
@@ -763,6 +784,21 @@ function CheckInForm({
         data-check-in-submit
       >
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+          <button
+            type="button"
+            form={formId}
+            className={styles.saveStay}
+            data-check-in-save-mode="stay"
+            disabled={locked}
+            aria-label="Save check-in and keep this dialog open"
+            onClick={(event) => {
+              if (event.currentTarget.form?.reportValidity()) void save(true);
+            }}
+          >
+            <Save size={13} strokeWidth={2} aria-hidden="true" />
+            <span>Save &amp; stay</span>
+            <span className={styles.saveStayNote}>Keep editing</span>
+          </button>
           <DialogPrimaryButton
             type="submit"
             disabled={locked}

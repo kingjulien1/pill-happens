@@ -3090,8 +3090,14 @@ export function DeveloperGuidePage() {
                   ReflectionDialog and independent saving controls retain their
                   launcher ref. Writing supports up to 100,000 characters. Done
                   returns to the check-in with the draft; Save Check-In saves
-                  all responses. The compact writer header has no heading icon
-                  or fade, and a larger description clamped to three lines. Its
+                  all responses and closes the dialog. The quiet Save & Stay
+                  bubble above that action uses the same validation and
+                  submission but keeps the keyed form, fields and editor state
+                  open. Its
+                  successful-save cleanup advances the writing baseline and
+                  resumes autosave; newer concurrent drafts remain untouched.
+                  The compact writer header has no heading icon or fade, and a
+                  larger description clamped to three lines. Its
                   context row above the heading shows the full weekday,
                   abbreviated month and day without a year, then a dot and
                   Reflection, with the shared 44px close control opposite. The
