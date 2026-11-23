@@ -17,13 +17,15 @@
   }
 }
 
-/* Actual dose arithmetic stays at the bottom of its own compact group while
+/* Recorded and default dose arithmetic stay at the bottom of their group while
    that whole group shares a visual centre with the ingredient beside it. */
-.card:global([data-intake-card]) :global(.intake-card-bottom) {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-bottom) {
   align-items: center;
 }
 
-.card:global([data-intake-card]) :global(.intake-card-dose-group) {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-dose-group) {
   align-items: flex-end;
 }
 
@@ -34,11 +36,12 @@
   font-weight: 650;
 }
 
-.card:global([data-intake-card]) :global(.intake-card-ingredient-group) {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-ingredient-group) {
   gap: 4px;
 }
 
-/* Library and preview tiles overlap by a third, starting at the right edge.
+/* Unmarked preview tiles overlap by a third, starting at the right edge.
    The RTL rail, labels and horizontal scrolling remain intact. */
 .card :global(.intake-card-tags) {
   isolation: isolate;
@@ -54,12 +57,14 @@
   margin-inline-start: calc(var(--medication-indicator-mark-size) / -3);
 }
 
-/* Intake categories are small white outlines with a clear, unchanged rhythm. */
-.card:global([data-intake-card]) :global(.intake-card-tags) {
+/* Intake and library categories share small outlines with a clear rhythm. */
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-tags) {
   gap: 6px;
 }
 
-.card:global([data-intake-card]) :global(.intake-card-indicator) {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-indicator) {
   margin-inline-start: 0;
   border: 0;
   background: none !important;
@@ -68,12 +73,16 @@
   opacity: 1;
 }
 
-.card:global([data-intake-card]) :global(.intake-card-indicator)::before,
-.card:global([data-intake-card]) :global(.intake-card-indicator)::after {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-indicator)::before,
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-indicator)::after {
   display: none;
 }
 
-.card:global([data-intake-card]) :global(.intake-card-indicator) svg {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-indicator)
+  svg {
   /* 80% of the former 80% glyph size, while the rail keeps its alignment. */
   width: 64%;
   height: 64%;
@@ -82,7 +91,10 @@
   fill: none;
 }
 
-.card:global([data-intake-card]) :global(.intake-card-indicator) svg * {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  :global(.intake-card-indicator)
+  svg
+  * {
   fill: none;
 }
 
@@ -94,8 +106,11 @@
     opacity: 1;
   }
 
-  .card:global([data-intake-card]) :global(.intake-card-indicator),
-  .card:global([data-intake-card]) :global(.intake-card-indicator) svg {
+  .card:global(:is([data-intake-card], [data-medication-library-card]))
+    :global(.intake-card-indicator),
+  .card:global(:is([data-intake-card], [data-medication-library-card]))
+    :global(.intake-card-indicator)
+    svg {
     color: var(--card-foreground) !important;
   }
 }

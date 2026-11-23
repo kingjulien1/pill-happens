@@ -1,3 +1,7 @@
+.card {
+  min-width: 0;
+}
+
 .card :global(.intake-card-heading) {
   column-gap: max(var(--entry-text-gap), 9px);
 }
@@ -10,12 +14,8 @@
   direction: ltr;
 }
 
-.card:global([data-medication-library-card]) .rail:global(.intake-card-tags) {
-  gap: 2px;
-  padding-block: 0;
-}
-
-.card:global([data-intake-card]) .rail:global(.intake-card-tags) {
+.card:global(:is([data-intake-card], [data-medication-library-card]))
+  .rail:global(.intake-card-tags) {
   gap: var(--intake-indicator-gap);
 }
 

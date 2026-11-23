@@ -108,7 +108,13 @@
 
 /* Keep the 60px face and fan anchors fixed. Unitless geometry lets the glyph
    follow the inner ring's growth without scaling either ring's stroke. */
-:global(:is([data-intake-card], [data-check-in-card]))
+:global(
+    :is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
+  )
   .mark:global(.intake-card-mark) {
   --intake-artwork-outset: 6px;
   --intake-artwork-face-size: 60;
@@ -148,13 +154,22 @@
 
 /* Absolute placement grows each face equally on all sides of its original
    48px fan layer, without scaling its drawing or entrance animation. */
-:global([data-intake-card]) .layer > .mark {
+:global(:is([data-intake-card], [data-medication-library-card]))
+  .layer
+  > .mark {
   position: absolute;
   inset: calc(-1 * var(--intake-artwork-outset));
 }
 
 /* The equal-width middle stroke stays completely inside the thick glass rim. */
-:global(:is([data-intake-card], [data-check-in-card])) .mark::before {
+:global(
+    :is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
+  )
+  .mark::before {
   content: "";
   position: absolute;
   inset: var(--intake-artwork-rim-inset);
@@ -165,14 +180,21 @@
 }
 
 /* Enlarge the inner ring and drawing together, leaving all fan layout intact. */
-:global(:is([data-intake-card], [data-check-in-card])) .mark::after {
+:global(
+    :is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
+  )
+  .mark::after {
   inset: calc(var(--intake-artwork-inner-inset) * 1px);
   border-radius: calc(20px - var(--intake-artwork-inner-inset) * 1px);
   box-shadow: inset 0 0 0 var(--intake-artwork-vivid-width)
     var(--intake-artwork-inner-rim);
 }
 
-:global([data-intake-card])
+:global(:is([data-intake-card], [data-medication-library-card]))
   .mark:global([data-medication-mark])
   > :global([data-medication-glyph]) {
   width: var(--intake-artwork-glyph-size);
@@ -461,15 +483,27 @@
   }
 }
 
-/* These two card families retain their November 20 icon glass. */
-:global(:is([data-intake-card], [data-check-in-card]))
+/* Logged and saved medications share the check-in artwork glass. */
+:global(
+    :is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
+  )
   .mark:global(.intake-card-mark) {
   -webkit-backdrop-filter: blur(96px) saturate(120%);
   backdrop-filter: blur(96px) saturate(120%);
 }
 
 /* A quiet pastel halo follows every frame of the complete artwork stack. */
-:global(:is([data-intake-card], [data-check-in-card]))
+:global(
+    :is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
+  )
   .mark:global(.intake-card-mark) {
   --intake-artwork-glow-ink: color-mix(
     in srgb,

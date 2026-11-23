@@ -8,7 +8,6 @@ import {
   getMedicationCategory,
 } from "@/lib/medication-categories";
 import { getMedicationType } from "@/lib/medication-types";
-import styles from "./medication-library-card.module.css";
 
 /** Saved defaults use exactly the same two-row composition as actual intakes. */
 export function MedicationLibraryCard({
@@ -46,7 +45,7 @@ export function MedicationLibraryCard({
       formPresentation="library"
       ingredient={ingredient}
       quantity={quantity}
-      className={`medication-library-card ${styles.card}`}
+      className="medication-library-card"
       onClick={onEdit}
       disabled={disabled}
       aria-label={label}

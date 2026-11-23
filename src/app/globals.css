@@ -956,8 +956,9 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   gap: 14px;
   padding: 12px var(--entry-card-padding);
 }
-/* Log cards, including check-ins, share the same artwork-to-copy clearance. */
-:is([data-intake-card], [data-check-in-card]) .intake-card-content {
+/* Log, check-in and library cards share the same artwork-to-copy clearance. */
+:is([data-intake-card], [data-check-in-card], [data-medication-library-card])
+  .intake-card-content {
   column-gap: 11px;
 }
 .intake-card-focus {
@@ -973,7 +974,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 /* Shrink the complete leading scene by the midpoint of 1/8 and 1/9.
    Composite every descendant and pseudo-element together, including fan
    spacing, badge lettering, stroke widths, glass rims and motion effects. */
-:is([data-intake-card], [data-check-in-card])
+:is([data-intake-card], [data-check-in-card], [data-medication-library-card])
   .intake-card-content
   > :is(.intake-card-focus, [data-check-in-artwork]) {
   scale: calc(127 / 144);
@@ -1257,31 +1258,36 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 }
 /* The intake second row shares one visual centre, midway between its previous
    raised ingredient and low dose. Protect the ingredient-to-dose gap first. */
-:is([data-intake-card], [data-check-in-card]) .intake-card-bottom {
+:is([data-intake-card], [data-check-in-card], [data-medication-library-card])
+  .intake-card-bottom {
   align-items: center;
   gap: calc(var(--content-min-gap, 8px) + 2px);
   padding-bottom: 3px;
 }
-[data-intake-card] .intake-card-dose-group {
+:is([data-intake-card], [data-medication-library-card])
+  .intake-card-dose-group {
   --entry-dose-gap: 4px;
   align-items: center;
 }
 /* Grow the previously reduced total by exactly 5/12 (41 2/3%), the midpoint
    of one third and one half. Keep recorded-dose arithmetic unchanged. */
-:is([data-intake-card], [data-check-in-card]) .intake-card-total-value {
+:is([data-intake-card], [data-check-in-card], [data-medication-library-card])
+  .intake-card-total-value {
   font-size: calc(15px * 17 / 24 * 17 / 12);
   line-height: 20px;
 }
-[data-intake-card]
+:is([data-intake-card], [data-medication-library-card])
   .intake-card-total[data-total-long="true"]
   .intake-card-total-value {
   font-size: calc(13.5px * 17 / 24 * 17 / 12);
 }
-:is([data-intake-card], [data-check-in-card]) .intake-card-total-unit {
+:is([data-intake-card], [data-check-in-card], [data-medication-library-card])
+  .intake-card-total-unit {
   font-size: calc(9px * 17 / 12);
 }
 @media (min-width: 768px) {
-  [data-intake-card] .intake-card-dose-group {
+  :is([data-intake-card], [data-medication-library-card])
+    .intake-card-dose-group {
     --entry-dose-gap: 5px;
   }
 }
@@ -1292,7 +1298,8 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   .intake-card-content {
     gap: 10px;
   }
-  :is([data-intake-card], [data-check-in-card]) .intake-card-content {
+  :is([data-intake-card], [data-check-in-card], [data-medication-library-card])
+    .intake-card-content {
     column-gap: 7px;
   }
 }

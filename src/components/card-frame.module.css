@@ -33,7 +33,7 @@
   );
 }
 
-/* Library and history surfaces retain their opaque, paired reading base. */
+/* The paired reading base remains available when frosted glass is unsupported. */
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card],
@@ -115,14 +115,16 @@
   );
 }
 
-.card[data-intake-card] {
+.card:is([data-intake-card], [data-medication-library-card]) {
   --intake-tint-factor: calc(31 / 24);
 }
 
-/* The artwork's saturated family pigment also owns the real intake wash.
+/* The artwork's saturated family pigment owns both intake and library washes.
    From the right, the last 26% drops from 10% to 6%: about 42% steeper.
    Empty previews keep their independent neutral skeleton surface. */
-.card[data-intake-card]:not([data-intake-preview-skeleton]) {
+.card:is([data-intake-card], [data-medication-library-card]):not(
+    [data-intake-preview-skeleton]
+  ) {
   --entry-tint-right: color-mix(
     in srgb,
     var(--entry-frame-pigment) 18%,
@@ -329,9 +331,13 @@
   }
 }
 
-/* Restore the November 20 glass only for intake and check-in faces. */
+/* Intake, check-in and library faces share the same frosted reading surface. */
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .card:global(.intake-log-card):is([data-intake-card], [data-check-in-card])
+  .card:global(.intake-log-card):is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
     :global(.intake-card-glass) {
     background:
       var(
