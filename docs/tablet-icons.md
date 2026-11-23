@@ -1,6 +1,6 @@
 # Tablet and dispenser icon library
 
-The library contains **16 tintable outline drawings** and **17 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 12 generic SVGs, the picker offers 45 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox and Levomethasan artwork.
+The library contains **21 tintable outline drawings** and **22 fixed-color medication illustrations**, based on the supplied tablet and dispenser references. Together with the existing 16 generic SVGs, the picker offers 59 local SVG icons. Existing paths and saved identifiers stay stable, including the updated Euthyrox and Levomethasan artwork.
 
 ## Source and generated files
 
@@ -98,6 +98,12 @@ Outline and filled files can share a basename, as with `viagra.svg` and `euthyro
 Levomethasan retains its persisted IDs, `svg:levomethasan` and `svg:color:levomethasan`, and its canonical outline/color file paths. Existing selections therefore show the refined artwork throughout the shared medication renderer, including the appearance preview, medication library, intake rows, medication selectors, and goals. `getSvgIconAssetUrl` adds a public revision query to the two Levomethasan asset URLs: `/icons/medications/tablets/outline/levomethasan.svg?v=facets-2` and `/icons/medications/tablets/color/levomethasan.svg?v=facets-2`. The revision refreshes browser-cached artwork without changing catalog paths or values stored in journals; other SVG URLs remain unchanged.
 
 ## Finding icons
+
+Compensan has its own `svg:compensan` outline and `svg:color:compensan` colored entry, displayed as **Compensan • SVG** and **Compensan • Color**. Both reuse Iserlohn's capsule and center seam, rotated 45 degrees clockwise around `(12, 12)`; Iserlohn itself stays upright. Their files are `tablets/outline/compensan.svg` and `tablets/color/compensan.svg`.
+
+The fixed Compensan pigment is `#fa5806` (**Red–Orange 500**): the hue of an equal OKLab blend of installed Tailwind Red400 and Orange300, raised to 500-level intensity with a small sRGB gamut adjustment. It is one flat pigment with a transparent center-seam cutout, using the same generator and SVG defaults as the other colored icons.
+
+Existing Compensan medication records receive this icon once, on their next authenticated journal read or write. The saved rotation becomes zero because the geometry already includes the turn. The journal's `appearanceUpdates` marker preserves subsequent manual choices, and the creation cutoff excludes new medications. Every linked intake automatically uses that appearance, regardless of age; orphaned Compensan cards and older restored notification previews also receive the new artwork. This uses the existing atomic repository writes and requires no production credentials in the client or development workspace.
 
 Search recognizes component names, display labels, slugs, aliases, and English/German keywords across local SVGs, Lucide icons, and emoji. Examples:
 

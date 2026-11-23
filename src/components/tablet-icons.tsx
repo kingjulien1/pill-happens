@@ -28,6 +28,7 @@ export const Testavan = tabletIcon("testavan");
 export const Levomethasan = tabletIcon("levomethasan");
 export const Xanax = tabletIcon("xanax");
 export const Iserlohn = tabletIcon("iserlohn");
+export const Compensan = tabletIcon("compensan");
 export const Desloratadin = tabletIcon("desloratadin");
 export const Atarax = tabletIcon("atarax");
 
@@ -58,6 +59,7 @@ export const TABLET_OUTLINE_COMPONENTS = {
   levomethasan: Levomethasan,
   xanax: Xanax,
   iserlohn: Iserlohn,
+  compensan: Compensan,
   desloratadin: Desloratadin,
   atarax: Atarax,
 } satisfies Record<keyof typeof TABLET_SHAPES, LucideIcon>;

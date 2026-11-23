@@ -2720,16 +2720,25 @@ export function DeveloperGuidePage() {
               <p>
                 Local SVG selection uses the allowlisted catalog. The medication
                 icon field accepts a known symbol or a single supported emoji,
-                rather than arbitrary SVG markup or remote URLs. There are 57
-                custom SVG choices: 16 original tintable drawings, 20 tablet or
-                dispenser outlines and 21 fixed-color variants. The colored
+                rather than arbitrary SVG markup or remote URLs. There are 59
+                custom SVG choices: 16 original tintable drawings, 21 tablet or
+                dispenser outlines and 22 fixed-color variants. The colored
                 variants render inline from shared <code>TABLET_SHAPES</code>
                 geometry and fixed catalog palettes. Each instance owns unique
                 local SVG mask IDs and luminance masks for transparent imprints
-                and score lines. All 49 earlier stored IDs, colors, filenames
-                and aliases remain stable; the eight new choices are additive.
+                and score lines. Existing stored IDs, colors, filenames and
+                aliases remain stable; the Compensan pair is additive.
                 Every asset remains vector geometry, with no bitmap conversion
                 or font dependency.
+              </p>
+              <p>
+                Compensan has separate SVG and Color choices. Both reuse the
+                Iserlohn capsule with a 45-degree clockwise turn; Color adds a
+                fixed Red–Orange 500 pigment, <code>#fa5806</code>. Existing
+                Compensan records update once during an authenticated journal
+                load or save, with no additional saved rotation. All linked
+                intake history follows the updated medication appearance, while
+                later manual icon choices remain authoritative.
               </p>
               <p>
                 Xanax, Iserlohn, Desloratadin and Atarax each have an outline

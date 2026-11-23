@@ -61,6 +61,8 @@ export type Goal = {
 export type Settings = { timezone: string };
 
 export type AppData = {
+  /** Completed one-time artwork updates; preserve subsequent manual choices. */
+  appearanceUpdates?: string[];
   medications: Medication[];
   intakes: Intake[];
   goals: Goal[];

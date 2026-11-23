@@ -1,5 +1,9 @@
 import type { AppData } from "@/lib/domain";
 import { withCurrentMedicationDetails } from "@/lib/medication-history";
+import {
+  applyCompensanIconUpdate,
+  needsCompensanIconUpdate,
+} from "@/lib/compensan-appearance";
 import type { JournalRepository } from "./journal-repository";
 
 type StateRepository = Pick<JournalRepository, "readState" | "mutateState">;
@@ -9,7 +13,12 @@ export async function readJournalState(
   repository: StateRepository,
   journalId: string,
 ): Promise<AppData> {
-  return withCurrentMedicationDetails(await repository.readState(journalId));
+  const state = await repository.readState(journalId);
+  if (needsCompensanIconUpdate(state))
+    return withCurrentMedicationDetails(
+      await repository.mutateState(journalId, applyCompensanIconUpdate),
+    );
+  return withCurrentMedicationDetails(state);
 }
 
 /**
@@ -22,6 +31,7 @@ export function mutateJournalState(
   mutate: (state: AppData) => void,
 ): Promise<AppData> {
   return repository.mutateState(journalId, (state) => {
+    applyCompensanIconUpdate(state);
     state.intakes = withCurrentMedicationDetails(state).intakes;
     mutate(state);
     state.intakes = withCurrentMedicationDetails(state).intakes;

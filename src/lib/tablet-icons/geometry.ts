@@ -26,6 +26,11 @@ const tadalafilBody: TabletIconNode[number] = [
   { cx: "12", cy: "12", rx: "5", ry: "9", key: "body" },
 ];
 
+const iserlohnNodes: TabletIconNode = [
+  ["rect", { x: "7", y: "2", width: "10", height: "20", rx: "5", key: "body" }],
+  ["path", { d: "M8 12h8", key: "capsule-seam" }],
+];
+
 /** Relative radii retain the size relationships in the supplied photo groups. */
 export const TABLET_SHAPES = {
   "tablet-meridian": {
@@ -226,13 +231,15 @@ export const TABLET_SHAPES = {
   iserlohn: {
     componentName: "Iserlohn",
     aliases: ["iserlohn", "capsule-center-seam"],
-    nodes: [
-      [
-        "rect",
-        { x: "7", y: "2", width: "10", height: "20", rx: "5", key: "body" },
-      ],
-      ["path", { d: "M8 12h8", key: "capsule-seam" }],
-    ],
+    nodes: iserlohnNodes,
+  },
+  compensan: {
+    componentName: "Compensan",
+    aliases: ["compensan", "diagonal-capsule", "compensan-diagonal"],
+    nodes: iserlohnNodes.map(([tag, attributes]): TabletIconNode[number] => [
+      tag,
+      { ...attributes, transform: "rotate(45 12 12)" },
+    ]),
   },
   desloratadin: {
     componentName: "Desloratadin",

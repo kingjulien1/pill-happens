@@ -28,6 +28,9 @@ export const TABLET_COLORS = {
   tramal: { name: "Amber 700", hex: "#bb4d00" },
   violet: { name: "Violet 300", hex: "#c4b4ff" },
   desloratadin: { name: "Sky 400", hex: "#00bcff" },
+  // Equal Red400/Orange300 OKLab hue, raised to a gamut-adjusted 500 intensity:
+  // oklch(67.1% 0.21 39.68258).
+  compensan: { name: "Red–Orange 500", hex: "#fa5806" },
 } as const satisfies Record<string, TabletArtworkColor>;
 
 const outlineDefinitions = [
@@ -178,6 +181,10 @@ const outlineDefinitions = [
   [
     "desloratadin",
     ["round", "tablet", "5", "five", "blue", "rund", "blau", "tablette"],
+  ],
+  [
+    "compensan",
+    ["capsule", "pill", "diagonal", "rotated", "45 degrees", "kapsel"],
   ],
   [
     "atarax",
@@ -404,6 +411,21 @@ const colorDefinitions = [
     "desloratadin",
     "desloratadin",
     ["blue", "blau", "round", "rund", "5", "five", "tablet", "tablette"],
+  ],
+  [
+    "compensan",
+    "Compensan",
+    "compensan",
+    "compensan",
+    [
+      "capsule",
+      "pill",
+      "diagonal",
+      "red orange",
+      "coral",
+      "45 degrees",
+      "kapsel",
+    ],
   ],
   [
     "atarax",

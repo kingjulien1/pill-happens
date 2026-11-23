@@ -13,6 +13,10 @@ import {
   getMedicationCategory,
 } from "@/lib/medication-categories";
 import type { Medication } from "@/lib/domain";
+import {
+  COMPENSAN_ICON,
+  isCompensanMedicationName,
+} from "@/lib/compensan-appearance";
 import { getMedicationClassification } from "@/lib/medication-classification";
 import {
   getMedicationType,
@@ -98,7 +102,12 @@ export function MedicationCard({
       {...props}
       className={cn(styles.card, className)}
       color={medication?.color}
-      icon={medication?.icon}
+      icon={
+        medication?.icon ??
+        (!medication && isCompensanMedicationName(name)
+          ? COMPENSAN_ICON
+          : undefined)
+      }
       iconRotation={medication?.iconRotation}
       quantity={quantity}
       data-medication-card

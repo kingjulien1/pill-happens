@@ -20,7 +20,7 @@ import {
 } from "./svg-icon-catalog";
 
 test("the local SVG catalog has unique stable IDs and corresponding checked-in assets", () => {
-  assert.equal(SVG_ICON_CATALOG.length, 57);
+  assert.equal(SVG_ICON_CATALOG.length, 59);
   assert.equal(
     new Set(SVG_ICON_CATALOG.map(({ value }) => value)).size,
     SVG_ICON_CATALOG.length,
@@ -148,7 +148,7 @@ test("all colored glyphs render inline vectors with independent transparent cuto
       /<svg\b(?=[^>]*data-tablet-variant="color")[\s\S]*?<\/svg>/g,
     ),
   ].map(([svg]) => svg);
-  assert.equal(colors.length, 21);
+  assert.equal(colors.length, 22);
   assert.equal(glyphs.length, entries.length);
   const maskIds = new Set<string>();
   glyphs.forEach((svg, index) => {
@@ -311,8 +311,8 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
   );
   const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
   assert.equal(outlines.length, Object.keys(TABLET_SHAPES).length);
-  assert.equal(outlines.length, 20);
-  assert.equal(colors.length, 21);
+  assert.equal(outlines.length, 21);
+  assert.equal(colors.length, 22);
   for (const [slug, label] of [
     ["bromazepam", "Bromazepam"],
     ["diazepam", "Diazepam"],
@@ -410,7 +410,7 @@ test("SVG component names, display labels, namespaces, and spelling aliases all 
       searchSvgIcons(query).some((entry) => entry.value === value),
       query,
     );
-  assert.equal(searchSvgIcons("color").length, 21);
+  assert.equal(searchSvgIcons("color").length, 22);
   assert.ok(
     searchSvgIcons("colored").every(({ variant }) => variant === "color"),
   );
@@ -534,6 +534,38 @@ test("the two Tadalafil strengths preserve a shared centered silhouette and sepa
   }
   assert.equal(getSvgIcon("svg:color:tadalafil-5")?.color?.name, "Amber 400");
   assert.equal(getSvgIcon("svg:color:tadalafil-10")?.color?.name, "Blue 600");
+});
+
+test("Compensan reuses Iserlohn at 45 degrees with separate canonical outline and saturated color entries", () => {
+  const original = TABLET_SHAPES.iserlohn.nodes;
+  assert.deepEqual(
+    TABLET_SHAPES.compensan.nodes,
+    original.map(([tag, attrs]) => [
+      tag,
+      { ...attrs, transform: "rotate(45 12 12)" },
+    ]),
+  );
+  for (const [value, variant] of [
+    ["svg:compensan", "outline"],
+    ["svg:color:compensan", "color"],
+  ] as const) {
+    const icon = getSvgIcon(value)!;
+    assert.equal(icon.label, "Compensan");
+    assert.equal(icon.variant, variant);
+    assert.equal(
+      icon.src,
+      `/icons/medications/tablets/${variant}/compensan.svg`,
+    );
+  }
+  assert.equal(getSvgIcon("svg:color:compensan")!.color!.hex, "#fa5806");
+  assert.deepEqual(
+    searchSvgIcons("Compensan outline").map((i) => i.value),
+    ["svg:compensan"],
+  );
+  assert.deepEqual(
+    searchSvgIcons("Compensan Color").map((i) => i.value),
+    ["svg:color:compensan"],
+  );
 });
 
 test("all round silhouettes and their vertical scores share the viewport center", () => {

@@ -3,6 +3,7 @@
 import { isValidElement, type ReactNode } from "react";
 import { NOTIFICATION_CHECKPOINT_INTERVAL } from "@/lib/notification-scheduling";
 import { recordNotificationContent } from "@/lib/record-notification-content";
+import { updateCompensanNotification } from "@/lib/compensan-appearance";
 import { toast as sonnerToast, type ExternalToast, type ToastT } from "sonner";
 import {
   JournalNotification,
@@ -456,7 +457,10 @@ export function bindJournalNotifications(
   };
   active = binding;
   const restore = (record: SavedNotice) => {
-    const descriptor = record.descriptor;
+    const descriptor = updateCompensanNotification(
+      record.descriptor,
+      record.createdAt,
+    );
     const readingClock = NotificationClock.restore(record.clock);
     if (readingClock.snapshot().expired) {
       binding.store.remove(record.id, issueTime(), record.createdAt);
