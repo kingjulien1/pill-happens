@@ -1,8 +1,7 @@
 import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
-import sectionStyles from "./check-in-section.module.css";
 import styles from "./intake-form.module.css";
 
-/** The same unframed heading rail as the form's Medication and Timing sections. */
+/** Saved and projected day totals, kept separate from the card preview. */
 export function IntakePreviewSummary({
   medicationName,
   count,
@@ -25,38 +24,41 @@ export function IntakePreviewSummary({
     day: undefined,
   });
   return (
-    <div
-      className={`${sectionStyles.header} ${styles.previewSummary}`}
-      data-intake-preview-summary
-    >
-      <div className={sectionStyles.caption}>
-        <time className={styles.previewSummaryWhen} dateTime={takenAt}>
-          <span>{weekday}</span>{" "}
-          <span className={styles.previewSummaryClock}>
-            {local.slice(11, 16)}
-          </span>
-        </time>
-        <div className={styles.previewSummaryCopy}>
-          <div className={styles.previewSummaryHeading}>
-            <strong>{formatDose(count)}</strong>{" "}
-            <span
-              className={styles.previewMedicationName}
-              title={medicationName}
-            >
-              {medicationName}
-            </span>{" "}
-            <span>{count === 1 ? "log" : "logs"} today</span>
+    <div className={styles.previewSummary} data-intake-preview-summary>
+      <time className={styles.previewSummaryWhen} dateTime={takenAt}>
+        <span>{weekday}</span>{" "}
+        <span className={styles.previewSummaryClock}>
+          {local.slice(11, 16)}
+        </span>
+      </time>
+      <div className={styles.previewSummaryCopy}>
+        <p className={styles.previewSummaryHeading}>
+          <strong>{formatDose(count)}</strong>{" "}
+          <span className={styles.previewMedicationName} title={medicationName}>
+            {medicationName}
+          </span>{" "}
+          <span>{count === 1 ? "log" : "logs"} today</span>
+        </p>
+        <dl
+          className={styles.previewSummaryTotals}
+          aria-label="Medication totals for this tracking day"
+        >
+          <div>
+            <dt>Saved total</dt>
+            <dd>
+              <strong>{formatDose(totalMg)}</strong> <span>mg</span>
+            </dd>
           </div>
-          <p
-            className={`${sectionStyles.detail} ${styles.previewSummaryTotals}`}
-          >
-            total <strong>{formatDose(totalMg)}</strong> mg –{" "}
-            <strong>
-              {includingDraftMg === null ? "—" : formatDose(includingDraftMg)}
-            </strong>{" "}
-            mg including this log
-          </p>
-        </div>
+          <div>
+            <dt>With this log</dt>
+            <dd>
+              <strong>
+                {includingDraftMg === null ? "—" : formatDose(includingDraftMg)}
+              </strong>{" "}
+              <span>mg</span>
+            </dd>
+          </div>
+        </dl>
       </div>
     </div>
   );

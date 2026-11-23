@@ -67,27 +67,32 @@
 }
 
 .preview .previewSummary {
-  margin-bottom: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: clamp(16px, 3vw, 24px);
+  min-width: 0;
+  margin-bottom: 14.5px;
+  padding: 4px 6px 0;
+  font-size: 11px;
+  line-height: 1.4;
 }
 .previewSummaryWhen {
   display: grid;
-  flex: none;
-  gap: 3px;
+  gap: 5px;
   color: var(--muted-foreground);
   font-weight: 400;
 }
 .previewSummaryClock {
-  font-size: 10px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   opacity: 0.8;
 }
 .previewSummaryCopy {
   display: grid;
-  flex: 1;
   min-width: 0;
   max-width: 100%;
-  margin-inline-start: auto;
-  gap: 3px;
+  gap: 10px;
   justify-items: end;
   color: color-mix(
     in srgb,
@@ -102,6 +107,8 @@
   max-width: 100%;
   align-items: baseline;
   gap: 0.3em;
+  margin: 0;
+  font-size: 12px;
 }
 .previewSummaryHeading > strong,
 .previewSummaryHeading > :last-child {
@@ -120,12 +127,51 @@
   font-weight: 750;
   font-variant-numeric: tabular-nums;
 }
-.previewSummary .previewSummaryTotals {
+.previewSummaryTotals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 224px);
   margin: 0;
-  color: inherit;
+  text-align: end;
+}
+.previewSummaryTotals > div {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+}
+.previewSummaryTotals > div + div {
+  margin-inline-start: 14px;
+  padding-inline-start: 14px;
+  border-inline-start: 1px solid
+    color-mix(in srgb, currentColor 22%, transparent);
+}
+.previewSummaryTotals dt {
+  font-size: 10px;
   font-weight: 400;
-  white-space: normal;
-  text-wrap: pretty;
+}
+.previewSummaryTotals dd {
+  display: flex;
+  justify-content: end;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 4px;
+  margin: 0;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.previewSummaryTotals dd strong {
+  font-size: 14px;
+  line-height: 1.2;
+}
+@media (prefers-color-scheme: light) {
+  .previewSummaryCopy {
+    color: color-mix(
+      in srgb,
+      var(--color-purple-800, #6b21a8) 35%,
+      var(--muted-foreground)
+    );
+  }
 }
 
 .previewContext {
