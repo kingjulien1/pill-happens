@@ -1252,9 +1252,9 @@ export function DeveloperGuidePage() {
                 padding and two 1px edges. Reduced transparency uses an opaque
                 semantic fallback. The row remains 7px above the 80px Log Intake
                 button, with the plain “Your journal, your pace, your way.”
-                footer 10px below it. It has no link, uses 450 weight, and mixes
-                the existing canvas-muted text color equally with transparency
-                for half its former visibility. Natural wrapping still
+                footer 22.5px below it. It has no link, uses 9px type at 500
+                weight and Violet400 at 74% opacity, with a matching Sparkles
+                icon. Natural wrapping still
                 participates in the dock’s existing ResizeObserver measurement
                 and page clearance; its entry animation remains independent of
                 the text color.

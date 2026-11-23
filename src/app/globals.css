@@ -3788,7 +3788,7 @@ input[type="time"] {
   }
 }
 .intake-action-note {
-  --intake-note-opacity: 0.67;
+  --intake-note-opacity: 0.74;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3796,8 +3796,8 @@ input[type="time"] {
   margin: 0;
   color: var(--color-violet-400);
   opacity: var(--intake-note-opacity);
-  font-size: calc(11.5px * 31 / 24);
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 500;
   line-height: 1.5;
   text-align: center;
   text-shadow: none;
