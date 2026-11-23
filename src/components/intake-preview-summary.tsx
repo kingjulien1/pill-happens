@@ -1,4 +1,4 @@
-import { formatDose } from "@/lib/domain";
+import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
 import sectionStyles from "./check-in-section.module.css";
 import styles from "./intake-form.module.css";
 
@@ -8,18 +8,34 @@ export function IntakePreviewSummary({
   count,
   totalMg,
   includingDraftMg,
+  takenAt,
+  timeZone,
 }: {
   medicationName: string;
   count: number;
   totalMg: number;
   includingDraftMg: number | null;
+  takenAt: string;
+  timeZone: string;
 }) {
+  const local = toLocalInput(takenAt, timeZone);
+  const weekday = formatDay(local.slice(0, 10), {
+    weekday: "long",
+    month: undefined,
+    day: undefined,
+  });
   return (
     <div
       className={`${sectionStyles.header} ${styles.previewSummary}`}
       data-intake-preview-summary
     >
       <div className={sectionStyles.caption}>
+        <time className={styles.previewSummaryWhen} dateTime={takenAt}>
+          <span>{weekday}</span>{" "}
+          <span className={styles.previewSummaryClock}>
+            {local.slice(11, 16)}
+          </span>
+        </time>
         <div className={styles.previewSummaryCopy}>
           <div className={styles.previewSummaryHeading}>
             <strong>{formatDose(count)}</strong>{" "}

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getMedicationColor,
+  getMedicationOutlineIcon,
   isMedicationIcon,
   isMedicationLucideIcon,
   MEDICATION_COLORS,
@@ -9,6 +10,33 @@ import {
 } from "./medication-appearance";
 import type { Medication } from "./domain";
 import { SVG_ICON_CATALOG } from "./svg-icon-catalog";
+
+test("amount-row medication outlines preserve the selected geometry without fixed-color artwork", () => {
+  assert.equal(
+    getMedicationOutlineIcon("svg:color:bromazepam"),
+    "svg:tablet-meridian",
+  );
+  assert.equal(
+    getMedicationOutlineIcon("svg:color:ritalin"),
+    "svg:tablet-dualmark",
+  );
+  assert.equal(
+    getMedicationOutlineIcon("svg:color:compensan"),
+    "svg:compensan",
+  );
+  assert.equal(getMedicationOutlineIcon("svg:iserlohn"), "svg:iserlohn");
+  assert.equal(
+    getMedicationOutlineIcon("svg:tablet-angled"),
+    "svg:tablet-angled",
+  );
+  assert.equal(getMedicationOutlineIcon("pill"), "pill");
+  for (const value of [undefined, "💊", "svg:unknown", "<svg/>"])
+    assert.equal(getMedicationOutlineIcon(value), undefined);
+  for (const icon of SVG_ICON_CATALOG.filter(
+    (entry) => entry.variant === "color",
+  ))
+    assert.equal(getMedicationOutlineIcon(icon.value), `svg:${icon.shape}`);
+});
 
 test("the expanded color registry preserves all 24 original choices and their order", () => {
   assert.ok(MEDICATION_COLORS.length > 300);

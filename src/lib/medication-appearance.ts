@@ -1,6 +1,6 @@
 import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
 import { TAILWIND_MEDICATION_COLORS } from "./medication-palette";
-import { isMedicationSvgIcon } from "./svg-icon-catalog";
+import { getSvgIcon, isMedicationSvgIcon } from "./svg-icon-catalog";
 
 /** Appearance values are persisted in medication records; keep legacy keys stable. */
 export const MEDICATION_COLORS = [
@@ -60,6 +60,15 @@ export function isMedicationLucideIcon(
   value: string,
 ): value is MedicationIconName {
   return iconNames.has(value);
+}
+
+/** Colored artwork can have a different slug from its underlying outline shape. */
+export function getMedicationOutlineIcon(icon?: string): string | undefined {
+  const svg = getSvgIcon(icon ?? "");
+  if (svg?.variant === "color" && svg.shape)
+    return getSvgIcon(`svg:${svg.shape}`)?.value;
+  if (svg) return svg.value;
+  return icon && isMedicationLucideIcon(icon) ? icon : undefined;
 }
 
 /** Accept an allowlisted Lucide/local SVG name or one emoji, never markup or URLs. */

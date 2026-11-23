@@ -572,6 +572,8 @@ export function IntakeForm({
                 increment={increment}
                 route={route}
                 form={medicationForm ?? "other"}
+                medicationIcon={medication?.icon}
+                medicationIconRotation={medication?.iconRotation}
                 categories={getMedicationCategories(medication)}
                 unit={visibleQuantity === 1 ? type.unit : type.units}
                 strengthMg={strength}
@@ -630,6 +632,8 @@ export function IntakeForm({
             count={daySummary.count}
             totalMg={daySummary.totalMg}
             includingDraftMg={includingDraftMg}
+            takenAt={previewTime}
+            timeZone={timezone}
           />
         )}
         <FinalLookHeading

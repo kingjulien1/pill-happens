@@ -91,6 +91,9 @@
 .iconGroup > span {
   display: inline-flex;
 }
+.medicationIcons {
+  gap: 6px;
+}
 .doseGroup {
   display: inline-flex;
   flex-wrap: wrap;

@@ -69,8 +69,21 @@
 .preview .previewSummary {
   margin-bottom: 0;
 }
+.previewSummaryWhen {
+  display: grid;
+  flex: none;
+  gap: 3px;
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+.previewSummaryClock {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
 .previewSummaryCopy {
   display: grid;
+  flex: 1;
   min-width: 0;
   max-width: 100%;
   margin-inline-start: auto;

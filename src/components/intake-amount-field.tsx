@@ -2,7 +2,8 @@
 
 import { useRef, useState, type CSSProperties } from "react";
 import { MedicationIndicatorMark } from "./medication-indicator-mark";
-import { MedicationTypeIcon } from "./medication-icon";
+import { MedicationGlyph, MedicationTypeIcon } from "./medication-icon";
+import { getMedicationOutlineIcon } from "@/lib/medication-appearance";
 import { IntakeRouteIcon } from "./intake-route-icon";
 import type { MedicationCategory } from "@/lib/medication-categories";
 import type { MedicationType } from "@/lib/medication-types";
@@ -34,6 +35,8 @@ export function IntakeAmountField({
   unit,
   route,
   form,
+  medicationIcon,
+  medicationIconRotation = 0,
   categories,
   strengthMg,
   calculatedDose,
@@ -49,6 +52,8 @@ export function IntakeAmountField({
   unit: string;
   route?: IntakeRoute;
   form: MedicationType;
+  medicationIcon?: string;
+  medicationIconRotation?: number;
   categories: MedicationCategory[];
   strengthMg: number;
   calculatedDose: number | null;
@@ -61,6 +66,7 @@ export function IntakeAmountField({
   const composing = useRef(false);
   const parsed = parseIntakeQuantity(value);
   const shown = composition ?? value;
+  const outlineIcon = getMedicationOutlineIcon(medicationIcon);
   const commit = (raw: string) => {
     const limited = limitIntakeQuantityInput(raw);
     if (limited !== null) onChange(limited);
@@ -222,20 +228,37 @@ export function IntakeAmountField({
                 <span>mg</span>
               </span>
             </span>
-            {categories.length > 0 && (
-              <span className={styles.iconGroup}>
-                {categories.map((kind) => (
-                  <MedicationIndicatorMark
-                    key={kind}
-                    kind={kind}
-                    size={14}
-                    strokeWidth={2.5}
-                    outline
-                    className={styles.categoryGlyph}
+            <span className={`${styles.iconGroup} ${styles.medicationIcons}`}>
+              <span
+                role="img"
+                aria-label="Selected medication symbol"
+                data-intake-medication-outline={outlineIcon ?? form}
+                style={{ rotate: `${medicationIconRotation}deg` }}
+              >
+                {outlineIcon ? (
+                  <MedicationGlyph
+                    icon={outlineIcon}
+                    className={styles.glyph}
                   />
-                ))}
+                ) : (
+                  <MedicationTypeIcon
+                    type={form}
+                    className={styles.glyph}
+                    strokeWidth={2.5}
+                  />
+                )}
               </span>
-            )}
+              {categories.map((kind) => (
+                <MedicationIndicatorMark
+                  key={kind}
+                  kind={kind}
+                  size={14}
+                  strokeWidth={2.5}
+                  outline
+                  className={styles.categoryGlyph}
+                />
+              ))}
+            </span>
           </>
         )}
         {originalQuantityPreserved && (
