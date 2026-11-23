@@ -968,7 +968,7 @@ export function JournalNotification({
         variant="ghost"
         size="icon"
         type="button"
-        className={`journal-notification-tool ${footer ? "journal-update-footer-action" : "journal-update-header-action"}`}
+        className={`journal-notification-tool journal-notification-confirm-action ${footer ? "journal-update-footer-action" : "journal-update-header-action"}`}
         data-update-choice={footer ? "footer" : undefined}
         aria-label="Apply update and reload"
         title="Apply update and reload"
@@ -1025,7 +1025,7 @@ export function JournalNotification({
           type="button"
           variant="ghost"
           size="icon"
-          className="journal-notification-revert"
+          className={`journal-notification-revert${kind === "info" ? " journal-notification-confirm-action" : ""}`}
           aria-label={label}
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {

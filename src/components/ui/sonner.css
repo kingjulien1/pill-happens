@@ -1771,9 +1771,8 @@
   outline: 2px solid var(--toast-ink);
   outline-offset: 3px;
 }
-/* Apply is a small raised confirmation key in both header and footer. */
-.journal-notification
-  :is(.journal-update-header-action, .journal-update-footer-action) {
+/* Update and info actions share a small raised confirmation key. */
+.journal-notification .journal-notification-confirm-action {
   --apply-key-ink: color-mix(
     in srgb,
     var(--color-violet-950, #2e1065) 72%,
@@ -1797,7 +1796,7 @@
   );
 }
 .journal-notification
-  :is(.journal-update-header-action, .journal-update-footer-action)
+  .journal-notification-confirm-action
   :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol) {
   position: relative;
   isolation: isolate;
@@ -1816,24 +1815,18 @@
     background-color 180ms ease;
 }
 .journal-notification
-  :is(.journal-update-header-action, .journal-update-footer-action)
+  .journal-notification-confirm-action
   :is(.journal-notification-tool-label, .journal-notification-revert-label) {
   color: var(--toast-ink);
   opacity: 0.86;
 }
-.journal-notification
-  :is(
-    .journal-update-header-action,
-    .journal-update-footer-action
-  ):focus-visible {
+.journal-notification .journal-notification-confirm-action:focus-visible {
   outline: 2px solid var(--color-violet-200, #ddd6fe);
   outline-offset: 3px;
 }
 @media (hover: hover) and (pointer: fine) {
   .journal-notification
-    :is(.journal-update-header-action, .journal-update-footer-action):not(
-      :disabled
-    ):hover
+    .journal-notification-confirm-action:not(:disabled):hover
     :is(
       .journal-notification-tool-symbol,
       .journal-notification-revert-symbol
@@ -1846,9 +1839,7 @@
   }
 }
 .journal-notification
-  :is(.journal-update-header-action, .journal-update-footer-action):not(
-    :disabled
-  ):active
+  .journal-notification-confirm-action:not(:disabled):active
   :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol) {
   transform: translateY(2px) scale(0.97);
   box-shadow:
@@ -1858,8 +1849,11 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .journal-notification
-    :is(.journal-update-header-action, .journal-update-footer-action)
-    :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol) {
+    .journal-notification-confirm-action
+    :is(
+      .journal-notification-tool-symbol,
+      .journal-notification-revert-symbol
+    ) {
     transition: none;
   }
 }
