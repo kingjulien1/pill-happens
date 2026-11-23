@@ -2085,7 +2085,13 @@ export function DeveloperGuidePage() {
                 filter and inward gradient rim. A faint geometric network sits
                 behind the foreground using a quiet, mode-aware Lilac tone. The
                 centered rounded title group separates Final Look and Live
-                Preview. Color chips use the selected pigment at 40% and a
+                Preview. It starts at half size and grows uniformly as the
+                preview enters the dialog viewport, reaching full size when
+                its bottom comes into view. Fading side rails extend during
+                the final fifth of that scroll. Cached layout and one queued
+                frame per scroll batch avoid repeated card measurements or an
+                idle render loop; reduced motion shows the full static heading.
+                Color chips use the selected pigment at 40% and a
                 matching family-900 ink, including a neutral fallback. The
                 preview shows quantity and per-unit strength as 2 tablets / 20
                 mg beside the calculated 40 mg total. Compact Surprise Me and

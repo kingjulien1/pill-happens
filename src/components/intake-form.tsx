@@ -668,6 +668,7 @@ export function IntakeForm({
       />
       <section
         className={styles.preview}
+        data-final-look-section
         data-preview-empty={!hasPreview || undefined}
         aria-labelledby="intake-preview-title"
       >

@@ -87,7 +87,7 @@
   min-width: 0;
   max-width: 100%;
 }
-.preview > [data-preview-title-pill] {
+.preview [data-preview-title-pill] {
   --final-look-copy: var(--foreground);
   --final-look-muted: var(--muted-foreground);
   justify-self: center;
@@ -371,7 +371,7 @@
   background: var(--preview-empty-surface, var(--color-mauve-600, #594c5b));
   cursor: default;
 }
-.preview[data-preview-empty="true"] > [data-preview-title-pill] {
+.preview[data-preview-empty="true"] [data-preview-title-pill] {
   --final-look-copy: var(--preview-empty-copy);
   --final-look-muted: var(--preview-empty-muted);
   background: var(--preview-empty-surface);

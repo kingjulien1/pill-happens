@@ -681,6 +681,7 @@ export function MedicationAppearanceFields({
         aria-labelledby={`${id}-preview-title`}
         className={styles.previewSection}
         data-appearance-preview-section
+        data-final-look-section
       >
         <div
           className={`final-look-showcase ${styles.showcase}`}
