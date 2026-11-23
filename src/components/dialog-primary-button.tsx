@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { PencilSparklesIcon } from "@/components/action-icon";
 import type { AccentButtonProps } from "@/components/accent-button";
@@ -9,7 +9,10 @@ import { INTAKE_ACTION_GEOMETRY } from "@/lib/action-button-system";
 import { cn } from "@/lib/utils";
 import styles from "./dialog-primary-button.module.css";
 
-type DialogPrimaryButtonProps = Omit<AccentButtonProps, "radius" | "finish">;
+type DialogPrimaryButtonProps = Omit<AccentButtonProps, "radius" | "finish"> & {
+  /** Optional short aside, using the main Log Intake button's separator rail. */
+  secondaryText?: ReactNode;
+};
 
 /** Submission content uses the same satin host and fixed geometry as Log Intake. */
 export function DialogPrimaryButton({
@@ -19,6 +22,7 @@ export function DialogPrimaryButton({
   pending = false,
   leadingIcon,
   trailingIcon,
+  secondaryText,
   "aria-busy": ariaBusy,
   ...props
 }: DialogPrimaryButtonProps) {
@@ -81,6 +85,14 @@ export function DialogPrimaryButton({
             )}
             <span className={styles.label}>{children}</span>
           </span>
+          {secondaryText != null && (
+            <>
+              <span className="intake-primary-dot" aria-hidden="true">
+                ·
+              </span>
+              <span className="intake-primary-aside">{secondaryText}</span>
+            </>
+          )}
         </span>
         {trailing != null && (
           <span className="intake-primary-next" aria-hidden="true">

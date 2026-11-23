@@ -3,6 +3,7 @@
 import {
   CalendarCheck,
   Clock3,
+  Import,
   Pill,
   Route,
   StickyNote,
@@ -716,9 +717,12 @@ export function IntakeForm({
           type="submit"
           disabled={busy || timingResetting}
           pending={busy}
-          className="w-full rounded-2xl"
+          leadingIcon={busy ? undefined : <Import aria-hidden="true" />}
+          secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
+          className={styles.submitButton}
+          data-intake-submit
         >
-          {busy ? "Saving…" : intake ? "Save Changes" : "Save Intake"}
+          {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
         </DialogPrimaryButton>
         <DraftStatus
           {...draftFeedback}
