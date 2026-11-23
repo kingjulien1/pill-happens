@@ -883,6 +883,11 @@
   --toast-wash-pink: #f472b61a;
   --toast-wash-purple: #c026d32e;
   --toast-wash-base: #701a75b3;
+  --toast-closed-surface:
+    linear-gradient(var(--toast-wash-pale) 0 0),
+    linear-gradient(var(--toast-wash-pink) 0 0),
+    linear-gradient(var(--toast-wash-purple) 0 0), var(--toast-wash-base);
+  --notification-open-fill: 0;
   /* Keep the innermost edge anchored and grow each successive band outward. */
   --frame-inner: calc(var(--toast-inner-width) * 7 / 6);
   --frame-middle: calc(var(--toast-outer-inset) * 7 / 6);
@@ -945,9 +950,6 @@
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-.journal-notification[data-expanded="false"] .journal-notification-summary {
   touch-action: none;
 }
 .journal-toaster-scroll
@@ -969,8 +971,16 @@
     grid-template-rows 500ms cubic-bezier(0.14, 1.08, 0.25, 1),
     opacity 230ms ease-out;
 }
+.journal-notification[data-notification-pull="closing"]
+  .journal-notification-details {
+  transition:
+    grid-template-rows 430ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms ease;
+}
 @media (prefers-reduced-motion: reduce) {
   .journal-notification[data-notification-pull="opening"]
+    .journal-notification-details,
+  .journal-notification[data-notification-pull="closing"]
     .journal-notification-details {
     transition: none;
   }
@@ -1556,15 +1566,13 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background:
-    linear-gradient(var(--toast-wash-pale) 0 0),
-    linear-gradient(var(--toast-wash-pink) 0 0),
-    linear-gradient(var(--toast-wash-purple) 0 0), var(--toast-wash-base);
+  background: var(--toast-closed-surface);
   opacity: var(--toast-wash-opacity);
-  transition: opacity var(--toast-expand);
+  clip-path: inset(0 0 calc(var(--notification-open-fill) * 100%) round 18px);
+  transition: clip-path var(--toast-expand);
 }
-.journal-notification[data-expanded="true"] .journal-notification-closed-wash {
-  opacity: 0;
+.journal-notification[data-expanded="true"] {
+  --notification-open-fill: 1;
 }
 .journal-notification-frame {
   inset: var(--frame-inset);
@@ -1578,11 +1586,8 @@
   inset: 0;
   border-radius: inherit;
   box-shadow: inset 0 0 0 var(--frame-middle) var(--toast-rim-muted);
-  opacity: 0;
+  opacity: var(--notification-open-fill);
   transition: opacity var(--toast-expand);
-}
-.journal-notification[data-expanded="true"] .journal-notification-frame::after {
-  opacity: 1;
 }
 .journal-notification-footer-fade {
   position: absolute;
@@ -1600,33 +1605,68 @@
       #c026d300 70%
     ),
     linear-gradient(to top, var(--toast-wash-base), #701a755c 50%, #701a7500);
-  opacity: 0;
+  opacity: calc(
+    var(--toast-wash-opacity) * 0.85 * var(--notification-open-fill)
+  );
   transition: opacity var(--toast-expand);
   pointer-events: none;
 }
-.journal-notification[data-expanded="true"] .journal-notification-footer-fade {
-  opacity: calc(var(--toast-wash-opacity) * 0.85);
-}
-/* Reveal the open surface through a soft moving edge behind the content. */
+/* Click/keyboard reveals keep their eased fill; a pull controls the same edge. */
 @media (prefers-reduced-motion: no-preference) {
   .journal-notification-closed-wash {
-    --toast-reveal-mask: linear-gradient(to bottom, transparent 34%, #000 66%);
-    -webkit-mask: var(--toast-reveal-mask) center bottom / 100% 300% no-repeat;
-    mask: var(--toast-reveal-mask) center bottom / 100% 300% no-repeat;
-    transition: mask-position 620ms cubic-bezier(0.48, 0.04, 0.2, 1);
-    transition-property: -webkit-mask-position, mask-position;
+    transition: clip-path 620ms cubic-bezier(0.48, 0.04, 0.2, 1);
   }
   .journal-notification[data-expanded="true"]
     .journal-notification-closed-wash {
-    opacity: var(--toast-wash-opacity);
-    -webkit-mask-position: center top;
-    mask-position: center top;
     transition-duration: 980ms;
   }
   .journal-notification[data-expanded="true"]
     .journal-notification-footer-fade {
     transition: opacity 680ms 200ms ease-in-out;
   }
+  /* The header is already filled on release. Continue the familiar fill only
+     across the new content as it unfolds, without repainting the header. */
+  .journal-notification[data-expanded="true"][data-notification-pull="opening"]
+    .journal-notification-details::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--toast-closed-surface);
+    border-radius: 0 0 18px 18px;
+    opacity: var(--toast-wash-opacity);
+    pointer-events: none;
+    animation: journal-notification-pull-fill 500ms
+      cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@keyframes journal-notification-pull-fill {
+  from {
+    clip-path: inset(0 round 18px);
+  }
+  to {
+    clip-path: inset(0 0 100% round 18px);
+  }
+}
+/* No easing lag while a finger is down: half the pull means half the fill. */
+.journal-notification:is(
+    [data-notification-pull="pulling"],
+    [data-notification-pull="ready"]
+  )
+  :is(
+    .journal-notification-closed-wash,
+    .journal-notification-footer-fade
+  ),
+.journal-notification:is(
+    [data-notification-pull="pulling"],
+    [data-notification-pull="ready"]
+  )
+  .journal-notification-frame::after {
+  transition: none;
+}
+.journal-notification[data-notification-pull="returning"]
+  .journal-notification-closed-wash {
+  transition: clip-path 340ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @media (prefers-reduced-motion: reduce) {
   .journal-notification-closed-wash,

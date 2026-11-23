@@ -5,7 +5,8 @@ import {
   getBrandPullThresholds,
 } from "./brand-refresh";
 
-export const NOTIFICATION_PULL_THRESHOLD = BRAND_REFRESH_THRESHOLD / 3;
+export const NOTIFICATION_PULL_THRESHOLD = (BRAND_REFRESH_THRESHOLD / 3) * 2;
+export const NOTIFICATION_PULL_MAX_OFFSET = 56;
 export const NOTIFICATION_PULL_RECOIL = 150;
 export const NOTIFICATION_PULL_OPEN_DURATION = 700;
 
@@ -22,7 +23,7 @@ export function notificationPullThreshold(
   right: number,
   bottom: number,
 ) {
-  return getBrandPullThresholds(x, y, right, bottom).refresh / 3;
+  return (getBrandPullThresholds(x, y, right, bottom).refresh / 3) * 2;
 }
 
 /** Keep native swipe ownership once chosen; a claimed downward pull can retract. */
@@ -56,7 +57,10 @@ export function updateNotificationPull(
   };
 }
 
-/** Match the branding resistance and its 84px visual cap at one-third scale. */
+/** Double the former pull travel while retaining the branding resistance. */
 export function notificationPullOffset(distance: number) {
-  return brandPullOffset(Number.isFinite(distance) ? distance * 3 : 0) / 3;
+  return (
+    (brandPullOffset(Number.isFinite(distance) ? (distance * 3) / 2 : 0) / 3) *
+    2
+  );
 }

@@ -690,16 +690,17 @@ export function JournalNotification({
       if (
         !isCurrent() ||
         leaving.current ||
-        expandedRef.current ||
         card?.closest('[inert],[aria-hidden="true"]') ||
         (!stack.expanded && host?.dataset.front === "false")
       )
         return false;
       // An open fan keeps native touch scrolling over its text. The artwork
       // remains a small pull handle; a single/folded card accepts its summary.
+      // An expanded header also accepts the closing pull; its body stays native.
       return (
         event.type !== "pointerdown" ||
         event.pointerType !== "touch" ||
+        expandedRef.current ||
         !stack.expanded ||
         Boolean(
           event.target instanceof Element &&
@@ -719,6 +720,17 @@ export function JournalNotification({
       expandedRef.current = true;
       pause("expanded", true);
       setExpanded(true);
+      return true;
+    },
+    onCollapse: () => {
+      if (
+        !isCurrent() ||
+        leaving.current ||
+        phase !== "idle" ||
+        !expandedRef.current
+      )
+        return false;
+      closeDetails();
       return true;
     },
     consumeClick: () => {
@@ -1297,7 +1309,7 @@ export function JournalNotification({
           <i />
         </span>
       )}
-      <NotificationPullIndicator ref={pullIndicator} />
+      <NotificationPullIndicator ref={pullIndicator} expanded={expanded} />
       <div className="journal-notification-header">
         <button
           type="button"

@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import {
+  NOTIFICATION_PULL_MAX_OFFSET,
   NOTIFICATION_PULL_OPEN_DURATION,
   NOTIFICATION_PULL_RECOIL,
   notificationPullOffset,
@@ -17,6 +18,7 @@ type Options = {
   expanded: boolean;
   canStart: (event: PointerEvent) => boolean;
   onExpand: () => boolean;
+  onCollapse: () => boolean;
   consumeClick: () => void;
   pause: (value: boolean) => void;
   resetNative: (pointer: number) => void;
@@ -28,6 +30,7 @@ type Session = {
   y: number;
   threshold: number;
   origin: number;
+  expanded: boolean;
   state: NotificationPullState;
 };
 
@@ -35,7 +38,11 @@ type Session = {
 export function useNotificationPull(options: Options) {
   const latest = useRef(options);
   const abort = useRef<() => void>(() => {});
-  const opening = useRef<"rack" | "expand" | null>(null);
+  const settling = useRef<{
+    target: boolean;
+    stage: "rack" | "commit";
+  } | null>(null);
+  const previousExpanded = useRef(options.expanded);
   useLayoutEffect(() => {
     latest.current = options;
   });
@@ -86,11 +93,12 @@ export function useNotificationPull(options: Options) {
     const resetPaint = () => {
       motionCleanup();
       node.style.removeProperty("translate");
+      node.style.removeProperty("--notification-open-fill");
       delete node.dataset.notificationPull;
       cue.style.opacity = "0";
       cue.style.removeProperty("--pull-progress");
       delete cue.dataset.ready;
-      opening.current = null;
+      settling.current = null;
       latest.current.pause(false);
     };
     const releaseCapture = (pointer: number) => {
@@ -165,11 +173,15 @@ export function useNotificationPull(options: Options) {
     const paint = () => {
       frame = 0;
       if (!session) return;
-      const { state, origin } = session;
+      const { state, origin, expanded } = session;
       const claimed = state.intent === "pull";
       if (claimed)
-        node.style.translate = `0px ${Math.min(28, origin + notificationPullOffset(state.distance))}px`;
+        node.style.translate = `0px ${Math.min(NOTIFICATION_PULL_MAX_OFFSET, origin + notificationPullOffset(state.distance))}px`;
       node.dataset.notificationPull = state.ready ? "ready" : "pulling";
+      node.style.setProperty(
+        "--notification-open-fill",
+        String(expanded ? 1 - state.progress : state.progress),
+      );
       cue.style.opacity = String(Math.min(1, state.distance / 12));
       cue.style.setProperty("--pull-progress", String(state.progress));
       cue.dataset.ready = String(state.ready);
@@ -201,7 +213,11 @@ export function useNotificationPull(options: Options) {
     };
     const move = (event: PointerEvent) => {
       if (!session || event.pointerId !== session.pointer) return;
-      if (!latest.current.enabled || !latest.current.canStart(event)) {
+      if (
+        !latest.current.enabled ||
+        latest.current.expanded !== session.expanded ||
+        !latest.current.canStart(event)
+      ) {
         cancel();
         return;
       }
@@ -245,6 +261,7 @@ export function useNotificationPull(options: Options) {
         claimed &&
         current.state.ready &&
         latest.current.enabled &&
+        latest.current.expanded === current.expanded &&
         latest.current.canStart(event);
       session = null;
       activeCleanup();
@@ -259,17 +276,24 @@ export function useNotificationPull(options: Options) {
       if (claimed || cancelled) latest.current.resetNative(current.pointer);
       const y = claimed
         ? Math.min(
-            28,
+            NOTIFICATION_PULL_MAX_OFFSET,
             current.origin + notificationPullOffset(current.state.distance),
           )
         : current.origin;
       if (commit) {
-        opening.current = "rack";
-        node.dataset.notificationPull = "opening";
+        settling.current = { target: !current.expanded, stage: "rack" };
+        node.dataset.notificationPull = current.expanded
+          ? "closing"
+          : "opening";
+        const commitExpansion = () => {
+          settling.current!.stage = "commit";
+          return current.expanded
+            ? latest.current.onCollapse()
+            : latest.current.onExpand();
+        };
         if (reduced.matches) {
           node.style.translate = "0px 0px";
-          opening.current = "expand";
-          if (!latest.current.onExpand()) {
+          if (!commitExpansion()) {
             cancel();
             return;
           }
@@ -307,13 +331,12 @@ export function useNotificationPull(options: Options) {
           { duration: 480, fill: "both" },
         );
         after(() => {
-          opening.current = "expand";
-          if (!latest.current.onExpand()) {
+          if (!commitExpansion()) {
             cancel();
             return;
           }
           const content = node.querySelector(".journal-notification-main");
-          if (content)
+          if (content && !current.expanded)
             animate(
               content,
               [
@@ -340,6 +363,7 @@ export function useNotificationPull(options: Options) {
         resetPaint();
       } else {
         node.dataset.notificationPull = "returning";
+        node.style.removeProperty("--notification-open-fill");
         const token = generation;
         const settle = animate(
           node,
@@ -372,9 +396,9 @@ export function useNotificationPull(options: Options) {
         target.closest("a,input,textarea,select,[contenteditable]")
       )
         return;
-      if (!latest.current.enabled || latest.current.expanded) return;
+      if (!latest.current.enabled) return;
       if (
-        opening.current ||
+        settling.current ||
         !event.isPrimary ||
         performance.now() < blockedUntil
       ) {
@@ -399,6 +423,7 @@ export function useNotificationPull(options: Options) {
         x: event.clientX,
         y: event.clientY,
         origin,
+        expanded: latest.current.expanded,
         threshold: notificationPullThreshold(
           event.clientX,
           event.clientY,
@@ -420,7 +445,11 @@ export function useNotificationPull(options: Options) {
         if (document.hidden) cancel();
       };
       const key = (e: KeyboardEvent) => {
-        if (e.key !== "Escape" || !session) return;
+        if (
+          e.key !== "Escape" ||
+          (!session && settling.current?.stage !== "rack")
+        )
+          return;
         e.preventDefault();
         e.stopPropagation();
         cancel();
@@ -443,11 +472,11 @@ export function useNotificationPull(options: Options) {
       activeCleanup = () => {
         window.removeEventListener("pointerup", globalUp);
         window.removeEventListener("pointercancel", globalUp);
-        window.removeEventListener("keydown", key, true);
         document.removeEventListener("pointerdown", multiple, true);
         activeCleanup = () => {};
       };
       motionCleanup = () => {
+        window.removeEventListener("keydown", key, true);
         window.removeEventListener("blur", interrupted);
         window.removeEventListener("resize", interrupted);
         window.removeEventListener("scroll", interrupted);
@@ -485,10 +514,14 @@ export function useNotificationPull(options: Options) {
   }, [options.root, options.indicator]);
 
   useEffect(() => {
+    const changed = previousExpanded.current !== options.expanded;
+    previousExpanded.current = options.expanded;
     if (
       !options.enabled ||
-      (options.expanded && !opening.current) ||
-      (!options.expanded && opening.current === "expand")
+      (changed &&
+        (!settling.current ||
+          settling.current.stage !== "commit" ||
+          options.expanded !== settling.current.target))
     )
       abort.current();
   }, [options.enabled, options.expanded]);

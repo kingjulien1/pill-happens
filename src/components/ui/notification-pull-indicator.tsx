@@ -4,8 +4,10 @@ import styles from "./notification-pull-indicator.module.css";
 
 export function NotificationPullIndicator({
   ref,
+  expanded,
 }: {
   ref: Ref<HTMLSpanElement>;
+  expanded: boolean;
 }) {
   return (
     <span
@@ -44,8 +46,12 @@ export function NotificationPullIndicator({
         </g>
       </svg>
       <span className={styles.caption}>
-        <span className={styles.pulling}>Pull to open</span>
-        <span className={styles.ready}>Release to open</span>
+        <span className={styles.pulling}>
+          Pull to {expanded ? "close" : "open"}
+        </span>
+        <span className={styles.ready}>
+          Release to {expanded ? "close" : "open"}
+        </span>
       </span>
     </span>
   );

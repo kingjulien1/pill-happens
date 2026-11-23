@@ -93,6 +93,10 @@
 .indicator[data-ready="true"] .ready {
   display: inline;
 }
+:global(.journal-notification[data-notification-pull="opening"]) .caption,
+:global(.journal-notification[data-notification-pull="closing"]) .caption {
+  visibility: hidden;
+}
 @media (prefers-reduced-motion: reduce) {
   .face {
     transform: none;
