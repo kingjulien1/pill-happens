@@ -970,6 +970,15 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   align-items: center;
   justify-content: center;
 }
+/* Shrink the complete leading scene by the midpoint of 1/8 and 1/9.
+   Composite every descendant and pseudo-element together, including fan
+   spacing, badge lettering, stroke widths, glass rims and motion effects. */
+:is([data-intake-card], [data-check-in-card])
+  .intake-card-content
+  > :is(.intake-card-focus, [data-check-in-artwork]) {
+  scale: calc(127 / 144);
+  transform-origin: center;
+}
 /* Share the cup pigment with topbar controls and the quiet stack-group tint. */
 .check-in-icon-theme,
 [data-page-topbar],
