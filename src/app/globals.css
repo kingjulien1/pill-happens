@@ -274,6 +274,9 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 
 :root {
   --intake-card-radius: 21px;
+  --intake-indicator-size: 13px;
+  --intake-indicator-cell-size: 20px;
+  --intake-indicator-gap: 2px;
   --check-in-icon-background: color-mix(
     in srgb,
     var(--color-violet-950, #2e1065) 88%,

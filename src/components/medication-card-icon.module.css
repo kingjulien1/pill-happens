@@ -108,7 +108,8 @@
 
 /* Keep the 60px face and fan anchors fixed. Unitless geometry lets the glyph
    follow the inner ring's growth without scaling either ring's stroke. */
-:global([data-intake-card]) .mark:global(.intake-card-mark) {
+:global(:is([data-intake-card], [data-check-in-card]))
+  .mark:global(.intake-card-mark) {
   --intake-artwork-outset: 6px;
   --intake-artwork-face-size: 60;
   --intake-artwork-thick-size: 6;
@@ -125,13 +126,11 @@
       (var(--intake-artwork-middle-inset) + var(--intake-artwork-vivid-size)) *
       2 / 3
   );
-  --intake-artwork-glyph-size: calc(
-    30px *
-      (
-        var(--intake-artwork-face-size) - 2 * var(--intake-artwork-inner-inset)
-      ) /
+  --intake-artwork-glyph-scale: calc(
+    (var(--intake-artwork-face-size) - 2 * var(--intake-artwork-inner-inset)) /
       (var(--intake-artwork-face-size) - 2 * var(--intake-artwork-inner-origin))
   );
+  --intake-artwork-glyph-size: calc(30px * var(--intake-artwork-glyph-scale));
   --intake-artwork-vivid-width: calc(var(--intake-artwork-vivid-size) * 1px);
   --intake-artwork-rim-inset: calc(var(--intake-artwork-middle-inset) * 1px);
   --intake-artwork-face-tint: color-mix(
@@ -155,7 +154,7 @@
 }
 
 /* The equal-width middle stroke stays completely inside the thick glass rim. */
-:global([data-intake-card]) .mark::before {
+:global(:is([data-intake-card], [data-check-in-card])) .mark::before {
   content: "";
   position: absolute;
   inset: var(--intake-artwork-rim-inset);
@@ -166,7 +165,7 @@
 }
 
 /* Enlarge the inner ring and drawing together, leaving all fan layout intact. */
-:global([data-intake-card]) .mark::after {
+:global(:is([data-intake-card], [data-check-in-card])) .mark::after {
   inset: calc(var(--intake-artwork-inner-inset) * 1px);
   border-radius: calc(20px - var(--intake-artwork-inner-inset) * 1px);
   box-shadow: inset 0 0 0 var(--intake-artwork-vivid-width)

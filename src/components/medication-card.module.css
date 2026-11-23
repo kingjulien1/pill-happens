@@ -16,15 +16,15 @@
 }
 
 .card:global([data-intake-card]) .rail:global(.intake-card-tags) {
-  gap: 2px;
+  gap: var(--intake-indicator-gap);
 }
 
 /* Recorded route, physical form and category marks share one outline weight. */
 .card:global(:is([data-intake-card], [data-medication-library-card]))
   .rail:global(.intake-card-tags)
   svg {
-  width: 13px;
-  height: 13px;
+  width: var(--intake-indicator-size);
+  height: var(--intake-indicator-size);
   color: var(--medication-detail-ink, var(--card-foreground)) !important;
   fill: none;
   stroke: currentColor;
@@ -85,8 +85,8 @@
 .route,
 .form {
   display: inline-flex;
-  width: 20px;
-  height: 20px;
+  width: var(--intake-indicator-cell-size);
+  height: var(--intake-indicator-cell-size);
   flex: none;
   align-items: center;
   justify-content: center;
@@ -95,8 +95,8 @@
 
 .route svg,
 .form svg {
-  width: 13px;
-  height: 13px;
+  width: var(--intake-indicator-size);
+  height: var(--intake-indicator-size);
   fill: none;
   stroke: currentColor;
 }

@@ -72,9 +72,9 @@
   transform-origin: center;
 }
 
-/* Scale the illustration once; the shared tile and card's text rail stay aligned. */
+/* Keep the animated scene's native coordinates while matching intake artwork. */
 .symbolFloat {
-  scale: calc(2 / 3);
+  scale: var(--intake-artwork-glyph-scale, 1);
 }
 
 .flourish {

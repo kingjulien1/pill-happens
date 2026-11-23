@@ -59,15 +59,24 @@
 .summaryIcons {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 20px;
+  gap: var(--intake-indicator-gap);
+  height: var(--intake-indicator-cell-size);
   color: var(--card-foreground);
 }
 
+.summaryIcons > span {
+  display: inline-flex;
+  width: var(--intake-indicator-cell-size);
+  height: var(--intake-indicator-cell-size);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
 .summaryIcons svg {
-  width: 14px;
-  height: 14px;
-  stroke-width: 2;
+  width: var(--intake-indicator-size);
+  height: var(--intake-indicator-size);
+  stroke-width: 2.5;
 }
 
 .card [data-check-in-preview-row] :global(.intake-card-ingredient-group) {
