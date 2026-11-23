@@ -68,6 +68,23 @@
   grid-template-columns: minmax(0, 1fr);
 }
 .actionSection {
+  --import-accent: var(--color-violet-400);
+  --import-depth: var(--color-indigo-500);
+  --import-light: var(--color-violet-200);
+  /* Resolve mixed colors before border/shadow shorthands for older Chromium. */
+  --import-frame-ink: color-mix(in srgb, var(--import-accent) 54%, transparent);
+  --import-edge-ink: color-mix(in srgb, var(--import-accent) 62%, transparent);
+  --import-inner-ink: color-mix(in srgb, var(--import-light) 32%, transparent);
+  --import-icon-edge: color-mix(in srgb, var(--import-light) 24%, transparent);
+  --import-hover-ink: color-mix(in srgb, var(--import-light) 74%, transparent);
+  --import-disabled-ink: color-mix(
+    in srgb,
+    var(--import-accent) 22%,
+    transparent
+  );
+  --import-frame-wash: color-mix(in srgb, var(--import-accent) 4%, transparent);
+  --import-icon-wash: color-mix(in srgb, var(--import-accent) 12%, transparent);
+  --import-shadow: color-mix(in srgb, var(--import-accent) 7%, transparent);
   display: grid;
   min-width: 0;
   gap: 10px;
@@ -92,45 +109,70 @@
   font-size: 9px;
   line-height: 1.5;
 }
+.actionSection[data-sleep-import-method="file"] {
+  --import-accent: var(--color-fuchsia-400);
+  --import-depth: var(--color-rose-500);
+  --import-light: var(--color-pink-200);
+}
+.actionFrame {
+  min-width: 0;
+  padding: 4px;
+  border: 1.5px solid var(--import-frame-ink);
+  border-radius: 24px;
+  background: var(--import-frame-wash);
+}
+.actionFrame:has(:disabled) {
+  border-color: var(--import-disabled-ink);
+}
 .import .importAction {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 18px;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
   align-items: center;
   width: 100%;
   min-width: 0;
   height: auto;
-  min-height: 78px;
-  gap: 13px;
-  padding: 12px 16px 12px 12px;
-  border: 3px solid;
-  border-color: color-mix(
-    in srgb,
-    var(--checkin-line, var(--color-violet-400)) 55%,
-    transparent
-  );
-  border-radius: 20px;
+  min-height: 66px;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 2.5px solid var(--import-edge-ink);
+  border-radius: 18px;
   background:
-    radial-gradient(ellipse at 0% 0%, #c4b5fd26, transparent 70%),
-    radial-gradient(ellipse at 100% 100%, #f9a8d41a, transparent 70%),
+    radial-gradient(
+      ellipse at 0% 0%,
+      color-mix(in srgb, var(--import-light) 15%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse at 100% 100%,
+      color-mix(in srgb, var(--import-accent) 10%, transparent),
+      transparent 70%
+    ),
     color-mix(
       in srgb,
-      var(--checkin-line, var(--color-violet-400)) 30%,
+      var(--import-depth) 23%,
       var(--navigation-surface, var(--popover))
     );
   color: var(--foreground);
-  font-size: 16px;
-  font-weight: 650;
+  font-size: 14.5px;
+  font-weight: 600;
   line-height: 1.3;
   text-align: start;
   white-space: normal;
-  box-shadow:
-    inset 0 0 0 1px #ddd6fe2e,
-    0 4px 16px #a78bfa0d;
+  box-shadow: 0 3px 12px var(--import-shadow);
   transition:
     border-color 180ms ease,
     transform 180ms ease;
+}
+.importAction::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 4px;
+  border: 1.25px solid var(--import-inner-ink);
+  border-radius: 11px;
+  pointer-events: none;
 }
 .importAction::after {
   content: "";
@@ -139,35 +181,62 @@
   z-index: -1;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(115deg, #ddd6fe0f, transparent 60%, #fbcfe812);
+  background: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--import-light) 8%, transparent),
+    transparent 60%,
+    color-mix(in srgb, var(--import-accent) 10%, transparent)
+  );
   opacity: 0;
   transition: opacity 180ms ease;
 }
+.actionContent {
+  grid-column: 2;
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  translate: 3px 0;
+}
 .actionIcon {
   display: grid;
+  flex: none;
   place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  border: 2px solid #ddd6fe33;
-  background: #ddd6fe12;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px solid var(--import-icon-edge);
+  background: var(--import-icon-wash);
   color: var(--foreground);
 }
-.actionIcon svg {
+.import .importAction .actionIcon svg,
+.import .importAction .actionArrow {
+  flex: none;
   width: 24px;
   height: 24px;
+  stroke-width: 2.3;
+}
+.actionIcon svg {
   transition: transform 180ms ease;
 }
 .actionArrow {
-  width: 18px;
-  height: 18px;
-  opacity: 0.65;
+  grid-column: 3;
+  color: var(--foreground);
 }
-.importAction > strong {
+.actionContent > strong {
   min-width: 0;
-  max-width: 100%;
+  overflow: hidden;
   font-size: inherit;
-  font-weight: 650;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 360px) {
+  .import .importAction {
+    padding-inline: 14px;
+  }
 }
 .actionDetail {
   margin: 0;
@@ -183,7 +252,7 @@
 }
 .import .importAction:focus-visible {
   outline: 2px solid var(--color-pink-200);
-  outline-offset: 3px;
+  outline-offset: 7px;
 }
 .import .importAction:active:not(:disabled) {
   transform: translateY(1px);
@@ -262,7 +331,7 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .import .importAction:hover:not(:disabled) {
-    border-color: color-mix(in srgb, var(--color-pink-300) 70%, transparent);
+    border-color: var(--import-hover-ink);
   }
   .import .importAction:hover:not(:disabled)::after {
     opacity: 1;

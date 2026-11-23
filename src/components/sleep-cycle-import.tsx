@@ -7,12 +7,12 @@ import {
   Fingerprint,
   FolderOpen,
   ListChecks,
-  ScanEye,
+  Import,
+  Paperclip,
   LoaderCircle,
   Check,
   X,
 } from "lucide-react";
-import { SquareArrowDownExit } from "./square-arrow-down-exit-icon";
 import {
   pastedSleepImage,
   isSleepImagePasteTarget,
@@ -285,37 +285,38 @@ export function SleepCycleImport({
         >
           <section
             className={styles.actionSection}
+            data-sleep-import-method="paste"
             aria-labelledby={`${id}-paste-heading`}
           >
             <div className={styles.actionHeading}>
               <h4 id={`${id}-paste-heading`}>From your clipboard</h4>
               <span>Quickest way in</span>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              className={styles.importAction}
-              disabled={disabled || reading || pasting}
-              onClick={() => void pasteImage()}
-              aria-label="Paste Report: read a copied Sleep Cycle image"
-              aria-describedby={`${id}-paste-description`}
-              data-sleep-paste
-            >
-              <span className={styles.actionIcon}>
-                <SquareArrowDownExit
+            <div className={styles.actionFrame}>
+              <Button
+                type="button"
+                variant="ghost"
+                className={styles.importAction}
+                disabled={disabled || reading || pasting}
+                onClick={() => void pasteImage()}
+                aria-label="Paste Report: read a copied Sleep Cycle image"
+                aria-describedby={`${id}-paste-description`}
+                data-sleep-paste
+              >
+                <span className={styles.actionContent}>
+                  <span className={styles.actionIcon}>
+                    <Import size={24} strokeWidth={2.3} aria-hidden="true" />
+                  </span>
+                  <strong>{pasting ? "Choose Paste…" : "Paste Report"}</strong>
+                </span>
+                <ArrowUpRight
                   size={24}
                   strokeWidth={2.3}
+                  className={styles.actionArrow}
                   aria-hidden="true"
                 />
-              </span>
-              <strong>{pasting ? "Choose Paste…" : "Paste Report"}</strong>
-              <ArrowUpRight
-                size={18}
-                strokeWidth={2.3}
-                className={styles.actionArrow}
-                aria-hidden="true"
-              />
-            </Button>
+              </Button>
+            </div>
             <p id={`${id}-paste-description`} className={styles.actionDetail}>
               Choose <strong>Copy Image</strong> in Sleep Cycle’s share menu,
               then paste it here. No file hunting required.
@@ -327,33 +328,38 @@ export function SleepCycleImport({
           </div>
           <section
             className={styles.actionSection}
+            data-sleep-import-method="file"
             aria-labelledby={`${id}-choose-heading`}
           >
             <div className={styles.actionHeading}>
               <h4 id={`${id}-choose-heading`}>From Photos or Files</h4>
               <span>Same report, saved</span>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              className={styles.importAction}
-              disabled={disabled || reading || pasting}
-              onClick={() => input.current?.click()}
-              aria-label="Bring Receipts: choose a saved report image"
-              aria-describedby={`${id}-choose-description`}
-              data-sleep-choose
-            >
-              <span className={styles.actionIcon}>
-                <ScanEye size={24} strokeWidth={2.3} aria-hidden="true" />
-              </span>
-              <strong>Bring Receipts</strong>
-              <ArrowUpRight
-                size={18}
-                strokeWidth={2.3}
-                className={styles.actionArrow}
-                aria-hidden="true"
-              />
-            </Button>
+            <div className={styles.actionFrame}>
+              <Button
+                type="button"
+                variant="ghost"
+                className={styles.importAction}
+                disabled={disabled || reading || pasting}
+                onClick={() => input.current?.click()}
+                aria-label="Bring Receipts: choose a saved report image"
+                aria-describedby={`${id}-choose-description`}
+                data-sleep-choose
+              >
+                <span className={styles.actionContent}>
+                  <span className={styles.actionIcon}>
+                    <Paperclip size={24} strokeWidth={2.3} aria-hidden="true" />
+                  </span>
+                  <strong>Bring Receipts</strong>
+                </span>
+                <ArrowUpRight
+                  size={24}
+                  strokeWidth={2.3}
+                  className={styles.actionArrow}
+                  aria-hidden="true"
+                />
+              </Button>
+            </div>
             <p id={`${id}-choose-description`} className={styles.actionDetail}>
               Choose the full portrait report you saved. Keep the score, graph
               and all the tiles in the picture.
