@@ -74,7 +74,9 @@ export function isIntakeFormDraft(value: unknown): value is IntakeFormDraft {
 }
 
 /** Interpret a restored field in the timezone in which the user entered it. */
-export function intakeDraftTimestamp(draft: IntakeFormDraft): string {
+export function intakeDraftTimestamp(
+  draft: Pick<IntakeFormDraft, "initialTimestamp" | "takenAt" | "timezone">,
+): string {
   return draft.takenAt === toLocalInput(draft.initialTimestamp, draft.timezone)
     ? draft.initialTimestamp
     : fromLocalInput(draft.takenAt, draft.timezone);

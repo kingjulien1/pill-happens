@@ -1,0 +1,36 @@
+.context {
+  display: inline-grid;
+  max-width: 96px;
+  gap: 3px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: end;
+  white-space: normal;
+}
+.label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.label > svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+.value {
+  min-width: 0;
+  text-wrap: pretty;
+}
+.label strong,
+.value strong {
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.value time {
+  font-variant-numeric: tabular-nums;
+}

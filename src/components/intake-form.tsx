@@ -26,6 +26,8 @@ import { IntakePreviewDetails } from "./intake-preview-details";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
 import { IntakePreviewSummary } from "./intake-preview-summary";
+import { IntakeSectionContext } from "./intake-section-context";
+import { priorMedicationIntake } from "@/lib/intake-context";
 import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
 import { IntakeAmountField } from "@/components/intake-amount-field";
 import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
@@ -167,6 +169,32 @@ export function IntakeForm({
         ? preferredRoute(medicationId)
         : undefined);
   const takenAt = intakeDraftDisplayTime(timing.draft, timezone);
+  const {
+    initialTimestamp,
+    takenAt: sourceTime,
+    timezone: sourceZone,
+  } = timing.draft;
+  const contextTime = useMemo(() => {
+    try {
+      return intakeDraftTimestamp({
+        initialTimestamp,
+        takenAt: sourceTime,
+        timezone: sourceZone,
+      });
+    } catch {
+      return "";
+    }
+  }, [initialTimestamp, sourceTime, sourceZone]);
+  const previousIntake = useMemo(
+    () =>
+      priorMedicationIntake(
+        data!.intakes,
+        medicationId,
+        contextTime,
+        intake?.id,
+      ),
+    [data, medicationId, contextTime, intake?.id],
+  );
   const setQuantity = (value: string) =>
     draft.setValue((current) => ({ ...current, quantity: value }));
   const [error, setError] = useState("");
@@ -484,8 +512,16 @@ export function IntakeForm({
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-7">
         <CheckInSection
           caption="Medication & Amount"
-          context="What you took"
-          detail={type.label}
+          detail={
+            <IntakeSectionContext
+              kind="medication"
+              previous={previousIntake}
+              takenAt={contextTime}
+              timeZone={timezone}
+              trackingDay={belongsTo}
+              hasMedication={Boolean(medication || fallbackIntake)}
+            />
+          }
         >
           <div className={styles.medicationSection}>
             <div
@@ -600,8 +636,16 @@ export function IntakeForm({
         </CheckInSection>
         <CheckInSection
           caption="Timing"
-          context="When you took it"
-          detail={timing.pinned ? "Pinned across entries" : "Local time"}
+          detail={
+            <IntakeSectionContext
+              kind="timing"
+              previous={previousIntake}
+              takenAt={contextTime}
+              timeZone={timezone}
+              trackingDay={belongsTo}
+              hasMedication={Boolean(medication || fallbackIntake)}
+            />
+          }
         >
           <div className="form-field p-4">
             <IntakeDateTimeFields
