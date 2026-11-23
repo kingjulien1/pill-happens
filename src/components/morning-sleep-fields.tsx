@@ -187,6 +187,7 @@ export function MorningSleepFields({
   return (
     <div className={styles.fields} data-morning-sleep-fields>
       <SleepCycleImport value={value} onChange={onChange} disabled={disabled} />
+      <hr className={styles.importDivider} data-sleep-import-divider />
       <CheckInSection
         caption="Bed to Daylight"
         context="Times & delays"

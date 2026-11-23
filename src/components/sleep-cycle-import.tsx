@@ -254,7 +254,15 @@ export function SleepCycleImport({
           this draft—the graph can testify, but you get the final word.
         </p>
       </div>
-      <hr className={`${styles.separator} ${styles.headingDivider}`} />
+      <div className={styles.headingEnd}>
+        <p className={styles.localNote} data-sleep-import-local-note>
+          <Fingerprint size={12} aria-hidden="true" />
+          <span>
+            Read on this device. Nothing is applied until you approve.
+          </span>
+        </p>
+        <hr className={`${styles.separator} ${styles.headingDivider}`} />
+      </div>
       <input
         ref={input}
         hidden
@@ -352,12 +360,6 @@ export function SleepCycleImport({
             </p>
           </section>
         </div>
-        <p className={styles.localNote}>
-          <Fingerprint size={12} aria-hidden="true" />
-          <span>
-            Read on this device. Nothing is applied until you approve.
-          </span>
-        </p>
       </div>
       {message && (
         <div className={styles.statusArea}>
