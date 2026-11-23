@@ -87,7 +87,7 @@
 .action[data-intake-paint="satin"][data-log-intake-rim] {
   --action-face-inset: 0px;
   --action-outer-line: 0px;
-  --action-inner-line: 1.667px;
+  --action-inner-line: calc(1.667px * 2.5);
   --control-face-edge: var(--check-in-icon-background);
 }
 
@@ -177,6 +177,24 @@
   color: inherit;
 }
 
+/* The former 38px well added 7.5px beside its 23px glyph. A plain glyph with
+   a 24px gap has about 30% more visible space before the label. */
+.action[data-control-style="satin"][data-log-intake-rim]
+  :global(.intake-primary-label) {
+  gap: 24px;
+}
+.action[data-log-intake-rim]
+  :global(.intake-primary-label)
+  > :global(.intake-log-symbol) {
+  width: 23px;
+  height: 23px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--control-secondary);
+  scale: none;
+}
+
 /* Pink tools keep their original glass geometry; only their local paint changes. */
 .headerButton.headerButton[data-slot="button"]:is(
     [data-brand-refresh],
@@ -259,6 +277,10 @@
   }
   .action[data-control-style="satin"] :global(.intake-primary-label) {
     gap: 8px;
+  }
+  .action[data-control-style="satin"][data-log-intake-rim]
+    :global(.intake-primary-label) {
+    gap: 20px;
   }
   .action[data-control-style="satin"] :global(.intake-primary-copy) {
     gap: 6px;

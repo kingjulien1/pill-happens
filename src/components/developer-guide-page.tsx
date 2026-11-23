@@ -1265,15 +1265,15 @@ export function DeveloperGuidePage() {
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
                 shadows retain the raised face. Main Log Intake brings its face
-                to the 80px host edge and keeps one 1⅔px inner line in the shared
-                Evening icon background color. Its redundant pale middle
-                outline and intervening painted band are removed. Its
-                outer SpecularCardBorder is shared with the Morning and Evening
-                cards: a 3px gap, 3.733px purple/pink rim, three brighter stops
-                and the same glow. That outside rim stays fixed; matching
-                concentric curves keep the 3px clear gap equal along all sides
-                and corners. Other satin actions keep their existing inset.
-                Mobile uses a static CSS rim through
+                to the 80px host edge and keeps one 4.17px inward line in the
+                shared Evening icon background color, 2.5 times its former
+                thickness. Its redundant pale middle outline and intervening
+                painted band are removed. Its outer SpecularCardBorder is shared
+                with the Morning and Evening cards: a 3px gap, 3.733px
+                purple/pink rim, three brighter stops and the same glow. That
+                outside rim stays fixed; matching concentric curves keep the 3px
+                clear gap equal along all sides and corners. Other satin actions
+                keep their existing inset. Mobile uses a static CSS rim through
                 PrimaryButton’s decoration slot; desktop uses a static sibling
                 SVG to avoid Safari clipping. Neither creates a canvas or
                 repeating animation. The transparent surround remains
@@ -1283,15 +1283,18 @@ export function DeveloperGuidePage() {
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
                 mode uses a pale lilac face with deep plum text; light mode uses
                 a rich plum face with pale lilac text. Supporting copy and the
-                arrow use a quieter, readable ink in the same family. The
-                original Tablets SVG, Log Intake label, dot, Jot it! aside and
-                directional arrow remain; the same 23px leading glyph now rests
-                in a 38px soft inset well. Its entrance and the content entrance
-                retain independent transform owners. Mobile keeps one centered
-                content row down to 320px and no hover feedback. Fine-pointer
-                desktop hover adjusts only luminance and shadow; reduced motion
-                removes those transitions, and reduced transparency replaces the
-                frosted base with opaque paint.
+                arrow use a quieter, readable ink in the same family. A bare
+                tablet or pill outline alternates each time Log Intake is used.
+                Both it and the arrow use 23px SVGs with 3.25px strokes and the
+                same secondary ink. A 24px gap, reduced to 20px on the narrowest
+                screens, gives the leading glyph about thirty percent more
+                visible space before the label; its former background well is
+                removed. The icon entrance and the content entrance retain
+                independent transform owners. Mobile keeps one centered content
+                row down to 320px and no hover feedback. Fine-pointer desktop
+                hover adjusts only luminance and shadow; reduced motion removes
+                those transitions, and reduced transparency replaces the frosted
+                base with opaque paint.
               </p>
               <p>
                 MedicationActionButton reuses this exact component for Add

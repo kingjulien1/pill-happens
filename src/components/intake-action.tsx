@@ -5,8 +5,8 @@ import {
   subscribePageEntryReadiness,
 } from "@/lib/page-entry-readiness";
 
-import { useCallback, useRef } from "react";
-import { ActionIcon } from "@/components/action-icon";
+import { useCallback, useRef, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
@@ -196,6 +196,9 @@ export function IntakeAction({
   stimulantCount: number;
 }) {
   const entryRoot = useIntakeActionEntrance();
+  const [medicationType, setMedicationType] = useState<"tablet" | "capsule">(
+    "tablet",
+  );
   const action = (
     <div
       ref={entryRoot}
@@ -262,13 +265,21 @@ export function IntakeAction({
             data-intake-paint="satin"
             data-log-intake-rim
             decoration={<SpecularCardBorder />}
-            onClick={onClick}
+            onClick={() => {
+              setMedicationType((current) =>
+                current === "tablet" ? "capsule" : "tablet",
+              );
+              onClick();
+            }}
             className="intake-primary-cta pointer-events-auto w-full"
           >
             <span className="intake-primary-row">
               <span className="intake-primary-copy">
                 <span className="intake-primary-label">
-                  <IntakeLogSymbol variant="pills" />
+                  <IntakeLogSymbol
+                    variant="pills"
+                    medicationType={medicationType}
+                  />
                   Log Intake
                 </span>
                 <span className="intake-primary-dot" aria-hidden="true">
@@ -276,7 +287,12 @@ export function IntakeAction({
                 </span>
                 <span className="intake-primary-aside">Jot it!</span>
               </span>
-              <ActionIcon name="next" className="intake-primary-next" />
+              <ArrowRight
+                className="intake-primary-next"
+                size={23}
+                strokeWidth={3.25}
+                aria-hidden="true"
+              />
             </span>
           </TodayActionButton>
         </div>

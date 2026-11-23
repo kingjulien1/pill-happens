@@ -1,14 +1,16 @@
-import { Tablets } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
+import { MedicationTypeIcon } from "@/components/medication-icon";
 import { cn } from "@/lib/utils";
 
-/** Reuse the journal mark frame with an optional plain-tablets action glyph. */
+/** Reuse the journal signature or a plain tablet/pill outline. */
 export function IntakeLogSymbol({
   className,
   variant = "signature",
+  medicationType = "tablet",
 }: {
   className?: string;
   variant?: "signature" | "pills";
+  medicationType?: "tablet" | "capsule";
 }) {
   return (
     <span
@@ -17,12 +19,10 @@ export function IntakeLogSymbol({
       aria-hidden="true"
     >
       {variant === "pills" ? (
-        <Tablets
+        <MedicationTypeIcon
+          type={medicationType}
           className="intake-log-symbol-pill size-[23px]"
-          size={23}
-          strokeWidth={2.5}
-          aria-hidden="true"
-          focusable="false"
+          strokeWidth={3.25}
         />
       ) : (
         <>
