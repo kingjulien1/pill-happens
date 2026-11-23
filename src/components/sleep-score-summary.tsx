@@ -8,6 +8,7 @@ import {
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
 import { Iridescence } from "./iridescence";
+import { useSleepScoreMotion } from "./use-sleep-score-motion";
 import styles from "./sleep-score-summary.module.css";
 
 function duration(minutes: number | null | undefined) {
@@ -77,6 +78,14 @@ export function SleepScoreSummary({
     ? sleepStages.reduce((sum, stage) => sum + stage.minutes!, 0)
     : null;
   const validStageTotal = stageTotal !== null && stageTotal <= 1440;
+  const hasStageBreakdown = validStageTotal && stageTotal > 0;
+  const visibleStages = hasStageBreakdown
+    ? sleepStages.filter((stage) => stage.minutes! > 0)
+    : [];
+  const tightStageLabels = visibleStages.some(
+    (stage) => stage.minutes! / stageTotal! < 0.1,
+  );
+  const stageMotion = useSleepScoreMotion(hasStageBreakdown && !disabled);
   return (
     <div className={styles.wrapper}>
       <div className={styles.topline}>
@@ -151,32 +160,47 @@ export function SleepScoreSummary({
           </div>
         </div>
 
-        <div className={styles.stageSummary}>
+        <div
+          ref={stageMotion}
+          className={styles.stageSummary}
+          data-sleep-stage-summary
+          data-active="false"
+        >
           <div className={styles.stageHeading}>
             <strong>How Your Sleep Adds Up</strong>
             <span>Asleep time only</span>
           </div>
           <div
-            className={styles.stageBar}
+            className={styles.stageChart}
+            data-tight-labels={tightStageLabels}
             role="img"
             aria-label={
-              validStageTotal
+              hasStageBreakdown
                 ? sleepStages
                     .map(
                       (stage) => `${stage.label}: ${duration(stage.minutes)}`,
                     )
                     .join("; ")
-                : "Sleep-stage breakdown awaiting complete readings"
+                : validStageTotal
+                  ? "No sleep time recorded"
+                  : "Sleep-stage breakdown awaiting complete readings"
             }
           >
-            {validStageTotal &&
-              sleepStages.map((stage) => (
+            <div className={styles.stageBar} aria-hidden="true">
+              {visibleStages.map((stage) => (
                 <span
+                  className={styles.stageSegment}
                   key={stage.key}
                   data-stage-tone={stage.tone}
                   style={{ "--stage-share": stage.minutes } as CSSProperties}
-                />
+                >
+                  <span className={styles.stagePercent}>
+                    {Math.round((stage.minutes! / stageTotal!) * 100) || "<1"}
+                    <small>%</small>
+                  </span>
+                </span>
               ))}
+            </div>
           </div>
           <dl className={styles.stageLegend}>
             {sleepStages.map((stage) => (
