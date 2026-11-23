@@ -215,12 +215,12 @@
      displaces the muted rim outward, beyond the measured card if needed. */
   --toast-inner-width: calc(2.6px * 31 / 24);
   --toast-outer-inset: calc(5px - (var(--toast-inner-width) - 2.6px));
+  --toast-outer-width: calc((5px * 4 / 3 - var(--toast-outer-inset)) * 4 / 3);
   outline: var(--toast-inner-width) solid var(--toast-pink-edge);
   outline-offset: -6.3px;
   box-shadow:
     inset 0 0 0 var(--toast-outer-inset) var(--toast-rim-muted),
-    0 0 0 calc(5px * 4 / 3 - var(--toast-outer-inset))
-      var(--toast-icon-background),
+    0 0 0 var(--toast-outer-width) var(--toast-icon-background),
     0 0 24px -9px
       color-mix(
         in srgb,
@@ -1079,7 +1079,7 @@
   /* Keep the innermost edge anchored and grow each successive band outward. */
   --frame-inner: calc(var(--toast-inner-width) * 7 / 6);
   --frame-middle: calc(var(--toast-outer-inset) * 7 / 6);
-  --frame-outer: calc((5px * 4 / 3 - var(--toast-outer-inset)) * 7 / 6);
+  --frame-outer: calc(var(--toast-outer-width) * 7 / 6);
   --frame-inset: calc(6.3px - var(--frame-inner) - var(--frame-middle));
   outline-width: var(--frame-inner);
   box-shadow:
