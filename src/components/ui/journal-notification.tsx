@@ -18,6 +18,7 @@ import {
   BookOpenText,
   CalendarDays,
   Check,
+  CheckCheck,
   ClockFading,
   ListFilter,
   ChevronsUp,
@@ -43,7 +44,6 @@ import {
   type NotificationCollapseDetail,
 } from "@/components/ui/sonner";
 import { NotificationCountdownBadge } from "@/components/ui/notification-countdown-badge";
-import { NotificationRocket } from "@/components/ui/notification-rocket";
 import { NotificationStatusBadge } from "@/components/ui/notification-status-badge";
 import { NotificationPullIndicator } from "@/components/ui/notification-pull-indicator";
 import { useNotificationPull } from "@/components/ui/use-notification-pull";
@@ -925,7 +925,7 @@ export function JournalNotification({
           <span className="journal-update-choice-copy">
             <span className="journal-update-choice-heading">
               <span className="journal-update-choice-label">
-                <NotificationRocket />
+                <CheckCheck aria-hidden="true" />
                 <span>Apply Now</span>
               </span>
               <ArrowRight className="intake-primary-next" aria-hidden="true" />
@@ -990,7 +990,7 @@ export function JournalNotification({
           }
           aria-hidden="true"
         >
-          <NotificationRocket />
+          <CheckCheck aria-hidden="true" />
         </span>
         <span
           className={

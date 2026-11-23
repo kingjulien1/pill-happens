@@ -445,7 +445,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             <code key="update">toast.update</code>,
             "Update available",
-            "8.633s bar + 1s active grace unless overridden · split CloudSync.",
+            "8.633s bar + 1s active grace unless overridden · amber-powered Rocket.",
           ],
         ]}
       />
@@ -1186,11 +1186,11 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last-seconds marker",
-            "34×34px clock, centred at 6px/6px on the rounded top-left border with translate(−50%, −50%). Pink200 14.5px/800 digits sit inside a clipped dark face and a pink/violet progress bezel. Number flips, casing recoil and a short ring pulse replace the old spinning marker. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above and 16px at the sides, preserving the cards’ width while protecting the corner badge.",
+            "28×28px dial with a 10px radius, centred at 6px/6px on the top-left border. The 14px/750 digits roll through a clipped dark face while a fine progress rim and soft glow deepen from Rose200 to Rose800 over the final three active seconds. Native animations seek to the reading clock, freeze during holds and stop when hidden; reduced motion keeps static, readable digits. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above and 16px at the sides, preserving the cards’ width while protecting the corner dial.",
           ],
           [
             "Header / unavailable Undo",
-            "All header and footer icon actions share the same 30px square tile, 9px radius, 2px border and inward 2px outline. Lucide glyphs are 17px with 2.25 stroke, and captions sit 3px below at 8.5px/500. A 52px-wide, at-least-47px-high control preserves the touch target. Undo and Apply use this same frame rather than circular or raised keys. Pending Undo spins its standard-size loader; completion turns green; unavailable Undo stays quiet and disabled. Okay acknowledges information and Details/Collapse toggles context.",
+            "Header and footer icon actions share a 30px square tile, 9px radius and 2px border. Ordinary tools add an inward 2px outline; Apply uses a raised violet face, contrasting CheckCheck glyph and press feedback within the same geometry. Lucide glyphs are 17px with 2.25 stroke, and captions sit 3px below at 8.5px/500. A 52px-wide, at-least-47px-high control preserves the touch target. Pending Undo spins its standard-size loader; completion turns green; unavailable Undo stays quiet and disabled. Okay acknowledges information and Details/Collapse toggles context.",
           ],
           [
             "Expanded backdrop / footer",
@@ -1205,15 +1205,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
       <p>
         Successful saves use BellCheck; Error, Info, Warning and Loading keep
         fitting status symbols on their Mauve tile. Update uses a split
-        CloudSync drawing: Emerald400 arrows make a steady 2.6-second turn
-        around their own center. The cloud’s light is one third softer, with a
-        small irregular drift on a 7.6-second loop. Icon artwork paints above
+        Rocket drawing: a 4.8-second coast-and-boost loop warms the rear fins,
+        with amber exhaust, a soft engine glow and six staggered dust particles
+        that travel beyond the icon tile. The fixed SVG scene uses native CSS
+        animation, pauses when hidden and respects reduced motion. Icon artwork paints above
         the rest of its card, and the Update badge uses Amber. Its expanded card
         replaces generic
         actions with a Pink300-tinted overview, a separate handoff section with
         two compact build/record stats and a 2:1 row of 58px Apply Now and Later
         buttons. Their 12px main labels sit above unchanged 8.5px captions;
-        the rocket and fading-clock glyphs retain their 21px size. A 3px face
+        the CheckCheck and fading-clock glyphs retain their 21px size. A 3px face
         inset halves the middle band, with thinner touching edges and a small
         overlap from the inner line. The
         overview’s “On device” status confirms that the files are downloaded.
@@ -1222,11 +1223,10 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         right-aligned statuses for app files, saved records and open drafts,
         followed by a centered, two-sentence journal-safety note. Its
         86% / 44ch width cap and two-line clamp share the handoff description’s
-        typography. Header Apply, footer Apply and Undo use the same square icon frame,
-        stroke weight and separate caption as the other tools.
-        All Apply rockets have fixed-size glyphs with gently banking flight and
-        staggered exhaust lines and particles. These CSS loops pause with
-        hidden content or inactive notifications and respect reduced motion.
+        typography. Header and footer Apply keep the ordinary tools’ size,
+        stroke weight and separate caption, with a raised violet confirmation
+        key that lifts on hover and depresses when pressed. All three Apply
+        controls use the same simple CheckCheck icon.
         Every Apply control shares the guarded launch/handoff, beside Collapse
         and Dismiss. The base surface uses a
         single 32px backdrop blur; reduced transparency keeps an opaque surface. Their

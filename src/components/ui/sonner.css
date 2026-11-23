@@ -578,24 +578,220 @@
 .journal-toaster [data-toast-symbol="success"] .journal-toast-bell-check {
   stroke: var(--color-emerald-600, oklch(59.6% 0.145 163.225));
 }
-[data-toast-symbol="update"] {
-  --toast-cloud-light: color-mix(
+.journal-toaster [data-update-rocket] {
+  --rocket-warm-edge: color-mix(
     in srgb,
-    var(--color-purple-100, #f3e8ff) 66.667%,
-    var(--color-purple-200, #e9d5ff)
+    var(--toast-glyph) 80%,
+    var(--color-amber-400, #fbbf24)
   );
+  overflow: visible;
 }
-.journal-toast-update-cloud-halo {
-  stroke: var(--toast-cloud-light);
+.journal-toast-rocket-body {
+  overflow: visible;
+  color: inherit;
 }
-.journal-toaster [data-toast-symbol="update"] .journal-toast-update-arrows {
-  color: var(--color-emerald-400, #00d492);
-  stroke: currentColor;
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
+.journal-toast-rocket-body > :is(path:first-child, path:last-child) {
+  stroke: var(--rocket-warm-edge);
+  fill: var(--color-amber-400, #fbbf24);
+  fill-opacity: 0.04;
 }
-.journal-toaster [data-toast-symbol="update"] .journal-toast-update-cloud {
-  transform-origin: 12px 12px;
+.journal-toast-rocket-body > path:nth-child(2) {
+  stroke: var(--color-amber-200, #fde68a);
+  fill: var(--color-amber-300, #fcd34d);
+  fill-opacity: 0.2;
+}
+.journal-toast-rocket-heat {
+  opacity: 0.2;
+}
+.journal-toast-rocket-flame {
+  fill: var(--color-amber-200, #fde68a);
+  opacity: 0.45;
+  transform-box: view-box;
+  transform-origin: 7px 17px;
+}
+.journal-toast-rocket-trails {
+  stroke: var(--color-amber-400, #fbbf24);
+}
+.journal-toast-rocket-trails > path {
+  opacity: 0;
+  stroke-dasharray: 6;
+  stroke-dashoffset: 6;
+  transform-box: view-box;
+  transform-origin: 6px 18px;
+}
+.journal-toast-rocket-dust > circle {
+  fill: var(--color-amber-400, #fbbf24);
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 5px 19px;
+}
+.journal-toast-rocket-dust > circle:nth-child(3n) {
+  fill: var(--color-amber-200, #fde68a);
+}
+.journal-toast-rocket-dust > circle:nth-child(3n + 2) {
+  fill: var(--color-amber-500, #f59e0b);
+}
+.journal-toast-symbol[data-toast-reversed="true"] {
+  --update-rocket-play-state: paused;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .journal-toast-rocket-flight {
+    animation: journal-rocket-coast 4.8s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+  .journal-toast-rocket-body > :is(path:first-child, path:last-child) {
+    animation: journal-rocket-warm 4.8s ease-in-out infinite;
+  }
+  .journal-toast-rocket-heat {
+    animation: journal-rocket-heat 4.8s ease-in-out infinite;
+  }
+  .journal-toast-rocket-flame {
+    animation: journal-rocket-thrust 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .journal-toast-rocket-trails > path {
+    animation: journal-rocket-trail 1.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+  .journal-toast-rocket-trails > path:nth-child(2) {
+    animation-delay: -0.53s;
+  }
+  .journal-toast-rocket-trails > path:nth-child(3) {
+    animation-delay: -1.06s;
+  }
+  .journal-toast-rocket-dust > circle {
+    animation: journal-rocket-dust var(--dust-duration)
+      cubic-bezier(0.16, 0.6, 0.25, 1) var(--dust-delay) infinite;
+  }
+  .journal-toaster
+    [data-update-rocket]
+    :is(
+      .journal-toast-rocket-flight,
+      .journal-toast-rocket-body > path,
+      .journal-toast-rocket-heat,
+      .journal-toast-rocket-flame,
+      .journal-toast-rocket-trails > path,
+      .journal-toast-rocket-dust > circle
+    ) {
+    animation-play-state: var(
+      --update-rocket-play-state,
+      var(--notification-motion-play-state, running)
+    );
+  }
+}
+@keyframes journal-rocket-coast {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  20% {
+    transform: translate(-0.4px, 0.5px) rotate(-1deg);
+  }
+  36% {
+    transform: translate(-1.1px, 1.1px) rotate(-2.5deg);
+  }
+  50% {
+    transform: translate(1.5px, -1.7px) rotate(2deg);
+  }
+  72% {
+    transform: translate(0.7px, -0.8px) rotate(0.4deg);
+  }
+  88% {
+    transform: translate(-0.3px, 0.2px) rotate(-0.7deg);
+  }
+}
+@keyframes journal-rocket-warm {
+  0%,
+  20%,
+  100% {
+    stroke: var(--rocket-warm-edge);
+    fill-opacity: 0.04;
+  }
+  38% {
+    stroke: var(--color-amber-300, #fcd34d);
+    fill-opacity: 0.12;
+  }
+  52% {
+    stroke: var(--color-amber-400, #fbbf24);
+    fill-opacity: 0.2;
+  }
+  76% {
+    stroke: var(--color-amber-200, #fde68a);
+    fill-opacity: 0.08;
+  }
+}
+@keyframes journal-rocket-heat {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  34% {
+    opacity: 0.32;
+  }
+  52% {
+    opacity: 0.74;
+  }
+  76% {
+    opacity: 0.28;
+  }
+}
+@keyframes journal-rocket-thrust {
+  0%,
+  100% {
+    transform: scale(0.62);
+    opacity: 0.38;
+  }
+  30% {
+    transform: scale(1.16);
+    opacity: 0.88;
+  }
+  58% {
+    transform: scale(0.82);
+    opacity: 0.55;
+  }
+  74% {
+    transform: scale(1.06);
+    opacity: 0.76;
+  }
+}
+@keyframes journal-rocket-trail {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.65);
+    stroke-dashoffset: 6;
+  }
+  20% {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+  }
+  68%,
+  100% {
+    opacity: 0;
+    transform: translate(-8px, 8px) scale(1.1);
+    stroke-dashoffset: -6;
+  }
+}
+@keyframes journal-rocket-dust {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2);
+  }
+  14% {
+    opacity: 0.78;
+  }
+  32% {
+    transform: translate(calc(var(--dust-x) * 0.22), calc(var(--dust-y) * 0.22))
+      scale(1);
+  }
+  66% {
+    opacity: 0.5;
+    transform: translate(calc(var(--dust-x) * 0.78), calc(var(--dust-y) * 0.78))
+      scale(0.9);
+  }
+  83% {
+    opacity: 0.22;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dust-x), var(--dust-y)) scale(0.08);
+  }
 }
 .journal-toast-bell-rings {
   opacity: 0;
@@ -1120,107 +1316,6 @@
   font-weight: 450;
   line-height: 1.4;
 }
-.journal-update-apply .notification-rocket {
-  --rocket-size: 21px;
-  --rocket-stroke: 2.3;
-}
-.journal-notification .notification-rocket {
-  position: relative;
-  display: inline-block;
-  flex: none;
-  width: var(--rocket-size, 17px);
-  height: var(--rocket-size, 17px);
-  overflow: visible;
-  color: inherit;
-  pointer-events: none;
-}
-.journal-notification .notification-rocket > .notification-rocket-body {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  height: 100%;
-  color: inherit;
-  stroke-width: var(--rocket-stroke, 2.25);
-}
-.journal-notification .notification-rocket > .notification-rocket-wake {
-  position: absolute;
-  z-index: 0;
-  top: -9px;
-  left: -9px;
-  width: calc(100% + 18px);
-  height: calc(100% + 18px);
-  overflow: visible;
-  color: inherit;
-}
-.notification-rocket-wake > * {
-  opacity: 0;
-}
-/* Keep hidden expanded-content decoration asleep, independently of the
-   notification's reading clock and document visibility gate. */
-.journal-notification[data-expanded="false"] .journal-notification-details {
-  --notification-rocket-play-state: paused;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .notification-rocket-body {
-    animation: notification-rocket-flight 3.6s cubic-bezier(0.45, 0, 0.25, 1)
-      infinite;
-    animation-play-state: var(
-      --notification-rocket-play-state,
-      var(--notification-motion-play-state, running)
-    );
-  }
-  .notification-rocket-wake > * {
-    animation: notification-rocket-exhaust 2.4s cubic-bezier(0.2, 0.6, 0.3, 1)
-      infinite;
-    animation-play-state: var(
-      --notification-rocket-play-state,
-      var(--notification-motion-play-state, running)
-    );
-  }
-  .notification-rocket-wake > :nth-child(2) {
-    animation-delay: -0.8s;
-  }
-  .notification-rocket-wake > :nth-child(3) {
-    animation-delay: -1.6s;
-  }
-  .notification-rocket-wake > :nth-child(4) {
-    animation-delay: -0.4s;
-  }
-  .notification-rocket-wake > :nth-child(5) {
-    animation-delay: -1.2s;
-  }
-  .notification-rocket-wake > :nth-child(6) {
-    animation-delay: -2s;
-  }
-}
-@keyframes notification-rocket-flight {
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0);
-  }
-  32% {
-    transform: translate(1.4px, -1.5px) rotate(3deg);
-  }
-  68% {
-    transform: translate(-0.8px, 0.6px) rotate(-3deg);
-  }
-}
-@keyframes notification-rocket-exhaust {
-  0%,
-  16% {
-    opacity: 0;
-    transform: translate(1px, -1px);
-  }
-  30% {
-    opacity: 0.65;
-  }
-  72%,
-  100% {
-    opacity: 0;
-    transform: translate(-6px, 6px);
-  }
-}
 .journal-update-notes {
   display: grid;
   min-width: 0;
@@ -1670,6 +1765,98 @@
   outline: 2px solid var(--toast-ink);
   outline-offset: 3px;
 }
+/* Apply is a small raised confirmation key in both header and footer. */
+.journal-notification
+  :is(.journal-update-header-action, .journal-update-footer-action) {
+  --apply-key-ink: color-mix(
+    in srgb,
+    var(--color-violet-950, #2e1065) 72%,
+    var(--color-mauve-950, #0c090c)
+  );
+  --apply-key-face: var(--color-violet-200, #ddd6fe);
+  --apply-key-edge: color-mix(
+    in srgb,
+    var(--color-violet-100, #ede9fe) 76%,
+    var(--color-pink-200, #fbcfe8)
+  );
+  --apply-key-base: color-mix(
+    in srgb,
+    var(--color-violet-400, #a78bfa) 64%,
+    var(--color-violet-950, #2e1065)
+  );
+  --apply-key-shadow: color-mix(
+    in srgb,
+    var(--color-mauve-950, #0c090c) 58%,
+    transparent
+  );
+}
+.journal-notification
+  :is(.journal-update-header-action, .journal-update-footer-action)
+  :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol) {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid var(--apply-key-edge);
+  outline: none;
+  background:
+    linear-gradient(145deg, #ffffff52, #ffffff00 62%), var(--apply-key-face);
+  color: var(--apply-key-ink);
+  box-shadow:
+    inset 0 1px 0 #ffffff80,
+    0 2px 0 var(--apply-key-base),
+    0 5px 9px -4px var(--apply-key-shadow);
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.8, 0.25, 1),
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+.journal-notification
+  :is(.journal-update-header-action, .journal-update-footer-action)
+  :is(.journal-notification-tool-label, .journal-notification-revert-label) {
+  color: var(--toast-ink);
+  opacity: 0.86;
+}
+.journal-notification
+  :is(
+    .journal-update-header-action,
+    .journal-update-footer-action
+  ):focus-visible {
+  outline: 2px solid var(--color-violet-200, #ddd6fe);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .journal-notification
+    :is(.journal-update-header-action, .journal-update-footer-action):not(
+      :disabled
+    ):hover
+    :is(
+      .journal-notification-tool-symbol,
+      .journal-notification-revert-symbol
+    ) {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 #ffffffb3,
+      0 3px 0 var(--apply-key-base),
+      0 7px 12px -5px var(--apply-key-shadow);
+  }
+}
+.journal-notification
+  :is(.journal-update-header-action, .journal-update-footer-action):not(
+    :disabled
+  ):active
+  :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol) {
+  transform: translateY(2px) scale(0.97);
+  box-shadow:
+    inset 0 1px 2px #2e10651a,
+    0 0.5px 0 var(--apply-key-base);
+  transition-duration: 80ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-notification
+    :is(.journal-update-header-action, .journal-update-footer-action)
+    :is(.journal-notification-tool-symbol, .journal-notification-revert-symbol) {
+    transition: none;
+  }
+}
 /* An absent reversal stays visible as a quiet native-disabled affordance.
    Resolve its ink once instead of multiplying generic disabled opacity. */
 .journal-notification
@@ -2015,12 +2202,6 @@
   .journal-toaster [data-mounted="true"] .journal-toast-plate-spin-back {
     animation-direction: normal;
   }
-  .journal-toaster [data-toast-symbol="update"] .journal-toast-update-arrows {
-    animation: journal-toast-update-sync 2.6s linear infinite;
-  }
-  .journal-toaster [data-toast-symbol="update"] .journal-toast-update-cloud {
-    animation: journal-toast-update-cloud 7.6s ease-in-out infinite;
-  }
   /* Animate work in progress, rather than every idle notification surface. */
   [data-toast-symbol="loading"] .journal-toast-glyph {
     animation: journal-toast-turn 900ms linear infinite;
@@ -2062,8 +2243,6 @@
       .journal-toast-plate-spin,
       .journal-toast-plate,
       .journal-toast-tile,
-      .journal-toast-update-arrows,
-      .journal-toast-update-cloud,
       .journal-notification-revert-symbol > svg
     ),
   .journal-toaster
@@ -2165,9 +2344,7 @@
       .journal-toast-plate-arrival,
       .journal-toast-plate-spin,
       .journal-toast-plate,
-      .journal-toast-tile,
-      .journal-toast-update-arrows,
-      .journal-toast-update-cloud
+      .journal-toast-tile
     ) {
     animation-play-state: paused;
   }
@@ -2432,35 +2609,7 @@
 }
 
 /* Uneven waypoints suggest a small organic drift; only the arrows rotate. */
-@keyframes journal-toast-update-cloud {
-  0%,
-  100% {
-    transform: translate(-0.28px, 0.32px);
-  }
-  17% {
-    transform: translate(0.45px, -0.18px);
-  }
-  36% {
-    transform: translate(-0.12px, -0.52px);
-  }
-  58% {
-    transform: translate(-0.5px, 0.08px);
-  }
-  77% {
-    transform: translate(0.22px, 0.5px);
-  }
-  91% {
-    transform: translate(0.46px, 0.04px);
-  }
-}
-@keyframes journal-toast-update-sync {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+
 
 @keyframes journal-toast-turn {
   to {
