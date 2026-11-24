@@ -468,23 +468,29 @@ export function DraftStatus({
 }) {
   if (!hasDraft && status === "saved" && !action && !copy?.idle) return null;
   const durable = status === "saved";
+  const restoredDraft = durable && hasDraft && restored;
   return (
     <div
-      className="flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[10px] leading-relaxed text-muted-foreground"
+      className={`flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[10px] leading-relaxed text-muted-foreground ${restoredDraft ? "mt-2" : ""}`}
       data-draft-status={status}
     >
       {(hasDraft || !durable || copy?.idle) && (
         <p
           role="status"
-          className={`flex min-w-0 items-center justify-center gap-1.5 ${durable && hasDraft && restored ? "font-semibold text-foreground/90" : ""}`}
+          className={`flex min-w-0 items-center justify-center gap-1.5 ${restoredDraft ? "font-semibold" : ""}`}
+          style={
+            restoredDraft
+              ? {
+                  color:
+                    "color-mix(in srgb, var(--color-emerald-300, #6ee7b7), var(--color-emerald-400, #34d399))",
+                  opacity: 0.82,
+                }
+              : undefined
+          }
         >
           <ActionIcon
             name={durable ? "save" : "retry"}
-            className={
-              durable && hasDraft && restored
-                ? "size-3.5 shrink-0"
-                : "size-3 shrink-0"
-            }
+            className={restoredDraft ? "size-3.5 shrink-0" : "size-3 shrink-0"}
           />
           <span>
             {durable
