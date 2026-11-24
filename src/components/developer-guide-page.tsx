@@ -3761,6 +3761,11 @@ export function DeveloperGuidePage() {
                 recorded sleep. Missing report values remain distinct from zero.
                 Narrow recap containers stack the two groups; wider layouts
                 retain paired columns with subtle row dividers.
+                A short recap footer explains the efficiency formula, the
+                separate report score and blank-versus-zero readings. Its help
+                links open the check-in guide and Sleep Cycle’s score reference
+                in separate tabs. A 64px Mauve950 fade rises from 60% to zero
+                behind the footer’s bottom edge; it never covers hit targets.
               </p>
               <p>
                 The Morning dialog starts with Before the Day Bites, followed by

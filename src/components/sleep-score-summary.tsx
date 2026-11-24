@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { ArrowUpRight, Info } from "lucide-react";
 import {
   getMorningSleepSummary,
   parseMorningSleepDraft,
@@ -275,11 +276,46 @@ export function SleepScoreSummary({
             ))}
           </dl>
         </div>
-        <footer className={styles.footer}>
+        <footer
+          className={styles.footer}
+          aria-labelledby={`${id}-footer-heading`}
+          data-sleep-summary-footer
+        >
+          <h4 id={`${id}-footer-heading`}>
+            <Info size={14} strokeWidth={2} aria-hidden="true" />
+            How this recap works
+          </h4>
           <p>
-            Efficiency is time asleep ÷ time in bed. The score comes from your
-            tracker; your ratings above capture what the numbers miss.
+            <strong>Efficiency</strong> uses{" "}
+            <span className={styles.formula}>asleep ÷ time in bed × 100</span>.
+            The asleep total comes from Light, Dream and Deep; it excludes
+            Asleep After and Awake.
           </p>
+          <p>
+            The sleep score is a separate report value; your ratings above
+            capture how the night felt. <strong>Blank</strong> means unknown;{" "}
+            <strong>0</strong> means a recorded zero.
+          </p>
+          <nav className={styles.footerLinks} aria-label="Sleep recap help">
+            <a
+              href="/guide#check-in"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Check-in guide (opens in a new tab)"
+            >
+              Check-in guide
+              <ArrowUpRight size={11} aria-hidden="true" />
+            </a>
+            <a
+              href="https://support.sleepcycle.com/hc/en-us/articles/206704659-How-does-the-app-calculate-Sleep-Quality"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Sleep Cycle score explanation (opens in a new tab)"
+            >
+              Sleep Cycle score
+              <ArrowUpRight size={11} aria-hidden="true" />
+            </a>
+          </nav>
         </footer>
       </section>
     </div>

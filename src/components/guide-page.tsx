@@ -697,18 +697,19 @@ export function GuidePage() {
               every field is optional.
             </p>
             <p>
-              Tap the cup or moon card to start, continue or edit. Evening moves
-              above Today’s intakes when it opens; Morning then sits below them.
-              The ring shows how many sections contain something, including
+              Tap the cup or moon card to start, continue or edit. Morning sits
+              above the day’s intakes; Evening stays below them. The completion
+              indicator shows how many sections contain something, including
               draft answers. Opening the card alone does not complete a section.
             </p>
             <p>
               <strong>Morning sleep journal.</strong> Rate dream recall,
               sleepiness, depth, restfulness and overall quality from 1 to 10.
-              Add lights-out and getting-up times, time to fall asleep, night
-              awakenings and sleep duration. The form estimates time in bed and
-              the percentage spent asleep. Leave unknown details blank; use 0
-              when you mean none.
+              Add Went to Bed, Woke Up, Asleep After and Awake, then the Light,
+              Dream and Deep sleep durations. You can also paste or choose a
+              Sleep Cycle report image and review its readings before applying
+              them. The form calculates time in bed and the percentage spent
+              asleep. Leave unknown details blank; use 0 for a recorded zero.
             </p>
             <p>
               <strong>Evening reflection.</strong> Browse{" "}
