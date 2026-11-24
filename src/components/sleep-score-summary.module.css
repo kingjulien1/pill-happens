@@ -75,40 +75,70 @@
 }
 .stats {
   display: grid;
-  gap: 11px;
+  gap: 0;
   margin: 0;
 }
 .stats > div {
   display: grid;
-  gap: 3px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 3px 8px;
   min-width: 0;
+  padding-block: 7px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--recap-line) 65%, transparent);
+}
+.stats > div:first-child {
+  padding-top: 0;
+}
+.stats > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 .stats dt {
   color: var(--muted-foreground);
   font-size: 10px;
+  font-weight: 500;
   line-height: 1.4;
 }
 .stats dd {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px;
   margin: 0;
   min-width: 0;
+}
+.metricValue {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 3px;
   max-width: 100%;
   overflow-wrap: anywhere;
   color: var(--foreground);
-  font-size: 19px;
+  font-size: 14px;
   font-weight: 625;
-  line-height: 1.15;
+  line-height: 1.25;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.025em;
+  text-align: right;
 }
-.stats dd > span {
+.metricValue > span {
   color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 450;
   letter-spacing: 0;
+}
+.metricNote {
+  grid-column: 1 / -1;
+  color: color-mix(in srgb, var(--muted-foreground) 78%, transparent);
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.metricNote strong {
+  color: var(--muted-foreground);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .stageSummary {
   padding-block: 14px;
@@ -282,20 +312,20 @@
   line-height: 1.7;
   text-wrap: pretty;
 }
-@container sleep-recap (min-width: 300px) and (max-width: 459px) {
-  .stats > div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 6px;
-    min-height: 25px;
+@container sleep-recap (max-width: 299px) {
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 18px;
   }
-  .stats dt {
-    font-size: 9px;
+  .ringSlot {
+    grid-column: 1;
   }
-  .stats dd {
-    flex-shrink: 1;
-    font-size: 16px;
+  .totals {
+    grid-column: 1;
+    grid-row: 3;
+    padding: 16px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--recap-line);
   }
 }
 @container sleep-recap (min-width: 460px) {
@@ -313,22 +343,12 @@
   .readings {
     grid-column: 1;
     grid-row: 1;
-    text-align: right;
-  }
-  .readings .stats > div {
-    justify-items: end;
   }
   .totals {
     grid-column: 3;
     grid-row: 1;
     padding: 0;
     border: 0;
-  }
-  .stats {
-    gap: 16px;
-  }
-  .stats dd {
-    font-size: 21px;
   }
   .stageSummary {
     padding-block: 16px;

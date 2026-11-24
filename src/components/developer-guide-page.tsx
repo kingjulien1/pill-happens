@@ -3754,6 +3754,13 @@ export function DeveloperGuidePage() {
                 heading uses 12px/650 type, its opposite label 11px/600, stage
                 percentages 13⅓px/650 and their color-matched signs 10px/700.
                 Taller label lanes keep narrow sleep stages from overlapping.
+                Tracker readings and time-based totals use compact 14px values
+                aligned to their column’s far edge. Each row adds a quiet
+                context line: the bed/wake window, combined sleep stages,
+                snoring’s share of time in bed when valid, and time outside
+                recorded sleep. Missing report values remain distinct from zero.
+                Narrow recap containers stack the two groups; wider layouts
+                retain paired columns with subtle row dividers.
               </p>
               <p>
                 The Morning dialog starts with Before the Day Bites, followed by

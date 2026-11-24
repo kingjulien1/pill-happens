@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type CSSProperties } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import {
   getMorningSleepSummary,
   parseMorningSleepDraft,
@@ -33,6 +33,34 @@ const stages = [
   { key: "deepMinutes", label: "Deep", tone: "deep" },
 ] as const;
 
+function SleepMetric({
+  label,
+  value,
+  unit,
+  detail,
+  report = false,
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  unit?: string;
+  detail: ReactNode;
+  report?: boolean;
+}) {
+  return (
+    <div
+      data-sleep-metric={label.toLowerCase().replaceAll(" ", "-")}
+      data-sleep-report-reading={report ? label.toLowerCase() : undefined}
+    >
+      <dt>{label}</dt>
+      <dd className={styles.metricValue}>
+        {value ?? "—"}
+        {value != null && unit && <span>{unit}</span>}
+      </dd>
+      <dd className={styles.metricNote}>{detail}</dd>
+    </div>
+  );
+}
+
 export function SleepScoreSummary({
   value,
   disabled,
@@ -53,21 +81,49 @@ export function SleepScoreSummary({
   }).value;
   const summary = getMorningSleepSummary(parsed);
   const score = reportNumber(value.reportScore, 100);
+  const regularity = reportNumber(value.regularity, 100);
+  const snoring = reportNumber(value.snoringMinutes, 1440);
+  const coughing = reportNumber(value.coughingRate, Infinity, true);
+  const snoringShare =
+    snoring !== null &&
+    summary.timeInBedMinutes !== null &&
+    summary.timeInBedMinutes > 0 &&
+    snoring <= summary.timeInBedMinutes
+      ? Number(((snoring / summary.timeInBedMinutes) * 100).toFixed(1))
+      : null;
+  const outsideSleep =
+    summary.sleepEfficiency !== null && parsed?.totalSleepMinutes != null
+      ? summary.timeInBedMinutes! - parsed.totalSleepMinutes
+      : null;
   const readings = [
     {
       label: "Regularity",
-      value: reportNumber(value.regularity, 100),
+      value: regularity,
       unit: "%",
+      detail: regularity === null ? "Not recorded" : "Tracker score · 0–100",
     },
     {
       label: "Snoring",
-      value: reportNumber(value.snoringMinutes, 1440),
+      value: snoring,
       unit: "min",
+      detail:
+        snoring === null ? (
+          "Not recorded"
+        ) : snoring === 0 ? (
+          "No snoring reported"
+        ) : snoringShare !== null ? (
+          <>
+            <strong>{snoringShare}%</strong> of time in bed
+          </>
+        ) : (
+          "Recorded snoring duration"
+        ),
     },
     {
       label: "Coughing",
-      value: reportNumber(value.coughingRate, Infinity, true),
+      value: coughing,
       unit: "/ h",
+      detail: coughing === null ? "Not recorded" : "Events per hour",
     },
   ];
   const sleepStages = stages.map((stage) => ({
@@ -116,39 +172,51 @@ export function SleepScoreSummary({
             <p className={styles.groupLabel}>Tracker readings</p>
             <dl className={styles.stats}>
               {readings.map((reading) => (
-                <div
-                  key={reading.label}
-                  data-sleep-report-reading={reading.label.toLowerCase()}
-                >
-                  <dt>{reading.label}</dt>
-                  <dd>
-                    {reading.value ?? "—"}
-                    {reading.value !== null && <span>{reading.unit}</span>}
-                  </dd>
-                </div>
+                <SleepMetric key={reading.label} {...reading} report />
               ))}
             </dl>
           </div>
           <div className={styles.totals}>
             <p className={styles.groupLabel}>Time-based totals</p>
             <dl className={styles.stats}>
-              <div>
-                <dt>Total asleep</dt>
-                <dd>{duration(parsed?.totalSleepMinutes)}</dd>
-              </div>
-              <div>
-                <dt>Time in bed</dt>
-                <dd>{duration(summary.timeInBedMinutes)}</dd>
-              </div>
-              <div>
-                <dt>Sleep efficiency</dt>
-                <dd>
-                  {summary.sleepEfficiency === null
-                    ? "—"
-                    : Math.round(summary.sleepEfficiency)}
-                  {summary.sleepEfficiency !== null && <span>%</span>}
-                </dd>
-              </div>
+              <SleepMetric
+                label="Total asleep"
+                value={duration(parsed?.totalSleepMinutes)}
+                detail={
+                  parsed?.totalSleepMinutes == null
+                    ? "Add sleep stages above"
+                    : validStageTotal
+                      ? "Light + Dream + Deep"
+                      : "Saved sleep duration"
+                }
+              />
+              <SleepMetric
+                label="Time in bed"
+                value={duration(summary.timeInBedMinutes)}
+                detail={
+                  summary.timeInBedMinutes !== null
+                    ? `${parsed!.lightsOut} → ${parsed!.gotUp}`
+                    : "Add bed & wake times"
+                }
+              />
+              <SleepMetric
+                label="Sleep efficiency"
+                value={
+                  summary.sleepEfficiency === null
+                    ? null
+                    : Math.round(summary.sleepEfficiency)
+                }
+                unit="%"
+                detail={
+                  outsideSleep === null ? (
+                    "Needs a sleep window"
+                  ) : (
+                    <>
+                      <strong>{duration(outsideSleep)}</strong> outside sleep
+                    </>
+                  )
+                }
+              />
             </dl>
           </div>
         </div>
