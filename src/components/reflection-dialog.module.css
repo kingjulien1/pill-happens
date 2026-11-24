@@ -927,16 +927,14 @@
   padding-block-start: 10px;
   border-block-start: 1px solid var(--writer-footer-edge);
 }
-.cloudState,
-.draftState {
+.cloudState {
   display: inline-flex;
   min-width: 0;
   align-items: center;
   gap: 6px;
   line-height: 1.5;
 }
-.cloudState > span,
-.draftState > span {
+.cloudState > span {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -951,21 +949,14 @@
 }
 .draftState {
   flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
   justify-content: flex-end;
-  text-align: end;
-  color: var(--writer-footer-muted);
-  font-size: 10px;
-  font-weight: 450;
 }
 .saveStateIcon {
   width: 17px;
   height: 17px;
   flex: 0 0 17px;
-}
-.deviceIcon {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 14px;
 }
 /* Lucide's first path is the cloud; only the circular backup arrow turns. */
 .backupIcon > path:nth-child(n + 2) {
@@ -1107,7 +1098,6 @@
   .cloudState {
     font-size: 11px;
   }
-  .draftState,
   .stats,
   .footerHint {
     font-size: 10px;
@@ -1175,11 +1165,7 @@
   .cloudState[data-reflection-save-status="saved"] {
     flex: 1 1 auto;
   }
-  .draftState {
-    font-size: 9.5px;
-  }
-  .cloudState,
-  .draftState {
+  .cloudState {
     gap: 3px;
   }
   .title {

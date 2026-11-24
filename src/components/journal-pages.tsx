@@ -1280,7 +1280,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
         </p>
       </div>
 
-      <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+      <div className="flex w-full flex-col" data-draft-action-footer>
         <div className={dialogButtonStyles.group}>
           <DialogPrimaryButton
             className="w-full"
@@ -1293,6 +1293,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
           <SaveOptions kind="preferences" formId={formId} disabled={busy} />
         </div>
         <DraftStatus
+          scope="preferences"
           hasDraft={draft.hasDraft}
           status={draft.status}
           restored={draft.restored}

@@ -364,7 +364,7 @@ export function IntakeForm({
             render={<Link href="/medications" />}
             onClick={onSaved}
           />
-          <DraftStatus {...draftFeedback} />
+          <DraftStatus {...draftFeedback} scope="intake" />
           {footerActions}
         </div>
       </form>
@@ -844,7 +844,7 @@ export function IntakeForm({
         >
           {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
         </IntakePrimaryButton>
-        <DraftStatus {...draftFeedback} />
+        <DraftStatus {...draftFeedback} scope="intake" />
         <div className={styles.trackingFooter} data-intake-tracking-footer>
           {draftFeedback.restored && draftFeedback.status === "saved" && (
             <p className={styles.restoredHelp}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { SaveStatusLine } from "./save-status-line";
 import {
   useCallback,
   useDeferredValue,
@@ -25,7 +26,6 @@ import {
   CloudBackup,
   CloudAlert,
   CloudCheck,
-  HardDrive,
   FileDown,
   Bookmark,
   BookmarkCheck,
@@ -1262,13 +1262,14 @@ export function ReflectionDialog({
                 data-draft-status={draftStatus}
                 title={draftLabel(draftStatus)}
                 data-writing-device-state
-                role="status"
               >
-                <span>{draftLabel(draftStatus)}</span>
-                <HardDrive
-                  className={styles.deviceIcon}
-                  strokeWidth={1.7}
-                  aria-hidden="true"
+                <SaveStatusLine
+                  text={draftLabel(draftStatus)}
+                  tone={
+                    draftStatus && draftStatus !== "saved"
+                      ? "warning"
+                      : "normal"
+                  }
                 />
               </span>
             </div>

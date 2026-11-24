@@ -810,7 +810,7 @@ function CheckInForm({
         data-dialog-fade-footer
         data-check-in-submit
       >
-        <div className="flex w-full flex-col gap-2" data-draft-action-footer>
+        <div className="flex w-full flex-col" data-draft-action-footer>
           <IntakePrimaryButton
             saveOptions={{ kind: "check-in", period, formId, disabled: locked }}
             type="submit"
@@ -829,11 +829,16 @@ function CheckInForm({
           >
             {locked ? "Saving…" : "Save Check-In"}
           </IntakePrimaryButton>
-          <DraftStatus {...draft} />
+          <DraftStatus
+            {...draft}
+            scope={checkInDraftKey(day, period)}
+            copy={{
+              idle: checkIn
+                ? "Saved to this day. Edit anytime."
+                : "Save to this day. Edit anytime.",
+            }}
+          />
         </div>
-        <p className={styles.saveHint}>
-          Saved to this day. Come back and edit whenever you like.
-        </p>
       </div>
     </form>
   );

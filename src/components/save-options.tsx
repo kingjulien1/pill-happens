@@ -4,6 +4,7 @@ import { useId, useRef, useState, type FormEvent } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { BookmarkCheck, Ellipsis, Feather, Info, Origami } from "lucide-react";
 import styles from "./save-options.module.css";
+import { playSaveStatusExit } from "./save-status-line";
 
 const saveCopy = {
   intake: {
@@ -150,7 +151,11 @@ export function SaveOptions({
                   onClick={(event) => {
                     event.preventDefault();
                     const button = event.currentTarget;
-                    button.form?.requestSubmit(button);
+                    const form = button.form;
+                    if (form) {
+                      playSaveStatusExit(form);
+                      form.requestSubmit(button);
+                    }
                     setOpen(false);
                   }}
                 >

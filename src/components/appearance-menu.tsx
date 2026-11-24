@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SaveStatusLine } from "./save-status-line";
 import { Menu } from "@base-ui/react/menu";
 import { Monitor, Moon, MoonStar, Sun } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
@@ -173,9 +174,10 @@ export function AppearanceMenu({ nested = true }: { nested?: boolean }) {
                 compact.footer,
               )}
             >
-              <span>
-                {persisted ? "Saved on this device" : "This visit only"}
-              </span>
+              <SaveStatusLine
+                text={persisted ? "Saved on this device" : "This visit only"}
+                tone={persisted ? "normal" : "warning"}
+              />
               <span className={cn(styles.resolvedMode, compact.resolvedMode)}>
                 {resolved === "dark" ? (
                   <MoonStar aria-hidden="true" />

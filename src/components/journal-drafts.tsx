@@ -15,7 +15,8 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useJournal } from "@/components/journal-provider";
-import { ActionIcon } from "@/components/action-icon";
+import { SaveStatusLine } from "./save-status-line";
+import statusStyles from "./save-status-line.module.css";
 import {
   EMPTY_INTAKE_STACK_VIEW,
   normalizeIntakeStackView,
@@ -483,54 +484,38 @@ export function DraftStatus({
   onReset,
   action,
   copy,
+  scope,
 }: {
   hasDraft: boolean;
   status: DraftStorageStatus;
   restored?: boolean;
   onReset?: () => void;
   action?: ReactNode;
-  /** Custom durable copy never replaces storage-unavailable/error messages. */
   copy?: { idle?: string; saved?: string; restored?: string };
+  scope?: string;
 }) {
-  if (!hasDraft && status === "saved" && !action && !copy?.idle) return null;
   const durable = status === "saved";
   const restoredDraft = durable && hasDraft && restored;
+  const text = !durable
+    ? !hasDraft && status === "error"
+      ? "Draft couldn’t be restored. You can start fresh."
+      : "Device storage unavailable. Draft lasts this visit."
+    : !hasDraft
+      ? (copy?.idle ?? "Edits stay on this device until saved.")
+      : restored
+        ? (copy?.restored ?? "Restored draft on this device.")
+        : (copy?.saved ?? "Draft saved on this device.");
   return (
     <div
-      className={`flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[10px] leading-relaxed text-muted-foreground ${restoredDraft ? "mt-2" : ""}`}
+      className={statusStyles.footerStatus}
       data-draft-status={status}
+      data-restored={restoredDraft ? "" : undefined}
     >
-      {(hasDraft || !durable || copy?.idle) && (
-        <p
-          role="status"
-          className={`flex min-w-0 items-center justify-center gap-1.5 ${restoredDraft ? "font-semibold" : ""}`}
-          style={
-            restoredDraft
-              ? {
-                  color:
-                    "color-mix(in srgb, var(--color-emerald-300, #6ee7b7), var(--color-emerald-400, #34d399))",
-                  opacity: 0.82,
-                }
-              : undefined
-          }
-        >
-          <ActionIcon
-            name={durable ? "save" : "retry"}
-            className={restoredDraft ? "size-3.5 shrink-0" : "size-3 shrink-0"}
-          />
-          <span>
-            {durable
-              ? !hasDraft && copy?.idle
-                ? copy.idle
-                : restored
-                  ? (copy?.restored ?? "Restored draft on this device.")
-                  : (copy?.saved ?? "Draft saved on this device.")
-              : !hasDraft && status === "error"
-                ? "A saved draft could not be restored. You can continue with fresh values."
-                : "Draft kept for this visit. Device storage is unavailable, so reopening may lose it."}
-          </span>
-        </p>
-      )}
+      <SaveStatusLine
+        text={text}
+        tone={!durable ? "warning" : restoredDraft ? "restored" : "normal"}
+        scope={scope}
+      />
       {action ??
         (hasDraft && onReset && (
           <Button

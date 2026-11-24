@@ -189,8 +189,7 @@
 
 .optional,
 .fieldHint,
-.bedtimeHint,
-.saveHint {
+.bedtimeHint {
   color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 400;
@@ -369,11 +368,6 @@
 }
 .form[data-check-in-form="morning"] .submitArea::before {
   border-top: 0;
-}
-.saveHint {
-  margin: 18px 0 2px;
-  opacity: 0.5;
-  text-align: center;
 }
 @media (max-width: 359px) {
   .card {

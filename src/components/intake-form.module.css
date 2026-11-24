@@ -1,4 +1,5 @@
 .footer {
+  --save-status-parent-gap: 10px;
   position: relative;
   isolation: isolate;
   display: grid;
