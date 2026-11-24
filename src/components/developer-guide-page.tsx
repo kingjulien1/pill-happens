@@ -2116,8 +2116,12 @@ export function DeveloperGuidePage() {
                 observer or blink timer. Saved and projected day totals sit in
                 equal-width Right Now / After lanes above those rails, using the
                 same 14px bold amounts and 10px labels/units on both sides. The
-                full-width row has a 12px gap before the badge; the weekday and
-                medication-log count remain in their own summary above it.
+                full-width row has a 12px gap before the badge. A centered
+                sentence heading above it describes the projected ordinal log
+                number, medication, local weekday/time and resulting day total.
+                Its typography and padding share a 31/24 scale; number emphasis
+                stays at weight 750, while normal copy uses Violet100 at 550.
+                A 31px bottom margin gives it substantial room before the totals.
                 Each total also has a log count directly underneath, reduced by
                 one third in type size, weight and opacity. The After count adds
                 one for a new intake, replaces an edited intake already on the

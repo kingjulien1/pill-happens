@@ -80,35 +80,24 @@
 }
 
 .preview .previewSummary {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  column-gap: clamp(16px, 3vw, 24px);
+  --preview-summary-scale: calc(31 / 24);
   min-width: 0;
-  margin-bottom: 14.5px;
-  padding: 4px 6px 0;
-  font-size: 11px;
+  margin-bottom: calc(24px * var(--preview-summary-scale));
+  padding: calc(4px * var(--preview-summary-scale))
+    calc(6px * var(--preview-summary-scale)) 0;
+  color: var(--color-violet-100, #ede9fe);
+  font-size: calc(11px * var(--preview-summary-scale));
   line-height: 1.4;
+  text-align: center;
 }
 .previewSummaryWhen {
-  display: grid;
-  gap: 5px;
-  color: var(--muted-foreground);
-  font-weight: 400;
+  font-size: calc(11px * var(--preview-summary-scale));
+  font-weight: 450;
+  white-space: nowrap;
 }
 .previewSummaryClock {
-  font-size: 11px;
   font-variant-numeric: tabular-nums;
-  opacity: 0.8;
 }
-.previewSummaryCopy {
-  display: grid;
-  min-width: 0;
-  max-width: 100%;
-  gap: 10px;
-  justify-items: end;
-}
-.previewSummaryCopy,
 .previewSummaryTotals {
   color: color-mix(
     in srgb,
@@ -117,24 +106,26 @@
   );
   font-weight: 500;
 }
-.previewSummaryHeading {
-  display: flex;
+.preview .previewSummaryHeading {
+  display: block;
   min-width: 0;
-  max-width: 100%;
-  align-items: baseline;
-  gap: 0.3em;
-  margin: 0;
-  font-size: 12px;
-}
-.previewSummaryHeading > strong,
-.previewSummaryHeading > :last-child {
-  flex: none;
-  white-space: nowrap;
+  max-width: 38ch;
+  margin: 0 auto;
+  color: inherit;
+  font-size: calc(12px * var(--preview-summary-scale));
+  font-weight: 550;
+  line-height: inherit;
+  text-wrap: balance;
 }
 .previewMedicationName {
-  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.previewSummaryDose {
+  display: inline-block;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  vertical-align: bottom;
   white-space: nowrap;
 }
 .previewSummary strong {
@@ -212,7 +203,6 @@
   font-weight: 500;
 }
 @media (prefers-color-scheme: light) {
-  .previewSummaryCopy,
   .previewSummaryTotals {
     color: color-mix(
       in srgb,

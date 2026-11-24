@@ -1,15 +1,26 @@
 import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
 import styles from "./intake-form.module.css";
 
-/** Recorded weekday, time and medication-log count above the preview. */
+const ordinalSuffix = (count: number) => {
+  const lastTwo = count % 100;
+  if (lastTwo >= 11 && lastTwo <= 13) return "th";
+  return (
+    ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[count % 10] ??
+    "th"
+  );
+};
+
+/** The draft's projected log number, local timestamp and resulting day total. */
 export function IntakePreviewSummary({
   medicationName,
   count,
+  totalMg,
   takenAt,
   timeZone,
 }: {
   medicationName: string;
-  count: number;
+  count: number | null;
+  totalMg: number | null;
   takenAt: string;
   timeZone: string;
 }) {
@@ -19,24 +30,39 @@ export function IntakePreviewSummary({
     month: undefined,
     day: undefined,
   });
+  const total = totalMg === null ? "—" : formatDose(totalMg);
   return (
-    <div className={styles.previewSummary} data-intake-preview-summary>
-      <time className={styles.previewSummaryWhen} dateTime={takenAt}>
-        <span>{weekday}</span>{" "}
-        <span className={styles.previewSummaryClock}>
-          {local.slice(11, 16)}
-        </span>
-      </time>
-      <div className={styles.previewSummaryCopy}>
-        <p className={styles.previewSummaryHeading}>
-          <strong>{formatDose(count)}</strong>{" "}
-          <span className={styles.previewMedicationName} title={medicationName}>
-            {medicationName}
-          </span>{" "}
-          <span>{count === 1 ? "log" : "logs"} today</span>
-        </p>
-      </div>
-    </div>
+    <header className={styles.previewSummary} data-intake-preview-summary>
+      <h3 className={styles.previewSummaryHeading}>
+        This is{" "}
+        {count === null ? (
+          "your"
+        ) : (
+          <>
+            the{" "}
+            <strong data-preview-log-number>
+              {formatDose(count)}
+              {ordinalSuffix(count)}
+            </strong>
+          </>
+        )}{" "}
+        Log for{" "}
+        <span className={styles.previewMedicationName}>{medicationName}</span>{" "}
+        Today{" "}
+        <time className={styles.previewSummaryWhen} dateTime={takenAt}>
+          ({weekday},{" "}
+          <span className={styles.previewSummaryClock}>
+            {local.slice(11, 16)}
+          </span>
+          )
+        </time>{" "}
+        with{" "}
+        <span className={styles.previewSummaryDose} title={`${total} mg`}>
+          <strong>{total}</strong> mg
+        </span>{" "}
+        total.
+      </h3>
+    </header>
   );
 }
 

@@ -685,7 +685,8 @@ export function IntakeForm({
         {belongsTo && (medication || fallbackIntake) && (
           <IntakePreviewSummary
             medicationName={medication?.name ?? fallbackIntake!.medicationName}
-            count={daySummary.count}
+            count={includingDraftCount}
+            totalMg={includingDraftMg}
             takenAt={previewTime}
             timeZone={timezone}
           />
