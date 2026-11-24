@@ -42,6 +42,12 @@
 }
 
 .preview {
+  --summary-ink-base: var(--color-violet-100, #ede9fe);
+  --preview-totals-ink: color-mix(
+    in srgb,
+    var(--color-purple-200, #e9d5ff),
+    var(--color-purple-300, #d8b4fe)
+  );
   display: grid;
   /* Bound the track before the card's ingredient and dose share its width. */
   grid-template-columns: minmax(0, 1fr);
@@ -80,39 +86,26 @@
 }
 
 .preview .previewSummary {
-  --preview-summary-scale: calc(31 / 24);
+  --summary-type: 15.5px;
   min-width: 0;
-  margin-bottom: calc(24px * var(--preview-summary-scale));
-  padding: calc(4px * var(--preview-summary-scale))
-    calc(6px * var(--preview-summary-scale)) 0;
-  color: var(--color-violet-100, #ede9fe);
-  font-size: calc(11px * var(--preview-summary-scale));
-  line-height: 1.4;
-  text-align: center;
-}
-.previewSummaryWhen {
-  font-size: calc(11px * var(--preview-summary-scale));
-  font-weight: 450;
-  white-space: nowrap;
-}
-.previewSummaryClock {
-  font-variant-numeric: tabular-nums;
-}
-.previewSummaryTotals {
+  margin-bottom: 31px;
+  padding: 5px 8px 0;
   color: color-mix(
     in srgb,
-    var(--color-purple-200, #e9d5ff),
-    var(--color-purple-300, #d8b4fe)
+    var(--summary-ink-base) 71%,
+    var(--intake-footer-ink)
   );
-  font-weight: 500;
+  font-size: calc(var(--summary-type) * 0.75);
+  line-height: 1.55;
+  text-align: center;
 }
 .preview .previewSummaryHeading {
   display: block;
   min-width: 0;
-  max-width: 38ch;
+  max-width: 48ch;
   margin: 0 auto;
   color: inherit;
-  font-size: calc(12px * var(--preview-summary-scale));
+  font-size: inherit;
   font-weight: 550;
   line-height: inherit;
   text-wrap: balance;
@@ -121,18 +114,17 @@
   overflow-wrap: anywhere;
 }
 .previewSummaryDose {
-  display: inline-block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: bottom;
   white-space: nowrap;
 }
 .previewSummary strong {
   color: var(--foreground);
-  font-size: 1.1em;
+  font-size: calc(var(--summary-type) * 1.1 * 10 / 9);
   font-weight: 750;
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.previewSummaryDose strong {
+  font-size: calc(var(--summary-type) * 1.1 * 9 / 8);
 }
 .previewTotals {
   display: grid;
@@ -149,6 +141,8 @@
   margin: 0;
   padding-inline: 6px;
   font-size: 10px;
+  color: var(--preview-totals-ink);
+  font-weight: 500;
   line-height: 1.4;
   text-align: start;
 }
@@ -174,7 +168,7 @@
   align-items: baseline;
   column-gap: 4px;
   margin: 0;
-  font-size: 10px;
+  font-size: inherit;
   font-variant-numeric: tabular-nums;
 }
 .previewSummaryTotals dd strong {
@@ -183,7 +177,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--foreground);
-  font-size: 14px;
+  font-size: 1.4em;
   font-weight: 750;
   line-height: 1.2;
 }
@@ -191,20 +185,18 @@
   flex: none;
 }
 .previewSummaryLogs {
-  opacity: calc(2 / 3);
-  font-weight: 333;
+  font-size: 7.5px;
+  font-weight: 450;
 }
 .previewSummaryLogs dd {
-  column-gap: calc(8px / 3);
-  font-size: calc(20px / 3);
+  column-gap: 3px;
 }
 .previewSummaryLogs dd strong {
-  font-size: calc(28px / 3);
-  font-weight: 500;
+  font-weight: 650;
 }
 @media (prefers-color-scheme: light) {
-  .previewSummaryTotals {
-    color: color-mix(
+  .preview {
+    --preview-totals-ink: color-mix(
       in srgb,
       var(--color-purple-800, #6b21a8) 35%,
       var(--muted-foreground)
@@ -212,6 +204,14 @@
   }
 }
 
+.preview,
+.trackingDay {
+  --intake-footer-ink: color-mix(
+    in srgb,
+    var(--muted-foreground) 60%,
+    transparent
+  );
+}
 .trackingFooter {
   display: grid;
   gap: 24px;
@@ -224,7 +224,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  color: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
+  color: var(--intake-footer-ink);
   font-size: 10px;
   font-weight: 525;
 }

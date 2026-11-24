@@ -2,7 +2,7 @@
 
 import type { AnimationEvent, CSSProperties } from "react";
 import { lunarSparkPath, lunarStarPath } from "./lunar-star-paths";
-import { useSleepScoreMotion } from "./use-sleep-score-motion";
+import { useVisibleMotion } from "./use-visible-motion";
 import styles from "./sleep-score-ring.module.css";
 
 const ARC = "M55.653283 184.346717 A91 91 0 1 1 184.346717 184.346717";
@@ -55,7 +55,7 @@ export function SleepScoreRing({
   disabled: boolean;
 }) {
   const positive = score !== null && score > 0;
-  const dial = useSleepScoreMotion(positive && !disabled);
+  const dial = useVisibleMotion(positive && !disabled);
   return (
     <div
       ref={dial}

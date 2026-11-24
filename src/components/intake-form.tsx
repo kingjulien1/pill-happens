@@ -709,8 +709,8 @@ export function IntakeForm({
             medicationName={medication?.name ?? fallbackIntake!.medicationName}
             count={includingDraftCount}
             totalMg={includingDraftMg}
-            takenAt={previewTime}
-            timeZone={timezone}
+            trackingDay={belongsTo}
+            isToday={belongsTo === dayKey(now ?? new Date(), timezone)}
           />
         )}
         <div className={styles.previewHeading}>

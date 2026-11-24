@@ -9,7 +9,7 @@ import {
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
 import { CheckInSectionHeader } from "./check-in-section";
-import { useSleepScoreMotion } from "./use-sleep-score-motion";
+import { useVisibleMotion } from "./use-visible-motion";
 import styles from "./sleep-score-summary.module.css";
 
 function duration(minutes: number | null | undefined) {
@@ -140,7 +140,7 @@ export function SleepScoreSummary({
   const tightStageLabels = visibleStages.some(
     (stage) => stage.minutes! / stageTotal! < 0.1,
   );
-  const stageMotion = useSleepScoreMotion(hasStageBreakdown && !disabled);
+  const stageMotion = useVisibleMotion(hasStageBreakdown && !disabled);
   return (
     <div className={styles.wrapper}>
       <CheckInSectionHeader

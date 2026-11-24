@@ -1,5 +1,9 @@
-import { formatDay, formatDose, toLocalInput } from "@/lib/domain";
+"use client";
+
+import { formatDay, formatDose } from "@/lib/domain";
+import { useVisibleMotion } from "./use-visible-motion";
 import styles from "./intake-form.module.css";
+import slate from "./intake-preview-slate.module.css";
 
 const ordinalSuffix = (count: number) => {
   const lastTwo = count % 100;
@@ -10,57 +14,86 @@ const ordinalSuffix = (count: number) => {
   );
 };
 
-/** The draft's projected log number, local timestamp and resulting day total. */
+function PreviewSlate() {
+  return (
+    <svg
+      className={slate.art}
+      width="58"
+      height="42"
+      viewBox="0 0 58 42"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <g className={slate.board}>
+        <path d="M15 20h28v12a3 3 0 0 1-3 3H18a3 3 0 0 1-3-3Z" />
+        <g className={slate.hinge}>
+          <path d="M15 20v-5a1.5 1.5 0 0 1 1.5-1.5h25A1.5 1.5 0 0 1 43 15v5ZM20 13.5l4.5 6.5m4-6.5L33 20m4-6.5 4.5 6.5" />
+        </g>
+        <g className={slate.capsule}>
+          <g transform="rotate(-24 29 27.5)">
+            <rect x="24" y="25" width="10" height="5" rx="2.5" />
+            <path d="M29 25v5" />
+          </g>
+        </g>
+      </g>
+      <path className={slate.clickLeft} d="m9 20-3-2m3 7-4 1" />
+      <path className={slate.clickRight} d="m48 19 3-3m-3 8 5 .5" />
+    </svg>
+  );
+}
+
+/** The draft's projected log number and resulting tracking-day total. */
 export function IntakePreviewSummary({
   medicationName,
   count,
   totalMg,
-  takenAt,
-  timeZone,
+  trackingDay,
+  isToday,
 }: {
   medicationName: string;
   count: number | null;
   totalMg: number | null;
-  takenAt: string;
-  timeZone: string;
+  trackingDay: string;
+  isToday: boolean;
 }) {
-  const local = toLocalInput(takenAt, timeZone);
-  const weekday = formatDay(local.slice(0, 10), {
-    weekday: "long",
-    month: undefined,
-    day: undefined,
-  });
-  const total = totalMg === null ? "—" : formatDose(totalMg);
+  const header = useVisibleMotion<HTMLElement>(true);
+  const name = (
+    <span className={styles.previewMedicationName}>{medicationName}</span>
+  );
   return (
-    <header className={styles.previewSummary} data-intake-preview-summary>
+    <header
+      ref={header}
+      className={`${styles.previewSummary} ${slate.scene}`}
+      data-intake-preview-summary
+    >
+      <PreviewSlate />
       <h3 className={styles.previewSummaryHeading}>
-        This is{" "}
-        {count === null ? (
-          "your"
-        ) : (
+        {count !== null && totalMg !== null ? (
           <>
-            the{" "}
+            This{" "}
             <strong data-preview-log-number>
               {formatDose(count)}
               {ordinalSuffix(count)}
-            </strong>
+            </strong>{" "}
+            intake for {name} logs a total intake of{" "}
+            <span className={styles.previewSummaryDose}>
+              <strong>{formatDose(totalMg)}</strong> mg
+            </span>{" "}
+            <time dateTime={trackingDay}>
+              {isToday
+                ? "today"
+                : `on ${formatDay(trackingDay, { weekday: "short", month: "short" })}`}
+            </time>
+            .
           </>
-        )}{" "}
-        Log for{" "}
-        <span className={styles.previewMedicationName}>{medicationName}</span>{" "}
-        Today{" "}
-        <time className={styles.previewSummaryWhen} dateTime={takenAt}>
-          ({weekday},{" "}
-          <span className={styles.previewSummaryClock}>
-            {local.slice(11, 16)}
-          </span>
-          )
-        </time>{" "}
-        with{" "}
-        <span className={styles.previewSummaryDose} title={`${total} mg`}>
-          <strong>{total}</strong> mg
-        </span>{" "}
-        total.
+        ) : (
+          <>Enter an amount to preview the daily total for {name}.</>
+        )}
       </h3>
     </header>
   );

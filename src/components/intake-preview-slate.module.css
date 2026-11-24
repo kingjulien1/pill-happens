@@ -1,0 +1,169 @@
+.scene {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+.art {
+  display: block;
+  overflow: visible;
+  color: var(--preview-totals-ink);
+}
+.board {
+  transform-origin: 29px 34px;
+}
+.hinge {
+  transform-origin: 15px 20px;
+  transform: rotate(-14deg);
+}
+.capsule {
+  transform-origin: 29px 27.5px;
+}
+.clickLeft,
+.clickRight {
+  opacity: 0;
+}
+.clickLeft {
+  --drift: -4px;
+}
+.clickRight {
+  --drift: 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scene {
+    --play: paused;
+    --take: 4.8s;
+    --arrival: 780ms;
+  }
+  .scene[data-active="true"] {
+    --play: running;
+  }
+  .art {
+    animation: roll-in var(--arrival) both;
+  }
+  .scene h3 {
+    animation: caption-in 480ms 140ms ease-out both;
+  }
+  .board {
+    animation: recoil var(--take) var(--arrival) ease-in-out infinite;
+  }
+  .hinge {
+    animation: clap var(--take) var(--arrival) ease-in-out infinite;
+  }
+  .capsule {
+    animation: hop var(--take) var(--arrival) ease-in-out infinite;
+  }
+  .clickLeft,
+  .clickRight {
+    animation: click var(--take) var(--arrival) ease-out infinite;
+  }
+  .art,
+  .scene h3,
+  .board,
+  .hinge,
+  .capsule,
+  .clickLeft,
+  .clickRight {
+    animation-play-state: var(--play);
+  }
+}
+
+@keyframes roll-in {
+  0% {
+    opacity: 0;
+    transform: translate(-10px, 6px) rotate(-17deg) scale(0.78);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(1px, -2px) rotate(5deg) scale(1.06);
+  }
+  80% {
+    transform: rotate(-2deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes caption-in {
+  from {
+    opacity: 0.72;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Wind up, clap at 28%, then let the lettering and the hinge settle independently. */
+@keyframes clap {
+  0%,
+  49%,
+  100% {
+    transform: rotate(-14deg);
+  }
+  19% {
+    transform: rotate(-27deg);
+    animation-timing-function: cubic-bezier(0.65, 0, 0.92, 0.45);
+  }
+  28%,
+  37% {
+    transform: rotate(0);
+  }
+  32% {
+    transform: rotate(-6deg);
+  }
+  43% {
+    transform: rotate(-16deg);
+  }
+}
+@keyframes recoil {
+  0%,
+  42%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateY(-1px) rotate(-3deg);
+  }
+  28% {
+    transform: translateY(1px) rotate(2deg) scale(1.05, 0.94);
+  }
+  33% {
+    transform: translateY(-0.5px) rotate(-1deg) scale(0.99, 1.02);
+  }
+}
+@keyframes hop {
+  0%,
+  27%,
+  49%,
+  100% {
+    transform: none;
+  }
+  33% {
+    transform: translate(1px, -3px) rotate(24deg);
+  }
+  39% {
+    transform: translateY(0.5px) rotate(-9deg);
+  }
+}
+@keyframes click {
+  0%,
+  26%,
+  44%,
+  100% {
+    opacity: 0;
+  }
+  27% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.86;
+  }
+  43% {
+    transform: translateX(var(--drift));
+    opacity: 0;
+  }
+}
