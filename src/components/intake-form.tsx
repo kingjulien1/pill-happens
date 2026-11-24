@@ -347,7 +347,11 @@ export function IntakeForm({
 
   if (!medications.length && !intake)
     return (
-      <form id={formId} data-intake-form className="pt-4 text-center">
+      <form
+        id={formId}
+        data-intake-form
+        className={`${styles.closingSurface} ${styles.emptySurface} pt-4 text-center`}
+      >
         <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
@@ -740,131 +744,137 @@ export function IntakeForm({
         </CheckInSection>
       </fieldset>
 
-      <div
-        className={`${checkStyles.sectionDivider} ${styles.previewDivider}`}
-        role="separator"
-      />
-      <section
-        className={styles.preview}
-        data-final-look-section
-        data-preview-empty={!hasPreview || undefined}
-        aria-labelledby="intake-preview-title"
-      >
-        {belongsTo && (medication || fallbackIntake) && (
-          <IntakePreviewSummary
-            medicationName={medication?.name ?? fallbackIntake!.medicationName}
-            count={includingDraftCount}
-            totalMg={includingDraftMg}
-            trackingDay={belongsTo}
-            isToday={belongsTo === dayKey(now ?? new Date(), timezone)}
-          />
-        )}
-        <div className={styles.previewHeading}>
-          {belongsTo && (medication || fallbackIntake) && (
-            <IntakePreviewTotals
-              count={daySummary.count}
-              includingDraftCount={includingDraftCount}
-              totalMg={daySummary.totalMg}
-              includingDraftMg={includingDraftMg}
+      <div className={`${styles.closingSurface} ${styles.closingRegion}`}>
+        <div
+          className={`${checkStyles.sectionDivider} ${styles.previewDivider}`}
+          role="separator"
+        />
+        <section
+          className={styles.preview}
+          data-final-look-section
+          data-preview-empty={!hasPreview || undefined}
+          aria-labelledby="intake-preview-title"
+        >
+          <div className={styles.previewIntro}>
+            {belongsTo && (medication || fallbackIntake) && (
+              <IntakePreviewSummary
+                medicationName={
+                  medication?.name ?? fallbackIntake!.medicationName
+                }
+                count={includingDraftCount}
+                totalMg={includingDraftMg}
+                trackingDay={belongsTo}
+                isToday={belongsTo === dayKey(now ?? new Date(), timezone)}
+              />
+            )}
+            <div className={styles.previewHeading}>
+              {belongsTo && (medication || fallbackIntake) && (
+                <IntakePreviewTotals
+                  count={daySummary.count}
+                  includingDraftCount={includingDraftCount}
+                  totalMg={daySummary.totalMg}
+                  includingDraftMg={includingDraftMg}
+                />
+              )}
+              <FinalLookHeading
+                id="intake-preview-title"
+                showIcon
+                motion={false}
+                color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
+              />
+            </div>
+          </div>
+          {belongsTo &&
+          validQuantity &&
+          effectiveQuantity !== null &&
+          route !== undefined &&
+          (medication || fallbackIntake) ? (
+            <MedicationPreview
+              record={{
+                kind: "intake",
+                name: medication?.name ?? fallbackIntake!.medicationName,
+                medication: medication
+                  ? medicationNotificationSnapshot(medication)
+                  : undefined,
+                strengthMg: strength,
+                quantity: effectiveQuantity,
+                form: medicationForm,
+                route,
+                takenAt: previewTime,
+                timeZone: timezone,
+              }}
+            />
+          ) : (
+            <IntakePreviewSkeleton />
+          )}
+        </section>
+        {error &&
+          !(error.jump?.selector === "#intake-quantity" && validQuantity) && (
+            <DialogErrorPanel
+              title={
+                error.jump
+                  ? "Before you log this dose"
+                  : "Couldn’t save this intake"
+              }
+              {...error}
             />
           )}
-          <FinalLookHeading
-            id="intake-preview-title"
-            showIcon
-            motion={false}
-            color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
-          />
-        </div>
-        {belongsTo &&
-        validQuantity &&
-        effectiveQuantity !== null &&
-        route !== undefined &&
-        (medication || fallbackIntake) ? (
-          <MedicationPreview
-            record={{
-              kind: "intake",
-              name: medication?.name ?? fallbackIntake!.medicationName,
-              medication: medication
-                ? medicationNotificationSnapshot(medication)
-                : undefined,
-              strengthMg: strength,
-              quantity: effectiveQuantity,
-              form: medicationForm,
-              route,
-              takenAt: previewTime,
-              timeZone: timezone,
-            }}
-          />
-        ) : (
-          <IntakePreviewSkeleton />
-        )}
-      </section>
-      {error &&
-        !(error.jump?.selector === "#intake-quantity" && validQuantity) && (
-          <DialogErrorPanel
-            title={
-              error.jump
-                ? "Before you log this dose"
-                : "Couldn’t save this intake"
-            }
-            {...error}
-          />
-        )}
-      <div
-        className={styles.footer}
-        data-dialog-fade-footer
-        data-draft-action-footer
-      >
-        <p id={previewHintId} className={styles.previewHint}>
-          <NotebookPen size={14} strokeWidth={1.7} aria-hidden="true" />
-          {"\u00a0"}
-          {previewHint}
-        </p>
-        <IntakePrimaryButton
-          type="submit"
-          aria-describedby={previewHintId}
-          disabled={busy || timingResetting}
-          pending={busy}
-          symbol={
-            <span className="intake-log-symbol" aria-hidden="true">
-              <Import
-                className="intake-log-symbol-pill"
-                size={23}
-                strokeWidth={3.25}
-              />
-            </span>
-          }
-          secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
-          saveOptions={{
-            kind: intake ? "edit" : "intake",
-            formId,
-            disabled: busy || timingResetting,
-          }}
-          data-intake-submit
+        <div
+          className={styles.footer}
+          data-dialog-fade-footer
+          data-draft-action-footer
         >
-          {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
-        </IntakePrimaryButton>
-        <DraftStatus {...draftFeedback} scope="intake" />
-        <div className={styles.trackingFooter} data-intake-tracking-footer>
-          {draftFeedback.restored && draftFeedback.status === "saved" && (
-            <p className={styles.restoredHelp}>
-              Your device kept these unfinished changes. Save them with the
-              button above, or choose <strong>Reset draft</strong> below to
-              discard them.
-            </p>
-          )}
-          {footerActions}
-          <div className={styles.trackingDay}>
-            <span>
-              <CalendarCheck aria-hidden="true" />
-              {belongsTo
-                ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.`
-                : "Choose a valid time."}
-            </span>
-            <span>
-              <Sunrise aria-hidden="true" />
-              Days begin at 06:00.
-            </span>
+          <p id={previewHintId} className={styles.previewHint}>
+            <NotebookPen size={14} strokeWidth={1.7} aria-hidden="true" />
+            {"\u00a0"}
+            {previewHint}
+          </p>
+          <IntakePrimaryButton
+            type="submit"
+            aria-describedby={previewHintId}
+            disabled={busy || timingResetting}
+            pending={busy}
+            symbol={
+              <span className="intake-log-symbol" aria-hidden="true">
+                <Import
+                  className="intake-log-symbol-pill"
+                  size={23}
+                  strokeWidth={3.25}
+                />
+              </span>
+            }
+            secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
+            saveOptions={{
+              kind: intake ? "edit" : "intake",
+              formId,
+              disabled: busy || timingResetting,
+            }}
+            data-intake-submit
+          >
+            {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
+          </IntakePrimaryButton>
+          <DraftStatus {...draftFeedback} scope="intake" />
+          <div className={styles.trackingFooter} data-intake-tracking-footer>
+            {draftFeedback.restored && draftFeedback.status === "saved" && (
+              <p className={styles.restoredHelp}>
+                Your device kept these unfinished changes. Save them with the
+                button above, or choose <strong>Reset draft</strong> below to
+                discard them.
+              </p>
+            )}
+            {footerActions}
+            <div className={styles.trackingDay}>
+              <span>
+                <CalendarCheck aria-hidden="true" />
+                {belongsTo
+                  ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.`
+                  : "Choose a valid time."}
+              </span>
+              <span>
+                <Sunrise aria-hidden="true" />
+                Days begin at 06:00.
+              </span>
+            </div>
           </div>
         </div>
       </div>

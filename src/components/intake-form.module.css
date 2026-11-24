@@ -49,8 +49,65 @@
   font-weight: 600;
 }
 
+.closingSurface {
+  --mauve: var(--dialog-mauve, var(--color-mauve-950, #0c090c));
+  --mauve-mid: color-mix(in srgb, var(--mauve) 44%, transparent);
+  --mauve-bottom: color-mix(in srgb, var(--mauve) 88%, transparent);
+  --mauve-base: linear-gradient(to top, var(--mauve), transparent);
+  margin-inline: calc(-1 * var(--dialog-scroll-gutter));
+  padding-inline: var(--dialog-scroll-gutter);
+  background: var(--mauve-base);
+}
+.emptySurface {
+  /* With no medication library, the introductory prompt is the upper landmark. */
+  background:
+    linear-gradient(
+      to top,
+      var(--mauve-bottom),
+      var(--mauve-mid) 50%,
+      transparent 75%
+    ),
+    var(--mauve-base);
+}
+.closingRegion {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: [divider] auto [intro] auto [card] 1fr [midpoint] 1fr [feedback] auto [actions] auto [end];
+  margin-block-start: 24px;
+}
+/* Both halves of the card size equally, so the 44% stop follows the actual
+   card midpoint even when the preview or the footer changes height. */
+.closingRegion::before,
+.closingRegion::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline: calc(-1 * var(--dialog-scroll-gutter));
+  grid-column: 1 / -1;
+  pointer-events: none;
+  z-index: -1;
+}
+.closingRegion::before {
+  grid-row: card / midpoint;
+  background: linear-gradient(to top, var(--mauve-mid), transparent);
+}
+.closingRegion::after {
+  grid-row: midpoint / end;
+  background: linear-gradient(to top, var(--mauve-bottom), var(--mauve-mid));
+}
 .previewDivider {
-  margin-block: 24px;
+  grid-row: divider;
+  margin-block-end: 48px;
+}
+.closingRegion > [data-dialog-error] {
+  grid-row: feedback;
+  margin-block-start: 24px;
+}
+.closingRegion > .footer {
+  grid-row: actions;
+  margin-block-start: 24px;
 }
 
 .preview {
@@ -61,10 +118,21 @@
     var(--color-purple-300, #d8b4fe)
   );
   display: grid;
+  grid-row: intro / feedback;
+  grid-template-rows: subgrid;
   /* Bound the track before the card's ingredient and dose share its width. */
   grid-template-columns: minmax(0, 1fr);
-  gap: 13.5px;
   min-width: 0;
+}
+.previewIntro {
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 13.5px;
+  padding-block-end: 13.5px;
+}
+.preview > :last-child {
+  grid-row: 2 / span 2;
 }
 .preview[data-preview-empty="true"] {
   --preview-empty-surface: var(--color-mauve-600, #594c5b);
@@ -72,6 +140,22 @@
   --preview-empty-muted: var(--color-mauve-200, #e8e3e8);
   /* Reduce the entire empty section by 7/18, keeping its internal hierarchy. */
   opacity: calc(11 / 18);
+}
+@supports not (grid-template-rows: subgrid) {
+  .preview {
+    display: contents;
+  }
+  .previewIntro {
+    grid-row: intro;
+  }
+  .preview > :last-child {
+    grid-row: card / feedback;
+  }
+  /* The wrapper has no paint box here. Retain the empty preview's dimming
+     independently of the card's own animated opacity. */
+  .preview[data-preview-empty="true"] > * {
+    filter: opacity(calc(11 / 18));
+  }
 }
 .preview > [data-notification-snapshot-card] {
   min-width: 0;
