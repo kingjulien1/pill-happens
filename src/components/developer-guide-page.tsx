@@ -2118,6 +2118,10 @@ export function DeveloperGuidePage() {
                 same 14px bold amounts and 10px labels/units on both sides. The
                 full-width row has a 12px gap before the badge; the weekday and
                 medication-log count remain in their own summary above it.
+                Each total also has a log count directly underneath, reduced by
+                one third in type size, weight and opacity. The After count adds
+                one for a new intake, replaces an edited intake already on the
+                selected day, and remains unknown while the draft dose is invalid.
                 Color chips use the selected pigment at 40% and a
                 matching family-900 ink, including a neutral fallback. The
                 preview shows quantity and per-unit strength as 2 tablets / 20

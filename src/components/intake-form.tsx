@@ -299,7 +299,12 @@ export function IntakeForm({
 
   const daySummary = useMemo(() => {
     if (!belongsTo || !medicationId)
-      return { count: 0, totalMg: 0, excludingEditedMg: 0 };
+      return {
+        count: 0,
+        totalMg: 0,
+        excludingEditedMg: 0,
+        excludingEditedCount: 0,
+      };
     const saved = totalsForDay(data!, belongsTo).find(
       (total) => total.medicationId === medicationId,
     );
@@ -313,6 +318,7 @@ export function IntakeForm({
     return {
       count: saved?.count ?? 0,
       totalMg,
+      excludingEditedCount: Math.max(0, (saved?.count ?? 0) - (edited ? 1 : 0)),
       excludingEditedMg: Number(
         (totalMg - (edited ? doseMg(edited) : 0)).toFixed(8),
       ),
@@ -322,6 +328,8 @@ export function IntakeForm({
     calculatedDose === null
       ? null
       : Number((daySummary.excludingEditedMg + calculatedDose).toFixed(8));
+  const includingDraftCount =
+    includingDraftMg === null ? null : daySummary.excludingEditedCount + 1;
 
   if (!medications.length && !intake)
     return (
@@ -685,6 +693,8 @@ export function IntakeForm({
         <div className={styles.previewHeading}>
           {belongsTo && (medication || fallbackIntake) && (
             <IntakePreviewTotals
+              count={daySummary.count}
+              includingDraftCount={includingDraftCount}
               totalMg={daySummary.totalMg}
               includingDraftMg={includingDraftMg}
             />
