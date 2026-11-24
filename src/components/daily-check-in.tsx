@@ -16,6 +16,7 @@ import { toast } from "@/components/ui/journal-toast";
 import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
+import { isSaveAndStay } from "@/components/save-options";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { CheckInCardBorder as SpecularCardBorder } from "@/components/check-in-card-border";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
@@ -626,11 +627,7 @@ function CheckInForm({
       className={styles.form}
       onSubmit={(event) => {
         event.preventDefault();
-        void save(
-          (event.nativeEvent as SubmitEvent).submitter?.getAttribute(
-            "value",
-          ) === "stay",
-        );
+        void save(isSaveAndStay(event));
       }}
       onReset={(event) => {
         event.preventDefault();
@@ -779,7 +776,7 @@ function CheckInForm({
       >
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
           <IntakePrimaryButton
-            saveOptions={{ kind: "check-in", formId, disabled: locked }}
+            saveOptions={{ kind: "check-in", period, formId, disabled: locked }}
             type="submit"
             disabled={locked}
             pending={locked}

@@ -21,6 +21,8 @@ import { useSearchParams } from "next/navigation";
 import { ArrowUpRight, FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { isSaveAndStay, SaveOptions } from "@/components/save-options";
+import { sameDraftRevision } from "@/lib/journal-drafts";
 import { toast } from "@/components/ui/journal-toast";
 import {
   goalNotificationSnapshot,
@@ -660,6 +662,7 @@ export function MedicationsPage() {
     dialog,
     openDialog,
     closeDialog,
+    openingAnchor,
     ready: workspaceReady,
   } = useJournalWorkspace();
   const medicationDialog =
@@ -956,6 +959,7 @@ export function MedicationsPage() {
           if (!next && medicationDialog) closeDialog(medicationDialog);
         }}
         scrollKey={editing ? `med:edit:${editing.id}` : "med:new"}
+        openingAnchor={openingAnchor}
         returnFocus={() => {
           const opener = medicationOpener.current;
           // Status changes can reorder a card; keep a stable keyboard target.
@@ -1291,6 +1295,9 @@ export function GoalsPage() {
 
 function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
   const { data, mutate, busy } = useJournal();
+  const formId = useId();
+  const saving = useRef(false);
+  const { store } = useJournalWorkspace();
   const draft = usePersistentDraft(
     "preferences",
     () => ({ timezone: data!.settings.timezone }),
@@ -1298,9 +1305,14 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
   );
   return (
     <form
+      id={formId}
       className="space-y-4"
       onSubmit={async (event) => {
         event.preventDefault();
+        if (busy || saving.current) return;
+        saving.current = true;
+        const stay = isSaveAndStay(event);
+        const submitted = store.getSnapshot().drafts.preferences;
         const beforePreview = data
           ? { kind: "timezone" as const, timeZone: data.settings.timezone }
           : undefined;
@@ -1310,7 +1322,11 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
             { timezone: draft.value.timezone },
             "PATCH",
           );
-          draft.clearDraft();
+          store.synchronize();
+          if (sameDraftRevision(submitted, store.getSnapshot().drafts.preferences)) {
+            if (stay) draft.resetDraft({ timezone: saved.data.settings.timezone });
+            else draft.clearDraft();
+          }
           toast.success("Timezone updated for your journal.", {
             journalScope: saved.notificationScope,
             ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
@@ -1345,9 +1361,11 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
                 }
               : {}),
           });
-          onSaved();
+          if (!stay) onSaved();
         } catch {
           /* The provider displays the error; the draft stays available. */
+        } finally {
+          saving.current = false;
         }
       }}
     >
@@ -1384,14 +1402,17 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
       </div>
 
       <div className="flex w-full flex-col gap-2" data-draft-action-footer>
-        <DialogPrimaryButton
-          className="w-full"
-          type="submit"
-          disabled={busy}
-          pending={busy}
-        >
-          {busy ? "Saving preferences…" : "Save preferences"}
-        </DialogPrimaryButton>
+        <div className="relative w-full">
+          <DialogPrimaryButton
+            className="w-full"
+            type="submit"
+            disabled={busy}
+            pending={busy}
+          >
+            {busy ? "Saving preferences…" : "Save preferences"}
+          </DialogPrimaryButton>
+          <SaveOptions kind="preferences" formId={formId} disabled={busy} />
+        </div>
         <DraftStatus
           hasDraft={draft.hasDraft}
           status={draft.status}

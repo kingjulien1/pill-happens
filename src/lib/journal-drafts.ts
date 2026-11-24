@@ -23,6 +23,18 @@ export type RememberedDialog = {
 
 export type DraftStorageStatus = "saved" | "memory" | "error";
 type DraftRecord = { value: unknown; updatedAt: number };
+
+/** A completed save may clear only the revision that was submitted. */
+export function sameDraftRevision(
+  submitted: DraftRecord | undefined,
+  current: DraftRecord | undefined,
+) {
+  if (!submitted || !current) return submitted === current;
+  return (
+    submitted.updatedAt === current.updatedAt &&
+    JSON.stringify(submitted.value) === JSON.stringify(current.value)
+  );
+}
 type ScreenRecord = {
   dialog: RememberedDialog | null;
   dialogInstance: number;

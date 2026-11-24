@@ -6,6 +6,7 @@ import {
   useEffect,
   useId,
   useImperativeHandle,
+  useRef,
   useState,
   type FormEvent,
   type Ref,
@@ -14,6 +15,8 @@ import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import type { SymbolSourceFilter } from "@/lib/medication-symbol-browser";
 import { MedicationActionButton } from "@/components/medication-action-button";
+import { isSaveAndStay, SaveOptions } from "@/components/save-options";
+import { sameDraftRevision } from "@/lib/journal-drafts";
 import {
   ChoiceMenuHeader,
   ChoiceOptionContent,
@@ -46,7 +49,11 @@ import {
   savedNotificationRecord,
 } from "@/lib/notification-change-preview";
 import { useJournal } from "@/components/journal-provider";
-import { DraftStatus, usePersistentDraft } from "@/components/journal-drafts";
+import {
+  DraftStatus,
+  useJournalWorkspace,
+  usePersistentDraft,
+} from "@/components/journal-drafts";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -186,6 +193,8 @@ export function MedicationForm({
   onDraftAvailabilityChange?: (state: MedicationDraftAvailability) => void;
 }) {
   const { data, mutate, busy } = useJournal();
+  const { openDialog, store } = useJournalWorkspace();
+  const saving = useRef(false);
   const id = useId();
   const draftKey = medication ? `med:edit:${medication.id}` : "med:new";
   const draft = usePersistentDraft(
@@ -242,7 +251,13 @@ export function MedicationForm({
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busy || saving.current) return;
+    const stay = isSaveAndStay(event);
+    const viewportTop = stay
+      ? event.currentTarget
+          .querySelector("[data-medication-submit]")
+          ?.getBoundingClientRect().top
+      : undefined;
     setError(null);
     const strengthMg = Number(strength);
     const quantity = Number(defaultQuantity);
@@ -266,6 +281,8 @@ export function MedicationForm({
       setError(iconError);
       return;
     }
+    saving.current = true;
+    const submitted = store.getSnapshot().drafts[draftKey];
     try {
       const beforePreview = medication
         ? {
@@ -295,7 +312,17 @@ export function MedicationForm({
         saved.data.medications,
         saved.entityId ?? medication?.id,
       );
-      draft.clearDraft();
+      store.synchronize();
+      if (sameDraftRevision(submitted, store.getSnapshot().drafts[draftKey])) {
+        if (stay && medication && savedMedication) {
+          draft.resetDraft({
+            ...medicationDefaults(savedMedication),
+            searchQuery,
+            symbolSource,
+            previewMotion,
+          });
+        } else draft.clearDraft();
+      }
       toast.success(medication ? "Medication updated." : "Medication added.", {
         journalScope: saved.notificationScope,
         ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
@@ -348,14 +375,23 @@ export function MedicationForm({
             }
           : {}),
       });
-      onSaved();
+      if (stay && savedMedication && viewportTop !== undefined) {
+        if (!medication) {
+          openDialog(
+            { kind: "medication-edit", id: savedMedication.id },
+            { selector: "[data-medication-submit]", viewportTop },
+          );
+        }
+      } else onSaved();
     } catch {
       // The journal provider explains failed saves and keeps the form available.
+    } finally {
+      saving.current = false;
     }
   }
 
   return (
-    <form onSubmit={save} className="flex min-w-0 flex-col gap-4">
+    <form id={id} onSubmit={save} className="flex min-w-0 flex-col gap-4">
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
         <div
           className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(128px,1fr)] items-end gap-3"
@@ -527,7 +563,19 @@ export function MedicationForm({
 
       <div className="w-full space-y-3 pt-1" data-medication-save-footer>
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
-          <MedicationActionButton intent="save" type="submit" pending={busy} />
+          <div className="relative w-full">
+            <MedicationActionButton
+              intent="save"
+              type="submit"
+              pending={busy}
+              data-medication-submit
+            />
+            <SaveOptions
+              kind={medication ? "medication-edit" : "medication-new"}
+              formId={id}
+              disabled={busy}
+            />
+          </div>
           <DraftStatus {...draft} />
         </div>
       </div>

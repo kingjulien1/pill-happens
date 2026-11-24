@@ -1,6 +1,6 @@
 import { isCheckInDraft, type CheckInDraft } from "./check-in-draft";
 
-type DraftRecord = { value: unknown; updatedAt: number };
+export { sameDraftRevision as checkInSubmissionDraftUnchanged } from "./journal-drafts";
 
 /** Compare submitted fields, leaving editor state and autosave metadata aside. */
 function content(draft: CheckInDraft) {
@@ -39,16 +39,4 @@ export function prepareCheckInSubmission(
     // draft base: that would silently authorize overwriting different writing.
     reflectionBaseUpdatedAt: latest.reflectionBaseUpdatedAt,
   };
-}
-
-/** A successful response must not discard another tab's newer draft edits. */
-export function checkInSubmissionDraftUnchanged(
-  submitted: DraftRecord | undefined,
-  current: DraftRecord | undefined,
-) {
-  if (!submitted || !current) return submitted === current;
-  return (
-    submitted.updatedAt === current.updatedAt &&
-    JSON.stringify(submitted.value) === JSON.stringify(current.value)
-  );
 }

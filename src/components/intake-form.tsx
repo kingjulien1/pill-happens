@@ -15,6 +15,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
+import { isSaveAndStay } from "@/components/save-options";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
@@ -365,9 +366,7 @@ export function IntakeForm({
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy || timingResetting || submitPending.current) return;
-    const stay =
-      (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value") ===
-      "stay";
+    const stay = isSaveAndStay(event);
     const form = event.currentTarget;
     const viewportTop = stay
       ? form.querySelector("[data-intake-submit]")?.getBoundingClientRect().top
