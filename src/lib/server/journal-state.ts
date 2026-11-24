@@ -4,9 +4,18 @@ import {
   applyCompensanIconUpdate,
   needsCompensanIconUpdate,
 } from "@/lib/compensan-appearance";
+import {
+  applyTramalIconUpdate,
+  needsTramalIconUpdate,
+} from "@/lib/tramal-appearance";
 import type { JournalRepository } from "./journal-repository";
 
 type StateRepository = Pick<JournalRepository, "readState" | "mutateState">;
+
+function applyAppearanceUpdates(state: AppData) {
+  applyCompensanIconUpdate(state);
+  applyTramalIconUpdate(state);
+}
 
 /** State and backup reads immediately include edits made before this policy. */
 export async function readJournalState(
@@ -14,9 +23,9 @@ export async function readJournalState(
   journalId: string,
 ): Promise<AppData> {
   const state = await repository.readState(journalId);
-  if (needsCompensanIconUpdate(state))
+  if (needsCompensanIconUpdate(state) || needsTramalIconUpdate(state))
     return withCurrentMedicationDetails(
-      await repository.mutateState(journalId, applyCompensanIconUpdate),
+      await repository.mutateState(journalId, applyAppearanceUpdates),
     );
   return withCurrentMedicationDetails(state);
 }
@@ -31,7 +40,7 @@ export function mutateJournalState(
   mutate: (state: AppData) => void,
 ): Promise<AppData> {
   return repository.mutateState(journalId, (state) => {
-    applyCompensanIconUpdate(state);
+    applyAppearanceUpdates(state);
     state.intakes = withCurrentMedicationDetails(state).intakes;
     mutate(state);
     state.intakes = withCurrentMedicationDetails(state).intakes;

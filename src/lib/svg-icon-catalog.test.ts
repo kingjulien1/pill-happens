@@ -10,7 +10,7 @@ import {
 import { EMOJI_CATALOG } from "./emoji-catalog";
 import { normalizeIconQuery } from "./icon-names";
 import { LUCIDE_ICON_NAMES } from "./lucide-icon-names";
-import { TABLET_SHAPES } from "./tablet-icons/geometry";
+import { TABLET_SHAPES, getTabletColorNodes } from "./tablet-icons/geometry";
 import {
   getSvgIcon,
   getSvgIconAssetUrl,
@@ -63,7 +63,9 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
         ? `${entry.src}?v=facets-2`
         : entry.value === "svg:viagra" || entry.value === "svg:color:viagra"
           ? `${entry.src}?v=imprint-2`
-          : entry.src,
+          : entry.shape === "tramal"
+            ? `${entry.src}?v=bottle-2`
+            : entry.src,
       `${entry.value}: runtime URL revisions must preserve canonical paths and IDs`,
     );
     assert.ok(entry.label.length > 0);
@@ -120,13 +122,19 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
       const paints = [...visible.matchAll(/(?:fill|stroke)="([^"]+)"/g)]
         .map(([, color]) => color)
         .filter((color) => color !== "none" && color !== "currentColor");
-      assert.deepEqual([...new Set(paints)], [entry.color.hex]);
+      const colorNodes = entry.shape && getTabletColorNodes(entry.shape);
+      assert.deepEqual(
+        [...new Set(paints)],
+        colorNodes
+          ? [...new Set(colorNodes.map(([, attrs]) => attrs.fill))]
+          : [entry.color.hex],
+      );
       assert.doesNotMatch(svg, /\b(?:opacity|fill-opacity|stroke-opacity)=/);
     }
   }
 });
 
-test("all colored glyphs render inline vectors with independent transparent cutouts", () => {
+test("colored glyphs preserve fixed painted layers or independent transparent cutouts", () => {
   const colors = SVG_ICON_CATALOG.filter(({ variant }) => variant === "color");
   // Repeat shapes in one document, as happens in quantity fans and the picker.
   const entries = [...colors, colors[0], colors[0]];
@@ -160,6 +168,17 @@ test("all colored glyphs render inline vectors with independent transparent cuto
     assert.match(svg, /focusable="false"/);
     assert.ok(svg.includes(`data-medication-svg="${entry.value}"`));
     assert.ok(svg.includes(`fill="${entry.color.hex}"`));
+    const colorNodes = getTabletColorNodes(entry.shape);
+    if (colorNodes) {
+      assert.doesNotMatch(
+        svg,
+        /<(?:mask|image|canvas|foreignObject|filter)\b|\b(?:href|src)=/i,
+      );
+      assert.equal([...svg.matchAll(/<(?:path|rect)\b/g)].length, 5);
+      for (const pigment of ["#874817", "#AAB3B9", "#FFF8EB", "#16AD81"])
+        assert.ok(svg.includes(`fill="${pigment}"`));
+      return;
+    }
     assert.match(svg, /maskUnits="userSpaceOnUse"/);
     assert.match(svg, /maskContentUnits="userSpaceOnUse"/);
     assert.match(svg, /mask-type:luminance/);

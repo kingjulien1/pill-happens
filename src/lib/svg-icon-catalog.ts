@@ -382,7 +382,9 @@ export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = [
         ? "facets-2"
         : entry.shape === "viagra"
           ? "imprint-2"
-          : undefined,
+          : entry.shape === "tramal"
+            ? "bottle-2"
+            : undefined,
     label: tabletIconLabel(entry.slug),
     aliases: [
       ...entry.aliases,

@@ -13,6 +13,7 @@ import {
 
 import { recordNotificationContent } from "@/lib/record-notification-content";
 import { updateCompensanNotification } from "@/lib/compensan-appearance";
+import { updateTramalNotification } from "@/lib/tramal-appearance";
 import { toast as sonnerToast, type ExternalToast, type ToastT } from "sonner";
 import {
   JournalNotification,
@@ -544,8 +545,8 @@ export function bindJournalNotifications(
   };
   active = binding;
   const restore = (record: SavedNotice) => {
-    const descriptor = updateCompensanNotification(
-      record.descriptor,
+    const descriptor = updateTramalNotification(
+      updateCompensanNotification(record.descriptor, record.createdAt),
       record.createdAt,
     );
     const readingClock = holdUnseen(NotificationClock.restore(record.clock));

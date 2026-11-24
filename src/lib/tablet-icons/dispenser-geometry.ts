@@ -1,5 +1,57 @@
 import type { IconNode } from "lucide-react";
 
+/** The supplied tramal-bottle.svg, preserved as five flat painted vector layers. */
+const tramalColorNodes: IconNode = [
+  [
+    "path",
+    {
+      fill: "#874817",
+      d: "M9 8h6v2c0 .8.4 1.2 1.1 1.5 1.8.9 2.9 2.4 2.9 4.2V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4.3c0-1.8 1.1-3.3 2.9-4.2C8.6 11.2 9 10.8 9 10Z",
+      key: "bottle",
+    },
+  ],
+  [
+    "rect",
+    {
+      x: "8",
+      y: "7",
+      width: "8",
+      height: "2.5",
+      rx: "1",
+      fill: "#AAB3B9",
+      key: "collar",
+    },
+  ],
+  [
+    "path",
+    {
+      fill: "#FFF8EB",
+      d: "M9 7.4V4a2 2 0 0 1 2-2h2a2 2 0 0 1 1.8 1.1H18c.7 0 1.3.4 1.6 1l1 2a.8.8 0 0 1-1.4.7l-1-1.3H15v1.9Z",
+      key: "pump",
+    },
+  ],
+  [
+    "rect",
+    {
+      x: "6.5",
+      y: "14",
+      width: "11",
+      height: "6",
+      rx: "1",
+      fill: "#FFF8EB",
+      key: "label",
+    },
+  ],
+  [
+    "path",
+    {
+      fill: "#16AD81",
+      d: "M6.5 17h11v2a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1Z",
+      key: "label-band",
+    },
+  ],
+];
+
 /**
  * Centered dispenser silhouettes in Lucide's 24px viewport. The first node is
  * one closed outer body, including the pump; subsequent nodes are cutout detail.
@@ -9,30 +61,29 @@ export const DISPENSER_SHAPES = {
   tramal: {
     componentName: "Tramal",
     aliases: ["tramal", "metered-pump-bottle", "dosierpumpen-flasche"],
+    colorNodes: tramalColorNodes,
     nodes: [
       [
         "path",
         {
-          d: "M9.5 2H13a1 1 0 0 1 1 1v.5h2.5a1 1 0 0 1 1 1V6H16v-.5h-2V7h-.75V9H14v2c0 1.5 3.5 1.5 3.5 5v4a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-4c0-3.5 3.5-3.5 3.5-5V9h.75V7H9.5Z",
+          d: "M9 7V4a2 2 0 0 1 2-2h2a2 2 0 0 1 1.8 1.1H18c.7 0 1.3.4 1.6 1l1 2a.8.8 0 0 1-1.4.7l-1-1.3H15V7h.25a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-.75.75H15V10c0 .8.4 1.2 1.1 1.5 1.8.9 2.9 2.4 2.9 4.2V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4.3c0-1.8 1.1-3.3 2.9-4.2C8.6 11.2 9 10.8 9 10v-.5h-.25A.75.75 0 0 1 8 8.75v-1A.75.75 0 0 1 8.75 7Z",
           key: "body",
         },
       ],
-      [
-        "path",
-        { d: "M9.5 7H14M10 9h4M10 11h4", strokeWidth: "1", key: "collar" },
-      ],
+      ["path", { d: "M9 7h6M9 9.5h6", strokeWidth: "1", key: "collar" }],
       [
         "rect",
         {
-          x: "8.75",
-          y: "15.5",
-          width: "6.5",
-          height: "4",
-          rx: "0.75",
+          x: "6.5",
+          y: "14",
+          width: "11",
+          height: "6",
+          rx: "1",
           strokeWidth: "1",
           key: "label",
         },
       ],
+      ["path", { d: "M6.5 17h11", strokeWidth: "1", key: "label-band" }],
     ],
   },
   testavan: {
@@ -63,5 +114,10 @@ export const DISPENSER_SHAPES = {
   },
 } satisfies Record<
   string,
-  { componentName: string; aliases: readonly string[]; nodes: IconNode }
+  {
+    componentName: string;
+    aliases: readonly string[];
+    nodes: IconNode;
+    colorNodes?: IconNode;
+  }
 >;

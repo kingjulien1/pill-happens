@@ -17,6 +17,7 @@ import {
   COMPENSAN_ICON,
   isCompensanMedicationName,
 } from "@/lib/compensan-appearance";
+import { isTramalMedicationName, TRAMAL_ICON } from "@/lib/tramal-appearance";
 import { getMedicationClassification } from "@/lib/medication-classification";
 import {
   getMedicationType,
@@ -111,7 +112,9 @@ export function MedicationCard({
         medication?.icon ??
         (!medication && isCompensanMedicationName(name)
           ? COMPENSAN_ICON
-          : undefined)
+          : !medication && isTramalMedicationName(name)
+            ? TRAMAL_ICON
+            : undefined)
       }
       iconRotation={medication?.iconRotation}
       quantity={quantity}

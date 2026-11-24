@@ -5,6 +5,7 @@ import { format } from "prettier";
 import { TABLET_ARTWORK } from "../src/lib/tablet-icons/artwork";
 import {
   TABLET_SHAPES,
+  getTabletColorNodes,
   type TabletIconNode,
 } from "../src/lib/tablet-icons/geometry";
 
@@ -45,7 +46,12 @@ async function main() {
     let contents = TABLET_SHAPES[artwork.shape].nodes
       .map((part) => node(part))
       .join("\n");
-    if (artwork.variant === "color") {
+    const colorNodes = getTabletColorNodes(artwork.shape);
+    if (artwork.variant === "color" && colorNodes) {
+      contents = colorNodes
+        .map((part) => node(part, { stroke: "none" }))
+        .join("\n");
+    } else if (artwork.variant === "color") {
       const maskId = `${artwork.slug}-cutouts`;
       const silhouette = node(body, { fill: "white", stroke: "white" });
       const cutouts = marks

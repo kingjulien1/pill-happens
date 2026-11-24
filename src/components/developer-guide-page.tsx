@@ -2759,12 +2759,22 @@ export function DeveloperGuidePage() {
                 custom SVG choices: 16 original tintable drawings, 21 tablet or
                 dispenser outlines and 22 fixed-color variants. The colored
                 variants render inline from shared <code>TABLET_SHAPES</code>
-                geometry and fixed catalog palettes. Each instance owns unique
-                local SVG mask IDs and luminance masks for transparent imprints
+                geometry and fixed catalog palettes. Single-pigment instances
+                own unique local SVG mask IDs and luminance masks for transparent imprints
                 and score lines. Existing stored IDs, colors, filenames and
                 aliases remain stable; the Compensan pair is additive.
                 Every asset remains vector geometry, with no bitmap conversion
                 or font dependency.
+              </p>
+              <p>
+                Tramal’s Color choice preserves the supplied pump-bottle SVG’s
+                five painted layers: amber glass, silver collar, cream pump and
+                label, and green label stripe. Its matching outline shares the
+                bottle proportions. Stable Tramal icon IDs now use these revised
+                assets; existing active and archived Tramal records update once
+                during an authenticated journal load or save. Linked intake
+                history and older notification snapshots follow the new icon,
+                without changing doses, timestamps, notes or Undo receipts.
               </p>
               <p>
                 Compensan has separate SVG and Color choices. Both reuse the

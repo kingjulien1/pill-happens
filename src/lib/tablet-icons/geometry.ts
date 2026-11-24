@@ -7,6 +7,7 @@ type TabletShape = {
   componentName: string;
   aliases: readonly string[];
   nodes: TabletIconNode;
+  colorNodes?: TabletIconNode;
 };
 
 function round(radius: number): TabletIconNode {
@@ -271,3 +272,9 @@ export const TABLET_SHAPES = {
 } satisfies Record<string, TabletShape>;
 
 export type TabletShapeName = keyof typeof TABLET_SHAPES;
+
+/** Some supplied artwork owns multiple pigments instead of a single cutout mask. */
+export function getTabletColorNodes(shape: TabletShapeName) {
+  const definition: TabletShape = TABLET_SHAPES[shape];
+  return definition.colorNodes;
+}

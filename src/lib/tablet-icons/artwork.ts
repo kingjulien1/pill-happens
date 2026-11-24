@@ -25,7 +25,7 @@ export const TABLET_COLORS = {
   viagra: { name: "Blue 400", hex: "#51a2ff" },
   tadalafil5: { name: "Amber 400", hex: "#ffb900" },
   tadalafil10: { name: "Blue 600", hex: "#155dfc" },
-  tramal: { name: "Amber 700", hex: "#bb4d00" },
+  tramal: { name: "Amber bottle", hex: "#874817" },
   violet: { name: "Violet 300", hex: "#c4b4ff" },
   desloratadin: { name: "Sky 400", hex: "#00bcff" },
   // Equal Red400/Orange300 OKLab hue, raised to a gamut-adjusted 500 intensity:

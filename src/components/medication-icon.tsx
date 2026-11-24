@@ -48,6 +48,7 @@ import { getSvgIcon, type SvgMedicationIconName } from "@/lib/svg-icon-catalog";
 import type { TABLET_ARTWORK } from "@/lib/tablet-icons/artwork";
 import {
   TABLET_SHAPES,
+  getTabletColorNodes,
   type TabletShapeName,
 } from "@/lib/tablet-icons/geometry";
 import {
@@ -386,6 +387,7 @@ function ColoredTabletGlyph({
   const instance = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const maskId = `medication-${shape}-${instance}`;
   const [body, ...details] = TABLET_SHAPES[shape].nodes;
+  const colorNodes = getTabletColorNodes(shape);
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -404,32 +406,38 @@ function ColoredTabletGlyph({
       data-tablet-variant="color"
       className={cn("size-6 shrink-0", className)}
     >
-      <defs>
-        <mask
-          id={maskId}
-          maskUnits="userSpaceOnUse"
-          maskContentUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width="24"
-          height="24"
-          style={{ maskType: "luminance" }}
-        >
-          {createElement(body[0], {
-            ...body[1],
-            fill: "white",
-            stroke: "white",
-          })}
-          {details.map(([tag, attributes]) =>
-            createElement(tag, {
-              ...attributes,
-              fill: "none",
-              stroke: "black",
-            }),
-          )}
-        </mask>
-      </defs>
-      <rect width="24" height="24" fill={color} mask={`url(#${maskId})`} />
+      {colorNodes ? (
+        colorNodes.map(([tag, attributes]) => createElement(tag, attributes))
+      ) : (
+        <>
+          <defs>
+            <mask
+              id={maskId}
+              maskUnits="userSpaceOnUse"
+              maskContentUnits="userSpaceOnUse"
+              x="0"
+              y="0"
+              width="24"
+              height="24"
+              style={{ maskType: "luminance" }}
+            >
+              {createElement(body[0], {
+                ...body[1],
+                fill: "white",
+                stroke: "white",
+              })}
+              {details.map(([tag, attributes]) =>
+                createElement(tag, {
+                  ...attributes,
+                  fill: "none",
+                  stroke: "black",
+                }),
+              )}
+            </mask>
+          </defs>
+          <rect width="24" height="24" fill={color} mask={`url(#${maskId})`} />
+        </>
+      )}
     </svg>
   );
 }
