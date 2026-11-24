@@ -1,0 +1,107 @@
+.panel {
+  --alert-line: var(--color-amber-400, #ffb900);
+  --alert-title: var(--color-amber-100, #fef3c6);
+  --alert-copy: #ffd39f;
+  --alert-accent: var(--color-orange-600, #ea580c);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 12px 14px;
+  text-align: start;
+  color: var(--alert-copy);
+  background: linear-gradient(105deg, #493025, #32212b 75%);
+  border: 1px solid color-mix(in srgb, var(--alert-line) 32%, transparent);
+  border-radius: 14px;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 10px;
+  color: var(--alert-line);
+  border: 1px solid color-mix(in srgb, var(--alert-line) 40%, transparent);
+  background: color-mix(in srgb, var(--alert-accent) 17%, transparent);
+  box-shadow: inset 0 -2px
+    color-mix(in srgb, var(--alert-accent) 55%, transparent);
+}
+.body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.title {
+  display: block;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 680;
+  color: var(--alert-title);
+}
+.message {
+  margin: 3px 0 0;
+  color: var(--alert-copy);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 12px;
+  margin-top: 6px;
+}
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 2px 0;
+  border-radius: 4px;
+  color: var(--alert-title);
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 625;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.actions button:hover {
+  text-decoration-color: currentColor;
+}
+.actions button:first-child {
+  padding-inline: 9px;
+  border: 1px solid color-mix(in srgb, var(--alert-line) 38%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--alert-line) 10%, transparent);
+  text-decoration: none;
+}
+.actions button:first-child:hover {
+  background: color-mix(in srgb, var(--alert-line) 18%, transparent);
+}
+.actions button:focus-visible {
+  outline: 2px solid var(--alert-line);
+  outline-offset: 3px;
+}
+@media (prefers-color-scheme: light) {
+  .panel {
+    --alert-title: #562e17;
+    --alert-copy: #704321;
+    --alert-line: #a95015;
+    background: linear-gradient(105deg, #ffebcf, #fff5e7 75%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .panel {
+    animation: arrive 180ms ease-out both;
+  }
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

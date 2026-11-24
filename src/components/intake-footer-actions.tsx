@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogErrorPanel } from "./dialog-error-panel";
+
 import { useEffect, useId, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -271,9 +273,14 @@ export function IntakeFooterActions({
               : "The daily total updates after deletion. You can restore this entry with Undo in the notification."}
           </p>
           {error && (
-            <p role="alert" className={styles.error}>
-              {error}
-            </p>
+            <DialogErrorPanel
+              title={
+                reset
+                  ? "Couldn’t reset the draft"
+                  : "Couldn’t delete this intake"
+              }
+              message={error}
+            />
           )}
           <div className={styles.buttons}>
             <button

@@ -243,10 +243,6 @@
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
-.error {
-  color: var(--color-rose-200);
-  font-size: 12px;
-}
 .panel[data-scene="done"] :is(.page, .mark) {
   opacity: 0;
 }

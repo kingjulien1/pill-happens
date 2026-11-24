@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogErrorPanel } from "./dialog-error-panel";
+
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { ResponsiveModal } from "@/components/responsive-modal";
@@ -257,13 +259,11 @@ export function LoginForm() {
             At least 4 characters. Each password has its own journal.
           </p>
           {error && (
-            <p
+            <DialogErrorPanel
               id="login-error"
-              role="alert"
-              className="text-sm leading-relaxed text-destructive"
-            >
-              {error}
-            </p>
+              title="Couldn’t open your journal"
+              message={error}
+            />
           )}
         </div>
         <DialogPrimaryButton
@@ -361,12 +361,10 @@ export function LoginForm() {
               stay separate.
             </p>
             {creationError && (
-              <p
-                role="alert"
-                className="rounded-[var(--dialog-radius-control)] border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-xs leading-relaxed text-destructive"
-              >
-                {creationError}
-              </p>
+              <DialogErrorPanel
+                title="Couldn’t create the journal"
+                message={creationError}
+              />
             )}
             <div className="flex flex-col gap-2">
               <DialogPrimaryButton

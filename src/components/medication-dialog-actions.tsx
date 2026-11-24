@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogErrorPanel } from "./dialog-error-panel";
+
 import { useEffect, useId, useRef, useState } from "react";
 import { ActionIcon } from "@/components/action-icon";
 import { Button } from "@/components/ui/button";
@@ -216,9 +218,14 @@ export function MedicationDialogActions({
             </DialogDescription>
           </DialogHeader>
           {error && (
-            <p role="alert" className={styles.error}>
-              {error}
-            </p>
+            <DialogErrorPanel
+              title={
+                reset
+                  ? "Couldn’t reset the draft"
+                  : "Couldn’t change medication status"
+              }
+              message={error}
+            />
           )}
           <div className={styles.footer}>
             <DialogClose

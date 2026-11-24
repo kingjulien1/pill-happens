@@ -16,6 +16,7 @@ import { toast } from "@/components/ui/journal-toast";
 import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
+import { DialogErrorPanel } from "./dialog-error-panel";
 import { isSaveAndStay } from "@/components/save-options";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { CheckInCardBorder as SpecularCardBorder } from "@/components/check-in-card-border";
@@ -458,10 +459,12 @@ function CheckInForm({
       helped: serializeReminders(items),
       helpedList: items,
     }));
-  const [error, setError] = useState("");
+  const [issue, setIssue] = useState<
+    "empty" | "sleep" | { message: string } | null
+  >(null);
   const reset = () => {
     draft.resetDraft(checkInDefaults(checkIn, period));
-    setError("");
+    setIssue(null);
   };
   const hasContent =
     note.trim() ||
@@ -470,23 +473,21 @@ function CheckInForm({
     stress !== null ||
     helped.trim() ||
     (morning && hasMorningSleepContent(morningSleep));
+  const sleepError =
+    issue === "sleep" ? parseMorningSleepDraft(morningSleep).error : null;
 
   async function save(stayOpen = false) {
     if (locked || saveInFlight.current) return;
     const parsedMorning = morning ? parseMorningSleepDraft(morningSleep) : null;
     if (parsedMorning?.error) {
-      setError(parsedMorning.error);
+      setIssue("sleep");
       return;
     }
     if (!hasContent) {
-      setError(
-        morning
-          ? "Add a few words, a sleep rating, or one detail before saving."
-          : "Add writing, a mood, or another detail before saving.",
-      );
+      setIssue("empty");
       return;
     }
-    setError("");
+    setIssue(null);
     saveInFlight.current = true;
     setSubmitting(true);
     let saved = false;
@@ -609,11 +610,12 @@ function CheckInForm({
       if (!stayOpen) onSaved();
     } catch (error) {
       // Server conflicts and concurrent local edits both keep the full draft.
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Your check-in could not be saved. Your draft is still kept here.",
-      );
+      setIssue({
+        message:
+          error instanceof Error
+            ? error.message
+            : "Your check-in could not be saved. Your draft is still kept here.",
+      });
     } finally {
       saveInFlight.current = false;
       if (!saved || stayOpen) {
@@ -766,10 +768,42 @@ function CheckInForm({
         </div>
       )}
 
-      {error && (
-        <p className={styles.error} role="alert">
-          {error}
-        </p>
+      {issue === "empty" && !hasContent && (
+        <DialogErrorPanel
+          title="One detail is enough"
+          message={
+            morning
+              ? "Add a few words, a sleep rating, or one detail before saving."
+              : "Add writing, a mood, or another detail before saving."
+          }
+          jump={
+            morning
+              ? {
+                  label: "Rate your sleep",
+                  selector: '[data-sleep-field="sleepQuality"]',
+                }
+              : {
+                  label: "Find a feeling",
+                  selector: '[data-mood-library] input[type="search"]',
+                }
+          }
+          action={{
+            label: "Write a note",
+            onClick: () => setField("writingOpen", true),
+          }}
+        />
+      )}
+      {sleepError && (
+        <DialogErrorPanel
+          title="Check your sleep details"
+          message={sleepError}
+        />
+      )}
+      {issue && typeof issue === "object" && (
+        <DialogErrorPanel
+          title="Couldn’t save your check-in"
+          message={issue.message}
+        />
       )}
       <div
         className={styles.submitArea}

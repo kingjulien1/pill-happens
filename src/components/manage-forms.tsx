@@ -12,6 +12,13 @@ import {
   type Ref,
 } from "react";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import {
+  correctedIssueField,
+  DialogErrorPanel,
+  fieldIssue,
+  nativeDialogIssue,
+  type DialogIssue,
+} from "./dialog-error-panel";
 import dialogButtonStyles from "./dialog-primary-button.module.css";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import type { SymbolSourceFilter } from "@/lib/medication-symbol-browser";
@@ -233,7 +240,7 @@ export function MedicationForm({
   const setColor = (value: Medication["color"]) => setField("color", value);
   const setIcon = (value: string) => setField("icon", value);
   const { isBenzodiazepine, isOpioid } = medicationCategoryFlags(categories);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DialogIssue | null>(null);
   const [resetRevision, setResetRevision] = useState(0);
   const type = getMedicationType(form);
   const reset = () => {
@@ -263,11 +270,19 @@ export function MedicationForm({
     const strengthMg = Number(strength);
     const quantity = Number(defaultQuantity);
     if (!name.trim()) {
-      setError("Enter a medication name.");
+      setError(
+        fieldIssue("Enter a medication name.", '[name="name"]', "Edit name"),
+      );
       return;
     }
     if (!Number.isFinite(strengthMg) || strengthMg <= 0) {
-      setError("Enter a strength greater than zero.");
+      setError(
+        fieldIssue(
+          "Enter a strength greater than zero.",
+          '[name="strengthMg"]',
+          "Edit strength",
+        ),
+      );
       return;
     }
     if (
@@ -275,11 +290,28 @@ export function MedicationForm({
       quantity < 0.000001 ||
       quantity > 10_000
     ) {
-      setError("Enter an intake amount between 0.000001 and 10,000.");
+      setError(
+        fieldIssue(
+          "Enter an intake amount between 0.000001 and 10,000.",
+          '[name="defaultQuantity"]',
+          "Edit intake amount",
+        ),
+      );
       return;
     }
     if (!isMedicationIcon(icon)) {
-      setError(iconError);
+      setError(
+        fieldIssue(
+          iconError,
+          '[data-medication-appearance] input[type="search"]',
+          "Find an icon",
+        ),
+      );
+      return;
+    }
+    const nativeIssue = nativeDialogIssue(event.currentTarget);
+    if (nativeIssue) {
+      setError(nativeIssue);
       return;
     }
     saving.current = true;
@@ -384,15 +416,28 @@ export function MedicationForm({
           );
         }
       } else onSaved();
-    } catch {
-      // The journal provider explains failed saves and keeps the form available.
+    } catch (cause) {
+      setError({
+        message:
+          cause instanceof Error
+            ? cause.message
+            : "Try saving your medication again.",
+      });
     } finally {
       saving.current = false;
     }
   }
 
   return (
-    <form id={id} onSubmit={save} className="flex min-w-0 flex-col gap-4">
+    <form
+      id={id}
+      noValidate
+      onSubmit={save}
+      onChange={(event) => {
+        if (correctedIssueField(error, event.target)) setError(null);
+      }}
+      className="flex min-w-0 flex-col gap-4"
+    >
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-4">
         <div
           className="grid min-w-0 grid-cols-[minmax(0,2fr)_minmax(128px,1fr)] items-end gap-3"
@@ -550,16 +595,23 @@ export function MedicationForm({
           onIconChange={(value) => {
             setIcon(value);
             if (isMedicationIcon(value)) {
-              setError((message) => (message === iconError ? null : message));
+              setError((issue) =>
+                issue?.message === iconError ? null : issue,
+              );
             }
           }}
         />
       </fieldset>
 
       {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
+        <DialogErrorPanel
+          title={
+            error.jump
+              ? "Check the medication details"
+              : "Couldn’t save this medication"
+          }
+          {...error}
+        />
       )}
 
       <div className="w-full space-y-3 pt-1" data-medication-save-footer>
@@ -610,7 +662,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
   const setStartsOn = (value: string) => setField("startsOn", value);
   const setEndsOn = (value: string) => setField("endsOn", value);
   const setNote = (value: string) => setField("note", value);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DialogIssue | null>(null);
   const selectedMedication = medications.find(
     (medication) => medication.id === medicationId,
   );
@@ -626,19 +678,48 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
     setError(null);
     const dailyLimitMg = Number(limit);
     if (!selectedMedication) {
-      setError("Choose an active medication.");
+      setError(
+        fieldIssue(
+          "Choose an active medication.",
+          `#${CSS.escape(id)}-medication`,
+          "Choose medication",
+        ),
+      );
       return;
     }
     if (!limit.trim() || !Number.isFinite(dailyLimitMg) || dailyLimitMg < 0) {
-      setError("Enter a daily maximum of zero or more.");
+      setError(
+        fieldIssue(
+          "Enter a daily maximum of zero or more.",
+          '[name="dailyLimitMg"]',
+          "Edit daily maximum",
+        ),
+      );
       return;
     }
     if (!isValidDayKey(startsOn) || (endsOn && !isValidDayKey(endsOn))) {
-      setError("Choose valid start and end dates.");
+      setError(
+        fieldIssue(
+          "Choose valid start and end dates.",
+          !isValidDayKey(startsOn) ? '[name="startsOn"]' : '[name="endsOn"]',
+          "Review dates",
+        ),
+      );
       return;
     }
     if (endsOn && endsOn < startsOn) {
-      setError("The end date must be on or after the start date.");
+      setError(
+        fieldIssue(
+          "The end date must be on or after the start date.",
+          '[name="endsOn"]',
+          "Edit end date",
+        ),
+      );
+      return;
+    }
+    const nativeIssue = nativeDialogIssue(event.currentTarget);
+    if (nativeIssue) {
+      setError(nativeIssue);
       return;
     }
     try {
@@ -699,13 +780,25 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           : {}),
       });
       onSaved();
-    } catch {
-      // Save failures are shown by the journal provider without clearing inputs.
+    } catch (cause) {
+      setError({
+        message:
+          cause instanceof Error
+            ? cause.message
+            : "Try saving your goal again.",
+      });
     }
   }
 
   return (
-    <form onSubmit={save} className="flex flex-col gap-4">
+    <form
+      noValidate
+      onSubmit={save}
+      onChange={(event) => {
+        if (correctedIssueField(error, event.target)) setError(null);
+      }}
+      className="flex flex-col gap-4"
+    >
       <div
         data-dialog-panel
         className="rounded-xl border border-primary/10 bg-primary/5 p-3.5 text-xs leading-relaxed text-muted-foreground"
@@ -731,7 +824,11 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
             value={medicationId || null}
             highlightItemOnHover={false}
             onValueChange={(value) => {
-              if (value) setMedicationId(value);
+              if (value) {
+                setMedicationId(value);
+                if (error?.jump?.selector === `#${CSS.escape(id)}-medication`)
+                  setError(null);
+              }
             }}
             disabled={busy || medications.length === 0}
             required
@@ -908,9 +1005,12 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       )}
 
       {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
+        <DialogErrorPanel
+          title={
+            error.jump ? "Before you save this goal" : "Couldn’t save this goal"
+          }
+          {...error}
+        />
       )}
 
       <div className="flex w-full flex-col gap-2" data-draft-action-footer>

@@ -7,6 +7,13 @@ import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useId, useMemo, useRef, useState } from "react";
 import { IntakeFooterActions } from "./intake-footer-actions";
+import {
+  correctedIssueField,
+  DialogErrorPanel,
+  fieldIssue,
+  nativeDialogIssue,
+  type DialogIssue,
+} from "./dialog-error-panel";
 import Link from "next/link";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { isSaveAndStay } from "@/components/save-options";
@@ -179,7 +186,7 @@ export function IntakeForm({
   );
   const setQuantity = (value: string) =>
     draft.setValue((current) => ({ ...current, quantity: value }));
-  const [error, setError] = useState("");
+  const [error, setError] = useState<DialogIssue | null>(null);
   const reset = () => {
     timing.reset("form");
     draft.resetDraft(
@@ -191,7 +198,7 @@ export function IntakeForm({
         timezone,
       }),
     );
-    setError("");
+    setError(null);
   };
   const medication = medications.find((m) => m.id === medicationId);
   const fallbackIntake =
@@ -371,29 +378,54 @@ export function IntakeForm({
     const viewportTop = stay
       ? form.querySelector("[data-intake-submit]")?.getBoundingClientRect().top
       : undefined;
-    setError("");
+    setError(null);
     try {
       if (!medication && !fallbackIntake) {
-        setError("Choose an available medication. Your draft is still here.");
+        setError(
+          fieldIssue(
+            "Choose an available medication. Your draft is still here.",
+            "#intake-medication",
+            "Choose medication",
+          ),
+        );
         return;
       }
       if (route === undefined) {
         setError(
-          "Choose how you took this medication. Your draft is still here.",
+          fieldIssue(
+            "Choose how you took this medication. Your draft is still here.",
+            "#intake-route",
+            "Choose route",
+          ),
         );
+        return;
+      }
+      const amount = effectiveQuantity;
+      if (!validQuantity || amount === null) {
+        setError(
+          fieldIssue(
+            "Enter an amount from 0.01 to 10000 with at most two decimal places. Use a comma or dot for decimals.",
+            "#intake-quantity",
+            "Edit amount",
+          ),
+        );
+        return;
+      }
+      const nativeIssue = nativeDialogIssue(form);
+      if (nativeIssue) {
+        setError(nativeIssue);
         return;
       }
       // The draft stores its original instant and the zone of any edited field.
       const timestamp = intakeDraftTimestamp(timing.draft);
       // This runs only from onSubmit, so it must check the actual submit time.
       if (new Date(timestamp).getTime() > Date.now()) {
-        setError("Choose a time that has already happened.");
-        return;
-      }
-      const amount = effectiveQuantity;
-      if (!validQuantity || amount === null) {
         setError(
-          "Enter an amount from 0.01 to 10000 with at most two decimal places. Use a comma or dot for decimals.",
+          fieldIssue(
+            "Choose a time that has already happened.",
+            "[data-intake-clock]",
+            "Review time",
+          ),
         );
         return;
       }
@@ -525,9 +557,10 @@ export function IntakeForm({
         onSaved();
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Unable to save. Try again.",
-      );
+      setError({
+        message:
+          err instanceof Error ? err.message : "Unable to save. Try again.",
+      });
     } finally {
       submitPending.current = false;
     }
@@ -537,6 +570,14 @@ export function IntakeForm({
     <form
       id={formId}
       onSubmit={submit}
+      noValidate
+      onChange={(event) => {
+        if (
+          error?.jump?.selector !== "#intake-quantity" &&
+          correctedIssueField(error, event.target)
+        )
+          setError(null);
+      }}
       className={`${checkStyles.form} ${styles.inputTypography}`}
       data-intake-form
     >
@@ -566,6 +607,8 @@ export function IntakeForm({
                   value={medicationId}
                   fallbackIntake={fallbackIntake}
                   onValueChange={(value) => {
+                    if (error?.jump?.selector === "#intake-medication")
+                      setError(null);
                     draft.setValue((current) => ({
                       ...current,
                       medicationId: value,
@@ -599,9 +642,11 @@ export function IntakeForm({
                       : undefined,
                   )}
                   disabled={busy}
-                  onValueChange={(value) =>
-                    draft.setValue((current) => ({ ...current, route: value }))
-                  }
+                  onValueChange={(value) => {
+                    if (error?.jump?.selector === "#intake-route")
+                      setError(null);
+                    draft.setValue((current) => ({ ...current, route: value }));
+                  }}
                 />
               </div>
             </div>
@@ -649,7 +694,9 @@ export function IntakeForm({
                 originalQuantityPreserved={originalQuantityPreserved}
                 disabled={busy || (!medication && !fallbackIntake)}
                 empty={!medication && !fallbackIntake}
-                invalid={Boolean(error) && !validQuantity}
+                invalid={
+                  error?.jump?.selector === "#intake-quantity" && !validQuantity
+                }
               />
               <IntakeQuantityShortcuts
                 amounts={presets}
@@ -752,11 +799,17 @@ export function IntakeForm({
           <IntakePreviewSkeleton />
         )}
       </section>
-      {error && (
-        <p role="alert" className="text-xs leading-relaxed text-destructive">
-          {error}
-        </p>
-      )}
+      {error &&
+        !(error.jump?.selector === "#intake-quantity" && validQuantity) && (
+          <DialogErrorPanel
+            title={
+              error.jump
+                ? "Before you log this dose"
+                : "Couldn’t save this intake"
+            }
+            {...error}
+          />
+        )}
       <div
         className={styles.footer}
         data-dialog-fade-footer

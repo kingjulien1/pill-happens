@@ -19,6 +19,7 @@ import {
   readSleepImageClipboard,
 } from "@/lib/sleep-image-clipboard";
 import { Button } from "./ui/button";
+import { DialogErrorPanel } from "./dialog-error-panel";
 import {
   reportLabels,
   type ReportKey,
@@ -57,7 +58,7 @@ export function SleepCycleImport({
   const task = useRef<AbortController | null>(null);
   const [reading, setReading] = useState(false);
   const [pasting, setPasting] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | { problem: string }>("");
   const [review, setReview] = useState<ReportValues | null>(null);
   const [count, setCount] = useState(0);
   const [exportHelpOpen, setExportHelpOpen] = useState(false);
@@ -99,13 +100,19 @@ export function SleepCycleImport({
       setMessage(
         found
           ? `${found} of ${reportFieldCount} readings found. Give them a quick once-over.`
-          : "Couldn’t read the values. Try the full export, or fill in the fields below.",
+          : {
+              problem:
+                "Couldn’t read the values. Try the full export, or fill in the fields below.",
+            },
       );
     } catch (error) {
       if (!controller.signal.aborted)
-        setMessage(
-          error instanceof Error ? error.message : "Couldn’t read this image.",
-        );
+        setMessage({
+          problem:
+            error instanceof Error
+              ? error.message
+              : "Couldn’t read this image.",
+        });
     } finally {
       if (!controller.signal.aborted) setReading(false);
     }
@@ -154,9 +161,10 @@ export function SleepCycleImport({
   async function pasteImage() {
     if (disabled || reading || pasting) return;
     if (!navigator.clipboard?.read) {
-      setMessage(
-        "Use your browser’s Paste command with a copied image, or choose Bring Receipts to select a saved image.",
-      );
+      setMessage({
+        problem:
+          "Use your browser’s Paste command with a copied image, or choose a saved report below.",
+      });
       return;
     }
     setPasting(true);
@@ -167,14 +175,16 @@ export function SleepCycleImport({
       if (!mounted.current) return;
       if (file) void load(file);
       else
-        setMessage(
-          "No image on the clipboard. In Sleep Cycle, share the full report and choose Copy Image, then try Paste Report again.",
-        );
+        setMessage({
+          problem:
+            "No image on the clipboard. In Sleep Cycle, share the full report and choose Copy Image, then try Paste Report again.",
+        });
     } catch {
       if (mounted.current)
-        setMessage(
-          "Paste wasn’t allowed. Tap Paste Report and choose Paste in the browser prompt, or use Bring Receipts for a saved image.",
-        );
+        setMessage({
+          problem:
+            "Paste wasn’t allowed. Tap Paste Report and choose Paste in the browser prompt, or choose a saved image.",
+        });
     } finally {
       if (mounted.current) setPasting(false);
     }
@@ -367,27 +377,42 @@ export function SleepCycleImport({
           </section>
         </div>
       </div>
-      {message && (
-        <div className={styles.statusArea}>
-          <p role="status" className={styles.status}>
+      {typeof message !== "string" ? (
+        <DialogErrorPanel
+          title="Report couldn’t be read"
+          message={message.problem}
+          action={
+            !disabled && !reading && !pasting
+              ? {
+                  label: "Choose a saved report",
+                  onClick: () => input.current?.click(),
+                }
+              : undefined
+          }
+        />
+      ) : (
+        message && (
+          <div className={styles.statusArea}>
+            <p role="status" className={styles.status}>
+              {reading && (
+                <LoaderCircle
+                  size={13}
+                  className={styles.spinner}
+                  aria-hidden="true"
+                />
+              )}
+              {message}
+            </p>
             {reading && (
-              <LoaderCircle
-                size={13}
-                className={styles.spinner}
-                aria-hidden="true"
+              <progress
+                className={styles.progress}
+                value={count}
+                max={reportFieldCount}
+                aria-label="Reading sleep report fields"
               />
             )}
-            {message}
-          </p>
-          {reading && (
-            <progress
-              className={styles.progress}
-              value={count}
-              max={reportFieldCount}
-              aria-label="Reading sleep report fields"
-            />
-          )}
-        </div>
+          </div>
+        )
       )}
       {review && (
         <div className={styles.review} data-sleep-report-review>

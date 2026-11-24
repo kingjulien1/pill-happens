@@ -54,13 +54,6 @@
   line-height: 18px;
 }
 
-.error {
-  margin: 0;
-  color: var(--destructive);
-  font-size: 11px;
-  line-height: 1.6;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .spinner {
     animation: medication-confirm-spin 900ms linear infinite;
