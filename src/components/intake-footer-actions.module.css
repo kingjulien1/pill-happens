@@ -1,0 +1,406 @@
+.tools {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  gap: 20px;
+}
+.tool[data-tone="reset"],
+.panel[data-tone="reset"] {
+  --pigment: var(--color-orange-600, #ea580c);
+  --ink: var(--color-orange-200, #fed7aa);
+}
+.tool[data-tone="delete"],
+.panel[data-tone="delete"] {
+  --pigment: var(--color-rose-600, #e11d48);
+  --ink: var(--color-rose-200, #fecdd3);
+}
+.tool {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 5px;
+  min-width: 62px;
+  min-height: 52px;
+  border-radius: 10px;
+  color: color-mix(in srgb, var(--ink) 75%, var(--muted-foreground));
+  font-size: 10px;
+  font-weight: 525;
+  line-height: 1.3;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.tile {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid color-mix(in srgb, var(--ink) 37%, transparent);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--pigment) 9%, transparent);
+  box-shadow: inset 0 -2px color-mix(in srgb, var(--pigment) 22%, transparent);
+}
+.tool:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+.tool:enabled:active .tile {
+  transform: translateY(1px);
+}
+@media (hover: hover) {
+  .tool:enabled:hover .tile {
+    border-color: var(--ink);
+    background: color-mix(in srgb, var(--pigment) 19%, transparent);
+  }
+}
+.panel[data-tone] {
+  --line: color-mix(in srgb, var(--ink) 27%, var(--border));
+  width: min(370px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 23px;
+  --dialog-surface-paint:
+    radial-gradient(
+      ellipse at 10% 0%,
+      color-mix(in srgb, var(--pigment) 12%, transparent),
+      transparent 65%
+    ),
+    var(--navigation-surface);
+  color: var(--foreground);
+  text-align: start;
+}
+.eyebrow,
+.steps,
+.heading,
+.buttons {
+  display: flex;
+  align-items: center;
+}
+.eyebrow {
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 620;
+  letter-spacing: 0.05em;
+}
+.steps {
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.steps i {
+  width: 15px;
+  height: 3px;
+  border-radius: 4px;
+  background: currentColor;
+}
+.steps i + i {
+  margin-inline-end: 3px;
+}
+.panel[data-scene="review"] .steps i + i {
+  opacity: 0.22;
+}
+.heading {
+  gap: 12px;
+}
+.art {
+  flex: none;
+  position: relative;
+  width: 50px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+.art > * {
+  grid-area: 1 / 1;
+}
+.orbit {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--pigment) 9%, transparent);
+  transform: rotate(-7deg);
+}
+.page {
+  width: 22px;
+  height: 22px;
+  opacity: 0.55;
+  transform: translate(-6px, -5px) rotate(-12deg);
+}
+.mark {
+  width: 24px;
+  height: 24px;
+  transform: translate(5px, 4px);
+  paint-order: stroke;
+  fill: var(--navigation-surface);
+}
+.check {
+  width: 29px;
+  height: 29px;
+}
+.flecks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.flecks i {
+  position: absolute;
+  left: 48%;
+  top: 58%;
+  width: 2px;
+  height: 6px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0;
+  --dx: -15px;
+  --tilt: -28deg;
+}
+.flecks i:nth-child(2) {
+  --dx: 1px;
+  --tilt: 8deg;
+}
+.flecks i:nth-child(3) {
+  --dx: 14px;
+  --tilt: 35deg;
+}
+.title {
+  font-size: 20px;
+  font-weight: 680;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+.description,
+.note,
+.record > span {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.description {
+  margin-top: 5px;
+}
+.record {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-inline-start: 2px solid var(--ink);
+  border-radius: 3px 12px 12px 3px;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  overflow-wrap: anywhere;
+}
+.record small {
+  font-size: 10px;
+  font-weight: 550;
+  color: var(--ink);
+}
+.record strong {
+  font-size: 15px;
+  font-weight: 650;
+}
+.record b {
+  padding: 0 2px;
+  color: var(--ink);
+}
+.note {
+  font-size: 11px;
+  text-wrap: pretty;
+}
+.buttons {
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.buttons button {
+  flex: 1;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.buttons .primary {
+  color: #32171d;
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.buttons button:disabled {
+  opacity: 0.64;
+  cursor: default;
+}
+.tool:focus-visible,
+.buttons button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.error {
+  color: var(--color-rose-200);
+  font-size: 12px;
+}
+.panel[data-scene="done"] :is(.page, .mark) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel[data-tone][data-open] {
+    animation: arrive 720ms both;
+  }
+  .panel[data-tone][data-closed] {
+    animation: depart 520ms ease-in both;
+  }
+  .steps i,
+  .buttons .primary,
+  .tile {
+    transition:
+      opacity 560ms ease,
+      background-color 560ms ease,
+      border-color 560ms ease;
+  }
+  .panel[data-scene="review"] .page {
+    animation: unfold 720ms both;
+  }
+  .panel[data-scene="review"] .mark {
+    animation: settle 720ms both;
+  }
+  .panel[data-scene="confirm"] .orbit {
+    animation: frame 720ms both;
+  }
+  .panel[data-scene="confirm"] .mark {
+    animation: ready 720ms both;
+  }
+  .panel[data-scene="applying"][data-tone="reset"] .mark {
+    animation: sweep 720ms both;
+  }
+  .panel[data-scene="applying"][data-tone="delete"] .mark {
+    animation: feed 720ms both;
+  }
+  .panel[data-scene="applying"] .page {
+    animation: file-away 720ms both;
+  }
+  .panel[data-scene="applying"] .flecks i {
+    animation: trail 720ms both;
+  }
+  .check {
+    animation: checked 720ms both;
+  }
+}
+@keyframes arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes depart {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.975);
+  }
+}
+@keyframes unfold {
+  from {
+    opacity: 0;
+    transform: translate(-8px, 4px) rotate(-29deg) scale(0.8);
+  }
+  68% {
+    transform: translate(-6px, -7px) rotate(-16deg);
+  }
+}
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translate(10px, -6px) rotate(18deg);
+  }
+  64% {
+    transform: translate(4px, 5px) rotate(-6deg);
+  }
+}
+@keyframes frame {
+  45% {
+    transform: rotate(6deg) scale(1.12);
+  }
+  78% {
+    transform: rotate(-9deg) scale(0.97);
+  }
+}
+@keyframes ready {
+  55% {
+    transform: translate(6px, 0) rotate(8deg);
+  }
+}
+@keyframes sweep {
+  24% {
+    transform: translate(10px, -1px) rotate(20deg);
+  }
+  58% {
+    transform: translate(-6px, 9px) rotate(-17deg);
+  }
+  80% {
+    transform: translate(7px, 3px) rotate(6deg);
+  }
+}
+@keyframes feed {
+  32%,
+  62% {
+    transform: translate(4px, 5px) rotate(-5deg);
+  }
+  46%,
+  76% {
+    transform: translate(6px, 4px) rotate(4deg);
+  }
+}
+@keyframes file-away {
+  18% {
+    opacity: 0.85;
+    transform: translate(-5px, -10px) rotate(-6deg);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: translate(2px, 7px) rotate(3deg) scale(0.65, 0.2);
+  }
+}
+@keyframes trail {
+  0%,
+  35% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  58% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), 15px) rotate(var(--tilt)) scale(0.6);
+  }
+}
+@keyframes checked {
+  from {
+    transform: scale(0.55) rotate(-14deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.16) rotate(3deg);
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

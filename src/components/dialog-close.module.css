@@ -118,8 +118,3 @@
     color: var(--primary);
   }
 }
-
-.control[data-restored-hint] {
-  background: color-mix(in srgb, var(--color-sky-300) 18%, var(--background));
-  outline: 4px solid color-mix(in srgb, var(--color-sky-300) 18%, transparent);
-}

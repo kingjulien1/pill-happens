@@ -37,6 +37,9 @@ export function useIntakeTiming({
     isIntakeTimingPreference,
   );
   const [resetAt, setResetAt] = useState<Date | null>(null);
+  const [restoredPin, setRestoredPin] = useState(
+    () => shared.restored && shared.value.mode === "pinned",
+  );
   const [editingAt, setEditingAt] = useState<Date | null>(null);
   const migration =
     !shared.hasDraft && hasDraft && hasEditedIntakeTiming(draft);
@@ -67,16 +70,22 @@ export function useIntakeTiming({
   return {
     draft: effectiveDraft,
     pinned: preference.mode === "pinned",
+    // Refreshing the clock can also change an edit (or a historical form) for this visit.
+    followingCurrentTime:
+      resetAt !== null &&
+      (editing ||
+        Boolean(initialDay && initialDay !== dayKey(clock, timezone))),
     status: shared.status,
-    restored: shared.restored,
+    restored: restoredPin,
     pin: (takenAt: string) =>
       shared.setValue(
         pinnedIntakeTiming({ ...effectiveDraft, takenAt, timezone }),
       ),
-    reset: () => {
+    reset: (target: "clock" | "form" = "clock") => {
       // Keep an automatic marker so old per-entry timing cannot resurrect a pin.
       shared.setValue({ mode: "automatic" });
-      setResetAt(new Date());
+      setRestoredPin(false);
+      setResetAt(target === "clock" ? new Date() : null);
       setEditingAt(null);
     },
     editingChanged: (focused: boolean) => setEditingAt(focused ? clock : null),

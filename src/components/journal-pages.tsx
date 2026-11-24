@@ -37,16 +37,9 @@ import {
   useJournalWorkspace,
   usePersistentDraft,
 } from "@/components/journal-drafts";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { PageEmptyState, PageHeading } from "@/components/page-heading";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
-import closeStyles from "./dialog-close.module.css";
 import goalStyles from "./goals-page.module.css";
 import {
   countOpioidPills,
@@ -170,15 +163,8 @@ function usagePercent(total: number, maximum: number) {
 }
 
 function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
-  const { data, mutate, busy } = useJournal();
+  const { data, mutate } = useJournal();
   const { store, openingAnchor } = useJournalWorkspace();
-  const [confirm, setConfirm] = useState(false);
-  const confirmId = useId();
-  const deleteLink = useRef<HTMLButtonElement>(null);
-  const keepButton = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (confirm) keepButton.current?.focus();
-  }, [confirm]);
   async function remove() {
     const beforePreview = data
       ? intakeNotificationSnapshot(
@@ -187,43 +173,39 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
           data.settings.timezone,
         )
       : undefined;
-    try {
-      const saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE");
-      store.clearDraft(`intake:edit:${intake.id}`);
-      toast.success("Entry removed from your daily log.", {
-        journalScope: saved.notificationScope,
-        ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
-        heading: "Intake removed",
-        details: {
-          ...(beforePreview ? { preview: { before: beforePreview } } : {}),
-          paragraphs: [
-            "This intake has been removed. Its medication’s daily total and goal progress now reflect the remaining entries; the medication itself stays in your library.",
-            "Undo restores this exact entry with its original quantity, time taken and notes.",
-          ],
-          facts: [
-            { label: "Medication", value: intake.medicationName },
-            {
-              label: "Amount Removed",
-              value: `${formatDose(intake.quantity)} × ${formatDose(intake.strengthMg)} mg`,
+    const saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE", false);
+    store.clearDraft(`intake:edit:${intake.id}`);
+    toast.success("Entry removed from your daily log.", {
+      journalScope: saved.notificationScope,
+      ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
+      heading: "Intake removed",
+      details: {
+        ...(beforePreview ? { preview: { before: beforePreview } } : {}),
+        paragraphs: [
+          "This intake has been removed. Its medication’s daily total and goal progress now reflect the remaining entries; the medication itself stays in your library.",
+          "Undo restores this exact entry with its original quantity, time taken and notes.",
+        ],
+        facts: [
+          { label: "Medication", value: intake.medicationName },
+          {
+            label: "Amount Removed",
+            value: `${formatDose(intake.quantity)} × ${formatDose(intake.strengthMg)} mg`,
+          },
+        ],
+        links: [{ label: "Daily Log", href: "/" }],
+        footer: "Your other entries and medication settings are unchanged.",
+      },
+      ...(saved.undo
+        ? {
+            undo: {
+              label: "Restore Entry",
+              onUndo: saved.undo,
+              receipt: saved.receipt,
             },
-          ],
-          links: [{ label: "Daily Log", href: "/" }],
-          footer: "Your other entries and medication settings are unchanged.",
-        },
-        ...(saved.undo
-          ? {
-              undo: {
-                label: "Restore Entry",
-                onUndo: saved.undo,
-                receipt: saved.receipt,
-              },
-            }
-          : {}),
-      });
-      close();
-    } catch {
-      /* provider displays error */
-    }
+          }
+        : {}),
+    });
+    close();
   }
   return (
     <ResponsiveModal
@@ -252,64 +234,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       }
       description="Adjust the medication, route or amount to match what you took. The date and time determine which tracking day this entry belongs to."
     >
-      <IntakeForm
-        intake={intake}
-        onSaved={close}
-        footerAction={
-          <Button
-            variant="link"
-            size="sm"
-            ref={deleteLink}
-            type="button"
-            disabled={busy}
-            className="min-h-7 shrink-0 rounded-[var(--dialog-radius-compact)] px-1 py-0.5 font-medium text-foreground/65 underline decoration-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 text-[10px]"
-            aria-expanded={confirm}
-            aria-controls={confirmId}
-            onClick={() => setConfirm(true)}
-            data-edit-intake-delete-link
-          >
-            Delete intake
-          </Button>
-        }
-      />
-      {confirm && (
-        <div
-          id={confirmId}
-          className="mt-3"
-          role="group"
-          aria-label="Confirm intake deletion"
-          data-edit-intake-delete-confirmation
-        >
-          <p className="mb-3 text-center text-xs text-muted-foreground">
-            Permanently delete this intake?
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              ref={keepButton}
-              type="button"
-              variant="outline"
-              disabled={busy}
-              className="h-11"
-              onClick={() => {
-                setConfirm(false);
-                deleteLink.current?.focus({ preventScroll: true });
-              }}
-            >
-              Keep entry
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={busy}
-              className="h-11"
-              onClick={() => void remove()}
-            >
-              <ActionIcon name="delete" />
-              Delete entry
-            </Button>
-          </div>
-        </div>
-      )}
+      <IntakeForm intake={intake} onSaved={close} onDelete={remove} />
     </ResponsiveModal>
   );
 }
@@ -510,22 +435,6 @@ function LogIntakeDialog({
   open: boolean;
   onClose: () => void;
 }) {
-  const formId = useId();
-  const [canReset, setCanReset] = useState(false);
-  const [showResetHint, setShowResetHint] = useState(false);
-  const resetId = useId();
-  useEffect(() => {
-    if (!open || !showResetHint) return;
-    const dismiss = () => setShowResetHint(false);
-    document.addEventListener("pointerdown", dismiss, true);
-    document.addEventListener("click", dismiss, true);
-    document.addEventListener("keydown", dismiss, true);
-    return () => {
-      document.removeEventListener("pointerdown", dismiss, true);
-      document.removeEventListener("click", dismiss, true);
-      document.removeEventListener("keydown", dismiss, true);
-    };
-  }, [open, showResetHint]);
   return (
     <ResponsiveModal
       open={open}
@@ -554,41 +463,10 @@ function LogIntakeDialog({
           ? "Choose the medication, route and amount for the intake you missed. Enter the time you took it so it appears on the correct tracking day."
           : "Choose your medication and how you took it, then enter the amount. If you’re logging later, adjust the date and time to match when you took it."
       }
-      headerActions={
-        <TooltipProvider>
-          <Tooltip open={showResetHint && canReset} triggerId={resetId}>
-            <TooltipTrigger
-              id={resetId}
-              type="reset"
-              render={
-                <Button
-                  type="reset"
-                  form={formId}
-                  variant="ghost"
-                  size="icon"
-                  rim={false}
-                  className={closeStyles.control}
-                  data-restored-hint={showResetHint || undefined}
-                  disabled={!canReset}
-                  aria-label="Reset intake draft"
-                >
-                  <ActionIcon name="retry" className="size-[18px]" />
-                </Button>
-              }
-            />
-            <TooltipContent side="bottom" align="end">
-              Clear this draft and start fresh.
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      }
     >
       {open && (
         <IntakeForm
-          formId={formId}
           initialDay={historical ? day : undefined}
-          onResetAvailability={setCanReset}
-          onRestoredHint={setShowResetHint}
           onSaved={onClose}
         />
       )}

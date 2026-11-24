@@ -55,6 +55,7 @@ type JournalContext = {
     path: string,
     body?: unknown,
     method?: string,
+    reportError?: boolean,
   ) => Promise<JournalMutationResult>;
   saveReflection: (
     input: ReflectionSaveInput,

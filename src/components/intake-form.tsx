@@ -5,14 +5,8 @@ import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
-import {
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useId, useMemo, useRef, useState } from "react";
+import { IntakeFooterActions } from "./intake-footer-actions";
 import Link from "next/link";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { isSaveAndStay } from "@/components/save-options";
@@ -87,23 +81,16 @@ export function IntakeForm({
   intake,
   initialDay,
   onSaved,
-  footerAction,
-  formId,
-  onResetAvailability,
-  onRestoredHint,
+  onDelete,
 }: {
-  formId?: string;
-  onRestoredHint?: (restored: boolean) => void;
-  onResetAvailability?: (available: boolean) => void;
   intake?: Intake;
   initialDay?: string;
   onSaved: () => void;
-  /** The editing owner can place a secondary action beside safe draft feedback. */
-  footerAction?: ReactNode;
+  onDelete?: () => Promise<void>;
 }) {
   const { data, mutate, busy, derived, now } = useJournal();
   const { openDialog } = useJournalWorkspace();
-  const generatedId = useId();
+  const formId = useId();
   const submitPending = useRef(false);
   const medications = useMemo(
     () =>
@@ -144,20 +131,12 @@ export function IntakeForm({
   const draftFeedback = {
     ...draft,
     hasDraft: draft.hasDraft || timing.pinned,
+    restored:
+      (draft.hasDraft && draft.restored) || (timing.pinned && timing.restored),
     // Each save status must report the least durable of the two draft stores.
     status:
       timing.pinned && timing.status !== "saved" ? timing.status : draft.status,
   };
-  useEffect(() => {
-    onResetAvailability?.(draft.hasDraft && !busy);
-  }, [onResetAvailability, draft.hasDraft, busy]);
-  const showRestoredHelp = Boolean(
-    formId && draft.hasDraft && draft.restored && draft.status === "saved",
-  );
-  useEffect(() => {
-    onRestoredHint?.(showRestoredHelp);
-    return () => onRestoredHint?.(false);
-  }, [onRestoredHint, showRestoredHelp]);
   const { medicationId } = draft.value;
   const quantity = medicationId ? draft.value.quantity : "";
   const preferredRoute = (id: string) =>
@@ -202,6 +181,7 @@ export function IntakeForm({
     draft.setValue((current) => ({ ...current, quantity: value }));
   const [error, setError] = useState("");
   const reset = () => {
+    timing.reset("form");
     draft.resetDraft(
       newIntakeFormDraft({
         intake,
@@ -212,10 +192,6 @@ export function IntakeForm({
       }),
     );
     setError("");
-  };
-  const handleReset = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!busy) reset();
   };
   const medication = medications.find((m) => m.id === medicationId);
   const fallbackIntake =
@@ -331,14 +307,22 @@ export function IntakeForm({
   const includingDraftCount =
     includingDraftMg === null ? null : daySummary.excludingEditedCount + 1;
 
+  const footerActions = (
+    <IntakeFooterActions
+      intake={intake}
+      timezone={timezone}
+      draftName={medication?.name ?? fallbackIntake?.medicationName}
+      canReset={draftFeedback.hasDraft || timing.followingCurrentTime}
+      pinned={timing.pinned}
+      busy={busy || timingResetting}
+      onReset={reset}
+      onDelete={onDelete}
+    />
+  );
+
   if (!medications.length && !intake)
     return (
-      <form
-        id={formId}
-        onReset={handleReset}
-        data-intake-form
-        className="pt-4 text-center"
-      >
+      <form id={formId} data-intake-form className="pt-4 text-center">
         <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
@@ -355,10 +339,8 @@ export function IntakeForm({
             render={<Link href="/medications" />}
             onClick={onSaved}
           />
-          <DraftStatus
-            {...draftFeedback}
-            onReset={busy || formId ? undefined : reset}
-          />
+          <DraftStatus {...draftFeedback} />
+          {footerActions}
         </div>
       </form>
     );
@@ -535,8 +517,7 @@ export function IntakeForm({
 
   return (
     <form
-      id={formId ?? generatedId}
-      onReset={handleReset}
+      id={formId}
       onSubmit={submit}
       className={`${checkStyles.form} ${styles.inputTypography}`}
       data-intake-form
@@ -779,36 +760,23 @@ export function IntakeForm({
           secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
           saveOptions={{
             kind: intake ? "edit" : "intake",
-            formId: formId ?? generatedId,
+            formId,
             disabled: busy || timingResetting,
           }}
           data-intake-submit
         >
           {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
         </IntakePrimaryButton>
-        <DraftStatus
-          {...draftFeedback}
-          onReset={busy || footerAction || formId ? undefined : reset}
-          action={footerAction}
-          copy={
-            footerAction
-              ? {
-                  idle: "Ready when you are. Take a look.",
-                  saved: "Your draft is kept on this device.",
-                  restored: "Your draft is back on this device.",
-                }
-              : undefined
-          }
-        />
+        <DraftStatus {...draftFeedback} />
         <div className={styles.trackingFooter} data-intake-tracking-footer>
-          {showRestoredHelp && (
+          {draftFeedback.restored && draftFeedback.status === "saved" && (
             <p className={styles.restoredHelp}>
-              Your device kept these unfinished changes.{" "}
-              {intake ? "Save Edits to keep them" : "Save Intake to log them"},
-              or use <strong>Reset draft</strong> at the top right to start
-              fresh.
+              Your device kept these unfinished changes. Save them with the
+              button above, or choose <strong>Reset draft</strong> below to
+              discard them.
             </p>
           )}
+          {footerActions}
           <div className={styles.trackingDay}>
             <span>
               <CalendarCheck aria-hidden="true" />

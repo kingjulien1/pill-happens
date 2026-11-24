@@ -2253,12 +2253,13 @@ export function DeveloperGuidePage() {
                 Timing uses 40px controls. Date is one seventh narrower and time
                 one sixth narrower than the previous layout, with the original
                 gaps retained and the recovered space assigned to reset. Native
-                values stay vertically centered. Edit Intake puts safe draft feedback and an underlined
-                Delete intake action directly beneath Save Changes; deletion
-                requires a separate confirmation. Storage warnings remain
-                visible. Manual date/time changes use the shared, journal-scoped
-                intake:timing draft. Saving an intake or resetting its other fields
-                preserves the pin. Native commit/blur waits 180ms before the pin’s
+                values stay vertically centered. Log Intake and Edit Intake share
+                the same draft feedback and tracking-day footer. Reset draft clears
+                the form and releases pinned timing. Edit Intake also offers Delete
+                intake. Both actions have a review and an explicit confirmation.
+                Manual date/time changes use the shared, journal-scoped
+                intake:timing draft. Saving an intake preserves the pin.
+                Native commit/blur waits 180ms before the pin’s
                 entry; reset releases it and sets both values to now after its
                 outro. Closing mid-reset still honors that reset. Fresh current-day
                 forms and explicitly reset forms use the existing minute clock
