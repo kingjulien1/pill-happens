@@ -2,14 +2,23 @@
   width: 100%;
   min-width: 0;
   margin: 0;
+  --check-in-surface:
+    radial-gradient(ellipse at 0% 100%, var(--check-in-wash), transparent 57%),
+    linear-gradient(
+      108deg,
+      var(--check-in-start),
+      var(--check-in-middle) 51%,
+      color-mix(in srgb, var(--check-in-shadow) 75%, var(--check-in-start))
+    );
 }
 
 /* Give each time marker more room while keeping the intake side compact. */
 .section[data-check-in-period="morning"] {
   padding-block-start: 8px;
-  --check-in-surface:
-    radial-gradient(ellipse at 0% 100%, #ffb35230, transparent 57%),
-    linear-gradient(108deg, #70382a, #4d293c 51%, #392341);
+  --check-in-wash: #ffb35230;
+  --check-in-start: #70382a;
+  --check-in-middle: #4d293c;
+  --check-in-shadow: #392341;
   --check-in-ink: var(--color-orange-50, #fff7ed);
   --check-in-key: var(--color-orange-200, #ffd6a7);
   --check-in-glyph: var(--color-amber-100, #fef3c6);
@@ -20,24 +29,16 @@
 
 .section[data-check-in-period="evening"] {
   padding-block-end: 8px;
-  --check-in-surface:
-    radial-gradient(ellipse at 100% 10%, #c47a5e26, transparent 47%),
-    linear-gradient(
-      110deg,
-      #302453,
-      var(--color-indigo-950, #1e1a4d) 48%,
-      color-mix(
-        in srgb,
-        var(--color-purple-900, #59168b) 57%,
-        var(--color-indigo-950, #1e1a4d)
-      )
-    );
-  --check-in-ink: var(--color-violet-50, #f5f3ff);
-  --check-in-key: var(--color-indigo-200, #c6d2ff);
-  --check-in-glyph: var(--color-orange-100, #ffedd4);
-  --check-in-icon-background: var(--color-indigo-950, #1e1a4d);
-  --check-in-outer-color: #9b88d9;
-  --check-in-rim-glint: #f9dcc6;
+  --check-in-wash: #5eead430;
+  --check-in-start: #135555;
+  --check-in-middle: #133d49;
+  --check-in-shadow: #10313d;
+  --check-in-ink: var(--color-cyan-50, #ecfeff);
+  --check-in-key: var(--color-cyan-200, #a2f4fd);
+  --check-in-glyph: var(--color-teal-100, #cbfbf1);
+  --check-in-icon-background: var(--color-cyan-950, #053345);
+  --check-in-outer-color: #4ab9bc;
+  --check-in-rim-glint: #d5fff6;
 }
 
 .cardFrame {
@@ -415,17 +416,29 @@
 }
 
 @media (prefers-color-scheme: light) {
+  .section {
+    --check-in-surface: linear-gradient(
+      108deg,
+      var(--check-in-start),
+      var(--check-in-middle) 54%,
+      color-mix(in srgb, var(--check-in-shadow) 75%, var(--check-in-middle))
+    );
+  }
   .section[data-check-in-period="morning"] {
-    --check-in-surface: linear-gradient(108deg, #ffdcaa, #fff1dd 54%, #f2d7d3);
+    --check-in-start: #ffdcaa;
+    --check-in-middle: #fff1dd;
+    --check-in-shadow: #f2d7d3;
     --check-in-ink: #392135;
     --check-in-key: #86401c;
     --check-in-outer-color: #bc7443;
   }
   .section[data-check-in-period="evening"] {
-    --check-in-surface: linear-gradient(108deg, #ccc9ef, #e7e5fa 52%, #decfe8);
-    --check-in-ink: var(--color-indigo-950, #1e1a4d);
-    --check-in-key: #534477;
-    --check-in-outer-color: #8670ba;
+    --check-in-start: #b6eeea;
+    --check-in-middle: #e4f9f6;
+    --check-in-shadow: #c5e4e8;
+    --check-in-ink: var(--color-cyan-950, #053345);
+    --check-in-key: #155c69;
+    --check-in-outer-color: #28999d;
   }
 }
 

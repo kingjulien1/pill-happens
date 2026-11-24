@@ -10,7 +10,7 @@ import styles from "./check-in-card-artwork.module.css";
 
 export const CHECK_IN_CARD_COLOR = {
   morning: "tw-orange-400",
-  evening: "tw-indigo-400",
+  evening: "tw-cyan-700",
 } as const;
 
 /** A quiet horizon behind the readings, clipped by the shared card frame. */

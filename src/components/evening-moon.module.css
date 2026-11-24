@@ -77,7 +77,7 @@
 
 .rays {
   fill: none;
-  stroke: #fff6e3;
+  stroke: var(--check-in-rim-glint);
   stroke-width: 0.55;
   stroke-linecap: round;
 }
@@ -97,7 +97,7 @@
 
 .stillStars {
   display: none;
-  color: #e9d5ff;
+  color: var(--check-in-glyph);
   opacity: 0.4;
 }
 
@@ -180,7 +180,7 @@
     color: var(--star-from);
   }
   45% {
-    color: #fff9ed;
+    color: var(--check-in-rim-glint);
   }
   76%,
   100% {
