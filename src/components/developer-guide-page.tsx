@@ -1942,8 +1942,8 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 Empty intake previews retain the real card geometry and a
-                Mauve-gray palette, with the Final Look title at 82% opacity
-                and disabled More details at 20%. While the skeleton is shown,
+                Mauve-gray palette, with the Final Look title at 82% opacity.
+                While the skeleton is shown,
                 the entire preview section uses an additional 11/18 opacity
                 multiplier, about 39% less visible. A complete preview returns
                 to full section opacity. A 6.8-second CSS sequence compresses

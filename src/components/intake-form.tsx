@@ -1,20 +1,8 @@
 "use client";
 
-import {
-  CalendarCheck,
-  Clock3,
-  Import,
-  Pill,
-  Route,
-  StickyNote,
-  Sunrise,
-  Tags,
-} from "lucide-react";
+import { CalendarCheck, Import, Sunrise } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
-import {
-  getMedicationCategories,
-  getMedicationCategory,
-} from "@/lib/medication-categories";
+import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -22,7 +10,6 @@ import Link from "next/link";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
-import { IntakePreviewDetails } from "./intake-preview-details";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
 import {
@@ -59,14 +46,12 @@ import {
   dayIntakes,
   doseMg,
   formatDay,
-  formatDose,
   fromLocalInput,
   totalsForDay,
   type Intake,
 } from "@/lib/domain";
 import { Label } from "@/components/ui/label";
 import {
-  INTAKE_ROUTES,
   preferredIntakeRoute,
   sortIntakeRoutesByUsage,
 } from "@/lib/intake-routes";
@@ -730,43 +715,6 @@ export function IntakeForm({
         ) : (
           <IntakePreviewSkeleton />
         )}
-        {hasPreview && (
-          <IntakePreviewDetails
-            color={getMedicationColor(medication?.color).hex}
-            rows={[
-              {
-                icon: CalendarCheck,
-                text: `Tracking day · ${formatDay(belongsTo, { weekday: "long", month: "short" })}`,
-              },
-              {
-                icon: Pill,
-                text: `Recorded strength · ${formatDose(strength)} mg per ${type.unit}`,
-              },
-              {
-                icon: Route,
-                text: `Intake route · ${INTAKE_ROUTES.find((item) => item.value === route)?.label ?? "Not specified"}`,
-              },
-              {
-                icon: Clock3,
-                text: `Time taken · ${takenAt.slice(11, 16)} (${timezone})`,
-              },
-              ...(getMedicationCategories(medication).length
-                ? [
-                    {
-                      icon: Tags,
-                      text: `Categories · ${getMedicationCategories(medication)
-                        .map((kind) => getMedicationCategory(kind).label)
-                        .join(", ")}`,
-                    },
-                  ]
-                : []),
-              ...(intake?.note?.trim()
-                ? [{ icon: StickyNote, text: `Entry note · ${intake.note}` }]
-                : []),
-            ]}
-          />
-        )}
-        {!hasPreview && <IntakePreviewDetails disabled rows={[]} />}
       </section>
       {error && (
         <p role="alert" className="text-xs leading-relaxed text-destructive">
