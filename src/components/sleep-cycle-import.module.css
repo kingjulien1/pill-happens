@@ -72,18 +72,16 @@
   --import-depth: var(--color-indigo-500);
   --import-light: var(--color-violet-200);
   /* Resolve mixed colors before border/shadow shorthands for older Chromium. */
-  --import-frame-ink: color-mix(in srgb, var(--import-accent) 54%, transparent);
-  --import-edge-ink: color-mix(in srgb, var(--import-accent) 62%, transparent);
+  --import-detail-opacity: 0.71;
+  --import-frame-ink: color-mix(in srgb, var(--import-accent) 38%, transparent);
+  --import-edge-ink: color-mix(in srgb, var(--import-light) 74%, transparent);
   --import-inner-ink: color-mix(in srgb, var(--import-light) 32%, transparent);
-  --import-icon-edge: color-mix(in srgb, var(--import-light) 24%, transparent);
-  --import-hover-ink: color-mix(in srgb, var(--import-light) 74%, transparent);
   --import-disabled-ink: color-mix(
     in srgb,
     var(--import-accent) 22%,
     transparent
   );
-  --import-frame-wash: color-mix(in srgb, var(--import-accent) 4%, transparent);
-  --import-icon-wash: color-mix(in srgb, var(--import-accent) 12%, transparent);
+  --import-frame-wash: color-mix(in srgb, var(--import-accent) 3%, transparent);
   --import-shadow: color-mix(in srgb, var(--import-accent) 7%, transparent);
   display: grid;
   min-width: 0;
@@ -124,21 +122,42 @@
 .actionFrame:has(:disabled) {
   border-color: var(--import-disabled-ink);
 }
-.import .importAction {
+.importAction {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  grid-template-columns: minmax(0, 1fr) 24px;
   align-items: center;
   width: 100%;
   min-width: 0;
   height: auto;
   min-height: 66px;
-  gap: 8px;
-  padding: 8px 18px;
-  border: 2.5px solid var(--import-edge-ink);
+  gap: 12px;
+  padding: 10px clamp(12px, 4vw, 20px);
+  border: 0;
   border-radius: 18px;
+  color: var(--foreground);
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  background: transparent;
+  cursor: pointer;
+}
+.importAction::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border: 2.5px solid var(--import-edge-ink);
+  border-radius: inherit;
   background:
+    linear-gradient(
+      115deg,
+      color-mix(in srgb, var(--import-light) 8%, transparent),
+      transparent 60%,
+      color-mix(in srgb, var(--import-accent) 10%, transparent)
+    ),
     radial-gradient(
       ellipse at 0% 0%,
       color-mix(in srgb, var(--import-light) 15%, transparent),
@@ -154,89 +173,49 @@
       var(--import-depth) 23%,
       var(--navigation-surface, var(--popover))
     );
-  color: var(--foreground);
-  font-size: 14.5px;
-  font-weight: 600;
-  line-height: 1.3;
-  text-align: start;
-  white-space: normal;
   box-shadow: 0 3px 12px var(--import-shadow);
-  transition:
-    border-color 180ms ease,
-    transform 180ms ease;
-}
-.importAction::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 4px;
-  border: 1.25px solid var(--import-inner-ink);
-  border-radius: 11px;
-  pointer-events: none;
+  opacity: var(--import-detail-opacity);
 }
 .importAction::after {
   content: "";
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
+  z-index: 1;
+  inset: 6px;
+  border: 1.25px solid var(--import-inner-ink);
+  border-radius: 11px;
   pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    color-mix(in srgb, var(--import-light) 8%, transparent),
-    transparent 60%,
-    color-mix(in srgb, var(--import-accent) 10%, transparent)
-  );
-  opacity: 0;
-  transition: opacity 180ms ease;
+  opacity: var(--import-detail-opacity);
+}
+.importAction:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 .actionContent {
-  grid-column: 2;
   display: inline-flex;
   min-width: 0;
   max-width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  translate: 3px 0;
+  gap: clamp(14px, 4vw, 20px);
+}
+.actionIcon,
+.actionArrow {
+  flex: none;
+  opacity: var(--import-detail-opacity);
 }
 .actionIcon {
-  display: grid;
+  transform: translateY(-1px) rotate(-4deg);
+}
+.actionCopy {
+  justify-content: start;
+  gap: clamp(4px, 1.5vw, 8px);
+}
+.actionCopy > strong {
   flex: none;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  border: 1.5px solid var(--import-icon-edge);
-  background: var(--import-icon-wash);
-  color: var(--foreground);
-}
-.import .importAction .actionIcon svg,
-.import .importAction .actionArrow {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  stroke-width: 2.3;
-}
-.actionIcon svg {
-  transition: transform 180ms ease;
-}
-.actionArrow {
-  grid-column: 3;
-  color: var(--foreground);
-}
-.actionContent > strong {
-  min-width: 0;
-  overflow: hidden;
-  font-size: inherit;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-@media (max-width: 360px) {
-  .import .importAction {
-    padding-inline: 14px;
-  }
+.actionCopy > span {
+  opacity: var(--import-detail-opacity);
 }
 .actionDetail {
   margin: 0;
@@ -330,25 +309,11 @@
   border-radius: 99px;
 }
 @media (hover: hover) and (pointer: fine) {
-  .import .importAction:hover:not(:disabled) {
-    border-color: var(--import-hover-ink);
-  }
-  .import .importAction:hover:not(:disabled)::after {
-    opacity: 1;
-  }
-  .importAction:hover:not(:disabled) .actionIcon svg {
-    transform: translateY(-1px) rotate(-4deg);
-  }
   .import .headingHelp:hover {
     background: color-mix(in srgb, var(--color-violet-400) 15%, transparent);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .import .importAction,
-  .importAction::after,
-  .actionIcon svg {
-    transition: none;
-  }
   .import .importAction:active:not(:disabled) {
     transform: none;
   }

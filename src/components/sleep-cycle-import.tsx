@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  type ComponentPropsWithoutRef,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import {
   ArrowUpRight,
   BookOpenText,
@@ -12,6 +19,7 @@ import {
   LoaderCircle,
   Check,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import {
   pastedSleepImage,
@@ -40,6 +48,45 @@ import {
 } from "@/lib/shared-sleep-image";
 
 const reportFieldCount = Object.keys(reportLabels).length;
+
+function ReportAction({
+  icon: Icon,
+  label,
+  aside,
+  ...props
+}: ComponentPropsWithoutRef<"button"> & {
+  icon: LucideIcon;
+  label: string;
+  aside: string;
+}) {
+  return (
+    <div className={styles.actionFrame}>
+      <button type="button" className={styles.importAction} {...props}>
+        <span className={styles.actionContent}>
+          <Icon
+            size={20.6}
+            strokeWidth={2.3}
+            className={styles.actionIcon}
+            aria-hidden="true"
+          />
+          <span className={`intake-primary-copy ${styles.actionCopy}`}>
+            <strong>{label}</strong>
+            <span className="intake-primary-dot" aria-hidden="true">
+              ·
+            </span>
+            <span className="intake-primary-aside">{aside}</span>
+          </span>
+        </span>
+        <ArrowUpRight
+          size={24}
+          strokeWidth={2.3}
+          className={styles.actionArrow}
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  );
+}
 
 export function SleepCycleImport({
   value,
@@ -302,31 +349,20 @@ export function SleepCycleImport({
               <h4 id={`${id}-paste-heading`}>From your clipboard</h4>
               <span>Quickest way in</span>
             </div>
-            <div className={styles.actionFrame}>
-              <Button
-                type="button"
-                variant="ghost"
-                className={styles.importAction}
-                disabled={disabled || reading || pasting}
-                onClick={() => void pasteImage()}
-                aria-label="Paste Report: read a copied Sleep Cycle image"
-                aria-describedby={`${id}-paste-description`}
-                data-sleep-paste
-              >
-                <span className={styles.actionContent}>
-                  <span className={styles.actionIcon}>
-                    <Import size={24} strokeWidth={2.3} aria-hidden="true" />
-                  </span>
-                  <strong>{pasting ? "Choose Paste…" : "Paste Report"}</strong>
-                </span>
-                <ArrowUpRight
-                  size={24}
-                  strokeWidth={2.3}
-                  className={styles.actionArrow}
-                  aria-hidden="true"
-                />
-              </Button>
-            </div>
+            <ReportAction
+              icon={Import}
+              label={pasting ? "Choose Paste…" : "Paste Report"}
+              aside="Déjà Vu"
+              disabled={disabled || reading || pasting}
+              onClick={() => void pasteImage()}
+              aria-label={
+                pasting
+                  ? "Choose Paste…"
+                  : "Paste Report: read a copied Sleep Cycle image"
+              }
+              aria-describedby={`${id}-paste-description`}
+              data-sleep-paste
+            />
             <p id={`${id}-paste-description`} className={styles.actionDetail}>
               Choose <strong>Copy Image</strong> in Sleep Cycle’s share menu,
               then paste it here. No file hunting required.
@@ -345,31 +381,16 @@ export function SleepCycleImport({
               <h4 id={`${id}-choose-heading`}>From Photos or Files</h4>
               <span>Same report, saved</span>
             </div>
-            <div className={styles.actionFrame}>
-              <Button
-                type="button"
-                variant="ghost"
-                className={styles.importAction}
-                disabled={disabled || reading || pasting}
-                onClick={() => input.current?.click()}
-                aria-label="Bring Receipts: choose a saved report image"
-                aria-describedby={`${id}-choose-description`}
-                data-sleep-choose
-              >
-                <span className={styles.actionContent}>
-                  <span className={styles.actionIcon}>
-                    <Paperclip size={24} strokeWidth={2.3} aria-hidden="true" />
-                  </span>
-                  <strong>Bring Receipts</strong>
-                </span>
-                <ArrowUpRight
-                  size={24}
-                  strokeWidth={2.3}
-                  className={styles.actionArrow}
-                  aria-hidden="true"
-                />
-              </Button>
-            </div>
+            <ReportAction
+              icon={Paperclip}
+              label="Bring Receipts"
+              aside="Exhibit A"
+              disabled={disabled || reading || pasting}
+              onClick={() => input.current?.click()}
+              aria-label="Bring Receipts: choose a saved report image"
+              aria-describedby={`${id}-choose-description`}
+              data-sleep-choose
+            />
             <p id={`${id}-choose-description`} className={styles.actionDetail}>
               Choose the full portrait report you saved. Keep the score, graph
               and all the tiles in the picture.
