@@ -17,13 +17,10 @@ test("indefinite, paused and expired notices require no polling", () => {
   assert.equal(nextNotificationWake(clock.snapshot(), true), null);
 });
 
-test("visible progress uses five samples per second while rear cards sleep until expiry", () => {
+test("visible progress uses five samples per second while clipped cards have no wake timer", () => {
   const snapshot = new NotificationClock(10_000).snapshot();
   assert.equal(nextNotificationWake(snapshot, true), 200);
-  assert.equal(
-    nextNotificationWake(snapshot, false),
-    snapshot.timeUntilComplete + snapshot.graceRemaining,
-  );
+  assert.equal(nextNotificationWake(snapshot, false), null);
 });
 
 test("countdown boundaries and the final grace deadline take precedence over sample cadence", () => {
@@ -49,23 +46,14 @@ test("countdown boundaries and the final grace deadline take precedence over sam
   );
 });
 
-test("one rear-card wake consumes its exact remaining lifetime including grace", () => {
-  let now = 0;
-  const clock = new NotificationClock(10_000, () => now);
-  const delay = nextNotificationWake(clock.snapshot(), false);
-  assert.notEqual(delay, null);
-  now += delay!;
-  assert.equal(clock.snapshot().expired, true);
-  assert.equal(nextNotificationWake(clock.snapshot(), false), null);
-});
-
-test("long finite lifetimes cannot overflow the browser timeout into a busy loop", () => {
+test("offscreen finite notices have no timeout, including very long lifetimes", () => {
   assert.equal(
-    nextNotificationWake(
-      new NotificationClock(10_000_000_000).snapshot(),
-      false,
-    ),
-    2_147_483_647,
+    nextNotificationWake(new NotificationClock(10000).snapshot(), false),
+    null,
+  );
+  assert.equal(
+    nextNotificationWake(new NotificationClock(10000000000).snapshot(), false),
+    null,
   );
 });
 

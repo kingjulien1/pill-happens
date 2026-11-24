@@ -68,16 +68,14 @@ export function useNotificationModal(
 
   useLayoutEffect(() => {
     const element = region.current;
-    if (!open || !element) return;
+    if (!element) return;
     let touch: { x: number; y: number; containers: HTMLElement[] } | undefined;
     const inside = (target: EventTarget | null) => {
       if (!(target instanceof Node)) return false;
-      const cards = element.querySelectorAll(openCardSelector);
-      return cards.length
-        ? Array.from(cards).some((card) => card.contains(target))
-        : Boolean(
-            element.querySelector("[data-sonner-toaster]")?.contains(target),
-          );
+      // Every notification remains usable while another card is expanded.
+      return Boolean(
+        element.querySelector("[data-sonner-toaster]")?.contains(target),
+      );
     };
     const stop = (event: Event) => {
       if (event.cancelable) event.preventDefault();
@@ -94,7 +92,10 @@ export function useNotificationModal(
           : undefined;
     };
     const touchMove = (event: TouchEvent) => {
-      if (!inside(event.target)) return stop(event);
+      if (!inside(event.target)) {
+        if (open) stop(event);
+        return;
+      }
       if (event.touches.length !== 1) return;
       const point = event.touches[0];
       if (!touch) return stop(event);
@@ -106,6 +107,7 @@ export function useNotificationModal(
         stop(event);
     };
     const wheel = (event: WheelEvent) => {
+      if (!inside(event.target) && !open) return;
       if (
         !inside(event.target) ||
         !event.deltaY ||
@@ -124,7 +126,7 @@ export function useNotificationModal(
           !node.closest('[inert], [aria-hidden="true"]') &&
           node.getClientRects().length,
       );
-    const focusInside = () => focusable()[0]?.focus({ preventScroll: true });
+    const focusInside = () => focusable()[0]?.focus();
     const focus = (event: FocusEvent) => {
       if (!inside(event.target)) focusInside();
     };
@@ -140,10 +142,10 @@ export function useNotificationModal(
           : document.activeElement === last)
       ) {
         event.preventDefault();
-        (event.shiftKey ? last : first)?.focus({ preventScroll: true });
+        (event.shiftKey ? last : first)?.focus();
       }
     };
-    if (!inside(document.activeElement)) focusInside();
+    if (open && !inside(document.activeElement)) focusInside();
     window.addEventListener("touchstart", touchStart, {
       passive: true,
       capture: true,
@@ -153,8 +155,10 @@ export function useNotificationModal(
       capture: true,
     });
     window.addEventListener("wheel", wheel, { passive: false, capture: true });
-    window.addEventListener("focusin", focus, true);
-    window.addEventListener("keydown", tab, true);
+    if (open) {
+      window.addEventListener("focusin", focus, true);
+      window.addEventListener("keydown", tab, true);
+    }
     return () => {
       window.removeEventListener("touchstart", touchStart, true);
       window.removeEventListener("touchmove", touchMove, true);

@@ -51,6 +51,22 @@ export function useNotificationPull(options: Options) {
     const node = options.root.current;
     const cue = options.indicator.current;
     if (!node || !cue) return;
+    // Move the native flow item, so every following card follows the same
+    // displacement automatically, including negative recoil and settling.
+    const host = node.closest<HTMLElement>("[data-sonner-toast]");
+    const motionTarget = host ?? node;
+    const originalMargin = host?.style.marginTop ?? "";
+    const writeOffset = (y: number) => {
+      if (host) host.style.marginTop = `${y}px`;
+      else node.style.translate = `0px ${y}px`;
+    };
+    const motionFrames = (frames: Keyframe[]) =>
+      host
+        ? frames.map(({ translate, ...frame }) => ({
+            ...frame,
+            marginTop: String(translate).split(" ")[1] ?? "0px",
+          }))
+        : frames;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const animations = new Set<Animation>();
     const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -92,7 +108,10 @@ export function useNotificationPull(options: Options) {
     };
     const resetPaint = () => {
       motionCleanup();
-      node.style.removeProperty("translate");
+      if (host) {
+        if (originalMargin) host.style.marginTop = originalMargin;
+        else host.style.removeProperty("margin-top");
+      } else node.style.removeProperty("translate");
       node.style.removeProperty("--notification-open-fill");
       delete node.dataset.notificationPull;
       cue.style.opacity = "0";
@@ -176,7 +195,12 @@ export function useNotificationPull(options: Options) {
       const { state, origin, expanded } = session;
       const claimed = state.intent === "pull";
       if (claimed)
-        node.style.translate = `0px ${Math.min(NOTIFICATION_PULL_MAX_OFFSET, origin + notificationPullOffset(state.distance))}px`;
+        writeOffset(
+          Math.min(
+            NOTIFICATION_PULL_MAX_OFFSET,
+            origin + notificationPullOffset(state.distance),
+          ),
+        );
       node.dataset.notificationPull = state.ready ? "ready" : "pulling";
       node.style.setProperty(
         "--notification-open-fill",
@@ -292,7 +316,7 @@ export function useNotificationPull(options: Options) {
             : latest.current.onExpand();
         };
         if (reduced.matches) {
-          node.style.translate = "0px 0px";
+          writeOffset(0);
           if (!commitExpansion()) {
             cancel();
             return;
@@ -302,8 +326,8 @@ export function useNotificationPull(options: Options) {
         }
         const token = generation;
         const recoil = animate(
-          node,
-          [
+          motionTarget,
+          motionFrames([
             {
               translate: `0px ${y}px`,
               offset: 0,
@@ -322,7 +346,7 @@ export function useNotificationPull(options: Options) {
             },
             { translate: "0px -1.5px", offset: 0.7, easing: "ease-out" },
             { translate: "0px 0px" },
-          ],
+          ]),
           { duration: NOTIFICATION_PULL_OPEN_DURATION, fill: "both" },
         );
         animate(
@@ -366,12 +390,12 @@ export function useNotificationPull(options: Options) {
         node.style.removeProperty("--notification-open-fill");
         const token = generation;
         const settle = animate(
-          node,
-          [
+          motionTarget,
+          motionFrames([
             { translate: `0px ${y}px` },
             { translate: "0px -1.5px", offset: 0.68 },
             { translate: "0px 0px" },
-          ],
+          ]),
           { duration: 340, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" },
         );
         animate(cue, [{ opacity: Number(cue.style.opacity) }, { opacity: 0 }], {
@@ -410,11 +434,15 @@ export function useNotificationPull(options: Options) {
       if (event.button !== 0 || !latest.current.canStart(event)) return;
       if (session) return;
       const offset = getComputedStyle(node).translate.split(" ");
-      const origin = offset.length > 1 ? parseFloat(offset[1]) || 0 : 0;
+      const origin = host
+        ? parseFloat(getComputedStyle(host).marginTop) || 0
+        : offset.length > 1
+          ? parseFloat(offset[1]) || 0
+          : 0;
       stop();
       activeCleanup();
       motionCleanup();
-      if (origin) node.style.translate = `0px ${origin}px`;
+      if (origin) writeOffset(origin);
       cue.style.opacity = "0";
       cue.style.setProperty("--pull-progress", "0");
       delete cue.dataset.ready;

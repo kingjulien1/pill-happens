@@ -5,9 +5,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useId,
   useRef,
+  useSyncExternalStore,
   useState,
   type CSSProperties,
   type SVGProps,
@@ -23,6 +25,17 @@ import { cn } from "@/lib/utils";
 import { NotificationRocket } from "@/components/ui/notification-rocket";
 import { useNotificationModal } from "@/components/ui/use-notification-modal";
 import { NOTIFICATION_DEFAULT_DURATION } from "@/lib/journal-notification-lifecycle";
+import {
+  NOTIFICATION_MAX_ACTIVE,
+  NOTIFICATION_STACK_GAP,
+  NOTIFICATION_STACK_CHANGE_EVENT,
+  getNotificationQueueSnapshot,
+  getServerNotificationQueueSnapshot,
+  subscribeNotificationQueue,
+  releaseNotificationHost,
+  retiringNotificationHosts,
+} from "@/lib/notification-admission";
+
 import "./sonner.css";
 
 type ToastSymbolKind =
@@ -185,7 +198,7 @@ const statusIcons = {
   loading: <ToastSymbol key="loading" kind="loading" />,
 };
 
-/** A stack reveal is a separate action from any notification's details. */
+/** One continuously visible list; each card owns its details independently. */
 const NotificationStackContext = createContext({
   expanded: false,
   count: 0,
@@ -201,11 +214,13 @@ function focusNotificationFront(region: HTMLDivElement | null) {
   const current = active.closest<HTMLElement>("[data-sonner-toast]");
   if (
     !current ||
-    (current.dataset.front === "true" && current.dataset.removed !== "true")
+    (current.dataset.front === "true" &&
+      current.dataset.removed !== "true" &&
+      current.dataset.notificationRetired !== "true")
   )
     return;
   const front = region.querySelector<HTMLElement>(
-    '[data-sonner-toast]:not([data-removed="true"])',
+    '[data-sonner-toast]:not([data-removed="true"]):not([data-notification-retired="true"])',
   );
   const target = front?.querySelector<HTMLElement>(
     ".journal-notification-summary, button:not(:disabled), a[href]",
@@ -219,85 +234,91 @@ export function Toaster({
   style,
   icons,
   toastOptions,
-  visibleToasts: collapsedVisibleToasts = 3,
-  swipeDirections = ["top", "left", "right"],
+  visibleToasts: _visibleToasts,
+  expand: _expand,
+  gap: _gap,
+  swipeDirections = ["left", "right"],
   ...props
 }: ToasterProps) {
+  void _visibleToasts;
+  void _expand;
+  void _gap;
   const region = useRef<HTMLDivElement>(null);
-  const [stackOpen, setStackOpen] = useState(false);
   const { toasts } = useSonner();
   const count = toasts.filter(
     (entry) =>
       !entry.delete &&
       (props.id ? entry.toasterId === props.id : !entry.toasterId),
   ).length;
-  const [previousCount, setPreviousCount] = useState(count);
-  // Sonner's external store shrinking to one ends this explicit reveal. Adjust
-  // only on a changed snapshot, before rendering a subsequent new stack.
-  if (count !== previousCount) {
-    setPreviousCount(count);
-    if (count <= 1 && stackOpen) setStackOpen(false);
-  }
-  const collapse = useCallback(() => {
-    // A lower card will become a folded/hidden rear face. Keep keyboard focus
-    // on a retained, visible control before restoring the native stack layout.
-    focusNotificationFront(region.current);
-    region.current
-      ?.querySelectorAll<HTMLElement>("[data-sonner-toaster]")
-      .forEach((list) => {
-        list.scrollTop = 0;
-      });
-    setStackOpen(false);
-    // Also clear Sonner's native hover fan through its existing drag-end bridge.
-    region.current
-      ?.querySelectorAll<HTMLElement>("[data-sonner-toaster]")
-      .forEach((list) =>
-        list.dispatchEvent(new Event("dragend", { bubbles: true })),
-      );
-  }, []);
-  const reveal = useCallback(() => setStackOpen(true), []);
-  const expanded = Boolean(props.expand || (stackOpen && count > 1));
+  const queue = useSyncExternalStore(
+    subscribeNotificationQueue,
+    getNotificationQueueSnapshot,
+    getServerNotificationQueueSnapshot,
+  );
   const outsidePointers = useRef(new Set<number>());
-  const [outsideHeld, setOutsideHeld] = useState(false);
-  const modalOpen = useNotificationModal(region, expanded, outsideHeld);
+  const [held, setHeld] = useState(false);
+  useLayoutEffect(() => {
+    const element = region.current;
+    if (!element) return;
+    let frame = 0;
+    let previous = "";
+    const sync = () => {
+      frame = 0;
+      const viewport = window.visualViewport;
+      const values = [
+        viewport?.offsetTop ?? 0,
+        viewport?.offsetLeft ?? 0,
+        viewport?.width ?? innerWidth,
+        viewport?.height ?? innerHeight,
+      ];
+      const key = values.join(":");
+      if (key === previous) return;
+      previous = key;
+      ["top", "left", "width", "height"].forEach((name, i) =>
+        element.style.setProperty(
+          `--notification-view-${name}`,
+          `${values[i]}px`,
+        ),
+      );
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(sync);
+    };
+    sync();
+    window.addEventListener("resize", schedule, { passive: true });
+    window.visualViewport?.addEventListener("resize", schedule, {
+      passive: true,
+    });
+    window.visualViewport?.addEventListener("scroll", schedule, {
+      passive: true,
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", schedule);
+      window.visualViewport?.removeEventListener("resize", schedule);
+      window.visualViewport?.removeEventListener("scroll", schedule);
+    };
+  }, []);
+  const modalOpen = useNotificationModal(region, false, held);
   const outsideRelease = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
+  const collapse = useCallback(
+    () => window.dispatchEvent(new Event(NOTIFICATION_COLLAPSE_EVENT)),
+    [],
+  );
+  const stack = useMemo(
+    () => ({ expanded: true, count, reveal: () => {}, collapse }),
+    [count, collapse],
+  );
   const collapseOutside = () => {
     clearTimeout(outsideRelease.current);
-    // Keep the shield in place through pointerup and its synthesized click.
-    // Collapsing on pointerdown would expose the page mid-gesture on iOS.
     outsideRelease.current = setTimeout(() => {
-      window.dispatchEvent(new Event(NOTIFICATION_COLLAPSE_EVENT));
       collapse();
-      setOutsideHeld(false);
+      setHeld(false);
     }, 0);
   };
   useEffect(() => () => clearTimeout(outsideRelease.current), []);
-  const stack = useMemo(
-    () => ({
-      expanded,
-      count,
-      reveal,
-      collapse,
-    }),
-    [expanded, count, reveal, collapse],
-  );
-
-  useEffect(() => {
-    if (!stackOpen) return;
-    const outside = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !region.current?.contains(event.target)
-      )
-        collapse();
-    };
-    document.addEventListener("pointerdown", outside, true);
-    return () => {
-      document.removeEventListener("pointerdown", outside, true);
-    };
-  }, [stackOpen, collapse]);
 
   useEffect(() => {
     if (!count) return;
@@ -309,140 +330,172 @@ export function Toaster({
         ".journal-notification",
       );
       const focusedCard = focused && element.contains(focused) ? focused : null;
-      // A closed, focused card owns the next press through its native handler.
       if (focusedCard?.dataset.expanded === "false") return;
       const opened =
         focusedCard ??
-        Array.from(
-          element.querySelectorAll<HTMLElement>(
+        [
+          ...element.querySelectorAll<HTMLElement>(
             '.journal-notification[data-expanded="true"][data-phase="idle"]',
           ),
-        ).find(
-          (card) =>
-            !card.closest('[inert], [aria-hidden="true"]') &&
-            (expanded ||
-              card.closest<HTMLElement>("[data-sonner-toast]")?.dataset
-                .front !== "false"),
+        ].find((card) => !card.closest('[inert], [aria-hidden="true"]'));
+      if (!opened) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!event.repeat)
+        window.dispatchEvent(
+          new CustomEvent<NotificationCollapseDetail>(
+            NOTIFICATION_COLLAPSE_EVENT,
+            { detail: { target: opened } },
+          ),
         );
-      if (opened) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (!event.repeat)
-          window.dispatchEvent(
-            new CustomEvent<NotificationCollapseDetail>(
-              NOTIFICATION_COLLAPSE_EVENT,
-              {
-                detail: { target: opened },
-              },
-            ),
-          );
-        return;
-      }
-      // Escape on the list itself still folds the fan without dismissing a card.
-      if (
-        stackOpen &&
-        event.target instanceof Node &&
-        element.contains(event.target)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (!event.repeat) collapse();
-      }
     };
     window.addEventListener("keydown", escape, true);
     return () => window.removeEventListener("keydown", escape, true);
-  }, [count, expanded, stackOpen, collapse]);
+  }, [count]);
 
   useEffect(() => {
     const element = region.current;
     if (!element) return;
+    let anchor: {
+      list: HTMLElement;
+      host: HTMLElement;
+      top: number;
+      scroll: number;
+    } | null = null;
+    const capturePosition = () => {
+      const list = element.querySelector<HTMLElement>("[data-sonner-toaster]");
+      if (!list || list.scrollTop < 1) {
+        anchor = null;
+        return;
+      }
+      const top = list.getBoundingClientRect().top;
+      const host = [...list.children].find(
+        (node): node is HTMLElement =>
+          node instanceof HTMLElement &&
+          node.matches(
+            '[data-sonner-toast]:not([data-removed="true"]):not([data-notification-retired="true"])',
+          ) &&
+          node.getBoundingClientRect().bottom > top,
+      );
+      anchor = host
+        ? {
+            list,
+            host,
+            top: host.getBoundingClientRect().top,
+            scroll: list.scrollTop,
+          }
+        : null;
+    };
+    const restorePosition = () => {
+      const saved = anchor;
+      anchor = null;
+      if (
+        !saved?.host.isConnected ||
+        saved.host.dataset.notificationRetired === "true" ||
+        Math.abs(saved.list.scrollTop - saved.scroll) > 1
+      )
+        return;
+      saved.list.scrollTop +=
+        saved.host.getBoundingClientRect().top - saved.top;
+    };
+    window.addEventListener(NOTIFICATION_STACK_CHANGE_EVENT, capturePosition);
     const syncHost = (host: HTMLElement) => {
       const hidden =
-        host.dataset.visible === "false" || host.dataset.removed === "true";
+        host.dataset.visible === "false" ||
+        host.dataset.removed === "true" ||
+        host.dataset.notificationRetired === "true";
       if (hidden && host.contains(document.activeElement))
         focusNotificationFront(element);
       if (host.inert !== hidden) host.inert = hidden;
     };
-    const syncVisibility = () => {
+    const sync = () =>
       element
         .querySelectorAll<HTMLElement>("[data-sonner-toast]")
         .forEach(syncHost);
-      if (!expanded)
-        element
-          .querySelectorAll<HTMLElement>("[data-sonner-toaster]")
-          .forEach((list) => {
-            if (list.scrollTop) list.scrollTop = 0;
-          });
-    };
     const observer = new MutationObserver((records) => {
       if (
         records.some(
           (record) =>
-            record.type === "childList" &&
-            record.target instanceof Element &&
-            record.target.matches("[data-sonner-toaster], section"),
+            (record.type === "childList" &&
+              record.target instanceof HTMLElement &&
+              record.target.matches("[data-sonner-toaster]")) ||
+            record.attributeName === "data-notification-retired",
         )
-      ) {
-        syncVisibility();
-        return;
+      )
+        restorePosition();
+      for (const record of records) {
+        for (const removed of record.removedNodes) {
+          if (!(removed instanceof HTMLElement)) continue;
+          const nodes = [
+            removed,
+            ...removed.querySelectorAll<HTMLElement>(
+              "[data-notification-host-id]",
+            ),
+          ];
+          for (const node of nodes) {
+            const id = node.dataset.notificationHostId;
+            if (id && !element.contains(node)) releaseNotificationHost(id);
+          }
+        }
       }
-      // A changed native host cannot affect another host's inert state. Avoid
-      // rescanning an uncapped stack for each individual visibility mutation.
-      const changed = new Set<HTMLElement>();
-      for (const record of records)
-        if (
-          record.type === "attributes" &&
-          record.target instanceof HTMLElement &&
-          record.target.matches("[data-sonner-toast]")
-        )
-          changed.add(record.target);
-      changed.forEach(syncHost);
+      if (records.some((record) => record.type === "childList")) sync();
+      else
+        for (const record of records)
+          if (
+            record.target instanceof HTMLElement &&
+            record.target.matches("[data-sonner-toast]")
+          )
+            syncHost(record.target);
     });
     observer.observe(element, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-visible", "data-removed"],
+      attributeFilter: [
+        "data-visible",
+        "data-removed",
+        "data-notification-retired",
+      ],
     });
-    syncVisibility();
-    return () => observer.disconnect();
-  }, [expanded, count]);
+    sync();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener(
+        NOTIFICATION_STACK_CHANGE_EVENT,
+        capturePosition,
+      );
+      // An entire toaster can leave during logout/navigation without delivering
+      // another observed child removal. Do not strand those retired slots.
+      queueMicrotask(() => {
+        const present = new Set(
+          [
+            ...document.querySelectorAll<HTMLElement>(
+              "[data-notification-host-id]",
+            ),
+          ].map((node) => node.dataset.notificationHostId),
+        );
+        for (const id of retiringNotificationHosts())
+          if (!present.has(id)) releaseNotificationHost(id);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    region.current
+      ?.querySelectorAll<HTMLElement>("[data-sonner-toaster]")
+      .forEach((list) => {
+        list.dataset.notificationWaiting = String(queue.waiting);
+      });
+  }, [queue.waiting, count]);
 
   return (
     <NotificationStackContext.Provider value={stack}>
       <div
         ref={region}
         style={{ display: "contents" }}
-        data-notification-stack-expanded={expanded}
+        data-notification-stack-expanded="true"
+        data-notification-stack-count={count}
         data-notification-modal={modalOpen}
-        onFocusCapture={(event) => {
-          // The list hotkey and keyboard focus entering a folded rear face both
-          // need the uncapped view. Pointer focus still consumes just the first
-          // click in the card's existing reveal handler.
-          if (
-            count > 1 &&
-            event.target instanceof HTMLElement &&
-            (event.target.matches("[data-sonner-toaster]") ||
-              (event.target.matches(":focus-visible") &&
-                event.target.closest<HTMLElement>("[data-sonner-toast]")
-                  ?.dataset.front === "false"))
-          )
-            reveal();
-        }}
-        onClickCapture={(event) => {
-          if (expanded || count <= 1) return;
-          const host =
-            event.target instanceof Element
-              ? event.target.closest<HTMLElement>("[data-sonner-toast]")
-              : null;
-          // Managed cards already suppress held clicks before revealing the
-          // fan. Give third-party/native notices the same first-click rule.
-          if (host && !host.querySelector(".journal-notification")) {
-            event.preventDefault();
-            event.stopPropagation();
-            reveal();
-          }
-        }}
         onPointerCancelCapture={(event) => {
           const host =
             event.target instanceof Element
@@ -454,8 +507,6 @@ export function Toaster({
             host.dataset.swipeOut === "true"
           )
             return;
-          // A pan can start on the native host/gutter outside its managed card.
-          // Always clear Sonner too when the browser takes over vertical scroll.
           host.style.setProperty("--swipe-amount-x", "0px");
           host.style.setProperty("--swipe-amount-y", "0px");
           host.dispatchEvent(new Event("dragend", { bubbles: true }));
@@ -475,7 +526,7 @@ export function Toaster({
             event.stopPropagation();
             clearTimeout(outsideRelease.current);
             outsidePointers.current.add(event.pointerId);
-            setOutsideHeld(true);
+            setHeld(true);
             event.currentTarget.setPointerCapture(event.pointerId);
           }}
           onPointerUp={(event) => {
@@ -504,7 +555,6 @@ export function Toaster({
         <Sonner
           position="top-center"
           duration={NOTIFICATION_DEFAULT_DURATION}
-          gap={10}
           offset={{
             top: "max(22px, calc(env(safe-area-inset-top, 0px) + 12px))",
           }}
@@ -513,27 +563,28 @@ export function Toaster({
             left: 16,
             right: 16,
           }}
-          containerAriaLabel="Journal notifications"
           {...props}
-          expand={expanded}
-          visibleToasts={expanded ? Infinity : collapsedVisibleToasts}
-          swipeDirections={
-            expanded
-              ? swipeDirections.filter(
-                  (direction) => direction === "left" || direction === "right",
-                )
-              : swipeDirections
+          containerAriaLabel={
+            queue.waiting
+              ? `Journal notifications, ${count} in the stack, ${queue.waiting} waiting`
+              : (props.containerAriaLabel ?? "Journal notifications")
           }
+          expand={true}
+          gap={NOTIFICATION_STACK_GAP}
+          visibleToasts={NOTIFICATION_MAX_ACTIVE}
+          swipeDirections={swipeDirections.filter(
+            (direction) => direction === "left" || direction === "right",
+          )}
           closeButton={false}
           className={cn(
-            "toaster group journal-toaster",
-            expanded && "journal-toaster-scroll",
+            "toaster group journal-toaster journal-toaster-scroll",
             className,
           )}
           icons={{ ...statusIcons, ...icons }}
           style={
             {
-              "--width": "min(460px, calc(100vw - 32px))",
+              "--width":
+                "min(460px, calc(var(--notification-view-width, 100vw) - 32px))",
               ...style,
             } as CSSProperties
           }

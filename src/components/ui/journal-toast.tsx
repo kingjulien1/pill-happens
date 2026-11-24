@@ -2,6 +2,15 @@
 
 import { isValidElement, type ReactNode } from "react";
 import { NOTIFICATION_CHECKPOINT_INTERVAL } from "@/lib/notification-scheduling";
+import {
+  notificationAdmissions,
+  prepareNotificationStackChange,
+  publishNotificationQueue,
+  retireNotificationHost,
+  retiringNotificationCount,
+  subscribeNotificationSlotRelease,
+} from "@/lib/notification-admission";
+
 import { recordNotificationContent } from "@/lib/record-notification-content";
 import { updateCompensanNotification } from "@/lib/compensan-appearance";
 import { toast as sonnerToast, type ExternalToast, type ToastT } from "sonner";
@@ -78,6 +87,58 @@ const live = new Map<NotificationId, LiveNotice>();
 let active: Binding | null = null;
 let lastIssued = 0;
 const issueTime = () => (lastIssued = Math.max(Date.now(), lastIssued + 1));
+let admissionScheduled = false;
+function scheduleAdmissions() {
+  if (admissionScheduled) return;
+  admissionScheduled = true;
+  queueMicrotask(() => {
+    admissionScheduled = false;
+    // Same-ID replacements retain their exact slot and native host.
+    for (const entry of live.values())
+      if (entry.hostId && entry.version < 0 && !entry.removed) show(entry);
+    const candidates = [...live.values()].map((entry) => ({
+      id: entry.id,
+      admitted: Boolean(entry.hostId),
+      removed: entry.removed,
+    }));
+    for (const id of notificationAdmissions(
+      candidates,
+      retiringNotificationCount(),
+    )) {
+      const entry = live.get(id);
+      if (entry && !entry.removed) show(entry);
+    }
+    publishNotificationQueue(
+      [...live.values()].filter((entry) => Boolean(entry.hostId)).length,
+      [...live.values()].filter((entry) => !entry.hostId && !entry.removed)
+        .length,
+    );
+  });
+}
+subscribeNotificationSlotRelease(scheduleAdmissions);
+
+function holdUnseen(clock: NotificationClock) {
+  clock.pause("not-visible", true);
+  clock.pause("queued", true);
+  return clock;
+}
+
+/** Release capacity only after Sonner actually removes its retired DOM host. */
+function retireHost(entry: LiveNotice, hide: boolean) {
+  if (!entry.hostId || typeof document === "undefined") return;
+  const content = [
+    ...document.querySelectorAll<HTMLElement>("[data-notification-host-id]"),
+  ].find((element) => element.dataset.notificationHostId === entry.hostId);
+  const host = content?.closest<HTMLElement>("[data-sonner-toast]");
+  if (!host) return;
+  retireNotificationHost(entry.hostId);
+  if (hide) {
+    prepareNotificationStackChange();
+    host.dataset.notificationRetired = "true";
+    host.inert = true;
+  }
+}
+
 const defaultHeadings: Record<JournalToastKind, string> = {
   success: "Change saved",
   error: "Action failed",
@@ -199,7 +260,9 @@ function detach(entry: LiveNotice) {
   entry.removed = true;
   exits.finish(entry.id, entry.version);
   if (live.get(entry.id) === entry) live.delete(entry.id);
+  retireHost(entry, true);
   if (entry.hostId) sonnerToast.dismiss(entry.hostId);
+  scheduleAdmissions();
 }
 
 function hideNativeHost(entry: LiveNotice) {
@@ -227,12 +290,26 @@ function requestExit(
   reason: NotificationExitReason = "dismiss",
 ) {
   if (live.get(entry.id) !== entry) return false;
+  if (entry.removed) return true;
   forget(entry);
+  if (!entry.hostId || entry.version < 0) {
+    retireHost(entry, true);
+    live.delete(entry.id);
+    if (entry.hostId) sonnerToast.dismiss(entry.hostId);
+    scheduleAdmissions();
+    if (reason === "dismiss")
+      entry.options.onDismiss?.({
+        id: entry.id,
+        title: entry.heading,
+      } as ToastT);
+    return true;
+  }
   return exits.request(entry.id, reason);
 }
 
 function show(entry: LiveNotice) {
   const { id, kind, duration, dismissible, options } = entry;
+  if (!entry.hostId) prepareNotificationStackChange();
   const hostId =
     (entry.hostId ??= `notice-host-${globalThis.crypto?.randomUUID?.() ?? issueTime()}`);
   const {
@@ -254,6 +331,7 @@ function show(entry: LiveNotice) {
       : undefined;
   const heading = recordText?.heading ?? entry.heading;
   const body = recordText?.message ?? entry.body;
+  entry.clock.pause("queued", false);
   entry.version = exits.begin(id);
   const version = entry.version;
   const current = () => live.get(id) === entry && exits.isCurrent(id, version);
@@ -269,6 +347,8 @@ function show(entry: LiveNotice) {
     if (!current() || !exits.finish(id, version)) return;
     forget(entry);
     live.delete(id);
+    retireHost(entry, true);
+    scheduleAdmissions();
     try {
       if (reason === "timeout") nativeOptions.onAutoClose?.(record);
       else if (reason === "dismiss") nativeOptions.onDismiss?.(record);
@@ -352,6 +432,8 @@ function show(entry: LiveNotice) {
         if (!current() || !exits.finish(id, version)) return;
         forget(entry);
         live.delete(id);
+        retireHost(entry, false);
+        scheduleAdmissions();
         nativeOptions.onDismiss?.(record ?? nativeRecord);
       },
       className: [
@@ -399,8 +481,10 @@ function notify(
   const retainedHost =
     previous && !previous.removed ? previous.hostId : undefined;
   if (previous) {
-    if (previous.removed && previous.hostId)
+    if (previous.removed && previous.hostId) {
+      retireHost(previous, true);
       sonnerToast.dismiss(previous.hostId);
+    }
     previous.removed = true;
     exits.finish(id, previous.version);
   }
@@ -413,7 +497,7 @@ function notify(
     duration,
     dismissible: kind !== "loading" && options.dismissible !== false,
     options,
-    clock: new NotificationClock(duration),
+    clock: holdUnseen(new NotificationClock(duration)),
     binding: active,
     createdAt: issueTime(),
     lastSaved: 0,
@@ -426,7 +510,8 @@ function notify(
   if (!entry.descriptor && previous?.descriptor)
     previous.binding?.store.remove(id, entry.createdAt, previous.createdAt);
   checkpoint(entry, true);
-  return entry.removed ? id : show(entry);
+  scheduleAdmissions();
+  return id;
 }
 
 function hideBinding(binding: Binding) {
@@ -437,8 +522,10 @@ function hideBinding(binding: Binding) {
     entry.clock.pause("workspace", true);
     exits.finish(entry.id, entry.version);
     live.delete(entry.id);
+    retireHost(entry, true);
     if (entry.hostId) sonnerToast.dismiss(entry.hostId);
   }
+  scheduleAdmissions();
 }
 
 /** Bind only a server-authenticated journal namespace, never an entered password. */
@@ -461,7 +548,7 @@ export function bindJournalNotifications(
       record.descriptor,
       record.createdAt,
     );
-    const readingClock = NotificationClock.restore(record.clock);
+    const readingClock = holdUnseen(NotificationClock.restore(record.clock));
     if (readingClock.snapshot().expired) {
       binding.store.remove(record.id, issueTime(), record.createdAt);
       return;
@@ -506,7 +593,7 @@ export function bindJournalNotifications(
       removed: false,
     };
     live.set(entry.id, entry);
-    show(entry);
+    scheduleAdmissions();
   };
   for (const record of binding.store.read().records) restore(record);
   const save = () => {
@@ -527,9 +614,11 @@ export function bindJournalNotifications(
         entry.removed = true;
         exits.finish(entry.id, entry.version);
         live.delete(entry.id);
+        retireHost(entry, true);
         if (entry.hostId) sonnerToast.dismiss(entry.hostId);
       }
     }
+    scheduleAdmissions();
   };
   window.addEventListener("pagehide", save);
   window.addEventListener("pageshow", save);
@@ -570,7 +659,7 @@ function dismiss(id?: NotificationId) {
     const entry = live.get(id);
     return entry && requestExit(entry) ? id : sonnerToast.dismiss(id);
   }
-  for (const entry of live.values()) requestExit(entry);
+  for (const entry of [...live.values()]) requestExit(entry);
   const managedHosts = new Set([...live.values()].map((entry) => entry.hostId));
   for (const entry of sonnerToast.getToasts())
     if (!managedHosts.has(String(entry.id))) sonnerToast.dismiss(entry.id);

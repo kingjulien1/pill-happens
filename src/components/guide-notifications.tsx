@@ -292,17 +292,16 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Notifications keep a short result in view and put the explanation one
         tap away. The collapsed card contains its summary and countdown; opening
         details reveals a saved-change preview or explanatory context, plus
-        links and actions. When several cards are folded together, the first
-        activation only fans the stack open; activate a card again for its
-        details. You can also pull a closed card down about 113px: release when
-        the cue lights up to spring its details open, or retract to cancel.
-        In a scrollable open stack, pull from the main icon so text remains
-        available for scrolling. Reduced motion opens details without the spring.
-        A real Undo stays in the card header and also appears in the
-        action footer while details are open. Information notices offer Got it in the header. Warnings, errors and
-        loading notices offer Details when there is no reversal. An opened stack has no card-count cap
-        and scrolls within the viewport. Use the shared journal facade for every
-        application notice.
+        links and actions. Cards stay in one vertical list with a 10px gap,
+        including while a card is pulled, expanded or collapsed. Pull a card
+        down about 227px and release when the cue lights up to spring its
+        details open; retract to cancel. The threshold shortens near the
+        viewport edge. In a multi-card list, pull from the main icon so text
+        remains available for scrolling. Reduced motion skips the spring.
+        Undo stays in the header and appears in the expanded footer; information
+        notices offer Got it. Up to 20 cards are mounted. Additional notices wait
+        in arrival order and enter when an outgoing card releases its slot.
+        Use the shared journal facade for every application notice.
       </p>
       <dl className={styles.overview}>
         <div>
@@ -331,9 +330,9 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         <Source path="src/components/appearance-provider.tsx">
           AppearanceToaster
         </Source>{" "}
-        mounts the themed host once. Sonner owns its outer list items, stack
-        geometry and native swipes. The adapter’s NotificationStackContext owns
-        the explicit fan/reveal state; the inner journal component owns details,
+        mounts the themed host once. Sonner owns its outer list items, host
+        arrival and native swipes. The adapter owns the shared viewport and
+        fixed-gap list; the inner journal component owns details,
         its independent reading clock and its staged exit. Keep those state and
         transform owners separate when changing motion.
       </p>
@@ -768,15 +767,13 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         without a second set of repeated links.
       </p>
       <p>
-        While a mounted, visible notification has expanded idle details and is
-        either frontmost or in the native fanned stack, one fixed, aria-hidden
-        sibling behind the toaster softly blurs the page by 4px and adds
-        Mauve900 at 31% alpha. A :has selector scoped to the owning notification
-        wrapper checks the inner details state as well as the host’s
-        front/fanned state; revealing a stack alone never opens this veil, and
-        another toaster cannot open it. It sits at z-index 999999998 below
+        While a mounted notification has expanded idle details anywhere in the
+        scrollable list, one fixed, aria-hidden sibling behind the toaster adds
+        Mauve900 at 31% alpha. The modal owner checks the details and native
+        host state; collapsed cards alone never open this veil, and another
+        toaster cannot open it. It sits at z-index 999999998 below
         Sonner, fades over 220ms and never accumulates for multiple open
-        notices. Folded rear, removed or exiting cards cannot leave it active.
+        notices. Removed or exiting cards cannot leave it active.
         It intercepts pointer input like a lightweight dialog shield. Pressing
         outside collapses details without dismissing the notice or spending its
         remaining timer; Escape follows the same collapse-first rule. The open
@@ -916,27 +913,32 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         Independent Countdown &amp; Stack Interaction
       </Heading>
       <p>
-        A folded stack and a card’s details are separate states. In a
-        multi-notification stack, the first click or keyboard activation on any
-        card is consumed by the capture handler and only reveals the fan. It
-        cannot also open details, follow a link or run Undo. The next activation
-        reaches the chosen card normally. Outside press or Escape closes the
-        fan; a count of one or zero clears its old reveal state. Sonner still
-        owns mounted toast IDs and swipe dismissal. An explicitly revealed fan
-        switches to normal-flow cards in a viewport-bounded scroll owner, with
-        no visible-notice cap. Native vertical scrolling takes priority there;
-        left/right dismissal remains available. Closing the fan restores the
-        compact stack without unmounting its live cards or restarting clocks.
+        The stack is always a normal-flow vertical list with a viewport-bounded
+        scroller. Every card opens its own details on the first activation;
+        several cards can remain open together. Native item height and pull
+        displacement move the following cards, preserving the same 10px gap
+        throughout recoil and expansion. Horizontal swipe dismissal and the
+        keyboard order follow the visible, newest-first list.
       </p>
       <p>
-        Every finite notice runs its own monotonic clock from host readiness,
-        including rear cards and notices beyond the currently visible stack.
-        They never queue behind the front notice. Its own expanded details,
-        focus, non-touch hover, held pointer and pending Undo pause only that
-        notice; document hiding, unmounted/removal and exit guards also pause.
-        All active reasons must clear before counting resumes. Infinite notices
-        keep their existing persistent behavior and show neither rail nor
-        final-seconds marker.
+        Admission is limited to 20 mounted cards, including outgoing native
+        hosts until they unmount. Additional notices wait in arrival order,
+        retaining their IDs, saved content and entire unused reading budget.
+        Same-ID replacements keep their slot or queue position. Cancelling a
+        waiting notice removes it immediately. New arrivals preserve the
+        reading position when the list is already scrolled; a quiet count at
+        the end indicates how many notices are waiting.
+      </p>
+      <p>
+        A finite notice starts counting only when its complete card is inside
+        both the screen and the stack scroller, and its host has finished
+        fading in. Partial clipping, scrolling offscreen, backgrounding the
+        app and waiting in the queue preserve its remaining time. Expanded
+        details, keyboard focus, non-touch hover, a held pointer and pending
+        Undo also pause that notice independently. All active holds must clear
+        before counting resumes. Infinite notices show neither rail nor
+        final-seconds marker. Restored notices retain their saved active time
+        and wait for full visibility again.
       </p>
       <p>
         The default nominal budget is <code>22_000 / 3</code> milliseconds,
@@ -991,30 +993,30 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         ]}
       />
       <p>
-        The clock samples every <strong>50ms</strong>; the bar’s
-        <code> inline-size</code> interpolates over <strong>60ms</strong>,
+        Visible clocks sample every <strong>200ms</strong>, with exact wakes at
+        countdown and grace boundaries; the bar’s transform interpolates between samples,
         preserving rounded endcaps. Color urgency runs from 40% to 10%. A
         separate shared pulse ramp starts at 50% remaining and increases all the
         way to zero for both the bar and the paint-only card glow. Their CSS
         animations keep a 1,400ms base duration and use phase-preserving
         <code> updatePlaybackRate()</code> to reach an effective 450ms cycle
         without restarting their phase. Arrival, width, urgency and card-exit
-        motion have separate owners. Decorative visibility still pauses hidden
-        or folded-rear effects; opening the native fan lets visible rear
-        decorations run. Actual reading pauses also freeze urgency pulses and
+        motion have separate owners. Decorations run only while their summary
+        is visible. Offscreen cards have no countdown wake timer. Actual reading
+        pauses also freeze urgency pulses and
         the tiny marker, while ordinary finite artwork retains its separate
         visibility policy.
       </p>
       <p>
         Pointer-down pauses immediately, with each pointer ID tracked
         separately. A hold of at least 350ms, movement beyond 8px or pointer
-        cancellation suppresses the following click; a short tap reveals a
-        folded stack first, or opens details when the stack is already revealed.
+        cancellation suppresses the following click; a short tap opens that
+        card’s details directly.
         Window release and cancellation, window blur and page hiding clear
         stranded holds. Releasing a held gesture clears non-keyboard focus so
         its timer can resume; keyboard-visible focus remains a reading pause.
-        The card and its descendants disable text selection and touch callouts,
-        without removing their accessible text or normal keyboard interaction.
+        Summary controls suppress touch callouts; expanded body text remains
+        selectable without starting a pull gesture.
       </p>
       <p>
         One gesture flag survives intermediate clicks until the last contact
@@ -1028,15 +1030,15 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         The real summary button supports Enter/Space and exposes expanded,
         controls, labelled-by and described-by relationships. Closed details are
         inert and hidden from accessibility APIs; expanded details form a
-        labelled region with a scroll limit at 17/24 of the viewport height from the top edge for a
-        single card. Inside an opened stack, the shared viewport scroller owns
-        all vertical overflow and details lose their nested cap. Scroll reads
-        vertically without starting a swipe. Sonner retains left/right/up
+        labelled region. The shared stack scroller owns vertical overflow and
+        is capped at 82.875% of the current visual viewport height when details
+        are open. The screen keyboard, zoom and orientation changes update
+        that viewport without per-card polling. Sonner retains horizontal
         dismissal and its Alt+T focus shortcut. Escape first collapses an open
         notification and returns focus to its summary; the next press dismisses
-        that notice if eligible. Escape on the stack list folds the fan. Holding
-        Escape does not advance both steps. Pending Undo blocks pointer swipe starts and
-        dismissal; it does not trap focus. Inline failure uses{" "}
+        that notice if eligible. Holding Escape does not advance both steps.
+        Pending Undo blocks pointer swipe starts and dismissal; it does not
+        trap focus. Inline failure uses{" "}
         <code>role=&quot;alert&quot;</code>.
       </p>
 
@@ -1078,7 +1080,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "Rear-card rotation",
             "4.5s turns after the artwork entrance",
-            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. The nearer pink plate is reduced by another quarter to about 34.43px; the violet base by another fifth to about 37.28px, before the complete artwork’s 8/7 scale. The front tile and illustration rail remain unchanged. Hidden/folded layers pause; reduced motion keeps both still.",
+            "The violet base turns counterclockwise and the nearer pink card turns clockwise, on independent CSS wrappers. Matching seam speeds give each turn a gentle, continuous pace change. The nearer pink plate is reduced by another quarter to about 34.43px; the violet base by another fifth to about 37.28px, before the complete artwork’s 8/7 scale. The front tile and illustration rail remain unchanged. Offscreen layers pause; reduced motion keeps both still.",
           ],
           [
             "Status motion",
@@ -1088,7 +1090,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           [
             "BellRing accents",
             "4.8s envelope / 200ms twitch after 1,660ms",
-            "Side curves are fully visible at 0–12% and 88–100%, fade at 12–18% and 82–88%, and stay hidden at 18–82%. Mirrored outward twitches add a small rotation and 0.7 → 1 → 0.7 opacity, exactly 24 times per bell cycle. They inherit the bell rotation, pause in phase when hidden or folded behind another card, and hide during reverse, static and reduced-motion states.",
+            "Side curves are fully visible at 0–12% and 88–100%, fade at 12–18% and 82–88%, and stay hidden at 18–82%. Mirrored outward twitches add a small rotation and 0.7 → 1 → 0.7 opacity, exactly 24 times per bell cycle. They inherit the bell rotation, pause in phase when outside the visible list, and hide during reverse, static and reduced-motion states.",
           ],
           [
             "Undo feedback",
@@ -1144,7 +1146,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         footer while expanded, with a quiet icon tile and a short label
         underneath. Longer copy and expanded previews may increase the card
         height. The host is top-center, <code>min(460px, 100vw − 32px)</code>{" "}
-        wide, with three visible notices and a 10px gap. Mobile side offsets are
+        wide, with up to 20 cards and a 10px gap. Mobile side offsets are
         16px and top offsets include the safe area. The entire card keeps
         <code> --toast-fuchsia-surface</code>: Fuchsia950 at 47% color alpha
         above a strong 32px standard/Safari backdrop blur. A 50/50
@@ -1191,7 +1193,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Last-seconds marker",
-            "28×28px dial with a 10px radius, centred at 6px/6px on the top-left border. The 14px/750 digits roll through a clipped dark face while a fine progress rim and soft glow deepen from Rose200 to Rose800 over the final three active seconds. Native animations seek to the reading clock, freeze during holds and stop when hidden; reduced motion keeps static, readable digits. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. Expanded scroll fans reserve 18px above and 16px at the sides, preserving the cards’ width while protecting the corner dial.",
+            "28×28px dial with a 10px radius, centred at 6px/6px on the top-left border. The 14px/750 digits roll through a clipped dark face while a fine progress rim and soft glow deepen from Rose200 to Rose800 over the final three active seconds. Native animations seek to the reading clock, freeze during holds and stop when hidden; reduced motion keeps static, readable digits. No pointer target, layout growth or accessible countdown chatter; infinite notices omit it. The scrollable list reserves 18px above and 16px at the sides, preserving the cards’ width while protecting the corner dial.",
           ],
           [
             "Header / unavailable Undo",
@@ -1199,7 +1201,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "Expanded backdrop / footer",
-            "One viewport shield per owning wrapper: Mauve900 at 31% with a 220ms fade. Expanded cards and revealed stacks share Base UI’s reference-counted page scroll lock with dialogs. Touch and wheel guards allow notification scrolling while blocking pans on the header, at scroll boundaries and outside the card. The shield captures an outside press through its release and consumes the click before collapsing without dismissing. Focus stays inside the notification while expanded. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(200px, 59.2%) at two-thirds opacity: Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
+            "One viewport shield per owning wrapper: Mauve900 at 31% with a 220ms fade. Expanded cards share Base UI’s reference-counted page scroll lock with dialogs; the always-visible collapsed list alone does not lock the page. Touch and wheel guards allow notification scrolling while blocking pans on the header, at scroll boundaries and outside the card. The shield captures an outside press through its release and consumes the click before collapsing without dismissing. Focus stays inside the notification list while any card is expanded. The first divider has 4px above/20px below; the footer divider has 20px above and below, uses 10% ink and stops 13px short of the card edges. Tools use 12px gaps and include a far-edge Dismiss action. The bottom wash is min(200px, 59.2%) at two-thirds opacity: Fuchsia900 70% holds through half its height, then fades to zero; Fuchsia600 18%, Pink400 10% and Pink300 7% finish at 70%, 45% and 28% of that height.",
           ],
           [
             "Artwork / bell",
@@ -1356,18 +1358,18 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           motion.
         </li>
         <li>
-          Verify rear/invisible clocks continue independently, individual and
-          hidden-document pauses preserve grace, and Undo failure remains safe
+          Verify clipped and queued cards retain their full remaining budget,
+          individual and hidden-document pauses preserve grace, and Undo failure remains safe
           during exit, after dismissal or after replacement.
         </li>
         <li>
-          Check first-activation stack reveal without details, then independent
-          detail opening, outside/Escape collapse and reset after one card
-          remains.
+          Check the 20-card cap, FIFO admission, queue cancellation, refresh
+          restoration, fixed gaps through pulling and expansion, first-click
+          details and outside/Escape collapse.
         </li>
         <li>
-          Keep outer stack transforms, inner exit motion, countdown entry and
-          artwork transforms independent.
+          Keep native flow displacement, inner exit motion, countdown entry
+          and artwork transforms independent.
         </li>
       </ul>
     </article>

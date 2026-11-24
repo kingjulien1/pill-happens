@@ -11,21 +11,12 @@ export function nextNotificationWake(
 ): number | null {
   if (
     snapshot.paused ||
+    !visible ||
     snapshot.expired ||
     !Number.isFinite(snapshot.timeUntilComplete)
   )
     return null;
   if (snapshot.complete) return Math.max(1, snapshot.graceRemaining);
-  // Rear/offscreen notices need only their exact dismissal deadline. Native
-  // visibility changes and lifecycle checkpoints wake them before then.
-  if (!visible)
-    return Math.max(
-      1,
-      Math.min(
-        2_147_483_647,
-        snapshot.timeUntilComplete + snapshot.graceRemaining,
-      ),
-    );
   const digitBoundary =
     snapshot.timeUntilComplete > 3_000
       ? snapshot.timeUntilComplete - 3_000

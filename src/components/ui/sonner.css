@@ -21,7 +21,7 @@
   background: inherit;
 }
 
-/* Sonner owns its outer transforms, stack and swipe bridges. Custom keyframes
+/* Sonner owns host arrival and swipe bridges. Custom keyframes
    and the translucent surface belong to the inner card and artwork. */
 .journal-notification-backdrop {
   position: fixed;
@@ -105,18 +105,20 @@
   --toast-shadow: #100b2199;
 }
 
-/* Keep Sonner's mounted nodes, but let an explicitly opened fan flow naturally.
-   Internal detail panels can grow without relying on native cached offsets. */
+/* All cards use native document flow, including live expansion and pulling. */
 .journal-toaster.journal-toaster-scroll[data-sonner-toaster] {
   --notification-viewport-top: var(--offset-top);
   --notification-viewport-bottom: var(--offset-bottom);
+  top: calc(
+    var(--notification-viewport-top) + var(--notification-view-top, 0px)
+  );
   display: flex;
   flex-direction: column;
   gap: var(--gap);
   width: calc(var(--width) + 32px);
   height: auto;
   max-height: calc(
-    100dvh - var(--notification-viewport-top) -
+    var(--notification-view-height, 100dvh) - var(--notification-viewport-top) -
       max(
         var(--notification-viewport-bottom),
         env(safe-area-inset-bottom, 0px) + 8px
@@ -128,9 +130,37 @@
   overflow-y: auto;
   overscroll-behavior-y: none;
   touch-action: pan-y;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--toast-soft) 35%, transparent)
-    transparent;
+  scrollbar-width: none;
+  overflow-anchor: none;
+}
+/* The native host fades in; scaling the card itself would change its gap. */
+.journal-toaster.journal-toaster-scroll[data-sonner-toaster]
+  .journal-notification[data-phase="idle"] {
+  animation: none;
+  transform: none;
+}
+.journal-toaster-scroll::-webkit-scrollbar {
+  display: none;
+}
+.journal-toaster-scroll > [data-notification-retired="true"] {
+  display: none !important;
+}
+.journal-toaster-scroll[data-notification-waiting]:not(
+    [data-notification-waiting="0"]
+  )::after {
+  content: attr(data-notification-waiting)
+    " waiting · Dismiss a card to bring in the next";
+  position: relative;
+  z-index: 30;
+  flex: none;
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+  pointer-events: none;
 }
 .journal-toaster.journal-toaster-scroll[data-sonner-toaster]
   > [data-sonner-toast][data-mounted][data-styled] {
@@ -141,13 +171,13 @@
   width: 100%;
   height: auto;
   touch-action: pan-y;
-}
-.journal-toaster.journal-toaster-scroll[data-sonner-toaster]
-  > [data-sonner-toast][data-mounted][data-styled][data-removed="true"][data-swipe-out="false"] {
-  --y: translateY(-12px);
+  transform: translateX(var(--swipe-amount-x, 0px));
 }
 .journal-toaster.journal-toaster-scroll[data-sonner-toaster][data-x-position="center"] {
-  left: 50%;
+  left: calc(
+    var(--notification-view-left, 0px) + var(--notification-view-width, 100vw) /
+      2
+  );
   right: auto;
   transform: translateX(-50%);
 }
@@ -160,7 +190,10 @@
 .journal-toaster.journal-toaster-scroll[data-sonner-toaster]:has(
     .journal-notification[data-expanded="true"]
   ) {
-  max-height: calc(82.875dvh - var(--notification-viewport-top));
+  max-height: calc(
+    var(--notification-view-height, 100dvh) * 0.82875 -
+      var(--notification-viewport-top)
+  );
 }
 @media (max-width: 600px) {
   .journal-toaster.journal-toaster-scroll[data-sonner-toaster] {
@@ -1173,8 +1206,10 @@
   .journal-notification-art {
   touch-action: none;
 }
-.journal-notification[data-notification-pull] {
-  will-change: translate;
+[data-notification-stack-count="1"]
+  .journal-notification[data-expanded="false"]
+  .journal-notification-summary {
+  touch-action: none;
 }
 .journal-notification[data-notification-pull="opening"]
   .journal-notification-details {

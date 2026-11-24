@@ -62,6 +62,7 @@ import {
   type NotificationId,
 } from "@/lib/journal-notification-lifecycle";
 import { Button } from "@/components/ui/button";
+import { notificationVisibilityAfterBatch } from "@/lib/notification-admission";
 import {
   Tooltip,
   TooltipContent,
@@ -374,7 +375,11 @@ export function JournalNotification({
     let paintedProgress = -1;
     let paintedUrgency = -1;
     let disposed = false;
-    let inViewport = true;
+    let inViewport = false;
+    let fullyVisible = false;
+    let readyToRead = false;
+    let entered = false;
+    const visibleHeader = element.querySelector(".journal-notification-header");
     const flag = (name: string, value: string | boolean) => {
       const next = String(value);
       if (element.dataset[name] !== next) element.dataset[name] = next;
@@ -412,20 +417,23 @@ export function JournalNotification({
           paintedUrgency = snapshot.colorUrgency;
         }
       }
+      const timerHidden = hidden || !readyToRead;
       const seconds =
-        !hidden && !snapshot.complete && snapshot.timeUntilComplete <= 3_000
+        !timerHidden &&
+        !snapshot.complete &&
+        snapshot.timeUntilComplete <= 3_000
           ? Math.max(1, Math.ceil(snapshot.timeUntilComplete / 1_000))
           : null;
       setCounter((previous) =>
         previous.seconds === seconds &&
         previous.paused === snapshot.paused &&
-        previous.hidden === hidden
+        previous.hidden === timerHidden
           ? previous
           : {
               seconds,
               remainingMs: snapshot.timeUntilComplete,
               paused: snapshot.paused,
-              hidden,
+              hidden: timerHidden,
             },
       );
       const now = performance.now();
@@ -444,6 +452,7 @@ export function JournalNotification({
       if (delay !== null && !leaving.current) timer = setTimeout(tick, delay);
     };
     const syncNative = () => {
+      if (disposed) return;
       flag(
         "motionPaused",
         !inViewport ||
@@ -455,8 +464,18 @@ export function JournalNotification({
       );
       setPause("hidden", document.hidden);
       if (document.hidden) clearPointers();
-      // Rear notices still advance their own lifetime, without repainting.
-      setPause("unmounted", outer?.dataset.mounted === "false");
+      // Clipped cards spend no reading time; only the latest complete view
+      // from the observer batch can resume the monotonic countdown.
+      if (!entered && outer?.dataset.mounted === "true")
+        entered = Number(getComputedStyle(outer).opacity) >= 0.999;
+      readyToRead = fullyVisible && entered && !document.hidden;
+      flag("fullyVisible", fullyVisible);
+      flag("readingVisible", readyToRead);
+      setPause(
+        "not-visible",
+        !readyToRead || outer?.dataset.visible === "false",
+      );
+      setPause("unmounted", outer?.dataset.mounted !== "true");
       if (outer?.dataset.removed === "true") {
         setPause("removed", true);
         setReversed(true);
@@ -475,11 +494,31 @@ export function JournalNotification({
           "data-removed",
         ],
       });
-    const intersection = new IntersectionObserver(([entry]) => {
-      inViewport = entry.isIntersecting;
-      syncNative();
-    });
+    const intersection = new IntersectionObserver(
+      (entries) => {
+        if (disposed) return;
+        // A rapid insertion can deliver several positions for the same card
+        // together. Consume the entire batch; its last position is authoritative.
+        const next = notificationVisibilityAfterBatch(
+          { fullyVisible, headerVisible: inViewport },
+          entries,
+          element,
+          visibleHeader ?? undefined,
+        );
+        fullyVisible = next.fullyVisible;
+        inViewport = next.headerVisible;
+        syncNative();
+      },
+      { threshold: [0, 1] },
+    );
     intersection.observe(element);
+    if (visibleHeader) intersection.observe(visibleHeader);
+    const enteredFrame = (event: TransitionEvent) => {
+      if (event.target === outer && event.propertyName === "opacity")
+        syncNative();
+    };
+    outer?.addEventListener("transitionend", enteredFrame);
+    outer?.addEventListener("transitioncancel", enteredFrame);
     document.addEventListener("visibilitychange", syncNative);
     window.addEventListener("pointerup", releasePointer);
     window.addEventListener("pointercancel", releasePointer);
@@ -490,6 +529,8 @@ export function JournalNotification({
       alive.current = false;
       observer.disconnect();
       intersection.disconnect();
+      outer?.removeEventListener("transitionend", enteredFrame);
+      outer?.removeEventListener("transitioncancel", enteredFrame);
       document.removeEventListener("visibilitychange", syncNative);
       window.removeEventListener("pointerup", releasePointer);
       window.removeEventListener("pointercancel", releasePointer);
@@ -697,13 +738,14 @@ export function JournalNotification({
         (!stack.expanded && host?.dataset.front === "false")
       )
         return false;
-      // An open fan keeps native touch scrolling over its text. The artwork
-      // remains a small pull handle; a single/folded card accepts its summary.
+      // A list keeps native touch scrolling over its text. The artwork
+      // remains a small pull handle; a single card accepts its whole summary.
       // An expanded header also accepts the closing pull; its body stays native.
       return (
         event.type !== "pointerdown" ||
         event.pointerType !== "touch" ||
         expandedRef.current ||
+        stack.count <= 1 ||
         !stack.expanded ||
         Boolean(
           event.target instanceof Element &&
