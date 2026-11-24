@@ -15,7 +15,7 @@ import {
 import { toast } from "@/components/ui/journal-toast";
 import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
-import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { CheckInCardBorder as SpecularCardBorder } from "@/components/check-in-card-border";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
@@ -789,18 +789,23 @@ function CheckInForm({
             <span>Save &amp; stay</span>
             <span className={styles.saveStayNote}>Keep editing</span>
           </button>
-          <DialogPrimaryButton
+          <IntakePrimaryButton
             type="submit"
             disabled={locked}
             pending={locked}
-            className="w-full rounded-2xl"
+            secondaryText={locked ? undefined : "Keep it!"}
+            symbol={
+              <span className="intake-log-symbol" aria-hidden="true">
+                <Save
+                  className="intake-log-symbol-pill"
+                  size={23}
+                  strokeWidth={3.25}
+                />
+              </span>
+            }
           >
-            {locked
-              ? period === "morning"
-                ? "Saving Your Morning…"
-                : "Saving Your Day…"
-              : "Save Check-In"}
-          </DialogPrimaryButton>
+            {locked ? "Saving…" : "Save Check-In"}
+          </IntakePrimaryButton>
           <DraftStatus {...draft} />
         </div>
         <p className={styles.saveHint}>

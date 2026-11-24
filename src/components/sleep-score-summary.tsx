@@ -7,6 +7,7 @@ import {
   type MorningSleepDraft,
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
+import { CheckInSectionHeader } from "./check-in-section";
 import { Iridescence } from "./iridescence";
 import { useSleepScoreMotion } from "./use-sleep-score-motion";
 import styles from "./sleep-score-summary.module.css";
@@ -88,12 +89,13 @@ export function SleepScoreSummary({
   const stageMotion = useSleepScoreMotion(hasStageBreakdown && !disabled);
   return (
     <div className={styles.wrapper}>
-      <div className={styles.topline}>
-        <h3 id={`${id}-heading`}>The Night, In Numbers</h3>
-        <span>
-          Sleep Cycle <span aria-hidden="true">·</span> Night recap
-        </span>
-      </div>
+      <CheckInSectionHeader
+        caption="The Night, In Numbers"
+        context="Sleep Cycle"
+        detail="Night recap"
+        headingId={`${id}-heading`}
+        description="Compare your tracker’s score with time asleep and time in bed. Edit the score in the ring; the sleep stages above update your totals automatically."
+      />
       <section
         className={styles.section}
         aria-labelledby={`${id}-heading`}

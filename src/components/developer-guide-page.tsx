@@ -1286,6 +1286,14 @@ export function DeveloperGuidePage() {
                 independent of that outer border.
               </p>
               <p>
+                IntakePrimaryButton owns the complete Log Intake button and is
+                also used by Save Check-In in both period dialogs. They share
+                the same face, concentric borders, outboard rim, icon rail,
+                separator, secondary copy and arrow. Check-in saving retains
+                its own label, Save icon and pending state without a separate
+                border override.
+              </p>
+              <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
                 mode uses a pale lilac face with deep plum text; light mode uses
                 a rich plum face with pale lilac text. Supporting copy and the
@@ -3722,16 +3730,16 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Morning reuses the Evening card, responsive modal, Markdown
-                launcher and Accent save action. Both cards share the same
-                period-specific Rose400 or Violet400 identity, shared glass,
+                launcher and shared Log Intake save component. Both cards use
+                the same period-specific Rose400 or Violet400 identity, shared glass,
                 80px frame and two-row summary; the coffee cup or Moon artwork
                 identifies the period. The journal editor stays first;
-                structured sleep details follow in three compact sections. Time
-                in bed and Sleep efficiency form one calculated summary row
-                immediately above Save Check-In. A 1px separator at 13%
-                foreground visibility follows the preceding content after 10px.
-                The summary has 12px of top padding, with 16px between its
-                values and Save; both estimates remain one compact row.
+                structured sleep details follow with times, stage durations,
+                ratings and a separate recap. The recap uses the same
+                CheckInSectionHeader above its card: a 14px heading, slash
+                context, opposite-side metadata and a brief description. Its
+                score, tracker readings and calculated sleep totals remain
+                inside the existing dark card above Save Check-In.
               </p>
               <p>
                 The Morning dialog starts with Before the Day Bites, followed by

@@ -1,5 +1,7 @@
 .wrapper {
+  display: grid;
   min-width: 0;
+  gap: 8px;
   margin-bottom: 14px;
 }
 .section {
@@ -58,34 +60,6 @@
   background-size: 100% 100%;
   background-repeat: no-repeat;
   opacity: 0.12;
-}
-.topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-  padding-inline: 4px;
-}
-.topline h3 {
-  min-width: 0;
-  margin: 0;
-  color: var(--foreground);
-  font-size: calc(14px * 2 / 3);
-  font-weight: 650;
-  line-height: 1.5;
-  white-space: nowrap;
-}
-.topline > span {
-  color: var(--muted-foreground);
-  font-size: 8px;
-  line-height: 1.5;
-  white-space: nowrap;
-  text-align: right;
-}
-.topline > span > span {
-  padding-inline: 3px;
-  opacity: 0.55;
 }
 .overview {
   display: grid;

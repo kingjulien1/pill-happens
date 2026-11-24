@@ -6,18 +6,13 @@ import {
 } from "@/lib/page-entry-readiness";
 
 import { useCallback, useRef, useState } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
-import { TodayActionButton } from "@/components/today-action-button";
-import {
-  getIntakeActionThemeStyle,
-  INTAKE_ACTION_GEOMETRY,
-} from "@/lib/action-button-system";
+import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { IntakeLogSymbol } from "@/components/intake-log-symbol";
 import { PageActionDock } from "@/components/page-action-dock";
-import { SpecularCardBorder } from "@/components/specular-card-border";
 
 // Temporary visibility switch: set true to restore the unchanged amounts bar.
 const SHOW_INTAKE_AMOUNTS = false;
@@ -251,51 +246,21 @@ export function IntakeAction({
         className="intake-action-entry-button"
         data-intake-entry-part="button"
       >
-        <div className="intake-action-shell">
-          <SpecularCardBorder desktop />
-          <TodayActionButton
-            type="button"
-            surface="solid"
-            radius={INTAKE_ACTION_GEOMETRY.radius}
-            style={{
-              ...getIntakeActionThemeStyle(),
-              height: INTAKE_ACTION_GEOMETRY.height,
-              minHeight: INTAKE_ACTION_GEOMETRY.height,
-            }}
-            data-intake-paint="satin"
-            data-log-intake-rim
-            decoration={<SpecularCardBorder />}
-            onClick={() => {
-              setMedicationType((current) =>
-                current === "tablet" ? "capsule" : "tablet",
-              );
-              onClick();
-            }}
-            className="intake-primary-cta pointer-events-auto w-full"
-          >
-            <span className="intake-primary-row">
-              <span className="intake-primary-copy">
-                <span className="intake-primary-label">
-                  <IntakeLogSymbol
-                    variant="pills"
-                    medicationType={medicationType}
-                  />
-                  Log Intake
-                </span>
-                <span className="intake-primary-dot" aria-hidden="true">
-                  ·
-                </span>
-                <span className="intake-primary-aside">Jot it!</span>
-              </span>
-              <ArrowRight
-                className="intake-primary-next"
-                size={23}
-                strokeWidth={3.25}
-                aria-hidden="true"
-              />
-            </span>
-          </TodayActionButton>
-        </div>
+        <IntakePrimaryButton
+          type="button"
+          symbol={
+            <IntakeLogSymbol variant="pills" medicationType={medicationType} />
+          }
+          secondaryText="Jot it!"
+          onClick={() => {
+            setMedicationType((current) =>
+              current === "tablet" ? "capsule" : "tablet",
+            );
+            onClick();
+          }}
+        >
+          Log Intake
+        </IntakePrimaryButton>
       </div>
       <p
         className="intake-action-note"
