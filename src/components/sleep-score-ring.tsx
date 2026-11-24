@@ -1,23 +1,58 @@
 "use client";
 
-import { type CSSProperties } from "react";
+import type { AnimationEvent, CSSProperties } from "react";
+import { lunarSparkPath, lunarStarPath } from "./lunar-star-paths";
 import { useSleepScoreMotion } from "./use-sleep-score-motion";
 import styles from "./sleep-score-ring.module.css";
 
 const ARC = "M55.653283 184.346717 A91 91 0 1 1 184.346717 184.346717";
-/** Native score edits stay inside the SVG dial and its softly lit arc. */
+function RingStar({ score }: { score: number }) {
+  // Reuse one glyph. Choose its next origin on the filled arc while it is invisible.
+  function placeStar(event: AnimationEvent<SVGSVGElement>) {
+    if (event.target !== event.currentTarget) return;
+    const { style } = event.currentTarget;
+    const angle = ((135 + 270 * (score / 100) * Math.random()) * Math.PI) / 180;
+    const x = Math.cos(angle);
+    const y = Math.sin(angle);
+    const radius = (91 / 240) * 100;
+    const distance = 18 + Math.random() * 10;
+    const turn = (18 + Math.random() * 200) * (Math.random() < 0.5 ? -1 : 1);
+    style.left = `${50 + x * radius}%`;
+    style.top = `${50 + y * radius}%`;
+    style.width = `${(7 + Math.random() * 2.4) * 0.44}px`;
+    style.setProperty("--drift-x", `${x * distance}px`);
+    style.setProperty("--drift-y", `${y * distance}px`);
+    style.setProperty("--turn", `${turn}deg`);
+    style.setProperty(
+      "--starlight",
+      Math.random() < 0.04 ? "#fde68a" : "#fef3c7",
+    );
+  }
+  return (
+    <svg
+      className={styles.star}
+      viewBox="-4 -4 8 8"
+      aria-hidden="true"
+      onAnimationStart={placeStar}
+      onAnimationIteration={placeStar}
+    >
+      <path d={lunarStarPath} fill="currentColor" />
+      <g className={styles.farewell}>
+        <circle r="2.7" strokeWidth=".55" />
+        <path d={lunarSparkPath} strokeWidth=".9" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
 export function SleepScoreRing({
   id,
   score,
-  rawScore,
   disabled,
-  onScoreChange,
 }: {
   id: string;
   score: number | null;
-  rawScore: string;
   disabled: boolean;
-  onScoreChange: (value: string) => void;
 }) {
   const positive = score !== null && score > 0;
   const dial = useSleepScoreMotion(positive && !disabled);
@@ -137,34 +172,17 @@ export function SleepScoreRing({
           </g>
         </g>
       </svg>
+      {positive && <RingStar key={score} score={score} />}
       <div className={styles.copy}>
-        <label htmlFor={`${id}-score`}>Sleep Score</label>
+        <span className={styles.scoreLabel}>Sleep Score</span>
         <div className={styles.number}>
-          <input
-            id={`${id}-score`}
-            aria-label="Sleep score out of 100"
-            aria-describedby={`${id}-score-hint`}
-            aria-invalid={
-              (rawScore.trim() !== "" && score === null) || undefined
-            }
-            type="number"
-            min={0}
-            max={100}
-            step={1}
-            inputMode="numeric"
-            placeholder="—"
-            value={rawScore}
-            disabled={disabled}
-            onChange={(event) => onScoreChange(event.target.value)}
-          />
-          <span aria-hidden="true">%</span>
+          <strong>{score ?? "—"}</strong>
+          {score !== null && <span>%</span>}
         </div>
-        <span id={`${id}-score-hint`} className={styles.caption}>
-          {rawScore.trim() !== "" && score === null
-            ? "Use a whole number from 0 to 100"
-            : score === null
-              ? "Add a score or import your report"
-              : "Tap the number to edit"}
+        <span className={styles.caption}>
+          {score === null
+            ? "Awaiting a report score"
+            : "From your sleep report"}
         </span>
       </div>
       <span className={styles.foot} aria-hidden="true">

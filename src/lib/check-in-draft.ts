@@ -12,6 +12,7 @@ import {
   type DailyMood,
 } from "./daily-check-in";
 import { isCheckInRating, type CheckInRatingScale } from "./check-in-rating";
+import { readReportValue } from "./sleep-cycle-report";
 
 /** Keep the existing Evening key so saved drafts survive the period split. */
 export function checkInDraftKey(
@@ -77,7 +78,15 @@ export function morningSleepForDraft(
   draft: CheckInDraft,
   checkIn?: DailyCheckIn,
 ): MorningSleepDraft {
-  if (draft.morningSleep !== undefined) return draft.morningSleep;
+  if (draft.morningSleep !== undefined) {
+    const sleep = draft.morningSleep;
+    if (!sleep.reportScore) return sleep;
+    // An unfinished value from the former score editor cannot be corrected in the dial.
+    const reportScore =
+      readReportValue("reportScore", sleep.reportScore) ??
+      checkIn?.morningSleep?.reportScore?.toString();
+    return reportScore === sleep.reportScore ? sleep : { ...sleep, reportScore };
+  }
   const base = morningSleepDefaults(checkIn?.morningSleep);
   const raw = draft.sleepHours;
   if (!raw.trim()) return { ...base, sleepHours: "", sleepMinutes: "" };

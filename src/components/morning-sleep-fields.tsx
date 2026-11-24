@@ -292,11 +292,7 @@ export function MorningSleepFields({
         </section>
       </CheckInSection>
       <hr className={styles.recapDivider} data-sleep-recap-divider />
-      <SleepScoreSummary
-        value={value}
-        disabled={disabled}
-        onChange={(next) => onChange(withSleepStageTotals(next))}
-      />
+      <SleepScoreSummary value={value} disabled={disabled} />
     </div>
   );
 }

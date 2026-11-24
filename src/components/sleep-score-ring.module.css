@@ -119,7 +119,7 @@
   justify-content: center;
   gap: 4px;
 }
-.copy > label {
+.scoreLabel {
   color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 550;
@@ -130,36 +130,15 @@
   min-width: 0;
   align-items: baseline;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
 }
-.number input {
-  appearance: textfield;
-  width: 2.7ch;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  border-radius: 8px;
-  background: none;
+.number strong {
   color: var(--foreground);
   font-size: clamp(40px, 20cqi, 52px);
   font-weight: 675;
   line-height: 1.1;
   letter-spacing: -0.06em;
-  text-align: center;
   font-variant-numeric: tabular-nums;
-}
-.number input::-webkit-inner-spin-button,
-.number input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.number input:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 3px;
-}
-.number input:disabled {
-  cursor: default;
 }
 .number > span {
   color: var(--score-orchid);
@@ -201,6 +180,22 @@
   transform-box: view-box;
   transform-origin: center;
 }
+.star {
+  position: absolute;
+  width: 3.6px;
+  aspect-ratio: 1;
+  overflow: visible;
+  translate: -50% -50%;
+  opacity: 0;
+  color: var(--starlight, #fef3c7);
+  pointer-events: none;
+}
+.farewell {
+  opacity: 0;
+  fill: none;
+  stroke: currentColor;
+  transform-origin: 0 0;
+}
 @media (prefers-reduced-motion: no-preference) {
   .dial[data-active="true"] .arcGlow {
     animation: score-corona 3.4s cubic-bezier(0.45, 0.04, 0.3, 1) infinite;
@@ -211,6 +206,71 @@
   .dial[data-active="true"] .beam {
     opacity: 1;
     animation: score-current 5.6s cubic-bezier(0.35, 0.02, 0.45, 1) infinite;
+  }
+  .dial[data-active="true"] .star,
+  .dial[data-active="true"] .farewell {
+    animation: star-flight 5.7s linear 2s infinite;
+  }
+  .dial[data-active="true"] .farewell {
+    animation-name: star-echo;
+  }
+}
+/* A short flick opens into two seconds of drift before the moon-style exit.
+   The rest of the cycle leaves the ring quiet. */
+@keyframes star-flight {
+  0% {
+    opacity: 0;
+    transform: scale(0.16);
+    animation-timing-function: ease-out;
+  }
+  5% {
+    opacity: 1;
+    transform: translate(
+        calc(var(--drift-x) * 0.44),
+        calc(var(--drift-y) * 0.44)
+      )
+      rotate(calc(var(--turn) * 0.15)) scale(1.1);
+  }
+  35% {
+    opacity: 0.92;
+    color: var(--starlight);
+    transform: translate(
+        calc(var(--drift-x) * 0.84),
+        calc(var(--drift-y) * 0.84)
+      )
+      rotate(calc(var(--turn) * 0.8)) scale(1);
+  }
+  41% {
+    opacity: 1;
+    color: #fff3ea;
+    transform: translate(
+        calc(var(--drift-x) * 0.93),
+        calc(var(--drift-y) * 0.93)
+      )
+      rotate(calc(var(--turn) * 0.94)) scale(1.13);
+  }
+  49%,
+  100% {
+    opacity: 0;
+    color: #ffe4e6;
+    transform: translate(var(--drift-x), var(--drift-y)) rotate(var(--turn))
+      scale(0.2);
+  }
+}
+@keyframes star-echo {
+  0%,
+  35% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  41% {
+    opacity: 0.88;
+    transform: scale(0.95);
+  }
+  48%,
+  100% {
+    opacity: 0;
+    transform: scale(2);
   }
 }
 @keyframes score-corona {

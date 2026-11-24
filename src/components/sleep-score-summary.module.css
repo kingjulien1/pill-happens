@@ -230,9 +230,8 @@
   --stage-pigment: var(--stage-deep);
 }
 .stageLegend {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 18px 0 0;
 }
@@ -243,18 +242,18 @@
   min-width: 0;
 }
 .stageLegend dt {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+  position: relative;
   color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 550;
 }
 .stageLegend i {
-  position: relative;
+  position: absolute;
+  inset-inline-end: calc(100% + 7px);
+  top: 50%;
+  transform: translateY(-50%);
   width: 7.5px;
   height: 7.5px;
-  flex: none;
   border-radius: 50%;
   background: var(--stage-pigment);
   box-shadow: inset 0 1px 0 #ffffff38;
@@ -313,12 +312,14 @@
   content: "";
   position: absolute;
   z-index: -1;
-  inset: auto -17px -15px;
-  height: 64px;
+  inset: 0 -17px -15px;
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-mauve-950, #0c090c) 60%, transparent),
-    transparent
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 60%, transparent) 0%,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 54%, transparent) 33%,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 40%, transparent) 67%,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 20%, transparent) 84%,
+    transparent 100%
   );
   pointer-events: none;
 }
@@ -328,14 +329,13 @@
   justify-content: center;
   gap: 6px;
   margin: 0;
-  color: var(--foreground);
+  color: var(--stage-light);
   font-size: 11.5px;
   font-weight: 625;
   line-height: 1.45;
 }
 .footer h4 svg {
   flex: none;
-  color: var(--stage-light);
 }
 .footer p {
   max-width: 64ch;

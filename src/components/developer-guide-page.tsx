@@ -3781,7 +3781,7 @@ export function DeveloperGuidePage() {
                 ratings and a separate recap. The recap uses the same
                 CheckInSectionHeader above its card: a 14px heading, slash
                 context, opposite-side metadata and a brief description. Its
-                score, tracker readings and calculated sleep totals remain
+                read-only score, tracker readings and calculated sleep totals sit
                 inside the recap above Save Check-In. Its single background
                 uses the subsection border pigment with one-third less opacity,
                 while text inherits the current dialog theme. The sleep-stage
@@ -3798,8 +3798,8 @@ export function DeveloperGuidePage() {
                 A short recap footer explains the efficiency formula, the
                 separate report score and blank-versus-zero readings. Its help
                 links open the check-in guide and Sleep Cycle’s score reference
-                in separate tabs. A 64px Mauve950 fade rises from 60% to zero
-                behind the footer’s bottom edge; it never covers hit targets.
+                in separate tabs. The Mauve950 footer fade starts at 60% along
+                the card bottom and clears at the divider above the info heading.
               </p>
               <p>
                 The Morning dialog starts with Before the Day Bites, followed by

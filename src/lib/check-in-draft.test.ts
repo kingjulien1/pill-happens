@@ -347,6 +347,31 @@ test("invalid old raw hours remain recoverable and fail save parsing instead of 
   }
 });
 
+test("unfinished scores from the old editor allow the rest of the morning draft to be saved", () => {
+  const draft = checkInDefaults(undefined, "morning");
+  const sleep = { ...draft.morningSleep!, reportScore: "101", dreamRecall: 4 };
+  const record: DailyCheckIn = {
+    ...changeRecord,
+    period: "morning",
+    morningSleep: { ...emptyMorningSleep(), reportScore: 0 },
+  };
+  for (const saved of [undefined, record]) {
+    const restored = morningSleepForDraft(
+      { ...draft, morningSleep: sleep },
+      saved,
+    );
+    const parsed = parseMorningSleepDraft(restored);
+    assert.equal(parsed.error, null);
+    assert.equal(parsed.value?.reportScore, saved?.morningSleep?.reportScore);
+    assert.equal(parsed.value?.dreamRecall, 4);
+  }
+  const valid = { ...sleep, reportScore: "84" };
+  assert.equal(
+    morningSleepForDraft({ ...draft, morningSleep: valid }, record),
+    valid,
+  );
+});
+
 test("an existing nested sleep draft always takes priority over its hidden legacy hours", () => {
   const nested = {
     ...morningSleepDefaults(),

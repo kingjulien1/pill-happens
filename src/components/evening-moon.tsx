@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { getEveningMoonMotion } from "@/lib/evening-moon-motion";
+import { lunarSparkPath, lunarStarPath } from "./lunar-star-paths";
 import styles from "./evening-moon.module.css";
 
 const STAR_POSITIONS = [
@@ -21,7 +22,6 @@ const STAR_COLORS = [
   ["#fde68a", "#fff7d6"],
   ["#e9d5ff", "#fbcfe8"],
 ] as const;
-const STAR_PATH = "M0-3.2.85-.85 3.2 0 .85.85 0 3.2-.85.85-3.2 0-.85-.85Z";
 
 type EveningStar = {
   id: number;
@@ -320,7 +320,7 @@ export function EveningMoon({
               fill="currentColor"
             >
               <circle className={styles.aureole} r="3.2" />
-              <path className={styles.starCore} d={STAR_PATH} />
+              <path className={styles.starCore} d={lunarStarPath} />
               <path
                 className={styles.rays}
                 d="M0-5v-2M0 5v2M-5 0h-2M5 0h2M3.6-3.6l1.1-1.1M-3.6 3.6l-1.1 1.1M3.6 3.6l1.1 1.1M-3.6-3.6l-1.1-1.1"
@@ -328,7 +328,7 @@ export function EveningMoon({
               <circle className={styles.burstRing} r="2.7" />
               <path
                 className={styles.burstSpecks}
-                d="M0-5.8v-.7M4.1-4.1l.5-.5M5.8 0h.7M4.1 4.1l.5.5M0 5.8v.7M-4.1 4.1l-.5.5M-5.8 0h-.7M-4.1-4.1l-.5-.5"
+                d={lunarSparkPath}
               />
             </svg>
           </span>

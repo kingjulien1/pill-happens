@@ -65,14 +65,12 @@ function SleepMetric({
 export function SleepScoreSummary({
   value,
   disabled,
-  onChange,
 }: {
   value: MorningSleepDraft;
   disabled: boolean;
-  onChange: (next: MorningSleepDraft) => void;
 }) {
   const id = useId();
-  // Editing a score must not temporarily erase otherwise valid time/stage math.
+  // Calculate stage totals independently of the imported tracker readings.
   const parsed = parseMorningSleepDraft({
     ...value,
     reportScore: undefined,
@@ -150,7 +148,7 @@ export function SleepScoreSummary({
         context="Sleep Cycle"
         detail="Night recap"
         headingId={`${id}-heading`}
-        description="Compare your tracker’s score with time asleep and time in bed. Edit the score in the ring; the sleep stages above update your totals automatically."
+        description="Your Sleep Cycle report supplies the score. The stages and bedtimes above show how much of the night you spent asleep."
       />
       <section
         className={styles.section}
@@ -162,11 +160,7 @@ export function SleepScoreSummary({
             <SleepScoreRing
               id={id}
               score={score}
-              rawScore={value.reportScore ?? ""}
               disabled={disabled}
-              onScoreChange={(reportScore) =>
-                onChange({ ...value, reportScore })
-              }
             />
           </div>
           <div className={styles.readings}>
@@ -284,6 +278,7 @@ export function SleepScoreSummary({
           <h4 id={`${id}-footer-heading`}>
             <Info size={14} strokeWidth={2} aria-hidden="true" />
             How this recap works
+            <Info size={14} strokeWidth={2} aria-hidden="true" />
           </h4>
           <p>
             <strong>Efficiency</strong> uses{" "}
