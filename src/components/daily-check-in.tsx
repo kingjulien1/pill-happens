@@ -235,7 +235,7 @@ export function DailyCheckInSection({
       <div className={styles.cardFrame}>
         <SpecularCardBorder desktop />
         <MedicationCardBase
-          color={CHECK_IN_CARD_COLOR[period]}
+          color={CHECK_IN_CARD_COLOR}
           background={<CheckInCardSurface period={period} />}
           decoration={<SpecularCardBorder />}
           icon={morning ? "sun" : "moon-star"}

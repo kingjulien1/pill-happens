@@ -2,6 +2,16 @@
   width: 100%;
   min-width: 0;
   margin: 0;
+  --check-in-wash: #ffb35230;
+  --check-in-start: #70382a;
+  --check-in-middle: #4d293c;
+  --check-in-shadow: #392341;
+  --check-in-ink: var(--color-orange-50, #fff7ed);
+  --check-in-key: var(--color-orange-200, #ffd6a7);
+  --check-in-glyph: var(--color-amber-100, #fef3c6);
+  --check-in-icon-background: var(--color-amber-950, #461901);
+  --check-in-outer-color: #dd925e;
+  --check-in-rim-glint: #fff1bf;
   --check-in-surface:
     radial-gradient(ellipse at 0% 100%, var(--check-in-wash), transparent 57%),
     linear-gradient(
@@ -15,30 +25,10 @@
 /* Give each time marker more room while keeping the intake side compact. */
 .section[data-check-in-period="morning"] {
   padding-block-start: 8px;
-  --check-in-wash: #ffb35230;
-  --check-in-start: #70382a;
-  --check-in-middle: #4d293c;
-  --check-in-shadow: #392341;
-  --check-in-ink: var(--color-orange-50, #fff7ed);
-  --check-in-key: var(--color-orange-200, #ffd6a7);
-  --check-in-glyph: var(--color-amber-100, #fef3c6);
-  --check-in-icon-background: var(--color-amber-950, #461901);
-  --check-in-outer-color: #dd925e;
-  --check-in-rim-glint: #fff1bf;
 }
 
 .section[data-check-in-period="evening"] {
   padding-block-end: 8px;
-  --check-in-wash: #5eead430;
-  --check-in-start: #135555;
-  --check-in-middle: #133d49;
-  --check-in-shadow: #10313d;
-  --check-in-ink: var(--color-cyan-50, #ecfeff);
-  --check-in-key: var(--color-cyan-200, #a2f4fd);
-  --check-in-glyph: var(--color-teal-100, #cbfbf1);
-  --check-in-icon-background: var(--color-cyan-950, #053345);
-  --check-in-outer-color: #4ab9bc;
-  --check-in-rim-glint: #d5fff6;
 }
 
 .cardFrame {
@@ -417,28 +407,18 @@
 
 @media (prefers-color-scheme: light) {
   .section {
-    --check-in-surface: linear-gradient(
-      108deg,
-      var(--check-in-start),
-      var(--check-in-middle) 54%,
-      color-mix(in srgb, var(--check-in-shadow) 75%, var(--check-in-middle))
-    );
-  }
-  .section[data-check-in-period="morning"] {
     --check-in-start: #ffdcaa;
     --check-in-middle: #fff1dd;
     --check-in-shadow: #f2d7d3;
     --check-in-ink: #392135;
     --check-in-key: #86401c;
     --check-in-outer-color: #bc7443;
-  }
-  .section[data-check-in-period="evening"] {
-    --check-in-start: #b6eeea;
-    --check-in-middle: #e4f9f6;
-    --check-in-shadow: #c5e4e8;
-    --check-in-ink: var(--color-cyan-950, #053345);
-    --check-in-key: #155c69;
-    --check-in-outer-color: #28999d;
+    --check-in-surface: linear-gradient(
+      108deg,
+      var(--check-in-start),
+      var(--check-in-middle) 54%,
+      color-mix(in srgb, var(--check-in-shadow) 75%, var(--check-in-middle))
+    );
   }
 }
 

@@ -16,9 +16,9 @@ const STAR_POSITIONS = [
   { x: -10, y: 11 },
 ] as const;
 const STAR_COLORS = [
-  ["var(--color-cyan-300, #53eafd)", "var(--check-in-glyph)"],
-  ["var(--color-teal-200, #96f7e4)", "var(--color-cyan-200, #a2f4fd)"],
-  ["var(--check-in-rim-glint)", "var(--color-teal-300, #46ecd5)"],
+  ["var(--entry-color)", "var(--check-in-glyph)"],
+  ["var(--check-in-outer-color)", "var(--check-in-rim-glint)"],
+  ["var(--check-in-glyph)", "var(--entry-color)"],
 ] as const;
 
 type EveningStar = {

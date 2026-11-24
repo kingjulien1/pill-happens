@@ -8,10 +8,7 @@ import { EveningMoon } from "@/components/evening-moon";
 import { MorningCoffee } from "@/components/morning-coffee";
 import styles from "./check-in-card-artwork.module.css";
 
-export const CHECK_IN_CARD_COLOR = {
-  morning: "tw-orange-400",
-  evening: "tw-cyan-700",
-} as const;
+export const CHECK_IN_CARD_COLOR = "tw-orange-400";
 
 /** A quiet horizon behind the readings, clipped by the shared card frame. */
 export function CheckInCardSurface({ period }: { period: DailyCheckInPeriod }) {
@@ -99,7 +96,7 @@ function ArtworkScene({ period }: { period: DailyCheckInPeriod }) {
       />
       <span className={styles.arrival}>
         <MedicationCardIconFrame
-          color={CHECK_IN_CARD_COLOR[period]}
+          color={CHECK_IN_CARD_COLOR}
           className={styles.tile}
           style={{
             color: "var(--art-ink)",
