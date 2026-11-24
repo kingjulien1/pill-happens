@@ -758,23 +758,27 @@ export function IntakeForm({
               : undefined
           }
         />
-        {showRestoredHelp && (
-          <p className={styles.restoredHelp}>
-            Your device kept these unfinished changes. Save Intake to log them,
-            or use <strong>Reset draft</strong> at the top right to start fresh.
-          </p>
-        )}
-        <div className={styles.trackingDay}>
-          <span>
-            <CalendarCheck aria-hidden="true" />
-            {belongsTo
-              ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.`
-              : "Choose a valid time."}
-          </span>
-          <span>
-            <Sunrise aria-hidden="true" />
-            Days begin at 06:00.
-          </span>
+        <div className={styles.trackingFooter} data-intake-tracking-footer>
+          {showRestoredHelp && (
+            <p className={styles.restoredHelp}>
+              Your device kept these unfinished changes.{" "}
+              {intake ? "Save Edits to keep them" : "Save Intake to log them"},
+              or use <strong>Reset draft</strong> at the top right to start
+              fresh.
+            </p>
+          )}
+          <div className={styles.trackingDay}>
+            <span>
+              <CalendarCheck aria-hidden="true" />
+              {belongsTo
+                ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.`
+                : "Choose a valid time."}
+            </span>
+            <span>
+              <Sunrise aria-hidden="true" />
+              Days begin at 06:00.
+            </span>
+          </div>
         </div>
       </div>
     </form>
