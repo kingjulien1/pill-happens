@@ -19,7 +19,7 @@ import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewDetails } from "./intake-preview-details";
@@ -757,17 +757,24 @@ export function IntakeForm({
         data-dialog-fade-footer
         data-draft-action-footer
       >
-        <DialogPrimaryButton
+        <IntakePrimaryButton
           type="submit"
           disabled={busy || timingResetting}
           pending={busy}
-          leadingIcon={busy ? undefined : <Import aria-hidden="true" />}
+          symbol={
+            <span className="intake-log-symbol" aria-hidden="true">
+              <Import
+                className="intake-log-symbol-pill"
+                size={23}
+                strokeWidth={3.25}
+              />
+            </span>
+          }
           secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
-          className={styles.submitButton}
           data-intake-submit
         >
           {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
-        </DialogPrimaryButton>
+        </IntakePrimaryButton>
         <DraftStatus
           {...draftFeedback}
           onReset={busy || footerAction || formId ? undefined : reset}

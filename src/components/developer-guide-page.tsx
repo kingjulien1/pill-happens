@@ -1287,10 +1287,10 @@ export function DeveloperGuidePage() {
               </p>
               <p>
                 IntakePrimaryButton owns the complete Log Intake button and is
-                also used by Save Check-In in both period dialogs. They share
+                also used by Save Check-In, Save Intake and Save Edits. They share
                 the same face, concentric borders, outboard rim, icon rail,
-                separator, secondary copy and arrow. Check-in saving retains
-                its own label, Save icon and pending state without a separate
+                separator, secondary copy and arrow. Each action keeps its own
+                label, contextual icon and pending state without a separate
                 border override.
               </p>
               <p>
@@ -1944,8 +1944,11 @@ export function DeveloperGuidePage() {
               <p>
                 Empty intake previews retain the real card geometry and a
                 Mauve-gray palette, with the Final Look title at 82% opacity
-                and disabled More details at 20%. A 6.8-second CSS sequence
-                compresses and rebounds the icon frame, releases three rings,
+                and disabled More details at 20%. While the skeleton is shown,
+                the entire preview section uses an additional 11/18 opacity
+                multiplier, about 39% less visible. A complete preview returns
+                to full section opacity. A 6.8-second CSS sequence compresses
+                and rebounds the icon frame, releases three rings,
                 eight rays and eight particles, then relays light through the
                 rows and opposing border trails into two edge flares. These
                 are fixed decorative elements, with no particle timers or

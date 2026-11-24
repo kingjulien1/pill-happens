@@ -7,38 +7,8 @@
   text-align: center;
 }
 
-.submitButton[data-slot="button"][data-dialog-primary-button][data-control-style="satin"] {
-  --action-outer-line: calc(1px * 29 / 12);
-  --action-inner-line: 0px;
-  --action-surround: var(--checkin-section-edge);
-  --action-reduced-surround: var(--action-surround);
-}
-.submitButton[data-slot="button"][data-dialog-primary-button]::before {
-  box-shadow: none;
-}
-.submitButton[data-dialog-primary-button][data-control-style="satin"]
-  :global(.intake-primary-label) {
-  gap: 24px;
-}
-.submitButton[data-slot="button"][data-dialog-primary-button][data-control-style="satin"]
-  :global(.intake-log-symbol) {
-  width: 23px;
-  height: 23px;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  color: var(--control-secondary);
-}
-.submitButton[data-slot="button"][data-dialog-primary-button]
-  :is(:global(.intake-log-symbol), :global(.intake-primary-next))
-  > svg {
-  stroke-width: 3.25;
-}
-@media (max-width: 359px) {
-  .submitButton[data-dialog-primary-button][data-control-style="satin"]
-    :global(.intake-primary-label) {
-    gap: 20px;
-  }
+.footer > :global(.intake-action-shell) {
+  margin-block-start: 24px;
 }
 
 .medicationSection {
@@ -82,6 +52,8 @@
   --preview-empty-surface: var(--color-mauve-600, #594c5b);
   --preview-empty-copy: var(--color-mauve-100, #f3f1f3);
   --preview-empty-muted: var(--color-mauve-200, #e8e3e8);
+  /* Reduce the entire empty section by 7/18, keeping its internal hierarchy. */
+  opacity: calc(11 / 18);
 }
 .preview > [data-notification-snapshot-card] {
   min-width: 0;
