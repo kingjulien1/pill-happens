@@ -983,8 +983,7 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   scale: calc(127 / 144);
   transform-origin: center;
 }
-/* Share the cup pigment with topbar controls and the quiet stack-group tint. */
-.check-in-icon-theme,
+/* Topbar controls and the quiet stack-group tint share these pigments. */
 [data-page-topbar],
 .intake-group[data-grouped="true"] {
   --check-in-mug-ink: #c1b6cc;

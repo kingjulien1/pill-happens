@@ -1,7 +1,23 @@
+.surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--check-in-surface);
+  pointer-events: none;
+}
+.surface svg {
+  position: absolute;
+  inset: 0 12% 0 auto;
+  width: min(31%, 140px);
+  height: 100%;
+  color: var(--check-in-key);
+  opacity: 0.18;
+}
+
 .stage {
-  --art-ink: var(--color-rose-200, #fecdd3);
-  --art-soft: var(--color-violet-400, #a78bfa);
-  --check-in-art-base: var(--check-in-icon-background);
+  --art-ink: var(--check-in-glyph);
+  --art-soft: var(--check-in-rim-glint);
   --art-entry-delay: 180ms;
   --art-start: var(
     --check-in-art-delay,

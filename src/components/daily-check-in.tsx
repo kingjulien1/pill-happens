@@ -23,6 +23,7 @@ import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
 import {
   CHECK_IN_CARD_COLOR,
   CheckInCardArtwork,
+  CheckInCardSurface,
 } from "@/components/check-in-card-artwork";
 import { recordedSleepAverage } from "@/lib/daily-derived-values";
 import { getCheckInCardMetric } from "@/lib/check-in-card-metric";
@@ -233,11 +234,12 @@ export function DailyCheckInSection({
       <div className={styles.cardFrame}>
         <SpecularCardBorder desktop />
         <MedicationCardBase
-          color={CHECK_IN_CARD_COLOR}
+          color={CHECK_IN_CARD_COLOR[period]}
+          background={<CheckInCardSurface period={period} />}
           decoration={<SpecularCardBorder />}
           icon={morning ? "sun" : "moon-star"}
           leadingArtwork={<CheckInCardArtwork period={period} day={day} />}
-          className={cn(styles.card, "check-in-icon-theme")}
+          className={styles.card}
           data-check-in-card
           data-check-in-dialog-open={ownDialogOpen}
           data-filled={saved}

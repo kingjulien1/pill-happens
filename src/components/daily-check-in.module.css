@@ -7,10 +7,37 @@
 /* Give each time marker more room while keeping the intake side compact. */
 .section[data-check-in-period="morning"] {
   padding-block-start: 8px;
+  --check-in-surface:
+    radial-gradient(ellipse at 0% 100%, #ffb35230, transparent 57%),
+    linear-gradient(108deg, #70382a, #4d293c 51%, #392341);
+  --check-in-ink: var(--color-orange-50, #fff7ed);
+  --check-in-key: var(--color-orange-200, #ffd6a7);
+  --check-in-glyph: var(--color-amber-100, #fef3c6);
+  --check-in-icon-background: var(--color-amber-950, #461901);
+  --check-in-outer-color: #dd925e;
+  --check-in-rim-glint: #fff1bf;
 }
 
 .section[data-check-in-period="evening"] {
   padding-block-end: 8px;
+  --check-in-surface:
+    radial-gradient(ellipse at 100% 10%, #c47a5e26, transparent 47%),
+    linear-gradient(
+      110deg,
+      #302453,
+      var(--color-indigo-950, #1e1a4d) 48%,
+      color-mix(
+        in srgb,
+        var(--color-purple-900, #59168b) 57%,
+        var(--color-indigo-950, #1e1a4d)
+      )
+    );
+  --check-in-ink: var(--color-violet-50, #f5f3ff);
+  --check-in-key: var(--color-indigo-200, #c6d2ff);
+  --check-in-glyph: var(--color-orange-100, #ffedd4);
+  --check-in-icon-background: var(--color-indigo-950, #1e1a4d);
+  --check-in-outer-color: #9b88d9;
+  --check-in-rim-glint: #f9dcc6;
 }
 
 .cardFrame {
@@ -25,32 +52,22 @@
   pointer-events: none;
 }
 
-/* Pink identity stays local to check-ins; shared medication frames keep their palette. */
-.card:global(.intake-log-card) {
-  --check-in-secondary: var(--color-pink-300, #f9a8d4);
-  --check-in-accent: var(--entry-color);
-  --check-in-rim-dark: var(--color-pink-500, #ec4899);
-  --check-in-art-base: color-mix(
-    in srgb,
-    #210f25 88%,
-    var(--color-pink-950, #500724)
-  );
-  /* Both artwork surfaces stay dark in either mode and use its primary light ink. */
-  --check-in-art-copy: var(--palette-white);
-  color: var(--card-foreground);
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Pale check-in glass needs the reading ink, independent of the page canvas. */
 .section .card:global(.intake-log-card[data-check-in-card]) {
-  --card-foreground: var(--foreground);
+  --card-foreground: var(--check-in-ink);
   --check-in-outer-gap: 3px;
   --check-in-outer-width: calc(var(--entry-inner-rim-width) * 1.4);
-  --check-in-outer-color: color-mix(
+  --entry-edge-color: color-mix(
     in srgb,
-    var(--color-purple-400, #c084fc) 78%,
-    var(--color-pink-400, #f472b6) 22%
+    var(--check-in-outer-color) 41%,
+    transparent
   );
+  --entry-inner-rim-color: color-mix(
+    in srgb,
+    var(--check-in-outer-color) 47%,
+    transparent
+  );
+  color: var(--card-foreground);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .card:disabled {
@@ -71,7 +88,7 @@
   align-items: center;
   gap: var(--intake-indicator-gap);
   height: var(--intake-indicator-cell-size);
-  color: var(--card-foreground);
+  color: var(--check-in-key);
 }
 
 .summaryIcons > span {
@@ -103,12 +120,15 @@
   gap: 1px;
   min-width: 0;
 }
+.card [data-check-in-opened-time],
+.card :global(.intake-card-total) {
+  color: var(--check-in-key);
+}
 .updatedTime {
   position: absolute;
   inset-block-start: calc(100% + 1px);
   display: block;
-  color: var(--card-foreground);
-  opacity: 0.36;
+  color: color-mix(in srgb, var(--check-in-key) 79%, transparent);
   font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   font-size: 9px;
@@ -117,9 +137,10 @@
   white-space: nowrap;
 }
 
-.card .preview {
+.card [data-check-in-preview-row] .preview {
   max-width: 100%;
   flex: 1 1 0;
+  color: color-mix(in srgb, var(--check-in-ink) 77%, var(--check-in-key));
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -406,16 +427,18 @@
   }
 }
 
-/* The dark illustration remains a contrast island inside the pale card face. */
 @media (prefers-color-scheme: light) {
-  .section .card:global(.intake-log-card[data-check-in-card]) {
-    --check-in-secondary: var(--color-pink-500, #ec4899);
-    --check-in-accent: var(--color-pink-600, #db2777);
-    --check-in-rim-dark: var(--color-pink-400, #f472b6);
+  .section[data-check-in-period="morning"] {
+    --check-in-surface: linear-gradient(108deg, #ffdcaa, #fff1dd 54%, #f2d7d3);
+    --check-in-ink: #392135;
+    --check-in-key: #86401c;
+    --check-in-outer-color: #bc7443;
   }
-
-  .updatedTime {
-    opacity: 0.65;
+  .section[data-check-in-period="evening"] {
+    --check-in-surface: linear-gradient(108deg, #ccc9ef, #e7e5fa 52%, #decfe8);
+    --check-in-ink: var(--color-indigo-950, #1e1a4d);
+    --check-in-key: #534477;
+    --check-in-outer-color: #8670ba;
   }
 }
 
@@ -460,8 +483,7 @@
 
 .card :global(.intake-card-total).sampleMetric {
   gap: 4px;
-  color: color-mix(in srgb, var(--muted-foreground) 24%, #93909a);
-  opacity: 0.55;
+  color: color-mix(in srgb, var(--check-in-ink) 78%, transparent);
   font-size: 11px;
   font-weight: 450;
   white-space: nowrap;

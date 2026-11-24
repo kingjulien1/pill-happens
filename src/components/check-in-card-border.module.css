@@ -2,24 +2,8 @@
   --rim-gap: var(--check-in-outer-gap, 3px);
   --rim-width: var(--check-in-outer-width, 3.733333px);
   --rim-radius: var(--entry-card-radius, var(--intake-card-radius, 21px));
-  --rim-color: var(
-    --check-in-outer-color,
-    color-mix(
-      in srgb,
-      var(--color-purple-400, #c084fc) 78%,
-      var(--color-pink-400, #f472b6) 22%
-    )
-  );
-  --rim-purple-glow: color-mix(
-    in srgb,
-    var(--color-purple-400, #c084fc) 46%,
-    transparent
-  );
-  --rim-pink-glow: color-mix(
-    in srgb,
-    var(--color-pink-400, #f472b6) 54%,
-    transparent
-  );
+  --rim-color: var(--check-in-outer-color);
+  --rim-glow: color-mix(in srgb, var(--rim-color) 36%, transparent);
   pointer-events: none;
 }
 
@@ -30,8 +14,12 @@
 .frame {
   --intake-rim-base: var(--rim-color);
   --intake-rim-stop-1: color-mix(in srgb, var(--intake-rim-base) 92%, black);
-  --intake-rim-stop-2: color-mix(in srgb, var(--intake-rim-base) 68%, white);
-  --intake-rim-stop-3: color-mix(in srgb, var(--intake-rim-base) 24%, white);
+  --intake-rim-stop-2: color-mix(
+    in srgb,
+    var(--intake-rim-base) 68%,
+    var(--check-in-rim-glint)
+  );
+  --intake-rim-stop-3: var(--check-in-rim-glint);
   position: absolute;
   z-index: 4;
   box-sizing: border-box;
@@ -82,14 +70,11 @@
   visibility: hidden;
 }
 
-/* Purple400 at 46% and Pink400 at 54% share the check-in card's quiet halo. */
 .frame::before {
   position: absolute;
   inset: calc(var(--rim-width) + var(--rim-gap) - 0.5px);
   border-radius: var(--rim-radius);
-  box-shadow:
-    0 0 18px 1px var(--rim-purple-glow),
-    0 0 11px 0 var(--rim-pink-glow);
+  box-shadow: 0 0 14px 1px var(--rim-glow);
   content: "";
 }
 
@@ -115,10 +100,10 @@
   }
   .track {
     stroke: color-mix(in srgb, currentColor 92%, black);
-    filter: drop-shadow(0 0 4px var(--color-pink-400));
+    filter: drop-shadow(0 0 3px var(--rim-glow));
   }
   .highlight {
-    stroke: color-mix(in srgb, currentColor 32%, white);
+    stroke: var(--check-in-rim-glint);
     stroke-dasharray: 12 88;
     stroke-linecap: round;
   }
