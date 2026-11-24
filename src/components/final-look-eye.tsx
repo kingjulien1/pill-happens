@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { Eye } from "lucide-react";
 import styles from "./final-look-eye.module.css";
+
+const BLINK_DURATION = 1_280;
 
 /** One idle timeout, only while visible; blinking never rerenders the form. */
 export function FinalLookEye() {
@@ -24,23 +26,24 @@ export function FinalLookEye() {
         () => {
           eye.dataset.blinking = "true";
         },
-        4_000 + Math.random() * 5_000 - (afterBlink ? 620 : 0),
+        4_000 + Math.random() * 5_000 - (afterBlink ? BLINK_DURATION : 0),
       );
     };
     const ended = (event: AnimationEvent) => {
-      if (event.target === eye.querySelector("[data-eye-glyph]"))
-        schedule(true);
+      // The scene owns completion, so the last ripple can finish after the lid.
+      if (event.target === eye && eye.dataset.blinking) schedule(true);
     };
     const sync = () => schedule();
     const observer =
       "IntersectionObserver" in window
-        ? new IntersectionObserver(([entry]) => {
-            visible = entry.isIntersecting;
+        ? new IntersectionObserver((entries) => {
+            for (const entry of entries) visible = entry.isIntersecting;
             schedule();
           })
         : null;
     observer?.observe(eye);
     eye.addEventListener("animationend", ended);
+    eye.addEventListener("animationcancel", ended);
     document.addEventListener("visibilitychange", sync);
     motion.addEventListener("change", sync);
     if (!observer) schedule();
@@ -48,6 +51,7 @@ export function FinalLookEye() {
       stop();
       observer?.disconnect();
       eye.removeEventListener("animationend", ended);
+      eye.removeEventListener("animationcancel", ended);
       document.removeEventListener("visibilitychange", sync);
       motion.removeEventListener("change", sync);
     };
@@ -57,9 +61,11 @@ export function FinalLookEye() {
     <span
       ref={ref}
       className={styles.eye}
+      style={{ "--eye-blink-duration": `${BLINK_DURATION}ms` } as CSSProperties}
       aria-hidden="true"
       data-final-look-eye
     >
+      <span className={styles.halo} />
       <Eye className={styles.glyph} data-eye-glyph strokeWidth={2.5} />
       <svg
         className={styles.lid}
@@ -73,22 +79,40 @@ export function FinalLookEye() {
       </svg>
       <svg
         className={styles.burst}
-        viewBox="0 0 24 24"
+        viewBox="-12 -12 48 48"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1"
+        strokeWidth="1.3"
         strokeLinecap="round"
       >
-        <circle className={styles.ring} cx="12" cy="12" r="5" />
-        <g className={styles.rays}>
-          {[0, 60, 120, 180, 240, 300].map((angle) => (
+        <circle className={styles.ring} cx="12" cy="12" r="10" />
+        <ellipse className={styles.echo} cx="12" cy="12" rx="12" ry="9" />
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => (
+          <g key={angle} transform={`rotate(${angle} 12 12)`}>
             <path
-              key={angle}
-              d="M12 3v1.5"
-              transform={`rotate(${angle} 12 12)`}
+              className={styles.ray}
+              d="M12 2V-3"
+              pathLength="1"
+              style={{ animationDelay: `${260 + index * 9}ms` }}
             />
-          ))}
-        </g>
+          </g>
+        ))}
+        {[22.5, 112.5, 202.5, 292.5].map((angle, index) => (
+          <g key={angle} transform={`rotate(${angle} 12 12)`}>
+            <path
+              className={styles.spark}
+              d="m12-7 1.1 2.9L16-3l-2.9 1.1L12 1l-1.1-2.9L8-3l2.9-1.1Z"
+              style={{ animationDelay: `${330 + index * 28}ms` }}
+            />
+            <circle
+              className={styles.mote}
+              cx="12"
+              cy="-1"
+              r="1.3"
+              style={{ animationDelay: `${410 + index * 24}ms` }}
+            />
+          </g>
+        ))}
       </svg>
     </span>
   );

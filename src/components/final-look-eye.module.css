@@ -1,103 +1,292 @@
 .eye {
+  --eye-pop-ink: color-mix(in srgb, currentColor 52%, var(--color-violet-300));
+  --eye-pop-light: color-mix(
+    in srgb,
+    currentColor 28%,
+    var(--color-fuchsia-200)
+  );
   position: relative;
+  z-index: 1;
   display: inline-block;
   flex: none;
   width: 1.24em;
   height: 1.24em;
   margin-inline-end: 2px;
+  overflow: visible;
   color: inherit;
   pointer-events: none;
+  transform-origin: center;
 }
 .glyph,
 .lid {
   position: absolute;
+  z-index: 1;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-.glyph {
   transform-origin: center;
 }
-.lid {
+.lid,
+.halo {
   opacity: 0;
+}
+.halo {
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--eye-pop-light),
+    color-mix(in srgb, var(--eye-pop-ink) 40%, transparent) 42%,
+    transparent 72%
+  );
 }
 .burst {
   position: absolute;
-  inset: -5px;
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
+  z-index: 2;
+  inset: -80%;
+  width: 260%;
+  height: 260%;
   overflow: visible;
+  color: var(--eye-pop-ink);
 }
 .ring,
-.rays {
+.echo,
+.ray,
+.spark,
+.mote {
   opacity: 0;
+  transform-box: view-box;
   transform-origin: 12px 12px;
 }
+.echo {
+  stroke: var(--eye-pop-light);
+  stroke-width: 0.95;
+  stroke-dasharray: 2 3.5;
+}
+.ray {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-width: 1.7;
+}
+.spark,
+.mote {
+  transform-box: fill-box;
+  transform-origin: center;
+  fill: var(--eye-pop-light);
+  stroke: none;
+}
+.glyph circle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* One finite scene: prepare, close, spring open, then let the outer echoes go. */
 @media (prefers-reduced-motion: no-preference) {
+  .eye[data-blinking] {
+    animation: eye-pop var(--eye-blink-duration) both;
+    will-change: transform;
+  }
   .eye[data-blinking] .glyph {
-    animation: eye-blink 620ms both;
+    animation: eye-blink var(--eye-blink-duration) both;
+  }
+  .eye[data-blinking] .glyph circle {
+    animation: eye-pupil var(--eye-blink-duration) both;
   }
   .eye[data-blinking] .lid {
-    animation: eye-lid 620ms both;
+    animation: eye-lid var(--eye-blink-duration) both;
+  }
+  .eye[data-blinking] .halo {
+    animation: eye-halo var(--eye-blink-duration) both;
   }
   .eye[data-blinking] .ring {
-    animation: eye-ring 420ms cubic-bezier(0.16, 1, 0.3, 1) 175ms both;
+    animation: eye-ring 880ms cubic-bezier(0.12, 0.72, 0.18, 1) 220ms both;
   }
-  .eye[data-blinking] .rays {
-    animation: eye-rays 420ms cubic-bezier(0.16, 1, 0.3, 1) 195ms both;
+  .eye[data-blinking] .echo {
+    animation: eye-echo 920ms cubic-bezier(0.16, 0.85, 0.25, 1) 300ms both;
+  }
+  .eye[data-blinking] .ray {
+    animation-name: eye-rays;
+    animation-duration: 760ms;
+    animation-timing-function: cubic-bezier(0.16, 0.8, 0.25, 1);
+    animation-fill-mode: both;
+  }
+  .eye[data-blinking] .spark {
+    animation-name: eye-spark;
+    animation-duration: 680ms;
+    animation-timing-function: cubic-bezier(0.15, 0.9, 0.2, 1);
+    animation-fill-mode: both;
+  }
+  .eye[data-blinking] .mote {
+    animation-name: eye-mote;
+    animation-duration: 640ms;
+    animation-timing-function: cubic-bezier(0.12, 0.68, 0.28, 1);
+    animation-fill-mode: both;
+  }
+}
+@keyframes eye-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.25);
+  }
+  20% {
+    transform: scale(0.84) rotate(-6deg);
+    animation-timing-function: cubic-bezier(0.14, 1.5, 0.3, 1);
+  }
+  36% {
+    transform: scale(1.26) rotate(5deg);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.25, 1);
+  }
+  53% {
+    transform: scale(0.97) rotate(-2deg);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  72% {
+    transform: scale(1.025) rotate(0.6deg);
   }
 }
 @keyframes eye-blink {
   0%,
+  65%,
   100% {
-    transform: scaleY(1);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.8, 0.2);
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.8, 0.2);
   }
-  24%,
-  32% {
-    transform: scaleY(0.04);
-    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  18%,
+  22% {
+    transform: scale(1.05, 0.035);
+    animation-timing-function: cubic-bezier(0.12, 1.4, 0.3, 1);
   }
-  72% {
-    transform: scaleY(1.035);
-    animation-timing-function: ease-out;
+  36% {
+    transform: scale(1.035, 1.14);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.25, 1);
+  }
+  49% {
+    transform: scale(1, 0.97);
+  }
+}
+@keyframes eye-pupil {
+  0%,
+  22%,
+  72%,
+  100% {
+    transform: scale(1);
+  }
+  37% {
+    transform: scale(1.26);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  52% {
+    transform: scale(0.94);
   }
 }
 @keyframes eye-lid {
   0%,
-  15%,
-  48%,
+  10%,
+  29%,
   100% {
     opacity: 0;
   }
-  24%,
-  32% {
+  18%,
+  22% {
     opacity: 1;
+  }
+}
+@keyframes eye-halo {
+  0%,
+  15%,
+  100% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  35% {
+    opacity: 0.42;
+    transform: scale(1.25);
+  }
+  65% {
+    opacity: 0;
+    transform: scale(1.8);
   }
 }
 @keyframes eye-ring {
   0% {
     opacity: 0;
-    transform: scale(0.25);
+    transform: scale(0.35);
   }
   18% {
-    opacity: 0.22;
+    opacity: 0.8;
+  }
+  52% {
+    opacity: 0.48;
   }
   100% {
     opacity: 0;
-    transform: scale(1.35);
+    transform: scale(2.1);
+  }
+}
+@keyframes eye-echo {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-18deg);
+  }
+  21% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9) rotate(24deg);
+    stroke-dashoffset: -7;
   }
 }
 @keyframes eye-rays {
   0% {
     opacity: 0;
-    transform: scale(0.45);
+    stroke-dashoffset: 1;
+    transform: scale(0.4);
   }
-  20% {
-    opacity: 0.16;
+  22% {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+  }
+  62% {
+    opacity: 0.36;
+    stroke-dashoffset: -0.15;
   }
   100% {
     opacity: 0;
-    transform: scale(1.08);
+    stroke-dashoffset: -1;
+    transform: translateY(-9px) scale(1.3);
+  }
+}
+@keyframes eye-spark {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0) rotate(-30deg);
+  }
+  28% {
+    opacity: 0.9;
+    transform: translateY(-3px) scale(1.12) rotate(8deg);
+  }
+  65% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.15) rotate(42deg);
+  }
+}
+@keyframes eye-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2);
+  }
+  23% {
+    opacity: 0.75;
+    transform: translate(2px, -5px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(5px, -15px) scale(0);
   }
 }

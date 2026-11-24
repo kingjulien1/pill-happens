@@ -2102,6 +2102,13 @@ export function DeveloperGuidePage() {
                 the final fifth of that scroll. Cached layout and one queued
                 frame per scroll batch avoid repeated card measurements or an
                 idle render loop; reduced motion shows the full static heading.
+                The preview eye runs a 1.28-second squeeze and spring reveal,
+                with a pupil rebound, soft halo, two expanding ripples, eight
+                staggered rays and four paired star/dot accents. One scene owns
+                completion so every echo finishes before cleanup. Random starts
+                stay 4–9 seconds apart; hidden/offscreen views and reduced motion
+                stop both the animation and its idle timeout. The effect uses
+                small SVG/CSS layers and never rerenders the surrounding form.
                 Color chips use the selected pigment at 40% and a
                 matching family-900 ink, including a neutral fallback. The
                 preview shows quantity and per-unit strength as 2 tablets / 20
