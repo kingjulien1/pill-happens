@@ -913,14 +913,12 @@ export function GuidePage() {
             </GuideDetail>
             <GuideDetail title="A Place For Everything" icon="menu">
               <p>
-                Open the menu beside the animated tablets to move between Today,
-                Journal, Past Days, Medications and Goals. On phones it opens as
-                a scrollable bottom sheet with full-width page cards. Each card
-                includes a short description, live count and a few useful
-                details. Today uses the same layout as the other destinations.
-                Getting Started sits under A Little Help / At Your Pace;
-                Backups, Report a Bug and Developer are under Help &amp;
-                Tools. Scroll to reach the lower shortcuts.
+                Open the Journal index beside the animated tablets. The amber
+                Today card shows the tracking date, logged intakes and saved
+                check-ins. Open it to return to your day. The Library links take
+                you to Journal, Past Days, Medications and Goals. Under Help
+                &amp; tools you can find Getting started, Backups &amp; export,
+                Report a bug and the Developer guide.
               </p>
             </GuideDetail>
             <GuideDetail title="Find Your Light" icon="palette">

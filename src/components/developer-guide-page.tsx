@@ -1024,8 +1024,9 @@ export function DeveloperGuidePage() {
                 </a>{" "}
                 use those same values. Hover, selected and selected-hover paints
                 have separate opaque tonal bases, so text remains clear above
-                the background field. Choice rows keep their borderless
-                selection treatment; navigation retains its inward bands.
+                the background field. Choice rows highlight the selected option.
+                The Journal index marks the current Library page with a colored
+                edge and checkmark.
               </p>
               <p>
                 Menu-local aliases adapt existing components without recoloring
@@ -1053,56 +1054,25 @@ export function DeveloperGuidePage() {
               context="One Family Of Menus"
             >
               <p>
-                The directory contains Today, Journal, Past Days, Medications,
-                Goals and Getting Started Guide. From 768px, HeaderNavigation
-                uses a 420px anchored Base UI Menu with native links, arrow-key
-                navigation and typeahead. Below 768px it uses the same
-                responsive Drawer primitives as intake editing: a full-width
-                bottom sheet with a swipe handle, safe-area clearance, modal
-                focus containment and background scroll locking. Its scroll
-                owner keeps every destination and footer tool reachable in short
-                phone windows. Route or breakpoint changes close the previous
-                host and preserve focus return to the current trigger.
+                The Journal index opens as an anchored Base UI Menu from 768px
+                and as a modal bottom sheet on smaller screens. Appearance and
+                Close sit in the header. The area beneath it scrolls through
+                Today, the Library and Help &amp; tools, including on short
+                screens. The phone sheet supports swiping and accounts for the
+                bottom safe area.
               </p>
               <p>
-                Today, Journal, Past Days, Medications and Goals are equal
-                full-width destination cards in a single column on both layouts.
-                Each title shares its row with a compact live count, while a
-                two-line purpose description stays visible below it. A fine
-                inset rule separates a small facts row: saved check-ins and the
-                06:00 reset for Today, word count and latest page for Journal,
-                latest historical day, archived medications or upcoming goals.
-                Counts and summaries are derived only while the menu is open
-                from already-loaded journal data; unavailable data keeps helpful
-                context instead of inventing zeroes. Appearance and Close retain
-                44px targets. A 50px layered brand tile ties the masthead to the
-                destinations. Pink and Lilac selection washes add no extra
-                borders, while keyboard focus remains independently visible.
+                The amber Today link uses the journal’s tracking date and shows
+                intake and check-in counts. The four Library links show saved
+                journal pages, past days, active medications and active goals.
+                Counts use the loaded journal and update while the index is open.
+                Descriptive labels stand in while the journal loads.
               </p>
               <p>
-                Navigation owns its own scoped surface in
-                navigation-panel.module.css: dark mode starts from #211625 with
-                #fdf1f7 copy and Pink/Lilac accents; light mode uses rose paper
-                with deep Plum copy. This leaves the canonical menu roles
-                available to Appearance and form selectors. The mobile sheet
-                uses the intake forms’ shared dialog radius and bounded height,
-                with dedicated safe-area padding. One navigationBody scroll
-                owner contains its header, destinations and footer, so even
-                short windows can reach every control without nested scrolling.
-              </p>
-              <p>
-                The same 40px icon tile, 15–15.5px label and protected 18px
-                trailing rail compose every destination, including Today.
-                Desktop cards have a 91px minimum height; mobile uses 96px,
-                growing naturally for wrapped purpose copy and facts. The
-                trailing rail holds the current-page check or destination arrow.
-                Long labels yield before the count badge, descriptions use at
-                most two lines, and individual facts truncate without moving the
-                arrow or adding horizontal scrolling. Routes and modified clicks
-                keep their native semantics. Destinations enter with a
-                restrained 380ms rise, offset by 32ms per item; reduced motion
-                shows settled content. Hover remains limited to desktop fine
-                pointers and never moves the icons.
+                The current Library destination carries a colored edge and a
+                checkmark. Keyboard focus has its own outline. The calendar
+                leaf tips into place as the index opens. Reduced motion displays
+                the index in its settled state.
               </p>
               <p>
                 Streaks is not listed in the navigation menu. The existing
@@ -1113,18 +1083,9 @@ export function DeveloperGuidePage() {
                 milestone pages are unchanged.
               </p>
               <p>
-                Getting Started has its own full-width supporting card beneath
-                “A Little Help / At Your Pace,” with daily basics, installation
-                and backup context. A separated Help &amp; Tools footer contains
-                three shortcut tiles: Backups, Report a Bug and Developer.
-                Mobile uses 62px stacked tiles; desktop uses 44px horizontal
-                tools while the richer destination list keeps its own scroll
-                area. Their CloudDownload, BugPlay and Braces glyphs use the
-                Pink accent; accessible names retain their complete
-                destinations. A quiet two-line note explains that the current
-                place is remembered on this device. Every tool stays reachable
-                through the sheet’s existing scroll owner; no decorative wash
-                overlaps the links.
+                Help &amp; tools groups Getting started, Backups &amp; export,
+                Report a bug and the Developer guide. The bug report opens
+                GitHub in a new tab.
               </p>
               <p>
                 Navigation keys its host by pathname and responsive layout. A
