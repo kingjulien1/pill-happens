@@ -35,6 +35,20 @@
   );
   transform-origin: left center;
 }
+.heading[data-motion="static"] {
+  --final-look-scale: 1;
+  --final-look-lines: 1;
+}
+.heading[data-motion="static"] .badge,
+.heading[data-motion="static"] .line {
+  transform: none;
+}
+.staticEye {
+  flex: none;
+  width: 1.24em;
+  height: 1.24em;
+  margin-inline-end: 2px;
+}
 @media (prefers-reduced-motion: reduce) {
   .badge {
     transform: none;

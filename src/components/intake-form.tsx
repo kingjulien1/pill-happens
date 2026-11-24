@@ -25,7 +25,10 @@ import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewDetails } from "./intake-preview-details";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
-import { IntakePreviewSummary } from "./intake-preview-summary";
+import {
+  IntakePreviewSummary,
+  IntakePreviewTotals,
+} from "./intake-preview-summary";
 import { IntakeSectionContext } from "./intake-section-context";
 import { priorMedicationIntake } from "@/lib/intake-context";
 import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
@@ -675,17 +678,24 @@ export function IntakeForm({
           <IntakePreviewSummary
             medicationName={medication?.name ?? fallbackIntake!.medicationName}
             count={daySummary.count}
-            totalMg={daySummary.totalMg}
-            includingDraftMg={includingDraftMg}
             takenAt={previewTime}
             timeZone={timezone}
           />
         )}
-        <FinalLookHeading
-          id="intake-preview-title"
-          showIcon
-          color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
-        />
+        <div className={styles.previewHeading}>
+          {belongsTo && (medication || fallbackIntake) && (
+            <IntakePreviewTotals
+              totalMg={daySummary.totalMg}
+              includingDraftMg={includingDraftMg}
+            />
+          )}
+          <FinalLookHeading
+            id="intake-preview-title"
+            showIcon
+            motion={false}
+            color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
+          />
+        </div>
         {belongsTo &&
         validQuantity &&
         effectiveQuantity !== null &&

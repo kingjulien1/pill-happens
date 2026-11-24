@@ -1,6 +1,7 @@
 "use client";
 
 import { FinalLookEye } from "./final-look-eye";
+import { Eye } from "lucide-react";
 import { useFinalLookScroll } from "./use-final-look-scroll";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import styles from "./medication-appearance-fields.module.css";
@@ -10,21 +11,38 @@ export function FinalLookHeading({
   id,
   showIcon = false,
   color,
+  motion = true,
 }: {
   id: string;
   showIcon?: boolean;
   color?: ReturnType<typeof getMedicationColor>;
+  motion?: boolean;
 }) {
-  const ref = useFinalLookScroll();
+  const ref = useFinalLookScroll(motion);
   return (
-    <div ref={ref} className={headingStyles.heading} data-final-look-heading>
+    <div
+      ref={ref}
+      className={headingStyles.heading}
+      data-final-look-heading
+      data-motion={motion ? "scroll" : "static"}
+    >
       <span className={headingStyles.line} aria-hidden="true" />
       <div
         className={`${styles.titlePill} ${headingStyles.badge}`}
         data-preview-title-pill
       >
         <h3 id={id}>
-          {showIcon && <FinalLookEye />}
+          {showIcon &&
+            (motion ? (
+              <FinalLookEye />
+            ) : (
+              <Eye
+                className={headingStyles.staticEye}
+                strokeWidth={2.5}
+                aria-hidden="true"
+                data-final-look-eye
+              />
+            ))}
           Final Look
         </h3>
         <span aria-hidden="true" className={styles.titleSeparator} />

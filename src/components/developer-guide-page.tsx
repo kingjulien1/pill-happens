@@ -2111,6 +2111,13 @@ export function DeveloperGuidePage() {
                 stay 4–9 seconds apart; hidden/offscreen views and reduced motion
                 stop both the animation and its idle timeout. The effect uses
                 small SVG/CSS layers and never rerenders the surrounding form.
+                Intake creation and editing instead keep their Final Look badge,
+                eye and fading side rails static at full size, with no scroll
+                observer or blink timer. Saved and projected day totals sit in
+                equal-width Right Now / After lanes above those rails, using the
+                same 14px bold amounts and 10px labels/units on both sides. The
+                full-width row has a 12px gap before the badge; the weekday and
+                medication-log count remain in their own summary above it.
                 Color chips use the selected pigment at 40% and a
                 matching family-900 ink, including a neutral fallback. The
                 preview shows quantity and per-unit strength as 2 tablets / 20

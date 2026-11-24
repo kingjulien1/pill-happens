@@ -71,6 +71,13 @@
   align-items: center;
   gap: 5px;
 }
+.previewHeading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 12px;
+  padding-top: 6px;
+}
 
 .preview .previewSummary {
   display: grid;
@@ -100,6 +107,9 @@
   max-width: 100%;
   gap: 10px;
   justify-items: end;
+}
+.previewSummaryCopy,
+.previewSummaryTotals {
   color: color-mix(
     in srgb,
     var(--color-purple-200, #e9d5ff),
@@ -136,42 +146,56 @@
 .previewSummaryTotals {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: min(100%, 224px);
+  width: 100%;
+  min-width: 0;
+  column-gap: 16px;
   margin: 0;
-  text-align: end;
+  padding-inline: 6px;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: start;
 }
 .previewSummaryTotals > div {
-  display: grid;
-  align-content: start;
-  gap: 3px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
   min-width: 0;
 }
 .previewSummaryTotals > div + div {
-  margin-inline-start: 14px;
-  padding-inline-start: 14px;
-  border-inline-start: 1px solid
-    color-mix(in srgb, currentColor 22%, transparent);
+  justify-content: end;
+  text-align: end;
 }
 .previewSummaryTotals dt {
-  font-size: 10px;
-  font-weight: 400;
+  flex: none;
+  font-size: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
 }
 .previewSummaryTotals dd {
   display: flex;
-  justify-content: end;
+  min-width: 0;
   align-items: baseline;
-  flex-wrap: wrap;
   column-gap: 4px;
   margin: 0;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
 }
 .previewSummaryTotals dd strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--foreground);
   font-size: 14px;
+  font-weight: 750;
   line-height: 1.2;
 }
+.previewSummaryTotals dd span {
+  flex: none;
+}
 @media (prefers-color-scheme: light) {
-  .previewSummaryCopy {
+  .previewSummaryCopy,
+  .previewSummaryTotals {
     color: color-mix(
       in srgb,
       var(--color-purple-800, #6b21a8) 35%,

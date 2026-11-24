@@ -6,9 +6,10 @@ const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const ease = (value: number) => value * value * (3 - 2 * value);
 
 /** Cache layout separately: scrolling reads only the pane offset, never card boxes. */
-export function useFinalLookScroll() {
+export function useFinalLookScroll(enabled = true) {
   const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
+    if (!enabled) return;
     const heading = ref.current;
     const section = heading?.closest<HTMLElement>("[data-final-look-section]");
     if (!heading || !section) return;
@@ -112,6 +113,6 @@ export function useFinalLookScroll() {
       popup?.removeEventListener("animationend", settle);
       popup?.removeEventListener("transitionend", settle);
     };
-  }, []);
+  }, [enabled]);
   return ref;
 }
