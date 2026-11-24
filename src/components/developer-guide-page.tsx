@@ -3755,8 +3755,12 @@ export function DeveloperGuidePage() {
                 separate from latest saved update, with an em dash only when
                 opening history is unknown. Both period cards retain their
                 Rose/Violet identity frames and dark artwork tiles, with
-                matching pale Rose200 cup/moon illustrations at two-thirds of
-                their former size. The right-hand summary shows recorded sleep
+                matching pale Rose200 cup/moon drawings at 7/8 of their prior
+                size while the tile geometry stays fixed. The cup body shares
+                its stroke pigment; the handle stays open and steam retains its
+                existing motion. Both intake-facing gaps are 24.5px, including
+                the timeline’s 8px, for single entries and groups. The
+                right-hand summary shows recorded sleep
                 in hours and minutes, including durations from older entries.
                 Local drafts and saved responses stay distinct, and both cards
                 retain their shared 80px frame and entry/ambient motion gates.
