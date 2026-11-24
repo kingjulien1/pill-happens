@@ -1225,7 +1225,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         inset halves the middle band, with thinner touching edges and a small
         overlap from the inner line. The
         overview’s “On device” status confirms that the files are downloaded.
-        Three compact preflight rows follow, with connected icon tiles,
+        The “Show update details” button below the Later explanation reveals
+        three compact preflight rows with connected icon tiles,
         individual violet/pink/amber accents, clear descriptions and separate
         right-aligned statuses for app files, saved records and open drafts,
         followed by a centered, two-sentence journal-safety note. Its

@@ -19,6 +19,7 @@ import {
   CalendarDays,
   Check,
   CheckCheck,
+  ChevronDown,
   ClockFading,
   ListFilter,
   ChevronsUp,
@@ -232,8 +233,8 @@ export function JournalNotification({
     "ready",
   );
   const [undoError, setUndoError] = useState("");
-  const [policyOpen, setPolicyOpen] = useState(false);
-  const policyId = useId();
+  const [extraDetailsOpen, setExtraDetailsOpen] = useState(false);
+  const extraDetailsId = useId();
   const detailsId = useId();
   const headingId = useId();
   const messageId = useId();
@@ -577,7 +578,7 @@ export function JournalNotification({
       ).matches;
       const hadDetails = expandedRef.current;
       expandedRef.current = false;
-      setPolicyOpen(false);
+      setExtraDetailsOpen(false);
       setExpanded(false);
       setPhase(hadDetails ? "collapsing" : "anticipate");
       const beginExit = () => {
@@ -696,7 +697,7 @@ export function JournalNotification({
       ?.focus({ preventScroll: true });
     expandedRef.current = false;
     pause("expanded", false);
-    setPolicyOpen(false);
+    setExtraDetailsOpen(false);
     setExpanded(false);
   }, [phase, pause]);
 
@@ -719,7 +720,7 @@ export function JournalNotification({
     const next = !expandedRef.current;
     expandedRef.current = next;
     pause("expanded", next);
-    if (!next) setPolicyOpen(false);
+    if (!next) setExtraDetailsOpen(false);
     setExpanded(next);
   };
 
@@ -1221,58 +1222,81 @@ export function JournalNotification({
           <strong>Later</strong> keeps this version open. The update takes over
           when you next close or reload the app—no mid-sentence plot twist.
         </p>
-      </section>
-      <section className="journal-update-notes" aria-label="Update Preflight">
-        <header>
-          <h5>The Handoff, Unpacked</h5>
-          <span>Three things to know</span>
-        </header>
-        <div className="journal-update-note-list">
-          <article className="journal-update-note" data-update-note="files">
-            <span className="journal-update-note-icon" aria-hidden="true">
-              <RefreshCcw />
+        <div className="journal-update-disclosure">
+          <button
+            type="button"
+            className="journal-update-disclosure-toggle"
+            aria-expanded={extraDetailsOpen}
+            aria-controls={extraDetailsId}
+            onClick={() => setExtraDetailsOpen((open) => !open)}
+          >
+            <span>
+              {extraDetailsOpen ? "Hide update details" : "Show update details"}
+              <ChevronDown size={13} strokeWidth={2.25} aria-hidden="true" />
             </span>
-            <div className="journal-update-note-copy">
-              <h6>App Files</h6>
-              <p>The new interface is downloaded to this device.</p>
-            </div>
-            <span className="journal-update-note-status">
-              <span>Ready</span>
-              <small>On device</small>
-            </span>
-          </article>
-          <article className="journal-update-note" data-update-note="journal">
-            <span className="journal-update-note-icon" aria-hidden="true">
-              <Database />
-            </span>
-            <div className="journal-update-note-copy">
-              <h6>Your Journal</h6>
-              <p>Saved entries stay put. Your history isn’t replaced.</p>
-            </div>
-            <span className="journal-update-note-status">
-              <span>Unchanged</span>
-              <small>Saved records</small>
-            </span>
-          </article>
-          <article className="journal-update-note" data-update-note="drafts">
-            <span className="journal-update-note-icon" aria-hidden="true">
-              <ShieldCheck />
-            </span>
-            <div className="journal-update-note-copy">
-              <h6>Open Drafts</h6>
-              <p>Finish and save any open entry before you reload.</p>
-            </div>
-            <span className="journal-update-note-status">
-              <span>Save First</span>
-              <small>Before Apply</small>
-            </span>
-          </article>
+          </button>
+          <div
+            id={extraDetailsId}
+            className="journal-update-extra"
+            hidden={!extraDetailsOpen}
+          >
+            <section
+              className="journal-update-notes"
+              aria-label="Update Preflight"
+            >
+              <header>
+                <h5>The Handoff, Unpacked</h5>
+                <span>Three things to know</span>
+              </header>
+              <div className="journal-update-note-list">
+                <article className="journal-update-note" data-update-note="files">
+                  <span className="journal-update-note-icon" aria-hidden="true">
+                    <RefreshCcw />
+                  </span>
+                  <div className="journal-update-note-copy">
+                    <h6>App Files</h6>
+                    <p>The new interface is downloaded to this device.</p>
+                  </div>
+                  <span className="journal-update-note-status">
+                    <span>Ready</span>
+                    <small>On device</small>
+                  </span>
+                </article>
+                <article className="journal-update-note" data-update-note="journal">
+                  <span className="journal-update-note-icon" aria-hidden="true">
+                    <Database />
+                  </span>
+                  <div className="journal-update-note-copy">
+                    <h6>Your Journal</h6>
+                    <p>Saved entries stay put. Your history isn’t replaced.</p>
+                  </div>
+                  <span className="journal-update-note-status">
+                    <span>Unchanged</span>
+                    <small>Saved records</small>
+                  </span>
+                </article>
+                <article className="journal-update-note" data-update-note="drafts">
+                  <span className="journal-update-note-icon" aria-hidden="true">
+                    <ShieldCheck />
+                  </span>
+                  <div className="journal-update-note-copy">
+                    <h6>Open Drafts</h6>
+                    <p>Finish and save any open entry before you reload.</p>
+                  </div>
+                  <span className="journal-update-note-status">
+                    <span>Save First</span>
+                    <small>Before Apply</small>
+                  </span>
+                </article>
+              </div>
+            </section>
+            <p className="journal-update-fine-print">
+              Saved entries stay put. Save your draft, then Apply—or choose
+              Later to keep writing.
+            </p>
+          </div>
         </div>
       </section>
-      <p className="journal-update-fine-print">
-        Saved entries stay put. Save your draft, then Apply—or choose Later to
-        keep writing.
-      </p>
     </section>
   );
   return (
@@ -1478,7 +1502,7 @@ export function JournalNotification({
                 </section>
                 <div
                   className="journal-policy-disclosure"
-                  data-open={policyOpen}
+                  data-open={extraDetailsOpen}
                 >
                   <div className="journal-policy-reveal" aria-hidden="true">
                     <div>
@@ -1488,21 +1512,21 @@ export function JournalNotification({
                   <button
                     type="button"
                     className="journal-policy-toggle"
-                    aria-expanded={policyOpen}
-                    aria-controls={policyId}
-                    onClick={() => setPolicyOpen(!policyOpen)}
+                    aria-expanded={extraDetailsOpen}
+                    aria-controls={extraDetailsId}
+                    onClick={() => setExtraDetailsOpen(!extraDetailsOpen)}
                   >
-                    {policyOpen ? (
+                    {extraDetailsOpen ? (
                       <ChevronsUp size={14} />
                     ) : (
                       <ListFilter size={14} />
                     )}
-                    {policyOpen ? "Hide edit details" : "See what changes"}
+                    {extraDetailsOpen ? "Hide edit details" : "See what changes"}
                   </button>
                   <div
                     className="journal-policy-reveal"
-                    id={policyId}
-                    aria-hidden={!policyOpen}
+                    id={extraDetailsId}
+                    aria-hidden={!extraDetailsOpen}
                   >
                     <div>
                       <dl className="journal-policy-stats">

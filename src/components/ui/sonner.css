@@ -1356,7 +1356,7 @@
   display: grid;
   gap: 20px;
   min-width: 0;
-  padding: 0 3px 12px;
+  padding-inline: 3px;
 }
 .journal-update-panel {
   display: grid;
@@ -1369,7 +1369,7 @@
   display: grid;
   gap: 12px;
   min-width: 0;
-  padding: 2px 3px 10px;
+  padding: 2px 3px 0;
 }
 .journal-update-panel-header {
   display: flex;
@@ -1580,6 +1580,68 @@
   font-size: 8.5px;
   font-weight: 450;
   line-height: 1.4;
+}
+.journal-update-disclosure {
+  display: grid;
+  min-width: 0;
+}
+.journal-update-disclosure-toggle {
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding-inline: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--toast-ink);
+  cursor: pointer;
+}
+.journal-update-disclosure-toggle > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 27px;
+  padding-inline: 11px 8px;
+  border: 1px solid color-mix(in srgb, var(--toast-accent) 37%, transparent);
+  border-radius: inherit;
+  background: var(--toast-quiet-fill);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.journal-update-disclosure-toggle svg {
+  color: var(--toast-accent);
+}
+.journal-update-disclosure-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.journal-update-disclosure-toggle:focus-visible {
+  outline: 2px solid var(--toast-accent);
+  outline-offset: 1px;
+}
+@media (hover: hover) {
+  .journal-update-disclosure-toggle:hover > span {
+    border-color: var(--toast-accent);
+  }
+}
+.journal-update-extra:not([hidden]) {
+  display: grid;
+  gap: 14px;
+  padding-block: 8px 4px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .journal-update-disclosure-toggle svg {
+    transition: transform 160ms ease-out;
+  }
+  .journal-update-extra:not([hidden]) {
+    animation: journal-update-details-in 180ms ease-out;
+  }
+  @keyframes journal-update-details-in {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 .journal-update-notes {
   display: grid;
