@@ -1168,10 +1168,9 @@ export function DeveloperGuidePage() {
                 original <code>#7c3aed</code> identity and layered washes remain.
                 Hidden tabs, open dialogs and reduced-motion preferences pause
                 the page field; the loading handoff uses the existing entry gate.
-                The sleep recap reuses a surface-scoped field at 17% opacity,
-                above Mauve950 and soft highlights, beneath the same canvas mesh
-                at 12%. Its heading sits outside the card. Surface motion stays
-                local to the visible card and pauses offscreen or when inert.
+                The sleep recap has its own flat tint from the shared subsection
+                border pigment at two-thirds of that border’s opacity; it no
+                longer mounts an Iridescence field or canvas mesh.
               </p>
               <p>
                 Dark Mode combines Pink300 at 21% opacity and Purple900 at 69%
@@ -3749,7 +3748,12 @@ export function DeveloperGuidePage() {
                 CheckInSectionHeader above its card: a 14px heading, slash
                 context, opposite-side metadata and a brief description. Its
                 score, tracker readings and calculated sleep totals remain
-                inside the existing dark card above Save Check-In.
+                inside the recap above Save Check-In. Its single background
+                uses the subsection border pigment with one-third less opacity,
+                while text inherits the current dialog theme. The sleep-stage
+                heading uses 12px/650 type, its opposite label 11px/600, stage
+                percentages 13⅓px/650 and their color-matched signs 10px/700.
+                Taller label lanes keep narrow sleep stages from overlapping.
               </p>
               <p>
                 The Morning dialog starts with Before the Day Bites, followed by

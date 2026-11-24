@@ -8,7 +8,6 @@ import {
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
 import { CheckInSectionHeader } from "./check-in-section";
-import { Iridescence } from "./iridescence";
 import { useSleepScoreMotion } from "./use-sleep-score-motion";
 import styles from "./sleep-score-summary.module.css";
 
@@ -101,14 +100,6 @@ export function SleepScoreSummary({
         aria-labelledby={`${id}-heading`}
         data-sleep-score-summary
       >
-        <div className={styles.backdrop} aria-hidden="true">
-          <span className={styles.highlight} />
-          <div className={styles.iridescence}>
-            <Iridescence scope="surface" />
-          </div>
-          <span className={styles.accent} />
-        </div>
-
         <div className={styles.overview}>
           <div className={styles.ringSlot}>
             <SleepScoreRing
