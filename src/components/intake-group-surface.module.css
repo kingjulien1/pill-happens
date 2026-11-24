@@ -1,4 +1,4 @@
-/* All three pigments live in one alpha-controlled plane; blur stays separate. */
+/* The three upper tints share one opacity above the darkened glass. */
 .group {
   --intake-group-fill-mauve: color-mix(
     in srgb,
@@ -33,7 +33,11 @@
 .blur {
   --group-layer-opacity: 1;
   z-index: 0;
-  background: none;
+  background-color: color-mix(
+    in srgb,
+    var(--color-mauve-950, #0c090c) 13%,
+    transparent
+  );
   -webkit-backdrop-filter: blur(48px);
   backdrop-filter: blur(48px);
 }
