@@ -9,56 +9,26 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <defs>
-    <mask
-      id="levomethasan-cutouts"
-      maskUnits="userSpaceOnUse"
-      x="0"
-      y="0"
-      width="24"
-      height="24"
-    >
-      <circle cx="12" cy="12" r="9" fill="white" stroke="white" />
-      <path
-        d="m6.35 6.35 11.3 11.3m0-11.3-11.3 11.3"
-        fill="none"
-        stroke="black"
-      />
-      <path
-        d="M12 9.5V6.2q0-1-.8-1.6"
-        stroke-width="1.1"
-        transform="rotate(0 12 12)"
-        fill="none"
-        stroke="black"
-      />
-      <path
-        d="M12 9.5V6.2q0-1-.8-1.6"
-        stroke-width="1.1"
-        transform="rotate(90 12 12)"
-        fill="none"
-        stroke="black"
-      />
-      <path
-        d="M12 9.5V6.2q0-1-.8-1.6"
-        stroke-width="1.1"
-        transform="rotate(180 12 12)"
-        fill="none"
-        stroke="black"
-      />
-      <path
-        d="M12 9.5V6.2q0-1-.8-1.6"
-        stroke-width="1.1"
-        transform="rotate(270 12 12)"
-        fill="none"
-        stroke="black"
-      />
-    </mask>
-  </defs>
-  <rect
-    width="24"
-    height="24"
-    fill="#D4D4D8"
+  <circle cx="12" cy="12.3" r="10.25" fill="#CFC7B7" stroke="none" />
+  <circle cx="12" cy="11.65" r="10.25" fill="#F3EEE3" stroke="none" />
+  <path
+    fill="#D6CCB9"
+    d="M-9.5 0-9.2-1.65H-1.65V-9.2L0-9.5V0H9.5L9.2 1.65H1.65V9.2L0 9.5V0Z"
+    transform="translate(12 11.65) rotate(36)"
     stroke="none"
-    mask="url(#levomethasan-cutouts)"
+  />
+  <path
+    fill="#E8DFCF"
+    d="M-9.5 0H0V9.5L-1.65 9.2V1.65H-9.2ZM0-9.5l1.65.3v7.55H9.2L9.5 0H0Z"
+    transform="translate(12 11.65) rotate(36)"
+    stroke="none"
+  />
+  <path
+    d="M-9.25 0h18.5M0-9.25v18.5"
+    fill="none"
+    stroke="#C5B9A3"
+    stroke-width=".65"
+    stroke-linecap="round"
+    transform="translate(12 11.65) rotate(36)"
   />
 </svg>

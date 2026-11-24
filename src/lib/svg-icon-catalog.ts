@@ -378,13 +378,17 @@ export const SVG_ICON_CATALOG: readonly SvgIconCatalogEntry[] = [
   ...TABLET_ARTWORK.map((entry): SvgIconCatalogEntry => ({
     ...entry,
     assetRevision:
-      entry.shape === "levomethasan"
-        ? "facets-2"
-        : entry.shape === "viagra"
-          ? "imprint-2"
-          : entry.shape === "tramal"
-            ? "bottle-2"
-            : undefined,
+      entry.variant === "color" && entry.shape === "levomethasan"
+        ? "tablet-3"
+        : entry.variant === "color" && entry.shape === "testavan"
+          ? "pump-2"
+          : entry.shape === "levomethasan"
+            ? "facets-2"
+            : entry.shape === "viagra"
+              ? "imprint-2"
+              : entry.shape === "tramal"
+                ? "bottle-2"
+                : undefined,
     label: tabletIconLabel(entry.slug),
     aliases: [
       ...entry.aliases,

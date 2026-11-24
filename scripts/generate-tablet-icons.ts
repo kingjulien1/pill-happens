@@ -49,7 +49,7 @@ async function main() {
     const colorNodes = getTabletColorNodes(artwork.shape);
     if (artwork.variant === "color" && colorNodes) {
       contents = colorNodes
-        .map((part) => node(part, { stroke: "none" }))
+        .map((part) => node(part, { stroke: part[1].stroke ?? "none" }))
         .join("\n");
     } else if (artwork.variant === "color") {
       const maskId = `${artwork.slug}-cutouts`;

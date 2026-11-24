@@ -1,4 +1,5 @@
 import type { IconNode } from "lucide-react";
+import { TESTAVAN_COLOR_NODES } from "./supplied-color-geometry";
 
 /** The supplied tramal-bottle.svg, preserved as five flat painted vector layers. */
 const tramalColorNodes: IconNode = [
@@ -89,6 +90,7 @@ export const DISPENSER_SHAPES = {
   testavan: {
     componentName: "Testavan",
     aliases: ["testavan", "gel-pump-dispenser", "gel-spender"],
+    colorNodes: TESTAVAN_COLOR_NODES,
     nodes: [
       [
         "path",

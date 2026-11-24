@@ -13,7 +13,7 @@ type ArtworkDefinition = {
   value: string;
 };
 
-/** Static sRGB equivalents of the installed Tailwind palette, plus requested Zinc. */
+/** Fixed sRGB pigments from the installed palette and supplied medication artwork. */
 export const TABLET_COLORS = {
   lime: { name: "Lime 300", hex: "#bbf451" },
   sky: { name: "Sky 300", hex: "#74d4ff" },
@@ -26,6 +26,8 @@ export const TABLET_COLORS = {
   tadalafil5: { name: "Amber 400", hex: "#ffb900" },
   tadalafil10: { name: "Blue 600", hex: "#155dfc" },
   tramal: { name: "Amber bottle", hex: "#874817" },
+  testavan: { name: "Green dispenser", hex: "#86CF83" },
+  levomethasan: { name: "Ivory tablet", hex: "#F3EEE3" },
   violet: { name: "Violet 300", hex: "#c4b4ff" },
   desloratadin: { name: "Sky 400", hex: "#00bcff" },
   // Equal Red400/Orange300 OKLab hue, raised to a gamut-adjusted 500 intensity:
@@ -335,7 +337,7 @@ const colorDefinitions = [
     "testavan",
     "Testavan",
     "testavan",
-    "zinc",
+    "testavan",
     [
       "gel",
       "metered pump",
@@ -343,6 +345,8 @@ const colorDefinitions = [
       "pumps",
       "white",
       "weiss",
+      "green",
+      "grün",
       "gelspender",
       "spender",
       "dosierpumpe",
@@ -353,10 +357,12 @@ const colorDefinitions = [
     "levomethasan",
     "Levomethasan",
     "levomethasan",
-    "zinc",
+    "levomethasan",
     [
       "white",
       "weiss",
+      "ivory",
+      "cream",
       "round",
       "cross",
       "quarter",

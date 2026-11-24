@@ -7,7 +7,7 @@ import type { MedicationType } from "@/lib/medication-types";
 import { TABLET_COLORS } from "@/lib/tablet-icons/artwork";
 import { DISPENSER_SHAPES } from "@/lib/tablet-icons/dispenser-geometry";
 
-/** The full-opacity pigment of the catalog's colored Levomethasan artwork. */
+/** Shared Zinc 300 form pigment, independent of a medication's custom artwork. */
 export const MEDICATION_FORM_FILL = TABLET_COLORS.zinc.hex;
 const filled = { fill: MEDICATION_FORM_FILL };
 

@@ -8,6 +8,7 @@ The library contains **21 tintable outline drawings** and **22 fixed-color medic
 src/lib/tablet-icons/
   geometry.ts                 Shared silhouettes, score lines, and vector imprints
   dispenser-geometry.ts       Separate pump-bottle and gel-dispenser silhouettes
+  supplied-color-geometry.ts  Exact painted Levomethasan and Testavan artwork
   artwork.ts                  Names, aliases, relative sizes, and fixed palettes
 src/lib/icon-names.ts         Component-name search and display-label formatting
 src/lib/svg-icon-catalog.ts   Registered local artwork and searchable metadata
@@ -63,13 +64,13 @@ The names are checked against the installed Lucide names and emoji display label
 | `euthyrox` / `Euthyrox`            | Euthyrox         | Round tablet with EM/50 imprint           | Zinc 300     |
 | `tadalafil-5` / `Tadalafil5`       | Tadalafil 5mg    | Upright oval with centered 5 imprint      | Amber 400    |
 | `tadalafil-10` / `Tadalafil10`     | Tadalafil 10mg   | Same oval with centered 10 imprint        | Blue 600     |
-| `tramal` / `Tramal`                | Tramal           | Shoulder bottle with metering pump        | Amber 700    |
-| `testavan` / `Testavan`            | Testavan         | Slender gel dispenser with pump           | Zinc 300     |
-| `levomethasan` / `Levomethasan`    | Levomethasan     | Round tablet with raised, ridged quarters | Zinc 300     |
+| `tramal` / `Tramal`                | Tramal           | Supplied amber bottle with metering pump  | Amber, cream, silver, green |
+| `testavan` / `Testavan`            | Testavan         | Supplied gel dispenser with pump          | Green, charcoal, cream |
+| `levomethasan` / `Levomethasan`    | Levomethasan     | Supplied round cross-scored tablet        | Ivory and warm score shading |
 
-Colors use static sRGB equivalents of the installed Tailwind palette. All neutral tablets use the specifically requested `#D4D4D8`. Every filled SVG has one visible paint color; score lines and imprints are transparent cutouts. There are no shadows, highlights, gradients, textures, or photographic irregularities in the artwork.
+Single-pigment variants use fixed sRGB equivalents of the installed Tailwind palette, with `#D4D4D8` for their neutral tablets and transparent score/imprint cutouts. The supplied Tramal, Testavan and Levomethasan illustrations instead preserve their authored painted layers, detail strokes and shading as native vectors, with no raster image, filter or animation.
 
-Tadalafil 5 uses Amber 400 (`#ffb900`); Tadalafil 10 uses a moderately dark Blue 600 (`#155dfc`). Their silhouette is shared, with separate vector numeral paths. Tramal uses Amber 700 (`#bb4d00`) for its simplified amber bottle, including its pump. Testavan uses the same neutral Zinc 300 as the white tablets. Both dispensers keep a single flat pigment with transparent collar and label details, rather than reproducing photographic packaging text or multiple materials.
+Tadalafil 5 uses Amber 400 (`#ffb900`); Tadalafil 10 uses a moderately dark Blue 600 (`#155dfc`). Their silhouette is shared, with separate vector numeral paths. Tramal preserves its amber bottle (`#874817`), cream pump/label, silver collar and green stripe. Testavan preserves its green pump (`#86CF83`), charcoal body, cream base and fine gray grip strokes. Levomethasan preserves its ivory face (`#F3EEE3`), lower depth circle and warm diagonal score shading. Catalog pigment metadata describes each illustration's principal color, rather than recoloring its other layers.
 
 The medication names and relative appearances come from the supplied references. Selecting an icon changes appearance only: it does not fill medication names, strengths, quantities, or doses. Imprint text is artwork; the `50` on Euthyrox does not add a strength to its label or medication record.
 
@@ -79,7 +80,7 @@ Outline assets use Lucide's standard `xmlns`, `width="24"`, `height="24"`, `view
 
 Every silhouette is centered at `(12, 12)`, and each vertical tablet score runs through `x=12` with its midpoint at `y=12`. Euthyrox's EM/50 blocks sit on either side of that centered split, straightened from the reference photo. The Tadalafil numerals and Viagra wordmark are centered independently of their bodies; the wider “10” has additional breathing room. Dispensers retain distinct proportions, with Testavan narrower and taller in appearance than the Tramal bottle. All artwork fits the viewport at the app's 2.75 stroke width.
 
-Levomethasan represents four raised wedge-shaped quarters rather than a plain circle with a plus sign. Deep diagonal valleys separate the quarters. Each quarter has a finer cardinal crest that divides two sloping faces and curves gently at the outer edge to suggest the rounded falloff. These details use vector lines and transparent cutouts only; the filled version keeps a single flat Zinc 300 pigment without shadows or highlights. Quartering marks are appearance only and do not set intake quantities.
+The Levomethasan outline represents four raised wedge-shaped quarters with deep diagonal valleys and finer cardinal crests. That outline is unchanged. Its colored version now uses the supplied tablet's separate face/depth circles and 36-degree rotated score layers. Testavan's colored version retains the supplied non-uniform matrix transform, including the grip stroke scaling. Group transforms are flattened onto the individual painted shapes without changing their appearance. Quartering marks are appearance only and do not set intake quantities.
 
 The React outline exports use `createLucideIcon` and accept the same size, stroke, color, and other SVG props:
 
@@ -91,11 +92,13 @@ import { TabletMeridian, TabletBisect, Euthyrox } from "@/components/tablet-icon
 <Euthyrox size={24} />
 ```
 
-Inside the application, these outlines receive the same 2.75 stroke width and selected medication accent as the other Lucide icons. Filled variants render their generated SVG file without a tint, mask, or filter in the shared glyph renderer. The color picker still controls their surrounding medication accent; the tablet pigment stays fixed. The preview identifies the fixed palette and the selected accent separately.
+Inside the application, these outlines receive the same 2.75 stroke width and selected medication accent as the other Lucide icons. Colored variants render inline from the same geometry that generates their public SVGs. Single-pigment artwork uses instance-scoped cutout masks; supplied multi-pigment artwork renders its painted layers directly. The color picker still controls the surrounding medication accent; authored artwork colors stay fixed. The preview identifies the fixed palette and selected accent separately.
 
 Outline and filled files can share a basename, as with `viagra.svg` and `euthyrox.svg`, because they live in separate folders. Their stored IDs are distinct: `svg:viagra` and `svg:color:viagra`, for example. Only registered identifiers are accepted by client/server validation.
 
-Levomethasan retains its persisted IDs, `svg:levomethasan` and `svg:color:levomethasan`, and its canonical outline/color file paths. Existing selections therefore show the refined artwork throughout the shared medication renderer, including the appearance preview, medication library, intake rows, medication selectors, and goals. `getSvgIconAssetUrl` adds a public revision query to the two Levomethasan asset URLs: `/icons/medications/tablets/outline/levomethasan.svg?v=facets-2` and `/icons/medications/tablets/color/levomethasan.svg?v=facets-2`. The revision refreshes browser-cached artwork without changing catalog paths or values stored in journals; other SVG URLs remain unchanged.
+Levomethasan and Testavan retain their persisted colored IDs, `svg:color:levomethasan` and `svg:color:testavan`, and canonical filenames. All existing selections therefore resolve the supplied artwork through the shared renderer, including archived medication records, the oldest intake rows, selectors, goals and restored notification snapshots. No log data or icon selections are rewritten. Their outline IDs and assets stay unchanged.
+
+`getSvgIconAssetUrl` refreshes browser-cached colored assets using `/icons/medications/tablets/color/levomethasan.svg?v=tablet-3` and `/icons/medications/tablets/color/testavan.svg?v=pump-2`. The unchanged Levomethasan outline retains its earlier `facets-2` revision. Tramal retains `bottle-2`. Revisions change asset requests without changing the IDs stored in journals.
 
 ## Finding icons
 

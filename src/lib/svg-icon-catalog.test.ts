@@ -54,18 +54,18 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
         ? `/icons/medications/${slug}.svg`
         : `/icons/medications/tablets/${entry.variant}/${slug}.svg`,
     );
-    const revisedLevomethasan =
-      entry.value === "svg:levomethasan" ||
-      entry.value === "svg:color:levomethasan";
+    const revision = new Map([
+      ["svg:levomethasan", "facets-2"],
+      ["svg:color:levomethasan", "tablet-3"],
+      ["svg:color:testavan", "pump-2"],
+      ["svg:viagra", "imprint-2"],
+      ["svg:color:viagra", "imprint-2"],
+      ["svg:tramal", "bottle-2"],
+      ["svg:color:tramal", "bottle-2"],
+    ]).get(entry.value);
     assert.equal(
       getSvgIconAssetUrl(entry),
-      revisedLevomethasan
-        ? `${entry.src}?v=facets-2`
-        : entry.value === "svg:viagra" || entry.value === "svg:color:viagra"
-          ? `${entry.src}?v=imprint-2`
-          : entry.shape === "tramal"
-            ? `${entry.src}?v=bottle-2`
-            : entry.src,
+      revision ? `${entry.src}?v=${revision}` : entry.src,
       `${entry.value}: runtime URL revisions must preserve canonical paths and IDs`,
     );
     assert.ok(entry.label.length > 0);
@@ -126,7 +126,16 @@ test("the local SVG catalog has unique stable IDs and corresponding checked-in a
       assert.deepEqual(
         [...new Set(paints)],
         colorNodes
-          ? [...new Set(colorNodes.map(([, attrs]) => attrs.fill))]
+          ? [
+              ...new Set(
+                colorNodes
+                  .flatMap(([, attrs]) => [attrs.fill, attrs.stroke])
+                  .filter(
+                    (paint) =>
+                      paint && paint !== "none" && paint !== "currentColor",
+                  ),
+              ),
+            ]
           : [entry.color.hex],
       );
       assert.doesNotMatch(svg, /\b(?:opacity|fill-opacity|stroke-opacity)=/);
@@ -174,9 +183,16 @@ test("colored glyphs preserve fixed painted layers or independent transparent cu
         svg,
         /<(?:mask|image|canvas|foreignObject|filter)\b|\b(?:href|src)=/i,
       );
-      assert.equal([...svg.matchAll(/<(?:path|rect)\b/g)].length, 5);
-      for (const pigment of ["#874817", "#AAB3B9", "#FFF8EB", "#16AD81"])
-        assert.ok(svg.includes(`fill="${pigment}"`));
+      assert.equal(
+        [...svg.matchAll(/<(?:path|rect|circle)\b/g)].length,
+        colorNodes.length,
+      );
+      for (const [, attributes] of colorNodes) {
+        for (const property of ["fill", "stroke", "transform"] as const) {
+          if (attributes[property])
+            assert.ok(svg.includes(`${property}="${attributes[property]}"`));
+        }
+      }
       return;
     }
     assert.match(svg, /maskUnits="userSpaceOnUse"/);
@@ -362,8 +378,6 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
     "queatialan-200",
     "venlafaxin",
     "euthyrox",
-    "testavan",
-    "levomethasan",
     "xanax",
     "atarax",
   ])
@@ -371,6 +385,8 @@ test("tablet variants preserve requested names, dose labels, color metadata, and
       getSvgIcon(`svg:color:${slug}`)?.color?.hex.toLowerCase(),
       "#d4d4d8",
     );
+  assert.equal(getSvgIcon("svg:color:levomethasan")?.color?.hex, "#F3EEE3");
+  assert.equal(getSvgIcon("svg:color:testavan")?.color?.hex, "#86CF83");
   const existing = new Set(
     [...LUCIDE_ICON_NAMES, ...EMOJI_CATALOG.map(({ label }) => label)].map(
       normalizeIconQuery,

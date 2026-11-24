@@ -2767,6 +2767,17 @@ export function DeveloperGuidePage() {
                 or font dependency.
               </p>
               <p>
+                Levomethasan and Testavan retain their existing colored SVG IDs
+                with supplied multi-pigment artwork. Levomethasan preserves its
+                ivory tablet, depth and diagonal score shading; Testavan keeps
+                its green pump, charcoal body, cream base and fine grip strokes.
+                Group transforms are preserved on each painted shape, including
+                non-uniform stroke scaling. Public asset revisions refresh old
+                copies. Current cards, all historical logs and saved notification
+                previews resolve the same updated IDs; outline variants and
+                recorded data stay unchanged.
+              </p>
+              <p>
                 Tramal’s Color choice preserves the supplied pump-bottle SVG’s
                 five painted layers: amber glass, silver collar, cream pump and
                 label, and green label stripe. Its matching outline shares the

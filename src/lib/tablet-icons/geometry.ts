@@ -1,5 +1,6 @@
 import type { IconNode } from "lucide-react";
 import { DISPENSER_SHAPES } from "./dispenser-geometry";
+import { LEVOMETHASAN_COLOR_NODES } from "./supplied-color-geometry";
 
 /** Pure Lucide-compatible geometry; the first node is the tablet silhouette. */
 export type TabletIconNode = IconNode;
@@ -182,6 +183,7 @@ export const TABLET_SHAPES = {
   levomethasan: {
     componentName: "Levomethasan",
     aliases: ["levomethasan", "quarter-scored-tablet"],
+    colorNodes: LEVOMETHASAN_COLOR_NODES,
     nodes: [
       ...round(9),
       // Deep diagonal valleys separate four raised quarters, as in the reference.
