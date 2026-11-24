@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, Import, Sunrise } from "lucide-react";
+import { CalendarCheck, Import, NotebookPen, Sunrise } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
@@ -306,6 +306,24 @@ export function IntakeForm({
       : Number((daySummary.excludingEditedMg + calculatedDose).toFixed(8));
   const includingDraftCount =
     includingDraftMg === null ? null : daySummary.excludingEditedCount + 1;
+  const previewHintId = `${formId}-preview-hint`;
+  let previewHint =
+    "This card shows one dose. “After” is the day’s total for this medication once you save.";
+  if (!medication && !fallbackIntake) {
+    previewHint = "Choose a medication to see the entry you’ll save.";
+  } else if (!validQuantity) {
+    previewHint = "Enter the amount you took to see the dose on your card.";
+  } else if (!belongsTo) {
+    previewHint =
+      "Set the date and time you took this dose to see it on your card.";
+  } else if (route === undefined) {
+    previewHint = "Choose how you took this medication to complete your card.";
+  } else if (intake) {
+    previewHint =
+      intake.medicationId === medicationId
+        ? "Saving updates the entry you opened. This dose counts just once."
+        : "Saving replaces the original entry with this medication and updates both totals.";
+  }
 
   const footerActions = (
     <IntakeFooterActions
@@ -744,8 +762,14 @@ export function IntakeForm({
         data-dialog-fade-footer
         data-draft-action-footer
       >
+        <p id={previewHintId} className={styles.previewHint}>
+          <NotebookPen size={14} strokeWidth={1.7} aria-hidden="true" />
+          {"\u00a0"}
+          {previewHint}
+        </p>
         <IntakePrimaryButton
           type="submit"
+          aria-describedby={previewHintId}
           disabled={busy || timingResetting}
           pending={busy}
           symbol={
