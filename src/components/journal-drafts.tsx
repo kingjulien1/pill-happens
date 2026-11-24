@@ -36,6 +36,7 @@ import {
   createSnapshotSelector,
   shallowEqual,
 } from "@/lib/external-store-selector";
+import type { DialogScrollAnchor } from "@/lib/dialog-scroll-memory";
 import { Button } from "@/components/ui/button";
 
 export type { RememberedDialog } from "@/lib/journal-drafts";
@@ -51,7 +52,8 @@ type WorkspaceContext = {
   store: DraftWorkspace;
   ready: boolean;
   dialog: RememberedDialog | null;
-  openDialog: (dialog: RememberedDialog) => void;
+  openingAnchor?: DialogScrollAnchor;
+  openDialog: (dialog: RememberedDialog, anchor?: DialogScrollAnchor) => void;
   closeDialog: (expected?: RememberedDialog) => void;
   rememberDestination: (path: string) => void;
 };
@@ -271,9 +273,31 @@ export function JournalDraftProvider({
     () => storedDialog && safeRememberedDialog(storedDialog, path),
     [path, storedDialog],
   );
+  const [handoff, setHandoff] = useState<{
+    path: string;
+    instance: number;
+    anchor: DialogScrollAnchor;
+  } | null>(null);
+  const openingAnchor =
+    handoff?.path === path && handoff.instance === instance
+      ? handoff.anchor
+      : undefined;
   const openDialog = useCallback(
-    (next: RememberedDialog) => store.openDialog(path, next),
-    [path, store],
+    (next: RememberedDialog, anchor?: DialogScrollAnchor) => {
+      if (
+        anchor &&
+        store.getSnapshot().screens[path]?.dialogInstance !== instance
+      )
+        return;
+      store.openDialog(path, next);
+      const screen = store.getSnapshot().screens[path];
+      setHandoff(
+        anchor && screen
+          ? { path, instance: screen.dialogInstance, anchor }
+          : null,
+      );
+    },
+    [instance, path, store],
   );
   const closeDialog = useCallback(
     (expected?: RememberedDialog) =>
@@ -285,6 +309,7 @@ export function JournalDraftProvider({
     () => ({
       store,
       ready: snapshot.ready,
+      openingAnchor,
       dialog,
       openDialog,
       closeDialog,
@@ -293,6 +318,7 @@ export function JournalDraftProvider({
     [
       store,
       snapshot.ready,
+      openingAnchor,
       dialog,
       openDialog,
       closeDialog,

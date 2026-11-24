@@ -2107,13 +2107,12 @@ export function DeveloperGuidePage() {
                 The preview eye runs a 1.28-second squeeze and spring reveal,
                 with a pupil rebound, soft halo, two expanding ripples, eight
                 staggered rays and four paired star/dot accents. One scene owns
-                completion so every echo finishes before cleanup. Random starts
-                stay 4–9 seconds apart; hidden/offscreen views and reduced motion
+                completion so every echo finishes before cleanup. Blinks start every
+                13 seconds; hidden/offscreen views and reduced motion
                 stop both the animation and its idle timeout. The effect uses
                 small SVG/CSS layers and never rerenders the surrounding form.
                 Intake creation and editing instead keep their Final Look badge,
-                eye and fading side rails static at full size, with no scroll
-                observer or blink timer. Saved and projected day totals sit in
+                and fading side rails at full size while the eye blinks in place. Saved and projected day totals sit in
                 equal-width Right Now / After lanes above those rails, using the
                 same 14px bold amounts and 10px labels/units on both sides. The
                 full-width row has a 12px gap before the badge. A centered
@@ -3152,10 +3151,9 @@ export function DeveloperGuidePage() {
                   ReflectionDialog and independent saving controls retain their
                   launcher ref. Writing supports up to 100,000 characters. Done
                   returns to the check-in with the draft; Save Check-In saves
-                  all responses and closes the dialog. The quiet Save & Stay
-                  bubble above that action uses the same validation and
-                  submission but keeps the keyed form, fields and editor state
-                  open. Its
+                  all responses and closes the dialog. The chevron on the save
+                  button opens Save options. Save and stay keeps the form open
+                  after saving. Keep editing returns to the draft. The
                   successful-save cleanup advances the writing baseline and
                   resumes autosave; newer concurrent drafts remain untouched.
                   The compact writer header has no heading icon or fade, and a

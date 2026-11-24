@@ -247,7 +247,9 @@
 }
 
 .checkInSurface [data-intake-form] [data-dialog-fade-footer] {
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-bottom: calc(
+    max(10px, env(safe-area-inset-bottom)) + var(--dialog-anchor-clearance, 0px)
+  );
   --outer-rim-color: var(
     --checkin-line,
     color-mix(in srgb, var(--color-fuchsia-500) 65%, var(--color-violet-400))

@@ -168,7 +168,7 @@ function usagePercent(total: number, maximum: number) {
 
 function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
   const { data, mutate, busy } = useJournal();
-  const { store } = useJournalWorkspace();
+  const { store, openingAnchor } = useJournalWorkspace();
   const [confirm, setConfirm] = useState(false);
   const confirmId = useId();
   const deleteLink = useRef<HTMLButtonElement>(null);
@@ -227,6 +227,7 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       open
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
+      openingAnchor={openingAnchor}
       title="Edit Intake"
       headerVariant="intake"
       context={
@@ -326,7 +327,11 @@ function IntakeTimeline({
       ? data.intakes.find((entry) => entry.id === dialog.id)
       : undefined;
   useEffect(() => {
-    if (dialog?.kind === "intake-edit" && !editing) closeDialog(dialog);
+    if (dialog?.kind !== "intake-edit" || editing) return;
+    // A medication replacement publishes the new record before the awaiting
+    // submit handler receives its ID. Let that handler select the new editor.
+    const frame = requestAnimationFrame(() => closeDialog(dialog));
+    return () => cancelAnimationFrame(frame);
   }, [dialog, editing, closeDialog]);
   useEffect(() => {
     const focusIntakes = () => {
@@ -382,6 +387,7 @@ function IntakeTimeline({
       {entries.length > 1 && <StackViewStorageStatus />}
       {editing && (
         <EntryEditor
+          key={editing.id}
           intake={editing}
           close={() => closeDialog(dialog ?? undefined)}
         />

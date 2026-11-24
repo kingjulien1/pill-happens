@@ -626,7 +626,11 @@ function CheckInForm({
       className={styles.form}
       onSubmit={(event) => {
         event.preventDefault();
-        void save();
+        void save(
+          (event.nativeEvent as SubmitEvent).submitter?.getAttribute(
+            "value",
+          ) === "stay",
+        );
       }}
       onReset={(event) => {
         event.preventDefault();
@@ -774,22 +778,8 @@ function CheckInForm({
         data-check-in-submit
       >
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
-          <button
-            type="button"
-            form={formId}
-            className={styles.saveStay}
-            data-check-in-save-mode="stay"
-            disabled={locked}
-            aria-label="Save check-in and keep this dialog open"
-            onClick={(event) => {
-              if (event.currentTarget.form?.reportValidity()) void save(true);
-            }}
-          >
-            <Save size={13} strokeWidth={2} aria-hidden="true" />
-            <span>Save &amp; stay</span>
-            <span className={styles.saveStayNote}>Keep editing</span>
-          </button>
           <IntakePrimaryButton
+            saveOptions={{ kind: "check-in", formId, disabled: locked }}
             type="submit"
             disabled={locked}
             pending={locked}

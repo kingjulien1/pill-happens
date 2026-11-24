@@ -26,7 +26,7 @@ export function FinalLookEye() {
         () => {
           eye.dataset.blinking = "true";
         },
-        4_000 + Math.random() * 5_000 - (afterBlink ? BLINK_DURATION : 0),
+        13_000 - (afterBlink ? BLINK_DURATION : 0),
       );
     };
     const ended = (event: AnimationEvent) => {

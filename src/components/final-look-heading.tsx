@@ -1,7 +1,6 @@
 "use client";
 
 import { FinalLookEye } from "./final-look-eye";
-import { Eye } from "lucide-react";
 import { useFinalLookScroll } from "./use-final-look-scroll";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import styles from "./medication-appearance-fields.module.css";
@@ -32,17 +31,7 @@ export function FinalLookHeading({
         data-preview-title-pill
       >
         <h3 id={id}>
-          {showIcon &&
-            (motion ? (
-              <FinalLookEye />
-            ) : (
-              <Eye
-                className={headingStyles.staticEye}
-                strokeWidth={2.5}
-                aria-hidden="true"
-                data-final-look-eye
-              />
-            ))}
+          {showIcon && <FinalLookEye />}
           Final Look
         </h3>
         <span aria-hidden="true" className={styles.titleSeparator} />

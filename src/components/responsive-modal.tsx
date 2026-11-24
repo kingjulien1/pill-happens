@@ -27,7 +27,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useDialogScrollMemory } from "@/components/use-dialog-scroll-memory";
-import type { PublicDialogScrollKey } from "@/lib/dialog-scroll-memory";
+import type {
+  DialogScrollAnchor,
+  PublicDialogScrollKey,
+} from "@/lib/dialog-scroll-memory";
 import closeStyles from "./dialog-close.module.css";
 import styles from "./responsive-modal.module.css";
 
@@ -48,6 +51,7 @@ export function ResponsiveModal({
   scrollKey,
   publicScrollKey,
   restoreScroll = true,
+  openingAnchor,
   returnFocus,
   scrollControlsRef,
   children,
@@ -64,6 +68,7 @@ export function ResponsiveModal({
   publicScrollKey?: PublicDialogScrollKey;
   /** Pane positions are local to this opening; new popups always start at the top. */
   restoreScroll?: boolean;
+  openingAnchor?: DialogScrollAnchor;
   returnFocus?: RefObject<HTMLElement | null> | (() => HTMLElement | null);
   scrollControlsRef?: Ref<DialogScrollControls>;
   children: React.ReactNode;
@@ -80,6 +85,7 @@ export function ResponsiveModal({
       publicScrollKey,
       layout: desktop,
       restorePosition: restoreScroll,
+      openingAnchor,
     });
   useImperativeHandle(scrollControlsRef, () => ({ save: saveScroll }), [
     saveScroll,

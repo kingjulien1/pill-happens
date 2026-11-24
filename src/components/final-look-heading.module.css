@@ -43,12 +43,6 @@
 .heading[data-motion="static"] .line {
   transform: none;
 }
-.staticEye {
-  flex: none;
-  width: 1.24em;
-  height: 1.24em;
-  margin-inline-end: 2px;
-}
 @media (prefers-reduced-motion: reduce) {
   .badge {
     transform: none;

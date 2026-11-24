@@ -1,5 +1,6 @@
 "use client";
 
+import { SaveOptions, type SaveOptionsProps } from "./save-options";
 import type { ReactNode } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import type { PrimaryButtonProps } from "@/components/primary-button";
@@ -15,6 +16,7 @@ type IntakePrimaryButtonProps = Omit<
   PrimaryButtonProps,
   "decoration" | "radius" | "surface"
 > & {
+  saveOptions?: SaveOptionsProps;
   symbol: ReactNode;
   secondaryText?: ReactNode;
 };
@@ -22,6 +24,7 @@ type IntakePrimaryButtonProps = Omit<
 /** The main Log Intake face, content rail and outboard frame, shared unchanged. */
 export function IntakePrimaryButton({
   children,
+  saveOptions,
   symbol,
   secondaryText,
   className,
@@ -93,6 +96,7 @@ export function IntakePrimaryButton({
           />
         </span>
       </TodayActionButton>
+      {saveOptions && <SaveOptions {...saveOptions} />}
     </div>
   );
 }

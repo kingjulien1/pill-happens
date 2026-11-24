@@ -5,7 +5,14 @@ import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
@@ -34,7 +41,11 @@ import {
   medicationQuantityControls,
 } from "@/lib/medication-types";
 import { useJournal } from "@/components/journal-provider";
-import { DraftStatus, usePersistentDraft } from "@/components/journal-drafts";
+import {
+  DraftStatus,
+  useJournalWorkspace,
+  usePersistentDraft,
+} from "@/components/journal-drafts";
 import {
   intakeDraftDisplayTime,
   intakeDraftTimestamp,
@@ -90,6 +101,9 @@ export function IntakeForm({
   footerAction?: ReactNode;
 }) {
   const { data, mutate, busy, derived, now } = useJournal();
+  const { openDialog } = useJournalWorkspace();
+  const generatedId = useId();
+  const submitPending = useRef(false);
   const medications = useMemo(
     () =>
       data!.medications.filter(
@@ -350,7 +364,14 @@ export function IntakeForm({
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (busy || timingResetting) return;
+    if (busy || timingResetting || submitPending.current) return;
+    const stay =
+      (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value") ===
+      "stay";
+    const form = event.currentTarget;
+    const viewportTop = stay
+      ? form.querySelector("[data-intake-submit]")?.getBoundingClientRect().top
+      : undefined;
     setError("");
     try {
       if (!medication && !fallbackIntake) {
@@ -377,6 +398,7 @@ export function IntakeForm({
         );
         return;
       }
+      submitPending.current = true;
       const saved = await mutate(
         intake ? `intakes/${intake.id}` : "intakes",
         {
@@ -487,18 +509,34 @@ export function IntakeForm({
             : {}),
         },
       );
-      draft.clearDraft();
-      onSaved();
+      if (stay && savedEntry && viewportTop !== undefined) {
+        if (intake?.id === savedEntry.id) {
+          draft.resetDraft(
+            newIntakeFormDraft({ intake: savedEntry, medications, timezone }),
+          );
+        } else {
+          draft.clearDraft();
+        }
+        openDialog(
+          { kind: "intake-edit", id: savedEntry.id },
+          { selector: "[data-intake-submit]", viewportTop },
+        );
+      } else {
+        draft.clearDraft();
+        onSaved();
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Unable to save. Try again.",
       );
+    } finally {
+      submitPending.current = false;
     }
   };
 
   return (
     <form
-      id={formId}
+      id={formId ?? generatedId}
       onReset={handleReset}
       onSubmit={submit}
       className={`${checkStyles.form} ${styles.inputTypography}`}
@@ -740,6 +778,11 @@ export function IntakeForm({
             </span>
           }
           secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
+          saveOptions={{
+            kind: intake ? "edit" : "intake",
+            formId: formId ?? generatedId,
+            disabled: busy || timingResetting,
+          }}
           data-intake-submit
         >
           {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
