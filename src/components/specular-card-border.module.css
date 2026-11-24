@@ -2,14 +2,7 @@
   --rim-gap: var(--check-in-outer-gap, 3px);
   --rim-width: var(--check-in-outer-width, 3.733333px);
   --rim-radius: var(--entry-card-radius, var(--intake-card-radius, 21px));
-  --rim-color: var(
-    --check-in-outer-color,
-    color-mix(
-      in srgb,
-      var(--color-purple-400, #c084fc) 78%,
-      var(--color-pink-400, #f472b6) 22%
-    )
-  );
+  --rim-color: var(--check-in-outer-color, var(--intake-frame-color));
   --rim-purple-glow: color-mix(
     in srgb,
     var(--color-purple-400, #c084fc) 46%,

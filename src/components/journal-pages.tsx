@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowUpRight, FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import dialogButtonStyles from "./dialog-primary-button.module.css";
 import { isSaveAndStay, SaveOptions } from "@/components/save-options";
 import { sameDraftRevision } from "@/lib/journal-drafts";
 import { toast } from "@/components/ui/journal-toast";
@@ -1402,7 +1403,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
       </div>
 
       <div className="flex w-full flex-col gap-2" data-draft-action-footer>
-        <div className="relative w-full">
+        <div className={dialogButtonStyles.group}>
           <DialogPrimaryButton
             className="w-full"
             type="submit"

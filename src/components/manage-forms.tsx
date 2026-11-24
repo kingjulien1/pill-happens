@@ -12,6 +12,7 @@ import {
   type Ref,
 } from "react";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
+import dialogButtonStyles from "./dialog-primary-button.module.css";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import type { SymbolSourceFilter } from "@/lib/medication-symbol-browser";
 import { MedicationActionButton } from "@/components/medication-action-button";
@@ -563,7 +564,7 @@ export function MedicationForm({
 
       <div className="w-full space-y-3 pt-1" data-medication-save-footer>
         <div className="flex w-full flex-col gap-2" data-draft-action-footer>
-          <div className="relative w-full">
+          <div className={dialogButtonStyles.group}>
             <MedicationActionButton
               intent="save"
               type="submit"

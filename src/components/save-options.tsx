@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState, type FormEvent } from "react";
 import { Popover } from "@base-ui/react/popover";
-import { BookmarkCheck, ChevronUp, Feather, Info, Origami } from "lucide-react";
+import { BookmarkCheck, Ellipsis, Feather, Info, Origami } from "lucide-react";
 import styles from "./save-options.module.css";
 
 const saveCopy = {
@@ -99,8 +99,8 @@ export function SaveOptions({
         data-kind={kind}
         className={styles.trigger}
       >
-        <span className={styles.tab}>
-          <ChevronUp size={14} strokeWidth={2.6} aria-hidden="true" />
+        <span className={styles.face}>
+          <Ellipsis size={15} strokeWidth={2.8} aria-hidden="true" />
         </span>
       </Popover.Trigger>
       <Popover.Portal>

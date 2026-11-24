@@ -1,43 +1,87 @@
+:global(button[type="submit"]):has(+ .trigger),
+.trigger,
+.popup {
+  --trigger-inset: 10px;
+  --trigger-target: 44px;
+  --trigger-center: calc(var(--trigger-inset) + var(--trigger-target) / 2);
+}
 .trigger,
 .popup {
   --accent: #f5bafb;
   --edge: #df80ec;
   --paper: #32182f;
 }
+:global(button[data-slot="button"][type="submit"]):has(+ .trigger) {
+  padding-inline-start: calc(
+    var(--trigger-inset) + var(--trigger-target) + 3px
+  );
+}
+@media (max-width: 389px) {
+  :global(button[type="submit"][data-slot="button"]):has(+ .trigger)
+    :global(.intake-primary-label),
+  :global(button[type="submit"][data-slot="button"]):has(+ .trigger)
+    :global(.intake-primary-row) {
+    column-gap: 6px;
+  }
+  :global(button[type="submit"][data-slot="button"]):has(+ .trigger)
+    :global(.intake-primary-copy) {
+    column-gap: 3px;
+  }
+}
+@media (max-width: 359px) {
+  :global(button[type="submit"]):has(+ .trigger),
+  .trigger,
+  .popup {
+    --trigger-inset: 6px;
+  }
+  :global(button[type="submit"][data-slot="button"]):has(+ .trigger) {
+    padding-inline-end: 12px;
+  }
+  :global(button[type="submit"][data-slot="button"]):has(+ .trigger)
+    :global(.intake-primary-row) {
+    column-gap: 3px;
+    padding-inline-end: 0;
+  }
+}
 .trigger {
+  --rim: color-mix(in srgb, var(--intake-frame-color) 92%, black);
+  --lip: color-mix(in srgb, var(--rim) 26%, #371c44);
   position: absolute;
   z-index: 4;
-  inset-inline-start: -2px;
-  top: 50%;
-  transform: translateY(-50%);
+  inset-inline-start: var(--trigger-inset);
+  inset-block-start: 6px;
   display: grid;
-  place-items: center start;
-  width: max(32px, 12.5%);
-  height: 44px;
+  place-items: center;
+  width: var(--trigger-target);
+  height: var(--trigger-target);
+  padding: 0;
+  background: transparent;
   color: #fdf4ff;
   cursor: pointer;
   touch-action: manipulation;
-  border-radius: 9px;
 }
-.tab {
+.face {
   display: grid;
   place-items: center;
-  width: 100%;
-  height: 24px;
-  border: 1.5px solid var(--edge);
-  border-radius: 6px 12px 12px 6px;
-  background: #70216a;
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  background: var(--lip);
+  /* The 1.5px dark frame separates the two colored edges. */
   box-shadow:
-    inset 2px 0 var(--accent),
-    inset 0 1px #ffd9fe40,
-    0 2px 2px #30112d66;
+    inset 0 0 0 1px var(--rim),
+    0 0 0 1.5px var(--lip),
+    0 0 0 3.5px var(--rim),
+    0 0 0 6px var(--focus-edge, transparent);
 }
-.trigger[data-popup-open] .tab svg {
-  transform: rotate(180deg);
+.trigger[data-popup-open] .face svg {
+  transform: rotate(90deg);
 }
-.trigger:is(:hover, :focus-visible, [data-popup-open]) .tab {
-  transform: translateX(1px);
-  background: #882680;
+.trigger:is(:focus-visible, [data-popup-open]) .face {
+  background: color-mix(in srgb, var(--rim) 42%, #361b42);
+}
+.trigger:enabled:active .face {
+  transform: scale(0.94);
 }
 .trigger:disabled {
   opacity: 0.5;
@@ -61,16 +105,16 @@
     inset 0 0 0 5px #ad61a3,
     0 3px 0 #501947,
     0 9px 20px #240d254d;
-  transform-origin: 20px bottom;
+  transform-origin: calc(var(--trigger-center) + 2px) bottom;
 }
 .popup[data-side="bottom"] {
-  transform-origin: 20px top;
+  transform-origin: calc(var(--trigger-center) + 2px) top;
 }
 .popup::after {
   position: absolute;
   z-index: -1;
   content: "";
-  left: 15px;
+  inset-inline-start: calc(var(--trigger-center) - 4.5px);
   width: 9px;
   height: 9px;
   transform: rotate(45deg);
@@ -198,12 +242,28 @@
   font-weight: 590;
   white-space: nowrap;
 }
-.trigger:focus-visible,
+.trigger:focus-visible {
+  outline: none;
+}
+.trigger:focus-visible .face,
 .actions button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+.trigger:focus-visible .face {
+  --focus-edge: #431c53;
+  outline-color: white;
+  outline-offset: 5px;
+}
+@media (forced-colors: active) {
+  .face {
+    border: 1px solid ButtonText;
+  }
+}
 @media (hover: hover) {
+  .trigger:enabled:hover .face {
+    background: color-mix(in srgb, var(--rim) 42%, #361b42);
+  }
   .save:hover {
     background: #f9c4fa;
   }
@@ -215,8 +275,8 @@
   transform: translateY(1px);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .tab,
-  .tab svg {
+  .face,
+  .face svg {
     transition:
       transform 180ms ease-out,
       background-color 180ms;
