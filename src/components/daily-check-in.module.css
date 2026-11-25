@@ -1,12 +1,6 @@
 .section,
 .form {
   --check-in-copper: #dd925e;
-}
-
-.section {
-  width: 100%;
-  min-width: 0;
-  margin: 0;
   --check-in-wash: #ffb35230;
   --check-in-start: #70382a;
   --check-in-middle: #4d293c;
@@ -14,9 +8,6 @@
   --check-in-shadow-weight: 35%;
   --check-in-ink: var(--color-orange-50, #fff7ed);
   --check-in-key: var(--color-orange-200, #ffd6a7);
-  --check-in-glyph: var(--color-amber-100, #fef3c6);
-  --check-in-icon-background: var(--color-amber-950, #461901);
-  --check-in-outer-color: var(--check-in-copper);
   --check-in-rim-glint: #fff1bf;
   --check-in-surface:
     radial-gradient(ellipse at 0% 100%, var(--check-in-wash), transparent 57%),
@@ -30,6 +21,15 @@
         var(--check-in-start)
       )
     );
+}
+
+.section {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  --check-in-glyph: var(--color-amber-100, #fef3c6);
+  --check-in-icon-background: var(--color-amber-950, #461901);
+  --check-in-outer-color: var(--check-in-copper);
 }
 
 /* Give each time marker more room while keeping the intake side compact. */
@@ -458,8 +458,6 @@
   .section,
   .form {
     --check-in-copper: #bc7443;
-  }
-  .section {
     --check-in-start: #ffdcaa;
     --check-in-middle: #fff1dd;
     --check-in-shadow: #f2d7d3;

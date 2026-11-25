@@ -60,8 +60,8 @@ function ReportAction({
   aside: string;
 }) {
   return (
-    <div className={styles.actionFrame}>
-      <button type="button" className={styles.importAction} {...props}>
+    <button type="button" className={styles.importAction} {...props}>
+      <span className={styles.actionFace}>
         <span className={styles.actionContent}>
           <Icon
             size={20.6}
@@ -78,13 +78,13 @@ function ReportAction({
           </span>
         </span>
         <ArrowUpRight
-          size={24}
+          size={22}
           strokeWidth={2.3}
           className={styles.actionArrow}
           aria-hidden="true"
         />
-      </button>
-    </div>
+      </span>
+    </button>
   );
 }
 
