@@ -359,7 +359,7 @@ export function SleepCycleImport({
             <ReportAction
               icon={Import}
               label={pasting ? "Choose Paste…" : "Paste Report"}
-              aside="Déjà Vu"
+              aside="Peak Effort"
               disabled={disabled || reading || pasting}
               onClick={() => void pasteImage()}
               aria-label={
@@ -391,7 +391,7 @@ export function SleepCycleImport({
             <ReportAction
               icon={Paperclip}
               label="Bring Receipts"
-              aside="Exhibit A"
+              aside="Snooze Snitch"
               disabled={disabled || reading || pasting}
               onClick={() => input.current?.click()}
               aria-label="Bring Receipts: choose a saved report image"
