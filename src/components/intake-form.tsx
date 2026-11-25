@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, Import, NotebookPen, Sunrise } from "lucide-react";
+import { Import, NotebookPen } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
@@ -822,7 +822,7 @@ export function IntakeForm({
         {intake && (
           <p
             id={previewHintId}
-            className={`${styles.editCaption} ${styles.editPreviewHint}`}
+            className={`${styles.footerCaption} ${styles.editPreviewHint}`}
           >
             {previewHint}
           </p>
@@ -877,45 +877,32 @@ export function IntakeForm({
           </IntakePrimaryButton>
           <DraftStatus {...draftFeedback} scope="intake" />
           <div className={styles.trackingFooter} data-intake-tracking-footer>
-            {draftFeedback.restored && draftFeedback.status === "saved" && (
-              <p className={styles.restoredHelp}>
-                Your device kept these unfinished changes. Save them with the
-                button above, or choose <strong>Reset draft</strong> below to
-                discard them.
-              </p>
-            )}
             {footerActions}
-            {intake ? (
-              <div className={styles.editTrackingNotes}>
-                <p className={styles.editCaption}>
-                  {belongsTo ? (
-                    <>
-                      <time dateTime={belongsTo}>{trackingDateLabel}</time>
-                      {" · Day starts at 06:00"}
-                    </>
-                  ) : (
-                    "Set a valid date and time."
-                  )}
+            <div className={styles.trackingNotes}>
+              <p className={styles.footerCaption}>
+                {belongsTo ? (
+                  <>
+                    <time dateTime={belongsTo}>{trackingDateLabel}</time>
+                    {" · Day starts at 06:00"}
+                  </>
+                ) : (
+                  "Set a valid date and time."
+                )}
+              </p>
+              {draftFeedback.restored && draftFeedback.status === "saved" && (
+                <p className={styles.restoredHelp}>
+                  Your device kept these unfinished changes. Choose{" "}
+                  {intake ? "Save Edits" : "Save Intake"} to keep them, or{" "}
+                  <strong>Reset draft</strong> to discard them.
                 </p>
-                <p className={`${styles.editCaption} ${styles.editFootnote}`}>
+              )}
+              {intake && (
+                <p className={`${styles.footerCaption} ${styles.editFootnote}`}>
                   Before 06:00, doses go on the previous day. Totals update on
                   save. The confirmation includes Undo.
                 </p>
-              </div>
-            ) : (
-              <div className={styles.trackingDay}>
-                <span>
-                  <CalendarCheck aria-hidden="true" />
-                  {trackingDateLabel
-                    ? `Saved to ${trackingDateLabel}.`
-                    : "Choose a valid time."}
-                </span>
-                <span>
-                  <Sunrise aria-hidden="true" />
-                  Days begin at 06:00.
-                </span>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

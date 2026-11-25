@@ -71,7 +71,7 @@
 }
 .closingRegion {
   --preview-card-gap: 13.5px;
-  --edit-caption-ink: color-mix(
+  --footer-caption-ink: color-mix(
     in srgb,
     var(--color-purple-300),
     var(--color-purple-400)
@@ -306,7 +306,7 @@
 }
 @media (prefers-color-scheme: light) {
   .closingRegion {
-    --edit-caption-ink: color-mix(
+    --footer-caption-ink: color-mix(
       in srgb,
       var(--color-purple-900) 35%,
       var(--muted-foreground)
@@ -321,8 +321,7 @@
   }
 }
 
-.preview,
-.trackingDay {
+.preview {
   --intake-footer-ink: color-mix(
     in srgb,
     var(--muted-foreground) 60%,
@@ -336,18 +335,9 @@
   padding-block: 28px 20px;
   border-top: 1px solid color-mix(in srgb, var(--foreground) 13%, transparent);
 }
-.trackingDay {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  color: var(--intake-footer-ink);
-  font-size: 10px;
-  font-weight: 525;
-}
-.editCaption {
+.footerCaption {
   margin: 0;
-  color: color-mix(in srgb, var(--edit-caption-ink) 72%, transparent);
+  color: color-mix(in srgb, var(--footer-caption-ink) 72%, transparent);
   font-size: 10.25px;
   font-weight: 525;
   line-height: 1.5;
@@ -360,7 +350,7 @@
   max-inline-size: 48ch;
   margin-block-start: var(--preview-card-gap);
 }
-.editTrackingNotes {
+.trackingNotes {
   display: grid;
   justify-items: center;
   gap: 7px;
@@ -368,7 +358,7 @@
 }
 .editFootnote {
   max-inline-size: min(40ch, 78%);
-  color: color-mix(in srgb, var(--edit-caption-ink) 65%, transparent);
+  color: color-mix(in srgb, var(--footer-caption-ink) 65%, transparent);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -389,16 +379,6 @@
 }
 .restoredHelp strong {
   color: var(--foreground);
-}
-.trackingDay > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.trackingDay svg {
-  width: 12px;
-  height: 12px;
-  flex: none;
 }
 
 .preview[data-preview-empty="true"] [data-preview-title-pill] {
