@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { formatDay, formatDose, type Medication } from "@/lib/domain";
 import { InlineMedicationMark } from "./medication-card-icon";
 import { useVisibleMotion } from "./use-visible-motion";
@@ -227,7 +227,8 @@ export function IntakePreviewSummary({
         : `on ${formatDay(trackingDay, { weekday: "short", month: "short" })}`}
     </time>
   );
-  let summary = <>Enter an amount to preview the daily total for {name}.</>;
+  let heading = <>Enter an amount to preview the daily total for {name}.</>;
+  let detail: ReactNode = null;
   if (count !== null && totalMg !== null) {
     const ordinal = (
       <strong data-preview-log-number>
@@ -237,21 +238,30 @@ export function IntakePreviewSummary({
         </span>
       </strong>
     );
-    summary = newIntake ? (
-      <>
-        This would be the {ordinal} logged intake for {name} {day}, bringing the
-        total from <DraftTotal mg={newIntake.savedTotalMg} /> as of currently,
-        to <DraftTotal mg={totalMg} /> should you log this Intake.
-      </>
-    ) : (
-      <>
-        This {ordinal} intake for {name} logs a total intake of{" "}
-        <span className={styles.previewSummaryDose}>
-          <strong>{formatDose(totalMg)}</strong> mg
-        </span>{" "}
-        {day}.
-      </>
-    );
+    if (newIntake) {
+      heading = (
+        <>
+          This would be the {ordinal} logged intake for {name} {day}.
+        </>
+      );
+      detail = (
+        <>
+          That brings the total from <DraftTotal mg={newIntake.savedTotalMg} />{" "}
+          as of currently, to <DraftTotal mg={totalMg} /> should you log this
+          Intake.
+        </>
+      );
+    } else {
+      heading = (
+        <>
+          This {ordinal} intake for {name} logs a total intake of{" "}
+          <span className={styles.previewSummaryDose}>
+            <strong>{formatDose(totalMg)}</strong> mg
+          </span>{" "}
+          {day}.
+        </>
+      );
+    }
   }
   return (
     <header
@@ -260,7 +270,10 @@ export function IntakePreviewSummary({
       data-intake-preview-summary
     >
       <PreviewSlate />
-      <h3 className={styles.previewSummaryHeading}>{summary}</h3>
+      <div className={styles.summaryText}>
+        <h3 className={styles.previewSummaryHeading}>{heading}</h3>
+        {detail && <p className={styles.summaryDetail}>{detail}</p>}
+      </div>
     </header>
   );
 }

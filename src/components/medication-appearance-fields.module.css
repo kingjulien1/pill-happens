@@ -107,39 +107,18 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 25%, transparent);
 }
 
-.liveDot::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: inherit;
-  background-color: inherit;
-  filter: blur(1.5px);
-  opacity: 0.28;
-}
 @media (prefers-reduced-motion: no-preference) {
+  .liveDot,
   .liveDot::before {
-    animation: none;
+    animation-duration: 3.2s;
   }
-}
-@keyframes live-dot-glow {
-  0%,
-  100% {
-    transform: scale(0.9);
-    opacity: 0.08;
-  }
-  45% {
-    transform: scale(1.7);
-    opacity: 0.52;
-  }
-  86% {
-    transform: scale(2.6);
-    opacity: 0;
-  }
-  87% {
-    transform: scale(0.9);
-    opacity: 0;
+  .liveDot::before {
+    position: absolute;
+    inset: -1.5px;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background-color: inherit;
   }
 }
 

@@ -38,7 +38,7 @@ export function FinalLookHeading({
         <span className={styles.liveLabel}>
           {color && (
             <span
-              className={styles.liveDot}
+              className={`${styles.liveDot} motion-safe:animate-pulse motion-safe:before:animate-ping`}
               style={{ backgroundColor: color.hex }}
               role="img"
               aria-label={color.label}
