@@ -313,7 +313,7 @@
   line-height: 1.7;
   text-wrap: pretty;
 }
-.moodOverflow {
+.moods > [data-mood-overflow] {
   flex: none;
   color: var(--toast-detail-muted);
   font-size: 9px;

@@ -3,12 +3,13 @@
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import {
   BedDouble,
+  Clapperboard,
   FlaskConical,
   Moon,
   BookOpen,
   BookOpenCheck,
   PencilLine,
-  Smile,
+  Sunset,
   Save,
 } from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
@@ -44,6 +45,7 @@ import dynamic from "next/dynamic";
 import { ArrowUpRight, LibraryBig } from "lucide-react";
 import { rememberJournalDestination } from "@/components/journal-drafts";
 import { CheckInSection } from "./check-in-section";
+import { DailyMoodIndicators } from "./daily-mood-icon";
 import { EveningDayRatings } from "@/components/evening-day-ratings";
 import { SmallReminders } from "@/components/small-reminders";
 import {
@@ -212,8 +214,11 @@ export function DailyCheckInSection({
       ? (derived?.sleepAverage ?? recordedSleepAverage(data?.dailyCheckIns))
       : undefined,
   );
-  const MetricIcon = morning ? BedDouble : Smile;
   const StateIcon = hasChanges ? PencilLine : saved ? BookOpenCheck : BookOpen;
+  const eveningMoods = morning
+    ? undefined
+    : (formDraft?.moods ?? currentCheckIn?.moods);
+  const feelingsId = eveningMoods?.length ? `${previewId}-feelings` : undefined;
   const feedback = getCheckInCardFeedback({
     period,
     saved,
@@ -279,11 +284,18 @@ export function DailyCheckInSection({
               ? `Edit ${title}. ${logged?.label ?? "Last update time unavailable"}.`
               : `Write ${title}`
           }
-          aria-describedby={previewId}
+          aria-describedby={
+            feelingsId ? `${feelingsId} ${previewId}` : previewId
+          }
           aria-haspopup="dialog"
           disabled={busy}
         >
-          <div className="medication-card-details intake-card-details">
+          <div
+            className={cn(
+              "medication-card-details intake-card-details",
+              eveningMoods && eveningMoods.length >= 3 && styles.manyFeelings,
+            )}
+          >
             <SavedCheckInHeading
               period={period}
               openedAt={openedAt}
@@ -291,14 +303,22 @@ export function DailyCheckInSection({
               updatedAt={saved ? checkIn?.updatedAt : undefined}
               timeZone={timeZone}
               trailing={
-                <span className={styles.summaryIcons} aria-hidden="true">
-                  <span title={morning ? "Sleep duration" : "Selected moods"}>
-                    <MetricIcon />
+                eveningMoods?.length ? (
+                  <DailyMoodIndicators
+                    id={feelingsId}
+                    className={styles.summaryIcons}
+                    moods={eveningMoods}
+                  />
+                ) : (
+                  <span className={styles.summaryIcons} aria-hidden="true">
+                    <span title={morning ? "Sleep duration" : "Last light"}>
+                      {morning ? <BedDouble /> : <Sunset />}
+                    </span>
+                    <span title={morning ? feedback.label : "That’s a wrap"}>
+                      {morning ? <StateIcon /> : <Clapperboard />}
+                    </span>
                   </span>
-                  <span title={feedback.label}>
-                    <StateIcon />
-                  </span>
-                </span>
+                )
               }
             />
             <div

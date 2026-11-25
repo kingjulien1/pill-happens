@@ -21,8 +21,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { MedicationCardIcon } from "@/components/medication-card-icon";
-import { DailyMoodIcon } from "@/components/daily-mood-icon";
-import { DAILY_MOODS } from "@/lib/daily-check-in";
+import { DailyMoodIndicators } from "@/components/daily-mood-icon";
+import { DAILY_MOOD_VALUES } from "@/lib/daily-check-in";
 import { formatDay, formatDose } from "@/lib/domain";
 import type {
   NotificationChangePreview as ChangePreview,
@@ -247,8 +247,8 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
   if (record.kind === "intake" || record.kind === "medication")
     return <MedicationPreview record={record} />;
   if (record.kind === "check-in") {
-    const moods = DAILY_MOODS.filter((mood) =>
-      record.moods.includes(mood.value),
+    const moods = DAILY_MOOD_VALUES.filter((mood) =>
+      record.moods.includes(mood),
     );
     const Icon = record.period === "morning" ? Coffee : MoonStar;
     return (
@@ -264,26 +264,7 @@ function RecordPreview({ record }: { record: NotificationPreviewRecord }) {
           <strong className={styles.name}>
             {record.period === "morning" ? "Morning" : "Evening"} Check-In
           </strong>
-          <span className={styles.moods}>
-            {moods.slice(0, 4).map((mood) => (
-              <span
-                key={mood.value}
-                role="img"
-                aria-label={mood.label}
-                title={mood.label}
-              >
-                <DailyMoodIcon mood={mood.value} size={14} />
-              </span>
-            ))}
-            {moods.length > 4 && (
-              <span
-                className={styles.moodOverflow}
-                aria-label={`${moods.length - 4} more feelings`}
-              >
-                +{moods.length - 4}
-              </span>
-            )}
-          </span>
+          <DailyMoodIndicators moods={moods} className={styles.moods} />
         </div>
         <div className={styles.metrics}>
           <Metric icon={BookOpen} label={record.words + " words"}>

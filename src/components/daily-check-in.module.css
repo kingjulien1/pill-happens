@@ -38,6 +38,7 @@
 }
 
 .section[data-check-in-period="evening"] {
+  container: evening-card / inline-size;
   padding-block-end: 8px;
 }
 
@@ -107,6 +108,14 @@
   stroke-width: 2.5;
 }
 
+.summaryIcons > [data-mood-overflow] {
+  width: auto;
+  padding-inline-start: 1px;
+  font-size: 10px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
 .card [data-check-in-preview-row] :global(.intake-card-ingredient-group) {
   padding-inline-start: calc(
     var(--entry-time-width) + var(--entry-text-gap) +
@@ -136,6 +145,40 @@
   font-weight: 475;
   line-height: 12px;
   white-space: nowrap;
+}
+
+/* Keep the title readable when the feeling icons need most of a phone row. */
+@container evening-card (max-width: 400px) {
+  .card .manyFeelings {
+    height: auto;
+    gap: 3px;
+  }
+  .manyFeelings [data-check-in-heading] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .manyFeelings .timeColumn {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 5px;
+  }
+  .manyFeelings .updatedTime {
+    position: static;
+  }
+  .manyFeelings .summaryIcons {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .manyFeelings :global(.intake-card-title-group) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .card
+    .manyFeelings
+    [data-check-in-preview-row]
+    :global(.intake-card-ingredient-group) {
+    padding-inline-start: 0;
+  }
 }
 
 .card [data-check-in-preview-row] .preview {

@@ -71,6 +71,8 @@ import {
 } from "lucide-react";
 import { DAILY_MOODS, type DailyMood } from "@/lib/daily-check-in";
 
+const moodById = new Map(DAILY_MOODS.map((mood) => [mood.value, mood]));
+
 const symbols = {
   activity: Activity,
   anchor: Anchor,
@@ -147,7 +149,45 @@ export function DailyMoodIcon({
   mood,
   ...props
 }: LucideProps & { mood: DailyMood }) {
-  const option = DAILY_MOODS.find((entry) => entry.value === mood);
+  const option = moodById.get(mood);
   const Icon = option ? symbols[option.icon] : Smile;
   return <Icon aria-hidden="true" size={15} strokeWidth={2.1} {...props} />;
+}
+
+/** Cards and notification snapshots share the same four-icon preview. */
+export function DailyMoodIndicators({
+  moods,
+  className,
+  id,
+}: {
+  moods: readonly DailyMood[];
+  className: string;
+  id?: string;
+}) {
+  if (!moods.length) return null;
+  const visible = moods.slice(0, 4);
+  const labels = visible.map((mood) => moodById.get(mood)?.label ?? mood);
+  const remaining = moods.length - visible.length;
+  const more = remaining
+    ? `${remaining} more ${remaining === 1 ? "feeling" : "feelings"}`
+    : "";
+  return (
+    <span
+      id={id}
+      className={className}
+      role="img"
+      aria-label={[...labels, more].filter(Boolean).join(", ")}
+    >
+      {visible.map((mood, index) => (
+        <span key={mood} title={labels[index]}>
+          <DailyMoodIcon mood={mood} size={14} />
+        </span>
+      ))}
+      {remaining > 0 && (
+        <span data-mood-overflow title={more}>
+          +{remaining}
+        </span>
+      )}
+    </span>
+  );
 }
