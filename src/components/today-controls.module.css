@@ -77,6 +77,29 @@
   --control-face-edge: var(--control-ink);
 }
 
+/* The check-in form supplies the same day/night palette as its timeline card. */
+:global([data-journal-card]) .action[data-journal-write] {
+  --control-face-paint: var(--check-in-surface);
+  --control-ink: var(--check-in-ink);
+  --control-secondary: var(--check-in-key);
+  --control-face-edge: color-mix(in srgb, var(--check-in-copper) 47%, transparent);
+  --control-edge: var(--check-in-copper);
+  --action-face-inset: 4px;
+  --action-inner-line: 2px;
+  --action-outer-line: 1px;
+  --action-surround: linear-gradient(
+    118deg,
+    var(--check-in-copper),
+    var(--check-in-rim-glint) 17%,
+    var(--check-in-copper) 40%,
+    color-mix(in srgb, var(--check-in-copper) 82%, var(--color-orange-600)) 83%,
+    var(--check-in-copper)
+  );
+  --action-reduced-surround: var(--check-in-copper);
+  --action-focus-ring: var(--check-in-rim-glint);
+  --action-focus-base: var(--color-amber-950);
+}
+
 :global([data-intake-entry-part="button"]) .action[data-intake-paint="satin"] {
   --action-surround: transparent;
   --action-reduced-surround: transparent;
@@ -308,9 +331,9 @@
     [data-navigation-trigger]
   ):focus-visible,
 .action.action[data-slot="button"][data-button-system="daily"][data-control-style="satin"]:focus-visible {
-  outline: 2px solid #f6e7ff;
+  outline: 2px solid var(--action-focus-ring, #f6e7ff);
   outline-offset: 4px;
-  box-shadow: 0 0 0 4px #392d49;
+  box-shadow: 0 0 0 4px var(--action-focus-base, #392d49);
 }
 .headerButton.headerButton[data-slot="button"]:is(
     [data-brand-refresh],
