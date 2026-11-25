@@ -27,9 +27,12 @@
   gap: 6px;
   vertical-align: middle;
 }
+.caption[data-tone="saved"],
 .caption[data-tone="restored"] {
   color: color-mix(in srgb, var(--color-emerald-300), var(--color-emerald-400));
   opacity: 0.82;
+}
+.caption[data-tone="restored"] {
   font-weight: 600;
 }
 .mark {

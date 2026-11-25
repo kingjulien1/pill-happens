@@ -1261,9 +1261,8 @@ export function ReflectionDialog({
                 <SaveStatusLine
                   text={draftLabel(draftStatus)}
                   tone={
-                    draftStatus && draftStatus !== "saved"
-                      ? "warning"
-                      : "normal"
+                    draftStatus &&
+                    (draftStatus === "saved" ? "saved" : "warning")
                   }
                 />
               </span>

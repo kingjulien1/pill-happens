@@ -496,6 +496,7 @@ export function DraftStatus({
 }) {
   const durable = status === "saved";
   const restoredDraft = durable && hasDraft && restored;
+  const draftTone = restoredDraft ? "restored" : hasDraft ? "saved" : "normal";
   const text = !durable
     ? !hasDraft && status === "error"
       ? "Draft couldn’t be restored. You can start fresh."
@@ -513,7 +514,7 @@ export function DraftStatus({
     >
       <SaveStatusLine
         text={text}
-        tone={!durable ? "warning" : restoredDraft ? "restored" : "normal"}
+        tone={durable ? draftTone : "warning"}
         scope={scope}
       />
       {action ??

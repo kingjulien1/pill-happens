@@ -9,7 +9,7 @@ import {
 import { ActionIcon } from "./action-icon";
 import styles from "./save-status-line.module.css";
 
-type Tone = "normal" | "restored" | "warning";
+type Tone = "normal" | "saved" | "restored" | "warning";
 type Status = { text: string; tone?: Tone };
 type Exit = Status & { scope: string; started: number };
 
@@ -36,14 +36,17 @@ export function playSaveStatusExit(form: HTMLFormElement) {
   const text = line?.querySelector("[role=status]")?.textContent;
   const scope = line?.dataset.saveStatusScope;
   if (!text || !scope) return;
-  const tone =
-    line.dataset.tone === "restored"
-      ? "restored"
-      : line.dataset.tone === "warning"
-        ? "warning"
-        : "normal";
+  const { tone } = line.dataset;
   window.clearTimeout(timer);
-  publish({ scope, tone, text, started: performance.now() });
+  publish({
+    scope,
+    tone:
+      tone === "saved" || tone === "restored" || tone === "warning"
+        ? tone
+        : "normal",
+    text,
+    started: performance.now(),
+  });
   timer = window.setTimeout(() => publish(null), duration);
 }
 
