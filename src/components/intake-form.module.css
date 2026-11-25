@@ -11,7 +11,8 @@
 .previewHint {
   justify-self: center;
   max-inline-size: min(48ch, 96%);
-  margin: 0 0 0.375rem;
+  margin: 0;
+  text-align: center;
   color: color-mix(in srgb, var(--muted-foreground) 84%, transparent);
   font-size: 0.75rem;
   line-height: 1.45;
@@ -88,28 +89,15 @@
   isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: [divider] auto [intro] auto [card] 1fr [midpoint] 1fr [hint] auto [feedback] auto [actions] auto [end];
-  margin-block-start: 24px;
-}
-/* Both halves of the card size equally, so the 44% stop follows the actual
-   card midpoint even when the preview or the footer changes height. */
-.closingRegion::before,
-.closingRegion::after {
-  content: "";
-  position: absolute;
-  inset-block: 0;
-  inset-inline: calc(-1 * var(--dialog-scroll-gutter));
-  grid-column: 1 / -1;
-  pointer-events: none;
-  z-index: -2;
-}
-.closingRegion::before {
-  grid-row: card / midpoint;
-  background: linear-gradient(to top, var(--mauve-mid), transparent);
-}
-.closingRegion::after {
-  grid-row: midpoint / end;
-  background: linear-gradient(to top, var(--mauve-bottom), var(--mauve-mid));
+  margin-block-start: 8px;
+  background:
+    linear-gradient(
+      to top,
+      var(--mauve-bottom),
+      var(--mauve-mid) 48%,
+      transparent 68%
+    ),
+    var(--mauve-base);
 }
 .editBottomFade {
   /* Span the separator, card, actions and safe area as one continuous wash. */
@@ -120,35 +108,29 @@
   --intake-rim-gain: 1.125;
 }
 .previewDivider {
-  grid-row: divider;
-  margin-block-end: 48px;
+  margin-block-end: 28px;
 }
 .closingRegion > [data-dialog-error] {
-  grid-row: feedback;
-  margin-block-start: 24px;
+  margin-block-start: 28px;
 }
 .closingRegion > .footer {
-  grid-row: actions;
-  margin-block-start: 24px;
+  margin-block-start: 12px;
 }
 
-.preview {
+.receiptBody {
+  --section-content-bg: var(--recap-fade);
+  --receipt-gutter: 18px;
   display: grid;
-  grid-row: intro / hint;
-  grid-template-rows: subgrid;
-  /* Bound the track before the card's ingredient and dose share its width. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--preview-card-gap);
+  padding: 16px var(--receipt-gutter);
+}
+.preview,
+.previewIntro {
+  display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
-}
-.previewIntro {
-  grid-row: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 13.5px;
-  padding-block-end: var(--preview-card-gap);
-}
-.preview > :last-child {
-  grid-row: 2 / span 2;
+  gap: var(--preview-card-gap);
 }
 .preview[data-preview-empty="true"] {
   --preview-empty-surface: var(--color-mauve-600, #594c5b);
@@ -156,22 +138,6 @@
   --preview-empty-muted: var(--color-mauve-200, #e8e3e8);
   /* Reduce the entire empty section by 7/18, keeping its internal hierarchy. */
   opacity: calc(11 / 18);
-}
-@supports not (grid-template-rows: subgrid) {
-  .preview {
-    display: contents;
-  }
-  .previewIntro {
-    grid-row: intro;
-  }
-  .preview > :last-child {
-    grid-row: card / hint;
-  }
-  /* The wrapper has no paint box here. Retain the empty preview's dimming
-     independently of the card's own animated opacity. */
-  .preview[data-preview-empty="true"] > * {
-    filter: opacity(calc(11 / 18));
-  }
 }
 .preview > [data-notification-snapshot-card] {
   min-width: 0;
@@ -199,8 +165,8 @@
 
 .preview .previewSummary {
   min-width: 0;
-  margin-bottom: 31px;
-  padding: 5px 8px 0;
+  margin: 0 calc(-1 * var(--receipt-gutter)) 18px;
+  padding: 3px 4.75px 0;
   color: color-mix(
     in srgb,
     var(--summary-ink-base) 71%,
@@ -353,16 +319,17 @@
 .editPreviewHint {
   color: var(--preview-totals-ink);
   opacity: 0.51;
-  grid-row: hint;
   justify-self: center;
   max-inline-size: 48ch;
-  margin-block-start: var(--preview-card-gap);
 }
 .trackingNotes {
   display: grid;
   justify-items: center;
   gap: 7px;
   margin-block-start: 3px;
+}
+.trackingNotes:empty {
+  display: none;
 }
 .editFootnote {
   max-inline-size: min(40ch, 78%);

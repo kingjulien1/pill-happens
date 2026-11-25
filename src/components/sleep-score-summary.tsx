@@ -8,7 +8,7 @@ import {
   type MorningSleepDraft,
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
-import { CheckInSectionHeader } from "./check-in-section";
+import { CheckInSection } from "./check-in-section";
 import { useVisibleMotion } from "./use-visible-motion";
 import styles from "./sleep-score-summary.module.css";
 
@@ -142,14 +142,14 @@ export function SleepScoreSummary({
   );
   const stageMotion = useVisibleMotion(hasStageBreakdown && !disabled);
   return (
-    <div className={styles.wrapper}>
-      <CheckInSectionHeader
-        caption="The Night, In Numbers"
-        context="Sleep Cycle"
-        detail="Night recap"
-        headingId={`${id}-heading`}
-        description="Your Sleep Cycle report supplies the score. The stages and bedtimes above show how much of the night you spent asleep."
-      />
+    <CheckInSection
+      recap
+      caption="The Night, In Numbers"
+      context="Sleep Cycle"
+      detail="Night recap"
+      headingId={`${id}-heading`}
+      description="Your Sleep Cycle report supplies the score. The stages and bedtimes above show how much of the night you spent asleep."
+    >
       <section
         className={styles.section}
         aria-labelledby={`${id}-heading`}
@@ -157,11 +157,7 @@ export function SleepScoreSummary({
       >
         <div className={styles.overview}>
           <div className={styles.ringSlot}>
-            <SleepScoreRing
-              id={id}
-              score={score}
-              disabled={disabled}
-            />
+            <SleepScoreRing id={id} score={score} disabled={disabled} />
           </div>
           <div className={styles.readings}>
             <p className={styles.groupLabel}>Tracker readings</p>
@@ -313,6 +309,6 @@ export function SleepScoreSummary({
           </nav>
         </footer>
       </section>
-    </div>
+    </CheckInSection>
   );
 }

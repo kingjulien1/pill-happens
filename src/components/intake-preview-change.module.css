@@ -4,12 +4,11 @@
     var(--summary-ink-base) 82%,
     var(--foreground)
   );
-  grid-row: hint;
   display: grid;
   grid-template-columns: fit-content(43%) minmax(0, 1fr);
   align-items: center;
   gap: 8px;
-  margin: var(--preview-card-gap) 0 0;
+  margin: 0;
   padding-inline: clamp(6px, 2%, 10px);
   font-size: var(--summary-copy-size);
   font-weight: 650;

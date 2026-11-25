@@ -1,14 +1,4 @@
-.wrapper {
-  display: grid;
-  min-width: 0;
-  gap: 8px;
-  margin-bottom: 14px;
-}
 .section {
-  --recap-surface: var(
-    --checkin-section-edge,
-    color-mix(in srgb, var(--color-violet-400, #a78bfa) 14%, transparent)
-  );
   --recap-line: color-mix(
     in srgb,
     var(--color-violet-300, #c4b5fd) 17%,
@@ -23,16 +13,6 @@
   min-width: 0;
   overflow: hidden;
   padding: 17px 17px 15px;
-  border: 1px solid;
-  border-color: var(--recap-line);
-  border-radius: var(--dialog-radius-surface, 24px);
-  background: color-mix(
-    in srgb,
-    var(--recap-surface) calc(100% * 2 / 3),
-    transparent
-  );
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--foreground) 5%, transparent);
   color: var(--foreground);
 }
 .overview {
@@ -313,14 +293,7 @@
   position: absolute;
   z-index: -1;
   inset: 0 -17px -15px;
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--color-mauve-950, #0c090c) 60%, transparent) 0%,
-    color-mix(in srgb, var(--color-mauve-950, #0c090c) 54%, transparent) 33%,
-    color-mix(in srgb, var(--color-mauve-950, #0c090c) 40%, transparent) 67%,
-    color-mix(in srgb, var(--color-mauve-950, #0c090c) 20%, transparent) 84%,
-    transparent 100%
-  );
+  background: var(--recap-fade);
   pointer-events: none;
 }
 .footer h4 {

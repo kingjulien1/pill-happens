@@ -43,10 +43,11 @@ export function CheckInSectionHeader({
 
 export function CheckInSection({
   children,
+  recap = false,
   ...header
-}: CheckInSectionHeaderProps & { children: ReactNode }) {
+}: CheckInSectionHeaderProps & { children: ReactNode; recap?: boolean }) {
   return (
-    <div className={styles.section}>
+    <div className={styles.section} data-recap={recap || undefined}>
       <CheckInSectionHeader {...header} />
       <div className={styles.frame}>{children}</div>
     </div>

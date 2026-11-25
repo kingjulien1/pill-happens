@@ -1,5 +1,6 @@
 .section {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   gap: 8px;
 }
@@ -16,7 +17,7 @@
 }
 .section .frame > :first-child {
   margin-block: 0;
-  background: transparent;
+  background: var(--section-content-bg, transparent);
   box-shadow: none;
   border-radius: var(--dialog-radius-surface);
 }
@@ -115,6 +116,21 @@
     ellipse closest-side,
     color-mix(in srgb, var(--surface-ink) 67%, transparent) 65%,
     color-mix(in srgb, var(--surface-ink) 43%, transparent)
+  );
+}
+.section[data-recap] > .frame {
+  --recap-fade: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 60%, transparent) 0%,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 54%, transparent) 33%,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 40%, transparent) 67%,
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 20%, transparent) 84%,
+    transparent 100%
+  );
+  background: color-mix(
+    in srgb,
+    var(--checkin-section-edge) calc(100% * 2 / 3),
+    transparent
   );
 }
 @media (prefers-reduced-motion: no-preference) {
