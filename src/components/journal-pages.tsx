@@ -1359,6 +1359,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
       <div className="flex w-full flex-col" data-draft-action-footer>
         <div className={dialogButtonStyles.group}>
           <DialogPrimaryButton
+            data-save-action
             className="w-full"
             type="submit"
             disabled={busy}

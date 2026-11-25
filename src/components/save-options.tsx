@@ -1,60 +1,73 @@
 "use client";
 
-import { useId, useRef, useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { Popover } from "@base-ui/react/popover";
-import { BookmarkCheck, Ellipsis, Feather, Info, Origami } from "lucide-react";
+import {
+  ArrowRight,
+  BookmarkCheck,
+  CornerDownLeft,
+  Info,
+  PencilLine,
+  X,
+} from "lucide-react";
 import styles from "./save-options.module.css";
 import { playSaveStatusExit } from "./save-status-line";
 
 const saveCopy = {
   intake: {
-    title: "Stay with this intake",
-    context: "New log",
-    description:
-      "Log this dose and keep its entry open. The button switches to Save Edits. You can correct the time or amount right here.",
-    note: "The time taken determines which tracking day gets the entry.",
-    result: "Adds one intake",
+    context: "New intake",
+    result: "Log this dose and open its saved entry.",
+    note: "The time taken determines which tracking day gets this dose.",
   },
   edit: {
-    title: "Stay with this intake",
-    context: "Editing",
-    description:
-      "Save your corrections and keep this entry open. The preview shows the new values. You can give them another look before you leave.",
+    context: "Edit intake",
+    result: "Keep this entry open after saving your changes.",
     note: "Choosing a different medication replaces the original intake.",
-    result: "Saves your changes",
   },
   "check-in": {
-    title: "Stay with this day",
-    description:
-      "Save the answers you’ve filled in so far. Your place in the check-in stays open. You can finish another section and save again.",
-    note: "Blank ratings stay unrated. You can fill them in later.",
-    result: "Saves to this day",
+    result: "Save these answers and carry on with your check-in.",
+    note: "You can come back to any unanswered rating later.",
   },
   "medication-new": {
-    title: "Stay with this medication",
     context: "New medication",
-    description:
-      "Add this medication to your library. Its saved details open here for editing. You can fine-tune the appearance or default amount before leaving.",
-    note: "Logging a dose is a separate step.",
-    result: "Adds to your library",
+    result: "Add it to your library and keep its details open.",
+    note: "You can log a dose once the medication is in your library.",
   },
   "medication-edit": {
-    title: "Stay with this medication",
-    context: "Library edit",
-    description:
-      "Save the medication details and keep this form open. Your next edit applies to the same library item. You can check the preview before making another change.",
-    note: "Strength changes recalculate the totals on linked intake logs.",
-    result: "Updates your library",
+    context: "Edit medication",
+    result: "Save the details and stay on this medication.",
+    note: "Strength changes recalculate doses on linked intake logs.",
   },
   preferences: {
-    title: "Stay in preferences",
-    context: "Timezone",
-    description:
-      "Apply this timezone to your journal. Your saved entries will use its local times. You can review the setting here after saving.",
-    note: "The 06:00 tracking-day boundary moves with the timezone.",
-    result: "Applies to your journal",
+    context: "Journal preferences",
+    result: "Apply the timezone and stay in preferences.",
+    note: "Tracking days begin at 06:00 in the timezone you choose.",
   },
 } as const;
+
+function SaveOptionsGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="21"
+      height="21"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path className={styles.tracks} d="M3.5 7.5h17m-17 9h17" />
+      <g className={styles.upperThumb}>
+        <rect x="5" y="4.25" width="5.5" height="6.5" rx="2.25" />
+      </g>
+      <g className={styles.lowerThumb}>
+        <rect x="13.5" y="13.25" width="5.5" height="6.5" rx="2.25" />
+      </g>
+    </svg>
+  );
+}
 
 export function isSaveAndStay(event: FormEvent<HTMLFormElement>) {
   const submitter = (event.nativeEvent as SubmitEvent).submitter;
@@ -81,19 +94,17 @@ export function SaveOptions({
 }: SaveOptionsProps) {
   const [open, setOpen] = useState(false);
   const id = useId();
-  const trigger = useRef<HTMLButtonElement>(null);
   const copy = saveCopy[kind];
   const context =
     "context" in copy
       ? copy.context
       : period === "morning"
-        ? "Morning"
-        : "Evening";
+        ? "Morning check-in"
+        : "Evening check-in";
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger
-        ref={trigger}
         type="button"
         aria-label="Save options"
         disabled={disabled}
@@ -101,20 +112,19 @@ export function SaveOptions({
         className={styles.trigger}
       >
         <span className={styles.face}>
-          <Ellipsis size={15} strokeWidth={2.8} aria-hidden="true" />
+          <SaveOptionsGlyph />
         </span>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner
-          anchor={() => trigger.current?.parentElement ?? null}
           side="top"
           align="start"
-          alignOffset={-2}
-          sideOffset={17}
+          alignOffset={-8}
+          sideOffset={18}
           collisionPadding={10}
           collisionAvoidance={{
             side: "flip",
-            align: "none",
+            align: "shift",
             fallbackAxisSide: "none",
           }}
           className={styles.positioner}
@@ -124,22 +134,33 @@ export function SaveOptions({
             data-kind={kind}
             aria-label="Save options"
           >
+            <Popover.Arrow className={styles.pointer}>
+              <svg width="16" height="8" viewBox="0 0 16 8" aria-hidden="true">
+                <path d="M0 0h16L9.4 6.5q-1.4 1.4-2.8 0Z" fill="var(--panel)" />
+                <path
+                  d="m.6 0 6 6.3q1.4 1.5 2.8 0l6-6.3"
+                  fill="none"
+                  stroke="var(--panel-edge)"
+                />
+              </svg>
+            </Popover.Arrow>
             <div className={styles.interior}>
               <header className={styles.heading}>
-                <span className={styles.mark}>
-                  <Origami size={17} strokeWidth={2.1} aria-hidden="true" />
-                </span>
-                <Popover.Title>{copy.title}</Popover.Title>
-                <span className={styles.context}>{context}</span>
+                <div>
+                  <p className={styles.context}>{context}</p>
+                  <Popover.Title className={styles.title}>
+                    Save options
+                  </Popover.Title>
+                </div>
+                <Popover.Close
+                  type="button"
+                  className={styles.close}
+                  aria-label="Close save options"
+                >
+                  <X size={16} strokeWidth={2} aria-hidden="true" />
+                </Popover.Close>
               </header>
-              <Popover.Description className={styles.description}>
-                {copy.description}
-              </Popover.Description>
-              <p className={styles.note}>
-                <Info size={11} aria-hidden="true" />
-                {copy.note}
-              </p>
-              <div className={styles.actions}>
+              <div className={styles.choices}>
                 <button
                   className={styles.save}
                   disabled={disabled}
@@ -147,33 +168,53 @@ export function SaveOptions({
                   name="saveMode"
                   value="stay"
                   form={formId}
-                  aria-describedby={`${id}-save`}
+                  aria-labelledby={`${id}-save`}
+                  aria-describedby={`${id}-result`}
                   onClick={(event) => {
                     event.preventDefault();
                     const button = event.currentTarget;
-                    const form = button.form;
-                    if (form) {
-                      playSaveStatusExit(form);
-                      form.requestSubmit(button);
+                    if (button.form) {
+                      playSaveStatusExit(button.form);
+                      button.form.requestSubmit(button);
                     }
                     setOpen(false);
                   }}
                 >
-                  <span className={styles.keycap}>
-                    <BookmarkCheck size={15} aria-hidden="true" />
+                  <BookmarkCheck
+                    className={styles.choiceIcon}
+                    aria-hidden="true"
+                  />
+                  <span className={styles.choiceCopy}>
+                    <strong id={`${id}-save`}>Save and stay</strong>
+                    <span id={`${id}-result`}>{copy.result}</span>
                   </span>
-                  Save and stay
+                  <ArrowRight className={styles.direction} aria-hidden="true" />
                 </button>
                 <Popover.Close
                   className={styles.edit}
                   type="button"
-                  aria-describedby={`${id}-edit`}
+                  aria-labelledby={`${id}-edit`}
+                  aria-describedby={`${id}-draft`}
                 >
-                  <Feather size={13} aria-hidden="true" /> Keep editing
+                  <PencilLine
+                    className={styles.choiceIcon}
+                    aria-hidden="true"
+                  />
+                  <span className={styles.choiceCopy}>
+                    <strong id={`${id}-edit`}>Keep editing</strong>
+                    <span id={`${id}-draft`}>
+                      Return to your draft without saving.
+                    </span>
+                  </span>
+                  <CornerDownLeft
+                    className={styles.direction}
+                    aria-hidden="true"
+                  />
                 </Popover.Close>
-                <small id={`${id}-save`}>{copy.result}</small>
-                <small id={`${id}-edit`}>Draft only</small>
               </div>
+              <Popover.Description className={styles.note}>
+                <Info size={13} aria-hidden="true" /> {copy.note}
+              </Popover.Description>
             </div>
           </Popover.Popup>
         </Popover.Positioner>

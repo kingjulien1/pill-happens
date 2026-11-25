@@ -50,6 +50,7 @@ export function IntakePrimaryButton({
             ? (state) => ({ ...paint, ...style(state) })
             : { ...paint, ...style }
         }
+        data-save-action={saveOptions ? "" : undefined}
         data-intake-paint="satin"
         data-log-intake-rim
         decoration={<SpecularCardBorder />}

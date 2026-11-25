@@ -621,6 +621,7 @@ export function MedicationForm({
               intent="save"
               type="submit"
               pending={busy}
+              data-save-action
               data-medication-submit
             />
             <SaveOptions
