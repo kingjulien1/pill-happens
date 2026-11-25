@@ -1,0 +1,148 @@
+.veil {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+  outline: none;
+  touch-action: none;
+  background: rgb(22 14 24 / 42%);
+  color: #ffdbb6;
+}
+.veil[data-sweep="waiting"] {
+  visibility: hidden;
+}
+.pass {
+  position: absolute;
+  inset: -110% -25% auto;
+  height: 105%;
+  background: linear-gradient(
+    178deg,
+    transparent 9%,
+    #301d3499 63%,
+    #875468c9 93%,
+    #ffd0a3 99%,
+    #fff1d6
+  );
+  transform-origin: center;
+  pointer-events: none;
+}
+.bristles {
+  position: absolute;
+  inset: auto 0 -10px;
+  height: 18px;
+  background: repeating-linear-gradient(
+    106deg,
+    transparent 0 9px,
+    #ffe2c299 9px 11px,
+    transparent 11px 17px
+  );
+}
+.pass svg {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  bottom: 0;
+  left: 48%;
+}
+.pass i {
+  position: absolute;
+  bottom: -4%;
+  left: 25%;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: #ffdfbd;
+}
+.pass i:nth-last-child(2) {
+  left: 66%;
+  bottom: -7%;
+}
+.pass i:last-child {
+  left: 78%;
+  bottom: -2%;
+}
+.seal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #f5b78099;
+  border-radius: 100px;
+  background: #392738;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 640;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-sweep="sweeping"] .pass {
+    animation: sweep 1150ms cubic-bezier(0.42, 0.03, 0.26, 0.99) both;
+  }
+  [data-sweep="sweeping"] .pass svg {
+    animation: brush 1150ms ease-in-out both;
+  }
+  [data-sweep="sweeping"] .pass i {
+    animation: scatter 530ms 250ms ease-out both;
+  }
+  [data-sweep="sweeping"] .seal {
+    animation: seal 640ms 680ms both;
+  }
+  [data-sweep="sweeping"].veil {
+    animation: lift 250ms 1200ms ease-out forwards;
+  }
+}
+@keyframes sweep {
+  0% {
+    transform: translateY(-5%) rotate(-5deg);
+  }
+  52% {
+    transform: translateY(105%) rotate(3deg);
+  }
+  to {
+    transform: translateY(217%) rotate(-2deg);
+  }
+}
+@keyframes brush {
+  from {
+    transform: translate(-70px, 0) rotate(-20deg);
+  }
+  45% {
+    transform: translate(36px, 6px) rotate(14deg);
+  }
+  to {
+    transform: translate(95px, 0) rotate(-10deg);
+  }
+}
+@keyframes scatter {
+  from {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3);
+  }
+  36% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(22px, 24px) rotate(110deg);
+  }
+}
+@keyframes seal {
+  from {
+    opacity: 0;
+    transform: translateY(7px) scale(0.87);
+  }
+  62% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lift {
+  to {
+    opacity: 0;
+  }
+}

@@ -6,7 +6,8 @@ import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useId, useMemo, useRef, useState } from "react";
-import { IntakeFooterActions } from "./intake-footer-actions";
+import { DraftResetFooter } from "./draft-reset-footer";
+import { DeleteIntakeAction } from "./intake-footer-actions";
 import {
   correctedIssueField,
   DialogErrorPanel,
@@ -334,16 +335,44 @@ export function IntakeForm({
   }
 
   const footerActions = (
-    <IntakeFooterActions
-      intake={intake}
-      timezone={timezone}
-      draftName={medication?.name ?? fallbackIntake?.medicationName}
+    <DraftResetFooter
+      saveLabel={intake ? "Save Edits" : "Save Intake"}
+      subject={
+        medication?.name ?? fallbackIntake?.medicationName ?? "New intake"
+      }
+      resetDetail={[
+        intake
+          ? "The medication, route and amount return to the saved entry."
+          : "Clears the medication, route and amount from this draft.",
+        timing.pinned &&
+          "Reset also releases the date and time pinned across both intake forms.",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      keptDetail="Saved intakes and medication settings stay in your journal."
+      hasDraft={draftFeedback.hasDraft}
+      durable={draftFeedback.status === "saved"}
       canReset={draftFeedback.hasDraft || timing.followingCurrentTime}
-      pinned={timing.pinned}
       busy={busy || timingResetting}
       onReset={reset}
-      onDelete={onDelete}
-    />
+      footnote={
+        intake && (
+          <p className={`${styles.footerCaption} ${styles.editFootnote}`}>
+            Before 06:00, doses go on the previous day. Totals update on save.
+            The confirmation includes Undo.
+          </p>
+        )
+      }
+    >
+      {intake && onDelete && (
+        <DeleteIntakeAction
+          intake={intake}
+          timezone={timezone}
+          busy={busy || timingResetting}
+          onDelete={onDelete}
+        />
+      )}
+    </DraftResetFooter>
   );
 
   if (!medications.length && !intake)
@@ -901,24 +930,7 @@ export function IntakeForm({
             {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
           </IntakePrimaryButton>
           <DraftStatus {...draftFeedback} scope="intake" />
-          <div className={styles.trackingFooter} data-intake-tracking-footer>
-            {footerActions}
-            <div className={styles.trackingNotes}>
-              {draftFeedback.restored && draftFeedback.status === "saved" && (
-                <p className={styles.restoredHelp}>
-                  Your device kept these unfinished changes. Choose{" "}
-                  {intake ? "Save Edits" : "Save Intake"} to keep them, or{" "}
-                  <strong>Reset draft</strong> to discard them.
-                </p>
-              )}
-              {intake && (
-                <p className={`${styles.footerCaption} ${styles.editFootnote}`}>
-                  Before 06:00, doses go on the previous day. Totals update on
-                  save. The confirmation includes Undo.
-                </p>
-              )}
-            </div>
-          </div>
+          {footerActions}
         </div>
       </div>
     </form>

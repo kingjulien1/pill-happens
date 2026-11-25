@@ -39,7 +39,7 @@ import {
 import type { WorkspaceSnapshot } from "@/lib/journal-drafts";
 import { shallowEqual } from "@/lib/external-store-selector";
 import { ResponsiveModal } from "@/components/responsive-modal";
-import { Button } from "@/components/ui/button";
+import { DraftResetFooter } from "./draft-reset-footer";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ArrowUpRight, LibraryBig } from "lucide-react";
@@ -98,7 +98,6 @@ import {
 } from "@/lib/check-in-logged-time";
 import { cn } from "@/lib/utils";
 import styles from "./daily-check-in.module.css";
-import closeStyles from "./dialog-close.module.css";
 
 const DailyMoodPicker = dynamic(() =>
   import("@/components/daily-mood-picker").then(
@@ -386,21 +385,6 @@ export function DailyCheckInSection({
             {checkInHeading(targetDay, period)}
           </span>
         }
-        headerActions={
-          <Button
-            type="reset"
-            form={formId}
-            variant="ghost"
-            size="icon"
-            className={closeStyles.control}
-            disabled={busy}
-            aria-label="Reset check-in draft"
-            title="Reset Draft"
-            data-check-in-reset
-          >
-            <ActionIcon name="retry" className="size-[18px]" />
-          </Button>
-        }
         context={
           <JournalDialogSubheading
             title={
@@ -468,6 +452,7 @@ function CheckInForm({
     isCheckInDraft,
   );
   const writing = useDailyWriting(day, data?.dailyCheckIns);
+  const [openingWritingDraft] = useState(writing.draft);
   const { note } = writing;
   const journalHref = writing.page ? `/journal/${day}` : "/journal";
   const { moods, energy, stress, helped, writingOpen = false } = draft.value;
@@ -477,6 +462,7 @@ function CheckInForm({
     key: K,
     value: CheckInDraft[K],
   ) => draft.setValue((current) => ({ ...current, [key]: value }));
+  const [reviewingReset, setReviewingReset] = useState(false);
   const reflectionSave = useReflectionSave({
     day,
     period,
@@ -484,7 +470,7 @@ function CheckInForm({
     checkIn: writing.page,
     baseUpdatedAt: writing.baseUpdatedAt,
     acknowledge: writing.acknowledge,
-    disabled: locked,
+    disabled: locked || reviewingReset,
   });
   const setRating = (field: "energy" | "stress", value: number | null) =>
     draft.setValue((current) => ({
@@ -502,13 +488,17 @@ function CheckInForm({
     "empty" | "sleep" | { message: string } | null
   >(null);
   const reset = () => {
-    draft.resetDraft({
-      ...checkInDefaults(checkIn, period),
-      dailyWriting: true,
-      note: "",
-    });
-    store.clearDraft(writing.key);
-    setIssue(null);
+    try {
+      draft.resetDraft({
+        ...checkInDefaults(checkIn, period),
+        dailyWriting: true,
+        note: "",
+      });
+      store.clearDraft(writing.key);
+      setIssue(null);
+    } finally {
+      reflectionSave.resume();
+    }
   };
   const hasContent =
     note.trim() ||
@@ -700,10 +690,6 @@ function CheckInForm({
         event.preventDefault();
         void save(isSaveAndStay(event));
       }}
-      onReset={(event) => {
-        event.preventDefault();
-        if (!locked) reset();
-      }}
       aria-busy={locked}
       data-check-in-form={period}
     >
@@ -893,12 +879,29 @@ function CheckInForm({
           <DraftStatus
             {...draft}
             hasDraft={draft.hasDraft || Boolean(writing.draft)}
+            restored={
+              (draft.hasDraft && draft.restored) ||
+              Boolean(writing.draft && writing.draft === openingWritingDraft)
+            }
             scope={checkInDraftKey(day, period)}
             copy={{
               idle: checkIn
                 ? "Saved to this day. Edit anytime."
                 : "Save to this day. Edit anytime.",
             }}
+          />
+          <DraftResetFooter
+            saveLabel="Save Check-In"
+            subject={`${morning ? "Morning" : "Evening"} check-in · ${formatDay(day)}`}
+            resetDetail={`${morning ? "Sleep readings and ratings" : "Feelings, ratings and reminders"} ${checkIn ? "return to their saved values" : "will be cleared"}. Unsaved writing on the shared daily page also returns to its last save.`}
+            keptDetail="Your saved daily journal, recorded check-ins and intakes stay on this day."
+            hasDraft={draft.hasDraft || Boolean(writing.draft)}
+            durable={draft.status === "saved"}
+            canReset={draft.hasDraft || Boolean(writing.draft)}
+            busy={locked}
+            prepareReset={reflectionSave.pauseAndDrain}
+            onReviewChange={setReviewingReset}
+            onReset={reset}
           />
         </div>
       </div>

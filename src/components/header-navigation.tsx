@@ -19,13 +19,15 @@ import {
   ArrowUpRight,
   CalendarDays,
   CircleCheck,
+  Sun,
+  Moon,
   CloudDownload,
   BugPlay,
   Braces,
   X,
 } from "lucide-react";
 import { ActionIcon } from "@/components/action-icon";
-import { AppearanceMenu } from "@/components/appearance-menu";
+import { AppearanceDialog } from "@/components/appearance-menu";
 import { BrandMark } from "@/components/brand";
 import { NavigationMenuMark } from "@/components/navigation-menu-mark";
 import { useJournal } from "@/components/journal-provider";
@@ -36,6 +38,7 @@ import { journalLibraryEntries } from "@/lib/journal-library";
 import { cn } from "@/lib/utils";
 import { getBrandThemeStyle } from "@/lib/action-button-system";
 import styles from "./navigation-panel.module.css";
+import menuStyles from "./header-menus.module.css";
 import closeStyles from "./dialog-close.module.css";
 import controlStyles from "./today-controls.module.css";
 import { Button } from "@/components/ui/button";
@@ -108,7 +111,10 @@ export function HeaderNavigation({ className }: { className?: string }) {
         focused &&
         (focused === triggerRef.current ||
           document.querySelector("[data-navigation-menu]")?.contains(focused) ||
-          document.querySelector("[data-appearance-menu]")?.contains(focused)),
+          document
+            .querySelector("[data-appearance-menu]")
+            ?.closest("[data-dialog-surface]")
+            ?.contains(focused)),
       );
       listener();
     };
@@ -198,10 +204,14 @@ function NavigationContents({
   mobile,
   pathname,
   followLink,
+  appearanceTrigger,
+  showAppearance,
 }: {
   mobile: boolean;
   pathname: string;
   followLink: () => void;
+  appearanceTrigger: RefObject<HTMLButtonElement | null>;
+  showAppearance: () => void;
 }) {
   const { data, now } = useJournal();
   const workspace = useJournalWorkspace();
@@ -258,6 +268,21 @@ function NavigationContents({
       },
     };
   }, [data, today]);
+  const appearanceProps = {
+    ref: appearanceTrigger,
+    className: cn(closeStyles.control, menuStyles.appearanceTrigger),
+    onClick: showAppearance,
+    "aria-label": "Choose color mode",
+    title: "Choose color mode",
+    "aria-haspopup": "dialog" as const,
+    "data-appearance-trigger": "",
+  };
+  const lightSwitch = (
+    <>
+      <Sun className={menuStyles.lightIcon} strokeWidth={2.5} />
+      <Moon className={menuStyles.darkIcon} strokeWidth={2.5} />
+    </>
+  );
   const Title = mobile ? DrawerTitle : "p";
   const Description = mobile ? DrawerDescription : "p";
   const Group = mobile ? "section" : Menu.Group;
@@ -280,7 +305,26 @@ function NavigationContents({
           aria-label="Navigation controls"
           data-navigation-header-actions
         >
-          <AppearanceMenu nested={!mobile} />
+          {mobile ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              {...appearanceProps}
+            >
+              {lightSwitch}
+            </Button>
+          ) : (
+            <Menu.Item
+              render={<Button type="button" variant="ghost" size="icon" />}
+              nativeButton
+              closeOnClick={false}
+              label="Choose color mode"
+              {...appearanceProps}
+            >
+              {lightSwitch}
+            </Menu.Item>
+          )}
           {mobile ? (
             <DrawerClose
               render={<Button variant="ghost" size="icon" type="button" />}
@@ -507,13 +551,36 @@ function NavigationMenu({
   triggerRef: RefObject<HTMLButtonElement | null>;
 }) {
   const [open, setOpen] = useState(false);
+  const [appearanceOpen, setAppearanceOpen] = useState(false);
+  const switching = useRef(false);
+  const restoring = useRef(false);
+  const appearanceTrigger = useRef<HTMLButtonElement>(null);
+  const showAppearance = () => {
+    switching.current = true;
+    setOpen(false);
+    setAppearanceOpen(true);
+  };
+  const restoreNavigation = () => {
+    if (!switching.current) return;
+    switching.current = false;
+    restoring.current = true;
+    setOpen(true);
+  };
+  const focusAppearance = (opened: boolean) => {
+    if (opened && restoring.current) {
+      restoring.current = false;
+      appearanceTrigger.current?.focus({ preventScroll: true });
+    }
+  };
   const followingLink = useRef(false);
   const followLink = () => {
     followingLink.current = true;
     setOpen(false);
   };
   const returnFocus = () =>
-    !followingLink.current && triggerRef.current?.isConnected
+    !switching.current &&
+    !followingLink.current &&
+    triggerRef.current?.isConnected
       ? triggerRef.current
       : false;
   const changeOpen = (next: boolean) => {
@@ -525,6 +592,8 @@ function NavigationMenu({
       mobile={mobile}
       pathname={pathname}
       followLink={followLink}
+      showAppearance={showAppearance}
+      appearanceTrigger={appearanceTrigger}
     />
   );
   const triggerProps = {
@@ -538,55 +607,73 @@ function NavigationMenu({
     style: getBrandThemeStyle(),
     "data-navigation-trigger": "",
   };
-  if (mobile)
-    return (
-      <Drawer open={open} onOpenChange={changeOpen} showSwipeHandle>
-        <DrawerTrigger
-          {...triggerProps}
-          render={<Button variant="ghost" size="icon" type="button" />}
-        >
-          <span className="header-control-surface" aria-hidden="true" />
-          <NavigationMenuMark open={open} />
-        </DrawerTrigger>
-        <DrawerContent
-          finalFocus={returnFocus}
-          className={cn(styles.popup, styles.navigation, styles.mobileDialog)}
-          data-navigation-menu
-          data-navigation-layout="dialog"
-        >
-          <nav className={styles.navigationBody} aria-label="Main navigation">
-            {contents}
-          </nav>
-        </DrawerContent>
-      </Drawer>
-    );
   return (
-    <Menu.Root open={open} onOpenChange={changeOpen} modal={false}>
-      <Menu.Trigger
-        {...triggerProps}
-        render={<Button variant="ghost" size="icon" type="button" />}
-      >
-        <span className="header-control-surface" aria-hidden="true" />
-        <NavigationMenuMark open={open} />
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner
-          side="bottom"
-          align="end"
-          sideOffset={10}
-          collisionPadding={12}
-          className={styles.positioner}
+    <>
+      {mobile ? (
+        <Drawer
+          open={open}
+          onOpenChange={changeOpen}
+          onOpenChangeComplete={focusAppearance}
+          showSwipeHandle
         >
-          <Menu.Popup
-            aria-label="Main navigation"
-            className={cn(styles.popup, styles.navigation)}
-            data-navigation-menu
-            data-navigation-layout="menu"
+          <DrawerTrigger
+            {...triggerProps}
+            render={<Button variant="ghost" size="icon" type="button" />}
           >
-            {contents}
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
+            <span className="header-control-surface" aria-hidden="true" />
+            <NavigationMenuMark open={open} />
+          </DrawerTrigger>
+          <DrawerContent
+            finalFocus={returnFocus}
+            className={cn(styles.popup, styles.navigation, styles.mobileDialog)}
+            data-navigation-menu
+            data-navigation-layout="dialog"
+          >
+            <nav className={styles.navigationBody} aria-label="Main navigation">
+              {contents}
+            </nav>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Menu.Root
+          open={open}
+          onOpenChange={changeOpen}
+          onOpenChangeComplete={focusAppearance}
+          modal={false}
+        >
+          <Menu.Trigger
+            {...triggerProps}
+            render={<Button variant="ghost" size="icon" type="button" />}
+          >
+            <span className="header-control-surface" aria-hidden="true" />
+            <NavigationMenuMark open={open} />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner
+              side="bottom"
+              align="end"
+              sideOffset={10}
+              collisionPadding={12}
+              className={styles.positioner}
+            >
+              <Menu.Popup
+                finalFocus={returnFocus}
+                aria-label="Main navigation"
+                className={cn(styles.popup, styles.navigation)}
+                data-navigation-menu
+                data-navigation-layout="menu"
+              >
+                {contents}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      )}
+      <AppearanceDialog
+        open={appearanceOpen}
+        onClose={() => setAppearanceOpen(false)}
+        onClosed={restoreNavigation}
+      />
+    </>
   );
 }

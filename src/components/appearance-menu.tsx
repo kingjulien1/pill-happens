@@ -1,17 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useId } from "react";
+import { Check, Monitor, MoonStar, Sun } from "lucide-react";
+import { useAppearance } from "./appearance-provider";
 import { SaveStatusLine } from "./save-status-line";
-import { Menu } from "@base-ui/react/menu";
-import { Monitor, Moon, MoonStar, Sun } from "lucide-react";
-import { ActionIcon } from "@/components/action-icon";
-import { useAppearance } from "@/components/appearance-provider";
-import { cn } from "@/lib/utils";
+import { ResponsiveModal } from "./responsive-modal";
+import { JournalDialogSubheading } from "./journal-dialog-subheading";
 import { APP_FOUNDATION } from "@/lib/app-theme";
-import styles from "./header-menus.module.css";
-import compact from "./appearance-menu.module.css";
-import closeStyles from "./dialog-close.module.css";
-import { Button } from "@/components/ui/button";
+import styles from "./appearance-menu.module.css";
 
 const options = [
   {
@@ -19,7 +15,6 @@ const options = [
     label: "Light & bright",
     description: "Soft Lilac, clear daylight",
     Icon: Sun,
-    tone: "sand",
     swatches: [
       APP_FOUNDATION.white,
       APP_FOUNDATION.lilac,
@@ -31,7 +26,6 @@ const options = [
     label: "Dark & cozy",
     description: "Deep Plum, a softer glow",
     Icon: MoonStar,
-    tone: "lilac",
     swatches: [
       APP_FOUNDATION.plum,
       APP_FOUNDATION.lilac,
@@ -43,164 +37,92 @@ const options = [
     label: "Follow your device",
     description: "Changes with your system",
     Icon: Monitor,
-    tone: "mint",
     swatches: [APP_FOUNDATION.white, APP_FOUNDATION.plum, APP_FOUNDATION.lilac],
   },
 ] as const;
 
-export function AppearanceMenu({ nested = true }: { nested?: boolean }) {
-  const [open, setOpen] = useState(false);
+export function AppearanceDialog({
+  open,
+  onClose,
+  onClosed,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onClosed: () => void;
+}) {
   const { preference, resolved, setPreference, persisted } = useAppearance();
-  const Root = nested ? Menu.SubmenuRoot : Menu.Root;
-  const triggerProps = {
-    render: <Button variant="ghost" size="icon" type="button" />,
-    className: cn(closeStyles.control, styles.appearanceTrigger),
-    "aria-label": "Choose color mode",
-    title: "Choose color mode",
-    "data-appearance-trigger": true,
-  };
-  const triggerIcons = (
-    <>
-      <Sun className={styles.lightIcon} strokeWidth={2.5} aria-hidden="true" />
-      <Moon className={styles.darkIcon} strokeWidth={2.5} aria-hidden="true" />
-    </>
-  );
+  const group = useId();
+  const dark = resolved === "dark";
+  const ModeIcon = dark ? MoonStar : Sun;
   return (
-    <Root
+    <ResponsiveModal
       open={open}
-      onOpenChange={setOpen}
-      {...(!nested ? { modal: false } : {})}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+      onOpenChangeComplete={(next) => {
+        if (!next) onClosed();
+      }}
+      headerVariant="check-in"
+      title="Appearance"
+      context={
+        <JournalDialogSubheading title="Reading light" detail="This device" />
+      }
+      description="Choose a palette for your journal. Follow your device to switch automatically when its light or dark setting changes."
     >
-      {nested ? (
-        <Menu.SubmenuTrigger
-          {...triggerProps}
-          nativeButton
-          openOnHover={false}
-          label="Choose color mode"
-        >
-          {triggerIcons}
-        </Menu.SubmenuTrigger>
-      ) : (
-        <Menu.Trigger {...triggerProps}>{triggerIcons}</Menu.Trigger>
-      )}
-      <Menu.Portal>
-        <Menu.Positioner
-          side="bottom"
-          align="end"
-          sideOffset={10}
-          collisionPadding={12}
-          className={cn(styles.positioner, compact.positioner)}
-        >
-          <Menu.Popup
-            aria-label="Appearance"
-            className={cn(styles.popup, styles.appearance, compact.panel)}
-            data-appearance-menu
-          >
-            <div className={cn(styles.masthead, compact.masthead)}>
-              <span
-                className={cn(styles.mastheadIcon, compact.mastheadIcon)}
-                aria-hidden="true"
-              >
-                <MoonStar strokeWidth={1.8} />
-              </span>
-              <div className={styles.mastheadCopy}>
-                <p className={cn(styles.title, compact.title)}>Appearance</p>
-                <p className={cn(styles.subtitle, compact.subtitle)}>
-                  Pick the light that feels right.
-                </p>
-              </div>
-            </div>
-            <Menu.Separator
-              className={cn(styles.separator, compact.separator)}
-            />
-            <Menu.RadioGroup
-              value={preference}
-              onValueChange={(value) => setPreference(value)}
-              aria-label="Color mode"
-              className={cn(styles.appearanceOptions, compact.options)}
+      <div data-appearance-menu className={styles.body}>
+        <div className={styles.sample} data-mode={resolved}>
+          <ModeIcon size={25} aria-hidden="true" />
+          <div>
+            <small>Live preview</small>
+            <strong>{dark ? "Dark & cozy" : "Light & bright"}</strong>
+          </div>
+          <span>
+            {preference === "system" ? "Device setting" : "Your choice"}
+          </span>
+        </div>
+        <fieldset className={styles.choices}>
+          <legend>Color mode</legend>
+          {options.map(({ value, label, description, Icon, swatches }) => (
+            <label
+              key={value}
+              className={styles.choice}
+              data-active={value === preference}
+              data-appearance-option={value}
             >
-              {options.map(
-                ({ value, label, description, Icon, tone, swatches }) => (
-                  <Menu.RadioItem
-                    key={value}
-                    value={value}
-                    label={label}
-                    closeOnClick={false}
-                    data-active={preference === value}
-                    data-appearance-option={value}
-                    className={cn(styles.entry, compact.entry)}
-                  >
-                    <span
-                      className={cn(styles.iconTile, compact.iconTile)}
-                      data-tone={tone}
-                    >
-                      <Icon strokeWidth={1.8} aria-hidden="true" />
-                    </span>
-                    <span className={cn(styles.copy, compact.copy)}>
-                      <span className={styles.labelRow}>
-                        <span className={cn(styles.label, compact.label)}>
-                          {label}
-                        </span>
-                      </span>
-                      <span
-                        className={cn(styles.description, compact.description)}
-                      >
-                        {preference === value ? "Selected · " : ""}
-                        {description}
-                      </span>
-                    </span>
-                    <span
-                      className={cn(styles.swatches, compact.swatches)}
-                      aria-hidden="true"
-                    >
-                      {swatches.map((color) => (
-                        <i key={color} style={{ background: color }} />
-                      ))}
-                    </span>
-                    <Menu.RadioItemIndicator
-                      className={cn(styles.modeCheck, compact.modeCheck)}
-                      keepMounted
-                    >
-                      <ActionIcon name="selected" />
-                    </Menu.RadioItemIndicator>
-                  </Menu.RadioItem>
-                ),
-              )}
-            </Menu.RadioGroup>
-            <div
-              className={cn(
-                styles.footer,
-                styles.appearanceFooter,
-                compact.footer,
-              )}
-            >
-              <SaveStatusLine
-                text={persisted ? "Saved on this device" : "This visit only"}
-                tone={persisted ? "normal" : "warning"}
+              <input
+                type="radio"
+                name={group}
+                value={value}
+                checked={preference === value}
+                onChange={() => setPreference(value)}
               />
-              <span className={cn(styles.resolvedMode, compact.resolvedMode)}>
-                {resolved === "dark" ? (
-                  <MoonStar aria-hidden="true" />
-                ) : (
-                  <Sun aria-hidden="true" />
-                )}
-                {resolved === "dark" ? "Dark right now" : "Light right now"}
+              <Icon className={styles.mark} aria-hidden="true" />
+              <span>
+                <strong>{label}</strong>
+                <small>{description}</small>
               </span>
-            </div>
-            <Menu.Item
-              render={<Button variant="ghost" size="icon" type="button" />}
-              nativeButton
-              closeOnClick={false}
-              onClick={() => setOpen(false)}
-              label="Close appearance"
-              aria-label="Close appearance"
-              className={cn(styles.close, compact.close)}
-            >
-              <ActionIcon name="close" />
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Root>
+              <span className={styles.swatches} aria-hidden="true">
+                {swatches.map((color) => (
+                  <i key={color} style={{ backgroundColor: color }} />
+                ))}
+              </span>
+              <span className={styles.check} aria-hidden="true">
+                {preference === value && <Check size={13} />}
+              </span>
+            </label>
+          ))}
+        </fieldset>
+        <footer className={styles.footer}>
+          <SaveStatusLine
+            text={persisted ? "Saved on this device" : "This visit only"}
+            tone={persisted ? "normal" : "warning"}
+          />
+          <button type="button" onClick={onClose}>
+            Done <Check size={15} aria-hidden="true" />
+          </button>
+        </footer>
+      </div>
+    </ResponsiveModal>
   );
 }

@@ -33,6 +33,11 @@ import type {
 } from "@/lib/dialog-scroll-memory";
 import closeStyles from "./dialog-close.module.css";
 import styles from "./responsive-modal.module.css";
+import {
+  DialogResetSweep,
+  DialogSweepVeil,
+  useDialogResetSweep,
+} from "./dialog-reset-sweep";
 
 const subscribe = (fn: () => void) => {
   const query = window.matchMedia("(min-width: 768px)");
@@ -43,6 +48,8 @@ export type DialogScrollControls = { save: () => void };
 export function ResponsiveModal({
   open,
   onOpenChange,
+  onOpenChangeComplete,
+  surfaceClassName,
   title,
   headerVariant,
   headerActions,
@@ -58,6 +65,8 @@ export function ResponsiveModal({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onOpenChangeComplete?: (open: boolean) => void;
+  surfaceClassName?: string;
   title: ReactNode;
   headerVariant?: "medication" | "check-in" | "intake";
   /** Native header controls share the close button’s action rail. */
@@ -90,7 +99,12 @@ export function ResponsiveModal({
   useImperativeHandle(scrollControlsRef, () => ({ save: saveScroll }), [
     saveScroll,
   ]);
-  const changeOpen = (next: boolean) => {
+  const { phase, controls } = useDialogResetSweep();
+  const changeOpen = (next: boolean, details: { cancel: () => void }) => {
+    if (phase) {
+      details.cancel();
+      return;
+    }
     if (!next) saveScroll();
     onOpenChange(next);
   };
@@ -147,11 +161,17 @@ export function ResponsiveModal({
   );
   if (desktop)
     return (
-      <Dialog open={open} onOpenChange={changeOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={changeOpen}
+        onOpenChangeComplete={onOpenChangeComplete}
+      >
         <DialogContent
           finalFocus={returnFocus}
           ref={setScrollElement}
           data-dialog-scroll
+          data-reset-phase={phase ?? undefined}
+          aria-busy={phase ? true : undefined}
           showCloseButton={false}
           className={cn(
             "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
@@ -160,9 +180,11 @@ export function ResponsiveModal({
             journalHeader && styles.checkInSurface,
             intakeHeader && styles.intakeSurface,
             medicationHeader && styles.medicationDialog,
+            surfaceClassName,
           )}
         >
           <DialogHeader
+            inert={Boolean(phase)}
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
           >
             {headerContent(
@@ -179,24 +201,38 @@ export function ResponsiveModal({
               </DialogDescription>,
             )}
           </DialogHeader>
-          {children}
+          <DialogResetSweep.Provider value={controls}>
+            <div className={styles.contentGroup} inert={Boolean(phase)}>
+              {children}
+            </div>
+          </DialogResetSweep.Provider>
+          {phase && <DialogSweepVeil phase={phase} />}
         </DialogContent>
       </Dialog>
     );
   return (
-    <Drawer open={open} onOpenChange={changeOpen} showSwipeHandle>
+    <Drawer
+      open={open}
+      onOpenChange={changeOpen}
+      onOpenChangeComplete={onOpenChangeComplete}
+      showSwipeHandle
+    >
       <DrawerContent
         className={cn(
           "rounded-t-[var(--dialog-radius-surface)]",
           styles.surface,
           journalHeader && styles.checkInSurface,
           intakeHeader && styles.intakeSurface,
+          surfaceClassName,
         )}
+        data-reset-phase={phase ?? undefined}
+        aria-busy={phase ? true : undefined}
         finalFocus={returnFocus}
       >
         <div
           ref={setScrollElement}
           data-dialog-scroll
+          inert={Boolean(phase)}
           data-base-ui-swipe-ignore={journalHeader ? "" : undefined}
           className={cn(
             "min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]",
@@ -226,9 +262,12 @@ export function ResponsiveModal({
             )}
           </DrawerHeader>
           <div className="pt-1" data-modal-body>
-            {children}
+            <DialogResetSweep.Provider value={controls}>
+              {children}
+            </DialogResetSweep.Provider>
           </div>
         </div>
+        {phase && <DialogSweepVeil phase={phase} />}
       </DrawerContent>
     </Drawer>
   );

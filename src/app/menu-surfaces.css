@@ -3,7 +3,6 @@
 :is(
   [data-menu-surface],
   [data-navigation-menu],
-  [data-appearance-menu],
   [data-slot="select-content"],
   [data-choice-menu],
   [data-journal-mention-menu],
@@ -93,7 +92,6 @@
   :is(
     [data-menu-surface],
     [data-navigation-menu],
-    [data-appearance-menu],
     [data-slot="select-content"],
     [data-choice-menu],
     [data-journal-mention-menu],

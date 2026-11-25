@@ -314,3 +314,20 @@
   > svg {
   color: color-mix(in srgb, var(--foreground) 86%, var(--color-purple-400));
 }
+
+.contentGroup {
+  display: contents;
+}
+.surface[data-reset-phase],
+.surface[data-reset-phase] .scrollBody {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+.surface[data-reset-phase] [data-slot="drawer-swipe-handle"] {
+  pointer-events: none;
+}
+.surface[data-reset-phase] [inert]:not(.contentGroup),
+.surface[data-reset-phase] .contentGroup > * {
+  opacity: 0.48;
+}

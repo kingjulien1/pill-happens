@@ -3,13 +3,7 @@
 import { DialogErrorPanel } from "./dialog-error-panel";
 
 import { useEffect, useId, useRef, useState } from "react";
-import {
-  ArrowRight,
-  BrushCleaning,
-  Check,
-  FileText,
-  Shredder,
-} from "lucide-react";
+import { ArrowRight, Check, FileText, Shredder } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,48 +13,28 @@ import {
 import { doseMg, formatDose, type Intake } from "@/lib/domain";
 import styles from "./intake-footer-actions.module.css";
 
-type Action = "reset" | "delete";
 type Step = "opening" | "review" | "arming" | "confirm" | "applying" | "done";
-const labels = { reset: "Reset draft", delete: "Delete intake" };
-const icons = { reset: BrushCleaning, delete: Shredder };
 const titles = {
-  reset: {
-    review: "Review your draft",
-    confirm: "Discard these changes?",
-    applying: "Resetting draft…",
-    done: "Draft reset",
-  },
-  delete: {
-    review: "Review this intake",
-    confirm: "Delete this intake?",
-    applying: "Deleting intake…",
-    done: "Intake deleted",
-  },
+  review: "Review this intake",
+  confirm: "Delete this intake?",
+  applying: "Deleting intake…",
+  done: "Intake deleted",
 };
 const beat = 720;
 const duration = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : beat;
 
-export function IntakeFooterActions({
+export function DeleteIntakeAction({
   intake,
   timezone,
-  draftName,
-  canReset,
-  pinned,
   busy,
-  onReset,
   onDelete,
 }: {
-  intake?: Intake;
+  intake: Intake;
   timezone: string;
-  draftName?: string;
-  canReset: boolean;
-  pinned: boolean;
   busy: boolean;
-  onReset: () => void;
-  onDelete?: () => Promise<void>;
+  onDelete: () => Promise<void>;
 }) {
-  const [action, setAction] = useState<Action>("reset");
   const [step, setStep] = useState<Step>("opening");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
@@ -69,10 +43,6 @@ export function IntakeFooterActions({
   const mounted = useRef(false);
   const applying = useRef(false);
   const id = useId();
-  const reset = action === "reset";
-  const Icon = icons[action];
-  const applyAction = reset ? onReset : onDelete;
-  const canAct = !busy && (reset ? canReset : Boolean(intake && onDelete));
   const scene =
     step === "opening" ? "review" : step === "arming" ? "confirm" : step;
   const reviewing = scene === "review";
@@ -99,9 +69,8 @@ export function IntakeFooterActions({
     return () => clearTimeout(timer);
   }, [open, step]);
 
-  function show(next: Action, button: HTMLButtonElement) {
+  function show(button: HTMLButtonElement) {
     origin.current = button;
-    setAction(next);
     setStep("opening");
     setError("");
     setOpen(true);
@@ -116,7 +85,7 @@ export function IntakeFooterActions({
     );
   }
   async function proceed() {
-    if (applying.current || !canAct || !applyAction) return;
+    if (applying.current || busy) return;
     if (step === "review") {
       setStep("arming");
       cancel.current?.focus({ preventScroll: true });
@@ -127,10 +96,10 @@ export function IntakeFooterActions({
     setError("");
     setStep("applying");
     try {
-      // Finish the sweep or paper feed before a successful delete unmounts its editor.
+      // Finish the paper feed before a successful delete unmounts its editor.
       await new Promise((resolve) => setTimeout(resolve, duration()));
       if (!mounted.current) return;
-      await applyAction();
+      await onDelete();
       if (mounted.current) setStep("done");
     } catch (err) {
       if (mounted.current) {
@@ -147,31 +116,22 @@ export function IntakeFooterActions({
   }
 
   return (
-    <div className={styles.tools} role="group" aria-label="Intake actions">
-      {(intake && onDelete
-        ? (["reset", "delete"] as const)
-        : (["reset"] as const)
-      ).map((kind) => {
-        const Mark = icons[kind];
-        return (
-          <button
-            key={kind}
-            type="button"
-            className={styles.tool}
-            data-tone={kind}
-            disabled={busy || (kind === "reset" && !canReset)}
-            aria-haspopup="dialog"
-            aria-controls={open && kind === action ? id : undefined}
-            aria-expanded={open && kind === action}
-            onClick={(event) => show(kind, event.currentTarget)}
-          >
-            <span className={styles.tile}>
-              <Mark size={19} strokeWidth={2.1} aria-hidden="true" />
-            </span>
-            {labels[kind]}
-          </button>
-        );
-      })}
+    <>
+      <button
+        type="button"
+        className={styles.tool}
+        data-tone="delete"
+        disabled={busy}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-controls={open ? id : undefined}
+        onClick={(event) => show(event.currentTarget)}
+      >
+        <span className={styles.tile}>
+          <Shredder size={19} strokeWidth={2.1} aria-hidden="true" />
+        </span>
+        Delete intake
+      </button>
       <Dialog
         open={open}
         disablePointerDismissal={step === "applying"}
@@ -190,12 +150,12 @@ export function IntakeFooterActions({
           initialFocus={cancel}
           finalFocus={returnFocus}
           className={styles.panel}
-          data-tone={action}
+          data-tone="delete"
           data-scene={scene}
           aria-busy={step === "applying"}
         >
           <div className={styles.eyebrow}>
-            <span>{reset ? "On this device" : "Daily log"}</span>
+            <span>Daily log</span>
             <span
               className={styles.steps}
               aria-label={reviewing ? "Step 1 of 2" : "Step 2 of 2"}
@@ -209,7 +169,7 @@ export function IntakeFooterActions({
             <div className={styles.art} aria-hidden="true">
               <span className={styles.orbit} />
               <FileText className={styles.page} />
-              <Icon className={styles.mark} />
+              <Shredder className={styles.mark} />
               <span className={styles.flecks}>
                 <i />
                 <i />
@@ -223,62 +183,40 @@ export function IntakeFooterActions({
                 aria-live="polite"
                 aria-atomic="true"
               >
-                {titles[action][scene]}
+                {titles[scene]}
               </DialogTitle>
               <DialogDescription className={styles.description}>
-                {reset
-                  ? intake
-                    ? "Reset returns this editor to the saved entry."
-                    : "Reset clears the unfinished intake from this device."
-                  : "Delete removes this saved entry from its tracking day."}
+                Delete removes this saved entry from its tracking day.
               </DialogDescription>
             </div>
           </div>
           <div className={styles.record}>
             <small>
-              {finished
-                ? "Ready for editing"
-                : reset
-                  ? "Draft to reset"
-                  : "Saved entry to delete"}
+              {finished ? "Intake removed" : "Saved entry to delete"}
             </small>
-            <strong>
-              {reset ? draftName || "New intake draft" : intake?.medicationName}
-            </strong>
-            {!reset && intake && (
-              <span>
-                {formatDose(doseMg(intake))} mg <b aria-hidden="true">·</b>{" "}
-                <time dateTime={intake.takenAt}>
-                  {new Intl.DateTimeFormat("en-GB", {
-                    timeZone: timezone,
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(intake.takenAt))}
-                </time>
-              </span>
-            )}
-            {reset && intake && draftName !== intake.medicationName && (
-              <span>Returns to {intake.medicationName}</span>
-            )}
+            <strong>{intake.medicationName}</strong>
+            <span>
+              {formatDose(doseMg(intake))} mg <b aria-hidden="true">·</b>{" "}
+              <time dateTime={intake.takenAt}>
+                {new Intl.DateTimeFormat("en-GB", {
+                  timeZone: timezone,
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(intake.takenAt))}
+              </time>
+            </span>
           </div>
           <p className={styles.note}>
-            {reset
-              ? pinned
-                ? "This also releases the date and time pinned across your intake forms."
-                : "Other drafts and saved intakes stay as they are."
-              : "The daily total updates after deletion. You can restore this entry with Undo in the notification."}
+            The daily total updates after deletion. You can restore this entry
+            with Undo in the notification.
           </p>
           {error && (
             <DialogErrorPanel
-              title={
-                reset
-                  ? "Couldn’t reset the draft"
-                  : "Couldn’t delete this intake"
-              }
+              title="Couldn’t delete this intake"
               message={error}
             />
           )}
@@ -294,7 +232,7 @@ export function IntakeFooterActions({
             <button
               type="button"
               className={styles.primary}
-              disabled={!canAct || (step !== "review" && step !== "confirm")}
+              disabled={busy || (step !== "review" && step !== "confirm")}
               onKeyDown={(event) => {
                 if (event.repeat) event.preventDefault();
               }}
@@ -310,14 +248,14 @@ export function IntakeFooterActions({
                 </>
               ) : (
                 <>
-                  <Icon size={15} />
-                  {labels[action]}
+                  <Shredder size={15} />
+                  Delete intake
                 </>
               )}
             </button>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

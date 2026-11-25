@@ -1097,24 +1097,11 @@ export function DeveloperGuidePage() {
                 links use ordinary Tab navigation.
               </p>
               <p>
-                AppearanceMenu uses a desktop Menu.SubmenuRoot by default.
-                Inside the mobile navigation Drawer it uses a standalone
-                nonmodal Menu.Root whose portal stays associated with the parent
-                modal. The compact 320px appearance popup retains Light, Dark
-                and Follow Your Device, palette samples, native radio keyboard
-                handling and browser preference persistence. Closing it returns
-                focus to Appearance; another Escape closes the parent directory.
-                Selecting a theme does not unexpectedly dismiss navigation.
-              </p>
-              <p>
-                Selecting a theme keeps Appearance and navigation open.
-                Appearance’s Close or Escape dismisses only that popup and
-                returns focus to its masthead trigger; another Escape closes the
-                parent menu or mobile Drawer and returns focus to the live page
-                trigger. Closing navigation or pressing outside dismisses the
-                Appearance popup too. Base UI retains radio arrow-key handling,
-                collision placement and the layered focus behavior in both
-                hosts.
+                Appearance opens a full-width bottom sheet on phones and a
+                centered dialog on desktop. Light, dark and system choices update
+                the palette sample and journal immediately. Native radio inputs
+                support arrow keys. Done, Close and Escape return to the
+                Appearance control in the journal index.
               </p>
             </Detail>
             <Detail
@@ -2205,7 +2192,7 @@ export function DeveloperGuidePage() {
                 one sixth narrower than the previous layout, with the original
                 gaps retained and the recovered space assigned to reset. Native
                 values stay vertically centered. Log Intake and Edit Intake share
-                the same draft feedback and tracking-day footer. Reset draft clears
+                the same draft feedback and tracking-day footer. Reset Draft clears
                 the form and releases pinned timing. Edit Intake also offers Delete
                 intake. Both actions have a review and an explicit confirmation.
                 Manual date/time changes use the shared, journal-scoped
@@ -2284,11 +2271,10 @@ export function DeveloperGuidePage() {
                 beneath the title in 12px copy without a dot or slash, and
                 visible descriptions align to the title’s text column. Reader
                 and writing-help headers also begin with text; body artwork and
-                action icons stay in place. The headerActions slot places native
-                controls beside Close; check-in Reset Draft uses the same 44px
-                styling. Its footer keeps draft feedback without a duplicate
-                Reset link. Native dismissal, focus return and scroll memory
-                remain with the existing primitives.
+                action icons stay in place. Morning and Evening share the intake draft footer.
+                Its inline Reset Draft control locates the reset icon and opens a
+                short guide. The confirmation identifies which local changes it
+                will discard. A sweep marks the reset while the editor is locked.
               </p>
               <p>
                 Dialog heading sections use 7/12 of their previous top padding,
@@ -3989,8 +3975,8 @@ export function DeveloperGuidePage() {
                 reloads and app relaunches. New forms, individual edit IDs and
                 past tracking days have separate drafts; successful saves clear
                 only their own draft, while failed requests retain it.
-                Medication and check-in forms place Reset beside Close;
-                medication Archive/Restore also remains in that header. The
+                Medication forms group Reset and Archive or Restore beside Close.
+                Check-in and intake forms share the Reset Draft footer. The
                 check-in heading separates first recorded opening from latest
                 successful save, and opening metadata never claims a save or
                 completion. Evening tracks five visible groups—Notes, Mood,

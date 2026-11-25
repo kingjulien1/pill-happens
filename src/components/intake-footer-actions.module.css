@@ -5,8 +5,7 @@
   justify-content: center;
   gap: 12px 28px;
 }
-.tool[data-tone="reset"],
-.panel[data-tone="reset"] {
+.tool[data-tone="reset"] {
   --pigment: var(--color-orange-600, #ea580c);
   --ink: var(--color-orange-200, #fed7aa);
 }
@@ -275,9 +274,6 @@
   .panel[data-scene="confirm"] .mark {
     animation: ready 720ms both;
   }
-  .panel[data-scene="applying"][data-tone="reset"] .mark {
-    animation: sweep 720ms both;
-  }
   .panel[data-scene="applying"][data-tone="delete"] .mark {
     animation: feed 720ms both;
   }
@@ -340,17 +336,6 @@
 @keyframes ready {
   55% {
     transform: translate(6px, 0) rotate(8deg);
-  }
-}
-@keyframes sweep {
-  24% {
-    transform: translate(10px, -1px) rotate(20deg);
-  }
-  58% {
-    transform: translate(-6px, 9px) rotate(-17deg);
-  }
-  80% {
-    transform: translate(7px, 3px) rotate(6deg);
   }
 }
 @keyframes feed {
