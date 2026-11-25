@@ -288,12 +288,12 @@
   border-top: 1px solid var(--recap-line);
   text-align: center;
 }
-.footer::before {
-  content: "";
+.footerFade {
   position: absolute;
   z-index: -1;
   inset: 0 -17px -15px;
   background: var(--recap-fade);
+  opacity: 0.42;
   pointer-events: none;
 }
 .footer h4 {

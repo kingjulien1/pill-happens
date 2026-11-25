@@ -271,6 +271,7 @@ export function SleepScoreSummary({
           aria-labelledby={`${id}-footer-heading`}
           data-sleep-summary-footer
         >
+          <div className={styles.footerFade} aria-hidden="true" />
           <h4 id={`${id}-footer-heading`}>
             <Info size={14} strokeWidth={2} aria-hidden="true" />
             How this recap works
