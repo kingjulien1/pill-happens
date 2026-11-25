@@ -1,0 +1,255 @@
+/* The receipt and the carriage follow the same feed points. Desktop centering
+   and the drawer's own translation remain under their respective primitives. */
+.shredding[data-dialog-surface][data-slot] {
+  transform-origin: 50% 8%;
+  pointer-events: none;
+  animation: shred 1750ms linear both;
+}
+.frame {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  user-select: none;
+  color: #ffd7e2;
+  overflow: visible;
+}
+.carriage {
+  position: absolute;
+  inset: 0;
+  animation: travel 1750ms linear both;
+}
+.rail {
+  position: absolute;
+  top: 0;
+  left: 1.5%;
+  width: 97%;
+  height: 4px;
+  border-radius: 100px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ad4d74 8%,
+    #ffc3d2 32%,
+    #fff1dd 50%,
+    #ffd3e1 70%,
+    #b35e82 92%,
+    transparent
+  );
+  box-shadow:
+    0 -2px 10px #f77ba767,
+    0 2px 6px #27131f;
+  animation: rail 1750ms linear both;
+}
+.rail i {
+  position: absolute;
+  inset: 4px 3% -5px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ffc1d3a8 0 3px,
+    transparent 3px 8px
+  );
+}
+.blade {
+  position: absolute;
+  inset: 0;
+  animation: traverse 1750ms cubic-bezier(0.4, 0.03, 0.24, 1) both;
+}
+.rail::before {
+  content: "";
+  position: absolute;
+  inset: -1px 39%;
+  border-radius: inherit;
+  background: #ffefe2;
+  box-shadow: 0 0 9px #ffbed3;
+  animation: traverse 1750ms cubic-bezier(0.4, 0.03, 0.24, 1) reverse both;
+}
+.rail svg {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  padding: 3px;
+  background: #553042;
+  animation: snip 1750ms ease-in-out both;
+}
+.strip {
+  position: absolute;
+  top: 3px;
+  width: clamp(5px, 1.2vw, 10px);
+  height: clamp(24px, 6vh, 50px);
+  border-radius: 1px 1px 4px 3px;
+  background: linear-gradient(#ffd2de, #c87b99 43%, #724261);
+  transform-origin: center top;
+  opacity: 0;
+  animation: paper 920ms var(--delay) cubic-bezier(0.18, 0.62, 0.32, 1) both;
+}
+.strip:nth-child(3n) {
+  height: 28px;
+  background: linear-gradient(#f3c5ac, #b47389 70%, #73445d);
+}
+@keyframes shred {
+  0% {
+    clip-path: inset(0 round 18px);
+    scale: 1;
+    rotate: 0deg;
+    opacity: 1;
+  }
+  12% {
+    clip-path: inset(0 round 20px);
+    scale: 0.985;
+    rotate: -0.65deg;
+  }
+  22% {
+    clip-path: inset(0 0 1% round 18px);
+    scale: 1;
+    rotate: 0.25deg;
+  }
+  34% {
+    clip-path: inset(0 0 9% round 16px);
+    rotate: 0deg;
+  }
+  48% {
+    clip-path: inset(0 0 36% round 14px);
+  }
+  64% {
+    clip-path: inset(0 0 72% round 12px);
+  }
+  76% {
+    clip-path: inset(0 0 91% round 10px);
+  }
+  85% {
+    clip-path: inset(0 0 97% round 6px);
+    scale: 0.99 1;
+    opacity: 1;
+  }
+  92%,
+  100% {
+    clip-path: inset(0 0 100% round 3px);
+    scale: 0.95 1;
+    opacity: 0;
+  }
+}
+@keyframes travel {
+  0%,
+  12% {
+    transform: translateY(99%);
+  }
+  22% {
+    transform: translateY(98%);
+  }
+  34% {
+    transform: translateY(91%);
+  }
+  48% {
+    transform: translateY(64%);
+  }
+  64% {
+    transform: translateY(28%);
+  }
+  76% {
+    transform: translateY(9%);
+  }
+  85% {
+    transform: translateY(3%);
+  }
+  92%,
+  100% {
+    transform: translateY(1%);
+  }
+}
+@keyframes rail {
+  0%,
+  5% {
+    opacity: 0;
+    transform: scaleX(0.06);
+  }
+  16% {
+    opacity: 1;
+    transform: scaleX(1.015);
+  }
+  23%,
+  82% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  91% {
+    opacity: 1;
+    transform: scaleX(0.13);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+@keyframes snip {
+  0%,
+  12% {
+    opacity: 0;
+    transform: rotate(-18deg);
+  }
+  24%,
+  58% {
+    opacity: 1;
+    transform: rotate(8deg);
+  }
+  42%,
+  74% {
+    opacity: 1;
+    transform: rotate(-12deg);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: scale(0.75) rotate(16deg);
+  }
+}
+@keyframes paper {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.02);
+  }
+  17% {
+    opacity: 0.92;
+    transform: scaleY(0.7);
+  }
+  48% {
+    opacity: 0.87;
+    transform: translateY(11px) rotate(3deg) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift), clamp(60px, 14vh, 125px))
+      rotate(var(--turn)) scale(0.72, 0.85);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shredding[data-dialog-surface][data-slot] {
+    animation: dissolve 160ms ease-out both;
+  }
+  .frame {
+    display: none;
+  }
+}
+@keyframes dissolve {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes traverse {
+  0%,
+  16% {
+    transform: translateX(-24%);
+  }
+  48% {
+    transform: translateX(28%);
+  }
+  74% {
+    transform: translateX(-14%);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}

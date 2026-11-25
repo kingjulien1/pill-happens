@@ -9,6 +9,7 @@ import mentionStyles from "./medication-mention-filter.module.css";
 
 import {
   Fragment,
+  useCallback,
   useEffect,
   useId,
   useLayoutEffect,
@@ -37,6 +38,8 @@ import {
   useJournalWorkspace,
   usePersistentDraft,
 } from "@/components/journal-drafts";
+import { IntakeDeletionExit } from "./intake-deletion-exit";
+import deletionStyles from "./intake-deletion-exit.module.css";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { PageEmptyState, PageHeading } from "@/components/page-heading";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
@@ -162,54 +165,129 @@ function usagePercent(total: number, maximum: number) {
   return maximum > 0 ? (total / maximum) * 100 : total > 0 ? 100 : 0;
 }
 
-function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
+function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
   const { data, mutate } = useJournal();
   const { store, openingAnchor } = useJournalWorkspace();
-  async function remove() {
-    const beforePreview = data
-      ? intakeNotificationSnapshot(
-          intake,
-          data.medications.find((item) => item.id === intake.medicationId),
-          data.settings.timezone,
-        )
-      : undefined;
-    const saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE", false);
-    store.clearDraft(`intake:edit:${intake.id}`);
-    toast.success("Entry removed from your daily log.", {
-      journalScope: saved.notificationScope,
-      ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
-      heading: "Intake removed",
-      details: {
-        ...(beforePreview ? { preview: { before: beforePreview } } : {}),
-        paragraphs: [
-          "This intake has been removed. Its medication’s daily total and goal progress now reflect the remaining entries; the medication itself stays in your library.",
-          "Undo restores this exact entry with its original quantity, time taken and notes.",
-        ],
-        facts: [
-          { label: "Medication", value: intake.medicationName },
-          {
-            label: "Amount Removed",
-            value: `${formatDose(intake.quantity)} × ${formatDose(intake.strengthMg)} mg`,
-          },
-        ],
-        links: [{ label: "Daily Log", href: "/" }],
-        footer: "Your other entries and medication settings are unchanged.",
+  // A successful mutation immediately removes the source row from the timeline.
+  // Retain only this editor's entry while its review closes and its sheet exits.
+  const [deletion, setDeletion] = useState<{
+    intake: Intake;
+    data: AppData;
+    phase: "pending" | "returning" | "shredding";
+  } | null>(null);
+  const intake = deletion?.intake ?? entry;
+  const mounted = useRef(false);
+  const receipt = useRef<(() => void) | null>(null);
+  const publish = useCallback(() => {
+    const notify = receipt.current;
+    receipt.current = null;
+    notify?.();
+  }, []);
+  useEffect(() => {
+    mounted.current = true;
+    window.addEventListener("pagehide", publish);
+    return () => {
+      mounted.current = false;
+      window.removeEventListener("pagehide", publish);
+      publish();
+    };
+  }, [publish]);
+  const afterReview = useCallback(() => {
+    setDeletion((current) =>
+      current?.phase === "returning"
+        ? { ...current, phase: "shredding" }
+        : current,
+    );
+  }, []);
+  useEffect(() => {
+    if (deletion?.phase === "returning") {
+      // A layout change can replace the review drawer during its native exit.
+      const timer = setTimeout(afterReview, 950);
+      return () => clearTimeout(timer);
+    }
+    if (deletion?.phase !== "shredding") return;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = setTimeout(
+      () => {
+        close();
+        publish();
       },
-      ...(saved.undo
-        ? {
-            undo: {
-              label: "Restore Entry",
-              onUndo: saved.undo,
-              receipt: saved.receipt,
+      reduced ? 175 : 1780,
+    );
+    return () => clearTimeout(timer);
+  }, [deletion?.phase, afterReview, close, publish]);
+  useEffect(() => {
+    if (intake) return;
+    // A medication replacement can publish its new ID one frame after removing the old one.
+    const frame = requestAnimationFrame(close);
+    return () => cancelAnimationFrame(frame);
+  }, [intake, close]);
+
+  async function remove() {
+    if (!intake || !data || deletion)
+      throw new Error("This entry is no longer available to delete.");
+    setDeletion({ intake, data, phase: "pending" });
+    const beforePreview = intakeNotificationSnapshot(
+      intake,
+      data.medications.find((item) => item.id === intake.medicationId),
+      data.settings.timezone,
+    );
+    let saved;
+    try {
+      saved = await mutate(`intakes/${intake.id}`, undefined, "DELETE", false);
+    } catch (error) {
+      if (mounted.current) setDeletion(null);
+      throw error;
+    }
+    receipt.current = () => {
+      store.clearDraft(`intake:edit:${intake.id}`);
+      toast.success("Entry removed from your daily log.", {
+        journalScope: saved.notificationScope,
+        ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
+        heading: "Intake removed",
+        details: {
+          preview: { before: beforePreview },
+          paragraphs: [
+            "This intake has been removed. Its medication’s daily total and goal progress now reflect the remaining entries; the medication itself stays in your library.",
+            "Undo restores this exact entry with its original quantity, time taken and notes.",
+          ],
+          facts: [
+            { label: "Medication", value: intake.medicationName },
+            {
+              label: "Amount Removed",
+              value: `${formatDose(intake.quantity)} × ${formatDose(intake.strengthMg)} mg`,
             },
-          }
-        : {}),
-    });
-    close();
+          ],
+          links: [{ label: "Daily Log", href: "/" }],
+          footer: "Your other entries and medication settings are unchanged.",
+        },
+        ...(saved.undo
+          ? {
+              undo: {
+                label: "Restore Entry",
+                onUndo: saved.undo,
+                receipt: saved.receipt,
+              },
+            }
+          : {}),
+      });
+    };
+    if (mounted.current) setDeletion({ intake, data, phase: "returning" });
+    else publish();
   }
+  if (!intake) return null;
   return (
     <ResponsiveModal
       open
+      interactionLocked={Boolean(deletion)}
+      surfaceClassName={
+        deletion?.phase === "shredding" ? deletionStyles.shredding : undefined
+      }
+      returnFocus={
+        deletion
+          ? () => document.querySelector<HTMLElement>("[data-logged-intakes]")
+          : undefined
+      }
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
       openingAnchor={openingAnchor}
@@ -234,7 +312,13 @@ function EntryEditor({ intake, close }: { intake: Intake; close: () => void }) {
       }
       description="Adjust the medication, route or amount to match what you took. The date and time determine which tracking day this entry belongs to."
     >
-      <IntakeForm intake={intake} onSaved={close} onDelete={remove} />
+      <IntakeForm
+        intake={intake}
+        deletionSnapshot={deletion?.data}
+        onSaved={close}
+        onDelete={{ remove, afterReview }}
+      />
+      {deletion?.phase === "shredding" && <IntakeDeletionExit />}
     </ResponsiveModal>
   );
 }
@@ -254,13 +338,9 @@ function IntakeTimeline({
     dialog?.kind === "intake-edit"
       ? data.intakes.find((entry) => entry.id === dialog.id)
       : undefined;
-  useEffect(() => {
-    if (dialog?.kind !== "intake-edit" || editing) return;
-    // A medication replacement publishes the new record before the awaiting
-    // submit handler receives its ID. Let that handler select the new editor.
-    const frame = requestAnimationFrame(() => closeDialog(dialog));
-    return () => cancelAnimationFrame(frame);
-  }, [dialog, editing, closeDialog]);
+  const closeEditor = useCallback(() => {
+    if (dialog?.kind === "intake-edit") closeDialog(dialog);
+  }, [dialog, closeDialog]);
   useEffect(() => {
     const focusIntakes = () => {
       if (
@@ -313,12 +393,8 @@ function IntakeTimeline({
         )}
       </div>
       {entries.length > 1 && <StackViewStorageStatus />}
-      {editing && (
-        <EntryEditor
-          key={editing.id}
-          intake={editing}
-          close={() => closeDialog(dialog ?? undefined)}
-        />
+      {dialog?.kind === "intake-edit" && (
+        <EntryEditor key={dialog.id} entry={editing} close={closeEditor} />
       )}
     </>
   );

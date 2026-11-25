@@ -6,8 +6,10 @@ import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
 
 import { useId, useMemo, useRef, useState } from "react";
-import { DraftResetFooter } from "./draft-reset-footer";
-import { DeleteIntakeAction } from "./intake-footer-actions";
+import {
+  DraftResetFooter,
+  type IntakeDeletionActions,
+} from "./draft-reset-footer";
 import {
   correctedIssueField,
   DialogErrorPanel,
@@ -62,6 +64,7 @@ import {
   formatDay,
   fromLocalInput,
   totalsForDay,
+  type AppData,
   type Intake,
 } from "@/lib/domain";
 import { Label } from "@/components/ui/label";
@@ -90,13 +93,16 @@ export function IntakeForm({
   initialDay,
   onSaved,
   onDelete,
+  deletionSnapshot,
 }: {
   intake?: Intake;
   initialDay?: string;
   onSaved: () => void;
-  onDelete?: () => Promise<void>;
+  onDelete?: IntakeDeletionActions;
+  deletionSnapshot?: AppData;
 }) {
-  const { data, mutate, busy, derived, now } = useJournal();
+  const { data: liveData, mutate, busy, derived, now } = useJournal();
+  const data = deletionSnapshot ?? liveData;
   const { openDialog } = useJournalWorkspace();
   const formId = useId();
   const submitPending = useRef(false);
@@ -363,16 +369,10 @@ export function IntakeForm({
           </p>
         )
       }
-    >
-      {intake && onDelete && (
-        <DeleteIntakeAction
-          intake={intake}
-          timezone={timezone}
-          busy={busy || timingResetting}
-          onDelete={onDelete}
-        />
-      )}
-    </DraftResetFooter>
+      deletion={
+        intake && onDelete ? { ...onDelete, intake, timezone } : undefined
+      }
+    />
   );
 
   if (!medications.length && !intake)

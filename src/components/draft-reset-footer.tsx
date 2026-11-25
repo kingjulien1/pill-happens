@@ -1,21 +1,31 @@
 "use client";
 
-import { useContext, useId, useRef, useState, type ReactNode } from "react";
-import { Popover } from "@base-ui/react/popover";
+import { useContext, useRef, useState, type ReactNode } from "react";
 import {
-  ArrowRight,
   BrushCleaning,
   FilePenLine,
+  ReceiptText,
   ShieldCheck,
-  Sparkles,
-  X,
+  Shredder,
+  Undo2,
 } from "lucide-react";
+import { doseMg, formatDose, type Intake } from "@/lib/domain";
+import {
+  FooterActionTile,
+  FooterActionLink,
+  useFooterGuide,
+} from "./intake-footer-actions";
 import { ResponsiveModal } from "./responsive-modal";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
 import { DialogResetSweep } from "./dialog-reset-sweep";
 import { DialogErrorPanel } from "./dialog-error-panel";
 import tools from "./intake-footer-actions.module.css";
 import styles from "./draft-reset-footer.module.css";
+
+export type IntakeDeletionActions = {
+  remove: () => Promise<void>;
+  afterReview: () => void;
+};
 
 export function DraftResetFooter({
   saveLabel,
@@ -29,7 +39,7 @@ export function DraftResetFooter({
   onReset,
   prepareReset,
   onReviewChange,
-  children,
+  deletion,
   footnote,
 }: {
   saveLabel: string;
@@ -43,25 +53,48 @@ export function DraftResetFooter({
   onReset: () => void;
   prepareReset?: () => Promise<unknown>;
   onReviewChange?: (reviewing: boolean) => void;
-  children?: ReactNode;
+  deletion?: IntakeDeletionActions & { intake: Intake; timezone: string };
   footnote?: ReactNode;
 }) {
-  const [guide, setGuide] = useState<"open" | "closing" | null>(null);
+  const resetGuide = useFooterGuide();
+  const deleteGuide = useFooterGuide();
+  const [selected, setSelected] = useState<"reset" | "delete">("reset");
   const [review, setReview] = useState(false);
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState("");
-  const button = useRef<HTMLButtonElement>(null);
   const applyingRef = useRef(false);
   const confirmed = useRef(false);
   const sweep = useContext(DialogResetSweep);
-  const id = useId();
-  const unavailable = busy || !canReset;
-  function openReview() {
-    if (unavailable || applyingRef.current) return;
-    setGuide(null);
+  const removing = selected === "delete" && Boolean(deletion);
+  const button = removing ? deleteGuide.button : resetGuide.button;
+  const unavailable = busy || (!removing && !canReset);
+  const resetProps = {
+    action: "reset" as const,
+    guide: resetGuide,
+    disabled: busy || !canReset,
+    reviewing: review && !removing,
+    onReview: () => openReview("reset"),
+  };
+  const deleteProps = {
+    action: "delete" as const,
+    guide: deleteGuide,
+    disabled: busy,
+    reviewing: review && removing,
+    onReview: () => openReview("delete"),
+  };
+  function openReview(action: "reset" | "delete") {
+    if (
+      busy ||
+      (action === "reset" ? !canReset : !deletion) ||
+      applyingRef.current
+    )
+      return;
+    resetGuide.setState(null);
+    deleteGuide.setState(null);
+    setSelected(action);
     setError("");
     confirmed.current = false;
-    onReviewChange?.(true);
+    if (action === "reset") onReviewChange?.(true);
     setReview(true);
   }
   function cancel() {
@@ -75,20 +108,26 @@ export function DraftResetFooter({
     applyingRef.current = true;
     setApplying(true);
     try {
-      await prepareReset?.();
+      if (removing && deletion) {
+        await deletion.remove();
+      } else {
+        await prepareReset?.();
+        const clear = () => {
+          onReset();
+          onReviewChange?.(false);
+        };
+        if (sweep && button.current?.isConnected) sweep.begin(clear);
+        else clear();
+      }
       confirmed.current = true;
-      const clear = () => {
-        onReset();
-        onReviewChange?.(false);
-      };
-      if (sweep && button.current?.isConnected) sweep.begin(clear);
-      else clear();
       setReview(false);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "The draft could not be reset. Try again.",
+          : removing
+            ? "The intake could not be deleted. Try again."
+            : "The draft could not be reset. Try again.",
       );
     } finally {
       applyingRef.current = false;
@@ -98,94 +137,25 @@ export function DraftResetFooter({
   return (
     <div className={styles.footer} data-draft-reset-footer>
       <div className={tools.tools} role="group" aria-label="Draft actions">
-        <button
-          ref={button}
-          type="button"
-          className={tools.tool}
-          data-tone="reset"
-          data-reset-tool=""
-          data-guidance={guide ?? undefined}
-          disabled={unavailable}
-          aria-haspopup="dialog"
-          aria-expanded={review}
-          aria-describedby={guide === "open" ? id : undefined}
-          onClick={openReview}
-        >
-          <span className={`${tools.tile} ${styles.tile}`}>
-            <BrushCleaning
-              className={styles.brush}
-              size={19}
-              strokeWidth={2.1}
-              aria-hidden="true"
-            />
-            <Sparkles className={styles.glint} size={11} aria-hidden="true" />
-          </span>
-          Reset Draft
-        </button>
-        {children}
+        <FooterActionTile {...resetProps} />
+        {deletion && <FooterActionTile {...deleteProps} />}
       </div>
       <div className={styles.notes}>
-        <Popover.Root
-          open={guide === "open" && !unavailable}
-          onOpenChange={(next) => setGuide(next ? "open" : "closing")}
-          onOpenChangeComplete={(open) => {
-            if (!open)
-              setGuide((current) => (current === "closing" ? null : current));
-          }}
-        >
+        <p className={styles.help}>
+          {hasDraft && durable
+            ? "Your device kept these unfinished changes."
+            : hasDraft
+              ? "Your unfinished changes are here for this visit."
+              : "This device keeps your unfinished changes while you edit."}{" "}
+          Choose {saveLabel} to keep them, or{" "}
+          <FooterActionLink {...resetProps} /> to discard them.
+        </p>
+        {deletion && (
           <p className={styles.help}>
-            {hasDraft && durable
-              ? "Your device kept these unfinished changes."
-              : hasDraft
-                ? "Your unfinished changes are here for this visit."
-                : "This device keeps your unfinished changes while you edit."}{" "}
-            Choose {saveLabel} to keep them, or{" "}
-            <Popover.Trigger
-              type="button"
-              disabled={unavailable}
-              className={styles.inlineLink}
-            >
-              Reset Draft
-            </Popover.Trigger>{" "}
-            to discard them.
+            To remove the saved entry itself, choose{" "}
+            <FooterActionLink {...deleteProps} />.
           </p>
-          <Popover.Portal>
-            <Popover.Positioner
-              anchor={button}
-              side="top"
-              sideOffset={10}
-              collisionPadding={12}
-              className={styles.positioner}
-            >
-              <Popover.Popup
-                className={styles.tip}
-                aria-label="Reset Draft help"
-                finalFocus={review ? false : undefined}
-              >
-                <Popover.Title>
-                  <BrushCleaning size={16} aria-hidden="true" /> Reset Draft
-                </Popover.Title>
-                <Popover.Close
-                  type="button"
-                  className={styles.tipClose}
-                  aria-label="Close reset help"
-                >
-                  <X size={14} />
-                </Popover.Close>
-                <Popover.Description id={id}>
-                  Review what will be cleared before you decide.
-                </Popover.Description>
-                <button
-                  type="button"
-                  className={styles.reviewLink}
-                  onClick={openReview}
-                >
-                  Review reset <ArrowRight size={13} />
-                </button>
-              </Popover.Popup>
-            </Popover.Positioner>
-          </Popover.Portal>
-        </Popover.Root>
+        )}
         {footnote}
       </div>
       <ResponsiveModal
@@ -196,7 +166,8 @@ export function DraftResetFooter({
         onOpenChangeComplete={(open) => {
           if (!open && confirmed.current) {
             confirmed.current = false;
-            sweep?.reveal();
+            if (removing) deletion?.afterReview();
+            else sweep?.reveal();
           }
         }}
         returnFocus={() =>
@@ -206,38 +177,87 @@ export function DraftResetFooter({
               ) ?? null)
             : button.current
         }
-        surfaceClassName={styles.sheet}
-        title="Reset this draft?"
+        surfaceClassName={
+          removing ? `${styles.sheet} ${styles.deleteSheet}` : styles.sheet
+        }
+        role={removing ? "alertdialog" : "dialog"}
+        title={removing ? "Delete this intake?" : "Reset this draft?"}
         context={
           <JournalDialogSubheading
-            title="Draft review"
-            detail="On this device"
+            title={removing ? "Saved intake" : "Draft review"}
+            detail={removing ? "One entry" : "On this device"}
           />
         }
         headerVariant="check-in"
-        description="Take one last look before clearing your unfinished changes."
+        description={
+          removing
+            ? "Check the dose and time below. Deleting it updates the total for its tracking day."
+            : "Take one last look before clearing your unfinished changes."
+        }
       >
-        <div className={styles.sheetBody} data-reset-review>
+        <div
+          className={styles.sheetBody}
+          data-reset-review={removing ? undefined : ""}
+          data-delete-review={removing ? "" : undefined}
+        >
           <section className={styles.scope}>
             <div>
-              <FilePenLine />
+              {removing ? (
+                <ReceiptText aria-hidden="true" />
+              ) : (
+                <FilePenLine aria-hidden="true" />
+              )}
               <span>
-                <small>Draft to reset</small>
-                <strong>{subject}</strong>
-                <p>{resetDetail}</p>
+                <small>{removing ? "Entry to remove" : "Draft to reset"}</small>
+                <strong>
+                  {removing ? deletion?.intake.medicationName : subject}
+                </strong>
+                {removing && deletion ? (
+                  <p className={styles.receipt}>
+                    <b>{formatDose(doseMg(deletion.intake))} mg</b>
+                    <span aria-hidden="true">·</span>
+                    <time dateTime={deletion.intake.takenAt}>
+                      {new Intl.DateTimeFormat("en-GB", {
+                        timeZone: deletion.timezone,
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(deletion.intake.takenAt))}
+                    </time>
+                  </p>
+                ) : (
+                  <p>{resetDetail}</p>
+                )}
               </span>
             </div>
             <div>
-              <ShieldCheck />
+              {removing ? (
+                <Undo2 aria-hidden="true" />
+              ) : (
+                <ShieldCheck aria-hidden="true" />
+              )}
               <span>
-                <small>Kept in your journal</small>
-                <p>{keptDetail}</p>
+                <small>
+                  {removing ? "Change your mind?" : "Kept in your journal"}
+                </small>
+                <p>
+                  {removing
+                    ? "Undo in the notification brings back this dose, its original time and any saved note."
+                    : keptDetail}
+                </p>
               </span>
             </div>
           </section>
           {error && (
             <DialogErrorPanel
-              title="Couldn’t reset the draft"
+              title={
+                removing
+                  ? "Couldn’t delete this intake"
+                  : "Couldn’t reset the draft"
+              }
               message={error}
             />
           )}
@@ -248,8 +268,18 @@ export function DraftResetFooter({
               disabled={unavailable || applying}
               onClick={() => void confirm()}
             >
-              <BrushCleaning size={17} />
-              {applying ? "Resetting…" : "Reset Draft"}
+              {removing ? (
+                <Shredder size={17} aria-hidden="true" />
+              ) : (
+                <BrushCleaning size={17} aria-hidden="true" />
+              )}
+              {removing
+                ? applying
+                  ? "Deleting…"
+                  : "Delete Intake"
+                : applying
+                  ? "Resetting…"
+                  : "Reset Draft"}
             </button>
             <button type="button" disabled={applying} onClick={cancel}>
               Keep editing

@@ -50,6 +50,8 @@ export function ResponsiveModal({
   onOpenChange,
   onOpenChangeComplete,
   surfaceClassName,
+  interactionLocked = false,
+  role = "dialog",
   title,
   headerVariant,
   headerActions,
@@ -67,6 +69,8 @@ export function ResponsiveModal({
   onOpenChange: (open: boolean) => void;
   onOpenChangeComplete?: (open: boolean) => void;
   surfaceClassName?: string;
+  interactionLocked?: boolean;
+  role?: "dialog" | "alertdialog";
   title: ReactNode;
   headerVariant?: "medication" | "check-in" | "intake";
   /** Native header controls share the close button’s action rail. */
@@ -100,8 +104,9 @@ export function ResponsiveModal({
     saveScroll,
   ]);
   const { phase, controls } = useDialogResetSweep();
+  const locked = interactionLocked || Boolean(phase);
   const changeOpen = (next: boolean, details: { cancel: () => void }) => {
-    if (phase) {
+    if (locked) {
       details.cancel();
       return;
     }
@@ -171,7 +176,9 @@ export function ResponsiveModal({
           ref={setScrollElement}
           data-dialog-scroll
           data-reset-phase={phase ?? undefined}
-          aria-busy={phase ? true : undefined}
+          aria-busy={locked || undefined}
+          data-interaction-locked={locked ? "" : undefined}
+          role={role}
           showCloseButton={false}
           className={cn(
             "max-h-[90dvh] overflow-y-auto overscroll-x-none rounded-[var(--dialog-radius-surface)] p-7 [--dialog-scroll-gutter:calc(var(--spacing)*7)] sm:max-w-[440px]",
@@ -184,7 +191,7 @@ export function ResponsiveModal({
           )}
         >
           <DialogHeader
-            inert={Boolean(phase)}
+            inert={locked}
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
           >
             {headerContent(
@@ -202,7 +209,7 @@ export function ResponsiveModal({
             )}
           </DialogHeader>
           <DialogResetSweep.Provider value={controls}>
-            <div className={styles.contentGroup} inert={Boolean(phase)}>
+            <div className={styles.contentGroup} inert={locked}>
               {children}
             </div>
           </DialogResetSweep.Provider>
@@ -226,13 +233,15 @@ export function ResponsiveModal({
           surfaceClassName,
         )}
         data-reset-phase={phase ?? undefined}
-        aria-busy={phase ? true : undefined}
+        aria-busy={locked || undefined}
+        data-interaction-locked={locked ? "" : undefined}
+        role={role}
         finalFocus={returnFocus}
       >
         <div
           ref={setScrollElement}
           data-dialog-scroll
-          inert={Boolean(phase)}
+          inert={locked}
           data-base-ui-swipe-ignore={journalHeader ? "" : undefined}
           className={cn(
             "min-h-0 overflow-y-auto overscroll-contain overscroll-x-none px-6 pb-[max(24px,env(safe-area-inset-bottom))] [--dialog-scroll-gutter:calc(var(--spacing)*6)]",

@@ -1,261 +1,142 @@
 "use client";
 
-import { DialogErrorPanel } from "./dialog-error-panel";
+import { useId, useRef, useState } from "react";
+import { Popover } from "@base-ui/react/popover";
+import { ArrowRight, BrushCleaning, Shredder, Sparkles, X } from "lucide-react";
+import tools from "./intake-footer-actions.module.css";
+import styles from "./draft-reset-footer.module.css";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { ArrowRight, Check, FileText, Shredder } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "./ui/dialog";
-import { doseMg, formatDose, type Intake } from "@/lib/domain";
-import styles from "./intake-footer-actions.module.css";
+type Action = "reset" | "delete";
+const actions = {
+  reset: {
+    label: "Reset Draft",
+    Icon: BrushCleaning,
+    description: "Review what will be cleared before you decide.",
+    next: "Review reset",
+  },
+  delete: {
+    label: "Delete Intake",
+    Icon: Shredder,
+    description: "See the saved dose and time before removing this entry.",
+    next: "Review intake",
+  },
+} as const;
 
-type Step = "opening" | "review" | "arming" | "confirm" | "applying" | "done";
-const titles = {
-  review: "Review this intake",
-  confirm: "Delete this intake?",
-  applying: "Deleting intake…",
-  done: "Intake deleted",
+export function useFooterGuide() {
+  const button = useRef<HTMLButtonElement>(null);
+  const descriptionId = useId();
+  const [state, setState] = useState<"open" | "closing" | null>(null);
+  return { button, descriptionId, state, setState };
+}
+type Props = {
+  action: Action;
+  guide: ReturnType<typeof useFooterGuide>;
+  disabled: boolean;
+  reviewing: boolean;
+  onReview: () => void;
 };
-const beat = 720;
-const duration = () =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : beat;
 
-export function DeleteIntakeAction({
-  intake,
-  timezone,
-  busy,
-  onDelete,
-}: {
-  intake: Intake;
-  timezone: string;
-  busy: boolean;
-  onDelete: () => Promise<void>;
-}) {
-  const [step, setStep] = useState<Step>("opening");
-  const [open, setOpen] = useState(false);
-  const [error, setError] = useState("");
-  const origin = useRef<HTMLButtonElement>(null);
-  const cancel = useRef<HTMLButtonElement>(null);
-  const mounted = useRef(false);
-  const applying = useRef(false);
-  const id = useId();
-  const scene =
-    step === "opening" ? "review" : step === "arming" ? "confirm" : step;
-  const reviewing = scene === "review";
-  const finished = step === "done";
-
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    if (step === "done") {
-      const timer = setTimeout(() => setOpen(false), 1000);
-      return () => clearTimeout(timer);
-    }
-    if (step !== "opening" && step !== "arming") return;
-    const timer = setTimeout(
-      () => setStep(step === "opening" ? "review" : "confirm"),
-      duration(),
-    );
-    return () => clearTimeout(timer);
-  }, [open, step]);
-
-  function show(button: HTMLButtonElement) {
-    origin.current = button;
-    setStep("opening");
-    setError("");
-    setOpen(true);
-  }
-  function returnFocus() {
-    const button = origin.current;
-    if (button?.isConnected && !button.disabled) return button;
-    return (
-      button?.form?.querySelector<HTMLElement>(
-        "[data-intake-submit], a[href]",
-      ) ?? false
-    );
-  }
-  async function proceed() {
-    if (applying.current || busy) return;
-    if (step === "review") {
-      setStep("arming");
-      cancel.current?.focus({ preventScroll: true });
-      return;
-    }
-    if (step !== "confirm") return;
-    applying.current = true;
-    setError("");
-    setStep("applying");
-    try {
-      // Finish the paper feed before a successful delete unmounts its editor.
-      await new Promise((resolve) => setTimeout(resolve, duration()));
-      if (!mounted.current) return;
-      await onDelete();
-      if (mounted.current) setStep("done");
-    } catch (err) {
-      if (mounted.current) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "The change couldn’t be confirmed. You can try again.",
-        );
-        setStep("confirm");
-      }
-    } finally {
-      applying.current = false;
-    }
-  }
-
+export function FooterActionTile({
+  action,
+  guide: { button: buttonRef, state, descriptionId },
+  disabled,
+  reviewing,
+  onReview,
+}: Props) {
+  const { label, Icon } = actions[action];
   return (
-    <>
-      <button
+    <button
+      ref={buttonRef}
+      type="button"
+      className={tools.tool}
+      data-tone={action}
+      data-reset-tool={action === "reset" ? "" : undefined}
+      data-guidance={state ?? undefined}
+      disabled={disabled}
+      aria-haspopup="dialog"
+      aria-expanded={reviewing}
+      aria-describedby={state === "open" ? descriptionId : undefined}
+      onClick={onReview}
+    >
+      <span className={`${tools.tile} ${styles.tile}`}>
+        <Icon
+          className={action === "delete" ? tools.shredder : styles.brush}
+          size={19}
+          strokeWidth={2.1}
+          aria-hidden="true"
+        />
+        {action === "reset" ? (
+          <Sparkles className={styles.glint} size={11} aria-hidden="true" />
+        ) : (
+          <i className={tools.strip} aria-hidden="true" />
+        )}
+      </span>
+      {label}
+    </button>
+  );
+}
+
+export function FooterActionLink({
+  action,
+  guide: { button: buttonRef, state, setState, descriptionId },
+  disabled,
+  reviewing,
+  onReview,
+}: Props) {
+  const { label, Icon, description, next } = actions[action];
+  return (
+    <Popover.Root
+      open={state === "open" && !disabled}
+      onOpenChange={(open) => setState(open ? "open" : "closing")}
+      onOpenChangeComplete={(open) => {
+        if (!open) setState((state) => (state === "closing" ? null : state));
+      }}
+    >
+      <Popover.Trigger
         type="button"
-        className={styles.tool}
-        data-tone="delete"
-        disabled={busy}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={open ? id : undefined}
-        onClick={(event) => show(event.currentTarget)}
+        disabled={disabled}
+        className={styles.inlineLink}
+        data-tone={action}
       >
-        <span className={styles.tile}>
-          <Shredder size={19} strokeWidth={2.1} aria-hidden="true" />
-        </span>
-        Delete intake
-      </button>
-      <Dialog
-        open={open}
-        disablePointerDismissal={step === "applying"}
-        onOpenChange={(next, details) => {
-          if (!next && applying.current) {
-            details.cancel();
-            return;
-          }
-          setOpen(next);
-        }}
-      >
-        <DialogContent
-          id={id}
-          role="alertdialog"
-          showCloseButton={false}
-          initialFocus={cancel}
-          finalFocus={returnFocus}
-          className={styles.panel}
-          data-tone="delete"
-          data-scene={scene}
-          aria-busy={step === "applying"}
+        {label}
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner
+          anchor={buttonRef}
+          side="top"
+          sideOffset={10}
+          collisionPadding={12}
+          className={styles.positioner}
         >
-          <div className={styles.eyebrow}>
-            <span>Daily log</span>
-            <span
-              className={styles.steps}
-              aria-label={reviewing ? "Step 1 of 2" : "Step 2 of 2"}
+          <Popover.Popup
+            className={styles.tip}
+            data-tone={action}
+            aria-label={`${label} help`}
+            finalFocus={reviewing ? false : undefined}
+          >
+            <Popover.Title>
+              <Icon size={16} aria-hidden="true" /> {label}
+            </Popover.Title>
+            <Popover.Close
+              type="button"
+              className={styles.tipClose}
+              aria-label={`Close ${action} help`}
             >
-              <i />
-              <i />
-              {reviewing ? "1 / 2" : "2 / 2"}
-            </span>
-          </div>
-          <div className={styles.heading}>
-            <div className={styles.art} aria-hidden="true">
-              <span className={styles.orbit} />
-              <FileText className={styles.page} />
-              <Shredder className={styles.mark} />
-              <span className={styles.flecks}>
-                <i />
-                <i />
-                <i />
-              </span>
-              {finished && <Check className={styles.check} />}
-            </div>
-            <div>
-              <DialogTitle
-                className={styles.title}
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                {titles[scene]}
-              </DialogTitle>
-              <DialogDescription className={styles.description}>
-                Delete removes this saved entry from its tracking day.
-              </DialogDescription>
-            </div>
-          </div>
-          <div className={styles.record}>
-            <small>
-              {finished ? "Intake removed" : "Saved entry to delete"}
-            </small>
-            <strong>{intake.medicationName}</strong>
-            <span>
-              {formatDose(doseMg(intake))} mg <b aria-hidden="true">·</b>{" "}
-              <time dateTime={intake.takenAt}>
-                {new Intl.DateTimeFormat("en-GB", {
-                  timeZone: timezone,
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }).format(new Date(intake.takenAt))}
-              </time>
-            </span>
-          </div>
-          <p className={styles.note}>
-            The daily total updates after deletion. You can restore this entry
-            with Undo in the notification.
-          </p>
-          {error && (
-            <DialogErrorPanel
-              title="Couldn’t delete this intake"
-              message={error}
-            />
-          )}
-          <div className={styles.buttons}>
+              <X size={14} />
+            </Popover.Close>
+            <Popover.Description id={descriptionId}>
+              {description}
+            </Popover.Description>
             <button
               type="button"
-              ref={cancel}
-              disabled={step === "applying"}
-              onClick={() => setOpen(false)}
+              className={styles.reviewLink}
+              onClick={onReview}
             >
-              {finished ? "Back to intake" : "Keep editing"}
+              {next} <ArrowRight size={13} />
             </button>
-            <button
-              type="button"
-              className={styles.primary}
-              disabled={busy || (step !== "review" && step !== "confirm")}
-              onKeyDown={(event) => {
-                if (event.repeat) event.preventDefault();
-              }}
-              onClick={() => void proceed()}
-            >
-              {reviewing ? (
-                <>
-                  Continue <ArrowRight size={15} />
-                </>
-              ) : finished ? (
-                <>
-                  <Check size={15} /> Done
-                </>
-              ) : (
-                <>
-                  <Shredder size={15} />
-                  Delete intake
-                </>
-              )}
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

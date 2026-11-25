@@ -2194,7 +2194,7 @@ export function DeveloperGuidePage() {
                 values stay vertically centered. Log Intake and Edit Intake share
                 the same draft feedback and tracking-day footer. Reset Draft clears
                 the form and releases pinned timing. Edit Intake also offers Delete
-                intake. Both actions have a review and an explicit confirmation.
+                Intake. Both actions have a review and an explicit confirmation.
                 Manual date/time changes use the shared, journal-scoped
                 intake:timing draft. Saving an intake preserves the pin.
                 Native commit/blur waits 180ms before the pin’s

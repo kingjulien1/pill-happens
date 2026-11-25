@@ -321,3 +321,48 @@
     transition: none;
   }
 }
+
+.inlineLink[data-tone="delete"] {
+  text-decoration-color: #f783a0a6;
+}
+.tip[data-tone="delete"] {
+  background: #39212e;
+  border-color: #d7899e;
+  color: #fff0f3;
+}
+.tip[data-tone="delete"] .reviewLink {
+  color: #ffc4d3;
+}
+.sheet.deleteSheet[data-dialog-surface][data-slot] {
+  --dialog-surface-paint: color-mix(
+    in srgb,
+    var(--color-rose-200, #fecdd3) 14%,
+    var(--color-mauve-950, #100c11)
+  );
+  color: #fff1f4;
+}
+.deleteSheet .scope {
+  border-color: #ffc3d13d;
+}
+.deleteSheet .scope > div + div {
+  border-color: #ffc3d126;
+}
+.deleteSheet .scope :is(small, svg) {
+  color: #ffc3d1;
+}
+.receipt {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3px 7px;
+  font-variant-numeric: tabular-nums;
+}
+.receipt b {
+  color: #ffe1e8;
+}
+.deleteSheet .buttons .confirm {
+  background: #ffc2d0;
+  border-color: #ffd6df;
+  color: #3b1c2b;
+  box-shadow: inset 0 -3px #a7486738;
+}

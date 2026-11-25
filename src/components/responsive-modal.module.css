@@ -318,13 +318,13 @@
 .contentGroup {
   display: contents;
 }
-.surface[data-reset-phase],
-.surface[data-reset-phase] .scrollBody {
+.surface[data-interaction-locked],
+.surface[data-interaction-locked] .scrollBody {
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: none;
 }
-.surface[data-reset-phase] [data-slot="drawer-swipe-handle"] {
+.surface[data-interaction-locked] [data-slot="drawer-swipe-handle"] {
   pointer-events: none;
 }
 .surface[data-reset-phase] [inert]:not(.contentGroup),
