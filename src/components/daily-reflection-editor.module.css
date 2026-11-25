@@ -10,22 +10,19 @@
     var(--color-pink-300, #f9a8d4)
   );
   --journal-ink: var(--surface-reading-foreground);
-  --journal-emphasis: color-mix(
+  --cue-accent: color-mix(
     in srgb,
-    var(--journal-ink) 75%,
-    var(--palette-plum)
+    var(--color-amber-300) 72%,
+    var(--foreground)
   );
   --journal-secondary: color-mix(in srgb, var(--journal-ink) 74%, transparent);
   --journal-muted: color-mix(in srgb, var(--journal-ink) 55%, transparent);
-  --journal-tile: color-mix(in srgb, var(--journal-ink) 5%, transparent);
   --journal-line: color-mix(in srgb, var(--journal-ink) 13%, transparent);
   --journal-focus: color-mix(
     in srgb,
     var(--palette-lilac) 72%,
     var(--journal-ink)
   );
-  --journal-icon: color-mix(in srgb, var(--journal-ink) 87%, transparent);
-  --journal-hover: color-mix(in srgb, var(--journal-ink) 10%, transparent);
   --journal-shadow: color-mix(in srgb, var(--palette-plum) 6%, transparent);
   --journal-motion: paused;
   position: relative;
@@ -93,7 +90,6 @@
       var(--surface-reading) 92%,
       var(--palette-plum)
     );
-    --journal-emphasis: var(--palette-white);
     --journal-shadow: color-mix(
       in srgb,
       var(--palette-black) 12.5%,
@@ -101,30 +97,50 @@
     );
   }
 }
-.iconButton {
-  display: inline-grid;
-  width: 28.3333px;
-  height: 28.3333px;
-  flex: 0 0 auto;
-  place-items: center;
+.footerButton {
+  --button-ink: color-mix(in srgb, var(--cue-accent) 64%, var(--foreground));
+  display: inline-flex;
+  width: 50px;
+  height: 44px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   padding: 0;
-  border: 0;
-  border-radius: 10px;
-  background: var(--journal-tile);
-  color: var(--journal-icon);
-  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--button-ink) 28%, transparent);
+  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--button-ink) 8%, transparent);
+  box-shadow:
+    inset 0 1px color-mix(in srgb, var(--button-ink) 13%, transparent),
+    0 2px 0 rgb(0 0 0 / 16%);
+  color: var(--button-ink);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition:
     background-color 160ms ease,
-    opacity 160ms ease;
+    transform 140ms ease-out;
 }
-.iconButton:focus-visible {
-  outline: 2px solid var(--journal-focus);
+.footerButton:focus-visible {
+  outline: 2px solid var(--cue-accent);
   outline-offset: 3px;
 }
-.iconButton:disabled {
-  opacity: 0.36;
+.footerButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.footerButton:disabled:not([aria-busy="true"]) {
+  opacity: 0.44;
   cursor: default;
+}
+.footerButton[aria-busy="true"] {
+  opacity: 0.8;
+}
+.footerButton[data-refresh-state="success"] {
+  --button-ink: var(--color-emerald-200);
+}
+.footerButton[data-refresh-state="error"] {
+  --button-ink: var(--color-orange-300);
 }
 .introduction {
   margin-top: 11px;
@@ -132,60 +148,48 @@
 .stats {
   display: flex;
   min-width: 0;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px clamp(12px, 5cqi, 22px);
   font-variant-numeric: tabular-nums;
-  line-height: 14px;
-  white-space: nowrap;
 }
 .stat {
   display: inline-flex;
-  min-width: 0;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
 }
 .stat strong {
-  max-width: 100%;
-  color: var(--journal-emphasis);
-  font-size: 10.5px;
-  font-weight: 650;
-  line-height: 14px;
-  white-space: nowrap;
+  color: var(--cue-accent);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.2;
 }
 .stat > span {
-  max-width: 100%;
-  overflow: hidden;
-  color: var(--journal-secondary);
-  font-size: 10px;
-  line-height: 14px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.3;
 }
 .captionRow {
-  position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   min-width: 0;
-  min-height: 26px;
   align-items: center;
-  justify-content: center;
-  padding-inline: 30px;
-  margin-top: -7px;
+  gap: 6px;
 }
-.refresh {
-  position: absolute;
-  inset-inline-end: 0;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
+@container journal-doorway (max-width: 320px) {
+  .stat {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
 }
-.refresh[data-refresh-state="pending"] svg {
+.footerButton[data-refresh-state="pending"] svg {
   animation: journal-refresh-spin 850ms linear infinite;
 }
-.refresh[data-refresh-state="success"] svg {
+.footerButton[data-refresh-state="success"] svg {
   animation: journal-refresh-confirm 320ms ease-out both;
 }
 @keyframes journal-rim-travel {
@@ -216,8 +220,8 @@
   }
 }
 @media (hover: hover) and (pointer: fine) {
-  .iconButton:hover:not(:disabled) {
-    background: var(--journal-hover);
+  .footerButton:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--button-ink) 16%, transparent);
   }
 }
 @media (max-width: 359px) {
@@ -228,11 +232,14 @@
 @media (prefers-reduced-motion: reduce) {
   .editor::before,
   .editor::after,
-  .refresh svg {
+  .footerButton svg {
     animation: none !important;
   }
-  .iconButton {
+  .footerButton {
     transition: none;
+  }
+  .footerButton:active:not(:disabled) {
+    transform: none;
   }
 }
 
@@ -252,7 +259,6 @@
       var(--surface-reading) 96%,
       var(--palette-rose)
     );
-    --journal-tile: color-mix(in srgb, var(--primary) 6%, transparent);
     --journal-focus: var(--ring);
     --journal-shadow: color-mix(in srgb, var(--palette-plum) 8%, transparent);
   }
@@ -319,46 +325,7 @@
   margin: 0 0 4px;
   font-size: 12px;
 }
-.captionRow {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  padding: 0;
-  margin: 0;
-  gap: 4px;
-}
-.captionRow .refresh {
-  position: static;
-  width: 32.5px;
-  height: 32.5px;
-  background: color-mix(in srgb, var(--journal-icon) 14%, transparent);
-}
-.stats {
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.stats,
-.stat > span {
-  color: var(--muted-foreground);
-  font-weight: 400;
-  line-height: 1.5;
-}
-.stats,
-.stat > span {
-  font-size: 12px;
-}
-@container journal-doorway (max-width: 300px) {
-  .stats {
-    gap: 3px;
-  }
-}
-
 .cue {
-  --cue-accent: color-mix(
-    in srgb,
-    var(--color-amber-300) 72%,
-    var(--foreground)
-  );
   display: grid;
   gap: 6px;
 }

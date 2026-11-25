@@ -349,7 +349,7 @@ export function DailyReflectionEditor({
           variant="ghost"
           size="icon"
           type="button"
-          className={`${styles.iconButton} ${styles.refresh}`}
+          className={styles.footerButton}
           disabled={!hasWriting}
           aria-label="Copy writing"
           title="Copy your writing"
@@ -381,10 +381,12 @@ export function DailyReflectionEditor({
             }
           }}
         >
-          <Copy size={14} aria-hidden="true" />
+          <Copy className="size-4" strokeWidth={2.1} aria-hidden="true" />
+          Copy
         </Button>
         <div
           className={styles.stats}
+          role="group"
           aria-label="Reflection statistics"
           data-journal-stats
         >
@@ -392,24 +394,16 @@ export function DailyReflectionEditor({
             <strong>{numberFormat.format(stats.words)}</strong>
             <span>{stats.words === 1 ? "word" : "words"}</span>
           </div>
-          <span aria-hidden="true">·</span>
           <div className={styles.stat} data-journal-stat="characters">
             <strong>{numberFormat.format(stats.characters)}</strong>
-            <span>characters</span>
-          </div>
-          <span aria-hidden="true">·</span>
-          <div className={styles.stat} data-journal-stat="reading">
-            <strong>
-              {stats.readingMinutes ? `~${stats.readingMinutes}` : "0"}
-            </strong>
-            <span>min read</span>
+            <span>{stats.characters === 1 ? "character" : "characters"}</span>
           </div>
         </div>
         <Button
           variant="ghost"
           size="icon"
           type="button"
-          className={`${styles.iconButton} ${styles.refresh}`}
+          className={styles.footerButton}
           onClick={() => void refreshJournal()}
           disabled={refreshLocked}
           aria-label={refreshLabel}
@@ -427,10 +421,15 @@ export function DailyReflectionEditor({
           }
         >
           {refreshFinished && !refreshError ? (
-            <Check size={14} strokeWidth={2.3} aria-hidden="true" />
+            <Check className="size-4" strokeWidth={2.3} aria-hidden="true" />
           ) : (
-            <RefreshCw size={14} strokeWidth={2} aria-hidden="true" />
+            <RefreshCw
+              className="size-4"
+              strokeWidth={2.1}
+              aria-hidden="true"
+            />
           )}
+          Refresh
         </Button>
       </div>
     </section>
