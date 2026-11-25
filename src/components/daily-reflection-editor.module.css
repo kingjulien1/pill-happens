@@ -126,13 +126,6 @@
   opacity: 0.36;
   cursor: default;
 }
-.guidance {
-  margin: 3px 0;
-  color: var(--journal-secondary);
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 18px;
-}
 .introduction {
   margin-top: 11px;
 }
@@ -284,7 +277,47 @@
   border-top: 1px solid var(--journal-line);
 }
 .guidance {
+  margin: 3px 0;
+  color: color-mix(in srgb, var(--color-amber-200, #fde68a) 67%, transparent);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
   text-align: center;
+}
+.guidance summary {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  margin-inline: auto;
+  border-radius: 4px;
+  cursor: pointer;
+  list-style: none;
+}
+.guidance summary::-webkit-details-marker {
+  display: none;
+}
+.guidance summary:focus-visible {
+  outline: 2px solid var(--journal-focus);
+  outline-offset: 2px;
+}
+.guidance summary svg {
+  flex: none;
+}
+.guidance details[open] summary svg {
+  transform: rotate(180deg);
+}
+.guidanceDetail {
+  margin: 4px auto 0;
+  max-width: 48ch;
+  text-wrap: pretty;
+}
+.syncStatus {
+  color: var(--foreground);
+  margin: 0 0 4px;
+  font-size: 12px;
 }
 .captionRow {
   display: grid;
@@ -304,14 +337,12 @@
   flex-wrap: wrap;
 }
 
-.guidance,
 .stats,
 .stat > span {
   color: var(--muted-foreground);
   font-weight: 400;
   line-height: 1.5;
 }
-.guidance,
 .stats,
 .stat > span {
   font-size: 12px;
@@ -340,20 +371,30 @@
 }
 .cueRow {
   justify-content: space-between;
-  flex-wrap: wrap;
   column-gap: 10px;
 }
 .cueTitle {
   gap: 8px;
+  min-width: 0;
+  margin: 0;
   color: var(--foreground);
-  font-size: 15px;
+  font-size: 19.4px;
   font-weight: 650;
   line-height: 1.3;
 }
 .cueTitle svg {
+  flex: none;
   color: var(--cue-accent);
 }
+.cueMeta {
+  flex: none;
+  color: var(--cue-accent);
+  font-size: 11px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
 .cueButton {
+  justify-self: end;
   flex: none;
   min-height: 32px;
   padding-inline: 9px;
@@ -376,6 +417,18 @@
 .cueText p,
 .cueText blockquote {
   margin: 0;
+}
+.cueText p:not([hidden]),
+.guidance summary span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+.cueText p:not([hidden]) {
+  -webkit-line-clamp: 4;
+}
+.guidance summary span {
+  -webkit-line-clamp: 2;
 }
 .cueText blockquote {
   padding-inline-start: 11px;

@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BookOpenText,
   Check,
+  ChevronDown,
   Copy,
   Dices,
   Eye,
@@ -62,47 +63,55 @@ function JournalPageCue({
   return (
     <div className={styles.cue} data-journal-snapshot>
       <div className={styles.cueRow}>
-        <strong className={styles.cueTitle}>
-          <CueIcon size={18} aria-hidden="true" />
+        <h4 className={styles.cueTitle}>
+          <CueIcon size={16} aria-hidden="true" />
           {hasOpening ? "Your page so far" : "A way in"}
-        </strong>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className={styles.cueButton}
-          disabled={disabled}
-          aria-controls={hasOpening ? passage : undefined}
-          aria-expanded={hasOpening ? showOpening : undefined}
-          onClick={() => {
-            if (hasOpening) setShowOpening((shown) => !shown);
-            else setPromptIndex((index) => (index + 1) % starters.length);
-          }}
-        >
-          <ControlIcon size={13} aria-hidden="true" />
+        </h4>
+        <span className={styles.cueMeta}>
           {hasOpening
-            ? showOpening
-              ? "Hide opening"
-              : "Peek at opening"
-            : "New prompt"}
-        </Button>
+            ? `${numberFormat.format(stats.paragraphs)} ${stats.paragraphs === 1 ? "paragraph" : "paragraphs"}`
+            : `Prompt ${promptIndex + 1}/${starters.length}`}
+        </span>
       </div>
       <div className={styles.cueText}>
         {hasOpening ? (
           <>
             <p hidden={showOpening}>
               {stats.words > JOURNAL_LIBRARY_MIN_WORDS
-                ? "Once saved, a page this length appears in your journal library as well as on its tracking day."
-                : `Short entries live on their tracking day. The library also lists saved pages over ${JOURNAL_LIBRARY_MIN_WORDS} words.`}
+                ? "Once saved, this page also appears in your journal library. Peek at the first lines to find your place. Either check-in opens the full page."
+                : `Your first lines are here when you want to pick up the thread. Either check-in opens this page. The library lists saved entries over ${JOURNAL_LIBRARY_MIN_WORDS} words.`}
             </p>
             <blockquote id={passage} hidden={!showOpening}>
               {showOpening && stats.excerpt}
             </blockquote>
           </>
         ) : (
-          <p aria-live="polite">{starters[promptIndex]}</p>
+          <p aria-live="polite">
+            {starters[promptIndex]} One honest line is enough. Take this prompt
+            or roll another until one feels like yours.
+          </p>
         )}
       </div>
+      <Button
+        type="button"
+        size="sm"
+        variant="ghost"
+        className={styles.cueButton}
+        disabled={disabled}
+        aria-controls={hasOpening ? passage : undefined}
+        aria-expanded={hasOpening ? showOpening : undefined}
+        onClick={() => {
+          if (hasOpening) setShowOpening((shown) => !shown);
+          else setPromptIndex((index) => (index + 1) % starters.length);
+        }}
+      >
+        <ControlIcon size={13} aria-hidden="true" />
+        {hasOpening
+          ? showOpening
+            ? "Hide opening"
+            : "Peek at opening"
+          : "New prompt"}
+      </Button>
     </div>
   );
 }
@@ -239,13 +248,7 @@ export function DailyReflectionEditor({
     }
   };
 
-  const writingHint =
-    !hasWriting && !savedAt
-      ? "In the editor, type @ to link a medication or / to link a day."
-      : (draftStatus === "error" || draftStatus === "memory") &&
-          saving.status !== "saved"
-        ? "Keep this window open until your writing syncs."
-        : saving.message;
+  const hasSyncUpdate = saving.status !== "saved" && (hasWriting || savedAt);
   const refreshLabel = refreshing
     ? "Refreshing journal"
     : refreshFinished
@@ -299,7 +302,11 @@ export function DailyReflectionEditor({
             <span className="intake-primary-row">
               <span className="intake-primary-copy">
                 <span className="intake-primary-label">
-                  <MarkdownMark size={21} aria-hidden="true" />
+                  <MarkdownMark
+                    size={hasWriting ? 26 : 21}
+                    className={hasWriting ? "size-[26px]" : undefined}
+                    aria-hidden="true"
+                  />
                   <span>{hasWriting ? "Keep Writing" : "Start Writing"}</span>
                 </span>
                 <span className="intake-primary-dot" aria-hidden="true">
@@ -312,9 +319,30 @@ export function DailyReflectionEditor({
           </TodayActionButton>
         }
       />
-      <p className={styles.guidance} data-journal-guidance>
-        {writingHint} Save Check-In keeps your other answers.
-      </p>
+      <div className={styles.guidance} data-journal-guidance>
+        {hasSyncUpdate && (
+          <p className={styles.syncStatus} role="status">
+            {draftStatus === "error" || draftStatus === "memory"
+              ? "Keep this window open until your writing syncs."
+              : saving.message}
+          </p>
+        )}
+        <details>
+          <summary>
+            <span>
+              {saving.status === "saved"
+                ? "Your words save as you write."
+                : "Your writing belongs to this tracking day."}{" "}
+              Save Check-In keeps your other answers.
+            </span>
+            <ChevronDown size={12} aria-hidden="true" />
+          </summary>
+          <p className={styles.guidanceDetail}>
+            Morning and evening open the same page. Type @ to link a medication
+            or / to link a day. Close the editor to return to your check-in.
+          </p>
+        </details>
+      </div>
       <hr className={styles.divider} />
       <div className={styles.captionRow}>
         <Button
