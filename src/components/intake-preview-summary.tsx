@@ -59,15 +59,24 @@ function DraftTotal({ mg }: { mg: number }) {
   );
 }
 
-/** A scored tablet follows the rise between the saved and projected readings. */
+// Rounded dashes lengthen and widen along a gentle rise into the arrowhead.
+const transferDashes = [
+  { d: "M2 15.3l.8-.02", width: 1.15 },
+  { d: "M5.1 15.14q.63-.04 1.25-.11", width: 1.45 },
+  { d: "M9 14.62q.9-.18 1.75-.43", width: 1.8 },
+  { d: "M13.85 13.12q1.1-.46 2.2-1.01", width: 2.15 },
+  { d: "M19.43 10.38q1.4-.73 2.8-1.39", width: 2.55 },
+  { d: "M26.07 7.43q1.72-.54 3.48-.8", width: 2.95 },
+  { d: "M33.85 6.23q2.05-.06 4.15-.06", width: 3.35 },
+];
+
 function DoseTransferIcon() {
   const paint = useId();
   return (
     <svg
       className={change.transfer}
-      viewBox="0 0 36 16"
+      viewBox="0 0 50 19"
       fill="none"
-      strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -76,43 +85,61 @@ function DoseTransferIcon() {
       <defs>
         <linearGradient
           id={paint}
-          x1="3"
-          x2="32"
+          x1="2"
+          x2="46"
           y1="0"
           y2="0"
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="var(--prior-ink)" />
-          <stop offset="1" stopColor="currentColor" />
+          <stop offset="1" stopColor="var(--projected-ink)" />
         </linearGradient>
       </defs>
-      <path
-        d="M3 11h8c6 0 7-6 13-6h8m-4-3.5L32 5l-4 3.5"
-        stroke={`url(#${paint})`}
-      />
-      <g transform="translate(5 11)">
-        <g className={change.tablet}>
-          <rect
-            x="-3.7"
-            y="-2.1"
-            width="7.4"
-            height="4.2"
-            rx="2.1"
-            fill="var(--popover)"
-            stroke="currentColor"
+      <g stroke={`url(#${paint})`}>
+        {transferDashes.map(({ d, width }, index) => (
+          <path
+            key={d}
+            className={change.dash}
+            d={d}
+            strokeWidth={width}
+            style={{ animationDelay: `${index * 45}ms` }}
           />
-          <path d="M0-1.7v3.4" stroke="currentColor" strokeWidth="1.2" />
-        </g>
+        ))}
       </g>
-      <circle
-        className={change.arrival}
-        cx="24"
-        cy="5"
-        r="3.1"
-        stroke="currentColor"
-        strokeWidth="1"
+      <path
+        className={change.arrowhead}
+        d="m41.8 1.95 4.8 4.22-4.8 4.48"
+        stroke="var(--projected-ink)"
+        strokeWidth="3.8"
       />
     </svg>
+  );
+}
+
+function ChangeReading({
+  value,
+  dosage,
+  projected = false,
+}: {
+  value: number;
+  dosage: boolean;
+  projected?: boolean;
+}) {
+  return (
+    <span className={projected ? change.projected : change.prior}>
+      <span className={change.amount}>
+        {formatDose(value)}
+        {dosage && <small className={change.unit}>{"\u00a0"}mg</small>}
+      </span>
+      {(!dosage || projected) && (
+        <>
+          {" "}
+          <span className={change.label}>
+            {dosage ? "Dosage" : value === 1 ? "Intake" : "Intakes"}
+          </span>
+        </>
+      )}
+    </span>
   );
 }
 
@@ -129,8 +156,13 @@ export function IntakePreviewChangeRow({
 }) {
   const row = useVisibleMotion<HTMLDListElement>(true);
   const readings = [
-    { label: "Intakes", before: savedCount, after: projectedCount, unit: "" },
-    { label: "Dosage", before: savedMg, after: projectedMg, unit: "\u202fmg" },
+    {
+      label: "Intakes",
+      before: savedCount,
+      after: projectedCount,
+      dosage: false,
+    },
+    { label: "Dosage", before: savedMg, after: projectedMg, dosage: true },
   ];
   return (
     <dl
@@ -138,25 +170,19 @@ export function IntakePreviewChangeRow({
       className={change.row}
       aria-label="Tracking-day totals if you save this intake"
     >
-      {readings.map(({ label, before, after, unit }) => (
+      {readings.map(({ label, before, after, dosage }) => (
         <div
           key={label}
           className={change.metric}
-          data-dosage={unit ? "" : undefined}
+          data-dosage={dosage ? "" : undefined}
         >
-          <dt>{label}</dt>
+          <dt className="sr-only">{label}</dt>
           <dd>
             <span className="sr-only">From </span>
-            <span className={change.prior}>
-              {formatDose(before)}
-              {unit}
-            </span>
+            <ChangeReading value={before} dosage={dosage} />
             <DoseTransferIcon key={`${before}-${after}`} />
             <span className="sr-only"> to </span>
-            <strong className={change.projected}>
-              {formatDose(after)}
-              {unit}
-            </strong>
+            <ChangeReading value={after} dosage={dosage} projected />
           </dd>
         </div>
       ))}
