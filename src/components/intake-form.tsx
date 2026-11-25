@@ -1,6 +1,6 @@
 "use client";
 
-import { Import, NotebookPen } from "lucide-react";
+import { Import } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
@@ -315,8 +315,7 @@ export function IntakeForm({
     includingDraftMg === null ? null : daySummary.excludingEditedCount + 1;
   const previewHintId = `${formId}-preview-hint`;
   const receiptDate = takenAt.slice(0, 10);
-  let previewHint =
-    "The arrows show this medication’s totals for the tracking day, before and after you save.";
+  let previewHint: string | undefined;
   if (!medication && !fallbackIntake) {
     previewHint = "Choose a medication to see the entry you’ll save.";
   } else if (!validQuantity) {
@@ -847,17 +846,15 @@ export function IntakeForm({
                   projectedMg={includingDraftMg}
                 />
               )}
-            {intake ? (
+            {previewHint && (
               <p
                 id={previewHintId}
-                className={`${styles.footerCaption} ${styles.editPreviewHint}`}
+                className={
+                  intake
+                    ? `${styles.footerCaption} ${styles.editPreviewHint}`
+                    : styles.previewHint
+                }
               >
-                {previewHint}
-              </p>
-            ) : (
-              <p id={previewHintId} className={styles.previewHint}>
-                <NotebookPen size={14} strokeWidth={1.7} aria-hidden="true" />
-                {"\u00a0"}
                 {previewHint}
               </p>
             )}
@@ -882,7 +879,7 @@ export function IntakeForm({
         >
           <IntakePrimaryButton
             type="submit"
-            aria-describedby={previewHintId}
+            aria-describedby={previewHint ? previewHintId : undefined}
             disabled={busy || timingResetting}
             pending={busy}
             symbol={
