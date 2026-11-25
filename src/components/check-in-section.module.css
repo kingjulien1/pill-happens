@@ -200,14 +200,32 @@
 [data-check-in-form] .frame:has(> [data-journal-card]) {
   --checkin-section-edge: color-mix(
     in srgb,
-    var(--color-amber-600) 24%,
+    var(--check-in-copper) 36%,
     transparent
   );
-  background:
+  --journal-corner:
+    radial-gradient(
+      ellipse 108px 78px at top left,
+      color-mix(in srgb, var(--color-amber-300) 10%, transparent) 12%,
+      transparent 100%
+    ),
     linear-gradient(
       115deg,
       color-mix(in srgb, var(--color-amber-600) 12%, transparent),
       transparent 65%
-    ),
-    var(--surface-ink);
+    );
+  background-color: var(--surface-ink);
+  background-image: var(--journal-corner);
+}
+
+[data-check-in-form] .frame:has(> [data-journal-card])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--journal-corner);
+  transform: rotate(180deg);
+  opacity: 0.5;
+  pointer-events: none;
 }

@@ -1,3 +1,8 @@
+.section,
+.form {
+  --check-in-copper: #dd925e;
+}
+
 .section {
   width: 100%;
   min-width: 0;
@@ -11,7 +16,7 @@
   --check-in-key: var(--color-orange-200, #ffd6a7);
   --check-in-glyph: var(--color-amber-100, #fef3c6);
   --check-in-icon-background: var(--color-amber-950, #461901);
-  --check-in-outer-color: #dd925e;
+  --check-in-outer-color: var(--check-in-copper);
   --check-in-rim-glint: #fff1bf;
   --check-in-surface:
     radial-gradient(ellipse at 0% 100%, var(--check-in-wash), transparent 57%),
@@ -411,13 +416,16 @@
 }
 
 @media (prefers-color-scheme: light) {
+  .section,
+  .form {
+    --check-in-copper: #bc7443;
+  }
   .section {
     --check-in-start: #ffdcaa;
     --check-in-middle: #fff1dd;
     --check-in-shadow: #f2d7d3;
     --check-in-ink: #392135;
     --check-in-key: #86401c;
-    --check-in-outer-color: #bc7443;
     --check-in-surface: linear-gradient(
       108deg,
       var(--check-in-start),
