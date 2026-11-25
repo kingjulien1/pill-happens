@@ -1,6 +1,5 @@
 .surface {
   --dialog-surface-paint: var(--popover);
-  --dialog-mauve-opacity: 14%;
   --dialog-top-fade-opacity: 67%;
   --dialog-top-fade-end: min(55%, 180px);
   --dialog-bottom-fade-strength: 0.79;
@@ -74,7 +73,7 @@
     --border: #bca4e445;
     --input: #bca4e48a;
     --ring: #bca4e4;
-    --navigation-surface: #211625;
+    --navigation-surface: var(--navigation-surface-dark);
     --navigation-highlight: #c4b5fd;
     --navigation-paint:
       radial-gradient(ellipse 90% 38% at 0% 0%, #ec48990b, transparent),

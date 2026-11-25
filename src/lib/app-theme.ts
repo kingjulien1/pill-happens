@@ -980,6 +980,7 @@ ${Object.entries(APP_HARMONY)
 ${APP_PALETTE.map((color) => `  --palette-${color.id}: ${color.hex};`).join("\n")}
 ${values("light", "  ")}
   --dialog-control-wash: color-mix(in srgb, var(--foreground) 6%, transparent);
+  --navigation-surface-dark: #211625;
   --navigation-surface: var(--menu-surface);
   --navigation-highlight: #8051b2;
   --navigation-paint: radial-gradient(ellipse 90% 38% at 0% 0%, #ec48990b, transparent), var(--navigation-surface);
@@ -992,7 +993,7 @@ ${values("light", "  ")}
     color-scheme: dark;
 ${getAppCanvasCss("dark")}
 ${values("dark", "    ")}
-    --navigation-surface: #211625;
+    --navigation-surface: var(--navigation-surface-dark);
     --navigation-highlight: #c4b5fd;
     --medication-symbol-mix: 55%;
   }

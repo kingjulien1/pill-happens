@@ -282,6 +282,13 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
 
 :root {
   --intake-card-radius: 21px;
+  --dialog-mauve-opacity: 14%;
+  --intake-section-pigment: color-mix(
+    in srgb,
+    var(--color-fuchsia-500) 65%,
+    var(--color-violet-400)
+  );
+  --intake-section-edge-opacity: 14%;
   --intake-frame-color: color-mix(
     in srgb,
     var(--color-purple-400, #c084fc) 78%,

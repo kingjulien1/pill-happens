@@ -197,7 +197,7 @@
 .form {
   --checkin-section-edge: color-mix(
     in srgb,
-    var(--checkin-line) 14%,
+    var(--checkin-line) var(--intake-section-edge-opacity),
     transparent
   );
   --checkin-feeling-selection-surface: color-mix(
@@ -205,11 +205,7 @@
     var(--color-pink-300, #f9a8d4) 12%,
     transparent
   );
-  --checkin-line: color-mix(
-    in srgb,
-    var(--color-fuchsia-500) 65%,
-    var(--color-violet-400)
-  );
+  --checkin-line: var(--intake-section-pigment);
   display: flex;
   min-width: 0;
   flex-direction: column;

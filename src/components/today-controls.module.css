@@ -104,6 +104,25 @@
   --control-face-edge: var(--color-mauve-700);
 }
 
+/* Match the translucent section edge as it appears over the intake dialog. */
+:global([data-intake-entry-part="button"]) .action[data-log-intake-rim] {
+  --intake-dialog-base: color-mix(
+    in srgb,
+    var(--color-mauve-950) var(--dialog-mauve-opacity),
+    var(--navigation-surface-dark)
+  );
+  --control-secondary: color-mix(
+    in srgb,
+    var(--intake-section-pigment) var(--intake-section-edge-opacity),
+    var(--intake-dialog-base)
+  );
+  --control-ink: var(--color-mauve-950);
+  --control-face-edge: var(--control-ink);
+  --action-inner-detail-color: var(--control-secondary);
+  /* Inset shadows paint outside-in. Double only the stripe beside the face. */
+  --action-inner-detail-width: calc(var(--action-inner-line) * 17 / 12);
+}
+
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
   --control-surround-width: var(--action-face-inset, 10px);
   isolation: isolate;
@@ -169,6 +188,9 @@
 .action[data-control-style="satin"] :global(.intake-primary-dot) {
   color: var(--control-secondary);
   opacity: 0.55;
+}
+:global([data-intake-entry-part="button"]) .action :global(.intake-primary-dot) {
+  opacity: 1;
 }
 .action[data-control-style="satin"] :global(.intake-primary-aside) {
   font-size: 0.86em;

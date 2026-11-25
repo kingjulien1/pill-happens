@@ -114,6 +114,7 @@
   --info: #e7e5f8;
   --info-foreground: #35233f;
   --dialog-control-wash: color-mix(in srgb, var(--foreground) 6%, transparent);
+  --navigation-surface-dark: #211625;
   --navigation-surface: var(--menu-surface);
   --navigation-highlight: #8051b2;
   --navigation-paint:
@@ -230,7 +231,7 @@
     --warning-foreground: #ffffff;
     --info: #443b58f0;
     --info-foreground: #ffffff;
-    --navigation-surface: #211625;
+    --navigation-surface: var(--navigation-surface-dark);
     --navigation-highlight: #c4b5fd;
     --medication-symbol-mix: 55%;
   }

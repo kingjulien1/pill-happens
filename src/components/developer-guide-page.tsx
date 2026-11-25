@@ -972,11 +972,11 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Today’s Log Intake action matches the 80px/21px intake-card
-                reference. Today and Add Medication use the satin face: rich
-                raspberry with light copy in Light Mode, and the established
-                pale Lilac/deep Plum pairing in Dark Mode. Dialog submissions
-                keep their shared specular adapter, with mode-aware Rose rim
-                stops and readable secondary ink. The inspectable button
+                reference. Log Intake uses a pale lilac face and a Mauve 950
+                label in both modes. Its tablet or capsule, short aside and
+                arrow match the subsection borders in the intake dialog.
+                Dialog submissions keep their shared specular adapter, with
+                mode-aware Rose rim stops and readable secondary ink. The inspectable button
                 reference below reports its source-defined layer values.
                 Primary, Accent and dialog submission adapters opt into the
                 main-action family. Small controls keep their semantic variants,
@@ -1231,12 +1231,11 @@ export function DeveloperGuidePage() {
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
                 shadows retain the raised face. Main Log Intake brings its face
-                to the 80px host edge and keeps one 4.17px inward line in the
-                shared Evening icon background color, 2.5 times its former
-                thickness. Its redundant pale middle outline and intervening
-                painted band are removed. Its outer SpecularCardBorder is shared
-                with the Morning and Evening cards: a 3px gap, 3.733px
-                purple/pink rim, three brighter stops and the same glow. That
+                to the 80px host edge. A 5.90px inner stripe uses the section
+                border pigment over the dialog base. The next stripe is
+                4.17px wide and matches the Mauve 950 label. Its outer
+                SpecularCardBorder shares the Morning and Evening cards’ 3px
+                gap, 3.733px purple/pink rim, three brighter stops and glow. That
                 outside rim stays fixed; matching concentric curves keep the 3px
                 clear gap equal along all sides and corners. Other satin actions
                 keep their existing inset. Mobile uses a static CSS rim through
@@ -1249,9 +1248,8 @@ export function DeveloperGuidePage() {
                 IntakePrimaryButton owns the complete Log Intake button and is
                 also used by Save Check-In, Save Intake and Save Edits. They share
                 the same face, concentric borders, outboard rim, icon rail,
-                separator, secondary copy and arrow. Each action keeps its own
-                label, contextual icon and pending state without a separate
-                border override.
+                separator, secondary copy and arrow. The Log Intake launcher
+                sets its own two inner stripe colors and widths.
               </p>
               <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
