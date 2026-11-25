@@ -70,11 +70,17 @@
     var(--mauve-base);
 }
 .closingRegion {
+  --preview-card-gap: 13.5px;
+  --edit-caption-ink: color-mix(
+    in srgb,
+    var(--color-purple-300),
+    var(--color-purple-400)
+  );
   position: relative;
   isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: [divider] auto [intro] auto [card] 1fr [midpoint] 1fr [feedback] auto [actions] auto [end];
+  grid-template-rows: [divider] auto [intro] auto [card] 1fr [midpoint] 1fr [hint] auto [feedback] auto [actions] auto [end];
   margin-block-start: 24px;
 }
 /* Both halves of the card size equally, so the 44% stop follows the actual
@@ -87,7 +93,7 @@
   inset-inline: calc(-1 * var(--dialog-scroll-gutter));
   grid-column: 1 / -1;
   pointer-events: none;
-  z-index: -1;
+  z-index: -2;
 }
 .closingRegion::before {
   grid-row: card / midpoint;
@@ -96,6 +102,14 @@
 .closingRegion::after {
   grid-row: midpoint / end;
   background: linear-gradient(to top, var(--mauve-bottom), var(--mauve-mid));
+}
+.editBottomFade {
+  /* Span the separator, card, actions and safe area as one continuous wash. */
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  --intake-rim-gain: 1.125;
 }
 .previewDivider {
   grid-row: divider;
@@ -118,7 +132,7 @@
     var(--color-purple-300, #d8b4fe)
   );
   display: grid;
-  grid-row: intro / feedback;
+  grid-row: intro / hint;
   grid-template-rows: subgrid;
   /* Bound the track before the card's ingredient and dose share its width. */
   grid-template-columns: minmax(0, 1fr);
@@ -129,7 +143,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 13.5px;
-  padding-block-end: 13.5px;
+  padding-block-end: var(--preview-card-gap);
 }
 .preview > :last-child {
   grid-row: 2 / span 2;
@@ -149,7 +163,7 @@
     grid-row: intro;
   }
   .preview > :last-child {
-    grid-row: card / feedback;
+    grid-row: card / hint;
   }
   /* The wrapper has no paint box here. Retain the empty preview's dimming
      independently of the card's own animated opacity. */
@@ -291,6 +305,13 @@
   font-weight: 650;
 }
 @media (prefers-color-scheme: light) {
+  .closingRegion {
+    --edit-caption-ink: color-mix(
+      in srgb,
+      var(--color-purple-900) 35%,
+      var(--muted-foreground)
+    );
+  }
   .preview {
     --preview-totals-ink: color-mix(
       in srgb,
@@ -323,6 +344,35 @@
   color: var(--intake-footer-ink);
   font-size: 10px;
   font-weight: 525;
+}
+.editCaption {
+  margin: 0;
+  color: color-mix(in srgb, var(--edit-caption-ink) 72%, transparent);
+  font-size: 10.25px;
+  font-weight: 525;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+.editPreviewHint {
+  grid-row: hint;
+  justify-self: center;
+  max-inline-size: 48ch;
+  margin-block-start: var(--preview-card-gap);
+}
+.editTrackingNotes {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  margin-block-start: 3px;
+}
+.editFootnote {
+  max-inline-size: min(40ch, 78%);
+  color: color-mix(in srgb, var(--edit-caption-ink) 65%, transparent);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 .restoredHelp {

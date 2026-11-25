@@ -314,6 +314,9 @@ export function IntakeForm({
   const includingDraftCount =
     includingDraftMg === null ? null : daySummary.excludingEditedCount + 1;
   const previewHintId = `${formId}-preview-hint`;
+  const trackingDateLabel = belongsTo
+    ? formatDay(belongsTo, { weekday: "short", month: "short" })
+    : null;
   let previewHint =
     "This card shows one dose. “After” is the day’s total for this medication once you save.";
   if (!medication && !fallbackIntake) {
@@ -359,6 +362,7 @@ export function IntakeForm({
         <div
           className={styles.footer}
           data-dialog-fade-footer
+          data-intake-rim-fade
           data-draft-action-footer
         >
           <MedicationActionButton
@@ -745,6 +749,13 @@ export function IntakeForm({
       </fieldset>
 
       <div className={`${styles.closingSurface} ${styles.closingRegion}`}>
+        {intake && (
+          <div
+            className={styles.editBottomFade}
+            data-intake-rim-fade
+            aria-hidden="true"
+          />
+        )}
         <div
           className={`${checkStyles.sectionDivider} ${styles.previewDivider}`}
           role="separator"
@@ -808,6 +819,14 @@ export function IntakeForm({
             <IntakePreviewSkeleton />
           )}
         </section>
+        {intake && (
+          <p
+            id={previewHintId}
+            className={`${styles.editCaption} ${styles.editPreviewHint}`}
+          >
+            {previewHint}
+          </p>
+        )}
         {error &&
           !(error.jump?.selector === "#intake-quantity" && validQuantity) && (
             <DialogErrorPanel
@@ -822,13 +841,16 @@ export function IntakeForm({
         <div
           className={styles.footer}
           data-dialog-fade-footer
+          data-intake-rim-fade={intake ? undefined : ""}
           data-draft-action-footer
         >
-          <p id={previewHintId} className={styles.previewHint}>
-            <NotebookPen size={14} strokeWidth={1.7} aria-hidden="true" />
-            {"\u00a0"}
-            {previewHint}
-          </p>
+          {!intake && (
+            <p id={previewHintId} className={styles.previewHint}>
+              <NotebookPen size={14} strokeWidth={1.7} aria-hidden="true" />
+              {"\u00a0"}
+              {previewHint}
+            </p>
+          )}
           <IntakePrimaryButton
             type="submit"
             aria-describedby={previewHintId}
@@ -863,18 +885,37 @@ export function IntakeForm({
               </p>
             )}
             {footerActions}
-            <div className={styles.trackingDay}>
-              <span>
-                <CalendarCheck aria-hidden="true" />
-                {belongsTo
-                  ? `Saved to ${formatDay(belongsTo, { weekday: "short", month: "short" })}.`
-                  : "Choose a valid time."}
-              </span>
-              <span>
-                <Sunrise aria-hidden="true" />
-                Days begin at 06:00.
-              </span>
-            </div>
+            {intake ? (
+              <div className={styles.editTrackingNotes}>
+                <p className={styles.editCaption}>
+                  {belongsTo ? (
+                    <>
+                      <time dateTime={belongsTo}>{trackingDateLabel}</time>
+                      {" · Day starts at 06:00"}
+                    </>
+                  ) : (
+                    "Set a valid date and time."
+                  )}
+                </p>
+                <p className={`${styles.editCaption} ${styles.editFootnote}`}>
+                  Before 06:00, doses go on the previous day. Totals update on
+                  save. The confirmation includes Undo.
+                </p>
+              </div>
+            ) : (
+              <div className={styles.trackingDay}>
+                <span>
+                  <CalendarCheck aria-hidden="true" />
+                  {trackingDateLabel
+                    ? `Saved to ${trackingDateLabel}.`
+                    : "Choose a valid time."}
+                </span>
+                <span>
+                  <Sunrise aria-hidden="true" />
+                  Days begin at 06:00.
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
