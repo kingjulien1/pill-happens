@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
 import {
   BookOpenText,
   Check,
-  ChevronDown,
-  Copy,
+  BookMarked,
   Dices,
-  Eye,
-  EyeOff,
+  LibraryBig,
   Feather,
   RefreshCw,
 } from "lucide-react";
@@ -29,7 +33,7 @@ import { JOURNAL_LIBRARY_MIN_WORDS } from "@/lib/journal-library";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { MarkdownMark } from "./markdown-mark";
 import styles from "./daily-reflection-editor.module.css";
-import { Button } from "@/components/ui/button";
+import { ReflectionWritingHelp } from "./reflection-writing-help";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
 const starters = [
@@ -42,76 +46,73 @@ const starters = [
   "If today came with a footnote, what would it say?",
 ];
 
+function JournalTool({
+  label,
+  children,
+  ...props
+}: ComponentProps<"button"> & { label: string }) {
+  return (
+    <button {...props} type="button" className={styles.tool}>
+      <span className={styles.toolIcon} aria-hidden="true">
+        {children}
+      </span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
 function JournalPageCue({
   day,
   stats,
+  hasWriting,
   disabled,
 }: {
   day: string;
   stats: ReturnType<typeof reflectionStats>;
+  hasWriting: boolean;
   disabled: boolean;
 }) {
   const [promptIndex, setPromptIndex] = useState(
     () => Number(day.slice(-2)) % starters.length,
   );
-  const [showOpening, setShowOpening] = useState(false);
-  const hasOpening = Boolean(stats.excerpt);
-  const CueIcon = hasOpening ? BookOpenText : Feather;
-  const ControlIcon = hasOpening ? (showOpening ? EyeOff : Eye) : Dices;
-  const passage = useId();
+  const CueIcon = hasWriting ? BookOpenText : Feather;
 
   return (
     <div className={styles.cue} data-journal-snapshot>
-      <div className={styles.cueRow}>
-        <h4 className={styles.cueTitle}>
-          <CueIcon size={16} aria-hidden="true" />
-          {hasOpening ? "Your page so far" : "A way in"}
-        </h4>
-        <span className={styles.cueMeta}>
-          {hasOpening
-            ? `${numberFormat.format(stats.paragraphs)} ${stats.paragraphs === 1 ? "paragraph" : "paragraphs"}`
-            : `Prompt ${promptIndex + 1}/${starters.length}`}
-        </span>
-      </div>
-      <div className={styles.cueText}>
-        {hasOpening ? (
-          <>
-            <p hidden={showOpening}>
-              {stats.words > JOURNAL_LIBRARY_MIN_WORDS
-                ? "Once saved, this page also appears in your journal library. Peek at the first lines to find your place. Either check-in opens the full page."
-                : `Your first lines are here when you want to pick up the thread. Either check-in opens this page. The library lists saved entries over ${JOURNAL_LIBRARY_MIN_WORDS} words.`}
+      <h4 className={styles.cueTitle}>
+        <CueIcon size={16} aria-hidden="true" />
+        {hasWriting ? "Your opening lines" : "A place to start"}
+      </h4>
+      {hasWriting ? (
+        <>
+          <span className={styles.cueMeta}>
+            {numberFormat.format(stats.paragraphs)}{" "}
+            {stats.paragraphs === 1 ? "paragraph" : "paragraphs"}
+          </span>
+          {stats.excerpt ? (
+            <blockquote className={styles.passage}>{stats.excerpt}</blockquote>
+          ) : (
+            <p className={styles.passage}>
+              Open the editor to see your formatting.
             </p>
-            <blockquote id={passage} hidden={!showOpening}>
-              {showOpening && stats.excerpt}
-            </blockquote>
-          </>
-        ) : (
-          <p aria-live="polite">
-            {starters[promptIndex]} One honest line is enough. Take this prompt
-            or roll another until one feels like yours.
+          )}
+        </>
+      ) : (
+        <>
+          <JournalTool
+            label="New prompt"
+            disabled={disabled}
+            onClick={() =>
+              setPromptIndex((index) => (index + 1) % starters.length)
+            }
+          >
+            <Dices size={17} />
+          </JournalTool>
+          <p className={styles.passage} aria-live="polite">
+            {starters[promptIndex]}
           </p>
-        )}
-      </div>
-      <Button
-        type="button"
-        size="sm"
-        variant="ghost"
-        className={styles.cueButton}
-        disabled={disabled}
-        aria-controls={hasOpening ? passage : undefined}
-        aria-expanded={hasOpening ? showOpening : undefined}
-        onClick={() => {
-          if (hasOpening) setShowOpening((shown) => !shown);
-          else setPromptIndex((index) => (index + 1) % starters.length);
-        }}
-      >
-        <ControlIcon size={13} aria-hidden="true" />
-        {hasOpening
-          ? showOpening
-            ? "Hide opening"
-            : "Peek at opening"
-          : "New prompt"}
-      </Button>
+        </>
+      )}
     </div>
   );
 }
@@ -143,6 +144,8 @@ export function DailyReflectionEditor({
   saving: ReflectionSaveControls;
 }) {
   const launcher = useRef<HTMLButtonElement>(null);
+  const helpButton = useRef<HTMLButtonElement>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshFinished, setRefreshFinished] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
@@ -158,6 +161,8 @@ export function DailyReflectionEditor({
   } = useJournal();
   const stats = useMemo(() => reflectionStats(value), [value]);
   const hasWriting = Boolean(value.trim());
+  const libraryWordCount = JOURNAL_LIBRARY_MIN_WORDS + 1;
+  const wordsToLibrary = libraryWordCount - stats.words;
   const refreshLocked =
     disabled || busy || saving.status === "saving" || refreshing;
   const refreshError = Boolean(journalError) || refreshFailed;
@@ -263,12 +268,12 @@ export function DailyReflectionEditor({
       aria-label="Daily journal writing"
       data-journal-card
       data-journal-period={period}
-      data-journal-active="false"
     >
       <JournalPageCue
-        key={stats.excerpt ? `opening:${day}` : day}
+        key={day}
         day={day}
         stats={stats}
+        hasWriting={hasWriting}
         disabled={disabled}
       />
       <ReflectionDialog
@@ -327,63 +332,14 @@ export function DailyReflectionEditor({
               : saving.message}
           </p>
         )}
-        <details>
-          <summary>
-            <span>
-              {saving.status === "saved"
-                ? "Your words save as you write."
-                : "Your writing belongs to this tracking day."}{" "}
-              Save Check-In keeps your other answers.
-            </span>
-            <ChevronDown size={12} aria-hidden="true" />
-          </summary>
-          <p className={styles.guidanceDetail}>
-            Morning and evening open the same page. Type @ to link a medication
-            or / to link a day. Close the editor to return to your check-in.
-          </p>
-        </details>
+        <p>
+          In the editor, type <strong>@</strong> to link a medication or{" "}
+          <strong>/</strong> to link a day. Your writing saves as you go. Close
+          the editor to return here, then use <strong>Save Check-In</strong> for
+          your other answers.
+        </p>
       </div>
-      <hr className={styles.divider} />
       <div className={styles.captionRow}>
-        <Button
-          variant="ghost"
-          size="icon"
-          type="button"
-          className={styles.footerButton}
-          disabled={!hasWriting}
-          aria-label="Copy writing"
-          title="Copy your writing"
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(value);
-              toast.success(
-                `${stats.words} words · ${stats.characters} characters on your clipboard`,
-                {
-                  journalScope: notificationScope,
-                  heading: "Writing copied.",
-                  details: {
-                    paragraphs: [
-                      "Paste the copied text wherever you need it. Copying does not change your entry or its save status.",
-                    ],
-                  },
-                },
-              );
-            } catch {
-              toast.error("Open the editor to select and copy your writing.", {
-                journalScope: notificationScope,
-                heading: "Clipboard unavailable.",
-                details: {
-                  paragraphs: [
-                    "This browser could not write to the clipboard. You can still open the writing editor, select the text and copy it yourself.",
-                  ],
-                },
-              });
-            }
-          }}
-        >
-          <Copy className="size-4" strokeWidth={2.1} aria-hidden="true" />
-          Copy
-        </Button>
         <div
           className={styles.stats}
           role="group"
@@ -399,39 +355,61 @@ export function DailyReflectionEditor({
             <span>{stats.characters === 1 ? "character" : "characters"}</span>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          type="button"
-          className={styles.footerButton}
-          onClick={() => void refreshJournal()}
-          disabled={refreshLocked}
-          aria-label={refreshLabel}
-          title={`${refreshLabel} · keeps your current writing`}
-          aria-busy={refreshing}
-          data-journal-refresh
-          data-refresh-state={
-            refreshing
-              ? "pending"
-              : refreshFinished
-                ? refreshError
-                  ? "error"
-                  : "success"
-                : "idle"
-          }
-        >
-          {refreshFinished && !refreshError ? (
-            <Check className="size-4" strokeWidth={2.3} aria-hidden="true" />
-          ) : (
-            <RefreshCw
-              className="size-4"
-              strokeWidth={2.1}
-              aria-hidden="true"
-            />
-          )}
-          Refresh
-        </Button>
+        <div className={styles.tools}>
+          <JournalTool
+            ref={helpButton}
+            label="Writing tips"
+            aria-haspopup="dialog"
+            disabled={disabled}
+            onClick={() => setHelpOpen(true)}
+          >
+            <BookMarked size={17} />
+          </JournalTool>
+          <JournalTool
+            label="Refresh"
+            onClick={() => void refreshJournal()}
+            disabled={refreshLocked}
+            aria-label={refreshLabel}
+            title={`${refreshLabel} · keeps your current writing`}
+            aria-busy={refreshing}
+            data-journal-refresh
+            data-refresh-state={
+              refreshing
+                ? "pending"
+                : refreshFinished
+                  ? refreshError
+                    ? "error"
+                    : "success"
+                  : "idle"
+            }
+          >
+            {refreshFinished && !refreshError ? (
+              <Check className="size-4" strokeWidth={2.3} aria-hidden="true" />
+            ) : (
+              <RefreshCw
+                className="size-4"
+                strokeWidth={2.1}
+                aria-hidden="true"
+              />
+            )}
+          </JournalTool>
+        </div>
       </div>
+      <div className={styles.libraryNote}>
+        <LibraryBig size={15} aria-hidden="true" />
+        <p>
+          {stats.words === 0
+            ? `Even a one-line entry stays with its day. Saved pages of ${libraryWordCount} words or more also appear in your Journal library.`
+            : wordsToLibrary > 0
+              ? `You can revisit this entry from its day. With ${wordsToLibrary} more ${wordsToLibrary === 1 ? "word" : "words"}, the saved page will also appear in your Journal library.`
+              : "Once saved, you can find this page in your Journal library by its date, title, or a phrase you remember."}
+        </p>
+      </div>
+      <ReflectionWritingHelp
+        open={helpOpen}
+        onOpenChange={setHelpOpen}
+        returnFocus={helpButton}
+      />
     </section>
   );
 }

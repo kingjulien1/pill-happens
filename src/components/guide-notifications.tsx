@@ -741,8 +741,8 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         behavior. A 9px footer at 50% ink alpha gives brief context. Intake
         previews explain Undo in a tooltip; other record previews keep their
         operation guidance in the receipt. Completed non-record
-        actions, such as copying writing or refreshing, use Okay rather than a
-        disabled Undo. Their supplied footer guidance lives in the main content,
+        actions, such as refreshing the journal, use Okay. Their supplied
+        footer guidance lives in the main content,
         without duplicate navigation prose. Record receipts reuse the caller’s
         useful context alongside their saved card and structured recap, without
         repeating facts already on that card. Action/cancel

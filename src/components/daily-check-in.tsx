@@ -699,8 +699,8 @@ function CheckInForm({
         context={morning ? "First light" : "After hours"}
         description={
           morning
-            ? "What’s on your mind before the day gets a vote? Leave a line your evening self can come back to."
-            : "What did the day leave out of the official story? Start here or add a footnote to what you wrote this morning."
+            ? "What do you want to remember once the day gets loud? Leave a line here. Your evening check-in opens this same page."
+            : "What looked different by the end of the day? This is the same page you had this morning, with room for a change of heart."
         }
         detail={
           <Link

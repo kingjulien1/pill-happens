@@ -3067,8 +3067,9 @@ export function DeveloperGuidePage() {
                   intake list and Evening follows it. Position is independent of
                   draft or saved status. A keyed editor keeps the open period
                   and original day across rollover. The amber Daily Journal section in both dialogs opens the same
-                  dated editor. A Saved page link opens the daily reader. Copy
-                  and Refresh flank the word, character and reading-time counts.
+                  dated editor. Its opening lines appear above the writing
+                  button. Writing tips and Refresh sit beside the word and
+                  character counts. A Saved page link opens the daily reader.
                   Writing has one device draft per tracking day. The other
                   check-in answers retain their period-specific drafts. Manual Refresh
                   synchronizes saved journal data without replacing unfinished
