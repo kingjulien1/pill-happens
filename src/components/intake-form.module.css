@@ -74,6 +74,11 @@
   --summary-type: 15.5px;
   --summary-copy-size: calc(var(--summary-type) * 0.75);
   --summary-ink-base: var(--color-violet-100, #ede9fe);
+  --preview-totals-ink: color-mix(
+    in srgb,
+    var(--color-purple-200, #e9d5ff),
+    var(--color-purple-300, #d8b4fe)
+  );
   --footer-caption-ink: color-mix(
     in srgb,
     var(--color-purple-300),
@@ -128,11 +133,6 @@
 }
 
 .preview {
-  --preview-totals-ink: color-mix(
-    in srgb,
-    var(--color-purple-200, #e9d5ff),
-    var(--color-purple-300, #d8b4fe)
-  );
   display: grid;
   grid-row: intro / hint;
   grid-template-rows: subgrid;
@@ -319,8 +319,6 @@
       var(--color-purple-900) 35%,
       var(--muted-foreground)
     );
-  }
-  .preview {
     --preview-totals-ink: color-mix(
       in srgb,
       var(--color-purple-800, #6b21a8) 35%,
@@ -353,6 +351,8 @@
   text-wrap: balance;
 }
 .editPreviewHint {
+  color: var(--preview-totals-ink);
+  opacity: 0.51;
   grid-row: hint;
   justify-self: center;
   max-inline-size: 48ch;
