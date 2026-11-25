@@ -1,6 +1,6 @@
 import { Iridescence } from "./iridescence";
 
-/** Base light, accent mesh, mauve glaze, then the foreground iridescence field. */
+/** The accent mesh and mauve glaze sit above the moving violet field. */
 export function JournalBackground() {
   return (
     <div
@@ -14,12 +14,6 @@ export function JournalBackground() {
         className="ambient-mauve-overlay"
         data-background-layer="mauve-glaze"
       />
-      <div
-        className="ambient-iridescence-overlay"
-        data-background-layer="iridescence-overlay"
-      >
-        <Iridescence />
-      </div>
     </div>
   );
 }

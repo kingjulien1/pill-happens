@@ -1140,10 +1140,8 @@ export function DeveloperGuidePage() {
                 equivalents in Light Mode. The lower-left rose/fuchsia pool
                 repeats at the upper right. This unblurred mesh stays fixed
                 above the moving light and scales to the entire viewport without
-                repeating or zooming with page length. Above it, a full-viewport
-                Mauve950 layer at 24% opacity sits beneath the top iridescence
-                field at 60% opacity. Both light fields use the existing
-                visibility and motion-preference gates. The original React Bits
+                repeating or zooming with page length. A full-viewport Mauve950
+                glaze at 24% opacity covers the mesh. The original React Bits
                 attribution and MIT + Commons Clause notice remain at{" "}
                 <code>public/licenses/react-bits.txt</code>.
               </p>
