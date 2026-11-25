@@ -24,7 +24,6 @@ import { FinalLookHeading } from "./final-look-heading";
 import {
   IntakePreviewChangeRow,
   IntakePreviewSummary,
-  IntakePreviewTotals,
 } from "./intake-preview-summary";
 import { IntakeSectionContext } from "./intake-section-context";
 import { priorMedicationIntake } from "@/lib/intake-context";
@@ -317,7 +316,7 @@ export function IntakeForm({
   const previewHintId = `${formId}-preview-hint`;
   const receiptDate = takenAt.slice(0, 10);
   let previewHint =
-    "This card shows one dose. “After” is the day’s total for this medication once you save.";
+    "The arrows show this medication’s totals for the tracking day, before and after you save.";
   if (!medication && !fallbackIntake) {
     previewHint = "Choose a medication to see the entry you’ll save.";
   } else if (!validQuantity) {
@@ -804,24 +803,14 @@ export function IntakeForm({
                     isToday={belongsTo === dayKey(now ?? new Date(), timezone)}
                   />
                 )}
-                <div className={styles.previewHeading}>
-                  {belongsTo && (medication || fallbackIntake) && (
-                    <IntakePreviewTotals
-                      count={daySummary.count}
-                      includingDraftCount={includingDraftCount}
-                      totalMg={daySummary.totalMg}
-                      includingDraftMg={includingDraftMg}
-                    />
+                <FinalLookHeading
+                  id="intake-preview-title"
+                  showIcon
+                  motion={false}
+                  color={getMedicationColor(
+                    medication?.color ?? "tw-mauve-400",
                   )}
-                  <FinalLookHeading
-                    id="intake-preview-title"
-                    showIcon
-                    motion={false}
-                    color={getMedicationColor(
-                      medication?.color ?? "tw-mauve-400",
-                    )}
-                  />
-                </div>
+                />
               </div>
               {belongsTo &&
               validQuantity &&
