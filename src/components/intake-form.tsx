@@ -769,6 +769,11 @@ export function IntakeForm({
           <div className={styles.previewIntro}>
             {belongsTo && (medication || fallbackIntake) && (
               <IntakePreviewSummary
+                newIntake={
+                  !intake && medication
+                    ? { medication, savedTotalMg: daySummary.totalMg }
+                    : undefined
+                }
                 medicationName={
                   medication?.name ?? fallbackIntake!.medicationName
                 }

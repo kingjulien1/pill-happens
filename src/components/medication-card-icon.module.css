@@ -139,14 +139,44 @@
   --intake-artwork-glyph-size: calc(30px * var(--intake-artwork-glyph-scale));
   --intake-artwork-vivid-width: calc(var(--intake-artwork-vivid-size) * 1px);
   --intake-artwork-rim-inset: calc(var(--intake-artwork-middle-inset) * 1px);
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+}
+
+.inlineMark {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1em;
+  block-size: 1em;
+  margin-inline-end: 0.2em;
+  vertical-align: -0.13em;
+}
+.inlineMark::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: 33.333%;
+  background-color: var(--mark-base);
+  opacity: 0.25;
+}
+.inlineMark::before,
+:global(
+    :is(
+      [data-intake-card],
+      [data-check-in-card],
+      [data-medication-library-card]
+    )
+  )
+  .mark:global(.intake-card-mark) {
   --intake-artwork-face-tint: color-mix(
     in srgb,
     var(--medication-frame-pigment) 37%,
     transparent
   );
-  width: 60px;
-  height: 60px;
-  border-radius: 20px;
   background-image:
     linear-gradient(var(--intake-artwork-face-tint) 0 0),
     linear-gradient(var(--entry-icon-tint) 0 0);

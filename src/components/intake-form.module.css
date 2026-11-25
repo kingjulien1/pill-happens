@@ -220,10 +220,12 @@
   line-height: inherit;
   text-wrap: balance;
 }
-.previewMedicationName {
+.previewMedicationName,
+.draftMedicationName {
   overflow-wrap: anywhere;
 }
-.previewSummaryDose {
+.previewSummaryDose,
+.draftTotal {
   white-space: nowrap;
 }
 .previewSummary strong {
@@ -233,8 +235,13 @@
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
-.previewSummaryDose strong {
+.previewSummaryDose strong,
+.previewSummary .draftMedicationName,
+.previewSummary .draftTotal {
   font-size: calc(var(--summary-type) * 1.1 * 9 / 8);
+}
+.amountSuffix {
+  font-size: 0.75em;
 }
 .previewTotals {
   display: grid;

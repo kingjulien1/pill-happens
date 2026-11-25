@@ -24,6 +24,35 @@ type MedicationArtworkProps = {
   iconRotation?: number;
 };
 
+/** A text-sized version of the preview artwork; only its backplate is subdued. */
+export function InlineMedicationMark({
+  color: value,
+  icon,
+  iconRotation = 0,
+}: MedicationArtworkProps) {
+  const color = getMedicationColor(value);
+  const pigment = getMedicationIconPigment(value, icon);
+  return (
+    <span
+      aria-hidden="true"
+      data-medication-mark
+      className={styles.inlineMark}
+      style={
+        {
+          "--mark-base":
+            getMedicationPreviewSurface(pigment) ?? "var(--popover)",
+          "--entry-icon-tint": `${color.hex}66`,
+          "--medication-frame-pigment": getMedicationFramePigment(value),
+          "--medication-rotation": `${iconRotation}deg`,
+          color: getMedicationColorScale(value).icon,
+        } as CSSProperties
+      }
+    >
+      <MedicationGlyph icon={icon} className="size-4/5" />
+    </span>
+  );
+}
+
 /** The same selected-color glass frame hosts medication and check-in artwork. */
 export function MedicationCardIconFrame({
   color: value,

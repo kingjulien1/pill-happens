@@ -1,6 +1,7 @@
 "use client";
 
-import { formatDay, formatDose } from "@/lib/domain";
+import { formatDay, formatDose, type Medication } from "@/lib/domain";
+import { InlineMedicationMark } from "./medication-card-icon";
 import { useVisibleMotion } from "./use-visible-motion";
 import styles from "./intake-form.module.css";
 import slate from "./intake-preview-slate.module.css";
@@ -47,24 +48,78 @@ function PreviewSlate() {
   );
 }
 
+function DraftTotal({ mg }: { mg: number }) {
+  return (
+    <strong className={styles.draftTotal}>
+      {formatDose(mg)}
+      <span className={styles.amountSuffix}>{"\u00a0"}mg</span>
+    </strong>
+  );
+}
+
 /** The draft's projected log number and resulting tracking-day total. */
 export function IntakePreviewSummary({
   medicationName,
+  newIntake,
   count,
   totalMg,
   trackingDay,
   isToday,
 }: {
   medicationName: string;
+  newIntake?: { medication: Medication; savedTotalMg: number };
   count: number | null;
   totalMg: number | null;
   trackingDay: string;
   isToday: boolean;
 }) {
   const header = useVisibleMotion<HTMLElement>(true);
-  const name = (
+  const name = newIntake ? (
+    <strong className={styles.draftMedicationName}>
+      <InlineMedicationMark
+        color={newIntake.medication.color}
+        icon={newIntake.medication.icon}
+        iconRotation={newIntake.medication.iconRotation}
+      />
+      {"\u2060"}
+      {medicationName}
+    </strong>
+  ) : (
     <span className={styles.previewMedicationName}>{medicationName}</span>
   );
+  const day = (
+    <time dateTime={trackingDay}>
+      {isToday
+        ? "today"
+        : `on ${formatDay(trackingDay, { weekday: "short", month: "short" })}`}
+    </time>
+  );
+  let summary = <>Enter an amount to preview the daily total for {name}.</>;
+  if (count !== null && totalMg !== null) {
+    const ordinal = (
+      <strong data-preview-log-number>
+        {formatDose(count)}
+        <span className={newIntake ? styles.amountSuffix : undefined}>
+          {ordinalSuffix(count)}
+        </span>
+      </strong>
+    );
+    summary = newIntake ? (
+      <>
+        This would be the {ordinal} logged intake for {name} {day}, bringing the
+        total from <DraftTotal mg={newIntake.savedTotalMg} /> to{" "}
+        <DraftTotal mg={totalMg} /> if you save this draft.
+      </>
+    ) : (
+      <>
+        This {ordinal} intake for {name} logs a total intake of{" "}
+        <span className={styles.previewSummaryDose}>
+          <strong>{formatDose(totalMg)}</strong> mg
+        </span>{" "}
+        {day}.
+      </>
+    );
+  }
   return (
     <header
       ref={header}
@@ -72,29 +127,7 @@ export function IntakePreviewSummary({
       data-intake-preview-summary
     >
       <PreviewSlate />
-      <h3 className={styles.previewSummaryHeading}>
-        {count !== null && totalMg !== null ? (
-          <>
-            This{" "}
-            <strong data-preview-log-number>
-              {formatDose(count)}
-              {ordinalSuffix(count)}
-            </strong>{" "}
-            intake for {name} logs a total intake of{" "}
-            <span className={styles.previewSummaryDose}>
-              <strong>{formatDose(totalMg)}</strong> mg
-            </span>{" "}
-            <time dateTime={trackingDay}>
-              {isToday
-                ? "today"
-                : `on ${formatDay(trackingDay, { weekday: "short", month: "short" })}`}
-            </time>
-            .
-          </>
-        ) : (
-          <>Enter an amount to preview the daily total for {name}.</>
-        )}
-      </h3>
+      <h3 className={styles.previewSummaryHeading}>{summary}</h3>
     </header>
   );
 }
