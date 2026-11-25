@@ -66,7 +66,6 @@
     var(--mauve-base);
 }
 .closingRegion {
-  --preview-card-gap: 13.5px;
   --summary-type: 15.5px;
   --summary-copy-size: calc(var(--summary-type) * 0.75);
   --summary-ink-base: var(--color-violet-100, #ede9fe);
@@ -117,18 +116,14 @@
   --receipt-gutter: 18px;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--preview-card-gap);
-  padding: 16px var(--receipt-gutter);
+  gap: clamp(24px, 6vw, 32px);
+  padding: clamp(24px, 6vw, 32px) var(--receipt-gutter) clamp(32px, 8vw, 44px);
 }
-.preview,
-.previewIntro {
+.preview {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
-  gap: var(--preview-card-gap);
-}
-.previewIntro {
-  gap: 8.5px;
+  gap: clamp(28px, 7vw, 38px);
 }
 .preview[data-preview-empty="true"] {
   --preview-empty-surface: var(--color-mauve-600, #594c5b);
@@ -148,9 +143,14 @@
 .preview [data-preview-title-pill] {
   --final-look-copy: var(--foreground);
   --final-look-muted: var(--muted-foreground);
+  --badge-base: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
+  --badge-tint: color-mix(in srgb, var(--preview-totals-ink) 21%, transparent);
   justify-self: center;
   padding-inline: 16px;
-  background: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--preview-totals-ink) 90%, transparent);
+  background:
+    linear-gradient(var(--badge-tint), var(--badge-tint)), var(--badge-base);
 }
 .preview h3 {
   display: inline-flex;
@@ -160,7 +160,7 @@
 .preview .previewSummary {
   min-width: 0;
   margin: 0 calc(-1 * var(--receipt-gutter));
-  padding: 3px 4.75px 0;
+  padding: 0 4.75px;
   color: color-mix(
     in srgb,
     var(--summary-ink-base) 71%,
@@ -256,11 +256,16 @@
   text-align: center;
   text-wrap: balance;
 }
-.editPreviewHint {
+.savePreviewHint {
   color: var(--preview-totals-ink);
   opacity: 0.51;
   justify-self: center;
   max-inline-size: 48ch;
+}
+.hintLead {
+  display: block;
+  margin-block-end: 4px;
+  font-weight: 600;
 }
 .trackingNotes {
   display: grid;
@@ -299,7 +304,7 @@
 .preview[data-preview-empty="true"] [data-preview-title-pill] {
   --final-look-copy: var(--preview-empty-copy);
   --final-look-muted: var(--preview-empty-muted);
-  background: var(--preview-empty-surface);
+  --badge-base: var(--preview-empty-surface);
   opacity: 0.82;
 }
 /* Timing owns the reference scale; all editable intake fields share it. */

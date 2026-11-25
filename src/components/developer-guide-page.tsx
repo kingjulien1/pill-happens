@@ -2068,18 +2068,12 @@ export function DeveloperGuidePage() {
                 13 seconds; hidden/offscreen views and reduced motion
                 stop both the animation and its idle timeout. The effect uses
                 small SVG/CSS layers and never rerenders the surrounding form.
-                Intake creation and editing instead keep their Final Look badge,
-                and fading side rails at full size while the eye blinks in place. Saved and projected day totals sit in
-                equal-width Right Now / After lanes above those rails, using the
-                same 14px bold amounts and 10px labels/units on both sides. The
-                full-width row has a 12px gap before the badge. A centered
-                sentence above it shows the projected intake number and daily
-                total. Earlier tracking days show their date. A small clapperboard
-                snaps above the sentence while the preview is in view. The log
-                count under each total uses the same ink at three quarters of
-                the size and a lighter weight. The After count adds
-                one for a new intake, replaces an edited intake already on the
-                selected day, and remains unknown while the draft dose is invalid.
+                In both intake dialogs, the full-size Final Look badge sits
+                above the daily summary and preview card. Below the card,
+                dashed arrows connect the saved intake count and dose total to
+                their values after saving. Both comparisons use the selected
+                medication and tracking day. Editing a dose already on that day
+                replaces its contribution to the total and counts the entry once.
                 Color chips use the selected pigment at 40% and a
                 matching family-900 ink, including a neutral fallback. The
                 preview shows quantity and per-unit strength as 2 tablets / 20
