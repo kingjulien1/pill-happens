@@ -76,7 +76,7 @@ test("authored internal links and typed markers retain first-occurrence order ac
       "week:2026-11-09",
       "intake:dose",
       "ingredient:methylphenidate",
-      "reflection:2026-11-08:morning",
+      "reflection:2026-11-08",
     ],
   );
   assert.deepEqual(
@@ -88,7 +88,7 @@ test("authored internal links and typed markers retain first-occurrence order ac
       "Nov 9–Nov 15",
       "Ritalin · 09:15",
       "Methylphenidate",
-      "Morning · Sun, Nov 8",
+      "Journal · Sun, Nov 8",
     ],
   );
   for (const { href, reference } of references)

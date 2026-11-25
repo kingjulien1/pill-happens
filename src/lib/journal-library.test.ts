@@ -41,17 +41,16 @@ test("only saved reflections strictly above 100 shared word-count words qualify"
   assert.deepEqual(journalLibraryEntries(undefined), []);
 });
 
-test("both periods remain separate saved pages, including legacy Evening identity", () => {
+test("identical Morning and legacy Evening writing appears as one daily page", () => {
   const entries = journalLibraryEntries([
     checkIn({ period: "morning" }),
     checkIn({ period: undefined }),
   ]);
   assert.deepEqual(
     entries.map(({ id }) => id),
-    ["2026-11-08:evening", "2026-11-08:morning"],
+    ["2026-11-08"],
   );
-  assert.equal(entries[0].period, "evening");
-  assert.equal(entries[1].period, "morning");
+  assert.equal(entries[0].value, words(101));
   assert.ok(entries.every(({ title }) => !/morning|evening/i.test(title)));
 });
 
@@ -84,12 +83,7 @@ test("pages sort by tracking day, then saved update time, with stable identity t
   ]);
   assert.deepEqual(
     entries.map(({ id }) => id),
-    [
-      "2026-11-09:evening",
-      "2026-11-08:morning",
-      "2026-11-08:evening",
-      "2026-11-07:evening",
-    ],
+    ["2026-11-09", "2026-11-08", "2026-11-07"],
   );
 });
 
@@ -144,6 +138,8 @@ test("missing or malformed drafts seed the correct saved entry without inventing
     const next = journalEntryEditDraft(saved, { note: "invalid draft" });
     assert.deepEqual(next, {
       ...checkInDefaults(saved, period),
+      dailyWriting: true,
+      note: "",
       writingOpen: true,
     });
     assert.equal(next.reflectionBaseUpdatedAt, saved.updatedAt);

@@ -58,9 +58,9 @@ test("oversized declared bodies are rejected before they are consumed", async ()
   }
 });
 
-test("the check-in override accepts exactly 1 MiB but rejects a byte more", async () => {
+test("the check-in override accepts exactly 1.5 MiB but rejects a byte more", async () => {
   const maxBytes = JSON_BODY_LIMITS.dailyCheckIn;
-  assert.equal(maxBytes, 1_048_576);
+  assert.equal(maxBytes, 1_572_864);
   const atLimit = bodyAtBytes(maxBytes);
   for (const declared of [undefined, String(maxBytes)]) {
     assert.deepEqual(

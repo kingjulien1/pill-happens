@@ -4,8 +4,7 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   BookOpenText,
-  Coffee,
-  MoonStar,
+  NotebookPen,
   PencilLine,
 } from "lucide-react";
 import { useJournal } from "@/components/journal-provider";
@@ -15,30 +14,42 @@ import {
   ReferenceBackLink,
   ReferenceEmpty,
 } from "@/components/journal-reference-detail-parts";
-import { checkInForDay, type DailyCheckInPeriod } from "@/lib/daily-check-in";
+import { dailyJournalForDay } from "@/lib/daily-journal";
+import {
+  checkInDraftKey,
+  checkInDefaults,
+  isCheckInDraft,
+} from "@/lib/check-in-draft";
+import { useJournalWorkspace } from "./journal-drafts";
+import { checkInForDay } from "@/lib/daily-check-in";
 import { formatDay } from "@/lib/domain";
 import { reflectionStats } from "@/lib/reflection-writing";
 import styles from "./journal-reference-details.module.css";
 import { Button } from "@/components/ui/button";
 
 /** Direct journal links have no collection word-count threshold. */
-export function JournalEntryPage({
-  day,
-  period,
-}: {
-  day: string;
-  period: DailyCheckInPeriod;
-}) {
+export function JournalEntryPage({ day }: { day: string }) {
   const { data } = useJournal();
+  const { store } = useJournalWorkspace();
   if (!data) return null;
-  const entry = checkInForDay(data.dailyCheckIns, day, period);
+  const entry = dailyJournalForDay(data.dailyCheckIns, day);
   const note = entry?.note ?? "";
   const stats = reflectionStats(note);
-  const morning = period === "morning";
-  const title = morning ? "Morning Reflection" : "Evening Reflection";
-  const sibling = morning ? "evening" : "morning";
-  const other = checkInForDay(data.dailyCheckIns, day, sibling);
-  const editHref = `/history/${day}?checkin=${period}`;
+  const editHref = `/history/${day}?checkin=morning`;
+  const openWriter = () => {
+    const key = checkInDraftKey(day, "morning");
+    const current = store.getSnapshot().drafts[key]?.value;
+    const initial = checkInDefaults(
+      checkInForDay(data.dailyCheckIns, day, "morning"),
+      "morning",
+    );
+    store.setDraft(key, {
+      ...(isCheckInDraft(current)
+        ? current
+        : { ...initial, dailyWriting: true, note: "" }),
+      writingOpen: true,
+    });
+  };
   const changed =
     entry && Number.isFinite(Date.parse(entry.updatedAt))
       ? new Intl.DateTimeFormat("en", {
@@ -55,20 +66,19 @@ export function JournalEntryPage({
       className={styles.page}
       data-journal-entry-page
       data-journal-entry-day={day}
-      data-journal-entry-period={period}
     >
       <ReferenceBackLink href="/journal">Your journal</ReferenceBackLink>
       <PageHeading
-        title={title}
+        title="Daily Journal"
         context={formatDay(day, { month: "short", year: "numeric" })}
-        icon={morning ? <Coffee /> : <MoonStar />}
+        icon={<NotebookPen />}
         actions={
           <Button
             navigation
             variant="ghost"
             size="sm"
             nativeButton={false}
-            render={<Link href={editHref} />}
+            render={<Link href={editHref} onNavigate={openWriter} />}
             className={`${styles.action} h-auto p-0`}
           >
             <PencilLine size={14} aria-hidden="true" />
@@ -76,9 +86,7 @@ export function JournalEntryPage({
           </Button>
         }
       >
-        {morning
-          ? "Before the day gets loud. Your morning, exactly as you left it."
-          : "A little space after the noise. Your evening, in your own words."}
+        One page for the whole tracking day. Add to it from either check-in.
       </PageHeading>
       {note.trim() ? (
         <>
@@ -140,19 +148,6 @@ export function JournalEntryPage({
           Back to this day
           <ArrowUpRight size={13} aria-hidden="true" />
         </Button>
-        {other?.note.trim() && (
-          <Button
-            navigation
-            variant="ghost"
-            size="sm"
-            nativeButton={false}
-            render={<Link href={`/journal/${day}/${sibling}`} />}
-            className={`${styles.periodLink} h-auto p-0`}
-          >
-            {morning ? "Evening" : "Morning"} Reflection
-            <ArrowUpRight size={13} aria-hidden="true" />
-          </Button>
-        )}
       </nav>
     </div>
   );

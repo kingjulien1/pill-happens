@@ -111,131 +111,74 @@
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
-.today {
-  display: block;
-  overflow: hidden;
-  border: 1px solid var(--today-edge);
-  border-radius: 16px;
-  background: linear-gradient(107deg, var(--today-start), var(--today-end) 88%);
-  color: var(--today-ink);
-  box-shadow: inset 0 1px
-    color-mix(in srgb, var(--today-accent) 24%, transparent);
-}
-.todayMain {
-  position: relative;
-  isolation: isolate;
-  display: flex;
+.today,
+.entry {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 22px;
   align-items: center;
-  gap: 14px;
-  overflow: hidden;
-  padding: 17px 14px 14px;
+  column-gap: 12px;
+  padding: 7px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+.today {
+  min-height: 54px;
+  border-color: var(--today-edge);
+  background: linear-gradient(107deg, var(--today-start), var(--today-end));
+  color: var(--today-ink);
 }
 .dateLeaf {
-  position: relative;
   display: grid;
-  flex: none;
-  min-width: 49px;
-  height: 55px;
+  width: 36px;
+  height: 36px;
   place-content: center;
   justify-items: center;
-  gap: 2px;
-  border-radius: 5px 5px 10px 10px;
+  border-top: 2px solid var(--today-edge);
+  border-radius: 4px 4px 7px 7px;
   background: var(--leaf);
   color: var(--leaf-ink);
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--today-accent) 38%, transparent);
-}
-.dateLeaf::before {
-  position: absolute;
-  top: 0;
-  left: 8px;
-  right: 8px;
-  border-top: 2px dotted var(--leaf-ink);
-  opacity: 0.43;
-  content: "";
-}
-.dateLeaf span {
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.12em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-.dateLeaf strong {
-  font-family: ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
-  font-size: 28px;
-  letter-spacing: -0.055em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.todayCopy {
+.dateLeaf span {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.dateLeaf strong {
+  font-size: 18px;
+}
+.rowCopy {
   display: grid;
-  gap: 1px;
   min-width: 0;
 }
-.todayCopy strong {
-  font-size: 23px;
-  font-weight: 680;
-  letter-spacing: -0.035em;
-  line-height: 1.2;
+.todayTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
 }
-.todayCopy time,
-.todayCopy > span {
-  color: var(--today-accent);
-  font-size: 13px;
+.todayTitle strong {
+  font-size: 16px;
+  line-height: 1.25;
 }
-.todayMain .horizon {
-  position: absolute;
-  z-index: -1;
-  right: 13%;
-  bottom: -17px;
-  width: 112px;
-  height: 112px;
+.todayTitle time {
   color: var(--today-accent);
-  opacity: 0.15;
-  pointer-events: none;
+  font-size: 11px;
+}
+.today .entryDetail {
+  color: var(--today-ink);
 }
 .todayArrow {
   display: grid;
-  width: 32px;
-  height: 32px;
-  flex: none;
   place-items: center;
-  margin-inline-start: auto;
-  border: 1px solid color-mix(in srgb, var(--today-accent) 40%, transparent);
-  border-radius: 50%;
   color: var(--today-accent);
+  border-radius: 50%;
 }
 .todayArrow svg {
   width: 16px;
   height: 16px;
-}
-.dayCounts {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 5px 0;
-  padding: 8px 15px;
-  border-top: 1px solid color-mix(in srgb, var(--today-edge) 55%, transparent);
-  background: color-mix(in srgb, var(--today-end) 60%, transparent);
-  color: var(--today-ink);
-  font-size: 12px;
-  font-weight: 550;
-  font-variant-numeric: tabular-nums;
-}
-.dayCounts > span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.dayCounts > span + span {
-  margin-inline-start: 12px;
-  padding-inline-start: 12px;
-  border-inline-start: 1px solid var(--today-edge);
-}
-.dayCounts svg {
-  width: 14px;
-  height: 14px;
-  color: var(--today-accent);
 }
 .sectionLabel {
   display: flex;
@@ -249,6 +192,9 @@
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
+.scrollArea > :first-child .sectionLabel {
+  margin-top: 0;
+}
 .sectionLabel::after {
   height: 1px;
   flex: 1;
@@ -257,20 +203,13 @@
 }
 .directory {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--rule);
-  border-radius: 15px;
-  background: var(--rule);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
 }
 .entry {
   --tab: var(--lilac);
-  display: flex;
+  min-height: 50px;
   min-width: 0;
-  flex-direction: column;
-  align-items: start;
-  padding: 11px 13px 12px;
   background: var(--page);
 }
 .entry[data-page="history"] {
@@ -282,17 +221,10 @@
 .entry[data-page="goals"] {
   --tab: var(--rose);
 }
-.entryHead {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 7px;
-}
 .tabIcon {
   display: grid;
-  width: 29px;
-  height: 29px;
+  width: 34px;
+  height: 34px;
   place-items: center;
   border-radius: 8px;
   background: color-mix(in srgb, var(--tab) 11%, transparent);
@@ -303,6 +235,7 @@
   height: 19px;
 }
 .direction {
+  justify-self: center;
   width: 14px;
   height: 14px;
   color: var(--secondary-ink);
@@ -464,7 +397,6 @@
     opacity: 0;
     transform: translateY(-5px) scale(0.985);
   }
-  .today,
   .directory,
   .tools {
     animation: index-arrival 330ms cubic-bezier(0.18, 0.83, 0.24, 1) backwards;

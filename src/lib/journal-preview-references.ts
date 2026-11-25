@@ -1,8 +1,9 @@
+import { DAILY_JOURNAL_MAX_LENGTH } from "@/lib/daily-journal";
 import type { Definition, Root, RootContent } from "mdast";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
-import { DAILY_REFLECTION_MAX_LENGTH } from "./daily-check-in";
+
 import {
   formatDay,
   isValidDayKey,
@@ -71,7 +72,7 @@ function referenceKey(reference: JournalMentionReference) {
     case "week":
       return `week:${reference.weekStart}`;
     case "reflection":
-      return `reflection:${reference.day}:${reference.period}`;
+      return `reflection:${reference.day}`;
   }
 }
 
@@ -98,7 +99,7 @@ function referenceLabel(
     case "week":
       return `${formatDay(reference.weekStart, { weekday: undefined, month: "short" })}–${formatDay(shiftDayKey(reference.weekStart, 6), { weekday: undefined, month: "short" })}`;
     case "reflection":
-      return `${reference.period === "morning" ? "Morning" : "Evening"} · ${shortDate(reference.day)}`;
+      return `Journal · ${shortDate(reference.day)}`;
     case "intake": {
       const intake = catalog.intakes.get(reference.id);
       if (!intake) return "Logged Intake";
@@ -134,7 +135,7 @@ export function createJournalPreviewReferenceExtractor(
     if (
       typeof value !== "string" ||
       !value.trim() ||
-      value.length > DAILY_REFLECTION_MAX_LENGTH ||
+      value.length > DAILY_JOURNAL_MAX_LENGTH ||
       !isValidDayKey(day)
     )
       return [];

@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { JournalEntryPage } from "@/components/journal-entry-page";
+import { notFound, redirect } from "next/navigation";
 import { isValidDayKey } from "@/lib/domain";
 
 export const metadata = { title: "Your journal page" };
@@ -12,5 +11,5 @@ export default async function Page({
   const { day, period } = await params;
   if (!isValidDayKey(day) || (period !== "morning" && period !== "evening"))
     notFound();
-  return <JournalEntryPage day={day} period={period} />;
+  redirect(`/journal/${day}`);
 }

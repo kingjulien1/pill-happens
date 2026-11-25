@@ -20,7 +20,7 @@ import {
 } from "@/lib/daily-derived-values";
 import type { AppData, Intake } from "@/lib/domain";
 import { probeSession, recoverSession } from "@/lib/session-recovery";
-import { checkInForDay } from "@/lib/daily-check-in";
+import { dailyJournalForDay } from "@/lib/daily-journal";
 import {
   ReflectionSaveError,
   confirmReflectionAcknowledgement,
@@ -404,7 +404,7 @@ export function JournalProvider({
             credentials: "same-origin",
             signal: controller.signal,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(input),
+            body: JSON.stringify({ ...input, sharedJournal: true }),
           });
           const result = await response.json().catch(() => null);
           if (response.status === 401) {
@@ -444,10 +444,9 @@ export function JournalProvider({
               null,
               "network",
             );
-          const saved = checkInForDay(
+          const saved = dailyJournalForDay(
             result.dailyCheckIns,
             input.day,
-            input.period,
           );
           const acknowledgement = confirmReflectionAcknowledgement(
             input.note,

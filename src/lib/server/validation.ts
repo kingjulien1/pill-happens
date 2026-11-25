@@ -1,3 +1,4 @@
+import { DAILY_JOURNAL_MAX_LENGTH } from "@/lib/daily-journal";
 import {
   getMorningSleepValidationError,
   hasMorningSleepData,
@@ -169,13 +170,9 @@ export const dailyCheckInSchema = z
   .object({
     day: calendarDate,
     period: z.enum(DAILY_CHECK_IN_PERIODS).default("evening"),
-    note: z
-      .string()
-      .max(
-        DAILY_REFLECTION_MAX_LENGTH,
-        "Keep your reflection to 100,000 characters or fewer.",
-      )
-      .default(""),
+    sharedJournal: z.literal(true).optional(),
+    expectedCheckInAt: z.string().max(64).refine(value => Number.isFinite(Date.parse(value))).nullable().optional(),
+    note: z.string().max(DAILY_JOURNAL_MAX_LENGTH).default(""),
     // Optional only for older clients: the writer still checks different notes.
     expectedUpdatedAt: z
       .string()
@@ -211,6 +208,7 @@ export const dailyCheckInSchema = z
       .default(""),
   })
   .superRefine((entry, context) => {
+    if (!entry.sharedJournal && entry.note.length > DAILY_REFLECTION_MAX_LENGTH) context.addIssue({ code: "custom", path: ["note"], message: "Keep your reflection to 100,000 characters or fewer." });
     for (const field of ["energy", "stress"] as const) {
       if (entry[field] !== null && entry[field] > (entry[`${field}Scale`] ?? 5))
         context.addIssue({

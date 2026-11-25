@@ -180,3 +180,18 @@
     grid-row: 1;
   }
 }
+
+[data-check-in-form] .frame:has(> [data-journal-card]) {
+  --checkin-section-edge: color-mix(
+    in srgb,
+    var(--color-amber-600) 24%,
+    transparent
+  );
+  background:
+    linear-gradient(
+      115deg,
+      color-mix(in srgb, var(--color-amber-600) 12%, transparent),
+      transparent 65%
+    ),
+    var(--surface-ink);
+}

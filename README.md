@@ -48,9 +48,9 @@ The leading `HH:mm` records the **first observed opening on this device**, separ
 
 ### Journal writing and saved drafts
 
-Both check-ins open the shared Markdown writing space, up to **100,000 characters**. Exactly empty writing starts with a relaxed date H1 such as `# Tue, Nov 17 --` and the cursor on line two. Existing content is never overwritten just to add that scaffold. Local drafts save as you type; writing has its own acknowledged autosave policy, while full check-in and other form submissions remain explicit.
+Each tracking day has one Markdown page and one writing draft, accessible from either check-in. Distinct older Morning and Evening notes appear in order with a Markdown divider. Identical notes appear once. The daily page supports 200,007 characters to fit two full legacy notes. Exactly empty writing starts with a relaxed date H1 such as `# Tue, Nov 17 --` and the cursor on line two. Existing content is never overwritten just to add that scaffold. Local drafts save as you type; writing has its own acknowledged autosave policy, while full check-in and other form submissions remain explicit.
 
-`@` references medications, active ingredients and manual categories. `/` references days, ISO weeks and Morning/Evening journals. Suggestions use only the already-loaded journal and preserve stable absolute destinations. Readers render compact linked components; references to intakes reveal the actual card and references to medications open the matching library record. Journal previews show dates, reading metadata and mentioned references rather than raw body excerpts. The main collection includes saved writing strictly longer than 100 Markdown-aware words; direct journal links can read shorter saved notes.
+`@` references medications, active ingredients and manual categories. `/` references days, ISO weeks and daily journal pages. Earlier Morning and Evening links resolve to the daily page. Suggestions use only the already-loaded journal and preserve stable absolute destinations. Readers render compact linked components; references to intakes reveal the actual card and references to medications open the matching library record. Journal previews show dates, reading metadata and mentioned references rather than raw body excerpts. The main collection includes saved writing strictly longer than 100 Markdown-aware words; direct journal links can read shorter saved notes.
 
 The journal-scoped device workspace keeps unfinished intake, medication, goal, check-in and preference inputs, including incomplete raw text. It also remembers the last screen, scroll position, ordinary open dialogs and stack disclosure. Successful saves clear only their own draft; failed requests and closing retain it. Reset Draft requires confirmation where provided and never changes saved records. Multi-tab reconciliation applies explicit draft changes to the latest durable workspace. Passwords, authentication tokens and destructive confirmations never enter draft storage. Device/browser storage can still be unavailable or cleared; the UI reports that fallback honestly.
 
@@ -237,7 +237,7 @@ Earlier manual checks covered the logging and management flow, backdating, corre
 
 `npm run build` produces a production build. To run that build locally, configure the production database and authentication variables, then use `npm start`. Like the development command, it listens on `127.0.0.1` by default.
 
-Daily check-ins allow a 1 MiB JSON body so valid full-length Unicode or escaped text can reach validation; other mutation bodies retain their 16 KiB cap.
+Daily check-ins allow a 1.5 MiB JSON body so valid full-length Unicode or escaped text can reach validation; other mutation bodies retain their 16 KiB cap.
 
 ### Medication SVG Library
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import {
   BedDouble,
   FlaskConical,
-  Coffee,
+  NotebookPen,
   Moon,
   BookOpen,
   BookOpenCheck,
@@ -53,6 +53,12 @@ import {
   serializeReminders,
   type ReminderItem,
 } from "@/lib/check-in-reminders";
+import { useDailyWriting } from "./use-daily-writing";
+import {
+  dailyJournalForDay,
+  dailyJournalDraftKey,
+  isDailyWritingDraft,
+} from "@/lib/daily-journal";
 import { useReflectionSave } from "@/components/use-reflection-save";
 import {
   hasMorningSleepContent,
@@ -144,12 +150,19 @@ export function DailyCheckInSection({
   const logged = saved ? getCheckInUpdatedTime(checkIn, timeZone) : null;
   const previewId = useId();
   const formId = useId();
+  const journal = useMemo(
+    () => dailyJournalForDay(data?.dailyCheckIns, day),
+    [data?.dailyCheckIns, day],
+  );
+  const savedDetails =
+    checkIn && journal ? { ...checkIn, note: journal.note } : checkIn;
   const completion = morning
-    ? getMorningCheckInCompletion(saved ? checkIn : undefined)
-    : getCheckInCompletion(saved ? checkIn : undefined);
+    ? getMorningCheckInCompletion(saved ? savedDetails : undefined)
+    : getCheckInCompletion(saved ? savedDetails : undefined);
   const selectCardDraft = useCallback(
     (snapshot: WorkspaceSnapshot) => ({
       draft: snapshot.drafts[checkInDraftKey(day, period)]?.value,
+      writing: snapshot.drafts[dailyJournalDraftKey(day)]?.value,
       openedAt: snapshot.checkInOpenedAt[checkInDraftKey(day, period)],
       status: snapshot.status,
     }),
@@ -160,15 +173,31 @@ export function DailyCheckInSection({
     selectCardDraft,
     shallowEqual,
   );
-  const storedDraft = snapshot.draft;
-  const hasChanges = hasCheckInDraftChanges(
-    storedDraft,
-    currentCheckIn,
-    period,
-  );
+  const writingDraft = isDailyWritingDraft(snapshot.writing)
+    ? snapshot.writing
+    : undefined;
+  const formDraft = isCheckInDraft(snapshot.draft) ? snapshot.draft : undefined;
+  const storedDraft =
+    formDraft || writingDraft
+      ? {
+          ...(formDraft ?? checkInDefaults(currentCheckIn, period)),
+          note:
+            writingDraft?.note ??
+            (formDraft && !formDraft.dailyWriting
+              ? formDraft.note
+              : (journal?.note ?? "")),
+          dailyWriting: undefined,
+        }
+      : undefined;
+  const baseline = currentCheckIn
+    ? { ...currentCheckIn, note: journal?.note ?? "" }
+    : undefined;
+  const hasChanges =
+    hasCheckInDraftChanges(formDraft, currentCheckIn, period) ||
+    Boolean(writingDraft && writingDraft.note !== (journal?.note ?? ""));
   const progress = getCheckInCardProgress({
     period,
-    checkIn: currentCheckIn,
+    checkIn: baseline,
     draft: storedDraft,
   });
   const hint = morning ? "Still here. Take stock." : "Survived? Leave notes.";
@@ -410,41 +439,31 @@ function CheckInForm({
   const locked = busy || submitting;
   const morning = period === "morning";
   const id = useId();
-  const draft = usePersistentDraft(
+  const draft = usePersistentDraft<CheckInDraft>(
     checkInDraftKey(day, period),
-    () => checkInDefaults(checkIn, period),
+    () => ({
+      ...checkInDefaults(checkIn, period),
+      dailyWriting: true,
+      note: "",
+    }),
     isCheckInDraft,
   );
-  const {
-    note,
-    moods,
-    energy,
-    stress,
-    helped,
-    writingOpen = false,
-  } = draft.value;
+  const writing = useDailyWriting(day, data?.dailyCheckIns);
+  const { note } = writing;
+  const { moods, energy, stress, helped, writingOpen = false } = draft.value;
   // Earlier Morning drafts had only the legacy hours field. Keep it recoverable.
   const morningSleep = morningSleepForDraft(draft.value, checkIn);
   const setField = <K extends keyof CheckInDraft>(
     key: K,
     value: CheckInDraft[K],
   ) => draft.setValue((current) => ({ ...current, [key]: value }));
-  const setNote = (value: string) =>
-    draft.setValue((current) => ({
-      ...current,
-      note: value,
-      ...(current.reflectionBaseUpdatedAt === undefined &&
-      current.note === (checkIn?.note ?? "")
-        ? { reflectionBaseUpdatedAt: checkIn?.updatedAt ?? null }
-        : {}),
-    }));
   const reflectionSave = useReflectionSave({
     day,
     period,
     note,
-    checkIn,
-    baseUpdatedAt: draft.value.reflectionBaseUpdatedAt,
-    setDraft: draft.setValue,
+    checkIn: writing.page,
+    baseUpdatedAt: writing.baseUpdatedAt,
+    acknowledge: writing.acknowledge,
     disabled: locked,
   });
   const setRating = (field: "energy" | "stress", value: number | null) =>
@@ -463,7 +482,12 @@ function CheckInForm({
     "empty" | "sleep" | { message: string } | null
   >(null);
   const reset = () => {
-    draft.resetDraft(checkInDefaults(checkIn, period));
+    draft.resetDraft({
+      ...checkInDefaults(checkIn, period),
+      dailyWriting: true,
+      note: "",
+    });
+    store.clearDraft(writing.key);
     setIssue(null);
   };
   const hasContent =
@@ -494,22 +518,34 @@ function CheckInForm({
     try {
       const key = checkInDraftKey(day, period);
       const hadDraft = Object.hasOwn(store.getSnapshot().drafts, key);
-      await reflectionSave.pauseAndDrain();
+      const confirmed = await reflectionSave.pauseAndDrain();
       store.synchronize();
       const submittedRecord = store.getSnapshot().drafts[key];
-      const submission = prepareCheckInSubmission(
-        draft.value,
-        submittedRecord?.value,
-        hadDraft,
-      );
+      prepareCheckInSubmission(draft.value, submittedRecord?.value, hadDraft);
+      const writingRecord = store.getSnapshot().drafts[writing.key];
+      const latestWriting = writingRecord?.value;
+      if (
+        (isDailyWritingDraft(latestWriting) && latestWriting.note !== note) ||
+        (writing.draft && !writingRecord && note !== confirmed.note)
+      )
+        throw new Error(
+          "The daily page changed while you were saving. Review your writing and try again.",
+        );
       const beforePreview = checkIn
-        ? checkInNotificationSnapshot(checkIn)
+        ? checkInNotificationSnapshot({
+            ...checkIn,
+            note: writing.page?.note ?? "",
+          })
         : undefined;
       const result = await mutate("daily-check-ins", {
         day,
         period,
         note,
-        expectedUpdatedAt: submission.reflectionBaseUpdatedAt,
+        sharedJournal: true,
+        expectedUpdatedAt: isDailyWritingDraft(latestWriting)
+          ? latestWriting.reflectionBaseUpdatedAt
+          : confirmed.updatedAt,
+        expectedCheckInAt: checkIn?.updatedAt ?? null,
         moods,
         energy,
         stress,
@@ -540,6 +576,14 @@ function CheckInForm({
       // its latest record before clearing only the exact draft we submitted.
       store.synchronize();
       if (
+        writingRecord &&
+        checkInSubmissionDraftUnchanged(
+          writingRecord,
+          store.getSnapshot().drafts[writing.key],
+        )
+      )
+        store.clearDraft(writing.key);
+      if (
         checkInSubmissionDraftUnchanged(
           submittedRecord,
           store.getSnapshot().drafts[key],
@@ -550,8 +594,8 @@ function CheckInForm({
           // base. Clearing alone would restore this form's pre-save defaults.
           draft.resetDraft({
             ...draft.value,
-            note: savedCheckIn.note,
-            reflectionBaseUpdatedAt: savedCheckIn.updatedAt,
+            dailyWriting: true,
+            note: "",
           });
         } else draft.clearDraft();
       }
@@ -573,7 +617,10 @@ function CheckInForm({
               ? {
                   preview: {
                     ...(beforePreview ? { before: beforePreview } : {}),
-                    after: checkInNotificationSnapshot(savedCheckIn),
+                    after: checkInNotificationSnapshot({
+                      ...savedCheckIn,
+                      note,
+                    }),
                   },
                 }
               : {}),
@@ -643,31 +690,23 @@ function CheckInForm({
       <CheckInSection
         caption={
           <>
-            {morning ? (
-              <Coffee aria-hidden="true" />
-            ) : (
-              <Moon aria-hidden="true" />
-            )}
-            {morning ? "Before the Day Bites" : "Today, for the Record"}
+            <NotebookPen aria-hidden="true" />
+            Daily Journal
           </>
         }
         headingId={`${id}-journal-heading`}
-        description={
-          morning
-            ? undefined
-            : "Pick the moment that stuck, what it did to you, and what you want to leave here. Tomorrow can read the case notes."
-        }
+        context="One page per day"
         detail={
           <Link
-            href="/journal"
+            href={`/journal/${day}`}
             className="inline-flex items-center gap-1.5"
             onNavigate={() => {
               onSaved?.();
-              rememberJournalDestination("/journal");
+              rememberJournalDestination(`/journal/${day}`);
             }}
           >
             <LibraryBig size={14} aria-hidden="true" />
-            Past pages
+            Saved page
             <ArrowUpRight size={12} className="opacity-60" aria-hidden="true" />
           </Link>
         }
@@ -675,14 +714,16 @@ function CheckInForm({
         <DailyReflectionEditor
           id={`${id}-note`}
           value={note}
-          onChange={setNote}
+          onChange={writing.setNote}
           day={day}
           period={period}
           open={writingOpen}
           onOpenChange={(value) => setField("writingOpen", value)}
-          draftStatus={draft.hasDraft ? draft.status : undefined}
+          draftStatus={
+            draft.hasDraft || writing.draft ? draft.status : undefined
+          }
           saving={reflectionSave.controls}
-          savedAt={checkIn?.updatedAt}
+          savedAt={writing.page?.updatedAt}
           disabled={locked}
         />
       </CheckInSection>
@@ -831,6 +872,7 @@ function CheckInForm({
           </IntakePrimaryButton>
           <DraftStatus
             {...draft}
+            hasDraft={draft.hasDraft || Boolean(writing.draft)}
             scope={checkInDraftKey(day, period)}
             copy={{
               idle: checkIn

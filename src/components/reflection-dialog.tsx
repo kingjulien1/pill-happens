@@ -65,10 +65,9 @@ import { useJournalMentionMenu } from "@/components/journal-mention-menu";
 import { ReflectionWritingHelp } from "@/components/reflection-writing-help";
 import { ReflectionMarkdown } from "@/components/reflection-markdown";
 import {
-  DAILY_REFLECTION_MAX_LENGTH,
   type DailyCheckInPeriod,
 } from "@/lib/daily-check-in";
-import { checkInDraftKey } from "@/lib/check-in-draft";
+import { DAILY_JOURNAL_MAX_LENGTH, dailyJournalDraftKey } from "@/lib/daily-journal";
 import { formatDay } from "@/lib/domain";
 import { createJournalEntryTemplate } from "@/lib/journal-entry-template";
 import {
@@ -358,14 +357,14 @@ export function ReflectionDialog({
     useDialogScrollMemory<HTMLDivElement>({
       open: open && view !== "preview",
       sessionOpen: open,
-      scrollKey: `${checkInDraftKey(day, period)}:writing-source`,
+      scrollKey: `${dailyJournalDraftKey(day)}:writing-source`,
       layout: view,
     });
   const { setScrollElement: setPreviewElement, save: savePreviewScroll } =
     useDialogScrollMemory<HTMLDivElement>({
       open: open && view === "preview",
       sessionOpen: open,
-      scrollKey: `${checkInDraftKey(day, period)}:writing-preview`,
+      scrollKey: `${dailyJournalDraftKey(day)}:writing-preview`,
       layout: view,
     });
   const setContentScrollElement = useCallback(
@@ -522,7 +521,7 @@ export function ReflectionDialog({
     input.current = node;
   }, []);
   const canFormat = !disabled && !finishing && view !== "preview";
-  const remaining = DAILY_REFLECTION_MAX_LENGTH - stats.characters;
+  const remaining = DAILY_JOURNAL_MAX_LENGTH - stats.characters;
   const SaveStateIcon =
     saving.status === "saved"
       ? CloudCheck
@@ -599,7 +598,7 @@ export function ReflectionDialog({
       selection.current.end,
       kind,
     );
-    if (next.value.length > DAILY_REFLECTION_MAX_LENGTH) {
+    if (next.value.length > DAILY_JOURNAL_MAX_LENGTH) {
       setFeedback(
         "There is not enough space for this formatting. Shorten the entry first.",
       );
@@ -673,7 +672,7 @@ export function ReflectionDialog({
       );
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `reflection-${day}${period === "morning" ? "-morning" : ""}.md`;
+      anchor.download = `journal-${day}.md`;
       anchor.hidden = true;
       document.body.appendChild(anchor);
       try {
@@ -767,7 +766,7 @@ export function ReflectionDialog({
                 className={styles.title}
                 data-writing-heading
               >
-                {period === "morning" ? "Morning Pages." : "Day, Debriefed."}
+                Your Daily Page.
               </DialogTitle>
               <div
                 className={`${closeStyles.actions} ${styles.headerActions}`}
@@ -816,8 +815,7 @@ export function ReflectionDialog({
                       weekday: "long",
                       month: undefined,
                       day: undefined,
-                    })}{" "}
-                    {period === "morning" ? "Morning" : "Evening"}
+                    })}
                   </time>
                 }
                 detail={formatDay(day, { weekday: undefined, month: "long" })}
@@ -827,10 +825,7 @@ export function ReflectionDialog({
               className={styles.description}
               data-writing-description
             >
-              {period === "morning"
-                ? "First thoughts, unfinished dreams, or the thing already on your mind—give them a little room."
-                : "Keep the good bits, unload the rest. Your day doesn’t need a neat ending to deserve a page."}{" "}
-              Write in Markdown; switch to Read to see it take shape.
+              There’s room for a first impression and a change of heart. Continue this page from either check-in. Switch to Read to see your Markdown take shape.
             </DialogDescription>
           </header>
           <div
@@ -1110,7 +1105,7 @@ export function ReflectionDialog({
                   }
                 }}
                 className={styles.writingArea}
-                maxLength={DAILY_REFLECTION_MAX_LENGTH}
+                maxLength={DAILY_JOURNAL_MAX_LENGTH}
                 placeholder="Write your reflection… @ links medications and categories; / links days, weeks and journals."
                 spellCheck
                 autoCapitalize="sentences"
@@ -1184,7 +1179,7 @@ export function ReflectionDialog({
                   data-near-limit={remaining <= 200}
                 >
                   <strong>{numberFormat.format(stats.characters)}</strong> /{" "}
-                  {numberFormat.format(DAILY_REFLECTION_MAX_LENGTH)} chars
+                  {numberFormat.format(DAILY_JOURNAL_MAX_LENGTH)} chars
                 </span>
                 {stats.headings > 0 && (
                   <span className={styles.headingStat}>

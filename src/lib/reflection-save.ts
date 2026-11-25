@@ -132,7 +132,7 @@ export function createReflectionSaveController(options: {
     note: string,
     expectedUpdatedAt: string | null,
   ) => Promise<ReflectionSaveAcknowledgement>;
-  acknowledge: (updatedAt: string | null) => void;
+  acknowledge: (updatedAt: string | null, note: string) => void;
   conflict?: () => void;
   now?: () => number;
   schedule?: (
@@ -280,7 +280,7 @@ export function createReflectionSaveController(options: {
         known = true;
         fault = null;
         cooldownUntil = 0;
-        options.acknowledge(version);
+        options.acknowledge(version, note);
       } catch (error) {
         if (disposed) return;
         const problem =
@@ -396,6 +396,7 @@ export function createReflectionSaveController(options: {
       clearTimer();
       emit();
       await flight;
+      return { note: confirmedNote, updatedAt: version };
     },
     resume() {
       held = false;

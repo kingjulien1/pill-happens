@@ -3091,25 +3091,15 @@ export function DeveloperGuidePage() {
                   rather than the time column. Past-day Morning precedes the
                   intake list and Evening follows it. Position is independent of
                   draft or saved status. A keyed editor keeps the open period
-                  and original day across rollover. The shared Before the Day
-                  Bites / Today, for the Record doorway pairs a gently steaming
-                  coffee icon with reading and library controls. Its writing
-                  action uses the Today button frame with the check-in section’s
-                  fuchsia-violet inner edge. Copy Writing and Refresh sit on
-                  opposite sides of the paragraph count. The morning and evening
-                  sections share an 8% tinted gradient, an introductory caption
-                  and two small footer notes. Local word, character and reading
-                  statistics use one unboxed single line beneath it: 10.5px
-                  values, 10px labels and a 14px line height. The surrounding
-                  11.5px/600 guidance uses an 18px line to explain Markdown,
-                  draft continuity, reading, the saved-Journal threshold and the
-                  separate Save Check-In action. Reading opens safe rendered
-                  Markdown from the current draft; Edit entry closes the reader
-                  before returning to the same writer. Manual Refresh
+                  and original day across rollover. The amber Daily Journal section in both dialogs opens the same
+                  dated editor. A Saved page link opens the daily reader. Copy
+                  and Refresh flank the word, character and reading-time counts.
+                  Writing has one device draft per tracking day. The other
+                  check-in answers retain their period-specific drafts. Manual Refresh
                   synchronizes saved journal data without replacing unfinished
                   draft fields or making an AI request. The existing
                   ReflectionDialog and independent saving controls retain their
-                  launcher ref. Writing supports up to 100,000 characters. Done
+                  launcher ref. The daily page can hold two full-length legacy reflections. Done
                   returns to the check-in with the draft; Save Check-In saves
                   all responses and closes the dialog. The three dots in the
                   save button’s top-left corner open Save options. Save and stay
@@ -3224,7 +3214,7 @@ export function DeveloperGuidePage() {
                   local destination and restores the caret after an ordinary
                   Markdown link. Completing mid-word consumes its remaining
                   suffix. The complete generated Markdown, including escaping
-                  and URL length, must fit the 100,000-character source budget.
+                  and URL length, must fit the daily page’s character limit.
                 </li>
               </ul>
               <p>
@@ -3398,8 +3388,7 @@ export function DeveloperGuidePage() {
                 Reflection-only days remain eligible; empty weeks stay empty.
                 Medication totals retain recorded strength snapshots, separate
                 forms and historical fallback names for missing definitions.{" "}
-                <code>/journal/DATE/morning</code> and{" "}
-                <code>/journal/DATE/evening</code> read the actual saved note at
+                <code>/journal/DATE</code> reads the shared daily page. Links ending in morning or evening also open this page at
                 any length, including writing below the main collection’s
                 strictly-more-than-100-word threshold. Missing or empty notes
                 have an explicit empty state and a dated Open Check-In link.
@@ -3513,7 +3502,7 @@ export function DeveloperGuidePage() {
                 exact Markdown and expected saved timestamp. It runs inside the
                 repository’s atomic mutation and replaces only note and its
                 update timestamp. Mood, Energy, Stress, Sleep, What Helped,
-                creation time and the opposite check-in remain untouched. New
+                and creation time stay on their own check-in. Both dialogs read the same daily note. Different historical notes are joined in morning-to-evening order. New
                 writing creates a note-only record with unknown optional values.
                 An empty new note creates nothing. Clearing the last content
                 removes only that empty period record; otherwise it retains the
@@ -3762,7 +3751,7 @@ export function DeveloperGuidePage() {
                 the card bottom and clears at the divider above the info heading.
               </p>
               <p>
-                The Morning dialog starts with Before the Day Bites, followed by
+                The Morning dialog starts with Daily Journal, followed by
                 report import, times and sleep stages, the overnight summary,
                 and five optional sleep ratings. Its card keeps first opening
                 separate from latest saved update, with an em dash only when

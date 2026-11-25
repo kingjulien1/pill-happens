@@ -24,6 +24,11 @@ const targetSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("goal"), id: z.string().min(1).max(160) }),
   z.object({ kind: z.literal("settings") }),
   z.object({
+    kind: z.literal("daily-page-check-in"),
+    day: z.string().refine(isValidDayKey),
+    period: z.enum(["morning", "evening"]),
+  }),
+  z.object({
     kind: z.literal("check-in"),
     day: z.string().refine(isValidDayKey),
     period: z.enum(["morning", "evening"]),
@@ -67,6 +72,19 @@ function copy<T>(value: T): T {
 }
 
 function snapshot(state: AppData, target: UndoTarget): UndoRecord {
+  if (target.kind === "daily-page-check-in")
+    return {
+      morning: snapshot(state, {
+        kind: "check-in",
+        day: target.day,
+        period: "morning",
+      }),
+      evening: snapshot(state, {
+        kind: "check-in",
+        day: target.day,
+        period: "evening",
+      }),
+    };
   if (target.kind === "intake-replacement")
     return {
       previous: snapshot(state, { kind: "intake", id: target.previousId }),
@@ -205,6 +223,15 @@ export async function mutateJournalStateWithUndo(
         takenAt: Date.parse(String(record.takenAt)),
         route: record.route ?? "unspecified",
       };
+    if (target.kind === "daily-page-check-in") {
+      return ["morning", "evening"].map((period) => {
+        const entry = record[period] as UndoRecord;
+        if (!entry) return null;
+        const { updatedAt: _version, ...fields } = entry;
+        void _version;
+        return fields;
+      });
+    }
     if (target.kind !== "check-in") return record;
     const { updatedAt: _version, ...fields } = record;
     void _version;
@@ -244,6 +271,15 @@ function restoreRecord(state: AppData, target: UndoTarget, before: UndoRecord) {
   const conflict = (message: string) => {
     throw new ApiError(409, message);
   };
+  if (target.kind === "daily-page-check-in") {
+    for (const period of ["morning", "evening"] as const)
+      restoreRecord(
+        state,
+        { kind: "check-in", day: target.day, period },
+        before?.[period] as UndoRecord,
+      );
+    return;
+  }
   if (target.kind === "intake-replacement") {
     // Both records were compared before this point. Restore the pair together,
     // never deleting a replacement first and attempting a second write later.

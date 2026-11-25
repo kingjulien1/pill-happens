@@ -1,3 +1,4 @@
+import { DAILY_JOURNAL_MAX_LENGTH } from "@/lib/daily-journal";
 import { z } from "zod";
 import { dayKey, isValidDayKey, type AppData } from "@/lib/domain";
 import {
@@ -9,19 +10,26 @@ import {
 import { hasMorningSleepData } from "@/lib/morning-sleep";
 import { DAILY_CHECK_IN_LIMIT } from "./daily-check-ins";
 
-export const dailyReflectionSchema = z.object({
-  day: z.string().refine(isValidDayKey, "Choose a valid tracking day."),
-  period: z.enum(DAILY_CHECK_IN_PERIODS),
-  note: z.string().max(DAILY_REFLECTION_MAX_LENGTH),
-  expectedUpdatedAt: z
-    .string()
-    .max(64)
-    .refine(
-      (value) => Number.isFinite(Date.parse(value)),
-      "Invalid reflection version.",
-    )
-    .nullable(),
-});
+export const dailyReflectionSchema = z
+  .object({
+    day: z.string().refine(isValidDayKey, "Choose a valid tracking day."),
+    period: z.enum(DAILY_CHECK_IN_PERIODS),
+    sharedJournal: z.literal(true).optional(),
+    note: z.string().max(DAILY_JOURNAL_MAX_LENGTH),
+    expectedUpdatedAt: z
+      .string()
+      .max(64)
+      .refine(
+        (value) => Number.isFinite(Date.parse(value)),
+        "Invalid reflection version.",
+      )
+      .nullable(),
+  })
+  .refine(
+    (input) =>
+      input.sharedJournal || input.note.length <= DAILY_REFLECTION_MAX_LENGTH,
+    { path: ["note"], message: "Reflection is too long." },
+  );
 
 export class DailyReflectionSaveError extends Error {
   constructor(

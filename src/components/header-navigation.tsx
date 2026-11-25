@@ -18,8 +18,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   CalendarDays,
-  ClipboardCheck,
-  Pill,
   CircleCheck,
   CloudDownload,
   BugPlay,
@@ -238,7 +236,7 @@ function NavigationContents({
       checkIns,
       journal: {
         count: countCaption(pages.length, "page"),
-        detail: words ? countCaption(words, "word") : undefined,
+        detail: countCaption(words, "word"),
       },
       history: {
         count: countCaption(history.length, "day"),
@@ -248,7 +246,7 @@ function NavigationContents({
       },
       medications: {
         count: `${active.length} active`,
-        detail: archived ? `${archived} archived` : undefined,
+        detail: `${archived} archived`,
       },
       goals: {
         count: countCaption(
@@ -256,7 +254,7 @@ function NavigationContents({
             .length,
           "active goal",
         ),
-        detail: upcoming ? `${upcoming} upcoming` : undefined,
+        detail: `${upcoming} upcoming`,
       },
     };
   }, [data, today]);
@@ -310,73 +308,64 @@ function NavigationContents({
         </div>
       </div>
       <div className={styles.scrollArea} data-navigation-scroll>
-        <NavigationLink
-          mobile={mobile}
-          href="/"
-          label="Today"
-          onFollow={followLink}
-          aria-current={pathname === "/" ? "page" : undefined}
-          className={styles.today}
-          data-navigation-link
-          data-page="today"
-          data-active={pathname === "/"}
-        >
-          <span className={styles.todayMain}>
-            <span className={styles.dateLeaf} aria-hidden="true">
-              {today ? (
-                <>
-                  <span>
-                    {formatDay(today, {
-                      weekday: undefined,
-                      month: "short",
-                      day: undefined,
-                    })}
-                  </span>
-                  <strong>{Number(today.slice(-2))}</strong>
-                </>
-              ) : (
-                <CalendarDays />
-              )}
-            </span>
-            <span className={styles.todayCopy}>
-              <strong>Today</strong>
-              {today ? (
-                <time dateTime={today} aria-label={formatDay(today)}>
-                  {formatDay(today, { month: undefined, day: undefined })}
-                </time>
-              ) : (
-                <span>Your daily log</span>
-              )}
-            </span>
-            <ActionIcon
-              name="navToday"
-              weight="duotone"
-              className={styles.horizon}
-            />
-            <span className={styles.todayArrow} aria-hidden="true">
-              {pathname === "/" ? <CircleCheck /> : <ArrowRight />}
-            </span>
-          </span>
-          <span className={styles.dayCounts}>
-            <span>
-              <Pill aria-hidden="true" />
-              {summaries
-                ? countCaption(summaries.intakes, "intake")
-                : "Intakes"}
-            </span>
-            <span>
-              <ClipboardCheck aria-hidden="true" />
-              {summaries
-                ? `${summaries.checkIns}/2 check-ins`
-                : "Daily check-ins"}
-            </span>
-          </span>
-        </NavigationLink>
         <Group aria-label="Journal library" data-navigation-section="daily">
           <div className={styles.sectionLabel} aria-hidden="true">
             Library
           </div>
           <div className={styles.directory}>
+            <NavigationLink
+              mobile={mobile}
+              href="/"
+              label="Today"
+              onFollow={followLink}
+              aria-current={pathname === "/" ? "page" : undefined}
+              className={styles.today}
+              data-navigation-link
+              data-page="today"
+              data-active={pathname === "/"}
+            >
+              <span className={styles.dateLeaf} aria-hidden="true">
+                {today ? (
+                  <>
+                    <span>
+                      {formatDay(today, {
+                        weekday: undefined,
+                        month: "short",
+                        day: undefined,
+                      })}
+                    </span>
+                    <strong>{Number(today.slice(-2))}</strong>
+                  </>
+                ) : (
+                  <CalendarDays />
+                )}
+              </span>
+              <span className={styles.rowCopy}>
+                <span className={styles.todayTitle}>
+                  <strong>Today</strong>
+                  {today && (
+                    <time dateTime={today} aria-label={formatDay(today)}>
+                      {formatDay(today, { month: undefined, day: undefined })}
+                    </time>
+                  )}
+                </span>
+                <span className={styles.entryDetail}>
+                  <span>
+                    {summaries
+                      ? countCaption(summaries.intakes, "intake")
+                      : "Intakes"}
+                  </span>
+                  <span>
+                    {summaries
+                      ? `${summaries.checkIns}/2 check-ins`
+                      : "Daily check-ins"}
+                  </span>
+                </span>
+              </span>
+              <span className={styles.todayArrow} aria-hidden="true">
+                {pathname === "/" ? <CircleCheck /> : <ArrowRight />}
+              </span>
+            </NavigationLink>
             {library.map(({ href, label, page, icon, hint }) => {
               const active =
                 pathname === href || pathname.startsWith(`${href}/`);
@@ -399,21 +388,27 @@ function NavigationContents({
                   data-navigation-link
                   className={styles.entry}
                 >
-                  <span className={styles.entryHead} aria-hidden="true">
-                    <span className={styles.tabIcon}>
-                      <ActionIcon name={icon} weight="duotone" />
+                  <span className={styles.tabIcon} aria-hidden="true">
+                    <ActionIcon name={icon} weight="duotone" />
+                  </span>
+                  <span className={styles.rowCopy}>
+                    <strong>{label}</strong>
+                    <span className={styles.entryDetail}>
+                      <span>{summary?.count ?? hint}</span>
+                      {summary?.detail && <span>{summary.detail}</span>}
                     </span>
-                    {active ? (
-                      <CircleCheck className={styles.direction} />
-                    ) : (
-                      <ArrowUpRight className={styles.direction} />
-                    )}
                   </span>
-                  <strong>{label}</strong>
-                  <span className={styles.entryDetail}>
-                    <span>{summary?.count ?? hint}</span>
-                    {summary?.detail && <span>{summary.detail}</span>}
-                  </span>
+                  {active ? (
+                    <CircleCheck
+                      aria-hidden="true"
+                      className={styles.direction}
+                    />
+                  ) : (
+                    <ArrowUpRight
+                      aria-hidden="true"
+                      className={styles.direction}
+                    />
+                  )}
                 </NavigationLink>
               );
             })}

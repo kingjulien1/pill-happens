@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useJournal } from "@/components/journal-provider";
-import type { CheckInDraft } from "@/lib/check-in-draft";
 import type { DailyCheckIn, DailyCheckInPeriod } from "@/lib/daily-check-in";
 import {
   createReflectionSaveController,
@@ -31,7 +30,7 @@ export function useReflectionSave({
   note,
   checkIn,
   baseUpdatedAt,
-  setDraft,
+  acknowledge,
   disabled,
 }: {
   day: string;
@@ -39,7 +38,7 @@ export function useReflectionSave({
   note: string;
   checkIn?: DailyCheckIn;
   baseUpdatedAt: string | null | undefined;
-  setDraft: (next: (current: CheckInDraft) => CheckInDraft) => void;
+  acknowledge: (updatedAt: string | null, note: string) => void;
   disabled: boolean;
 }) {
   const { saveReflection, refresh, busy } = useJournal();
@@ -68,11 +67,7 @@ export function useReflectionSave({
       },
       send: (value, expectedUpdatedAt) =>
         saveReflection({ day, period, note: value, expectedUpdatedAt }),
-      acknowledge: (updatedAt) =>
-        setDraft((current) => ({
-          ...current,
-          reflectionBaseUpdatedAt: updatedAt,
-        })),
+      acknowledge,
       conflict: () => {
         void refresh();
       },

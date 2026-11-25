@@ -1,3 +1,5 @@
+import { dailyCheckInUndoTarget, saveDayCheckIn } from "./daily-journal";
+import { dailyCheckInSchema } from "./validation";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PGlite } from "@electric-sql/pglite";
@@ -803,4 +805,31 @@ test("replacement confirmation is returned without signing and never becomes sto
     before: intake,
   });
   assert.equal(Object.hasOwn(f.state(), "_intakeChange"), false);
+});
+
+test("one Undo restores both the daily page and the other period’s submitted answers", async () => {
+  const f = fixture();
+  const submit = dailyCheckInSchema.parse({
+    day: checkIn.day,
+    period: "evening",
+    sharedJournal: true,
+    note: "Revised at night",
+    expectedUpdatedAt: checkIn.updatedAt,
+    moods: ["hopeful"],
+  });
+  const save = () =>
+    f.save(
+      (state) => dailyCheckInUndoTarget(state, submit),
+      (state) => saveDayCheckIn(state, submit, new Date(now)),
+    );
+  const original = f.state().dailyCheckIns;
+  const first = await save();
+  assert.equal(first.dailyCheckIns!.length, 2);
+  assert.deepEqual((await f.undo(first)).dailyCheckIns, original);
+  const second = await save();
+  f.concurrent((state) => {
+    state.dailyCheckIns![0].note = "Newer writing";
+  });
+  await assert.rejects(f.undo(second), status(409));
+  assert.equal(f.state().dailyCheckIns!.length, 2);
 });

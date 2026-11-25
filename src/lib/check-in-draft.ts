@@ -24,6 +24,8 @@ export function checkInDraftKey(
 
 /** The tracking day belongs to the draft key; a clock rollover cannot rename it. */
 export type CheckInDraft = {
+  /** Writing now belongs to the daily draft key. */
+  dailyWriting?: true;
   note: string;
   moods: DailyMood[];
   energy: number | null;
@@ -141,7 +143,7 @@ export function hasCheckInDraftChanges(
   if (!isCheckInDraft(value)) return false;
   const defaults = checkInDefaults(checkIn, period);
   if (
-    value.note !== defaults.note ||
+    (!value.dailyWriting && value.note !== defaults.note) ||
     value.helped !== defaults.helped ||
     value.energy !== defaults.energy ||
     value.stress !== defaults.stress ||

@@ -6,9 +6,7 @@ import {
   CalendarRange,
   Clock3,
   FlaskConical,
-  MoonStar,
   NotebookPen,
-  Sun,
 } from "lucide-react";
 import { MedicationGlyph } from "@/components/medication-icon";
 import { MedicationChoiceIcon } from "@/components/medication-choice-icon";
@@ -452,34 +450,31 @@ export function ReflectionJournalReference(
   },
 ) {
   const reflection = props.catalog.reflections.get(
-    `${props.reference.day}:${props.reference.period}`,
+    props.reference.day,
   );
   const stats = reflection?.note.trim()
     ? reflectionStats(reflection.note)
     : null;
-  const morning = props.reference.period === "morning";
-  const Icon = morning ? Sun : MoonStar;
-  const period = morning ? "Morning" : "Evening";
   const counts = stats
     ? `${countLabel(stats.words, "word")} · ~${stats.readingMinutes || 1} min read`
     : "No saved writing";
   return (
     <ReferenceLink
       {...props}
-      pigment={morning ? "var(--palette-apricot)" : "var(--palette-lilac)"}
+      pigment="var(--palette-apricot)"
       title={
         props.title ??
-        `${period} journal · ${formatDay(props.reference.day, { year: "numeric" })} · ${counts}`
+        `Daily journal · ${formatDay(props.reference.day, { year: "numeric" })} · ${counts}`
       }
-      label={`${period} journal, ${shortDate(props.reference.day)}, ${counts}`}
+      label={`Daily journal, ${shortDate(props.reference.day)}, ${counts}`}
       unavailable={!stats}
     >
       <Symbol>
-        <Icon className={styles.glyph} strokeWidth={2.2} />
+        <NotebookPen className={styles.glyph} strokeWidth={2.2} />
       </Symbol>
       <span className={styles.copy}>
         <span className={styles.name} data-reference-name>
-          {period}
+          Journal
           <span className={styles.dot}>·</span>
           {shortDate(props.reference.day)}
         </span>

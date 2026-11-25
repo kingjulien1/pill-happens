@@ -1,10 +1,11 @@
+import { dailyJournalForDay } from "@/lib/daily-journal";
 import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { isValidDayKey, type AppData } from "@/lib/domain";
 import {
   DAILY_CHECK_IN_PERIODS,
   DAILY_REFLECTION_MAX_LENGTH,
-  checkInForDay,
+  getCheckInPeriod,
 } from "@/lib/daily-check-in";
 import {
   parseReflectionInsightResponse,
@@ -62,7 +63,7 @@ function sourceMatches(
   input: ReflectionInsightRequest,
 ): boolean {
   return (
-    checkInForDay(state.dailyCheckIns, input.day, input.period)?.note ===
+    dailyJournalForDay(state.dailyCheckIns, input.day)?.note ===
     input.note
   );
 }
@@ -126,11 +127,7 @@ function putCache(
   const siblings = entries
     .filter((entry) => entry.day === next.day && entry.period === next.period)
     .sort((a, b) => entryTime(b) - entryTime(a));
-  const currentNote = checkInForDay(
-    state.dailyCheckIns,
-    next.day,
-    next.period,
-  )?.note;
+  const currentNote = dailyJournalForDay(state.dailyCheckIns, next.day)?.note;
   const currentHash =
     currentNote === undefined ? null : reflectionNoteHash(currentNote);
   const kept = new Set<ReflectionInsightCacheEntry>();
@@ -169,8 +166,10 @@ export async function getReflectionInsight(
   if (!reflectionInsightEligible(input.note))
     return { status: "unavailable", reason: "too_short" };
   const state = await repository.readState(journalId);
-  if (!sourceMatches(state, input))
+  const page = dailyJournalForDay(state.dailyCheckIns, input.day);
+  if (!page || page.note !== input.note)
     return { status: "unavailable", reason: "save_first" };
+  input = { ...input, period: getCheckInPeriod(page) };
   const noteHash = reflectionNoteHash(input.note);
   const clock = options.now ?? Date.now;
   const existing = state.reflectionInsights?.find((entry) =>

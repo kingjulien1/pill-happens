@@ -1,5 +1,4 @@
 import {
-  checkInForDay,
   getCheckInPeriod,
   type DailyCheckIn,
   type DailyCheckInPeriod,
@@ -10,6 +9,7 @@ import {
   type CheckInDraft,
 } from "./check-in-draft";
 import { formatDay, isValidDayKey } from "./domain";
+import { dailyJournalPages } from "./daily-journal";
 import { reflectionStats } from "./reflection-writing";
 
 /** The collection is for saved, longer writing; exactly 100 words stays in its day. */
@@ -26,13 +26,6 @@ export type JournalLibraryEntry = {
   words: number;
   readingMinutes: number;
 };
-
-function versionTime(entry: DailyCheckIn) {
-  const updated = Date.parse(entry.updatedAt);
-  if (Number.isFinite(updated)) return updated;
-  const created = Date.parse(entry.createdAt);
-  return Number.isFinite(created) ? created : -Infinity;
-}
 
 /** Heading labels are plain text; code fences and HTML comments are not titles. */
 export function journalEntryTitle(value: string, day: string) {
@@ -107,47 +100,24 @@ export function journalLibraryEntries(
 ): JournalLibraryEntry[] {
   const cached = checkIns && savedLibraries.get(checkIns);
   if (cached) return [...cached];
-  const candidates = [...(checkIns ?? [])].sort((a, b) => {
-    const first = versionTime(a);
-    const second = versionTime(b);
-    return first === second ? 0 : first > second ? -1 : 1;
-  });
-  const days = new Map<string, DailyCheckIn[]>();
-  for (const checkIn of candidates) {
-    if (!isValidDayKey(checkIn.day)) continue;
-    const bucket = days.get(checkIn.day);
-    if (bucket) bucket.push(checkIn);
-    else days.set(checkIn.day, [checkIn]);
-  }
   const entries: JournalLibraryEntry[] = [];
-  for (const [day, saved] of days) {
-    for (const period of ["morning", "evening"] as const) {
-      const checkIn = checkInForDay(saved, day, period);
-      if (!checkIn || !checkIn.note.trim()) continue;
-      const stats = reflectionStats(checkIn.note);
-      if (stats.words <= JOURNAL_LIBRARY_MIN_WORDS) continue;
-      entries.push({
-        id: `${day}:${getCheckInPeriod(checkIn)}`,
-        day,
-        period,
-        checkIn,
-        value: checkIn.note,
-        title: journalEntryTitle(checkIn.note, day),
-        excerpt: stats.excerpt,
-        words: stats.words,
-        readingMinutes: stats.readingMinutes,
-      });
-    }
+  for (const [day, checkIn] of dailyJournalPages(checkIns)) {
+    if (!isValidDayKey(day)) continue;
+    const stats = reflectionStats(checkIn.note);
+    if (stats.words <= JOURNAL_LIBRARY_MIN_WORDS) continue;
+    entries.push({
+      id: day,
+      day,
+      period: getCheckInPeriod(checkIn),
+      checkIn,
+      value: checkIn.note,
+      title: journalEntryTitle(checkIn.note, day),
+      excerpt: stats.excerpt,
+      words: stats.words,
+      readingMinutes: stats.readingMinutes,
+    });
   }
-  const result = entries.sort(
-    (a, b) =>
-      b.day.localeCompare(a.day) ||
-      (versionTime(a.checkIn) === versionTime(b.checkIn)
-        ? a.id.localeCompare(b.id)
-        : versionTime(a.checkIn) > versionTime(b.checkIn)
-          ? -1
-          : 1),
-  );
+  const result = entries.sort((a, b) => b.day.localeCompare(a.day));
   if (checkIns) savedLibraries.set(checkIns, result);
   return [...result];
 }
@@ -160,7 +130,11 @@ export function journalEntryEditDraft(
   return {
     ...(isCheckInDraft(current)
       ? current
-      : checkInDefaults(checkIn, getCheckInPeriod(checkIn))),
+      : {
+          ...checkInDefaults(checkIn, getCheckInPeriod(checkIn)),
+          dailyWriting: true as const,
+          note: "",
+        }),
     writingOpen: true,
   };
 }

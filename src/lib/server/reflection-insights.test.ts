@@ -563,13 +563,13 @@ test("new cache survives local reopen and keeps four versions without evicting o
   await repository.mutateState("personal", (state) => {
     state.dailyCheckIns = [
       originalCheckIn(),
-      { ...originalCheckIn(), period: "evening" },
+      { ...originalCheckIn(), day: "2026-11-01", period: "evening" },
     ];
   });
   await getReflectionInsight(
     repository,
     "personal",
-    { ...input, period: "evening" },
+    { ...input, day: "2026-11-01", period: "morning" },
     { configured: true, now: () => now, generate: async () => content },
   );
   for (let index = 0; index < 6; index++) {

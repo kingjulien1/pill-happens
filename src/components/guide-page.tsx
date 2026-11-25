@@ -1,3 +1,4 @@
+import { DAILY_JOURNAL_MAX_LENGTH } from "@/lib/daily-journal";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BookOpenTextIcon } from "@phosphor-icons/react/dist/ssr/BookOpenText";
@@ -14,7 +15,6 @@ import { InstallAppButton } from "@/components/install-app-button";
 import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import {
   DAILY_MOOD_CHOICES,
-  DAILY_REFLECTION_MAX_LENGTH,
 } from "@/lib/daily-check-in";
 import { MEDICATION_CATEGORIES } from "@/lib/medication-categories";
 import styles from "./guide-page.module.css";
@@ -735,15 +735,14 @@ export function GuidePage() {
                 <dt
                   id={guideHeadingId("guide-checkin", "Your Day, Your Words")}
                   data-guide-outline-level="2"
-                  data-guide-outline-label={"Today, for the Record"}
+                  data-guide-outline-label={"Daily Journal"}
                 >
-                  Today, for the Record
+                  Daily Journal
                 </dt>
                 <dd>
                   A roomy journal entry, up to{" "}
-                  {DAILY_REFLECTION_MAX_LENGTH.toLocaleString("en-GB")}{" "}
-                  characters. Morning calls this Before the Day Bites. Both open
-                  the same writing space with Markdown formatting, Preview, Read
+                  {DAILY_JOURNAL_MAX_LENGTH.toLocaleString("en-GB")}{" "}
+                  characters. Morning and Evening open the same daily page and draft with Markdown formatting, Preview, Read
                   and a Markdown download. Watch the writing save status; Done
                   returns to the check-in.
                 </dd>
@@ -825,13 +824,12 @@ export function GuidePage() {
               <strong>Find longer writing in Journal.</strong> Saved entries
               with more than 100 words appear there automatically, with search
               and a reading view. Shorter saved notes stay in their check-in and
-              can still open through a direct journal link. Unfinished drafts
-              stay with their check-in.
+              can still open through a direct journal link. Unfinished writing is available from either check-in.
             </p>
             <PageLink href="/journal">Browse Journal Pages</PageLink>
             <p>
               Morning and Evening each have one saved record per tracking day
-              and their own local draft. Saving one leaves the other alone. An
+              for sleep, feelings and reminders. Writing has one shared draft and saved page. An
               open draft keeps its original day across the 06:00 reset. In Past
               Days, add either missed check-in at any hour: Morning sits above
               the intakes and Evening below them.

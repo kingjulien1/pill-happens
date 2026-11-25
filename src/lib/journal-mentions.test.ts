@@ -690,12 +690,12 @@ test("day journal children include short nonempty morning and legacy evening wri
   const results = searchJournalMentions(data, "Today", today, "/");
   assert.deepEqual(
     results[0].children?.map((item) => item.href),
-    [`/journal/${today}/morning`, `/journal/${today}/evening`],
+    [`/journal/${today}`],
   );
   assert.ok(results.every((item) => item.kind !== "reflection"));
   assert.equal(
     searchJournalMentions(data, "Today.Morning", today, "/")[0].href,
-    `/journal/${today}/morning`,
+    `/journal/${today}`,
   );
   assert.ok(
     searchJournalMentions(data, "2026-11-09.Morning", today, "/").every(
@@ -709,9 +709,9 @@ test("calendar aliases resolve current days, stable relative weeks, ISO rollover
     ["Today", today, `/history/${today}`],
     ["Yesterday", today, "/history/2026-11-09"],
     ["DayBeforeYesterday", today, "/history/2026-11-08"],
-    ["Today.Morning", today, `/journal/${today}/morning`],
-    ["Yesterday/Evening", today, "/journal/2026-11-09/evening"],
-    ["Morning", today, `/journal/${today}/morning`],
+    ["Today.Morning", today, `/journal/${today}`],
+    ["Yesterday/Evening", today, "/journal/2026-11-09"],
+    ["Morning", today, `/journal/${today}`],
     ["ThisWeek", "2021-01-01", "/history/weeks/2020-12-28"],
     ["LastWeek", "2021-01-01", "/history/weeks/2020-12-21"],
     ["2020-W53", today, "/history/weeks/2020-12-28"],
@@ -832,8 +832,8 @@ test("the live catalog resolves missing records safely and sorts ingredient targ
   assert.equal(catalog.categories.get("benzodiazepine")?.[0].id, "v5");
   assert.equal(catalog.intakes.get("i3")?.medicationId, "rit");
   assert.equal(catalog.intakes.get("missing"), undefined);
-  assert.equal(catalog.reflections.get(`${today}:evening`)?.day, today);
-  assert.equal(catalog.reflections.get(`${today}:morning`), undefined);
+  assert.equal(catalog.reflections.get(today)?.day, today);
+  assert.equal(catalog.reflections.get("2099-01-01"), undefined);
   assert.equal(catalog.weeks.get("2026-11-09")?.intakes, 3);
   assert.equal(catalog.timezone, "Europe/Vienna");
   assert.equal(catalog.today, today);

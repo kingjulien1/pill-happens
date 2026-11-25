@@ -1,6 +1,8 @@
+import { dailyJournalForDay, dailyJournalPages } from "@/lib/daily-journal";
+import { saveDayWriting } from "./daily-journal";
 import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { dayKey, isValidDayKey, type AppData } from "@/lib/domain";
-import { getCheckInPeriod, type DailyCheckIn } from "@/lib/daily-check-in";
+import { DAILY_REFLECTION_MAX_LENGTH, getCheckInPeriod, type DailyCheckIn } from "@/lib/daily-check-in";
 import type {
   JournalEditingReport,
   JournalEditingRevision,
@@ -155,11 +157,12 @@ function validateResult(
 
 function candidates(state: AppData, now: Date, includeDeferred = false) {
   const today = dayKey(now, state.settings.timezone);
-  return (state.dailyCheckIns ?? [])
+  return [...dailyJournalPages(state.dailyCheckIns).values()]
     .filter(
       (entry) =>
         isValidDayKey(entry.day) &&
         entry.day < today &&
+        entry.note.length <= DAILY_REFLECTION_MAX_LENGTH &&
         entry.note.replace(/^# [^\n]*--[^\n]*\n?/u, "").trim().length > 0 &&
         !alreadyReviewed(state, entry) &&
         (includeDeferred ||
@@ -237,11 +240,7 @@ export async function runJournalEditing({
       // Leave room for the provider's45s timeout and a final atomic write.
       if (now().getTime() - started > JOURNAL_EDITING_BUDGET_MS - 60_000) break;
       const current = await repository.readState(journalId);
-      const latest = current.dailyCheckIns?.find(
-        (value) =>
-          value.day === entry.day &&
-          getCheckInPeriod(value) === getCheckInPeriod(entry),
-      );
+      const latest = dailyJournalForDay(current.dailyCheckIns, entry.day);
       if (
         !latest ||
         latest.note !== entry.note ||
@@ -263,11 +262,7 @@ export async function runJournalEditing({
         await repository.mutateState(journalId, (state) => {
           if (state.journalEditing?.lease?.id !== leaseId)
             throw new EntryChanged();
-          const target = state.dailyCheckIns?.find(
-            (value) =>
-              value.day === entry.day &&
-              getCheckInPeriod(value) === getCheckInPeriod(entry),
-          );
+          const target = dailyJournalForDay(state.dailyCheckIns, entry.day);
           if (
             !target ||
             target.note !== latest.note ||
@@ -302,8 +297,7 @@ export async function runJournalEditing({
                 failure.period !== getCheckInPeriod(target),
             );
           if (changed) {
-            target.note = result.markdown;
-            target.updatedAt = timestamp;
+            saveDayWriting(state, { day: target.day, period: getCheckInPeriod(target), sharedJournal: true, note: result.markdown, expectedUpdatedAt: target.updatedAt }, new Date(timestamp));
           }
         });
         report.reviewed++;
@@ -314,11 +308,7 @@ export async function runJournalEditing({
           report.failed++;
           await repository.mutateState(journalId, (state) => {
             if (state.journalEditing?.lease?.id !== leaseId) return;
-            const target = state.dailyCheckIns?.find(
-              (value) =>
-                value.day === entry.day &&
-                getCheckInPeriod(value) === getCheckInPeriod(entry),
-            );
+            const target = dailyJournalForDay(state.dailyCheckIns, entry.day);
             if (
               !target ||
               target.note !== latest.note ||
@@ -414,11 +404,8 @@ export function saveReviewedJournalEntry(
   },
   now: Date,
 ) {
-  const entry = state.dailyCheckIns?.find(
-    (value) =>
-      value.day === input.day && getCheckInPeriod(value) === input.period,
-  );
-  if (!entry)
+  const entry = dailyJournalForDay(state.dailyCheckIns, input.day);
+  if (!entry || getCheckInPeriod(entry) !== input.period)
     throw new JournalEditingConflict(
       "This journal entry is no longer available.",
     );
@@ -467,7 +454,6 @@ export function saveReviewedJournalEntry(
       failure.day !== entry.day || failure.period !== getCheckInPeriod(entry),
   );
   if (changed) {
-    entry.note = result.markdown;
-    entry.updatedAt = timestamp;
+    saveDayWriting(state, { day: entry.day, period: getCheckInPeriod(entry), sharedJournal: true, note: result.markdown, expectedUpdatedAt: entry.updatedAt }, new Date(timestamp));
   }
 }

@@ -91,6 +91,7 @@ const utf8Length = (value: string) => encoder.encode(value).byteLength;
 const jsonBytes = (value: unknown) => utf8Length(JSON.stringify(value));
 
 function draftByteLimit(key: string) {
+  if (key.startsWith("journal:")) return 2 * DRAFT_STORAGE_LIMITS.checkInDraft;
   return /^checkin:\d{4}-\d{2}-\d{2}(?::morning)?$/.test(key)
     ? DRAFT_STORAGE_LIMITS.checkInDraft
     : DRAFT_STORAGE_LIMITS.draft;
@@ -119,7 +120,7 @@ export function safeWorkspacePath(value: unknown): string | null {
     new Date(`${week}T12:00:00Z`).getUTCDay() === 1
   )
     return value;
-  const journal = /^\/journal\/(\d{4}-\d{2}-\d{2})\/(?:morning|evening)$/.exec(
+  const journal = /^\/journal\/(\d{4}-\d{2}-\d{2})(?:\/(?:morning|evening))?$/.exec(
     value,
   )?.[1];
   if (journal && isValidDayKey(journal)) return value;
@@ -159,7 +160,7 @@ export function safeDraftKey(key: unknown): key is string {
   const edit = /^(?:med|intake):edit:(.+)$/.exec(key)?.[1];
   if (edit) return idPattern.test(edit);
   const day =
-    /^(?:intake:new|checkin):(\d{4}-\d{2}-\d{2})$/.exec(key)?.[1] ??
+    /^(?:intake:new|checkin|journal):(\d{4}-\d{2}-\d{2})$/.exec(key)?.[1] ??
     /^checkin:(\d{4}-\d{2}-\d{2}):morning$/.exec(key)?.[1];
   return Boolean(day && isValidDayKey(day));
 }

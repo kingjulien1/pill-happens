@@ -221,8 +221,8 @@ test("reference context rejects ambiguous medication names and pins relative dat
         ref.href === "/history/2026-11-09",
     ),
   );
-  assert.ok(refs.some((ref) => ref.href === "/journal/2026-11-10/morning"));
-  assert.ok(refs.some((ref) => ref.href === "/journal/2026-11-09/evening"));
+  assert.ok(refs.some((ref) => ref.href === "/journal/2026-11-10"));
+  assert.ok(refs.some((ref) => ref.href === "/journal/2026-11-09"));
   assert.ok(refs.some((ref) => ref.href === "/history/weeks/2026-11-02"));
   assert.ok(
     refs.some(
@@ -905,7 +905,7 @@ test("Postgres editing isolates journals, protects concurrent changes, and durab
   };
 
   await t.test(
-    "one configured journal and both periods are reviewed without changing any other records",
+    "one editing revision retains both historical notes and preserves all other check-in answers",
     async () => {
       const original = state([
         entry("2026-11-10", { period: "morning", note: "morning was quiet." }),
@@ -972,8 +972,8 @@ test("Postgres editing isolates journals, protects concurrent changes, and durab
         generate: polished,
         now,
       });
-      assert.equal(report.reviewed, 2);
-      assert.equal(report.changed, 2);
+      assert.equal(report.reviewed, 1);
+      assert.equal(report.changed, 1);
       const reopened = createPostgresJournalRepository(query);
       const exported = JSON.parse(
         JSON.stringify({
@@ -987,12 +987,12 @@ test("Postgres editing isolates journals, protects concurrent changes, and durab
       assert.deepEqual(saved.intakes, original.intakes);
       assert.deepEqual(saved.goals, original.goals);
       assert.deepEqual(saved.dailyCheckIns![2], original.dailyCheckIns![2]);
-      assert.equal(saved.journalEditing!.revisions.length, 2);
+      assert.equal(saved.journalEditing!.revisions.length, 1);
       assert.deepEqual(
         new Set(
           saved.journalEditing!.revisions.map((revision) => revision.period),
         ),
-        new Set(["morning", "evening"]),
+        new Set(["morning"]),
       );
       for (const revision of saved.journalEditing!.revisions) {
         const before = original.dailyCheckIns!.find(
@@ -1003,9 +1003,11 @@ test("Postgres editing isolates journals, protects concurrent changes, and durab
             value.day === revision.day &&
             (value.period ?? "evening") === revision.period,
         )!;
-        assert.equal(revision.originalNote, before.note);
+        const combined = original.dailyCheckIns![0].note + "\n\n---\n\n" + original.dailyCheckIns![1].note;
+        assert.equal(revision.originalNote, combined);
+        assert.equal(saved.dailyCheckIns![1].note, "");
         assert.equal(revision.editedNote, after.note);
-        assert.equal(revision.sourceHash, journalNoteHash(before.note));
+        assert.equal(revision.sourceHash, journalNoteHash(combined));
         assert.equal(revision.outputHash, journalNoteHash(after.note));
         assert.equal(revision.sourceUpdatedAt, before.updatedAt);
         assert.equal(revision.appliedUpdatedAt, after.updatedAt);

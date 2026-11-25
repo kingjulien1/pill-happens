@@ -277,10 +277,10 @@ test("day journal shortcuts resolve either period without consuming surrounding 
   assert.deepEqual(
     refs(source).map((item) => item.href),
     [
-      "/journal/2026-11-10/morning",
-      "/journal/2026-11-09/evening",
-      "/journal/2026-11-08/morning",
-      "/journal/2026-11-10/morning",
+      "/journal/2026-11-10",
+      "/journal/2026-11-09",
+      "/journal/2026-11-08",
+      "/journal/2026-11-10",
     ],
   );
   assert.deepEqual(
@@ -309,8 +309,8 @@ test("typed relative day, week and journal references keep their saved entry's d
       "/history/2026-11-09",
       "/history/weeks/2026-11-09",
       "/history/weeks/2026-11-02",
-      "/journal/2026-11-10/morning",
-      "/journal/2026-11-09/evening",
+      "/journal/2026-11-10",
+      "/journal/2026-11-09",
     ],
   );
   assert.equal(
@@ -338,7 +338,7 @@ test("slash code, entities, escapes, URLs, ordinary paths and links remain untou
       "/history/2026-11-10",
       "/history/weeks/2026-11-09",
       "/history/2026-11-09",
-      "/journal/2026-11-10/morning",
+      "/journal/2026-11-10",
       "/history/weeks/2026-11-02",
       "/history/2026-11-08",
     ],

@@ -1,6 +1,5 @@
+import { DAILY_JOURNAL_MAX_LENGTH, dailyJournalPages } from "./daily-journal";
 import {
-  DAILY_REFLECTION_MAX_LENGTH,
-  getCheckInPeriod,
   type DailyCheckIn,
   type DailyCheckInPeriod,
 } from "./daily-check-in";
@@ -56,7 +55,7 @@ export type JournalMentionReference =
   | { kind: "category"; category: MedicationCategory }
   | { kind: "intake"; id: string; day: string }
   | { kind: "week"; weekStart: string }
-  | { kind: "reflection"; day: string; period: DailyCheckInPeriod };
+  | { kind: "reflection"; day: string; period?: DailyCheckInPeriod };
 
 /** Resolve live manual labels without adding metadata to portable Markdown links. */
 export function getJournalMentionCategories(
@@ -264,7 +263,7 @@ export function parseJournalMentionHref(
       new Date(`${week}T12:00:00Z`).getUTCDay() === 1
       ? { kind: "week", weekStart: week }
       : null;
-  const reflection = /^\/journal\/(\d{4}-\d{2}-\d{2})\/(morning|evening)$/.exec(
+  const reflection = /^\/journal\/(\d{4}-\d{2}-\d{2})(?:\/(morning|evening))?$/.exec(
     href,
   );
   if (reflection)
@@ -272,7 +271,7 @@ export function parseJournalMentionHref(
       ? {
           kind: "reflection",
           day: reflection[1],
-          period: reflection[2] as DailyCheckInPeriod,
+          ...(reflection[2] ? { period: reflection[2] as DailyCheckInPeriod } : {}),
         }
       : null;
   const dayMatch = /^\/history\/(\d{4}-\d{2}-\d{2})(?:\?intake=([^&]+))?$/.exec(
@@ -530,34 +529,19 @@ export function journalCalendarHref(reference: JournalCalendarReference) {
   return reference.kind === "week"
     ? `/history/weeks/${reference.weekStart}`
     : reference.kind === "reflection"
-      ? `/journal/${reference.day}/${reference.period}`
+      ? `/journal/${reference.day}`
       : `/history/${reference.day}`;
 }
 
 type ScoredMention = { mention: JournalMention; score: number; order: number };
 
-function reflectionChildren(data: AppData, day: string): JournalMention[] {
-  return (["morning", "evening"] as const).flatMap((period) => {
-    const reflection = data.dailyCheckIns?.find(
-      (item) =>
-        item.day === day &&
-        getCheckInPeriod(item) === period &&
-        item.note.trim(),
-    );
-    return reflection
-      ? [
-          {
-            key: `reflection:${day}:${period}`,
-            kind: "reflection" as const,
-            label: `${period === "morning" ? "Morning" : "Evening"} journal`,
-            detail: `${reflection.note.trim().split(/\s+/u).length} words · Saved writing`,
-            href: `/journal/${day}/${period}`,
-            day,
-            period,
-          },
-        ]
-      : [];
-  });
+function reflectionChildren(reflection: DailyCheckIn | undefined, day: string): JournalMention[] {
+  return reflection ? [{
+    key: `reflection:${day}`,
+    kind: "reflection", label: "Daily journal",
+    detail: `${reflection.note.trim().split(/\s+/u).length} words · Saved writing`,
+    href: `/journal/${day}`, day,
+  }] : [];
 }
 
 /** Search loaded data only. The supplied day must already use the journal's 06:00 boundary. */
@@ -747,7 +731,7 @@ export function searchJournalMentions(
         ]
           .filter(Boolean)
           .join(" · ") || "No entries";
-      const children = reflectionChildren(data, day);
+      const children = reflectionChildren(catalog.reflections.get(day), day);
       add(
         {
           key: `day:${day}`,
@@ -767,7 +751,6 @@ export function searchJournalMentions(
       for (const child of children) {
         if (
           exact?.kind === "reflection" &&
-          child.period === exact.period &&
           day === exact.day
         )
           add(child, -3, order);
@@ -843,7 +826,7 @@ export function applyJournalMention(
   value: string,
   token: JournalMentionToken,
   mention: JournalMention,
-  maxLength = DAILY_REFLECTION_MAX_LENGTH,
+  maxLength = DAILY_JOURNAL_MAX_LENGTH,
 ) {
   const current = getJournalMentionToken(value, token.end);
   const reference = parseJournalMentionHref(mention.href);
@@ -891,7 +874,7 @@ export function createJournalReferenceCatalog(
     MEDICATION_CATEGORY_VALUES.map((category) => [category, []]),
   );
   const intakes = new Map<string, Intake>();
-  const reflections = new Map<string, DailyCheckIn>();
+  const reflections = dailyJournalPages(data?.dailyCheckIns);
   const days = new Map<string, { intakes: number; checkIns: number }>();
   for (const medication of medications.values()) {
     const key = normalizeJournalMentionText(medication.activeIngredient ?? "");
@@ -914,7 +897,6 @@ export function createJournalReferenceCatalog(
   }
   for (const checkIn of data?.dailyCheckIns ?? []) {
     if (!isValidDayKey(checkIn.day)) continue;
-    reflections.set(`${checkIn.day}:${getCheckInPeriod(checkIn)}`, checkIn);
     const count = days.get(checkIn.day) ?? { intakes: 0, checkIns: 0 };
     count.checkIns++;
     days.set(checkIn.day, count);

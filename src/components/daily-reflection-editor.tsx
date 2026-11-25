@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, RefreshCw, Info } from "lucide-react";
+import { Check, Copy, RefreshCw, BookOpenText } from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
 
 import {
@@ -153,22 +153,14 @@ export function DailyReflectionEditor({
     }
   };
 
-  const snapshotTitle = !hasWriting
-    ? period === "morning"
-      ? "First thoughts. No filter."
-      : "File today’s incident report."
-    : saving.status === "saved"
-      ? "Your words, kept together."
-      : saving.status === "saving"
-        ? "Your page is catching up."
-        : "A little space for what's on your mind.";
+  const snapshotTitle = hasWriting
+    ? "Pick up the thread."
+    : "Leave a line for later.";
   const snapshotDetail = !hasWriting
-    ? period === "morning"
-      ? "A dream, a worry, or what would make today easier—leave a note for your less foggy self."
-      : "What happened, what hurt, and what you’d do differently."
+    ? "Start with what’s on your mind. Open either check-in to pick up where you left off."
     : draftStatus === "error" || draftStatus === "memory"
-      ? "These edits are in this open page. Keep it open until they're saved."
-      : saving.message;
+      ? "Keep this window open until your changes save."
+      : "Your morning thoughts and evening afterthoughts share this page.";
   const refreshLabel = refreshing
     ? "Refreshing journal"
     : refreshFinished
@@ -180,27 +172,18 @@ export function DailyReflectionEditor({
   return (
     <section
       className={styles.editor}
-      aria-label={`${period === "morning" ? "Morning" : "Evening"} journal writing`}
+      aria-label="Daily journal writing"
       data-journal-card
       data-journal-period={period}
       data-journal-active="false"
     >
-      <p className={styles.snapshot} data-journal-snapshot>
-        {snapshotTitle} {snapshotDetail}
-      </p>
-      {period === "evening" && (
-        <p
-          className={`${styles.guidance} ${styles.introduction}`}
-          data-journal-introduction
-        >
-          <Info size={20} aria-hidden="true" />
-          <span>
-            Separate what happened from how it felt. A short list works; a rant
-            is admissible. Use Markdown for structure, then close the editor to
-            return here.
-          </span>
-        </p>
-      )}
+      <div className={styles.lead} data-journal-snapshot>
+        <BookOpenText aria-hidden="true" />
+        <div>
+          <p className={styles.leadTitle}>{snapshotTitle}</p>
+          <p className={styles.snapshot}>{snapshotDetail}</p>
+        </div>
+      </div>
       <ReflectionDialog
         id={id}
         value={value}
@@ -238,9 +221,7 @@ export function DailyReflectionEditor({
                 <span className="intake-primary-dot" aria-hidden="true">
                   ·
                 </span>
-                <span className="intake-primary-aside">
-                  {period === "morning" ? "Spill" : "Vent"}
-                </span>
+                <span className="intake-primary-aside">Pen it</span>
               </span>
               <ActionIcon name="next" className="intake-primary-next" />
             </span>
@@ -248,8 +229,7 @@ export function DailyReflectionEditor({
         }
       />
       <p className={styles.guidance} data-journal-guidance>
-        Writing saves separately from your ratings. Use Save Check-In to keep
-        the rest of your answers with this day.
+        Your words save as you write. Save Check-In keeps your other answers.
       </p>
       <hr className={styles.divider} />
       <div className={styles.captionRow}>
