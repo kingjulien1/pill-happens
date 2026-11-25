@@ -11,7 +11,6 @@ import {
 import {
   ArrowUpRight,
   BookOpenText,
-  Fingerprint,
   FolderOpen,
   ListChecks,
   Import,
@@ -318,15 +317,7 @@ export function SleepCycleImport({
           this draft—the graph can testify, but you get the final word.
         </p>
       </div>
-      <div className={styles.headingEnd}>
-        <p className={styles.localNote} data-sleep-import-local-note>
-          <Fingerprint size={12} aria-hidden="true" />
-          <span>
-            Read on this device. Nothing is applied until you approve.
-          </span>
-        </p>
-        <hr className={`${styles.separator} ${styles.headingDivider}`} />
-      </div>
+      <hr className={`${styles.separator} ${styles.headingDivider}`} />
       <input
         ref={input}
         hidden
