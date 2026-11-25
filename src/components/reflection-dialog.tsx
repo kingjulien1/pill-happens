@@ -1,6 +1,5 @@
 "use client";
 
-import { SaveStatusLine } from "./save-status-line";
 import {
   useCallback,
   useDeferredValue,
@@ -22,10 +21,10 @@ import {
   Bold,
   Code,
   Columns2,
-  CornerDownLeft,
   CloudBackup,
   CloudAlert,
   CloudCheck,
+  HardDrive,
   FileDown,
   Bookmark,
   BookmarkCheck,
@@ -55,8 +54,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { DialogPrimaryButton } from "@/components/dialog-primary-button";
-import { JournalDialogSubheading } from "@/components/journal-dialog-subheading";
 import closeStyles from "./dialog-close.module.css";
 import { useDialogScrollMemory } from "@/components/use-dialog-scroll-memory";
 import type { ReflectionSaveControls } from "@/components/use-reflection-save";
@@ -64,10 +61,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useJournalMentionMenu } from "@/components/journal-mention-menu";
 import { ReflectionWritingHelp } from "@/components/reflection-writing-help";
 import { ReflectionMarkdown } from "@/components/reflection-markdown";
+import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import {
-  type DailyCheckInPeriod,
-} from "@/lib/daily-check-in";
-import { DAILY_JOURNAL_MAX_LENGTH, dailyJournalDraftKey } from "@/lib/daily-journal";
+  DAILY_JOURNAL_MAX_LENGTH,
+  dailyJournalDraftKey,
+} from "@/lib/daily-journal";
 import { formatDay } from "@/lib/domain";
 import { createJournalEntryTemplate } from "@/lib/journal-entry-template";
 import {
@@ -80,6 +78,11 @@ import styles from "./reflection-dialog.module.css";
 
 export type ReflectionDraftStatus = "saved" | "memory" | "error";
 type WritingMode = "write" | "preview" | "split";
+const modeLabels: Record<WritingMode, string> = {
+  write: "Editing",
+  preview: "Reading",
+  split: "Split view",
+};
 type CompletionPhase =
   "idle" | "enter" | "hold" | "exit" | "depart" | "reduced" | "closed";
 // The center holds for exactly 700ms. The editor leaves halfway through its retreat.
@@ -121,7 +124,7 @@ function draftLabel(status?: ReflectionDraftStatus) {
   if (status === "saved") return "Draft saved on this device";
   if (status === "memory") return "Draft kept for this visit";
   if (status === "error") return "Device draft could not be saved";
-  return "Part of your check-in draft";
+  return "Part of your daily journal";
 }
 
 export function ReflectionDialog({
@@ -760,72 +763,56 @@ export function ReflectionDialog({
         >
           <header className={styles.header} data-writing-header>
             <div className={styles.titleRow}>
-              <DialogTitle
-                ref={title}
-                tabIndex={-1}
-                className={styles.title}
-                data-writing-heading
-              >
-                Your Daily Page.
-              </DialogTitle>
-              <div
-                className={`${closeStyles.actions} ${styles.headerActions}`}
-                onPointerDownCapture={blurWritingInput}
-                onClickCapture={blurWritingInput}
-              >
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className={closeStyles.control}
-                  disabled={finishing}
-                  aria-label="Markdown syntax help"
-                  aria-expanded={help}
-                  ref={helpButton}
-                  aria-haspopup="dialog"
-                  data-dialog-corner="control"
-                  data-writing-info
-                  title="Markdown syntax help"
-                  onClick={() => setHelp(true)}
-                >
-                  <Info strokeWidth={2.2} aria-hidden="true" />
-                </Button>
-                <DialogClose
-                  disabled={finishing}
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      type="button"
-                      className={closeStyles.control}
-                      data-dialog-corner="control"
-                      aria-label="Close writing space"
-                    />
-                  }
-                >
-                  <X strokeWidth={2.2} aria-hidden="true" />
-                </DialogClose>
-              </div>
-            </div>
-            <p className={styles.context} data-writing-context>
-              <JournalDialogSubheading
-                title={
-                  <time dateTime={day} data-writing-date>
-                    {formatDay(day, {
-                      weekday: "long",
-                      month: undefined,
-                      day: undefined,
-                    })}
-                  </time>
+              <p className={styles.context} data-writing-context>
+                <time dateTime={day} data-writing-date>
+                  {formatDay(day, { weekday: "long", month: "short" })}
+                </time>
+                <span className={styles.contextSeparator} aria-hidden="true">
+                  ·
+                </span>
+                <span className={styles.periodLabel}>
+                  {period === "morning"
+                    ? "Morning Reflection"
+                    : "Evening Reflection"}
+                </span>
+              </p>
+              <DialogClose
+                disabled={finishing}
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    className={closeStyles.control}
+                    data-dialog-corner="control"
+                    aria-label="Close writing space"
+                  />
                 }
-                detail={formatDay(day, { weekday: undefined, month: "long" })}
-              />
-            </p>
+              >
+                <X strokeWidth={2.2} aria-hidden="true" />
+              </DialogClose>
+            </div>
+            <DialogTitle
+              ref={title}
+              tabIndex={-1}
+              className={styles.title}
+              data-writing-heading
+            >
+              {period === "morning"
+                ? "Before the Day Bites"
+                : "Today, for the Record"}
+            </DialogTitle>
             <DialogDescription
               className={styles.description}
               data-writing-description
             >
-              There’s room for a first impression and a change of heart. Continue this page from either check-in. Switch to Read to see your Markdown take shape.
+              Write in Markdown and read it as a page. Give a passing thought a
+              line, or let a longer story take its time. Headings, lists and
+              emphasis help your words find their shape. Switch to preview
+              whenever you want a quieter view. Both check-ins open this day’s
+              journal. Save your writing with the bookmark, or let autosave
+              catch the next pause. Mood, sleep and the rest of your check-in
+              stay yours to finish when you’re ready.
             </DialogDescription>
           </header>
           <div
@@ -834,8 +821,13 @@ export function ReflectionDialog({
             data-writing-tools
           >
             <div className={styles.toolsCaption}>
-              <span>Writing Desk</span>
-              <span className={styles.toolsHint}>Markdown</span>
+              <span>
+                Writing Desk
+                <span className={styles.toolsAside}>
+                  <span aria-hidden="true"> · </span>Exhibit A
+                </span>
+              </span>
+              <span>{modeLabels[view]}</span>
             </div>
             <div
               className={styles.actionsRow}
@@ -847,29 +839,23 @@ export function ReflectionDialog({
                 <Button
                   type="button"
                   variant="secondary"
-                  className={`${styles.iconControl} ${styles.modeControl}`}
-                  aria-label="Write reflection"
-                  aria-pressed={view === "write"}
-                  onClick={() => changeMode("write")}
-                  data-writing-edit
-                >
-                  <Pencil
-                    className={styles.controlGlyph}
-                    strokeWidth={2.2}
-                    aria-hidden="true"
-                  />
-                  <span>Write</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
                   size="icon"
-                  className={`${styles.iconControl} ${styles.modeControl}`}
+                  className={styles.iconControl}
                   data-mode={view}
-                  aria-label="Read reflection"
-                  title="Show reading preview"
+                  aria-label={
+                    view === "preview"
+                      ? "Return to writing"
+                      : "Show reading preview"
+                  }
+                  title={
+                    view === "preview"
+                      ? "Return to writing"
+                      : "Show reading preview"
+                  }
                   aria-pressed={view === "preview"}
-                  onClick={() => changeMode("preview")}
+                  onClick={() =>
+                    changeMode(view === "preview" ? "write" : "preview")
+                  }
                   data-writing-toggle
                 >
                   <span
@@ -882,20 +868,27 @@ export function ReflectionDialog({
                         : undefined
                     }
                   >
-                    <Eye
-                      className={styles.controlGlyph}
-                      strokeWidth={2.2}
-                      aria-hidden="true"
-                    />
+                    {view === "preview" ? (
+                      <Eye
+                        className={styles.controlGlyph}
+                        strokeWidth={2.6}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Pencil
+                        className={styles.controlGlyph}
+                        strokeWidth={2.6}
+                        aria-hidden="true"
+                      />
+                    )}
                   </span>
-                  <span>Read</span>
                 </Button>
                 {wide && (
                   <Button
                     type="button"
                     variant="secondary"
                     size="icon"
-                    className={`${styles.iconControl} ${styles.modeControl}`}
+                    className={styles.iconControl}
                     aria-label="Split writing and preview"
                     title="Split writing and preview"
                     aria-pressed={view === "split"}
@@ -906,14 +899,11 @@ export function ReflectionDialog({
                   >
                     <Columns2
                       className={styles.controlGlyph}
-                      strokeWidth={2.2}
+                      strokeWidth={2.6}
                       aria-hidden="true"
                     />
-                    <span>Split</span>
                   </Button>
                 )}
-              </div>
-              <div className={styles.actionGroup}>
                 <Button
                   type="button"
                   variant="secondary"
@@ -943,6 +933,45 @@ export function ReflectionDialog({
                       data-writing-save-icon="bookmark"
                     />
                   )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className={`${styles.iconControl} ${styles.done}`}
+                  aria-label="Done writing"
+                  title="Done writing"
+                  onClick={completeWriting}
+                  disabled={disabled || finishing}
+                  aria-busy={finishing || undefined}
+                  data-writing-done
+                >
+                  <CloudCheck
+                    className={styles.doneIcon}
+                    strokeWidth={2.6}
+                    aria-hidden="true"
+                  />
+                </Button>
+              </div>
+              <div className={styles.actionGroup}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className={styles.iconControl}
+                  aria-label="Markdown syntax help"
+                  aria-expanded={help}
+                  ref={helpButton}
+                  aria-haspopup="dialog"
+                  data-writing-info
+                  title="Markdown syntax help"
+                  onClick={() => setHelp(true)}
+                >
+                  <Info
+                    className={styles.controlGlyph}
+                    strokeWidth={2.6}
+                    aria-hidden="true"
+                  />
                 </Button>
                 <Button
                   type="button"
@@ -1146,12 +1175,49 @@ export function ReflectionDialog({
             {finishing ? "Returning to your check-in…" : ""}
           </span>
         </div>
-        <footer
-          className={styles.footer}
-          data-writing-footer
-          data-dialog-fade-footer
-        >
+        <footer className={styles.footer} data-writing-footer>
           <div className={styles.footerBody}>
+            <div className={styles.persistence} data-writing-persistence>
+              <span
+                className={styles.cloudState}
+                role="status"
+                data-reflection-save-status={saving.status}
+                data-reflection-sync-active={
+                  saving.status === "pending" || saving.status === "saving"
+                }
+                title={saving.message}
+              >
+                <SaveStateIcon
+                  className={`${styles.saveStateIcon} ${saving.status === "pending" || saving.status === "saving" ? styles.backupIcon : ""}`}
+                  data-writing-cloud-icon
+                  strokeWidth={1.9}
+                  aria-hidden="true"
+                />
+                <span>
+                  {saving.status === "saved"
+                    ? "Writing is up to date."
+                    : saving.status === "pending"
+                      ? "Waiting to sync…"
+                      : saving.status === "saving"
+                        ? "Syncing your writing…"
+                        : saving.message}
+                </span>
+              </span>
+              <span
+                className={styles.draftState}
+                data-draft-status={draftStatus}
+                title={draftLabel(draftStatus)}
+                data-writing-device-state
+                role="status"
+              >
+                <span>{draftLabel(draftStatus)}</span>
+                <HardDrive
+                  className={styles.deviceIcon}
+                  strokeWidth={1.7}
+                  aria-hidden="true"
+                />
+              </span>
+            </div>
             <div
               className={styles.stats}
               role="group"
@@ -1189,85 +1255,20 @@ export function ReflectionDialog({
                 )}
               </div>
             </div>
-            <DialogPrimaryButton
-              type="button"
-              className={`${styles.returnButton} ${styles.done}`}
-              onClick={completeWriting}
-              disabled={disabled || finishing}
-              aria-busy={finishing || undefined}
-              aria-label="Back to Check-In"
-              aria-describedby={`${id}-save-hint`}
-              leadingIcon={
-                <CornerDownLeft
-                  className={styles.doneIcon}
-                  strokeWidth={2.5}
-                  aria-hidden="true"
-                />
-              }
-              data-writing-done
-            >
-              {finishing ? "Back to Your Check-In…" : "Back to Check-In"}
-            </DialogPrimaryButton>
-            <span
-              className={styles.feedback}
-              role="status"
-              data-writing-feedback
-            >
-              {feedback ||
-                (remaining === 0
-                  ? "Character limit reached. You can still edit your entry."
-                  : "")}
-            </span>
-            <p
-              id={`${id}-save-hint`}
-              className={styles.footerHint}
-              title={savedAt ? `Last check-in save: ${savedAt}` : undefined}
-            >
-              Writing saves separately. Back returns to your draft; Save
-              Check-In keeps your other answers with this day.
-            </p>
-            <div className={styles.persistence} data-writing-persistence>
-              <span
-                className={styles.cloudState}
-                role="status"
-                data-reflection-save-status={saving.status}
-                data-reflection-sync-active={
-                  saving.status === "pending" || saving.status === "saving"
-                }
-                title={saving.message}
-              >
-                <SaveStateIcon
-                  className={`${styles.saveStateIcon} ${saving.status === "pending" || saving.status === "saving" ? styles.backupIcon : ""}`}
-                  data-writing-cloud-icon
-                  strokeWidth={1.9}
-                  aria-hidden="true"
-                />
-                <span>
-                  {saving.status === "saved"
-                    ? "Writing is up to date."
-                    : saving.status === "pending"
-                      ? "Waiting to sync…"
-                      : saving.status === "saving"
-                        ? "Syncing your writing…"
-                        : saving.message}
-                </span>
-              </span>
-              <span
-                className={styles.draftState}
-                data-draft-status={draftStatus}
-                title={draftLabel(draftStatus)}
-                data-writing-device-state
-              >
-                <SaveStatusLine
-                  text={draftLabel(draftStatus)}
-                  tone={
-                    draftStatus &&
-                    (draftStatus === "saved" ? "saved" : "warning")
-                  }
-                />
-              </span>
-            </div>
           </div>
+          <span className={styles.feedback} role="status" data-writing-feedback>
+            {feedback ||
+              (remaining === 0
+                ? "Character limit reached. You can still edit your entry."
+                : "")}
+          </span>
+          <p
+            id={`${id}-save-hint`}
+            className={styles.footerHint}
+            title={savedAt ? `Last check-in save: ${savedAt}` : undefined}
+          >
+            Writing saves separately. Save Check-In keeps the rest together.
+          </p>
         </footer>
       </DialogContent>
       {open &&
