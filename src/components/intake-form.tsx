@@ -350,7 +350,7 @@ export function IntakeForm({
     return (
       <form
         id={formId}
-        data-intake-form
+        data-intake-form="new"
         className={`${styles.closingSurface} ${styles.emptySurface} pt-4 text-center`}
       >
         <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
@@ -585,7 +585,7 @@ export function IntakeForm({
           setError(null);
       }}
       className={`${checkStyles.form} ${styles.inputTypography}`}
-      data-intake-form
+      data-intake-form={intake ? "edit" : "new"}
     >
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-7">
         <CheckInSection

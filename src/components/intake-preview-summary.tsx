@@ -240,8 +240,8 @@ export function IntakePreviewSummary({
     summary = newIntake ? (
       <>
         This would be the {ordinal} logged intake for {name} {day}, bringing the
-        total from <DraftTotal mg={newIntake.savedTotalMg} /> to{" "}
-        <DraftTotal mg={totalMg} /> if you save this draft.
+        total from <DraftTotal mg={newIntake.savedTotalMg} /> as of currently,
+        to <DraftTotal mg={totalMg} /> should you log this Intake.
       </>
     ) : (
       <>
