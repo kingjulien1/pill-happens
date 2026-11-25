@@ -83,6 +83,13 @@ export function SleepScoreSummary({
   const regularity = reportNumber(value.regularity, 100);
   const snoring = reportNumber(value.snoringMinutes, 1440);
   const coughing = reportNumber(value.coughingRate, Infinity, true);
+  const overnightTiming = [
+    {
+      label: "Time to fall asleep",
+      minutes: reportNumber(value.fallAsleepMinutes, 1440),
+    },
+    { label: "Time awake", minutes: reportNumber(value.awakeMinutes, 1440) },
+  ];
   const snoringShare =
     snoring !== null &&
     summary.timeInBedMinutes !== null &&
@@ -155,6 +162,22 @@ export function SleepScoreSummary({
         aria-labelledby={`${id}-heading`}
         data-sleep-score-summary
       >
+        <dl className={styles.overnightTiming} aria-label="Overnight timing">
+          {overnightTiming.map(({ label, minutes }) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>
+                {minutes === null ? (
+                  <span>Not recorded</span>
+                ) : minutes < 60 ? (
+                  `${minutes} min`
+                ) : (
+                  duration(minutes)
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
         <div className={styles.overview}>
           <div className={styles.ringSlot}>
             <SleepScoreRing id={id} score={score} disabled={disabled} />

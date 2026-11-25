@@ -78,7 +78,19 @@ export function SleepScoreRing({
             height="190%"
             colorInterpolationFilters="sRGB"
           >
-            <feGaussianBlur stdDeviation="6" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="14" />
+            <feComponentTransfer result="outerGlow">
+              <feFuncA type="linear" slope="0.5" />
+            </feComponentTransfer>
+            <feGaussianBlur
+              in="SourceGraphic"
+              stdDeviation="6"
+              result="nearGlow"
+            />
+            <feMerge>
+              <feMergeNode in="outerGlow" />
+              <feMergeNode in="nearGlow" />
+            </feMerge>
           </filter>
           <filter
             id={`${id}-score-corona`}
@@ -103,22 +115,8 @@ export function SleepScoreRing({
             <stop offset=".74" stopColor="var(--score-violet)" />
             <stop offset="1" stopColor="var(--score-iris)" />
           </linearGradient>
-          <mask
-            id={`${id}-score-window`}
-            maskUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="240"
-            height="240"
-          >
-            <path className={styles.maskStroke} d={ARC} pathLength="100" />
-          </mask>
         </defs>
         <circle className={styles.innerOrbit} cx="120" cy="120" r="75" />
-        <path
-          className={styles.outerOrbit}
-          d="M44.3 195.7a107 107 0 1 1 151.4 0"
-        />
         <g className={styles.ticks}>
           {Array.from({ length: 13 }, (_, index) => (
             <path
@@ -152,24 +150,6 @@ export function SleepScoreRing({
             pathLength="100"
             stroke={`url(#${id}-score-pigment)`}
           />
-          <g mask={`url(#${id}-score-window)`}>
-            <g className={styles.beam}>
-              <circle
-                className={styles.shine}
-                cx="120"
-                cy="120"
-                r="91"
-                pathLength="100"
-              />
-              <circle
-                className={styles.shineTail}
-                cx="120"
-                cy="120"
-                r="91"
-                pathLength="100"
-              />
-            </g>
-          </g>
         </g>
       </svg>
       {positive && <RingStar key={score} score={score} />}
