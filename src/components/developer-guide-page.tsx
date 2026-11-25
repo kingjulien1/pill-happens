@@ -1215,10 +1215,9 @@ export function DeveloperGuidePage() {
                 border at 29% opacity. Its former bright reflections are
                 replaced by restrained Violet400 at 5% in the upper left and
                 Pink500 at 6% in the lower right. Soft directional contact
-                shadows retain the raised face. Main Log Intake brings its face
-                to the 80px host edge. A 5.90px inner stripe uses the section
-                border pigment over the dialog base. The next stripe is
-                4.17px wide and matches the Mauve 950 label. Its outer
+                shadows retain the raised face. Main Log Intake leaves a
+                5.90px transparent gap between its satin face and the 4.17px
+                rim that matches the Mauve 950 label. Its outer
                 SpecularCardBorder shares the Morning and Evening cards’ 3px
                 gap, 3.733px purple/pink rim, three brighter stops and glow. That
                 outside rim stays fixed; matching concentric curves keep the 3px
@@ -1233,8 +1232,8 @@ export function DeveloperGuidePage() {
                 IntakePrimaryButton owns the complete Log Intake button and is
                 also used by Save Check-In, Save Intake and Save Edits. They share
                 the same face, concentric borders, outboard rim, icon rail,
-                separator, secondary copy and arrow. The Log Intake launcher
-                sets its own two inner stripe colors and widths.
+                separator, secondary copy and arrow. Only the Log Intake
+                launcher exposes the page background along its inner edge.
               </p>
               <p>
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark

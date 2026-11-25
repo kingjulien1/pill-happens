@@ -118,8 +118,6 @@
   );
   --control-ink: var(--color-mauve-950);
   --control-face-edge: var(--control-ink);
-  --action-inner-detail-color: var(--control-secondary);
-  /* Inset shadows paint outside-in. Double only the stripe beside the face. */
   --action-inner-detail-width: calc(var(--action-inner-line) * 17 / 12);
 }
 
@@ -163,6 +161,13 @@
     inset 0 0 0
       calc(var(--action-inner-line) + var(--action-inner-detail-width))
       var(--action-inner-detail-color);
+}
+
+:global([data-intake-entry-part="button"]) .action[data-log-intake-rim]::before {
+  /* Leave the page visible between the dark rim and the satin face. */
+  padding: calc(var(--action-inner-line) + var(--action-inner-detail-width));
+  background-clip: content-box;
+  box-shadow: inset 0 0 0 var(--action-inner-line) var(--control-face-edge);
 }
 
 .action[data-control-style="satin"] :global(.intake-primary-row) {
