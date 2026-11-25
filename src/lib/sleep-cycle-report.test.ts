@@ -33,4 +33,7 @@ test("Sleep Cycle readings retain clock times, stages and measured zeroes on reo
   assert.equal(reopened.gotUp, "12:49");
   assert.equal(readReportValue("deepMinutes", "illegible"), undefined);
   assert.equal(readReportValue("regularity", "108%"), undefined);
+  assert.equal(readReportValue("deepMinutes", "0"), "0");
+  assert.equal(readReportValue("coughingRate", "0,4 /h"), "0.4");
+  assert.equal(readReportValue("coughingRate", "04 /h"), undefined);
 });

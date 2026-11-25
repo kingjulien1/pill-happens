@@ -38,6 +38,53 @@ const input = (fields: Record<string, unknown> = {}) =>
 // deleted-property/empty-array narrowing across the retry-safe mutation call.
 const checkIns = (state: AppData) => state.dailyCheckIns ?? [];
 
+test("morning saves group old and new sound fields, preserve partial readings and recalculate the recorded stages", () => {
+  for (const [readings, expected] of [
+    [
+      { snoringMinutes: 0, coughingRate: 0.4 },
+      { snoringMinutes: 0, coughingRate: 0.4 },
+    ],
+    [{ nightSounds: { coughingRate: 0 } }, { coughingRate: 0 }],
+    [
+      { snoringMinutes: 5, nightSounds: { snoringMinutes: 0 } },
+      { snoringMinutes: 0 },
+    ],
+  ] as const) {
+    const submission = input({
+      period: "morning",
+      morningSleep: {
+        ...readings,
+        regularity: 81,
+        lightMinutes: 379,
+        dreamMinutes: 107,
+        totalSleepMinutes: null,
+      },
+    });
+    const state = emptyData();
+    upsertDailyCheckIn(state, submission, now);
+    const saved = checkIns(state)[0];
+    assert.deepEqual(saved.morningSleep?.nightSounds, expected);
+    assert.equal(saved.morningSleep?.snoringMinutes, undefined);
+    assert.notEqual(
+      saved.morningSleep?.nightSounds,
+      submission.morningSleep?.nightSounds,
+    );
+    assert.equal(saved.morningSleep?.totalSleepMinutes, 486);
+    assert.equal(saved.sleepHours, 8.1);
+  }
+  assert.equal(
+    input({ period: "morning", morningSleep: { nightSounds: {} } })
+      .morningSleep,
+    null,
+  );
+  assert.throws(() =>
+    input({
+      period: "morning",
+      morningSleep: { nightSounds: { coughingRate: -1 } },
+    }),
+  );
+});
+
 test("daily check-ins preserve reflection whitespace, trim short fields, and ignore client timestamps", () => {
   assert.deepEqual(
     input({

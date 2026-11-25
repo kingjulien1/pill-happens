@@ -38,13 +38,19 @@ export function readReportValue(
       : undefined;
   }
   if (key.endsWith("Minutes")) {
+    // Zero is unambiguous even if OCR misses the small unit next to it.
+    if (text === "0") return "0";
     const match = /^(?:(\d+)h)?(?:(\d+)(?:min|m))?$/.exec(text);
     if (!match || (!match[1] && !match[2])) return;
     const minutes = Number(match[1] ?? 0) * 60 + Number(match[2] ?? 0);
     return minutes <= 1440 ? String(minutes) : undefined;
   }
   const number = text.replace(key === "coughingRate" ? /\/h$/ : /%$/, "");
-  if (!(key === "coughingRate" ? /^\d+(\.\d+)?$/ : /^\d+$/).test(number))
+  if (
+    !(key === "coughingRate" ? /^(?:0|[1-9]\d*)(\.\d+)?$/ : /^\d+$/).test(
+      number,
+    )
+  )
     return;
   if (Number.isFinite(+number) && (key === "coughingRate" || +number <= 100))
     return number;

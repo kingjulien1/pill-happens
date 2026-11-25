@@ -3798,10 +3798,11 @@ export function DeveloperGuidePage() {
                     </tr>
                     <tr>
                       <td>Calculated summary</td>
-                      <td>Time in bed and estimated sleep efficiency</td>
+                      <td>Time in bed, sleep efficiency and personal ratings</td>
                       <td>
-                        Derived from entered clock times and total sleep, never
-                        another duplicate input
+                        Sleep efficiency displays the report’s Regularity when
+                        available. The share of time in bed spent asleep is
+                        calculated from the recorded stages and clock times.
                       </td>
                     </tr>
                   </tbody>
@@ -3810,9 +3811,9 @@ export function DeveloperGuidePage() {
               <p>
                 Lights out at 23:00 and getting up at 07:00 describes an
                 estimated 480-minute window. Reporting 7 hours 30 minutes asleep
-                gives 450 ÷ 480 × 100 = 93.75%, displayed as 94%. These are
-                neutral arithmetic summaries, without diagnostic thresholds or a
-                recommended target. Missing inputs leave the result unknown;
+                gives a time-based share of 94%. The stage chart uses every
+                recorded stage, including nights with only Light and Dream.
+                Missing clock times leave the time-based share unknown, and
                 equal clock times mean zero rather than an invented 24 hours.
                 Clock-only estimates do not represent precise instants over a
                 daylight-saving change. Sleep longer than a known window is

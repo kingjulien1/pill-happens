@@ -8,6 +8,7 @@ import { CheckInRating } from "@/components/check-in-rating";
 import { Label } from "@/components/ui/label";
 import {
   withSleepStageTotals,
+  sleepStageKeys,
   type MorningSleepDraft,
 } from "@/lib/morning-sleep";
 import styles from "./morning-sleep-fields.module.css";
@@ -90,7 +91,8 @@ function DurationField({
                 min={0}
                 max={max}
                 step={1}
-                value={value || "0"}
+                value={value}
+                placeholder="0"
                 readOnly={readOnly}
                 disabled={disabled}
                 onChange={(event) => {
@@ -131,14 +133,20 @@ function MinuteDuration({
       <DurationField
         id={id}
         label={label}
-        hours={String(hours)}
-        minutes={String(minutes)}
+        hours={value && String(hours)}
+        minutes={value && String(minutes)}
         disabled={disabled}
         onHoursChange={(next) =>
-          onChange(String(Number(next || 0) * 60 + minutes))
+          onChange(
+            next === "" && minutes === 0
+              ? ""
+              : String(Number(next) * 60 + minutes),
+          )
         }
         onMinutesChange={(next) =>
-          onChange(String(hours * 60 + Number(next || 0)))
+          onChange(
+            next === "" && hours === 0 ? "" : String(hours * 60 + Number(next)),
+          )
         }
       />
       {!valid && (
@@ -166,10 +174,15 @@ export function MorningSleepFields({
     next: MorningSleepDraft[K],
   ) => {
     const updated = { ...value, [key]: next };
-    if (["lightMinutes", "dreamMinutes", "deepMinutes"].includes(key)) {
-      updated.lightMinutes ||= "0";
-      updated.dreamMinutes ||= "0";
-      updated.deepMinutes ||= "0";
+    if (
+      sleepStageKeys.some((stage) => stage === key) &&
+      !sleepStageKeys.some((stage) => updated[stage]?.trim())
+    ) {
+      updated.sleepHours =
+        updated.sleepMinutes =
+        updated.extraSleepHours =
+        updated.extraSleepMinutes =
+          "";
     }
     onChange(withSleepStageTotals(updated));
   };
@@ -234,7 +247,7 @@ export function MorningSleepFields({
       <CheckInSection
         caption="Where the Night Went"
         detail="Hours & minutes"
-        description="Enter the stage durations from your report. Light + Dream + Deep fill your total sleep automatically; time spent falling asleep stays separate."
+        description="Enter whichever stages your report includes. Each recorded stage adds to your sleep total. Leave an unread stage blank or enter 0 if the report shows zero."
         headingId={`${id}-duration-heading`}
       >
         <section

@@ -377,6 +377,36 @@
   gap: 8px;
   margin-top: 15px;
 }
+.soundFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+.soundFields legend {
+  padding-bottom: 6px;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 600;
+}
+.soundFields label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.soundFields input {
+  min-width: 0;
+  padding: 6px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input);
+  color: var(--foreground);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
 .reviewActions .reviewApply {
   min-height: 40px;
   font-size: 11px;

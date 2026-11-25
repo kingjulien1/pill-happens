@@ -1,5 +1,6 @@
 import { dayKey, type AppData } from "@/lib/domain";
 import { getCheckInPeriod, type DailyCheckIn } from "@/lib/daily-check-in";
+import { groupNightSounds } from "@/lib/morning-sleep";
 import type { DailyCheckInInput } from "./validation";
 
 export const DAILY_CHECK_IN_LIMIT = 50_000;
@@ -92,13 +93,15 @@ export function upsertDailyCheckIn(
           morningSleep:
             existing.morningSleep === null
               ? null
-              : { ...existing.morningSleep },
+              : groupNightSounds(existing.morningSleep),
         }
       : input.morningSleep === undefined
         ? {}
         : {
             morningSleep:
-              input.morningSleep === null ? null : { ...input.morningSleep },
+              input.morningSleep === null
+                ? null
+                : groupNightSounds(input.morningSleep),
           }),
     moods: [...input.moods],
     createdAt: existing?.createdAt ?? timestamp,

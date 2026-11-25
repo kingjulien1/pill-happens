@@ -1,6 +1,7 @@
 import {
   isMorningSleepDraft,
   morningSleepDefaults,
+  withSleepStageTotals,
   type MorningSleepDraft,
 } from "./morning-sleep";
 import {
@@ -81,7 +82,7 @@ export function morningSleepForDraft(
   checkIn?: DailyCheckIn,
 ): MorningSleepDraft {
   if (draft.morningSleep !== undefined) {
-    const sleep = draft.morningSleep;
+    const sleep = withSleepStageTotals(draft.morningSleep);
     if (!sleep.reportScore) return sleep;
     // An unfinished value from the former score editor cannot be corrected in the dial.
     const reportScore =

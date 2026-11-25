@@ -1,7 +1,10 @@
 import { DAILY_JOURNAL_MAX_LENGTH } from "@/lib/daily-journal";
 import {
   getMorningSleepValidationError,
+  groupNightSounds,
   hasMorningSleepData,
+  recordedStageMinutes,
+  sleepTargetMinutes,
 } from "@/lib/morning-sleep";
 import { z } from "zod";
 import { isValidDayKey } from "@/lib/domain";
@@ -122,6 +125,10 @@ const checkInClock = z
   .string()
   .regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, "Enter a valid 24-hour time (HH:mm).");
 const morningClock = checkInClock.nullable().default(null);
+const nightSoundFields = {
+  snoringMinutes: z.number().int().min(0).max(1440).optional(),
+  coughingRate: z.number().finite().nonnegative().optional(),
+};
 
 export const morningSleepSchema = z
   .object({
@@ -130,8 +137,8 @@ export const morningSleepSchema = z
     dreamMinutes: z.number().int().min(0).max(1440).optional(),
     lightMinutes: z.number().int().min(0).max(1440).optional(),
     deepMinutes: z.number().int().min(0).max(1440).optional(),
-    snoringMinutes: z.number().int().min(0).max(1440).optional(),
-    coughingRate: z.number().finite().nonnegative().optional(),
+    ...nightSoundFields,
+    nightSounds: z.object(nightSoundFields).strict().optional(),
     dreamRecall: morningRating,
     sleepiness: morningRating,
     sleepDepth: morningRating,
@@ -153,6 +160,16 @@ export const morningSleepSchema = z
     extraSleepMinutes: morningMinutes,
   })
   .strict()
+  .transform((sleep) => {
+    const grouped = groupNightSounds(sleep);
+    const total = recordedStageMinutes(grouped);
+    if (total === null || !Number.isFinite(total)) return grouped;
+    return {
+      ...grouped,
+      totalSleepMinutes: total,
+      extraSleepMinutes: Math.max(0, sleepTargetMinutes - total),
+    };
+  })
   .superRefine((sleep, context) => {
     const message = getMorningSleepValidationError(sleep);
     if (message)

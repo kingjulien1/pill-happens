@@ -4,7 +4,9 @@ import { useId, type CSSProperties, type ReactNode } from "react";
 import { ArrowUpRight, Info } from "lucide-react";
 import {
   getMorningSleepSummary,
-  parseMorningSleepDraft,
+  recordedStageMinutes,
+  nightFeelingPercent,
+  sleepTargetMinutes,
   type MorningSleepDraft,
 } from "@/lib/morning-sleep";
 import { SleepScoreRing } from "./sleep-score-ring";
@@ -39,19 +41,14 @@ function SleepMetric({
   value,
   unit,
   detail,
-  report = false,
 }: {
   label: string;
-  value: string | number | null | undefined;
+  value: ReactNode;
   unit?: string;
   detail: ReactNode;
-  report?: boolean;
 }) {
   return (
-    <div
-      data-sleep-metric={label.toLowerCase().replaceAll(" ", "-")}
-      data-sleep-report-reading={report ? label.toLowerCase() : undefined}
-    >
+    <div data-sleep-metric={label.toLowerCase().replaceAll(" ", "-")}>
       <dt>{label}</dt>
       <dd className={styles.metricValue}>
         {value ?? "—"}
@@ -70,15 +67,24 @@ export function SleepScoreSummary({
   disabled: boolean;
 }) {
   const id = useId();
-  // Calculate stage totals independently of the imported tracker readings.
-  const parsed = parseMorningSleepDraft({
-    ...value,
-    reportScore: undefined,
-    regularity: undefined,
-    snoringMinutes: undefined,
-    coughingRate: undefined,
-  }).value;
-  const summary = getMorningSleepSummary(parsed);
+  const stageTotal = recordedStageMinutes(value);
+  const savedHours = reportNumber(value.sleepHours, 24);
+  const savedMinutes = reportNumber(value.sleepMinutes, 59);
+  const legacyTotal =
+    savedHours === null && savedMinutes === null
+      ? null
+      : (savedHours ?? 0) * 60 + (savedMinutes ?? 0);
+  const total =
+    stageTotal === null
+      ? legacyTotal
+      : Number.isFinite(stageTotal)
+        ? stageTotal
+        : null;
+  const summary = getMorningSleepSummary({
+    lightsOut: value.lightsOut,
+    gotUp: value.gotUp,
+    totalSleepMinutes: total,
+  });
   const score = reportNumber(value.reportScore, 100);
   const regularity = reportNumber(value.regularity, 100);
   const snoring = reportNumber(value.snoringMinutes, 1440);
@@ -90,59 +96,20 @@ export function SleepScoreSummary({
     },
     { label: "Time awake", minutes: reportNumber(value.awakeMinutes, 1440) },
   ];
-  const snoringShare =
-    snoring !== null &&
-    summary.timeInBedMinutes !== null &&
-    summary.timeInBedMinutes > 0 &&
-    snoring <= summary.timeInBedMinutes
-      ? Number(((snoring / summary.timeInBedMinutes) * 100).toFixed(1))
-      : null;
-  const outsideSleep =
-    summary.sleepEfficiency !== null && parsed?.totalSleepMinutes != null
-      ? summary.timeInBedMinutes! - parsed.totalSleepMinutes
-      : null;
-  const readings = [
-    {
-      label: "Regularity",
-      value: regularity,
-      unit: "%",
-      detail: regularity === null ? "Not recorded" : "Tracker score · 0–100",
-    },
-    {
-      label: "Snoring",
-      value: snoring,
-      unit: "min",
-      detail:
-        snoring === null ? (
-          "Not recorded"
-        ) : snoring === 0 ? (
-          "No snoring reported"
-        ) : snoringShare !== null ? (
-          <>
-            <strong>{snoringShare}%</strong> of time in bed
-          </>
-        ) : (
-          "Recorded snoring duration"
-        ),
-    },
-    {
-      label: "Coughing",
-      value: coughing,
-      unit: "/ h",
-      detail: coughing === null ? "Not recorded" : "Events per hour",
-    },
-  ];
+  const felt = nightFeelingPercent(value);
+  const timeShare =
+    summary.sleepEfficiency === null
+      ? null
+      : Math.round(summary.sleepEfficiency);
   const sleepStages = stages.map((stage) => ({
     ...stage,
     minutes: reportNumber(value[stage.key], 1440),
   }));
-  const stageTotal = sleepStages.every((stage) => stage.minutes !== null)
-    ? sleepStages.reduce((sum, stage) => sum + stage.minutes!, 0)
-    : null;
-  const validStageTotal = stageTotal !== null && stageTotal <= 1440;
-  const hasStageBreakdown = validStageTotal && stageTotal > 0;
+  const recordedStages = sleepStages.filter((stage) => stage.minutes !== null);
+  const hasStageBreakdown =
+    stageTotal !== null && Number.isFinite(stageTotal) && stageTotal > 0;
   const visibleStages = hasStageBreakdown
-    ? sleepStages.filter((stage) => stage.minutes! > 0)
+    ? recordedStages.filter((stage) => stage.minutes! > 0)
     : [];
   const tightStageLabels = visibleStages.some(
     (stage) => stage.minutes! / stageTotal! < 0.1,
@@ -183,24 +150,53 @@ export function SleepScoreSummary({
             <SleepScoreRing id={id} score={score} disabled={disabled} />
           </div>
           <div className={styles.readings}>
-            <p className={styles.groupLabel}>Tracker readings</p>
+            <p className={styles.groupLabel}>Night details</p>
             <dl className={styles.stats}>
-              {readings.map((reading) => (
-                <SleepMetric key={reading.label} {...reading} report />
-              ))}
+              <SleepMetric
+                label="Sleep target gap"
+                value={
+                  total === null
+                    ? null
+                    : duration(Math.max(0, sleepTargetMinutes - total))
+                }
+                detail="To your 10h 30m target"
+              />
+              <div data-sleep-metric="night-sounds">
+                <dt className={styles.soundHeading}>Night sounds</dt>
+                <dd className={styles.soundReadings}>
+                  <span>
+                    Snoring{" "}
+                    <strong>{snoring === null ? "—" : `${snoring} min`}</strong>
+                  </span>
+                  <span>
+                    Coughing{" "}
+                    <strong>{coughing === null ? "—" : `${coughing}/h`}</strong>
+                  </span>
+                </dd>
+              </div>
+              <SleepMetric
+                label="How the night felt"
+                value={felt}
+                unit="%"
+                detail={
+                  felt === null
+                    ? "Rate your sleep above"
+                    : "From your check-in ratings"
+                }
+              />
             </dl>
           </div>
           <div className={styles.totals}>
-            <p className={styles.groupLabel}>Time-based totals</p>
+            <p className={styles.groupLabel}>Sleep totals</p>
             <dl className={styles.stats}>
               <SleepMetric
                 label="Total asleep"
-                value={duration(parsed?.totalSleepMinutes)}
+                value={duration(total)}
                 detail={
-                  parsed?.totalSleepMinutes == null
+                  total === null
                     ? "Add sleep stages above"
-                    : validStageTotal
-                      ? "Light + Dream + Deep"
+                    : recordedStages.length > 0
+                      ? recordedStages.map((stage) => stage.label).join(" + ")
                       : "Saved sleep duration"
                 }
               />
@@ -209,26 +205,22 @@ export function SleepScoreSummary({
                 value={duration(summary.timeInBedMinutes)}
                 detail={
                   summary.timeInBedMinutes !== null
-                    ? `${parsed!.lightsOut} → ${parsed!.gotUp}`
+                    ? `${value.lightsOut} → ${value.gotUp}`
                     : "Add bed & wake times"
                 }
               />
               <SleepMetric
                 label="Sleep efficiency"
-                value={
-                  summary.sleepEfficiency === null
-                    ? null
-                    : Math.round(summary.sleepEfficiency)
-                }
+                value={regularity ?? timeShare}
                 unit="%"
                 detail={
-                  outsideSleep === null ? (
-                    "Needs a sleep window"
-                  ) : (
-                    <>
-                      <strong>{duration(outsideSleep)}</strong> outside sleep
-                    </>
-                  )
+                  regularity !== null
+                    ? timeShare === null
+                      ? "Sleep Cycle · Regularity"
+                      : `Report regularity · ${timeShare}% of bed time asleep`
+                    : timeShare !== null
+                      ? "Recorded sleep ÷ time in bed"
+                      : "Add a report or sleep times"
                 }
               />
             </dl>
@@ -243,7 +235,7 @@ export function SleepScoreSummary({
         >
           <div className={styles.stageHeading}>
             <strong>How Your Sleep Adds Up</strong>
-            <span>Asleep time only</span>
+            <span>Recorded stages only</span>
           </div>
           <div
             className={styles.stageChart}
@@ -251,14 +243,14 @@ export function SleepScoreSummary({
             role="img"
             aria-label={
               hasStageBreakdown
-                ? sleepStages
+                ? recordedStages
                     .map(
                       (stage) => `${stage.label}: ${duration(stage.minutes)}`,
                     )
                     .join("; ")
-                : validStageTotal
-                  ? "No sleep time recorded"
-                  : "Sleep-stage breakdown awaiting complete readings"
+                : stageTotal === 0
+                  ? "Recorded stages total zero minutes"
+                  : "Add a sleep stage to see its share"
             }
           >
             <div className={styles.stageBar} aria-hidden="true">
@@ -278,7 +270,7 @@ export function SleepScoreSummary({
             </div>
           </div>
           <dl className={styles.stageLegend}>
-            {sleepStages.map((stage) => (
+            {recordedStages.map((stage) => (
               <div key={stage.key}>
                 <dt>
                   <i data-stage-tone={stage.tone} aria-hidden="true" />
@@ -301,15 +293,16 @@ export function SleepScoreSummary({
             <Info size={14} strokeWidth={2} aria-hidden="true" />
           </h4>
           <p>
-            <strong>Efficiency</strong> uses{" "}
-            <span className={styles.formula}>asleep ÷ time in bed × 100</span>.
-            The asleep total comes from Light, Dream and Deep; it excludes
-            Asleep After and Awake.
+            <strong>Sleep efficiency</strong> shows Regularity when your report
+            includes it. The time-based percentage divides recorded sleep by
+            time in bed. Stage bars share only the minutes you have entered. A
+            blank stage is unknown, and 0 is a recorded zero.
           </p>
           <p>
-            The sleep score is a separate report value; your ratings above
-            capture how the night felt. <strong>Blank</strong> means unknown;{" "}
-            <strong>0</strong> means a recorded zero.
+            <strong>How the night felt</strong> averages your answered
+            restfulness, sleep quality, depth and wakefulness ratings on a 0–100
+            scale. Lower sleepiness means more wakefulness. Dream recall
+            describes what you remember and stays separate.
           </p>
           <nav className={styles.footerLinks} aria-label="Sleep recap help">
             <a

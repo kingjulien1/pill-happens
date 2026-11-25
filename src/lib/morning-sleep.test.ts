@@ -7,6 +7,7 @@ import {
   hasMorningSleepData,
   isMorningSleepDraft,
   morningSleepDefaults,
+  nightFeelingPercent,
   parseMorningSleepDraft,
   withSleepStageTotals,
 } from "./morning-sleep";
@@ -258,7 +259,7 @@ test("zero stage values remain valid and sleep at or beyond the reference yields
   }
 });
 
-test("partial, unfinished and invalid stage edits preserve previously known total and extra sleep", () => {
+test("partial stages replace a legacy total while invalid stage edits cannot be saved", () => {
   const base = {
     ...morningSleepDefaults({
       ...emptyMorningSleep(),
@@ -268,7 +269,7 @@ test("partial, unfinished and invalid stage edits preserve previously known tota
     lightMinutes: "227",
     dreamMinutes: "55",
   };
-  for (const deepMinutes of [undefined, "", "-", "1.5", "-1", "1441", "1440"]) {
+  for (const deepMinutes of ["-", "1.5", "-1", "1441", "1440"]) {
     const draft = { ...base, deepMinutes };
     const calculated = withSleepStageTotals(draft);
     assert.equal(calculated, draft);
@@ -276,6 +277,53 @@ test("partial, unfinished and invalid stage edits preserve previously known tota
     assert.equal(calculated.sleepMinutes, "35");
     assert.equal(calculated.extraSleepHours, "0");
     assert.equal(calculated.extraSleepMinutes, "35");
+    assert.ok(parseMorningSleepDraft(draft).error);
   }
-  assert.equal(parseMorningSleepDraft(base).value?.totalSleepMinutes, 455);
+  assert.equal(parseMorningSleepDraft(base).value?.totalSleepMinutes, 282);
+});
+
+test("the recorded stages give the same total for missing and zero deep sleep", () => {
+  for (const deepMinutes of [undefined, "", "0"]) {
+    const draft = {
+      ...morningSleepDefaults(),
+      lightMinutes: "379",
+      dreamMinutes: "107",
+      deepMinutes,
+      lightsOut: "00:34",
+      gotUp: "12:37",
+      regularity: "81",
+      snoringMinutes: "0",
+      coughingRate: "0.4",
+    };
+    const { value, error } = parseMorningSleepDraft(draft);
+    assert.equal(error, null);
+    assert.equal(value?.totalSleepMinutes, 486);
+    assert.equal(value.extraSleepMinutes, 144);
+    assert.equal(value.deepMinutes, deepMinutes === "0" ? 0 : undefined);
+    assert.deepEqual(value.nightSounds, {
+      snoringMinutes: 0,
+      coughingRate: 0.4,
+    });
+    assert.equal(value.coughingRate, undefined);
+    assert.equal(value.regularity, 81);
+    const { timeInBedMinutes, sleepEfficiency } = getMorningSleepSummary(value);
+    assert.equal(timeInBedMinutes, 723);
+    assert.equal(Math.round(sleepEfficiency!), 67);
+    assert.equal(morningSleepDefaults(value).coughingRate, "0.4");
+  }
+});
+
+test("night feeling scales answered ratings from 0 to 100 and reverses sleepiness", () => {
+  const empty = emptyMorningSleep();
+  assert.equal(
+    nightFeelingPercent({ ...empty, dreamRecall: 10 } as typeof empty),
+    null,
+  );
+  assert.equal(nightFeelingPercent({ ...empty, sleepiness: 10 }), 0);
+  assert.equal(nightFeelingPercent({ ...empty, sleepiness: 1 }), 100);
+  assert.equal(
+    nightFeelingPercent({ ...empty, sleepQuality: 10, sleepDepth: 1 }),
+    50,
+  );
+  assert.equal(nightFeelingPercent({ ...empty, restfulness: 7 }), 67);
 });

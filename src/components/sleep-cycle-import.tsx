@@ -247,6 +247,13 @@ export function SleepCycleImport({
   }
 
   const found = review ? Object.keys(review).length : 0;
+  const validSounds =
+    (review?.snoringMinutes === undefined ||
+      (/^\d+$/.test(review.snoringMinutes) &&
+        Number(review.snoringMinutes) <= 1440)) &&
+    (review?.coughingRate === undefined ||
+      (/^\d+(?:\.\d+)?$/.test(review.coughingRate) &&
+        Number.isFinite(Number(review.coughingRate))));
 
   return (
     <section
@@ -447,28 +454,59 @@ export function SleepCycleImport({
             </span>
           </div>
           <dl>
-            {(Object.keys(review) as ReportKey[]).map((key) => {
-              const raw = review[key];
-              const display = key.endsWith("Minutes")
-                ? `${Math.floor(Number(raw) / 60)} h ${Number(raw) % 60} min`
-                : raw;
-              return (
-                <div key={key}>
-                  <dt>{reportLabels[key]}</dt>
-                  <dd>
-                    {display}
-                    {key === "reportScore"
-                      ? " / 100"
-                      : key === "regularity"
-                        ? "%"
-                        : key === "coughingRate"
-                          ? " / h"
+            {(Object.keys(review) as ReportKey[])
+              .filter(
+                (key) => key !== "snoringMinutes" && key !== "coughingRate",
+              )
+              .map((key) => {
+                const raw = review[key];
+                const display = key.endsWith("Minutes")
+                  ? `${Math.floor(Number(raw) / 60)} h ${Number(raw) % 60} min`
+                  : raw;
+                return (
+                  <div key={key}>
+                    <dt>{reportLabels[key]}</dt>
+                    <dd>
+                      {display}
+                      {key === "reportScore"
+                        ? " / 100"
+                        : key === "regularity"
+                          ? "%"
                           : ""}
-                  </dd>
-                </div>
-              );
-            })}
+                    </dd>
+                  </div>
+                );
+              })}
           </dl>
+          <fieldset className={styles.soundFields} disabled={disabled}>
+            <legend>Night sounds</legend>
+            {(["snoringMinutes", "coughingRate"] as const).map((key) => (
+              <label key={key}>
+                {key === "snoringMinutes"
+                  ? "Snoring (min)"
+                  : "Coughing (per hour)"}
+                <input
+                  type="text"
+                  inputMode={key === "snoringMinutes" ? "numeric" : "decimal"}
+                  placeholder="Not read"
+                  value={review[key] ?? ""}
+                  onChange={(event) => {
+                    const updated = { ...review };
+                    const raw = event.target.value.trim().replace(",", ".");
+                    if (raw) updated[key] = raw;
+                    else delete updated[key];
+                    setReview(updated);
+                  }}
+                />
+              </label>
+            ))}
+          </fieldset>
+          {!validSounds && (
+            <p role="status" className={styles.hint}>
+              Use 0–1440 whole minutes for snoring and a nonnegative number for
+              coughs per hour.
+            </p>
+          )}
           <p className={styles.hint}>
             Only the readings shown here replace matching fields. Anything else
             stays as you entered it. Save Check-In keeps the finished draft with
@@ -477,7 +515,7 @@ export function SleepCycleImport({
           <div className={styles.reviewActions}>
             <Button
               type="button"
-              disabled={disabled}
+              disabled={disabled || !found || !validSounds}
               onClick={apply}
               className={styles.reviewApply}
               data-sleep-apply
