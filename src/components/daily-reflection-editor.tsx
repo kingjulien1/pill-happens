@@ -1,7 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, RefreshCw, BookOpenText } from "lucide-react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  BookOpenText,
+  Check,
+  Copy,
+  Dices,
+  Eye,
+  EyeOff,
+  Feather,
+  RefreshCw,
+} from "lucide-react";
 import { toast } from "@/components/ui/journal-toast";
 
 import {
@@ -15,13 +24,90 @@ import { TodayActionButton } from "@/components/today-action-button";
 
 import { useJournal } from "@/components/journal-provider";
 import { reflectionStats } from "@/lib/reflection-writing";
+import { JOURNAL_LIBRARY_MIN_WORDS } from "@/lib/journal-library";
 import type { DailyCheckInPeriod } from "@/lib/daily-check-in";
 import { MarkdownMark } from "./markdown-mark";
 import styles from "./daily-reflection-editor.module.css";
 import { Button } from "@/components/ui/button";
 
 const numberFormat = new Intl.NumberFormat("en-GB");
-/** A compact doorway into the same persistent check-in draft. */
+const starters = [
+  "What’s one small thing you’d like to remember about today?",
+  "What’s taking up more room in your head than it pays rent for?",
+  "Which detail would a photo of today miss?",
+  "Who or what made something a little easier?",
+  "What deserves a second try with slightly better instructions?",
+  "What would you tell a friend about today that you’d leave off a to-do list?",
+  "If today came with a footnote, what would it say?",
+];
+
+function JournalPageCue({
+  day,
+  stats,
+  disabled,
+}: {
+  day: string;
+  stats: ReturnType<typeof reflectionStats>;
+  disabled: boolean;
+}) {
+  const [promptIndex, setPromptIndex] = useState(
+    () => Number(day.slice(-2)) % starters.length,
+  );
+  const [showOpening, setShowOpening] = useState(false);
+  const hasOpening = Boolean(stats.excerpt);
+  const CueIcon = hasOpening ? BookOpenText : Feather;
+  const ControlIcon = hasOpening ? (showOpening ? EyeOff : Eye) : Dices;
+  const passage = useId();
+
+  return (
+    <div className={styles.cue} data-journal-snapshot>
+      <div className={styles.cueRow}>
+        <strong className={styles.cueTitle}>
+          <CueIcon size={18} aria-hidden="true" />
+          {hasOpening ? "Your page so far" : "A way in"}
+        </strong>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          className={styles.cueButton}
+          disabled={disabled}
+          aria-controls={hasOpening ? passage : undefined}
+          aria-expanded={hasOpening ? showOpening : undefined}
+          onClick={() => {
+            if (hasOpening) setShowOpening((shown) => !shown);
+            else setPromptIndex((index) => (index + 1) % starters.length);
+          }}
+        >
+          <ControlIcon size={13} aria-hidden="true" />
+          {hasOpening
+            ? showOpening
+              ? "Hide opening"
+              : "Peek at opening"
+            : "New prompt"}
+        </Button>
+      </div>
+      <div className={styles.cueText}>
+        {hasOpening ? (
+          <>
+            <p hidden={showOpening}>
+              {stats.words > JOURNAL_LIBRARY_MIN_WORDS
+                ? "Once saved, a page this length appears in your journal library as well as on its tracking day."
+                : `Short entries live on their tracking day. The library also lists saved pages over ${JOURNAL_LIBRARY_MIN_WORDS} words.`}
+            </p>
+            <blockquote id={passage} hidden={!showOpening}>
+              {showOpening && stats.excerpt}
+            </blockquote>
+          </>
+        ) : (
+          <p aria-live="polite">{starters[promptIndex]}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Both check-ins use this same body and the same daily writing draft. */
 export function DailyReflectionEditor({
   id,
   value,
@@ -153,14 +239,13 @@ export function DailyReflectionEditor({
     }
   };
 
-  const snapshotTitle = hasWriting
-    ? "Pick up the thread."
-    : "Leave a line for later.";
-  const snapshotDetail = !hasWriting
-    ? "Start with what’s on your mind. Open either check-in to pick up where you left off."
-    : draftStatus === "error" || draftStatus === "memory"
-      ? "Keep this window open until your changes save."
-      : "Your morning thoughts and evening afterthoughts share this page.";
+  const writingHint =
+    !hasWriting && !savedAt
+      ? "In the editor, type @ to link a medication or / to link a day."
+      : (draftStatus === "error" || draftStatus === "memory") &&
+          saving.status !== "saved"
+        ? "Keep this window open until your writing syncs."
+        : saving.message;
   const refreshLabel = refreshing
     ? "Refreshing journal"
     : refreshFinished
@@ -177,13 +262,12 @@ export function DailyReflectionEditor({
       data-journal-period={period}
       data-journal-active="false"
     >
-      <div className={styles.lead} data-journal-snapshot>
-        <BookOpenText aria-hidden="true" />
-        <div>
-          <p className={styles.leadTitle}>{snapshotTitle}</p>
-          <p className={styles.snapshot}>{snapshotDetail}</p>
-        </div>
-      </div>
+      <JournalPageCue
+        key={stats.excerpt ? `opening:${day}` : day}
+        day={day}
+        stats={stats}
+        disabled={disabled}
+      />
       <ReflectionDialog
         id={id}
         value={value}
@@ -229,7 +313,7 @@ export function DailyReflectionEditor({
         }
       />
       <p className={styles.guidance} data-journal-guidance>
-        Your words save as you write. Save Check-In keeps your other answers.
+        {writingHint} Save Check-In keeps your other answers.
       </p>
       <hr className={styles.divider} />
       <div className={styles.captionRow}>

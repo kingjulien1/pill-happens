@@ -4,7 +4,6 @@ import { useCallback, useId, useMemo, useRef, useState } from "react";
 import {
   BedDouble,
   FlaskConical,
-  NotebookPen,
   Moon,
   BookOpen,
   BookOpenCheck,
@@ -450,6 +449,7 @@ function CheckInForm({
   );
   const writing = useDailyWriting(day, data?.dailyCheckIns);
   const { note } = writing;
+  const journalHref = writing.page ? `/journal/${day}` : "/journal";
   const { moods, energy, stress, helped, writingOpen = false } = draft.value;
   // Earlier Morning drafts had only the legacy hours field. Keep it recoverable.
   const morningSleep = morningSleepForDraft(draft.value, checkIn);
@@ -688,25 +688,25 @@ function CheckInForm({
       data-check-in-form={period}
     >
       <CheckInSection
-        caption={
-          <>
-            <NotebookPen aria-hidden="true" />
-            Daily Journal
-          </>
-        }
+        caption="Daily Journal"
         headingId={`${id}-journal-heading`}
-        context="One page per day"
+        context={morning ? "First light" : "After hours"}
+        description={
+          morning
+            ? "What’s on your mind before the day gets a vote? Leave a line your evening self can come back to."
+            : "What did the day leave out of the official story? Start here or add a footnote to what you wrote this morning."
+        }
         detail={
           <Link
-            href={`/journal/${day}`}
+            href={journalHref}
             className="inline-flex items-center gap-1.5"
             onNavigate={() => {
               onSaved?.();
-              rememberJournalDestination(`/journal/${day}`);
+              rememberJournalDestination(journalHref);
             }}
           >
             <LibraryBig size={14} aria-hidden="true" />
-            Saved page
+            {writing.page ? "Saved page" : "All journals"}
             <ArrowUpRight size={12} className="opacity-60" aria-hidden="true" />
           </Link>
         }
