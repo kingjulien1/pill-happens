@@ -1,0 +1,120 @@
+.row {
+  --change-ink: color-mix(
+    in srgb,
+    var(--summary-ink-base) 82%,
+    var(--foreground)
+  );
+  grid-row: hint;
+  display: grid;
+  grid-template-columns: fit-content(43%) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: var(--preview-card-gap) 0 0;
+  padding-inline: clamp(6px, 2%, 10px);
+  font-size: var(--summary-copy-size);
+  font-weight: 650;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+.metric {
+  --prior-ink: color-mix(in srgb, var(--change-ink) 63%, var(--color-zinc-500));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px 0.32em;
+  min-width: 0;
+  color: var(--change-ink);
+}
+.metric[data-dosage] {
+  --change-ink: color-mix(
+    in srgb,
+    var(--summary-ink-base) 69%,
+    var(--color-emerald-300)
+  );
+  justify-content: flex-end;
+}
+.metric dt {
+  order: 1;
+}
+.metric dd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: inherit;
+  align-items: center;
+  gap: 0.18em;
+  min-width: 0;
+  margin: 0;
+}
+.prior,
+.projected {
+  white-space: nowrap;
+}
+.projected {
+  font-size: 1.22em;
+  font-weight: 725;
+}
+.prior {
+  color: var(--prior-ink);
+  font-size: calc(1.22em * 2 / 3);
+  font-weight: 550;
+}
+.transfer {
+  flex: none;
+  width: 2.35em;
+  height: auto;
+  overflow: visible;
+}
+.tablet {
+  transform: translate(19px, -6px) rotate(-18deg);
+}
+.arrival {
+  opacity: 0;
+  transform-origin: 24px 5px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .row {
+    --transfer-play: paused;
+  }
+  .row[data-active="true"] {
+    --transfer-play: running;
+  }
+  .tablet {
+    animation: carry 820ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .arrival {
+    animation: settle 360ms 590ms ease-out both;
+  }
+  .tablet,
+  .arrival {
+    animation-play-state: var(--transfer-play);
+  }
+}
+@keyframes carry {
+  0%,
+  12% {
+    transform: translate(0, 0) rotate(0);
+    color: var(--prior-ink);
+  }
+  40% {
+    transform: translate(6px, 0) rotate(-12deg);
+  }
+  76% {
+    transform: translate(16px, -5.4px) rotate(-33deg);
+  }
+  100% {
+    transform: translate(19px, -6px) rotate(-18deg);
+  }
+}
+@keyframes settle {
+  from {
+    transform: scale(0.65);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}

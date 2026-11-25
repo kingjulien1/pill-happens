@@ -22,6 +22,7 @@ import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
 import { FinalLookHeading } from "./final-look-heading";
 import {
+  IntakePreviewChangeRow,
   IntakePreviewSummary,
   IntakePreviewTotals,
 } from "./intake-preview-summary";
@@ -824,6 +825,17 @@ export function IntakeForm({
             <IntakePreviewSkeleton />
           )}
         </section>
+        {!intake &&
+          hasPreview &&
+          includingDraftCount !== null &&
+          includingDraftMg !== null && (
+            <IntakePreviewChangeRow
+              savedCount={daySummary.count}
+              projectedCount={includingDraftCount}
+              savedMg={daySummary.totalMg}
+              projectedMg={includingDraftMg}
+            />
+          )}
         {intake && (
           <p
             id={previewHintId}
