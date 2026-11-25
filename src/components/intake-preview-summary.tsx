@@ -61,13 +61,13 @@ function DraftTotal({ mg }: { mg: number }) {
 
 // Rounded dashes lengthen and widen along a gentle rise into the arrowhead.
 const transferDashes = [
-  { d: "M2 15.3l.8-.02", width: 1.15 },
-  { d: "M5.1 15.14q.63-.04 1.25-.11", width: 1.45 },
-  { d: "M9 14.62q.9-.18 1.75-.43", width: 1.8 },
-  { d: "M13.85 13.12q1.1-.46 2.2-1.01", width: 2.15 },
-  { d: "M19.43 10.38q1.4-.73 2.8-1.39", width: 2.55 },
-  { d: "M26.07 7.43q1.72-.54 3.48-.8", width: 2.95 },
-  { d: "M33.85 6.23q2.05-.06 4.15-.06", width: 3.35 },
+  { d: "M2 11.8h.8", width: 1.35 },
+  { d: "M5.1 11.75q.63-.01 1.25-.03", width: 1.7 },
+  { d: "M9 11.6q.9-.05 1.75-.13", width: 2.1 },
+  { d: "M13.85 11.15q1.1-.14 2.2-.3", width: 2.55 },
+  { d: "M19.43 10.35q1.4-.22 2.8-.41", width: 3 },
+  { d: "M26.07 9.48q1.72-.16 3.48-.24", width: 3.5 },
+  { d: "M33.85 9.12q2.05-.02 4.15-.02", width: 3.95 },
 ];
 
 function DoseTransferIcon() {
@@ -108,9 +108,9 @@ function DoseTransferIcon() {
       </g>
       <path
         className={change.arrowhead}
-        d="m41.8 1.95 4.8 4.22-4.8 4.48"
+        d="M41.8 3.85l4.8 5.25-4.8 5.25"
         stroke="var(--projected-ink)"
-        strokeWidth="3.8"
+        strokeWidth="4.5"
       />
     </svg>
   );
@@ -131,11 +131,11 @@ function ChangeReading({
         {formatDose(value)}
         {dosage && <small className={change.unit}>{"\u00a0"}mg</small>}
       </span>
-      {(!dosage || projected) && (
+      {!dosage && (
         <>
           {" "}
           <span className={change.label}>
-            {dosage ? "Dosage" : value === 1 ? "Intake" : "Intakes"}
+            {value === 1 ? "Intake" : "Intakes"}
           </span>
         </>
       )}
@@ -162,7 +162,7 @@ export function IntakePreviewChangeRow({
       after: projectedCount,
       dosage: false,
     },
-    { label: "Dosage", before: savedMg, after: projectedMg, dosage: true },
+    { label: "Dose total", before: savedMg, after: projectedMg, dosage: true },
   ];
   return (
     <dl
