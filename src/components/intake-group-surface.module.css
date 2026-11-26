@@ -63,9 +63,23 @@
   backdrop-filter: blur(48px);
 }
 .colors {
-  --group-layer-opacity: 0.67;
+  --group-layer-opacity: 1;
+  --intake-group-wash-opacity: 0.67;
   z-index: 1;
+}
+.colors::before,
+.colors::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.colors::before {
   background: var(--intake-group-color-stack);
+  opacity: var(--intake-group-wash-opacity);
+}
+.colors::after {
+  background: color-mix(in srgb, var(--color-purple-300) 24%, transparent);
 }
 /* Keep the label's material independent: its 84% wash never stacks on 67%. */
 .group :global(.intake-group-glass) > :is(.blur, .colors) {
@@ -206,7 +220,7 @@
   border-radius: inherit;
 }
 .buttonSurface > .colors {
-  --group-layer-opacity: 0.84;
+  --intake-group-wash-opacity: 0.84;
 }
 .group :global(.intake-group-label) > :not(.buttonSurface) {
   position: relative;
