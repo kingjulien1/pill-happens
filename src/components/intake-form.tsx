@@ -1,6 +1,6 @@
 "use client";
 
-import { Import } from "lucide-react";
+import { Import, Stamp } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
@@ -871,6 +871,12 @@ export function IntakeForm({
                   : styles.previewHint
               }
             >
+              <Stamp
+                aria-hidden="true"
+                className={styles.receiptStamp}
+                size="1em"
+                strokeWidth={2.1}
+              />
               {hasPreview && !intake && (
                 <strong className={styles.hintLead}>
                   To edit later, reopen this intake from your day.

@@ -114,10 +114,19 @@
 .receiptBody {
   --section-content-bg: var(--recap-fade);
   --receipt-gutter: 18px;
+  --receipt-gap: clamp(24px, 6vw, 32px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: clamp(24px, 6vw, 32px);
+  gap: var(--receipt-gap);
   padding: clamp(24px, 6vw, 32px) var(--receipt-gutter) clamp(32px, 8vw, 44px);
+}
+.receiptBody > dl {
+  --lift: calc(var(--receipt-gap) * 0.4);
+  margin-block: calc(-1 * var(--lift)) var(--lift);
+}
+.receiptStamp {
+  display: block;
+  margin-inline: auto;
 }
 .preview {
   display: grid;
