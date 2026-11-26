@@ -209,7 +209,8 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 24px;
+  --form-row-gap: 24px;
+  gap: var(--form-row-gap);
   padding-top: 20px;
 }
 
@@ -400,11 +401,8 @@
 .form {
   padding-top: 24px;
 }
-.submitArea::before {
-  margin-bottom: 24px;
-}
-.submitArea :global(.intake-action-shell) {
-  margin-block-start: 24px;
+.submitArea {
+  --draft-action-leading-gap: var(--form-row-gap);
 }
 .form[data-check-in-form="morning"] .submitArea::before {
   border-top: 0;

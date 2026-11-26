@@ -614,24 +614,26 @@ export function MedicationForm({
         />
       )}
 
-      <div className="w-full space-y-3 pt-1" data-medication-save-footer>
-        <div className="flex w-full flex-col" data-draft-action-footer>
-          <div className={dialogButtonStyles.group}>
-            <MedicationActionButton
-              intent="save"
-              type="submit"
-              pending={busy}
-              data-save-action
-              data-medication-submit
-            />
-            <SaveOptions
-              kind={medication ? "medication-edit" : "medication-new"}
-              formId={id}
-              disabled={busy}
-            />
-          </div>
-          <DraftStatus {...draft} scope="medication" />
+      <div
+        className={dialogButtonStyles.formFooter}
+        data-medication-save-footer
+        data-draft-action-footer
+      >
+        <div className={dialogButtonStyles.group}>
+          <MedicationActionButton
+            intent="save"
+            type="submit"
+            pending={busy}
+            data-save-action
+            data-medication-submit
+          />
+          <SaveOptions
+            kind={medication ? "medication-edit" : "medication-new"}
+            formId={id}
+            disabled={busy}
+          />
         </div>
+        <DraftStatus {...draft} scope="medication" />
       </div>
     </form>
   );
@@ -1014,7 +1016,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         />
       )}
 
-      <div className="flex w-full flex-col" data-draft-action-footer>
+      <div className={dialogButtonStyles.formFooter} data-draft-action-footer>
         <DialogPrimaryButton
           type="submit"
           disabled={busy || medications.length === 0}

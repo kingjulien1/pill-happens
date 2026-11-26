@@ -1356,7 +1356,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
         </p>
       </div>
 
-      <div className="flex w-full flex-col" data-draft-action-footer>
+      <div className={dialogButtonStyles.formFooter} data-draft-action-footer>
         <div className={dialogButtonStyles.group}>
           <DialogPrimaryButton
             data-save-action

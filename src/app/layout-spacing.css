@@ -6,6 +6,21 @@
   --content-min-gap: var(--content-min-gap-primary);
 }
 
+/* The full clearance includes the gap already supplied by the surrounding form. */
+[data-draft-action-footer] {
+  --draft-action-clearance: 80px;
+  --dialog-primary-margin: 0px;
+  padding-block-start: calc(
+    var(--draft-action-clearance) - var(--draft-action-leading-gap, 0px)
+  );
+}
+
+@media (min-width: 48rem) {
+  [data-draft-action-footer] {
+    --draft-action-clearance: 72px;
+  }
+}
+
 @media (min-width: 40rem) {
   :root {
     --content-min-gap-primary: 8.5px;

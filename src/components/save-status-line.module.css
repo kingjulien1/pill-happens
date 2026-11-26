@@ -1,14 +1,11 @@
 .footerStatus {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px 12px;
+  gap: 6px;
   min-width: 0;
-  margin-block-start: calc(13px - var(--save-status-parent-gap, 0px));
-}
-.footerStatus[data-restored] {
-  margin-block-start: calc(23.25px - var(--save-status-parent-gap, 0px));
+  margin-block-start: calc(24px - var(--save-status-parent-gap, 0px));
 }
 .line {
   position: relative;
@@ -32,8 +29,12 @@
   color: color-mix(in srgb, var(--color-emerald-300), var(--color-emerald-400));
   opacity: 0.82;
 }
-.caption[data-tone="restored"] {
-  font-weight: 600;
+.footerStatus .line {
+  font-size: 12px;
+  font-weight: 575;
+}
+.footerStatus .caption[data-tone="warning"] {
+  color: var(--color-amber-300);
 }
 .mark {
   position: relative;

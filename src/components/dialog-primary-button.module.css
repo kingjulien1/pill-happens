@@ -3,6 +3,13 @@
   width: 100%;
 }
 
+.formFooter {
+  --draft-action-leading-gap: calc(4 * var(--spacing));
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
 .button[data-slot="button"][data-dialog-primary-button] {
   width: 100%;
   max-width: 100%;
@@ -38,7 +45,7 @@
   :is(.group, .button[data-dialog-primary-button]:not(.group > *)),
 :global([data-slot="drawer-popup"])
   :is(.group, .button[data-dialog-primary-button]:not(.group > *)) {
-  margin-block-start: 24px;
+  margin-block-start: var(--dialog-primary-margin, 24px);
 }
 
 @media (prefers-reduced-motion: no-preference) {

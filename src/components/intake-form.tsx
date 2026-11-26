@@ -372,7 +372,7 @@ export function IntakeForm({
         data-intake-form="new"
         className={`${styles.closingSurface} ${styles.emptySurface} pt-4 text-center`}
       >
-        <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           Add the name and strength from your medication packaging, then come
           back to log your first intake.
         </p>
