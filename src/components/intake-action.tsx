@@ -5,7 +5,7 @@ import {
   subscribePageEntryReadiness,
 } from "@/lib/page-entry-readiness";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { Sparkles } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
@@ -191,9 +191,6 @@ export function IntakeAction({
   stimulantCount: number;
 }) {
   const entryRoot = useIntakeActionEntrance();
-  const [medicationType, setMedicationType] = useState<"tablet" | "capsule">(
-    "tablet",
-  );
   const action = (
     <div
       ref={entryRoot}
@@ -248,16 +245,9 @@ export function IntakeAction({
       >
         <IntakePrimaryButton
           type="button"
-          symbol={
-            <IntakeLogSymbol variant="pills" medicationType={medicationType} />
-          }
+          symbol={<IntakeLogSymbol variant="layers-arrow-up" />}
           secondaryText="Jot it!"
-          onClick={() => {
-            setMedicationType((current) =>
-              current === "tablet" ? "capsule" : "tablet",
-            );
-            onClick();
-          }}
+          onClick={onClick}
         >
           Log Intake
         </IntakePrimaryButton>

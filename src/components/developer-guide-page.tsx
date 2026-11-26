@@ -973,7 +973,7 @@ export function DeveloperGuidePage() {
               <p>
                 Today’s Log Intake action matches the 80px/21px intake-card
                 reference. Log Intake uses a pale lilac face and a Mauve 950
-                label in both modes. Its tablet or capsule, short aside and
+                label in both modes. Its Layers Arrow Up icon, short aside and
                 arrow match the subsection borders in the intake dialog.
                 Dialog submissions keep their shared specular adapter, with
                 mode-aware Rose rim stops and readable secondary ink. The inspectable button
@@ -1239,9 +1239,8 @@ export function DeveloperGuidePage() {
                 TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
                 mode uses a pale lilac face with deep plum text; light mode uses
                 a rich plum face with pale lilac text. Supporting copy and the
-                arrow use a quieter, readable ink in the same family. A bare
-                tablet or pill outline alternates each time Log Intake is used.
-                Both it and the arrow use 23px SVGs with 3.25px strokes and the
+                arrow use a quieter, readable ink in the same family. The Layers
+                Arrow Up icon and the trailing arrow use 3.25px strokes and the
                 same secondary ink. A 24px gap, reduced to 20px on the narrowest
                 screens, gives the leading glyph about thirty percent more
                 visible space before the label; its former background well is
