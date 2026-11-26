@@ -764,6 +764,7 @@ export function IntakeForm({
             <IntakeDateTimeFields
               value={takenAt}
               onChange={timing.pin}
+              onFix={timing.fixTime}
               onReset={timing.reset}
               pinned={timing.pinned}
               onEditingChange={timing.editingChanged}

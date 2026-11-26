@@ -2186,18 +2186,19 @@ export function DeveloperGuidePage() {
                 dose formatting elsewhere in the journal.
               </p>
               <p>
-                Timing uses 40px controls. Date is one seventh narrower and time
-                one sixth narrower than the previous layout, with the original
-                gaps retained and the recovered space assigned to reset. Native
+                Timing uses three labeled 40px controls. Time Taken and Time
+                Lock share equal widths beside the date. Native
                 values stay vertically centered. Log Intake and Edit Intake share
                 the same draft feedback and tracking-day footer. Reset Draft clears
                 the form and releases pinned timing. Edit Intake also offers Delete
                 Intake. Both actions have a review and an explicit confirmation.
                 Manual date/time changes use the shared, journal-scoped
                 intake:timing draft. Saving an intake preserves the pin.
-                Native commit/blur waits 180ms before the pin’s
-                entry; reset releases it and sets both values to now after its
-                outro. Closing mid-reset still honors that reset. Fresh current-day
+                Manual edits show the lock animation after the picker closes.
+                Holding Time Lock starts feedback at 300ms and arms it at two
+                seconds. Releasing then fixes the time. A second hold fixes the
+                current instant. Tapping returns to now after the animation.
+                Closing mid-reset still honors that reset. Fresh current-day
                 forms and explicitly reset forms use the existing minute clock
                 without draft writes. Untouched edits retain their recorded instant.
                 Ambient sparkle scheduling pauses offscreen and when hidden, with

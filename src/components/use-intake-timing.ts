@@ -81,6 +81,19 @@ export function useIntakeTiming({
       shared.setValue(
         pinnedIntakeTiming({ ...effectiveDraft, takenAt, timezone }),
       ),
+    fixTime: () => {
+      // Preserve the displayed historical instant on the first hold. A live
+      // clock or a repeat hold captures the exact instant of release.
+      const fixed = withIntakeTiming(
+        effectiveDraft,
+        { mode: "automatic" },
+        timezone,
+        new Date(),
+        preference.mode === "pinned" || followClock,
+      );
+      shared.setValue(pinnedIntakeTiming(fixed));
+      setRestoredPin(false);
+    },
     reset: (target: "clock" | "form" = "clock") => {
       // Keep an automatic marker so old per-entry timing cannot resurrect a pin.
       shared.setValue({ mode: "automatic" });

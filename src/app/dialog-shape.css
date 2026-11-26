@@ -134,6 +134,7 @@
   :is([data-slot="dialog-content"], [data-slot="drawer-popup"])
     :is(
       [data-slot="input"],
+      [data-intake-time-reset],
       [data-slot="textarea"],
       [data-slot="select-trigger"]
     ):not([data-dialog-canvas], [aria-invalid="true"]) {
@@ -149,6 +150,7 @@
   :is([data-slot="dialog-content"], [data-slot="drawer-popup"])
     :is(
       [data-slot="input"],
+      [data-intake-time-reset],
       [data-slot="textarea"],
       [data-slot="select-trigger"]
     ):focus-visible:not([data-dialog-canvas], [aria-invalid="true"]) {
