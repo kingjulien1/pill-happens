@@ -33,6 +33,9 @@ type IntakeDateTimeFieldsProps = {
 const reducedMotion = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Leave a gap under the arrow like the open dial on the sleep score.
+const chargeArc = "M9.39 30.61a15 15 0 1 1 21.22 0";
+
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
 export function IntakeDateTimeFields({
   value,
@@ -125,6 +128,7 @@ export function IntakeDateTimeFields({
     setPhase(reducedMotion() ? "idle" : "settling");
   };
   const hold = useTimeLockPress(locked, resetTiming, fixTiming);
+  const { chargeDuration } = hold;
   const state =
     hold.stage ??
     (phase === "resetting" || phase === "refreshing"
@@ -139,7 +143,7 @@ export function IntakeDateTimeFields({
   // OS changes its motion preference before an animationend could fire.
   useEffect(() => {
     const durations = {
-      entering: 1020,
+      entering: chargeDuration,
       settling: 420,
       resetting: 540,
       refreshing: 460,
@@ -147,10 +151,10 @@ export function IntakeDateTimeFields({
     if (phase === "idle" || phase === "waiting") return;
     const timer = setTimeout(() => {
       finishReset();
-      setPhase("idle");
+      setPhase(phase === "entering" && !reducedMotion() ? "settling" : "idle");
     }, durations[phase]);
     return () => clearTimeout(timer);
-  }, [phase, motionKey, finishReset]);
+  }, [phase, motionKey, chargeDuration, finishReset]);
 
   useEffect(() => {
     const node = button.current;
@@ -265,10 +269,10 @@ export function IntakeDateTimeFields({
           }
           data-fixed-start={(pinned && hold.stage) || undefined}
           style={
-            { "--charge-duration": `${hold.chargeDuration}ms` } as CSSProperties
+            { "--charge-duration": `${chargeDuration}ms` } as CSSProperties
           }
         >
-          <span className={styles.face} aria-hidden="true">
+          <span key={motionKey} className={styles.face} aria-hidden="true">
             <span className={styles.wash} />
             <svg
               className={styles.rim}
@@ -284,7 +288,37 @@ export function IntakeDateTimeFields({
                 pathLength="100"
               />
             </svg>
-            <span key={motionKey} className={styles.glyph}>
+            <svg className={styles.gauge} viewBox="0 0 40 40" fill="none">
+              <defs>
+                <linearGradient
+                  id={`${id}-arc`}
+                  x1="0%"
+                  y1="90%"
+                  x2="100%"
+                  y2="10%"
+                >
+                  <stop stopColor="#fda4af" />
+                  <stop offset=".48" stopColor="#ffe4ed" />
+                  <stop offset="1" stopColor="#c4a9ff" />
+                </linearGradient>
+              </defs>
+              <path
+                className={styles.ticks}
+                d="M20 1v2M6.56 6.56l1.42 1.42M1 20h2M33.44 6.56l-1.42 1.42M39 20h-2"
+              />
+              <path className={styles.track} d={chargeArc} />
+              <g className={styles.chargeArc} stroke={`url(#${id}-arc)`}>
+                <path
+                  pathLength="1"
+                  d={chargeArc}
+                  strokeWidth="5"
+                  opacity=".18"
+                />
+                <path pathLength="1" d={chargeArc} strokeWidth="1.85" />
+              </g>
+              <circle className={styles.echo} cx="20" cy="20" r="15" />
+            </svg>
+            <span className={styles.glyph}>
               <RotateCcw
                 className={styles.refresh}
                 size={20}
@@ -318,7 +352,11 @@ export function IntakeDateTimeFields({
                 data-star={position}
                 viewBox="-8 -8 16 16"
               >
-                <path d={lunarStarPath} fill="currentColor" />
+                <path
+                  className={styles.starCore}
+                  d={lunarStarPath}
+                  fill="currentColor"
+                />
                 <path
                   className={styles.sparks}
                   d={lunarSparkPath}
