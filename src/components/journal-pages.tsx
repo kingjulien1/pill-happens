@@ -466,7 +466,7 @@ function CheckInTimeline({
         period="morning"
         checkIn={morning}
         variant={morning ? "saved" : "prompt"}
-        intakeSpacing={hasIntakes ? "after" : undefined}
+        intakeSpacing="after"
       />
     </div>
   );
