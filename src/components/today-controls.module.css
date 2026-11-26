@@ -134,7 +134,11 @@
     var(--color-mauve-700) 70%,
     var(--color-mauve-600)
   );
-  --control-face-edge: var(--color-pink-500);
+  --control-face-edge: color-mix(
+    in oklab,
+    var(--color-orange-300) 50%,
+    color-mix(in oklab, var(--color-taupe-700) 50%, var(--color-taupe-800))
+  );
   --action-inner-detail-width: calc(var(--action-inner-line) * 17 / 12);
 }
 
@@ -181,7 +185,7 @@
 }
 
 :global([data-intake-entry-part="button"]) .action[data-log-intake-rim]::before {
-  /* Leave the page visible between the pink rim and the satin face. */
+  /* Leave the page visible between the middle rim and the satin face. */
   padding: calc(var(--action-inner-line) + var(--action-inner-detail-width));
   background-clip: content-box;
   box-shadow: inset 0 0 0 var(--action-inner-line) var(--control-face-edge);
