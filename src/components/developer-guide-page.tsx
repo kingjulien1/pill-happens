@@ -972,9 +972,9 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Today’s Log Intake action matches the 80px/21px intake-card
-                reference. Log Intake uses a pale lilac face and a Mauve 950
-                label in both modes. Its Layers Arrow Up icon, short aside and
-                arrow match the subsection borders in the intake dialog.
+                reference. Log Intake uses a pale lilac face and a Mauve 900
+                label in both modes. The short aside, dot and both icons use
+                a mix of 70% Mauve 700 and 30% Mauve 600.
                 Dialog submissions keep their shared specular adapter, with
                 mode-aware Rose rim stops and readable secondary ink. The inspectable button
                 reference below reports its source-defined layer values.

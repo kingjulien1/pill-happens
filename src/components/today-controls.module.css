@@ -127,19 +127,13 @@
   --control-face-edge: var(--color-mauve-700);
 }
 
-/* Match the translucent section edge as it appears over the intake dialog. */
 :global([data-intake-entry-part="button"]) .action[data-log-intake-rim] {
-  --intake-dialog-base: color-mix(
-    in srgb,
-    var(--color-mauve-950) var(--dialog-mauve-opacity),
-    var(--navigation-surface-dark)
-  );
+  --control-ink: var(--color-mauve-900);
   --control-secondary: color-mix(
-    in srgb,
-    var(--intake-section-pigment) var(--intake-section-edge-opacity),
-    var(--intake-dialog-base)
+    in oklab,
+    var(--color-mauve-700) 70%,
+    var(--color-mauve-600)
   );
-  --control-ink: var(--color-mauve-950);
   --control-face-edge: var(--color-pink-500);
   --action-inner-detail-width: calc(var(--action-inner-line) * 17 / 12);
 }
