@@ -2055,10 +2055,10 @@ export function DeveloperGuidePage() {
                 small SVG/CSS layers and never rerenders the surrounding form.
                 In both intake dialogs, the full-size Final Look badge sits
                 above the daily summary and preview card. Below the card,
-                dashed arrows connect the saved intake count and dose total to
-                their values after saving. Both comparisons use the selected
-                medication and tracking day. Editing a dose already on that day
-                replaces its contribution to the total and counts the entry once.
+                paired chevrons show how this dose contributes to the count and
+                total for the selected medication and tracking day. On edits,
+                the starting values exclude the original entry. The ending
+                values include the revised dose once.
                 Color chips use the selected pigment at 40% and a
                 matching family-900 ink, including a neutral fallback. The
                 preview shows quantity and per-unit strength as 2 tablets / 20

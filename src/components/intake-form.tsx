@@ -287,14 +287,8 @@ export function IntakeForm({
     route !== undefined,
   );
 
-  const daySummary = useMemo(() => {
-    if (!belongsTo || !medicationId)
-      return {
-        count: 0,
-        totalMg: 0,
-        excludingEditedMg: 0,
-        excludingEditedCount: 0,
-      };
+  const otherIntakes = useMemo(() => {
+    if (!belongsTo || !medicationId) return { count: 0, totalMg: 0 };
     const saved = totalsForDay(data!, belongsTo).find(
       (total) => total.medicationId === medicationId,
     );
@@ -306,20 +300,16 @@ export function IntakeForm({
       : undefined;
     const totalMg = saved?.totalMg ?? 0;
     return {
-      count: saved?.count ?? 0,
-      totalMg,
-      excludingEditedCount: Math.max(0, (saved?.count ?? 0) - (edited ? 1 : 0)),
-      excludingEditedMg: Number(
-        (totalMg - (edited ? doseMg(edited) : 0)).toFixed(8),
-      ),
+      count: (saved?.count ?? 0) - (edited ? 1 : 0),
+      totalMg: Number((totalMg - (edited ? doseMg(edited) : 0)).toFixed(8)),
     };
   }, [belongsTo, data, intake, medicationId]);
   const includingDraftMg =
     calculatedDose === null
       ? null
-      : Number((daySummary.excludingEditedMg + calculatedDose).toFixed(8));
+      : Number((otherIntakes.totalMg + calculatedDose).toFixed(8));
   const includingDraftCount =
-    includingDraftMg === null ? null : daySummary.excludingEditedCount + 1;
+    includingDraftMg === null ? null : otherIntakes.count + 1;
   const previewHintId = `${formId}-preview-hint`;
   const receiptDate = takenAt.slice(0, 10);
   let previewHint: string;
@@ -827,7 +817,7 @@ export function IntakeForm({
                 <IntakePreviewSummary
                   newIntake={
                     !intake && medication
-                      ? { medication, savedTotalMg: daySummary.totalMg }
+                      ? { medication, savedTotalMg: otherIntakes.totalMg }
                       : undefined
                   }
                   medicationName={
@@ -867,9 +857,9 @@ export function IntakeForm({
               includingDraftCount !== null &&
               includingDraftMg !== null && (
                 <IntakePreviewChangeRow
-                  savedCount={daySummary.count}
+                  priorCount={otherIntakes.count}
                   projectedCount={includingDraftCount}
-                  savedMg={daySummary.totalMg}
+                  priorMg={otherIntakes.totalMg}
                   projectedMg={includingDraftMg}
                 />
               )}

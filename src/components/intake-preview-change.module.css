@@ -14,63 +14,69 @@
     var(--reading-ink) 69%,
     var(--color-emerald-300)
   );
+  --number-size: calc(var(--summary-copy-size) * 1.22);
+  --label-size: calc(var(--number-size) * 0.7);
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
   margin: 0;
   padding-inline: clamp(6px, 2%, 10px);
-  font-size: var(--summary-copy-size);
+  font-size: var(--number-size);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
 }
+@media (max-width: 360px) {
+  .row {
+    margin-inline: calc(-1 * var(--receipt-gutter));
+  }
+}
 .metric {
-  min-width: min(46%, 8.5em);
+  min-width: 0;
+  max-width: 100%;
+}
+.metric:last-child {
+  margin-inline-start: auto;
 }
 .metric dd {
   display: grid;
-  grid-template-columns: minmax(0, max-content) minmax(2.4em, 1fr) minmax(
-      3.5em,
-      max-content
-    );
+  grid-template-columns: minmax(0, auto) auto minmax(0, auto);
   align-items: center;
-  gap: 0.24em;
+  gap: 0.2em;
   margin: 0;
 }
 .prior,
 .projected {
   min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--label-size);
 }
 .prior {
   color: var(--prior-ink);
-  font-size: calc(1.22em * 2 / 3);
   font-weight: 550;
 }
 .projected {
   color: var(--projected-ink);
-  font-size: 1.22em;
   font-weight: 725;
 }
 .amount {
-  display: inline-block;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-.unit {
-  margin-inline-start: 0.1em;
-  white-space: nowrap;
-  font-size: 0.7em;
-  font-weight: inherit;
-}
-.label {
-  display: inline-block;
-  font-size: 0.82em;
+  font-size: var(--number-size);
 }
 .transfer {
-  width: 3.6em;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.09em;
+  color: var(--projected-ink);
+}
+.transfer svg {
+  width: 1em;
+  height: 1em;
+  stroke-width: 3.75;
+  transform-origin: center;
+}
+.transfer svg:first-child {
+  color: color-mix(in srgb, var(--prior-ink) 55%, var(--projected-ink));
 }
 @media (prefers-reduced-motion: no-preference) {
   .row {
@@ -79,32 +85,54 @@
   .row[data-active="true"] {
     --transfer-play: running;
   }
-  .dash {
-    animation: trace 350ms cubic-bezier(0.2, 0.75, 0.3, 1) backwards;
-  }
-  .arrowhead {
-    animation: arrive 400ms 315ms cubic-bezier(0.2, 0.75, 0.3, 1) backwards;
-  }
-  .dash,
-  .arrowhead {
+  /* The nudge and rebound take 2.7s. Both glyphs then rest for 4.5s. */
+  .transfer svg {
+    animation: nudge 7.2s cubic-bezier(0.35, 0, 0.22, 1) infinite;
     animation-play-state: var(--transfer-play);
   }
-}
-@keyframes trace {
-  from {
-    opacity: 0.25;
-    transform: translate(-1.8px, 0.4px);
+  .transfer svg:last-child {
+    animation-name: rebound;
   }
 }
-@keyframes arrive {
-  0% {
-    opacity: 0.4;
-    transform: translateX(-2px);
-  }
-  65% {
-    transform: translateX(0.9px);
-  }
+@keyframes nudge {
+  0%,
+  37.5%,
   100% {
-    transform: translateX(0);
+    transform: none;
+  }
+  9% {
+    transform: translateX(-0.18em) rotate(-7deg) scale(0.83, 1.1);
+  }
+  15% {
+    transform: translateX(0.46em) scale(1.13, 0.9);
+  }
+  17% {
+    transform: translateX(0.48em) scale(0.76, 1.12);
+  }
+  24% {
+    transform: translateX(-0.12em) rotate(4deg);
+  }
+  30% {
+    transform: translateX(0.04em) rotate(-1deg);
+  }
+}
+@keyframes rebound {
+  0%,
+  15%,
+  37.5%,
+  100% {
+    transform: none;
+  }
+  17% {
+    transform: translateX(0.09em) scale(0.82, 1.1);
+  }
+  22% {
+    transform: translateX(0.32em) rotate(5deg) scale(1.12, 0.91);
+  }
+  28% {
+    transform: translateX(-0.08em) rotate(-2deg) scale(0.96, 1.03);
+  }
+  33% {
+    transform: translateX(0.025em);
   }
 }
