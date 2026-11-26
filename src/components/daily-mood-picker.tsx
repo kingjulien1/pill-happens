@@ -62,7 +62,7 @@ export function DailyMoodPicker({
     <EveningReflectionPanel
       kind="feelings"
       headingId={`${id}-heading`}
-      title="What Today Cost"
+      title="Today Felt Like"
       icon={<SmilePlus size={16} strokeWidth={2.1} aria-hidden="true" />}
       detail={
         <>
