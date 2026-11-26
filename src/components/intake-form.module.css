@@ -143,14 +143,11 @@
 .preview [data-preview-title-pill] {
   --final-look-copy: var(--foreground);
   --final-look-muted: var(--muted-foreground);
-  --badge-base: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
-  --badge-tint: color-mix(in srgb, var(--preview-totals-ink) 21%, transparent);
   justify-self: center;
   padding-inline: 16px;
-  border: 1px solid
-    color-mix(in srgb, var(--preview-totals-ink) 90%, transparent);
-  background:
-    linear-gradient(var(--badge-tint), var(--badge-tint)), var(--badge-base);
+  border: 0;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--color-violet-400) 19%, transparent);
 }
 .preview h3 {
   display: inline-flex;
@@ -272,7 +269,7 @@
 .preview[data-preview-empty="true"] [data-preview-title-pill] {
   --final-look-copy: var(--preview-empty-copy);
   --final-look-muted: var(--preview-empty-muted);
-  --badge-base: var(--preview-empty-surface);
+  background: var(--preview-empty-surface);
   opacity: 0.82;
 }
 /* Timing owns the reference scale; all editable intake fields share it. */

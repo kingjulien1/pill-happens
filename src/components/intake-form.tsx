@@ -819,6 +819,7 @@ export function IntakeForm({
               <FinalLookHeading
                 id="intake-preview-title"
                 showIcon
+                receiptGlow
                 motion={false}
                 color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
               />

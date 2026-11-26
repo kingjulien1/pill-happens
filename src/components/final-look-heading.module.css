@@ -9,9 +9,67 @@
   gap: clamp(6px, 2cqi, 12px);
 }
 .badge {
+  position: relative;
   flex: 0 1 auto;
   transform: scale(var(--final-look-scale));
   transform-origin: center;
+}
+
+/* Cut out the translucent face so the traveling light only paints outside. */
+.glow {
+  --reach: 9px;
+  --curve: var(--dialog-radius-compact);
+  position: absolute;
+  inset: calc(-1 * var(--reach));
+  padding: var(--reach);
+  border-radius: calc(var(--curve) + var(--reach));
+  pointer-events: none;
+  color: var(--color-purple-950, #3b0764);
+  opacity: 0.42;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.glow::before {
+  content: "";
+  position: absolute;
+  inset: var(--reach);
+  border-radius: var(--curve);
+  box-shadow: 0 0 6px 1px currentColor;
+  opacity: 0.45;
+}
+.glow svg {
+  display: block;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-dashoffset: -12;
+  filter: blur(2.5px);
+}
+.glow rect {
+  rx: var(--curve);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .glow svg {
+    animation: follow-edge 16s linear infinite paused;
+  }
+  .badge[data-active="true"] .glow svg {
+    animation-play-state: running;
+  }
+}
+@keyframes follow-edge {
+  from {
+    stroke-dashoffset: -12;
+  }
+  to {
+    stroke-dashoffset: -112;
+  }
 }
 .line {
   flex: 1 1 0;
