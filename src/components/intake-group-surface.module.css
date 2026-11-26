@@ -32,6 +32,7 @@
   border-radius: calc(
     var(--intake-card-radius) + var(--intake-group-border-outset)
   );
+  box-shadow: 0 0 9px 1px color-mix(in srgb, var(--color-violet-300) 15%, transparent);
 }
 .group :global(.intake-group-label) {
   margin: calc(-1 * var(--intake-group-border-outset));
