@@ -302,7 +302,10 @@ body:has([data-dialog-scroll] [data-check-in-form]) {
   min-width: 0;
 }
 .intake-group[data-grouped="true"] {
-  --intake-group-border-width: calc(8px / 3);
+  --intake-group-border-inset: calc(8px / 3);
+  --intake-group-border-width: calc(
+    var(--intake-group-border-inset) + var(--intake-group-border-outset, 0px)
+  );
   --intake-group-border-pigment: color-mix(
     in srgb,
     var(--card-foreground) 84%,

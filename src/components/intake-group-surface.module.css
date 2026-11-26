@@ -1,18 +1,23 @@
 /* The three upper tints share one opacity above the darkened glass. */
 .group {
+  --intake-group-border-outset: calc(var(--intake-group-border-inset) * 0.29);
+  --intake-group-shade: 15.5%;
   --intake-group-fill-mauve: color-mix(
     in srgb,
-    var(--color-mauve-900) 5.5%,
+    color-mix(in srgb, black var(--intake-group-shade), var(--color-mauve-900))
+      5.5%,
     transparent
   );
   --intake-group-fill-indigo: color-mix(
     in srgb,
-    var(--color-indigo-950) 18%,
+    color-mix(in srgb, black var(--intake-group-shade), var(--color-indigo-950))
+      18%,
     transparent
   );
   --intake-group-fill-purple: color-mix(
     in srgb,
-    var(--color-purple-800) 14%,
+    color-mix(in srgb, black var(--intake-group-shade), var(--color-purple-800))
+      14%,
     transparent
   );
   --intake-group-color-stack:
@@ -20,12 +25,27 @@
     linear-gradient(var(--intake-group-fill-indigo) 0 0),
     linear-gradient(var(--intake-group-fill-mauve) 0 0);
 }
+/* Extend the painted boxes. The measured join follows their new outer edges. */
+.group > :global(.intake-group-glass) {
+  inset: calc(-1 * var(--intake-group-border-outset));
+  inset-block-end: calc(12px - var(--intake-group-border-outset));
+  border-radius: calc(
+    var(--intake-card-radius) + var(--intake-group-border-outset)
+  );
+}
+.group :global(.intake-group-label) {
+  margin: calc(-1 * var(--intake-group-border-outset));
+  padding: calc(3px + var(--intake-group-border-outset))
+    calc(8px + var(--intake-group-border-outset));
+  min-height: calc(24px + 2 * var(--intake-group-border-outset));
+  border-radius: calc(9px + var(--intake-group-border-outset));
+}
 .blur,
 .colors {
   position: absolute;
   inset: var(--intake-group-border-width);
   border-radius: calc(
-    var(--intake-card-radius) - var(--intake-group-border-width)
+    var(--intake-card-radius) - var(--intake-group-border-inset)
   );
   pointer-events: none;
   opacity: var(--group-layer-opacity);
@@ -35,8 +55,8 @@
   z-index: 0;
   background-color: color-mix(
     in srgb,
-    var(--color-mauve-950, #0c090c) 13%,
-    transparent
+    black var(--intake-group-shade),
+    color-mix(in srgb, var(--color-mauve-950, #0c090c) 13%, transparent)
   );
   -webkit-backdrop-filter: blur(48px);
   backdrop-filter: blur(48px);
@@ -176,7 +196,7 @@
   position: absolute;
   z-index: 0;
   inset: var(--intake-group-border-width);
-  border-radius: calc(9px - var(--intake-group-border-width));
+  border-radius: calc(9px - var(--intake-group-border-inset));
   transform-origin: center;
   pointer-events: none;
 }
