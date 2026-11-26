@@ -4,11 +4,6 @@
     var(--summary-ink-base) 82%,
     var(--foreground)
   );
-  --prior-ink: color-mix(
-    in srgb,
-    var(--reading-ink) 52%,
-    var(--color-zinc-500)
-  );
   --projected-ink: color-mix(
     in srgb,
     var(--reading-ink) 69%,
@@ -22,7 +17,8 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  padding-inline: clamp(6px, 2%, 10px);
+  padding-inline: clamp(8px, calc(2% + 2px), 12px);
+  color: var(--foreground);
   font-size: var(--number-size);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
@@ -30,6 +26,7 @@
 @media (max-width: 360px) {
   .row {
     margin-inline: calc(-1 * var(--receipt-gutter));
+    --reading-gap: 0.16em;
   }
 }
 .metric {
@@ -43,7 +40,7 @@
   display: grid;
   grid-template-columns: minmax(0, auto) auto minmax(0, auto);
   align-items: center;
-  gap: 0.2em;
+  gap: var(--reading-gap, 0.2em);
   margin: 0;
 }
 .prior,
@@ -53,7 +50,6 @@
   font-size: var(--label-size);
 }
 .prior {
-  color: var(--prior-ink);
   font-weight: 550;
 }
 .projected {
@@ -67,16 +63,22 @@
   display: inline-flex;
   align-items: center;
   gap: 0.09em;
-  color: var(--projected-ink);
+}
+@property --intake-chevron-tint {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
 }
 .transfer svg {
+  color: color-mix(
+    in srgb,
+    var(--projected-ink) var(--intake-chevron-tint, 0%),
+    var(--foreground)
+  );
   width: 1em;
   height: 1em;
   stroke-width: 3.75;
   transform-origin: center;
-}
-.transfer svg:first-child {
-  color: color-mix(in srgb, var(--prior-ink) 55%, var(--projected-ink));
 }
 @media (prefers-reduced-motion: no-preference) {
   .row {
@@ -98,22 +100,28 @@
   0%,
   37.5%,
   100% {
+    --intake-chevron-tint: 0%;
     transform: none;
   }
   9% {
-    transform: translateX(-0.18em) rotate(-7deg) scale(0.83, 1.1);
+    --intake-chevron-tint: 0%;
+    transform: translate(-0.21em, 0.03em) rotate(-9deg) scale(0.78, 1.13);
+    animation-timing-function: cubic-bezier(0.63, 0, 0.9, 0.45);
   }
   15% {
-    transform: translateX(0.46em) scale(1.13, 0.9);
+    --intake-chevron-tint: 100%;
+    transform: translateX(0.77em) scale(1.17, 0.86);
   }
   17% {
-    transform: translateX(0.48em) scale(0.76, 1.12);
+    transform: translateX(0.74em) rotate(3deg) scale(0.72, 1.17);
+    animation-timing-function: cubic-bezier(0.14, 0.8, 0.22, 1);
   }
   24% {
-    transform: translateX(-0.12em) rotate(4deg);
+    --intake-chevron-tint: 100%;
+    transform: translate(-0.14em, -0.06em) rotate(-7deg) scale(1.06, 0.94);
   }
   30% {
-    transform: translateX(0.04em) rotate(-1deg);
+    transform: translateX(0.055em) rotate(2deg) scale(0.98, 1.02);
   }
 }
 @keyframes rebound {
@@ -121,18 +129,23 @@
   15%,
   37.5%,
   100% {
+    --intake-chevron-tint: 0%;
     transform: none;
   }
   17% {
-    transform: translateX(0.09em) scale(0.82, 1.1);
+    --intake-chevron-tint: 100%;
+    transform: translateX(0.08em) rotate(3deg) scale(0.76, 1.14);
+    animation-timing-function: cubic-bezier(0.12, 0.76, 0.22, 1);
   }
   22% {
-    transform: translateX(0.32em) rotate(5deg) scale(1.12, 0.91);
+    transform: translate(0.34em, -0.08em) rotate(-8deg) scale(1.16, 0.89);
+    animation-timing-function: cubic-bezier(0.42, 0, 0.62, 1);
   }
   28% {
-    transform: translateX(-0.08em) rotate(-2deg) scale(0.96, 1.03);
+    --intake-chevron-tint: 100%;
+    transform: translate(-0.09em, 0.025em) rotate(4deg) scale(0.93, 1.06);
   }
   33% {
-    transform: translateX(0.025em);
+    transform: translateX(0.03em) rotate(-1deg);
   }
 }
