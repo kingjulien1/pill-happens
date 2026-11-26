@@ -764,6 +764,7 @@ export function GuideColors() {
       />
 
       <ResponsiveModal
+        showFooterNavigation={false}
         scrollKey="color-manual-copy"
         open={Boolean(manual)}
         onOpenChange={(open) => !open && setManual(null)}

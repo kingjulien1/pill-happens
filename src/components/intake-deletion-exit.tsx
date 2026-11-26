@@ -1,21 +1,15 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import { useDialogSweepFrame } from "./use-dialog-sweep-frame";
 import { Scissors } from "lucide-react";
 import styles from "./intake-deletion-exit.module.css";
 
 // The cutting edge is outside the popup's clip so the strips can fall past it.
 export function IntakeDeletionExit() {
   const marker = useRef<HTMLSpanElement>(null);
-  const [frame, setFrame] = useState<DOMRect | null>(null);
-  useLayoutEffect(() => {
-    const popup = marker.current?.closest<HTMLElement>("[data-dialog-surface]");
-    if (!popup || matchMedia("(prefers-reduced-motion: reduce)").matches)
-      return;
-    // Capture its original frame before the first animation paint.
-    setFrame(popup.getBoundingClientRect());
-  }, []);
+  const frame = useDialogSweepFrame(marker, true, "up");
   return (
     <>
       <span hidden ref={marker} />
@@ -48,11 +42,16 @@ export function IntakeDeletionExit() {
                       left: 7 + i * 10.75 + "%",
                       "--drift": ((i % 3) - 1) * 18 + "px",
                       "--turn": (i % 2 ? 1 : -1) * (16 + i * 3) + "deg",
-                      "--delay": 380 + (i % 4) * 76 + "ms",
+                      "--delay": 650 + (i % 4) * 128 + "ms",
                     } as CSSProperties
                   }
                 />
               ))}
+            </div>
+            <div className={styles.lastCut}>
+              <i />
+              <i />
+              <i />
             </div>
           </div>,
           document.body,

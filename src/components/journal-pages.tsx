@@ -38,6 +38,10 @@ import {
   useJournalWorkspace,
   usePersistentDraft,
 } from "@/components/journal-drafts";
+import {
+  CONFIRMATION_PAUSE_MS,
+  DELETE_EXIT_MS,
+} from "./use-dialog-sweep-frame";
 import { IntakeDeletionExit } from "./intake-deletion-exit";
 import deletionStyles from "./intake-deletion-exit.module.css";
 import { ResponsiveModal } from "@/components/responsive-modal";
@@ -173,7 +177,7 @@ function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
   const [deletion, setDeletion] = useState<{
     intake: Intake;
     data: AppData;
-    phase: "pending" | "returning" | "shredding";
+    phase: "pending" | "returning" | "settling" | "shredding";
   } | null>(null);
   const intake = deletion?.intake ?? entry;
   const mounted = useRef(false);
@@ -195,7 +199,7 @@ function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
   const afterReview = useCallback(() => {
     setDeletion((current) =>
       current?.phase === "returning"
-        ? { ...current, phase: "shredding" }
+        ? { ...current, phase: "settling" }
         : current,
     );
   }, []);
@@ -205,14 +209,27 @@ function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
       const timer = setTimeout(afterReview, 950);
       return () => clearTimeout(timer);
     }
-    if (deletion?.phase !== "shredding") return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (deletion?.phase === "settling") {
+      const timer = setTimeout(
+        () => {
+          setDeletion((current) =>
+            current?.phase === "settling"
+              ? { ...current, phase: "shredding" }
+              : current,
+          );
+        },
+        reduced ? 0 : CONFIRMATION_PAUSE_MS,
+      );
+      return () => clearTimeout(timer);
+    }
+    if (deletion?.phase !== "shredding") return;
     const timer = setTimeout(
       () => {
         close();
         publish();
       },
-      reduced ? 175 : 1780,
+      reduced ? 175 : DELETE_EXIT_MS,
     );
     return () => clearTimeout(timer);
   }, [deletion?.phase, afterReview, close, publish]);
@@ -293,6 +310,7 @@ function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
       openingAnchor={openingAnchor}
       title="Edit Intake"
       headerVariant="intake"
+      showFooterNavigation={false}
       context={
         <JournalDialogSubheading
           title={intake.medicationName}
@@ -520,6 +538,7 @@ function LogIntakeDialog({
       scrollKey={`intake:new:${historical ? day : "today"}`}
       title={<span className="block truncate pe-2">Jot That Dose</span>}
       headerVariant="intake"
+      showFooterNavigation={false}
       context={
         <JournalDialogSubheading
           title={
@@ -1219,6 +1238,7 @@ export function GoalsPage() {
       </ResponsiveModal>
       <ResponsiveModal
         open={Boolean(deleting)}
+        showFooterNavigation={false}
         onOpenChange={(v) => !v && setDeleting(null)}
         scrollKey={deleting ? `goal:remove:${deleting}` : "goal:remove"}
         title="Remove This Goal?"

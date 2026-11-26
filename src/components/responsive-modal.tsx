@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogFooterNavigation } from "./dialog-footer-navigation";
+
 import {
   useImperativeHandle,
   useSyncExternalStore,
@@ -51,6 +53,7 @@ export function ResponsiveModal({
   onOpenChangeComplete,
   surfaceClassName,
   interactionLocked = false,
+  showFooterNavigation = true,
   role = "dialog",
   title,
   headerVariant,
@@ -70,6 +73,7 @@ export function ResponsiveModal({
   onOpenChangeComplete?: (open: boolean) => void;
   surfaceClassName?: string;
   interactionLocked?: boolean;
+  showFooterNavigation?: boolean;
   role?: "dialog" | "alertdialog";
   title: ReactNode;
   headerVariant?: "medication" | "check-in" | "intake";
@@ -195,7 +199,9 @@ export function ResponsiveModal({
             className={cn("mb-1 gap-1.5", medicationHeader && "mb-2")}
           >
             {headerContent(
-              <DialogTitle className={styles.title}>{title}</DialogTitle>,
+              <DialogTitle tabIndex={-1} className={styles.title}>
+                {title}
+              </DialogTitle>,
               <DialogClose render={closeButton}>
                 <ActionIcon
                   name="close"
@@ -211,6 +217,9 @@ export function ResponsiveModal({
           <DialogResetSweep.Provider value={controls}>
             <div className={styles.contentGroup} inert={locked}>
               {children}
+              {showFooterNavigation && role !== "alertdialog" && (
+                <DialogFooterNavigation />
+              )}
             </div>
           </DialogResetSweep.Provider>
           {phase && <DialogSweepVeil phase={phase} />}
@@ -257,7 +266,9 @@ export function ResponsiveModal({
             )}
           >
             {headerContent(
-              <DrawerTitle className={styles.title}>{title}</DrawerTitle>,
+              <DrawerTitle tabIndex={-1} className={styles.title}>
+                {title}
+              </DrawerTitle>,
               <DrawerClose render={closeButton}>
                 <ActionIcon
                   name="close"
@@ -273,6 +284,9 @@ export function ResponsiveModal({
           <div className="pt-1" data-modal-body>
             <DialogResetSweep.Provider value={controls}>
               {children}
+              {showFooterNavigation && role !== "alertdialog" && (
+                <DialogFooterNavigation />
+              )}
             </DialogResetSweep.Provider>
           </div>
         </div>

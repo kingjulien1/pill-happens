@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogFooterNavigation } from "./dialog-footer-navigation";
+
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import {
   BedDouble,
@@ -365,6 +367,7 @@ export function DailyCheckInSection({
       </div>
       {intakeSpacing === "after" && intakeSpacer}
       <ResponsiveModal
+        showFooterNavigation={false}
         open={open}
         onOpenChange={(next) => {
           if (!busy) {
@@ -903,6 +906,7 @@ function CheckInForm({
             onReviewChange={setReviewingReset}
             onReset={reset}
           />
+          <DialogFooterNavigation />
         </div>
       </div>
     </form>

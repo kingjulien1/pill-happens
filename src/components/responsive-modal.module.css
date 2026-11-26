@@ -331,3 +331,12 @@
 .surface[data-reset-phase] .contentGroup > * {
   opacity: 0.48;
 }
+
+/* Keep the navigation inside the same painted safe area as the form footer. */
+.checkInSurface
+  [data-intake-form]
+  [data-dialog-fade-footer]:has([data-dialog-footer-navigation]) {
+  padding-bottom: calc(
+    max(27px, env(safe-area-inset-bottom)) + var(--dialog-anchor-clearance, 0px)
+  );
+}

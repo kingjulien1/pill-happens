@@ -1,18 +1,21 @@
 .veil {
-  position: absolute;
-  inset-inline: 0;
-  z-index: 30;
+  position: fixed;
+  pointer-events: none;
+  z-index: 60;
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: inherit;
+  border-radius: var(--dialog-radius-surface);
   outline: none;
   touch-action: none;
   background: rgb(22 14 24 / 42%);
   color: #ffdbb6;
 }
-.veil[data-sweep="waiting"] {
-  visibility: hidden;
+@media (max-width: 767px) {
+  .veil {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
 }
 .pass {
   position: absolute;
@@ -65,6 +68,7 @@
   bottom: -2%;
 }
 .seal {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -77,30 +81,39 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-sweep="sweeping"] .pass {
-    animation: sweep 1150ms cubic-bezier(0.42, 0.03, 0.26, 0.99) both;
+    animation: sweep 2130ms linear both;
   }
   [data-sweep="sweeping"] .pass svg {
-    animation: brush 1150ms ease-in-out both;
+    animation: brush 2130ms ease-in-out both;
   }
   [data-sweep="sweeping"] .pass i {
-    animation: scatter 530ms 250ms ease-out both;
+    animation: scatter 920ms 620ms ease-out both;
   }
   [data-sweep="sweeping"] .seal {
-    animation: seal 640ms 680ms both;
+    animation: seal 760ms 1640ms cubic-bezier(0.24, 0.78, 0.19, 1) both;
   }
   [data-sweep="sweeping"].veil {
-    animation: lift 250ms 1200ms ease-out forwards;
+    animation: lift 310ms 2690ms ease-out forwards;
   }
 }
 @keyframes sweep {
   0% {
-    transform: translateY(-5%) rotate(-5deg);
+    opacity: 0;
+    transform: translateY(3%) rotate(-2deg);
   }
-  52% {
-    transform: translateY(105%) rotate(3deg);
+  5% {
+    opacity: 1;
+    transform: translateY(5%) rotate(-2deg);
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  87% {
+    opacity: 1;
+    transform: translateY(101%) rotate(1deg);
+    animation-timing-function: ease-out;
   }
   to {
-    transform: translateY(217%) rotate(-2deg);
+    opacity: 0;
+    transform: translateY(116%) rotate(2deg);
   }
 }
 @keyframes brush {
@@ -144,5 +157,71 @@
 @keyframes lift {
   to {
     opacity: 0;
+  }
+}
+
+.imprint,
+.imprint::before,
+.imprint::after {
+  position: absolute;
+  inset: -3px;
+  pointer-events: none;
+  border-radius: inherit;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .imprint {
+    animation: stampLift 820ms 2050ms ease-out both;
+  }
+  .imprint::before,
+  .imprint::after {
+    content: "";
+    border: 1px solid #ffd7a4;
+    animation: impression 740ms cubic-bezier(0.16, 0.76, 0.25, 1) 2060ms both;
+  }
+  .imprint::after {
+    inset: -6px;
+    border-style: dashed;
+    border-color: #f4b7a3;
+    animation-delay: 2150ms;
+  }
+  .seal > svg {
+    animation: tick 490ms 2010ms both;
+  }
+}
+@keyframes impression {
+  from {
+    opacity: 0;
+    transform: scale(0.88, 0.78);
+  }
+  18% {
+    opacity: 0.88;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.52, 1.9);
+  }
+}
+@keyframes stampLift {
+  from,
+  to {
+    opacity: 0;
+  }
+  12%,
+  82% {
+    opacity: 1;
+  }
+}
+@keyframes tick {
+  from {
+    transform: scale(0.65) rotate(-14deg);
+  }
+  52% {
+    transform: scale(1.25) rotate(5deg);
+  }
+  78% {
+    transform: scale(0.95);
+  }
+  to {
+    transform: none;
   }
 }

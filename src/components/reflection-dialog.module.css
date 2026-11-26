@@ -1237,3 +1237,8 @@
     color: var(--muted-foreground);
   }
 }
+
+.scrollContent > [data-dialog-footer-navigation] {
+  --dialog-scroll-gutter: 0px;
+  margin-bottom: 26px;
+}

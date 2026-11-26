@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogFooterNavigation } from "./dialog-footer-navigation";
+
 import {
   useCallback,
   useDeferredValue,
@@ -1171,6 +1173,7 @@ export function ReflectionDialog({
               </div>
             </section>
           </div>
+          <DialogFooterNavigation disabled={finishing} />
           <span className="sr-only" role="status">
             {finishing ? "Returning to your check-in…" : ""}
           </span>

@@ -3,7 +3,7 @@
 .shredding[data-dialog-surface][data-slot] {
   transform-origin: 50% 8%;
   pointer-events: none;
-  animation: shred 1750ms linear both;
+  animation: shred 2920ms linear both;
 }
 .frame {
   position: fixed;
@@ -16,7 +16,7 @@
 .carriage {
   position: absolute;
   inset: 0;
-  animation: travel 1750ms linear both;
+  animation: travel 2920ms linear both;
 }
 .rail {
   position: absolute;
@@ -38,7 +38,7 @@
   box-shadow:
     0 -2px 10px #f77ba767,
     0 2px 6px #27131f;
-  animation: rail 1750ms linear both;
+  animation: rail 2920ms linear both;
 }
 .rail i {
   position: absolute;
@@ -52,7 +52,7 @@
 .blade {
   position: absolute;
   inset: 0;
-  animation: traverse 1750ms cubic-bezier(0.4, 0.03, 0.24, 1) both;
+  animation: traverse 2920ms cubic-bezier(0.4, 0.03, 0.24, 1) both;
 }
 .rail::before {
   content: "";
@@ -61,7 +61,7 @@
   border-radius: inherit;
   background: #ffefe2;
   box-shadow: 0 0 9px #ffbed3;
-  animation: traverse 1750ms cubic-bezier(0.4, 0.03, 0.24, 1) reverse both;
+  animation: traverse 2920ms cubic-bezier(0.4, 0.03, 0.24, 1) reverse both;
 }
 .rail svg {
   position: absolute;
@@ -71,7 +71,7 @@
   border-radius: 50%;
   padding: 3px;
   background: #553042;
-  animation: snip 1750ms ease-in-out both;
+  animation: snip 2920ms ease-in-out both;
 }
 .strip {
   position: absolute;
@@ -82,7 +82,7 @@
   background: linear-gradient(#ffd2de, #c87b99 43%, #724261);
   transform-origin: center top;
   opacity: 0;
-  animation: paper 920ms var(--delay) cubic-bezier(0.18, 0.62, 0.32, 1) both;
+  animation: paper 1530ms var(--delay) cubic-bezier(0.18, 0.62, 0.32, 1) both;
 }
 .strip:nth-child(3n) {
   height: 28px;
@@ -251,5 +251,92 @@
   91%,
   100% {
     transform: none;
+  }
+}
+
+/* When the blades meet, the last sliver folds once and splits at the seam. */
+.lastCut {
+  position: absolute;
+  inset: 1.5% 0 auto;
+  margin-inline: auto;
+  width: 38px;
+  height: 6px;
+}
+.lastCut::before,
+.lastCut::after,
+.lastCut i {
+  position: absolute;
+  content: "";
+  inset: 0;
+  border-radius: 2px;
+  background: linear-gradient(95deg, #b55d83, #ffe1df 48%, #da82a1);
+  animation: lastFold 860ms 2600ms both;
+}
+.lastCut::after {
+  inset: -5px 10px;
+  border: 1px solid #f8a9bb;
+  border-radius: 50%;
+  background: transparent;
+  animation: cutRing 550ms 2880ms ease-out both;
+}
+.lastCut i {
+  --x: -21px;
+  --y: 15px;
+  inset: 1px 15px;
+  animation: offcut 610ms 2870ms cubic-bezier(0.17, 0.72, 0.35, 1) both;
+}
+.lastCut i:nth-child(2) {
+  --x: 3px;
+  --y: 24px;
+}
+.lastCut i:last-child {
+  --x: 23px;
+  --y: 10px;
+}
+@keyframes lastFold {
+  from {
+    opacity: 0;
+    transform: scaleX(1.8) scaleY(0.35);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1, 1.15);
+  }
+  39% {
+    transform: rotate(-11deg) scale(0.35, 1.65);
+  }
+  56% {
+    opacity: 1;
+    transform: rotate(7deg) scale(0.49, 0.8);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) rotate(35deg) scale(0.03);
+  }
+}
+@keyframes cutRing {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  16% {
+    opacity: 0.83;
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.2, 1.9);
+  }
+}
+@keyframes offcut {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  16% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(95deg) scale(0.35);
   }
 }

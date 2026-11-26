@@ -1,5 +1,7 @@
 "use client";
 
+import { DialogFooterNavigation } from "./dialog-footer-navigation";
+
 import { useMemo, useRef, type RefObject } from "react";
 import { Check, PencilLine, X } from "lucide-react";
 import {
@@ -135,6 +137,7 @@ export function ReflectionReaderDialog({
           >
             Done Reading
           </DialogPrimaryButton>
+          <DialogFooterNavigation />
         </footer>
       </DialogContent>
     </Dialog>

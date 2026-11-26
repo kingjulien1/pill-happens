@@ -9,10 +9,16 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
+import {
+  CONFIRMATION_PAUSE_MS,
+  RESET_EXIT_MS,
+  useDialogSweepFrame,
+} from "./use-dialog-sweep-frame";
 import { BrushCleaning, Check } from "lucide-react";
 import styles from "./dialog-reset-sweep.module.css";
 
-type Phase = "waiting" | "sweeping" | null;
+type Phase = "waiting" | "settling" | "sweeping" | null;
 export const DialogResetSweep = createContext<{
   begin: (reset: () => void) => void;
   reveal: () => void;
@@ -33,7 +39,7 @@ export function useDialogResetSweep() {
         setPhase("waiting");
       },
       reveal() {
-        setPhase((current) => (current === "waiting" ? "sweeping" : current));
+        setPhase((current) => (current === "waiting" ? "settling" : current));
       },
     }),
     [],
@@ -47,8 +53,15 @@ export function useDialogResetSweep() {
     // The exit callback usually starts the sweep. Resizing can replace that sheet.
     const revealTimer =
       phase === "waiting" ? setTimeout(controls.reveal, 950) : undefined;
+    const pauseTimer =
+      phase === "settling"
+        ? setTimeout(
+            () => setPhase("sweeping"),
+            reduced ? 0 : CONFIRMATION_PAUSE_MS,
+          )
+        : undefined;
     const cleanTimer =
-      phase === "sweeping" ? setTimeout(commit, reduced ? 0 : 560) : undefined;
+      phase === "sweeping" ? setTimeout(commit, reduced ? 0 : 1180) : undefined;
     const finishTimer =
       phase === "sweeping"
         ? setTimeout(
@@ -56,11 +69,12 @@ export function useDialogResetSweep() {
               commit();
               setPhase(null);
             },
-            reduced ? 220 : 1450,
+            reduced ? 220 : RESET_EXIT_MS,
           )
         : undefined;
     return () => {
       clearTimeout(revealTimer);
+      clearTimeout(pauseTimer);
       clearTimeout(cleanTimer);
       clearTimeout(finishTimer);
       window.removeEventListener("pagehide", commit);
@@ -71,58 +85,60 @@ export function useDialogResetSweep() {
 
 export function DialogSweepVeil({ phase }: { phase: Exclude<Phase, null> }) {
   const ref = useRef<HTMLDivElement>(null);
+  const active = phase === "sweeping";
+  const frame = useDialogSweepFrame(ref, active, "down");
   useLayoutEffect(() => {
-    const veil = ref.current;
-    const surface = veil?.closest<HTMLElement>("[data-dialog-surface]");
-    if (!veil || !surface) return;
-    const place = () => {
-      veil.style.top = surface.scrollTop + "px";
-      veil.style.height = surface.clientHeight + "px";
-    };
-    place();
-    const observer = new ResizeObserver(place);
-    observer.observe(surface);
-    surface.addEventListener("scroll", place, { passive: true });
-    if (phase === "sweeping") veil.focus({ preventScroll: true });
+    const marker = ref.current;
+    const surface = marker?.closest<HTMLElement>("[data-dialog-surface]");
+    if (!active || !marker || !surface) return;
+    marker.focus({ preventScroll: true });
     return () => {
-      observer.disconnect();
-      surface.removeEventListener("scroll", place);
-      if (phase === "sweeping")
-        requestAnimationFrame(() => {
-          if (
-            surface.isConnected &&
-            !surface.hasAttribute("data-reset-phase")
-          ) {
-            const target =
-              surface.querySelector<HTMLElement>("[data-reset-tool]:enabled") ??
-              surface.querySelector<HTMLElement>(
-                "[data-intake-submit], [data-check-in-submit] button[type=submit]",
-              ) ??
-              surface.querySelector<HTMLElement>("[data-modal-close]");
-            target?.focus({ preventScroll: true });
-          }
-        });
+      requestAnimationFrame(() => {
+        if (!surface.isConnected || surface.hasAttribute("data-reset-phase"))
+          return;
+        const target =
+          surface.querySelector<HTMLElement>("[data-reset-tool]:enabled") ??
+          surface.querySelector<HTMLElement>(
+            "[data-intake-submit], [data-check-in-submit] button[type=submit]",
+          ) ??
+          surface.querySelector<HTMLElement>("[data-modal-close]");
+        target?.focus({ preventScroll: true });
+      });
     };
-  }, [phase]);
+  }, [active]);
   return (
-    <div
-      className={styles.veil}
-      ref={ref}
-      data-sweep={phase}
-      tabIndex={-1}
-      data-base-ui-swipe-ignore=""
-      role="status"
-    >
-      <div className={styles.pass} aria-hidden="true">
-        <span className={styles.bristles} />
-        <BrushCleaning />
-        <i />
-        <i />
-        <i />
+    <>
+      <div ref={ref} tabIndex={-1} className="sr-only" role="status">
+        {active ? "Resetting draft" : ""}
       </div>
-      <span className={styles.seal}>
-        <Check aria-hidden="true" size={17} /> Draft reset
-      </span>
-    </div>
+      {active &&
+        frame &&
+        createPortal(
+          <div
+            className={styles.veil}
+            style={{
+              top: frame.top,
+              left: frame.left,
+              width: frame.width,
+              height: frame.height,
+            }}
+            data-sweep="sweeping"
+            aria-hidden="true"
+          >
+            <div className={styles.pass}>
+              <span className={styles.bristles} />
+              <BrushCleaning />
+              <i />
+              <i />
+              <i />
+            </div>
+            <span className={styles.seal}>
+              <Check size={17} /> Draft reset
+              <i className={styles.imprint} />
+            </span>
+          </div>,
+          document.body,
+        )}
+    </>
   );
 }

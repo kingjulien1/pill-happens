@@ -159,6 +159,7 @@ export function DraftResetFooter({
         {footnote}
       </div>
       <ResponsiveModal
+        showFooterNavigation={false}
         open={review}
         onOpenChange={(next) => {
           if (!next) cancel();
