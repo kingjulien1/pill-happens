@@ -91,7 +91,8 @@ export function SaveOptions({
   period,
   formId,
   disabled,
-}: SaveOptionsProps) {
+  placement = "corner",
+}: SaveOptionsProps & { placement?: "corner" | "top-edge" }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const copy = saveCopy[kind];
@@ -109,10 +110,12 @@ export function SaveOptions({
         aria-label="Save options"
         disabled={disabled}
         data-kind={kind}
+        data-placement={placement}
         className={styles.trigger}
       >
         <span className={styles.face}>
           <SaveOptionsGlyph />
+          {placement === "top-edge" && <span>Save options</span>}
         </span>
       </Popover.Trigger>
       <Popover.Portal>
@@ -120,7 +123,7 @@ export function SaveOptions({
           side="top"
           align="start"
           alignOffset={-8}
-          sideOffset={18}
+          sideOffset={placement === "top-edge" ? 8 : 18}
           collisionPadding={10}
           collisionAvoidance={{
             side: "flip",

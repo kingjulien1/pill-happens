@@ -51,6 +51,34 @@
 .face svg {
   display: block;
 }
+.trigger[data-placement="top-edge"] {
+  --tab-height: max(30px, 1.875rem);
+  /* The lower 29% of the visible tab overlaps the outer rim. */
+  inset-block-start: calc(
+    -1 *
+      (
+        var(--check-in-outer-gap, 3px) +
+          var(--check-in-outer-width, 3.733333px) + var(--tab-height) * 0.21
+      )
+  );
+  inset-inline-start: clamp(14px, 4vw, 22px);
+  translate: 0 -50%;
+  width: max-content;
+  height: max(44px, var(--tab-height));
+}
+.trigger[data-placement="top-edge"] .face {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  height: var(--tab-height);
+  padding-inline: 7px 10px;
+  font-size: 0.75rem;
+  font-weight: 640;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: auto;
+}
 .tracks {
   stroke: #e4a7e9;
 }

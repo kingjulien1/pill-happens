@@ -40,6 +40,7 @@ export function IntakePrimaryButton({
   return (
     <div className="intake-action-shell">
       <SpecularCardBorder desktop />
+      {saveOptions && <SaveOptions {...saveOptions} placement="top-edge" />}
       <TodayActionButton
         {...props}
         pending={pending}
@@ -97,7 +98,6 @@ export function IntakePrimaryButton({
           />
         </span>
       </TodayActionButton>
-      {saveOptions && <SaveOptions {...saveOptions} />}
     </div>
   );
 }

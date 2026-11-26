@@ -541,8 +541,8 @@
   }
 }
 
-/* The save face reserves a fixed gutter for the independent 44px touch target. */
-.action[data-slot="button"][data-save-action][type="submit"] {
+/* Forms with an in-face options control reserve its touch target on the left. */
+.action[data-dialog-primary-button][data-save-action][type="submit"] {
   padding-inline-start: 57px;
 }
 @media (max-width: 389px) {
@@ -555,7 +555,7 @@
   }
 }
 @media (max-width: 359px) {
-  .action[data-slot="button"][data-save-action][type="submit"] {
+  .action[data-dialog-primary-button][data-save-action][type="submit"] {
     padding-inline: 53px 12px;
   }
   .action[data-slot="button"][data-save-action] :global(.intake-primary-row) {
