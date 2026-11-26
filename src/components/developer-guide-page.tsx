@@ -1217,7 +1217,7 @@ export function DeveloperGuidePage() {
                 Pink500 at 6% in the lower right. Soft directional contact
                 shadows retain the raised face. Main Log Intake leaves a
                 5.90px transparent gap between its satin face and the 4.17px
-                rim that matches the Mauve 950 label. Its outer
+                Pink 500 rim. Its outer
                 SpecularCardBorder shares the Morning and Evening cards’ 3px
                 gap, 3.733px purple/pink rim, three brighter stops and glow. That
                 outside rim stays fixed; matching concentric curves keep the 3px
