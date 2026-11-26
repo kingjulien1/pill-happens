@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Search, Shuffle, Sparkles, X } from "lucide-react";
+import { Search, Shuffle, SmilePlus, Sparkles, X } from "lucide-react";
 import { DailyMoodIcon } from "@/components/daily-mood-icon";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,6 +12,7 @@ import {
   type DailyCheckIn,
   type DailyMood,
 } from "@/lib/daily-check-in";
+import { EveningReflectionPanel } from "./evening-reflection-panel";
 import styles from "./daily-mood-picker.module.css";
 
 const visibleMoodIds = new Set<DailyMood>(
@@ -58,10 +59,21 @@ export function DailyMoodPicker({
   };
 
   return (
-    <div className={styles.picker} data-mood-library>
+    <EveningReflectionPanel
+      kind="feelings"
+      headingId={`${id}-heading`}
+      title="What Today Cost"
+      icon={<SmilePlus size={16} strokeWidth={2.1} aria-hidden="true" />}
+      detail={
+        <>
+          <strong>{value.length}</strong>{" "}
+          {value.length === 1 ? "feeling" : "feelings"} picked
+        </>
+      }
+    >
       <div className={styles.searchRow}>
         <div className={styles.search}>
-          <Search size={12.4} strokeWidth={1.6275} aria-hidden="true" />
+          <Search size={17} strokeWidth={2} aria-hidden="true" />
           <Input
             id={`${id}-search`}
             type="search"
@@ -82,7 +94,7 @@ export function DailyMoodPicker({
               disabled={disabled}
               onClick={() => setQuery("")}
             >
-              <X size={10.075} strokeWidth={1.6275} aria-hidden="true" />
+              <X size={14} strokeWidth={2} aria-hidden="true" />
             </button>
           )}
         </div>
@@ -95,7 +107,7 @@ export function DailyMoodPicker({
           title="Shuffle feelings used equally often."
           data-mood-shuffle
         >
-          <Shuffle size={13.175} strokeWidth={1.6275} aria-hidden="true" />
+          <Shuffle size={19} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
       <p id={`${id}-results-status`} className="sr-only" role="status">
@@ -166,9 +178,9 @@ export function DailyMoodPicker({
                 disabled={disabled}
                 aria-label={`Remove ${mood.label}`}
               >
-                <DailyMoodIcon mood={selected} size={13} />
+                <DailyMoodIcon mood={selected} size={12} />
                 <span>{mood.label}</span>
-                <X size={11} aria-hidden="true" />
+                <X size={10} aria-hidden="true" />
               </button>
             ) : null;
           })
@@ -178,6 +190,6 @@ export function DailyMoodPicker({
           </span>
         )}
       </div>
-    </div>
+    </EveningReflectionPanel>
   );
 }

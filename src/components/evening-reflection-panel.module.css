@@ -1,0 +1,45 @@
+.panel {
+  --panel-accent: var(--color-violet-300);
+  display: grid;
+  min-width: 0;
+  gap: 15px;
+  padding: clamp(12px, 3.5vw, 17px);
+  border-radius: var(--dialog-radius-control);
+  background: color-mix(in srgb, var(--panel-accent) 8%, transparent);
+}
+.panel[data-reflection-panel="ratings"] {
+  --panel-accent: var(--color-amber-300);
+}
+.heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+.heading h4 {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.heading h4 > svg {
+  flex: none;
+}
+.detail {
+  margin-inline-start: auto;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+.detail strong {
+  color: var(--foreground);
+  font-weight: 650;
+}

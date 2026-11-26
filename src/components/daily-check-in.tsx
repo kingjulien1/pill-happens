@@ -767,21 +767,14 @@ function CheckInForm({
               aria-labelledby={`${id}-feelings-heading`}
               data-evening-feelings
             >
-              <fieldset
-                className={styles.moodField}
+              <DailyMoodPicker
+                cachedUsage={derived?.moodUsage}
+                value={moods}
+                onChange={(value) => setField("moods", value)}
+                checkIns={data?.dailyCheckIns}
+                seed={`${day}:${period}`}
                 disabled={locked}
-                data-check-in-section="mood"
-              >
-                <legend className="sr-only">Today Felt Like</legend>
-                <DailyMoodPicker
-                  cachedUsage={derived?.moodUsage}
-                  value={moods}
-                  onChange={(value) => setField("moods", value)}
-                  checkIns={data?.dailyCheckIns}
-                  seed={`${day}:${period}`}
-                  disabled={locked}
-                />
-              </fieldset>
+              />
               <hr className={styles.feelingsDivider} />
               <EveningDayRatings
                 id={`${id}-ratings`}

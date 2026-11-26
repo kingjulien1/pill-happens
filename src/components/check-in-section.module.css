@@ -159,6 +159,9 @@
   .section .frame > :first-child {
     padding-inline: 18px;
   }
+  .section .frame > [data-evening-feelings] {
+    padding-inline: 8px;
+  }
   .section .frame > [data-journal-card] {
     padding-inline: 22px;
   }

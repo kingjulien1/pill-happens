@@ -3,6 +3,7 @@
 import { Drama } from "lucide-react";
 import { BatteryMediumIcon } from "@phosphor-icons/react/dist/ssr/BatteryMedium";
 import { WavesIcon } from "@phosphor-icons/react/dist/ssr/Waves";
+import { EveningReflectionPanel } from "./evening-reflection-panel";
 import { CheckInRating } from "./check-in-rating";
 import {
   checkInRatingForSlider,
@@ -66,17 +67,13 @@ export function EveningDayRatings({
       : "Both ratings use a 1–10 scale and are optional.";
 
   return (
-    <section
-      className={styles.ratings}
-      aria-labelledby={`${id}-heading`}
-      data-evening-day-ratings
-    >
-      <div className={styles.heading}>
-        <h3 id={`${id}-heading`}>
-          <Drama size={16} strokeWidth={2.1} aria-hidden="true" />
-          What Today Cost
-        </h3>
-        {comparison.previousDay && deltas.length ? (
+    <EveningReflectionPanel
+      kind="ratings"
+      headingId={`${id}-heading`}
+      title="What Today Cost"
+      icon={<Drama size={16} strokeWidth={2.1} aria-hidden="true" />}
+      detail={
+        comparison.previousDay && deltas.length ? (
           <div
             className={styles.comparison}
             role="group"
@@ -101,11 +98,10 @@ export function EveningDayRatings({
             ))}
           </div>
         ) : (
-          <span className={styles.scale} title={comparisonLabel}>
-            Set your baseline
-          </span>
-        )}
-      </div>
+          <span title={comparisonLabel}>Set your baseline</span>
+        )
+      }
+    >
       <div className={styles.stack}>
         <CheckInRating
           id={`${id}-energy`}
@@ -142,6 +138,6 @@ export function EveningDayRatings({
           }
         />
       </div>
-    </section>
+    </EveningReflectionPanel>
   );
 }
