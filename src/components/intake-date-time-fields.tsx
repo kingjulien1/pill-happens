@@ -275,6 +275,7 @@ export function IntakeTimingSection({
             : "idle"
       ];
   const ToggleIcon = pinned ? LockKeyholeOpen : LockKeyhole;
+  const toggleGuideLabel = pinned ? "Show unlock gesture" : "Show lock gesture";
   const actionsDisabled = locked || hold.stage !== null || phase === "settling";
   const showGesture = (gesture: "tap" | "hold") => {
     const control = button.current;
@@ -432,48 +433,51 @@ export function IntakeTimingSection({
           data-pinned={pinned}
           aria-labelledby={`${id}-guide-title`}
         >
-          <Timer aria-hidden="true" />
-          <div>
-            <div className={styles.guideHeading}>
-              <h4 id={`${id}-guide-title`}>How Time Lock works</h4>
-              <span role="status" aria-atomic="true" id={`${id}-timing-status`}>
-                {status}
-              </span>
-            </div>
-            <p id={`${id}-timing-help`}>
-              {pinned
-                ? "Both values carry over to new and edited intakes. Tap Time Lock to unlock and use the current time, or hold it until the ring fills and release to relock at the current time."
-                : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds, then release when the ring fills. Your next intake will use this date and time. Editing either field also locks both values.`}
-            </p>
-            <div className={styles.guideActions}>
+          <div className={styles.guideHeading}>
+            <Timer aria-hidden="true" />
+            <h4 id={`${id}-guide-title`} aria-label="How Time Lock works">
+              <span>How </span>Time Lock<span> works</span>
+            </h4>
+            <span aria-hidden="true" className={styles.labelDot} />
+            <span role="status" aria-atomic="true" id={`${id}-timing-status`}>
+              {status}
+            </span>
+          </div>
+          <div className={styles.guideActions}>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              aria-label={toggleGuideLabel}
+              title={toggleGuideLabel}
+              disabled={actionsDisabled}
+              focusableWhenDisabled={!disabled}
+              aria-controls={`${id}-lock`}
+              onClick={() => showGesture(pinned ? "tap" : "hold")}
+            >
+              <ToggleIcon aria-hidden="true" className="size-4" />
+            </Button>
+            {pinned && (
               <Button
                 type="button"
-                size="sm"
+                size="icon"
                 variant="outline"
+                aria-label="Show relock gesture"
+                title="Show relock gesture"
                 disabled={actionsDisabled}
                 focusableWhenDisabled={!disabled}
                 aria-controls={`${id}-lock`}
-                onClick={() => showGesture(pinned ? "tap" : "hold")}
+                onClick={() => showGesture("hold")}
               >
-                <ToggleIcon aria-hidden="true" className="size-4" />
-                {pinned ? "Show unlock gesture" : "Show lock gesture"}
+                <TimerReset aria-hidden="true" className="size-4" />
               </Button>
-              {pinned && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  disabled={actionsDisabled}
-                  focusableWhenDisabled={!disabled}
-                  aria-controls={`${id}-lock`}
-                  onClick={() => showGesture("hold")}
-                >
-                  <TimerReset aria-hidden="true" className="size-4" />
-                  Show relock gesture
-                </Button>
-              )}
-            </div>
+            )}
           </div>
+          <p id={`${id}-timing-help`}>
+            {pinned
+              ? "Both values carry over to new and edited intakes. Tap Time Lock to unlock and use the current time, or hold it until the ring fills and release to relock at the current time."
+              : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds, then release when the ring fills. Your next intake will use this date and time. Editing either field also locks both values.`}
+          </p>
         </aside>
       </div>
     </CheckInSection>

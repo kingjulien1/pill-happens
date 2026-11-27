@@ -233,11 +233,12 @@
 }
 .lockGuide {
   --guide-accent: var(--color-violet-400);
+  container-type: inline-size;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-  padding: 13px 15px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 12px clamp(10px, 3vw, 15px);
   border: 1px solid color-mix(in srgb, var(--guide-accent) 29%, var(--border));
   border-radius: var(--dialog-radius-control, 12px);
   background: color-mix(in srgb, var(--popover) 90%, var(--guide-accent));
@@ -246,7 +247,8 @@
 .lockGuide[data-pinned="true"] {
   --guide-accent: var(--color-rose-400);
 }
-.lockGuide > svg {
+.guideHeading > svg {
+  flex: none;
   width: 19px;
   height: 19px;
   color: color-mix(in srgb, var(--foreground) 45%, var(--guide-accent));
@@ -256,11 +258,11 @@
 .guideActions {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 9px;
 }
 .guideHeading {
-  justify-content: space-between;
+  gap: clamp(6px, 1.7vw, 9px);
+  min-width: 0;
+  text-wrap: balance;
 }
 .guideHeading h4 {
   margin: 0;
@@ -269,36 +271,35 @@
   line-height: 1.35;
 }
 .guideHeading [role="status"] {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
   color: var(--muted-foreground);
   font-size: 0.72rem;
   line-height: 1.4;
 }
-.guideHeading [role="status"]::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-}
-.lockGuide[data-pinned="true"] [role="status"]::before {
-  border-color: var(--guide-accent);
-  background-color: var(--guide-accent);
-}
 .lockGuide p {
-  margin-block: 6px 10px;
+  grid-column: 1 / -1;
+  margin: 0;
   color: var(--muted-foreground);
   font-size: 0.8rem;
   line-height: 1.5;
 }
-.guideActions button {
-  font-size: 0.76rem;
+.guideActions {
+  align-self: start;
+  gap: 4px;
+}
+@container (max-width: 20.5rem) {
+  .guideHeading h4 span {
+    display: none;
+  }
+}
+@container (max-width: 15.5rem) {
+  .guideHeading > svg {
+    display: none;
+  }
 }
 @media (pointer: coarse) {
   .guideActions button {
-    min-height: 44px;
+    min-inline-size: 44px;
+    min-block-size: 44px;
   }
 }
 
