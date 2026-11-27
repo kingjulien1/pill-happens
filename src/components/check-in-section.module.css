@@ -90,6 +90,32 @@
   max-width: 100%;
   margin-inline-start: auto;
 }
+.header[data-has-action] {
+  --section-action-size: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: clamp(6px, 2vw, 14px);
+}
+.header[data-has-action] .labelRow {
+  min-height: var(--section-action-size);
+}
+.header[data-has-action] .description {
+  grid-column: 1 / -1;
+}
+.action {
+  display: flex;
+  color: var(--foreground);
+}
+.action > button {
+  min-width: var(--section-action-size);
+  min-height: var(--section-action-size);
+}
+@media (pointer: coarse) {
+  .header[data-has-action] {
+    --section-action-size: 44px;
+  }
+}
 .description {
   margin: 7px 0 0;
   color: var(--muted-foreground);

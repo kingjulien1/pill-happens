@@ -2186,12 +2186,12 @@ export function DeveloperGuidePage() {
                 dose formatting elsewhere in the journal.
               </p>
               <p>
-                Timing uses three labeled 40px controls. Time Taken and Time
-                Lock share equal widths beside the date. Native
-                values stay vertically centered. Log Intake and Edit Intake share
-                the same draft feedback and tracking-day footer. Reset Draft clears
-                the form and releases pinned timing. Edit Intake also offers Delete
-                Intake. Both actions have a review and an explicit confirmation.
+                Time Lock sits at the top right of the Timing header. Date Taken
+                and Time Taken share the row below in 40px-high fields. Log Intake
+                and Edit Intake share the same draft feedback and tracking-day
+                footer. Reset Draft clears the form and releases pinned timing.
+                Edit Intake also offers Delete Intake. Both actions have a review
+                and an explicit confirmation.
                 Manual date/time changes use the shared, journal-scoped
                 intake:timing draft. Saving an intake preserves the pin.
                 Manual edits show the lock animation after the picker closes.

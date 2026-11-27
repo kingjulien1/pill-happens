@@ -3,7 +3,7 @@
   --timing-rose: var(--color-rose-400, #fb7185);
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(104px, 1.18fr) repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -24,7 +24,7 @@
   max-width: 100%;
   height: var(--control-height);
   padding-block: 0;
-  padding-inline-start: 8px;
+  padding-inline: 8px;
   border-radius: var(--dialog-radius-control, 12px);
   font-size: var(--intake-input-font-size, 16px);
   font-weight: var(--intake-input-font-weight, 400);
@@ -35,7 +35,7 @@
 }
 
 /* Keep the picker’s control geometry and keyboard focus ring in both appearances. */
-.fields .field :is(input, button).input {
+.fields .field input.input {
   --ring: var(--timing-rose);
   border-color: var(--timing-rose);
 }
@@ -47,32 +47,6 @@
   color: var(--foreground);
   -webkit-text-fill-color: currentColor;
   opacity: 1;
-}
-
-.field .dateInput {
-  padding-inline-end: 2px;
-}
-
-.field .timeInput {
-  /* Reclaim a little native-control padding for the compact clock field. */
-  padding-inline-start: 8px;
-  padding-inline-end: 2px;
-}
-
-@media (max-width: 359px) {
-  .fields {
-    margin-inline: -4px;
-    column-gap: 6px;
-    grid-template-columns: minmax(98px, 1.16fr) repeat(2, minmax(0, 1fr));
-  }
-  .field label {
-    gap: 1px;
-    font-size: 0.72rem;
-    letter-spacing: normal;
-  }
-  .field :is(.dateInput, .timeInput) {
-    padding-inline: 3px;
-  }
 }
 
 .input::-webkit-calendar-picker-indicator,
@@ -123,34 +97,9 @@
   line-height: 1.2;
 }
 
-.field .resetButton {
-  position: relative;
-  display: grid;
-  place-content: center;
-  padding: 0;
-  color: inherit;
-  cursor: pointer;
+.resetButton {
   touch-action: manipulation;
   -webkit-touch-callout: none;
-  user-select: none;
-}
-.fields .field button.resetButton,
-.fields .field button.resetButton:focus-visible {
-  background: var(--lock-fill, #503142);
-  color: var(--color-rose-50, #fff1f2);
-}
-.resetButton:is(
-  [data-state="waiting"],
-  [data-state="entering"],
-  [data-state="charging"]
-) {
-  --lock-fill: #80334e;
-}
-.resetButton:is([data-state="ready"], [data-state="settling"]) {
-  --lock-fill: var(--color-rose-800, #9f1239);
-}
-.resetButton[data-state="fixed"] {
-  --lock-fill: var(--color-rose-900, #881337);
 }
 .face {
   display: grid;
@@ -226,12 +175,6 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .field .resetButton {
-    transition: background-color 220ms ease-out;
-  }
-  .field .resetButton[data-state="charging"] {
-    transition: background-color var(--charge-duration) ease-in;
-  }
   /* The outgoing glyph clears the centre while the next springs into its place. */
   .glyph {
     transform: translateY(-3px) rotate(-12deg) scale(0.68);

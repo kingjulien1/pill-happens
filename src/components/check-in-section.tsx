@@ -5,6 +5,7 @@ type CheckInSectionHeaderProps = {
   caption: ReactNode;
   context?: string;
   detail: ReactNode;
+  action?: ReactNode;
   headingId?: string;
   description?: ReactNode;
 };
@@ -13,11 +14,12 @@ export function CheckInSectionHeader({
   caption,
   context,
   detail,
+  action,
   headingId,
   description,
 }: CheckInSectionHeaderProps) {
   return (
-    <div className={styles.header}>
+    <div className={styles.header} data-has-action={action ? "" : undefined}>
       <div className={styles.caption}>
         <div className={styles.labelRow}>
           {headingId ? (
@@ -36,6 +38,7 @@ export function CheckInSectionHeader({
         </div>
         <span className={styles.detail}>{detail}</span>
       </div>
+      {action && <div className={styles.action}>{action}</div>}
       {description && <p className={styles.description}>{description}</p>}
     </div>
   );

@@ -34,7 +34,7 @@ import {
 import { priorMedicationIntake } from "@/lib/intake-context";
 import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
 import { IntakeAmountField } from "@/components/intake-amount-field";
-import { IntakeDateTimeFields } from "@/components/intake-date-time-fields";
+import { IntakeTimingSection } from "@/components/intake-date-time-fields";
 import { useIntakeTiming } from "@/components/use-intake-timing";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import { toast } from "@/components/ui/journal-toast";
@@ -736,11 +736,8 @@ export function IntakeForm({
           </div>
         </CheckInSection>
         <div className={checkStyles.sectionDivider} role="separator" />
-        <CheckInSection
-          caption="Timing"
+        <IntakeTimingSection
           headingId={`${formId}-timing-heading`}
-          context={timing.pinned ? "Locked" : "Journal time"}
-          description="Use the time you took the dose, even if you’re logging it later. Intakes before 06:00 go on the previous tracking day."
           detail={
             <IntakeSectionContext
               kind="timing"
@@ -750,21 +747,16 @@ export function IntakeForm({
               hasMedication={Boolean(medication || fallbackIntake)}
             />
           }
-        >
-          <div className="form-field p-4">
-            <IntakeDateTimeFields
-              value={takenAt}
-              onChange={timing.pin}
-              onFix={timing.fixTime}
-              onReset={timing.reset}
-              pinned={timing.pinned}
-              onEditingChange={timing.editingChanged}
-              onResettingChange={setTimingResetting}
-              timezone={timezone}
-              disabled={busy}
-            />
-          </div>
-        </CheckInSection>
+          value={takenAt}
+          onChange={timing.pin}
+          onFix={timing.fixTime}
+          onReset={timing.reset}
+          pinned={timing.pinned}
+          onEditingChange={timing.editingChanged}
+          onResettingChange={setTimingResetting}
+          timezone={timezone}
+          disabled={busy}
+        />
       </fieldset>
 
       <div className={`${styles.closingSurface} ${styles.closingRegion}`}>

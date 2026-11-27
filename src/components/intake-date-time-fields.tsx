@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import {
   CalendarClock,
@@ -22,7 +23,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTimeLockPress } from "./use-time-lock-press";
-import { Input, inputSurface } from "@/components/ui/input";
+import { CheckInSection } from "./check-in-section";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toLocalInput } from "@/lib/domain";
 import styles from "./intake-date-time-fields.module.css";
@@ -40,7 +43,9 @@ const timeLockIcons = Object.entries({
   resetting: LockKeyholeOpen,
   refreshing: TimerReset,
 } satisfies Record<Phase | "charging" | "ready" | "fixed", LucideIcon>);
-type IntakeDateTimeFieldsProps = {
+type IntakeTimingSectionProps = {
+  headingId: string;
+  detail: ReactNode;
   value: string;
   onChange: (combined: string) => void;
   onReset: () => void;
@@ -68,7 +73,9 @@ const noticeHeadings = {
 } as const;
 
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
-export function IntakeDateTimeFields({
+export function IntakeTimingSection({
+  headingId,
+  detail,
   value,
   onChange,
   onReset,
@@ -78,7 +85,7 @@ export function IntakeDateTimeFields({
   pinned,
   timezone,
   disabled = false,
-}: IntakeDateTimeFieldsProps) {
+}: IntakeTimingSectionProps) {
   const id = useId();
   const separator = value.indexOf("T");
   const date = separator < 0 ? value : value.slice(0, separator);
@@ -221,76 +228,27 @@ export function IntakeDateTimeFields({
       ? "The date and time return to now together. Your saved intakes keep their original timestamps."
       : pinned
         ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
-        : "Hold for one second, then release. Both values carry over. Editing either field locks both.";
+        : "Hold Time Lock for one second, then release. Both values carry over. Editing either field locks both.";
 
   return (
-    <div
-      className={styles.fields}
-      data-intake-date-time-fields
-      data-timing-pinned={pinned}
-      data-timing-phase={state}
-    >
-      <div className={styles.field} data-timing-field="date">
-        <Label htmlFor={`${id}-date`}>Date Taken</Label>
-        <Input
-          id={`${id}-date`}
-          name="takenAtDate"
-          type="date"
-          value={date}
-          max={localNow.slice(0, 10)}
-          onChange={(event) => {
-            changeInput(`${event.target.value}T${time}`);
-            // Native pickers can commit without moving focus away from the field.
-            if (event.nativeEvent.type === "change") commitInput();
-          }}
-          onFocus={focusInput}
-          onBlur={commitInput}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              event.currentTarget.blur();
-            }
-          }}
-          disabled={locked}
-          required
-          className={`${styles.input} ${styles.dateInput}`}
-          data-intake-date
-        />
-      </div>
-      <div className={styles.field} data-timing-field="time">
-        <Label htmlFor={`${id}-time`}>Time Taken</Label>
-        <Input
-          id={`${id}-time`}
-          name="takenAtTime"
-          type="time"
-          value={time}
-          max={date === localNow.slice(0, 10) ? localNow.slice(11) : undefined}
-          step={60}
-          onChange={(event) => {
-            changeInput(`${date}T${event.target.value}`);
-            if (event.nativeEvent.type === "change") commitInput();
-          }}
-          onFocus={focusInput}
-          onBlur={commitInput}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              event.currentTarget.blur();
-            }
-          }}
-          disabled={locked}
-          required
-          className={`${styles.input} ${styles.timeInput}`}
-          data-intake-clock
-        />
-      </div>
-      <div className={styles.field}>
-        <Label htmlFor={`${id}-lock`}>Time Lock</Label>
-        <button
+    <CheckInSection
+      caption="Timing"
+      headingId={headingId}
+      context={pinned ? "Locked" : "Journal time"}
+      detail={detail}
+      action={
+        <Button
           ref={button}
-          id={`${id}-lock`}
           type="button"
-          className={`${inputSurface} ${styles.input} ${styles.resetButton}`}
+          variant="outline"
+          size="icon"
+          className={styles.resetButton}
+          aria-label="Time Lock"
+          title={
+            pinned
+              ? "Tap to unlock · Hold to lock the current time"
+              : "Tap for now · Hold to lock the time"
+          }
           {...hold.handlers}
           disabled={locked}
           aria-pressed={pinned}
@@ -314,27 +272,94 @@ export function IntakeDateTimeFields({
                 data-glyph={phaseName}
                 data-current={phaseName === state || undefined}
               >
-                <Icon size={22} strokeWidth={2.15} />
+                <Icon strokeWidth={2.15} />
               </span>
             ))}
           </span>
-        </button>
-      </div>
-      <aside className={styles.notice} aria-label="Timing help">
+        </Button>
+      }
+      description="Use the time you took the dose, even if you’re logging it later. Intakes before 06:00 go on the previous tracking day."
+    >
+      <div className="form-field p-4">
         <div
-          className={styles.noticeHeader}
-          role="status"
-          aria-atomic="true"
-          id={`${id}-timing-status`}
+          className={styles.fields}
+          data-intake-date-time-fields
+          data-timing-pinned={pinned}
+          data-timing-phase={state}
         >
-          <strong>
-            <Info aria-hidden="true" />
-            {status}
-          </strong>
-          <span>{action}</span>
+          <div className={styles.field} data-timing-field="date">
+            <Label htmlFor={`${id}-date`}>Date Taken</Label>
+            <Input
+              id={`${id}-date`}
+              name="takenAtDate"
+              type="date"
+              value={date}
+              max={localNow.slice(0, 10)}
+              onChange={(event) => {
+                changeInput(`${event.target.value}T${time}`);
+                // Native pickers can commit without moving focus away from the field.
+                if (event.nativeEvent.type === "change") commitInput();
+              }}
+              onFocus={focusInput}
+              onBlur={commitInput}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  event.currentTarget.blur();
+                }
+              }}
+              disabled={locked}
+              required
+              className={styles.input}
+              data-intake-date
+            />
+          </div>
+          <div className={styles.field} data-timing-field="time">
+            <Label htmlFor={`${id}-time`}>Time Taken</Label>
+            <Input
+              id={`${id}-time`}
+              name="takenAtTime"
+              type="time"
+              value={time}
+              max={
+                date === localNow.slice(0, 10) ? localNow.slice(11) : undefined
+              }
+              step={60}
+              onChange={(event) => {
+                changeInput(`${date}T${event.target.value}`);
+                if (event.nativeEvent.type === "change") commitInput();
+              }}
+              onFocus={focusInput}
+              onBlur={commitInput}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  event.currentTarget.blur();
+                }
+              }}
+              disabled={locked}
+              required
+              className={styles.input}
+              data-intake-clock
+            />
+          </div>
+          <aside className={styles.notice} aria-label="Timing help">
+            <div
+              className={styles.noticeHeader}
+              role="status"
+              aria-atomic="true"
+              id={`${id}-timing-status`}
+            >
+              <strong>
+                <Info aria-hidden="true" />
+                {status}
+              </strong>
+              <span>{action}</span>
+            </div>
+            <p id={`${id}-timing-help`}>{instructions}</p>
+          </aside>
         </div>
-        <p id={`${id}-timing-help`}>{instructions}</p>
-      </aside>
-    </div>
+      </div>
+    </CheckInSection>
   );
 }
