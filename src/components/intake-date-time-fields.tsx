@@ -45,7 +45,7 @@ const timeLockIcons = Object.entries({
 } satisfies Record<Phase | "charging" | "ready" | "fixed", LucideIcon>);
 type IntakeTimingSectionProps = {
   headingId: string;
-  detail: ReactNode;
+  context: ReactNode;
   value: string;
   onChange: (combined: string) => void;
   onReset: () => void;
@@ -75,7 +75,7 @@ const noticeHeadings = {
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
 export function IntakeTimingSection({
   headingId,
-  detail,
+  context,
   value,
   onChange,
   onReset,
@@ -234,8 +234,7 @@ export function IntakeTimingSection({
     <CheckInSection
       caption="Timing"
       headingId={headingId}
-      context={pinned ? "Locked" : "Journal time"}
-      detail={detail}
+      context={context}
       action={
         <Button
           ref={button}

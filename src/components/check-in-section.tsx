@@ -3,8 +3,8 @@ import styles from "./check-in-section.module.css";
 
 type CheckInSectionHeaderProps = {
   caption: ReactNode;
-  context?: string;
-  detail: ReactNode;
+  context?: ReactNode;
+  detail?: ReactNode;
   action?: ReactNode;
   headingId?: string;
   description?: ReactNode;
@@ -36,7 +36,7 @@ export function CheckInSectionHeader({
             </span>
           )}
         </div>
-        <span className={styles.detail}>{detail}</span>
+        {detail != null && <span className={styles.detail}>{detail}</span>}
       </div>
       {action && <div className={styles.action}>{action}</div>}
       {description && <p className={styles.description}>{description}</p>}

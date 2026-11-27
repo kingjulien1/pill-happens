@@ -738,7 +738,7 @@ export function IntakeForm({
         <div className={checkStyles.sectionDivider} role="separator" />
         <IntakeTimingSection
           headingId={`${formId}-timing-heading`}
-          detail={
+          context={
             <IntakeSectionContext
               kind="timing"
               previous={previousIntake}
