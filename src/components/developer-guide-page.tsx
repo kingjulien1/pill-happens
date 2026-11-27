@@ -2195,7 +2195,7 @@ export function DeveloperGuidePage() {
                 Manual date/time changes use the shared, journal-scoped
                 intake:timing draft. Saving an intake preserves the pin.
                 Manual edits show the lock animation after the picker closes.
-                Hold Time Lock for one second. When “Release to lock” appears,
+                Hold Time Lock for 1.75 seconds. When “Release to lock” appears,
                 release to keep the time. A second hold fixes the
                 current instant. Tapping returns to now after the animation.
                 Closing mid-reset still honors that reset. Fresh current-day

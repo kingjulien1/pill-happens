@@ -1,0 +1,415 @@
+/* Grow the painted face independently of its touch target and header gutter. */
+.trigger[data-feedback] {
+  isolation: isolate;
+  overflow: visible;
+}
+.trigger[data-feedback]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -1px;
+  border: 3px solid #fda4af;
+  border-radius: inherit;
+  background-color: #54223e;
+  box-shadow:
+    0 0 0 1px #2d172f,
+    0 3px 10px #45132750;
+  pointer-events: none;
+}
+.trigger[data-feedback] > span {
+  color: #fff1f2;
+}
+.trigger[data-feedback="ready"]::before {
+  border-color: #fed7aa;
+}
+
+.countdown {
+  --lift: 28px;
+  --gap: 14px;
+  --gather: 500ms;
+  position: absolute;
+  z-index: 4;
+  bottom: calc(100% + var(--gap));
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  margin-left: -25px;
+  color: #fff1f2;
+  pointer-events: none;
+  user-select: none;
+}
+.countdown[data-side="below"] {
+  --lift: -28px;
+  bottom: auto;
+  top: calc(100% + var(--gap));
+}
+.countdown::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: var(--gap);
+  background: linear-gradient(#fda4af, #fda4af40);
+}
+.countdown[data-side="below"]::before {
+  top: auto;
+  bottom: 100%;
+  transform: rotate(180deg);
+}
+.caption {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 5px);
+  transform: translateY(-50%);
+  padding: 3px 8px;
+  border: 1px solid #d691ab;
+  border-radius: 100px;
+  background: #382033;
+  color: #ffedd5;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.disc {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(at 35% 20%, #663451, #321d37 70%);
+  box-shadow:
+    0 0 0 1px #43243c,
+    0 3px 10px #220e2955;
+}
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke-width: 5.5;
+}
+.track {
+  stroke: #91607e;
+  opacity: 0.55;
+}
+.arc {
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+}
+.latch {
+  width: 22px;
+  height: 22px;
+}
+.burst {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff7ed, #fda4af80 42%, transparent)
+    center / 0 0 no-repeat;
+}
+.burst::before,
+.burst::after {
+  content: "";
+  position: absolute;
+  inset: 9%;
+  border: 2px solid #fde2b5;
+  border-radius: inherit;
+}
+.burst::after {
+  border: 1.5px dashed #f9a8d4;
+}
+.burst i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 8px;
+  margin: -4px 0 0 -1.5px;
+  border-radius: 2px;
+  background: #fda4af;
+}
+.burst i:nth-child(3n + 1) {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px;
+  background: #fde68a;
+  clip-path: polygon(
+    50% 0%,
+    65% 35%,
+    100% 50%,
+    65% 65%,
+    50% 100%,
+    35% 65%,
+    0 50%,
+    35% 35%
+  );
+}
+.burst i:nth-child(3n + 2) {
+  height: 4px;
+  background: #ddd6fe;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .trigger[data-feedback="charging"]::before {
+    animation: wind-up var(--charge-duration)
+      cubic-bezier(0.45, 0.03, 0.65, 0.82) both;
+  }
+  .trigger[data-feedback="charging"] > span {
+    animation: grow-icon var(--charge-duration) ease-in both;
+  }
+  .trigger[data-feedback="ready"]::before {
+    transform: scale(1.45);
+    animation: poised 1.65s ease-in-out infinite;
+  }
+  .trigger[data-feedback="ready"] > span {
+    transform: scale(1.25);
+  }
+  .trigger[data-feedback="released"]::before {
+    animation: recoil 650ms ease-out both;
+  }
+  .trigger[data-feedback="released"] > span {
+    animation: recoil-icon 620ms ease-out both;
+  }
+  .trigger[data-feedback="canceled"]::before {
+    animation:
+      wind-up var(--charge-duration) ease-in both paused,
+      withdraw 165ms ease-out both;
+  }
+  .countdown {
+    animation: lift-out 300ms cubic-bezier(0.16, 0.94, 0.22, 1.16) both;
+  }
+  .countdown:is(
+      [data-lock-countdown="charging"],
+      [data-lock-countdown="canceled"]
+    )
+    .arc {
+    animation: sweep var(--charge-duration) linear both;
+  }
+  .countdown[data-lock-countdown="charging"] .latch {
+    animation: develop var(--charge-duration) ease-out both;
+  }
+  .countdown[data-lock-countdown="ready"] .latch {
+    animation: click-shut 380ms cubic-bezier(0.17, 0.85, 0.24, 1.25) both;
+  }
+  .countdown[data-lock-countdown="ready"] .disc {
+    animation: beacon 1.65s ease-in-out infinite;
+  }
+  .countdown[data-lock-countdown="released"] .disc {
+    animation: gather var(--gather) both;
+  }
+  .countdown[data-lock-countdown="canceled"] {
+    animation: lift-out 165ms ease-in reverse both;
+  }
+  .countdown[data-lock-countdown="released"] .caption,
+  .countdown[data-lock-countdown="released"]::before {
+    animation: withdraw 240ms ease-out both;
+  }
+  .burst::before,
+  .burst::after {
+    animation: ripple 490ms cubic-bezier(0.13, 0.77, 0.21, 1) var(--gather) both;
+  }
+  .burst {
+    animation: flash 220ms ease-out var(--gather) both;
+  }
+  .burst::after {
+    animation-delay: calc(var(--gather) + 70ms);
+  }
+  .burst i {
+    animation: scatter 570ms cubic-bezier(0.13, 0.77, 0.24, 1)
+      calc(var(--gather) + var(--delay)) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .countdown[data-lock-countdown="charging"] .arc {
+    stroke-dashoffset: 100;
+  }
+  .countdown[data-lock-countdown="released"],
+  .countdown[data-lock-countdown="canceled"],
+  .trigger[data-feedback="released"]::before {
+    display: none;
+  }
+  .trigger[data-feedback="released"] > span {
+    color: inherit;
+  }
+}
+@keyframes wind-up {
+  from {
+    transform: scale(0.99);
+    opacity: 0;
+    border-width: 1px;
+  }
+  24% {
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.45);
+    border-color: #fed7aa;
+  }
+}
+@keyframes grow-icon {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.25);
+  }
+}
+@keyframes poised {
+  50% {
+    transform: scale(1.43);
+    border-color: #fda4af;
+  }
+}
+@keyframes recoil {
+  0% {
+    transform: scale(1.45);
+    border-color: #fed7aa;
+  }
+  32% {
+    transform: scale(0.89);
+    border-width: 1px;
+  }
+  53% {
+    transform: scale(1.075);
+    border-width: 2px;
+  }
+  74% {
+    transform: scale(0.978);
+  }
+  90% {
+    transform: scale(1.008);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+@keyframes recoil-icon {
+  0% {
+    transform: scale(1.25);
+  }
+  31% {
+    transform: scale(0.86);
+  }
+  57% {
+    transform: scale(1.08);
+  }
+  80% {
+    transform: scale(0.98);
+  }
+  to {
+    transform: scale(1);
+    color: var(--foreground);
+  }
+}
+@keyframes lift-out {
+  from {
+    opacity: 0;
+    transform: translateY(var(--lift)) scale(0.68);
+  }
+  72% {
+    opacity: 1;
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes sweep {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes develop {
+  from {
+    opacity: 0.14;
+    transform: translateY(2px) scale(0.48) rotate(-14deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes click-shut {
+  35% {
+    transform: translateY(1px) scale(1.12, 0.91);
+  }
+  70% {
+    transform: translateY(-0.5px) scale(0.98, 1.05);
+  }
+}
+@keyframes beacon {
+  50% {
+    box-shadow:
+      0 0 0 2px #fecdd350,
+      0 0 12px #fb718560;
+  }
+}
+@keyframes gather {
+  0% {
+    transform: none;
+    animation-timing-function: ease-out;
+  }
+  20% {
+    transform: rotate(-14deg) scale(1.09);
+    animation-timing-function: cubic-bezier(0.55, 0.04, 0.89, 0.45);
+  }
+  66% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(280deg) scale(0.025);
+    opacity: 0;
+  }
+}
+@keyframes withdraw {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ripple {
+  from {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  14% {
+    opacity: 0.95;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.93);
+  }
+}
+@keyframes flash {
+  0%,
+  100% {
+    background-size: 0 0;
+  }
+  22% {
+    background-size: 20px 20px;
+  }
+}
+@keyframes scatter {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--bearing)) translateY(-2px) scale(0.25);
+  }
+  22% {
+    opacity: 1;
+    transform: rotate(var(--bearing)) translateY(calc(var(--travel) * 0.55))
+      rotate(18deg) scale(1.12);
+  }
+  58% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--bearing)) translateY(var(--travel))
+      rotate(var(--twist)) scale(0.42);
+  }
+}

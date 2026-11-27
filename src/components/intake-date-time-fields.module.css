@@ -215,7 +215,7 @@
   }
   .glyph[data-current][data-glyph="entering"] svg {
     transform-origin: 75% 25%;
-    animation: turn-key var(--charge-duration) ease-in-out both;
+    animation: turn-key var(--key-duration) ease-in-out both;
   }
   .glyph[data-current][data-glyph="resetting"] svg {
     animation: unlatch var(--unlock-duration) cubic-bezier(0.22, 0.75, 0.31, 1)

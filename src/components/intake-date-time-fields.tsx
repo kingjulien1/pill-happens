@@ -22,7 +22,9 @@ import {
   TimerReset,
   type LucideIcon,
 } from "lucide-react";
-import { useTimeLockPress } from "./use-time-lock-press";
+import { TIME_LOCK_HOLD_MS, useTimeLockPress } from "./use-time-lock-press";
+import { TimeLockCountdown } from "./time-lock-countdown";
+import feedbackStyles from "./time-lock-countdown.module.css";
 import { CheckInSection } from "./check-in-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +63,7 @@ const reducedMotion = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const revealDuration = 580;
+const manualEntryDuration = 700;
 const unlockDuration = 820;
 const refreshDuration = 460;
 const noticeHeadings = {
@@ -181,7 +184,7 @@ export function IntakeTimingSection({
   // OS changes its motion preference before an animationend could fire.
   useEffect(() => {
     const durations = {
-      entering: chargeDuration,
+      entering: manualEntryDuration,
       settling: revealDuration,
       resetting: unlockDuration,
       refreshing: refreshDuration,
@@ -192,7 +195,7 @@ export function IntakeTimingSection({
       setPhase(phase === "entering" && !reducedMotion() ? "settling" : "idle");
     }, durations[phase]);
     return () => clearTimeout(timer);
-  }, [phase, motionKey, chargeDuration, finishReset]);
+  }, [phase, motionKey, finishReset]);
 
   useEffect(() => {
     const node = button.current;
@@ -228,7 +231,7 @@ export function IntakeTimingSection({
       ? "The date and time return to now together. Your saved intakes keep their original timestamps."
       : pinned
         ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
-        : "Hold Time Lock for one second, then release. Both values carry over. Editing either field locks both.";
+        : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds. Release when the ring fills to keep both values. Editing either field also locks them.`;
 
   return (
     <CheckInSection
@@ -236,46 +239,56 @@ export function IntakeTimingSection({
       headingId={headingId}
       context={context}
       action={
-        <Button
-          ref={button}
-          type="button"
-          variant="outline"
-          size="icon"
-          className={styles.resetButton}
-          aria-label="Time Lock"
-          title={
-            pinned
-              ? "Tap to unlock · Hold to lock the current time"
-              : "Tap for now · Hold to lock the time"
-          }
-          {...hold.handlers}
-          disabled={locked}
-          aria-pressed={pinned}
-          aria-describedby={`${id}-timing-status ${id}-timing-help`}
-          data-intake-time-reset
-          data-state={state}
-          style={
-            {
-              "--charge-duration": `${chargeDuration}ms`,
-              "--settle-duration": `${revealDuration}ms`,
-              "--unlock-duration": `${unlockDuration}ms`,
-              "--refresh-duration": `${refreshDuration}ms`,
-            } as CSSProperties
-          }
-        >
-          <span className={styles.face} aria-hidden="true">
-            {timeLockIcons.map(([phaseName, Icon]) => (
-              <span
-                key={phaseName}
-                className={styles.glyph}
-                data-glyph={phaseName}
-                data-current={phaseName === state || undefined}
-              >
-                <Icon strokeWidth={2.15} />
-              </span>
-            ))}
-          </span>
-        </Button>
+        <>
+          <Button
+            ref={button}
+            type="button"
+            variant="outline"
+            size="icon"
+            className={`${styles.resetButton} ${feedbackStyles.trigger}`}
+            aria-label="Time Lock"
+            title={
+              pinned
+                ? "Tap to unlock · Hold to lock the current time"
+                : "Tap for now · Hold to lock the time"
+            }
+            {...hold.handlers}
+            disabled={locked}
+            aria-pressed={pinned}
+            aria-describedby={`${id}-timing-status ${id}-timing-help`}
+            data-intake-time-reset
+            data-state={state}
+            data-feedback={hold.feedback ?? undefined}
+            style={
+              {
+                "--charge-duration": `${chargeDuration}ms`,
+                "--key-duration": `${manualEntryDuration}ms`,
+                "--settle-duration": `${revealDuration}ms`,
+                "--unlock-duration": `${unlockDuration}ms`,
+                "--refresh-duration": `${refreshDuration}ms`,
+              } as CSSProperties
+            }
+          >
+            <span className={styles.face} aria-hidden="true">
+              {timeLockIcons.map(([phaseName, Icon]) => (
+                <span
+                  key={phaseName}
+                  className={styles.glyph}
+                  data-glyph={phaseName}
+                  data-current={phaseName === state || undefined}
+                >
+                  <Icon strokeWidth={2.15} />
+                </span>
+              ))}
+            </span>
+          </Button>
+          {hold.feedback && (
+            <TimeLockCountdown
+              phase={hold.feedback}
+              chargeDuration={chargeDuration}
+            />
+          )}
+        </>
       }
       description="Use the time you took the dose, even if you’re logging it later. Intakes before 06:00 go on the previous tracking day."
     >

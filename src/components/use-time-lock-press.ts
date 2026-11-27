@@ -4,8 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
 
 const chargeDelay = 300;
-const readyAfter = 1000;
+export const TIME_LOCK_HOLD_MS = 1750;
+const releaseDuration = 1200;
 type PressSource = number | " " | "Enter";
+export type TimeLockFeedback = "charging" | "ready" | "released" | "canceled";
 
 /** Keep the native click for taps and assistive technology. A hold commits only on release. */
 export function useTimeLockPress(
@@ -13,7 +15,7 @@ export function useTimeLockPress(
   tap: () => void,
   fix: () => void,
 ) {
-  const [stage, setStage] = useState<"charging" | "ready" | null>(null);
+  const [feedback, setFeedback] = useState<TimeLockFeedback | null>(null);
   const press = useRef<{
     source: PressSource;
     started: number;
@@ -29,12 +31,15 @@ export function useTimeLockPress(
     clearTimeout(press.current.chargeTimer);
     clearTimeout(press.current.readyTimer);
     press.current = null;
-    setStage(null);
+    setFeedback(null);
   }, []);
   const cancel = useCallback(() => {
     if (!press.current) return;
+    const visibleHold =
+      performance.now() - press.current.started >= chargeDelay;
     swallowClick.current = true;
     clear();
+    if (visibleHold && !document.hidden) setFeedback("canceled");
   }, [clear]);
 
   useEffect(() => {
@@ -54,17 +59,26 @@ export function useTimeLockPress(
   useEffect(() => {
     if (disabled) cancel();
   }, [cancel, disabled]);
+  useEffect(() => {
+    if (feedback !== "released" && feedback !== "canceled") return;
+    const timer = setTimeout(
+      () => setFeedback(null),
+      feedback === "released" ? releaseDuration : 180,
+    );
+    return () => clearTimeout(timer);
+  }, [feedback]);
 
   function begin(source: PressSource, x = 0, y = 0) {
     if (disabled || press.current) return;
     swallowClick.current = false;
+    setFeedback(null);
     press.current = {
       source,
       started: performance.now(),
       x,
       y,
-      chargeTimer: setTimeout(() => setStage("charging"), chargeDelay),
-      readyTimer: setTimeout(() => setStage("ready"), readyAfter),
+      chargeTimer: setTimeout(() => setFeedback("charging"), chargeDelay),
+      readyTimer: setTimeout(() => setFeedback("ready"), TIME_LOCK_HOLD_MS),
     };
   }
   function release(source: PressSource) {
@@ -74,7 +88,10 @@ export function useTimeLockPress(
     if (disabled) return;
     if (elapsed >= chargeDelay) {
       swallowClick.current = true;
-      if (elapsed >= readyAfter) fix();
+      if (elapsed >= TIME_LOCK_HOLD_MS) {
+        fix();
+        setFeedback("released");
+      } else setFeedback("canceled");
     } else if (typeof source === "string") {
       tap();
     }
@@ -87,8 +104,9 @@ export function useTimeLockPress(
     );
   }
   return {
-    stage,
-    chargeDuration: readyAfter - chargeDelay,
+    feedback,
+    stage: feedback === "charging" || feedback === "ready" ? feedback : null,
+    chargeDuration: TIME_LOCK_HOLD_MS - chargeDelay,
     handlers: {
       onPointerDown(event: PointerEvent<HTMLButtonElement>) {
         if (!event.isPrimary || event.button !== 0 || press.current || disabled)

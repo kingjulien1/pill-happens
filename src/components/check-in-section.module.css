@@ -109,6 +109,7 @@
   grid-column: 1;
 }
 .action {
+  position: relative;
   display: flex;
   color: var(--foreground);
 }
