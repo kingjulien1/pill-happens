@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { TIME_LOCK_HOLD_MS, useTimeLockPress } from "./use-time-lock-press";
 import { TimeLockCountdown, timeLockCaption } from "./time-lock-countdown";
-import feedbackStyles from "./time-lock-countdown.module.css";
 import { CheckInSection } from "./check-in-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -341,7 +340,7 @@ export function IntakeTimingSection({
             type="button"
             variant="outline"
             size="icon"
-            className={`${styles.lockControl} ${styles.resetButton} ${feedbackStyles.trigger}`}
+            className={`${styles.lockControl} ${styles.resetButton}`}
             aria-label="Time Lock"
             title={
               pinned

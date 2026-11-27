@@ -46,12 +46,27 @@ export function TimeLockCountdown({
     const pane = anchor.closest(
       '[data-dialog-scroll], [data-slot="dialog-content"], [data-slot="drawer-popup"]',
     );
-    const visibleTop = Math.max(
-      pane?.getBoundingClientRect().top ?? 0,
-      window.visualViewport?.offsetTop ?? 0,
+    const paneBounds = pane?.getBoundingClientRect();
+    const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop ?? 0;
+    const visibleTop = Math.max(paneBounds?.top ?? 0, viewportTop);
+    const visibleBottom = Math.min(
+      paneBounds?.bottom ?? Infinity,
+      viewportTop + (viewport?.height ?? window.innerHeight),
     );
-    // Leave room for the outgoing label's upward arc above the dial.
-    if (anchor.getBoundingClientRect().top + node.offsetTop < visibleTop + 40)
+    const trigger = anchor.getBoundingClientRect();
+    const roomAbove = trigger.top - visibleTop;
+    const roomBelow = visibleBottom - trigger.bottom;
+    // Reserve the caption's 26-degree swing as well as the full-size dial.
+    const caption = node.querySelector<HTMLElement>("[data-caption]");
+    const reach = node.offsetWidth / 2 - (caption?.offsetLeft ?? 0);
+    const swing = reach * Math.sin((26 * Math.PI) / 180);
+    const clearance =
+      Math.max(
+        0,
+        swing + ((caption?.offsetHeight ?? 0) - node.offsetHeight) / 2,
+      ) + 8;
+    if (roomAbove < clearance - node.offsetTop && roomBelow > roomAbove)
       node.dataset.side = "below";
   }, []);
 
@@ -66,11 +81,25 @@ export function TimeLockCountdown({
       {(phase === "charging" || phase === "ready") && (
         <span className={styles.caption} data-caption="hold">
           {captions.charging}
+          <span className={styles.captionDetails}>
+            <span>Release early to cancel.</span>
+            <span>Your timing stays as it is.</span>
+          </span>
         </span>
       )}
       {phase !== "charging" && (
         <span className={styles.caption} data-caption="result">
           {timeLockCaption(phase, pinned)}
+          {phase === "ready" && (
+            <span className={styles.captionDetails}>
+              <span>
+                {pinned
+                  ? "Pins the time at release."
+                  : "Pins this date and time."}
+              </span>
+              <span>Your next log will use it.</span>
+            </span>
+          )}
         </span>
       )}
       <span className={styles.disc}>

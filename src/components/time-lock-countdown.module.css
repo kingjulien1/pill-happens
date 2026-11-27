@@ -1,33 +1,9 @@
-/* Grow the painted face independently of its touch target and header gutter. */
-.trigger[data-feedback] {
-  isolation: isolate;
-  overflow: visible;
-}
-.trigger[data-feedback]::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -1px;
-  border: 3px solid #fda4af;
-  border-radius: inherit;
-  background-color: #54223e;
-  box-shadow:
-    0 0 0 1px #2d172f,
-    0 3px 10px #45132750;
-  pointer-events: none;
-}
-.trigger[data-feedback] > span {
-  color: #fff1f2;
-}
-.trigger[data-feedback="ready"]::before {
-  border-color: #fed7aa;
-}
-
 .countdown {
-  --disc-size: 50px;
-  --caption-gap: 5px;
-  --lift: 28px;
-  --gap: 14px;
+  /* Reserve the fully grown dial so the connector and caption pivot stay put. */
+  --disc-size: 72px;
+  --caption-gap: 8px;
+  --lift: 12px;
+  --gap: 26px;
   --gather: 500ms;
   position: absolute;
   z-index: 4;
@@ -41,7 +17,7 @@
   user-select: none;
 }
 .countdown[data-side="below"] {
-  --lift: -28px;
+  --lift: -12px;
   bottom: auto;
   top: calc(100% + var(--gap));
 }
@@ -76,6 +52,19 @@
   line-height: 1.5;
   white-space: nowrap;
 }
+.caption:has(.captionDetails) {
+  padding: 7px 11px;
+  border-radius: var(--dialog-radius-control, 12px);
+}
+.captionDetails {
+  display: grid;
+  gap: 2px;
+  margin-block-start: 6px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.6;
+}
 .countdown[data-lock-countdown="ready"] [data-caption="hold"] {
   display: none;
 }
@@ -107,8 +96,8 @@
   stroke-dasharray: 100;
 }
 .latch {
-  width: 22px;
-  height: 22px;
+  width: 44%;
+  height: 44%;
 }
 .burst {
   position: absolute;
@@ -168,31 +157,6 @@
     animation: caption-rise-in 460ms cubic-bezier(0.18, 0.75, 0.25, 1) 100ms
       both;
   }
-  .trigger[data-feedback="charging"]::before {
-    animation: wind-up var(--charge-duration)
-      cubic-bezier(0.45, 0.03, 0.65, 0.82) both;
-  }
-  .trigger[data-feedback="charging"] > span {
-    animation: grow-icon var(--charge-duration) ease-in both;
-  }
-  .trigger[data-feedback="ready"]::before {
-    transform: scale(1.45);
-    animation: poised 1.65s ease-in-out infinite;
-  }
-  .trigger[data-feedback="ready"] > span {
-    transform: scale(1.25);
-  }
-  .trigger[data-feedback="released"]::before {
-    animation: recoil 650ms ease-out both;
-  }
-  .trigger[data-feedback="released"] > span {
-    animation: recoil-icon 620ms ease-out both;
-  }
-  .trigger[data-feedback="canceled"]::before {
-    animation:
-      wind-up var(--charge-duration) ease-in both paused,
-      withdraw 165ms ease-out both;
-  }
   .countdown {
     animation: lift-out 300ms cubic-bezier(0.16, 0.94, 0.22, 1.16) both;
   }
@@ -202,6 +166,17 @@
     )
     .arc {
     animation: sweep var(--charge-duration) linear both;
+  }
+  .countdown:is(
+      [data-lock-countdown="charging"],
+      [data-lock-countdown="canceled"]
+    )
+    .disc {
+    animation: charge-disc var(--charge-duration)
+      cubic-bezier(0.32, 0.05, 0.35, 1) both;
+  }
+  .countdown[data-lock-countdown="canceled"] :is(.disc, .arc) {
+    animation-play-state: paused;
   }
   .countdown[data-lock-countdown="charging"] .latch {
     animation: develop var(--charge-duration) ease-out both;
@@ -216,7 +191,7 @@
     animation: gather var(--gather) both;
   }
   .countdown[data-lock-countdown="canceled"] {
-    animation: lift-out 165ms ease-in reverse both;
+    animation: withdraw 165ms ease-out both;
   }
   .countdown[data-lock-countdown="released"] .caption,
   .countdown[data-lock-countdown="released"]::before {
@@ -266,88 +241,22 @@
     stroke-dashoffset: 100;
   }
   .countdown[data-lock-countdown="released"],
-  .countdown[data-lock-countdown="canceled"],
-  .trigger[data-feedback="released"]::before {
+  .countdown[data-lock-countdown="canceled"] {
     display: none;
   }
-  .trigger[data-feedback="released"] > span {
-    color: inherit;
-  }
 }
-@keyframes wind-up {
+@keyframes charge-disc {
   from {
-    transform: scale(0.99);
-    opacity: 0;
-    border-width: 1px;
-  }
-  24% {
-    opacity: 1;
-  }
-  to {
-    transform: scale(1.45);
-    border-color: #fed7aa;
-  }
-}
-@keyframes grow-icon {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.25);
-  }
-}
-@keyframes poised {
-  50% {
-    transform: scale(1.43);
-    border-color: #fda4af;
-  }
-}
-@keyframes recoil {
-  0% {
-    transform: scale(1.45);
-    border-color: #fed7aa;
-  }
-  32% {
-    transform: scale(0.89);
-    border-width: 1px;
-  }
-  53% {
-    transform: scale(1.075);
-    border-width: 2px;
-  }
-  74% {
-    transform: scale(0.978);
-  }
-  90% {
-    transform: scale(1.008);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-@keyframes recoil-icon {
-  0% {
-    transform: scale(1.25);
-  }
-  31% {
-    transform: scale(0.86);
-  }
-  57% {
-    transform: scale(1.08);
-  }
-  80% {
-    transform: scale(0.98);
+    transform: scale(0.69);
   }
   to {
     transform: scale(1);
-    color: var(--foreground);
   }
 }
 @keyframes lift-out {
   from {
     opacity: 0;
-    transform: translateY(var(--lift)) scale(0.68);
+    transform: translateY(var(--lift));
   }
   72% {
     opacity: 1;
@@ -384,6 +293,7 @@
 }
 @keyframes beacon {
   50% {
+    transform: scale(1.025);
     box-shadow:
       0 0 0 2px #fecdd350,
       0 0 12px #fb718560;
@@ -395,7 +305,7 @@
     animation-timing-function: ease-out;
   }
   20% {
-    transform: rotate(-14deg) scale(1.09);
+    transform: rotate(-8deg) scale(1.025);
     animation-timing-function: cubic-bezier(0.55, 0.04, 0.89, 0.45);
   }
   66% {
