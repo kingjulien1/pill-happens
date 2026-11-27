@@ -116,7 +116,7 @@ export function notificationChangeSummary(
     changed(a.form !== b.form, "medication type");
     changed(
       a.archived !== b.archived,
-      b.archived ? "archive status" : "active status",
+      "rotation status",
     );
     changed(
       a.color !== b.color ||

@@ -24,14 +24,16 @@ import {
   Wind,
   type LucideIcon,
 } from "lucide-react";
-import { TIME_LOCK_HOLD_MS, useTimeLockPress } from "./use-time-lock-press";
-import { TimeLockCountdown, timeLockCaption } from "./time-lock-countdown";
+import { useHoldPress } from "./use-hold-press";
+import { HoldCountdown, timeLockCaption } from "./time-lock-countdown";
 import { CheckInSection } from "./check-in-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toLocalInput } from "@/lib/domain";
 import styles from "./intake-date-time-fields.module.css";
+
+const TIME_LOCK_PRESS = { delay: 300, duration: 1750 };
 
 type Phase =
   "idle" | "waiting" | "entering" | "settling" | "resetting" | "refreshing";
@@ -247,7 +249,7 @@ export function IntakeTimingSection({
     onFix();
     setPhase(reducedMotion() ? "idle" : "settling");
   };
-  const hold = useTimeLockPress(locked, resetTiming, fixTiming);
+  const hold = useHoldPress(locked, resetTiming, fixTiming, TIME_LOCK_PRESS);
   const { chargeDuration } = hold;
   const state =
     hold.stage ??
@@ -420,7 +422,7 @@ export function IntakeTimingSection({
             </span>
           )}
           {hold.feedback && (
-            <TimeLockCountdown
+            <HoldCountdown
               phase={hold.feedback}
               pinned={pinned}
               chargeDuration={chargeDuration}
@@ -540,7 +542,7 @@ export function IntakeTimingSection({
           <p className={styles.guideHelp} id={`${id}-timing-help`}>
             {pinned
               ? "Tap Time Lock to use the current time again. To pin a fresh timestamp, hold until the ring fills and release. You can still edit either field."
-              : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds, then release when the ring fills. Changing the date or time by hand also locks both values.`}
+              : `Hold Time Lock for ${TIME_LOCK_PRESS.duration / 1000} seconds, then release when the ring fills. Changing the date or time by hand also locks both values.`}
           </p>
           <span
             className={styles.guideStatus}

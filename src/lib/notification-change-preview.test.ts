@@ -175,6 +175,6 @@ test("summary comparisons normalize equivalent instants and unordered categories
         medication: { ...med, name: "Renamed", archived: true },
       },
     }),
-    "Name and archive status updated.",
+    "Name and rotation status updated.",
   );
 });

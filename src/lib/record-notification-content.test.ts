@@ -86,20 +86,20 @@ test("medication saves summarize actual strength, type and default amount withou
   });
 });
 
-test("archive and restore outcomes state selector availability and retain the saved history distinction", () => {
+test("bench and return outcomes state selector availability and retain the saved history distinction", () => {
   const archived: NotificationPreviewRecord = {
     kind: "medication",
     medication: { ...medication, archived: true },
   };
   const removal = recordNotificationContent({ before: med, after: archived })!;
-  assert.equal(removal.heading, "Ritalin archived.");
+  assert.equal(removal.heading, "Ritalin benched.");
   assert.equal(removal.message, "Hidden from new intakes · Past entries kept");
-  assert.match(removal.guidance, /Restore the medication/);
+  assert.match(removal.guidance, /Return to rotation/);
   const restoration = recordNotificationContent({
     before: archived,
     after: med,
   })!;
-  assert.equal(restoration.heading, "Ritalin restored.");
+  assert.equal(restoration.heading, "Ritalin back in rotation.");
   assert.equal(
     restoration.message,
     "Available for new intakes · Past entries kept",

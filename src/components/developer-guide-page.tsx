@@ -1059,7 +1059,7 @@ export function DeveloperGuidePage() {
               <p>
                 The amber Today link uses the journal’s tracking date and shows
                 intake and check-in counts. The four Library links show saved
-                journal pages, past days, active medications and active goals.
+                journal pages, past days, medications in rotation and active goals.
                 Counts use the loaded journal and update while the index is open.
                 Descriptive labels stand in while the journal loads.
               </p>
@@ -1340,13 +1340,11 @@ export function DeveloperGuidePage() {
                 21px below 360px, and 32px from 640px. Its 44px/48px artwork
                 stage and saved-count summary align on the same centered row.
                 Below it, the 14px/500 library heading states the total
-                medication count, opposite a centered, noninteractive summary of
-                active and archived counts. There is no Active button or saved
-                archive-view filter: all definitions remain visible, active
-                first and usage-ranked within each status. A compact Archived
-                divider identifies the later group; its cards remain editable
-                and can be restored from the usual editor. Explicit medication
-                and ingredient journal references keep their own query
+                medication count. Select In rotation or Benched to filter the
+                list. Select it again to show both groups in usage order.
+                Tap a card to edit it. Hold for one second and release, or
+                use its three-dot button, to edit, bench, return or view its
+                history. Explicit medication and ingredient references keep their own
                 filtering. The notice that edits update all past logs uses an
                 explicit 37%-opacity card surface without dimming its icon or
                 text.
@@ -2254,7 +2252,7 @@ export function DeveloperGuidePage() {
               <p>
                 Medication dialogs use their own slightly higher, compact header
                 with a longer visible description. Reset Draft and the edit-only
-                Archive or Restore action sit beside Close. The paired actions
+                Bench or Return to rotation action sit beside Close. The paired actions
                 have a 2px gap, followed by 8px before Close. All three controls
                 use 17/24 of the top bar’s 46px control and 23px glyph sizes:
                 approximately 32.5833px and 16.2917px. Their existing colors and
@@ -2265,7 +2263,7 @@ export function DeveloperGuidePage() {
                 keeps a failed action available to retry. Focus returns to its
                 trigger, or to Close when resetting disables that trigger.
                 Closing the editor returns to its original list card or Add
-                Medication; archiving an opener that leaves the visible list
+                Medication; benching an opener that leaves the visible list
                 falls back to the stable Add action.
               </p>
               <p>
@@ -3087,7 +3085,7 @@ export function DeveloperGuidePage() {
                 Tablet, Drops and other dosage forms remain separate
                 presentation/counting units. <code>/</code> searches tracking
                 days, Monday–Sunday ISO weeks and Morning/Evening journals.
-                Archived medication matches stay available and are labeled.
+                Benched medication matches stay available and are labeled.
                 Medication usage orders names, with stable saved-order ties;
                 ingredient matching and deduplication share case, combining-mark
                 and whitespace normalization.
@@ -3279,8 +3277,8 @@ export function DeveloperGuidePage() {
               context="Locate the Record, Keep Its Context"
             >
               <p>
-                Medication references reveal matching active and archived
-                library cards without overwriting the saved Active/Archive
+                Medication references reveal matching in-rotation and benched
+                library cards without overwriting the current rotation
                 choice. Show kit removes only reference parameters, preserving
                 unrelated query context. An intake link follows the live
                 record’s taken time in the current journal timezone, so a moved
@@ -3310,7 +3308,7 @@ export function DeveloperGuidePage() {
                 NIMH/MedlinePlus category background, matching saved medications
                 and related ingredients. Membership comes only from explicit
                 saved categories, with the existing legacy flags respected;
-                names never infer a clinical category. Archived definitions
+                names never infer a clinical category. Benched definitions
                 remain visible. Decoration respects page readiness, visibility,
                 hidden tabs and reduced motion. Amounts stay per medication and
                 per counted form: milligrams from unrelated medicines are never
@@ -3934,7 +3932,7 @@ export function DeveloperGuidePage() {
                 reloads and app relaunches. New forms, individual edit IDs and
                 past tracking days have separate drafts; successful saves clear
                 only their own draft, while failed requests retain it.
-                Medication forms group Reset and Archive or Restore beside Close.
+                Medication forms group Reset and Bench or Return to rotation beside Close.
                 Check-in and intake forms share the Reset Draft footer. The
                 check-in heading separates first recorded opening from latest
                 successful save, and opening metadata never claims a save or

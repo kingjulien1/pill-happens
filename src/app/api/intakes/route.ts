@@ -17,7 +17,7 @@ export function POST(request: Request) {
           (item) => item.id === input.medicationId && !item.archived,
         );
         if (!medication)
-          throw new ApiError(400, "Choose an active medication.");
+          throw new ApiError(400, "Choose a medication in your rotation.");
         if (state.intakes.length >= 200_000)
           throw new ApiError(
             400,

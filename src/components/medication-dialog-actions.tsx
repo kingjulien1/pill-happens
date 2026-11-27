@@ -53,7 +53,7 @@ export function MedicationDialogActions({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const reset = confirmation === "reset";
-  const action = reset ? "Reset Draft" : archived ? "Restore" : "Archive";
+  const action = reset ? "Reset Draft" : archived ? "Return to rotation" : "Bench medication";
   const statusIcon = archived ? "restore" : "archive";
   const name = medicationName.trim() || "this medication";
 
@@ -155,11 +155,11 @@ export function MedicationDialogActions({
           data-dialog-corner="medication"
           data-medication-archive-action
           disabled={archiveDisabled || pending}
-          aria-label={archived ? "Restore Medication" : "Archive Medication"}
+          aria-label={archived ? "Return to rotation" : "Bench medication"}
           aria-haspopup="dialog"
           aria-expanded={open && !reset}
           aria-controls={confirmationId}
-          title={archived ? "Restore Medication" : "Archive Medication"}
+          title={archived ? "Return to rotation" : "Bench medication"}
           onClick={(event) =>
             requestConfirmation("status", event.currentTarget)
           }
@@ -198,9 +198,9 @@ export function MedicationDialogActions({
               {reset ? (
                 <ReviewTitle action="reset" />
               ) : archived ? (
-                "Restore This Medication?"
+                "Return to Rotation?"
               ) : (
-                "Archive This Medication?"
+                "Bench This Medication?"
               )}
             </DialogTitle>
             <DialogDescription className={styles.description}>
@@ -208,13 +208,13 @@ export function MedicationDialogActions({
                 "Discard the edits waiting in this draft."
               ) : archived ? (
                 <>
-                  Return <strong>{name}</strong> to your active medications so
+                  Return <strong>{name}</strong> to your rotation so
                   it can be selected for new intakes. Its details, past entries
                   and any unsaved draft stay available.
                 </>
               ) : (
                 <>
-                  Move <strong>{name}</strong> to your archive and hide it from
+                  Move <strong>{name}</strong> to the bench and hide it from
                   the selector for new intakes. Past entries and this form’s
                   unsaved draft stay available.
                 </>

@@ -150,7 +150,7 @@ export function MedicationJournalReference(
   const detail = [
     strength,
     medication?.activeIngredient?.trim(),
-    medication?.archived ? "Archived" : "",
+    medication?.archived ? "Benched" : "",
   ]
     .filter(Boolean)
     .join(" · ");

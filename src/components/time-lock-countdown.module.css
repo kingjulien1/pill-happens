@@ -282,8 +282,8 @@
   50% {
     transform: scale(1.025);
     box-shadow:
-      0 0 0 2px #fecdd350,
-      0 0 12px #fb718560;
+      0 0 0 2px var(--dial-edge, #fecdd350),
+      0 0 12px var(--dial-glow, #fb718560);
   }
 }
 @keyframes gather {
@@ -347,5 +347,80 @@
     opacity: 0;
     transform: rotate(var(--bearing)) translateY(var(--travel))
       rotate(var(--twist)) scale(0.42);
+  }
+}
+
+/* Library artwork sits on the left rail. The dial drains and the caption
+   pivots to the right, leaving the medication name clear beneath it. */
+.countdown[data-medication-dial] {
+  --disc-size: 52px;
+  --gap: 10px;
+  --lift: 50px;
+  --gather: 300ms;
+  --dial-glow: #d879f569;
+  --dial-edge: #dfb6ff88;
+  color: #f6e7ff;
+}
+.countdown[data-medication-dial][data-side="below"] {
+  --lift: -50px;
+}
+.countdown[data-medication-dial]::before {
+  background: linear-gradient(#d493fc, #c66cde44);
+}
+.countdown[data-medication-dial] .disc {
+  background: radial-gradient(at 32% 18%, #723aa1, #372044 75%);
+}
+.countdown[data-medication-dial] .track {
+  stroke: #b38bd1;
+}
+.countdown[data-medication-dial] .caption {
+  left: calc(100% + var(--caption-gap));
+  right: auto;
+  width: max-content;
+  border-color: #c68bdb;
+  background: #301d3b;
+  color: #f6e2ff;
+  transform-origin: calc(0px - var(--caption-gap) - var(--disc-size) / 2) 50%;
+}
+.countdown[data-medication-dial] .burst {
+  background-image: radial-gradient(
+    closest-side,
+    #f5eaff,
+    #dd97f588 42%,
+    transparent
+  );
+}
+.countdown[data-medication-dial] .burst::before {
+  border-color: #e9c4ff;
+}
+.countdown[data-medication-dial] .burst i {
+  background: #e3a7fc;
+}
+.countdown[data-medication-dial] .burst i:nth-child(3n + 1) {
+  background: #f5c9ff;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .countdown[data-medication-dial]:is(
+      [data-lock-countdown="charging"],
+      [data-lock-countdown="canceled"]
+    )
+    .arc {
+    animation-direction: reverse;
+  }
+  .countdown[data-medication-dial][data-lock-countdown="charging"] .disc {
+    animation: orbit-in 340ms cubic-bezier(0.16, 0.86, 0.25, 1.12) both;
+  }
+  .countdown[data-medication-dial][data-lock-countdown="ready"] .arc {
+    stroke: #e9b6fe;
+  }
+}
+@keyframes orbit-in {
+  from {
+    opacity: 0.12;
+    transform: scale(0.36) rotate(-110deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

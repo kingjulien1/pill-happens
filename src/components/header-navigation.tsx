@@ -255,8 +255,8 @@ function NavigationContents({
           `Last ${formatDay(history[0], { weekday: undefined, month: "short" })}`,
       },
       medications: {
-        count: `${active.length} active`,
-        detail: `${archived} archived`,
+        count: `${active.length} in rotation`,
+        detail: `${archived} benched`,
       },
       goals: {
         count: countCaption(

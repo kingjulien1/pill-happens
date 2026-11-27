@@ -66,7 +66,7 @@ export function MedicationCategoryPage({
         title={`${details.medications.length} Saved ${details.medications.length === 1 ? "Medication" : "Medications"}`}
       >
         {details.medications.length
-          ? `${details.medications.length} saved ${details.medications.length === 1 ? "medication" : "medications"}${archived ? `, including ${archived} archived` : ""}. Follow a name to its ingredients, recorded routes and full history.`
+          ? `${details.medications.length} saved ${details.medications.length === 1 ? "medication" : "medications"}${archived ? `, including ${archived} benched` : ""}. Follow a name to its ingredients, recorded routes and full history.`
           : "No medications carry this label yet. You can add it under Categories when editing a medication."}
       </ReferenceHero>
       <ReferenceMetrics

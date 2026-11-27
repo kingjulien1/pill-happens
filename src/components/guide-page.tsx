@@ -610,12 +610,12 @@ export function GuidePage() {
                 menu.
               </p>
             </GuideDetail>
-            <GuideDetail title="Archive &amp; Restore" icon="archive">
+            <GuideDetail title="Your Medication Rotation" icon="archive">
               <p>
-                Open a medication card and choose Archive Medication to stop
-                offering it for new intakes. Earlier records stay in the
-                journal. To bring it back, open its card in the Archived group
-                and choose Restore Medication.
+                Hold a medication for one second and release, or tap its three dots.
+                Choose Bench to pause it in the intake picker. Your past logs
+                stay in place. Choose Return to rotation on a benched card to
+                use its saved defaults again.
               </p>
             </GuideDetail>
           </div>

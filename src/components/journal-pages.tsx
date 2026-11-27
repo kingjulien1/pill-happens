@@ -62,6 +62,7 @@ import {
 import { getMedicationClassification } from "@/lib/medication-classification";
 import {
   MedicationListHeading,
+  type RotationFilter,
   MedicationsHeading,
 } from "@/components/medications-heading";
 import { IntakeAction } from "@/components/intake-action";
@@ -606,6 +607,7 @@ export function TodayPage() {
 export function MedicationsPage() {
   const { data, derived, mutate, busy, notificationScope } = useJournal();
   const search = useSearchParams();
+  const [rotationFilter, setRotationFilter] = useState<RotationFilter>(null);
   const medicationReferences = search.getAll("medication");
   const ingredientReferences = search.getAll("ingredient");
   const hasReference =
@@ -720,6 +722,9 @@ export function MedicationsPage() {
         ...rankedMedications.filter((item) => !item.archived),
         ...rankedMedications.filter((item) => item.archived),
       ];
+  const visibleMedications = !hasReference && rotationFilter
+    ? medications.filter((item) => item.archived === (rotationFilter === "bench"))
+    : medications;
   const referenceAvailable = medications.length > 0;
   const ReferenceIcon = reference?.kind === "ingredient" ? FlaskConical : Pill;
   const referenceTitle =
@@ -728,7 +733,7 @@ export function MedicationsPage() {
       : reference?.kind === "medication"
         ? medications[0]?.name || "Medication unavailable"
         : "Reference unavailable";
-  async function archive(medication: Medication): Promise<boolean> {
+  async function changeRotation(medication: Medication): Promise<boolean> {
     if (busy) return false;
     const beforePreview = {
       kind: "medication" as const,
@@ -745,14 +750,14 @@ export function MedicationsPage() {
       );
       toast.success(
         medication.archived
-          ? "Medication restored."
-          : "Medication archived. Past entries are saved.",
+          ? `${medication.name} is back in rotation.`
+          : `${medication.name} is on the bench.`,
         {
           journalScope: saved.notificationScope,
           ...(saved.unchanged ? { variant: "unchanged" as const } : {}),
           heading: medication.archived
-            ? "Medication restored."
-            : "Medication archived.",
+            ? "Back in rotation."
+            : "Medication benched.",
           details: {
             ...(updatedMedication
               ? {
@@ -768,15 +773,14 @@ export function MedicationsPage() {
               : {}),
             paragraphs: [
               medication.archived
-                ? "This medication is active again and available in the intake selector. Its existing settings and past entries have been kept."
-                : "This medication is now in your archive and is hidden from the selector for new intakes. Its past entries and totals remain in your journal.",
-              "Active and archived medications stay together in your library. Open an archived card whenever you want to restore it.",
+                ? "This medication is available for new intakes with its saved defaults."
+                : "This medication is on the bench. Past intakes and totals stay in your journal.",
             ],
             facts: [
               { label: "Medication", value: medication.name },
               {
-                label: "Status",
-                value: medication.archived ? "Active" : "Archived",
+                label: "Rotation",
+                value: medication.archived ? "In rotation" : "Benched",
               },
             ],
             links: [{ label: "Medication Library", href: "/medications" }],
@@ -793,7 +797,11 @@ export function MedicationsPage() {
             : {}),
         },
       );
-      closeDialog(medicationDialog ?? undefined);
+      if (medicationDialog?.kind === "medication-edit" && medicationDialog.id === medication.id) {
+        closeDialog(medicationDialog);
+      } else if (!hasReference && rotationFilter) {
+        document.querySelector<HTMLButtonElement>(`[data-rotation-filter="${rotationFilter}"]`)?.focus();
+      }
       return true;
     } catch {
       /* Provider displays the error; keep the editor and draft available. */
@@ -830,7 +838,7 @@ export function MedicationsPage() {
             </h2>
             <p className={mentionStyles.detail} role="status">
               {referenceAvailable
-                ? `${medications.length} ${medications.length === 1 ? "medication" : "medications"}${medications.some((item) => item.archived) ? " · Includes archived" : " · In your kit"}`
+                ? `${medications.length} ${medications.length === 1 ? "medication" : "medications"}${medications.some((item) => item.archived) ? " · Includes benched medication" : " · In your kit"}`
                 : reference?.kind === "ingredient"
                   ? "No medication currently uses this ingredient. Your journal link stays intact."
                   : "This reference no longer matches your kit. Your journal link stays intact."}
@@ -853,6 +861,8 @@ export function MedicationsPage() {
       ) : (
         <MedicationListHeading
           count={medications.length}
+          filter={rotationFilter}
+          onFilter={setRotationFilter}
           activeCount={data.medications.filter((item) => !item.archived).length}
           archivedCount={
             data.medications.filter((item) => item.archived).length
@@ -871,19 +881,23 @@ export function MedicationsPage() {
               starts here.
             </EmptyState>
           )
+        ) : !visibleMedications.length ? (
+          <p className={mentionStyles.empty} role="status">
+            {rotationFilter === "bench" ? "The bench is empty. All your medications are in rotation." : "Your medications are on the bench. Choose one to return it to rotation."}
+          </p>
         ) : (
           <div className="space-y-3">
-            {medications.map((medication, index) => (
+            {visibleMedications.map((medication, index) => (
               <Fragment key={medication.id}>
-                {!hasReference &&
+                {!hasReference && !rotationFilter &&
                   medication.archived &&
                   !medications[index - 1]?.archived && (
                     <div
                       className="flex items-center gap-3 pt-3 text-muted-foreground"
-                      data-medications-archived-heading
+                      data-medications-bench-heading
                     >
                       <h3 className="shrink-0 text-[11px] font-medium">
-                        Archived
+                        On the bench
                       </h3>
                       <span
                         className="h-px flex-1 bg-border/60"
@@ -894,6 +908,7 @@ export function MedicationsPage() {
                 <MedicationLibraryCard
                   medication={medication}
                   disabled={busy}
+                  onChangeRotation={() => changeRotation(medication)}
                   onEdit={() => {
                     medicationOpener.current =
                       document.querySelector<HTMLElement>(
@@ -953,7 +968,7 @@ export function MedicationsPage() {
                 ? formControls.current.resetDraft()
                 : false
             }
-            onArchive={editing ? () => archive(editing) : undefined}
+            onArchive={editing ? () => changeRotation(editing) : undefined}
           />
         }
         description={

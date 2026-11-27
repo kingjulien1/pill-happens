@@ -78,7 +78,7 @@ export function MedicationsHeading({
     notation: medications.length >= 10_000 ? "compact" : "standard",
     maximumFractionDigits: 1,
   }).format(medications.length);
-  const description = `${medications.length} saved ${medications.length === 1 ? "medication" : "medications"}, ${activeCount} active${palette.length ? `. Accent colors: ${palette.map((color) => color.label).join(", ")}.` : "."}`;
+  const description = `${medications.length} saved ${medications.length === 1 ? "medication" : "medications"}, ${activeCount} in rotation${palette.length ? `. Accent colors: ${palette.map((color) => color.label).join(", ")}.` : "."}`;
 
   return (
     <PageHeading
@@ -86,8 +86,11 @@ export function MedicationsHeading({
       titleClassName={modalStyles.title}
       subtitle={
         <p className={checkInStyles.headerDate}>
-          {medications.length ? "Tap a medication" : "Add your first"}
-          <small><span aria-hidden="true">/</span> {medications.length ? "Edit details" : "Set defaults"}</small>
+          {medications.length ? "Tap to edit" : "Add your first"}
+          <small>
+            <span aria-hidden="true">/</span>{" "}
+            {medications.length ? "Hold for actions" : "Set defaults"}
+          </small>
         </p>
       }
       className={styles.heading}
@@ -116,20 +119,26 @@ export function MedicationsHeading({
         </span>
       }
     >
-      Keep names, strengths, and familiar symbols together. Your defaults make
-      each intake quicker to log and easier to review.
+      Keep frequently used medications in rotation. Bench one when you take a
+      break, then bring it back with its defaults and history intact.
     </PageHeading>
   );
 }
+
+export type RotationFilter = "rotation" | "bench" | null;
 
 export function MedicationListHeading({
   count,
   activeCount,
   archivedCount,
+  filter,
+  onFilter,
 }: {
   count: number;
   activeCount: number;
   archivedCount: number;
+  filter: RotationFilter;
+  onFilter: (filter: RotationFilter) => void;
 }) {
   return (
     <div className={styles.listHeading} data-medications-list-heading>
@@ -137,15 +146,26 @@ export function MedicationListHeading({
         <strong className={styles.listCount}>{count}</strong>{" "}
         {count === 1 ? "Medication" : "Medications"}
       </h2>
-      <span className={styles.statusSummary} data-medications-status-summary>
-        <span>
-          <strong>{activeCount}</strong> active
-        </span>
-        <span aria-hidden="true">/</span>
-        <span>
-          <strong>{archivedCount}</strong> archived
-        </span>
-      </span>
+      <div
+        className={styles.statusSummary}
+        role="group"
+        aria-label="Filter medications by rotation"
+        data-medications-status-summary
+      >
+        {(["rotation", "bench"] as const).map((key) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={filter === key}
+            aria-controls="medication-library-list"
+            data-rotation-filter={key}
+            onClick={() => onFilter(filter === key ? null : key)}
+          >
+            <strong>{key === "rotation" ? activeCount : archivedCount}</strong>
+            {key === "rotation" ? "In rotation" : "Benched"}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

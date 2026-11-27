@@ -84,8 +84,8 @@ export function recordNoticeChanges(
     );
     add(
       "Library",
-      x.archived ? "Archived" : "Active",
-      y.archived ? "Archived" : "Active",
+      x.archived ? "Benched" : "In rotation",
+      y.archived ? "Benched" : "In rotation",
     );
     add(
       "Color",
@@ -185,8 +185,8 @@ export function recordNotificationContent(
         ? "removed"
         : archived
           ? m.archived
-            ? "archived"
-            : "restored"
+            ? "benched"
+            : "back in rotation"
           : before
             ? "updated"
             : "added";
@@ -214,13 +214,13 @@ export function recordNotificationContent(
               : "Ready for your next log.",
         category: "Medication",
         primary: "Medication library",
-        secondary: !after ? "Removed" : m.archived ? "Archived" : "Active",
+        secondary: !after ? "Removed" : m.archived ? "Benched" : "In rotation",
         guidance: !after
           ? "The removed medication is shown here for reference. Open the library to review the items that remain."
           : archived
             ? m.archived
-              ? "Archived medications and their past entries stay in your journal. Restore the medication when you want it back in the intake selector."
-              : "This medication is active again. New intake entries can use its current settings."
+              ? "Benched medications keep their history. Choose Return to rotation to use this medication for a new intake."
+              : "This medication is back in rotation. New intake entries can use its current settings."
             : before
               ? "Strength, name and type changes follow this medication into its past intake cards. Recorded quantities and times stay as entered."
               : "This adds a medication to your library; it does not record a dose. Its default amount is a starting point for new intake entries.",

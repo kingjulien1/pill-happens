@@ -635,7 +635,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
           ],
           [
             "medication",
-            "Name, optional ingredient, strength, default quantity, form, color, artwork/rotation, archived state and category labels.",
+            "Name, optional ingredient, strength, default quantity, form, color, artwork/rotation, rotation status and category labels.",
           ],
           [
             "check-in",
@@ -691,7 +691,7 @@ export function GuideNotifications({ children }: { children?: ReactNode }) {
         This copy is derived once when presenting the confirmed snapshot,
         including restored notices. Time-only or route-only edits do not claim
         that the dose changed. Other records summarize the actual medication,
-        strength, archive state, check-in period and metrics, daily maximum or
+        strength, rotation status, check-in period and metrics, daily maximum or
         timezone. Removal summaries name the removed amount. Unsupported
         snapshots retain the caller’s copy; equal display fields never imply an
         unchanged save. Refresh, clipboard, image, link and error notices have

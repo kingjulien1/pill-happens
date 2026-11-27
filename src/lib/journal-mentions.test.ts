@@ -238,7 +238,7 @@ test("empty @ balances medications, deduplicated ingredients and manual categori
   const medications = results.filter((item) => item.kind === "medication");
   assert.equal(medications[0].medication?.id, "v10");
   assert.match(medications[0].label, /10 mg/);
-  assert.match(medications[0].detail, /Archived/);
+  assert.match(medications[0].detail, /Benched/);
   assert.match(
     medications.find((item) => item.medication?.id === "v5")!.label,
     /5 mg/,
@@ -249,7 +249,7 @@ test("empty @ balances medications, deduplicated ingredients and manual categori
       normalizeJournalMentionText(item.label) === "diazepam",
   );
   assert.equal(diazepam.length, 1);
-  assert.equal(diazepam[0].detail, "2 medications · 1 archived");
+  assert.equal(diazepam[0].detail, "2 medications · 1 benched");
   const calendar = searchJournalMentions(data, "", today, "/");
   assert.deepEqual(
     calendar.filter((item) => item.kind === "day").map((item) => item.href),

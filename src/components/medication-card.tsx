@@ -58,6 +58,7 @@ type MedicationCardProps = Omit<
   /** A recorded or default dose in the shared second-row amount region. */
   trailing?: ReactNode;
   decoration?: ReactNode;
+  artworkFeedback?: ReactNode;
   /** Recorded routes remain distinct from a medication's physical form. */
   intakeRoute?: IntakeRoute;
   /** Library and recorded cards share the outline rail; only intakes add a route. */
@@ -87,6 +88,7 @@ export function MedicationCard({
   trailing,
   decoration,
   formPresentation = "text",
+  artworkFeedback,
   intakeRoute,
   renderDetail = plainDetail,
   detailDecoration,
@@ -127,10 +129,13 @@ export function MedicationCard({
       decoration={decoration}
       artworkBadge={
         iconPresentation ? (
-          <MedicationQuantityBadge
-            quantity={quantity}
-            hasIndicators={indicators.length > 0}
-          />
+          <>
+            <MedicationQuantityBadge
+              quantity={quantity}
+              hasIndicators={indicators.length > 0}
+            />
+            {artworkFeedback}
+          </>
         ) : undefined
       }
     >

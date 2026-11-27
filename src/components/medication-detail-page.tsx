@@ -111,8 +111,8 @@ export function MedicationDetailPage({ id }: { id: string }) {
         artwork={<MedicationHeroArtwork medication={medication} />}
         eyebrow={
           medication.archived
-            ? "Archived saved definition"
-            : "Current saved definition"
+            ? "On the bench"
+            : "In rotation"
         }
         title={
           <>

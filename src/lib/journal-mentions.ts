@@ -629,7 +629,7 @@ export function searchJournalMentions(
           key: `medication:${medication.id}`,
           kind: "medication",
           label: `${medication.name}${duplicate ? ` · ${strength}` : ""}`,
-          detail: [strength, ingredient, medication.archived ? "Archived" : ""]
+          detail: [strength, ingredient, medication.archived ? "Benched" : ""]
             .filter(Boolean)
             .join(" · "),
           href: medicationHref(medication.id),
@@ -657,7 +657,7 @@ export function searchJournalMentions(
           key: `ingredient:${key}`,
           kind: "ingredient",
           label: group.label,
-          detail: `${count} ${count === 1 ? "medication" : "medications"}${archived ? (archived === count ? " · Archived" : ` · ${archived} archived`) : ""}`,
+          detail: `${count} ${count === 1 ? "medication" : "medications"}${archived ? (archived === count ? " · Benched" : ` · ${archived} benched`) : ""}`,
           href: ingredientHref(group.label),
         },
         Math.min(

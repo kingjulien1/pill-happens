@@ -1,8 +1,8 @@
 "use client";
 
 import { useId, useLayoutEffect, useRef, type CSSProperties } from "react";
-import { LockKeyhole } from "lucide-react";
-import type { TimeLockFeedback } from "./use-time-lock-press";
+import { LockKeyhole, RefreshCw } from "lucide-react";
+import type { HoldFeedback } from "./use-hold-press";
 import styles from "./time-lock-countdown.module.css";
 
 const captions = {
@@ -12,7 +12,7 @@ const captions = {
   canceled: "Canceled",
 } as const;
 
-export function timeLockCaption(phase: TimeLockFeedback, pinned: boolean) {
+export function timeLockCaption(phase: HoldFeedback, pinned: boolean) {
   return phase === "ready" && pinned ? "Release to relock" : captions[phase];
 }
 
@@ -28,16 +28,19 @@ const confetti = Array.from(
     }) as CSSProperties,
 );
 
-export function TimeLockCountdown({
+export function HoldCountdown({
   phase,
-  pinned,
+  pinned = false,
+  medication = false,
   chargeDuration,
 }: {
-  phase: TimeLockFeedback;
-  pinned: boolean;
+  phase: HoldFeedback;
+  pinned?: boolean;
+  medication?: boolean;
   chargeDuration: number;
 }) {
   const gradientId = useId();
+  const Glyph = medication ? RefreshCw : LockKeyhole;
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
     const node = ref.current;
@@ -59,7 +62,12 @@ export function TimeLockCountdown({
     const roomBelow = visibleBottom - trigger.bottom;
     // Reserve the caption's 26-degree swing as well as the full-size dial.
     const caption = node.querySelector<HTMLElement>("[data-caption]");
-    const reach = node.offsetWidth / 2 - (caption?.offsetLeft ?? 0);
+    const reach = caption
+      ? Math.max(
+          node.offsetWidth / 2 - caption.offsetLeft,
+          caption.offsetLeft + caption.offsetWidth - node.offsetWidth / 2,
+        )
+      : 0;
     const swing = reach * Math.sin((26 * Math.PI) / 180);
     const clearance =
       Math.max(
@@ -75,6 +83,7 @@ export function TimeLockCountdown({
       ref={ref}
       className={styles.countdown}
       data-lock-countdown={phase}
+      data-medication-dial={medication || undefined}
       style={{ "--charge-duration": `${chargeDuration}ms` } as CSSProperties}
       aria-hidden="true"
     >
@@ -85,16 +94,23 @@ export function TimeLockCountdown({
       )}
       {phase !== "charging" && (
         <span className={styles.caption} data-caption="result">
-          {timeLockCaption(phase, pinned)}
+          {medication && phase === "ready"
+            ? "Release for actions"
+            : medication && phase === "released"
+              ? "Actions open"
+              : timeLockCaption(phase, pinned)}
         </span>
       )}
       <span className={styles.disc}>
         <svg className={styles.ring} viewBox="0 0 52 52" fill="none">
           <defs>
             <linearGradient id={gradientId} x1="0" y1="1" x2="1" y2="0">
-              <stop stopColor="#c4b5fd" />
-              <stop offset=".55" stopColor="#fda4af" />
-              <stop offset="1" stopColor="#fde68a" />
+              <stop stopColor={medication ? "#e9d4ff" : "#c4b5fd"} />
+              <stop
+                offset=".55"
+                stopColor={medication ? "#a855f7" : "#fda4af"}
+              />
+              <stop offset="1" stopColor={medication ? "#f0abfc" : "#fde68a"} />
             </linearGradient>
           </defs>
           <circle className={styles.track} cx="26" cy="26" r="21.5" />
@@ -108,7 +124,7 @@ export function TimeLockCountdown({
             transform="rotate(-90 26 26)"
           />
         </svg>
-        <LockKeyhole className={styles.latch} strokeWidth={2.35} />
+        <Glyph className={styles.latch} strokeWidth={2.35} />
       </span>
       {phase === "released" && (
         <span className={styles.burst}>

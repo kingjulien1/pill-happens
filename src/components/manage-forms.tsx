@@ -654,7 +654,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
     if (!selectedMedication) {
       setError(
         fieldIssue(
-          "Choose an active medication.",
+          "Choose a medication in your rotation.",
           `#${CSS.escape(id)}-medication`,
           "Choose medication",
         ),

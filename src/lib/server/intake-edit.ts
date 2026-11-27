@@ -34,7 +34,7 @@ export function intakeEditMutation(
       const medication = state.medications.find(
         (entry) => entry.id === input.medicationId && !entry.archived,
       );
-      if (!medication) throw new ApiError(400, "Choose an active medication.");
+      if (!medication) throw new ApiError(400, "Choose a medication in your rotation.");
       if (state.intakes.some((entry) => entry.id === replacement.id))
         throw new ApiError(
           409,

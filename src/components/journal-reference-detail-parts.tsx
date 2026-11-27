@@ -137,7 +137,7 @@ export function ReferenceMedicationCard({
                   : `${formatDose(medication?.strengthMg ?? 0)} mg / ${getMedicationType(medication?.form).unit}`)}
             </span>
             {medication?.archived && (
-              <span className={styles.archive}>Archived</span>
+              <span className={styles.archive}>Benched</span>
             )}
             {!medication && (
               <span className={styles.archive}>Saved history</span>
@@ -180,7 +180,7 @@ export function ReferenceMedicationCard({
     <Link
       {...props}
       href={`/medications/${encodeURIComponent(medication.id)}`}
-      aria-label={`${record.name}${medication.activeIngredient ? `, ${medication.activeIngredient}` : ""}. ${record.count} ${record.count === 1 ? "intake" : "intakes"}; ${quantitySummary(record) || "none logged"}; ${formatDose(record.totalMg)} milligrams logged${medication.archived ? ". Archived" : ""}. View medication.`}
+      aria-label={`${record.name}${medication.activeIngredient ? `, ${medication.activeIngredient}` : ""}. ${record.count} ${record.count === 1 ? "intake" : "intakes"}; ${quantitySummary(record) || "none logged"}; ${formatDose(record.totalMg)} milligrams logged${medication.archived ? ". Benched" : ""}. View medication.`}
     >
       {body}
     </Link>
