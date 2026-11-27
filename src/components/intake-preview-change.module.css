@@ -9,13 +9,16 @@
     var(--reading-ink) 69%,
     var(--color-emerald-300)
   );
-  --number-size: calc(var(--summary-copy-size) * 1.22);
+  --crest: var(--color-teal-500);
+  --glyph-unit: calc(var(--summary-copy-size) * 1.22);
+  --number-size: calc(var(--glyph-unit) * 1.225);
   --label-size: calc(var(--number-size) * 0.7);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  --reading-gap: 0.18em;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
-  gap: 8px;
+  column-gap: clamp(12px, 3%, 20px);
   margin: 0;
   padding-inline: clamp(8px, calc(2% + 2px), 12px);
   color: var(--foreground);
@@ -23,129 +26,139 @@
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
 }
-@media (max-width: 360px) {
+.row::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: 1px;
+  height: 1.05em;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, currentColor 30%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+@media (max-width: 480px) {
   .row {
     margin-inline: calc(-1 * var(--receipt-gutter));
-    --reading-gap: 0.16em;
+    --reading-gap: 0.14em;
   }
 }
 .metric {
+  justify-self: start;
   min-width: 0;
   max-width: 100%;
 }
 .metric:last-child {
-  margin-inline-start: auto;
+  justify-self: end;
+}
+.metric dd,
+.destination {
+  display: flex;
+  align-items: center;
+  column-gap: var(--reading-gap);
 }
 .metric dd {
-  display: grid;
-  grid-template-columns: minmax(0, auto) auto minmax(0, auto);
-  align-items: center;
-  gap: var(--reading-gap, 0.2em);
+  flex-wrap: wrap;
+  row-gap: 2px;
   margin: 0;
+}
+.prior,
+.destination {
+  flex: 1 1 min-content;
+  min-width: 0;
+  max-width: max-content;
 }
 .prior,
 .projected {
   min-width: 0;
-  overflow-wrap: anywhere;
   font-size: var(--label-size);
+  color: var(--rest-ink);
 }
 .prior {
+  --rest-ink: var(--foreground);
+  --peak-ink: color-mix(in srgb, var(--rest-ink) 78%, var(--crest));
   font-weight: 550;
 }
 .projected {
-  color: var(--projected-ink);
+  --rest-ink: var(--projected-ink);
+  --peak-ink: color-mix(in srgb, var(--rest-ink) 65%, var(--crest));
+  --beat-delay: 520ms;
   font-weight: 725;
 }
 .amount {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: break-word;
   font-size: var(--number-size);
+  transform-origin: center bottom;
 }
 .transfer {
+  --rest-ink: var(--foreground);
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: 0.09em;
-}
-@property --intake-chevron-tint {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
+  font-size: var(--glyph-unit);
 }
 .transfer svg {
-  color: color-mix(
-    in srgb,
-    var(--projected-ink) var(--intake-chevron-tint, 0%),
-    var(--foreground)
-  );
-  width: 1em;
-  height: 1em;
+  flex: none;
+  width: calc(8em / 7);
+  height: calc(8em / 7);
   stroke-width: 3.75;
-  transform-origin: center;
+}
+.transfer svg:first-child {
+  --beat-delay: 180ms;
+  --peak-ink: color-mix(in srgb, var(--rest-ink) 28%, var(--crest));
+  --travel-x: 0.045em;
+  width: 1.2em;
+  height: 1.2em;
+  stroke-width: 4.05;
+}
+.transfer svg:last-child {
+  --beat-delay: 340ms;
+  --peak-ink: var(--crest);
+  --travel-x: 0.075em;
+  /* Overlap the empty SVG margins so the painted gap is ~1.4× the double chevron's gap. */
+  margin-inline-start: -0.59em;
 }
 @media (prefers-reduced-motion: no-preference) {
   .row {
-    --transfer-play: paused;
+    --pulse-play: paused;
   }
   .row[data-active="true"] {
-    --transfer-play: running;
+    --pulse-play: running;
   }
-  /* The nudge and rebound take 2.7s. Both glyphs then rest for 4.5s. */
+  .prior .amount {
+    --lift-y: -0.035em;
+    --pulse-scale: 1.035;
+  }
+  .projected .amount {
+    --lift-y: -0.055em;
+    --pulse-scale: 1.065;
+    --peak-ink: var(--crest);
+  }
+  .prior > span,
+  .projected > span,
   .transfer svg {
-    animation: nudge 7.2s cubic-bezier(0.35, 0, 0.22, 1) infinite;
-    animation-play-state: var(--transfer-play);
-  }
-  .transfer svg:last-child {
-    animation-name: rebound;
+    animation: receipt-pulse 7.6s ease-in-out var(--beat-delay, 0s) infinite
+      both;
+    animation-play-state: var(--pulse-play);
   }
 }
-@keyframes nudge {
+@keyframes receipt-pulse {
   0%,
-  37.5%,
+  34%,
   100% {
-    --intake-chevron-tint: 0%;
+    color: var(--rest-ink);
     transform: none;
   }
-  9% {
-    --intake-chevron-tint: 0%;
-    transform: translate(-0.21em, 0.03em) rotate(-9deg) scale(0.78, 1.13);
-    animation-timing-function: cubic-bezier(0.63, 0, 0.9, 0.45);
-  }
-  15% {
-    --intake-chevron-tint: 100%;
-    transform: translateX(0.77em) scale(1.17, 0.86);
-  }
-  17% {
-    transform: translateX(0.74em) rotate(3deg) scale(0.72, 1.17);
-    animation-timing-function: cubic-bezier(0.14, 0.8, 0.22, 1);
-  }
-  24% {
-    --intake-chevron-tint: 100%;
-    transform: translate(-0.14em, -0.06em) rotate(-7deg) scale(1.06, 0.94);
-  }
-  30% {
-    transform: translateX(0.055em) rotate(2deg) scale(0.98, 1.02);
-  }
-}
-@keyframes rebound {
-  0%,
-  15%,
-  37.5%,
-  100% {
-    --intake-chevron-tint: 0%;
-    transform: none;
-  }
-  17% {
-    --intake-chevron-tint: 100%;
-    transform: translateX(0.08em) rotate(3deg) scale(0.76, 1.14);
-    animation-timing-function: cubic-bezier(0.12, 0.76, 0.22, 1);
-  }
-  22% {
-    transform: translate(0.34em, -0.08em) rotate(-8deg) scale(1.16, 0.89);
-    animation-timing-function: cubic-bezier(0.42, 0, 0.62, 1);
-  }
-  28% {
-    --intake-chevron-tint: 100%;
-    transform: translate(-0.09em, 0.025em) rotate(4deg) scale(0.93, 1.06);
-  }
-  33% {
-    transform: translateX(0.03em) rotate(-1deg);
+  27% {
+    color: var(--peak-ink);
+    transform: translate(var(--travel-x, 0), var(--lift-y, 0))
+      scale(var(--pulse-scale, 1));
   }
 }

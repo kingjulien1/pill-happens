@@ -38,7 +38,7 @@ function ChangeReading({
   return (
     <span className={projected ? change.projected : change.prior}>
       <span className={change.amount}>{formatDose(value)}</span>
-      {"\u00a0"}
+      {" "}
       <span>{dosage ? "mg" : value === 1 ? "Intake" : "Intakes"}</span>
     </span>
   );
@@ -77,12 +77,14 @@ export function IntakePreviewChangeRow({
           <dd>
             <span className="sr-only">From </span>
             <ChangeReading value={before} dosage={dosage} />
-            <span className={change.transfer} aria-hidden="true">
-              <ChevronRight />
-              <ChevronsRight />
+            <span className={change.destination}>
+              <span className={change.transfer} aria-hidden="true">
+                <ChevronRight />
+                <ChevronsRight />
+              </span>
+              <span className="sr-only"> to </span>
+              <ChangeReading value={after} dosage={dosage} projected />
             </span>
-            <span className="sr-only"> to </span>
-            <ChangeReading value={after} dosage={dosage} projected />
           </dd>
         </div>
       ))}
