@@ -295,7 +295,7 @@
   padding: 12px clamp(10px, 3vw, 15px);
   border: 1px solid color-mix(in srgb, var(--guide-accent) 29%, var(--border));
   border-radius: var(--dialog-radius-control, 12px);
-  background: color-mix(in srgb, var(--popover) 90%, var(--guide-accent));
+  background: color-mix(in srgb, var(--popover) 92%, var(--guide-accent));
   color: var(--foreground);
 }
 .lockGuide[data-pinned="true"] {
@@ -303,8 +303,8 @@
 }
 .guideHeading > svg {
   flex: none;
-  width: 19px;
-  height: 19px;
+  width: 1.33em;
+  height: 1.33em;
   color: color-mix(in srgb, var(--foreground) 45%, var(--guide-accent));
   stroke-width: 2.35;
 }
@@ -316,17 +316,18 @@
 .guideHeading {
   gap: clamp(6px, 1.7vw, 9px);
   min-width: 0;
+  font-size: 1.15rem;
   text-wrap: balance;
 }
 .guideHeading h4 {
   margin: 0;
-  font-size: 0.89rem;
+  font-size: inherit;
   font-weight: 650;
   line-height: 1.35;
 }
 .guideHeading [role="status"] {
   color: var(--muted-foreground);
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   line-height: 1.4;
 }
 .lockGuide p {
@@ -340,14 +341,22 @@
   align-self: start;
   gap: 4px;
 }
-@container (max-width: 20.5rem) {
+@container (max-width: 23.5rem) {
   .guideHeading h4 span {
     display: none;
   }
 }
-@container (max-width: 15.5rem) {
+@container (max-width: 17rem) {
+  .guideHeading {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    row-gap: 2px;
+  }
   .guideHeading > svg {
-    display: none;
+    grid-row: span 2;
+  }
+  .guideHeading h4 {
+    grid-column: 2 / -1;
   }
 }
 @media (pointer: coarse) {
