@@ -471,7 +471,7 @@ export function IntakeTimelineEntrance({
       if (
         event.type === "animationend" &&
         event.target instanceof HTMLElement &&
-        event.target.dataset.intakeGroupEntrancePart === "finish"
+        event.target.dataset.intakeGroupEntrancePart === "control"
       ) {
         const group = event.target.closest<HTMLElement>("[data-intake-group]");
         if (group?.dataset.groupEntryState === "running") finishGroup(group);

@@ -2291,13 +2291,9 @@ export function DeveloperGuidePage() {
                 label measurements.
               </p>
               <p>
-                Intake group outlines arrive in 400ms. After a 300ms pause,
-                separate blur and color planes reveal diagonally over 1000ms.
-                The 48px blur remains independent of the three color washes at
-                67% opacity. The control follows with an 850ms damped spring and
-                the same color stack at 84%. Native CSS easing owns the impulse,
-                overshoot, inside gap and settling; no JavaScript spring clock
-                runs. Fractional frame and label edges keep both joins closed.
+                The intake group outline and its Reveal/Collapse control fade
+                in together over 400ms. Both have a transparent background.
+                Fractional frame and label edges keep the two joins closed.
                 Height-only disclosure updates need no geometry reads. Past
                 Days week groups retain their existing theme washes. Collapse
                 and Reveal retain their direct transitions and keyboard behavior.

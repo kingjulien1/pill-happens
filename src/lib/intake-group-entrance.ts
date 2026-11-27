@@ -2,15 +2,7 @@ import { CARD_ENTRY_SPACING_MS } from "./card-entry-timing";
 
 export type IntakeGroupEntranceState = "pending" | "running" | "done";
 
-/** Joined frame first, then a 300ms breath, a diagonal wash and a damped pop. */
-export const INTAKE_GROUP_SURFACE_TIMING = {
-  fillDelay: 700,
-  fill: 1000,
-  buttonDelay: 1700,
-  button: 850,
-} as const;
-export const INTAKE_GROUP_ENTRANCE_MS =
-  INTAKE_GROUP_SURFACE_TIMING.buttonDelay + INTAKE_GROUP_SURFACE_TIMING.button;
+export const INTAKE_GROUP_ENTRANCE_MS = 400;
 
 export type IntakeGroupEntranceFace = {
   exposed: boolean;

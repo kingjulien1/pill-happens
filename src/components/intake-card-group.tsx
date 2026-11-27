@@ -23,7 +23,7 @@ import { getMedicationClasses } from "@/lib/medication-classification";
 import entranceStyles from "@/components/intake-group-entrance.module.css";
 import spacingStyles from "@/components/intake-group-spacing.module.css";
 import surfaceStyles from "@/components/intake-group-surface.module.css";
-import { INTAKE_GROUP_SURFACE_TIMING } from "@/lib/intake-group-entrance";
+import { INTAKE_GROUP_ENTRANCE_MS } from "@/lib/intake-group-entrance";
 import {
   EMPTY_INTAKE_STACK_VIEW,
   INTAKE_GROUP_SPACING_PX,
@@ -326,10 +326,7 @@ export function IntakeCardGroup({
         grouped
           ? ({
               "--intake-group-space": `${INTAKE_GROUP_SPACING_PX}px`,
-              "--group-fill-delay": `${INTAKE_GROUP_SURFACE_TIMING.fillDelay}ms`,
-              "--group-fill-duration": `${INTAKE_GROUP_SURFACE_TIMING.fill}ms`,
-              "--group-button-delay": `${INTAKE_GROUP_SURFACE_TIMING.buttonDelay}ms`,
-              "--group-button-duration": `${INTAKE_GROUP_SURFACE_TIMING.button}ms`,
+              "--group-frame-duration": `${INTAKE_GROUP_ENTRANCE_MS}ms`,
             } as CSSProperties)
           : undefined
       }
@@ -360,12 +357,7 @@ export function IntakeCardGroup({
         <div
           className={`intake-group-glass ${entranceStyles.surface}`}
           aria-hidden="true"
-        >
-          <span className={`${surfaceStyles.blur} ${entranceStyles.reveal}`} />
-          <span
-            className={`${surfaceStyles.colors} ${entranceStyles.reveal}`}
-          />
-        </div>
+        />
       )}
       <div
         id={cardsId}
@@ -430,18 +422,6 @@ export function IntakeCardGroup({
               }}
             >
               <span ref={labelRef} className="intake-group-label">
-                <span
-                  className={`${surfaceStyles.buttonSurface} ${entranceStyles.buttonSurface}`}
-                  data-intake-group-entrance-part="finish"
-                  aria-hidden="true"
-                >
-                  <span
-                    className={`${surfaceStyles.blur} ${entranceStyles.buttonMaterial}`}
-                  />
-                  <span
-                    className={`${surfaceStyles.colors} ${entranceStyles.buttonMaterial}`}
-                  />
-                </span>
                 <span
                   className={`intake-group-chevron-frame ${entranceStyles.chevron}`}
                   aria-hidden="true"

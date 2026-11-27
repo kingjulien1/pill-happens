@@ -1,29 +1,5 @@
-/* The three upper tints share one opacity above the darkened glass. */
 .group {
   --intake-group-border-outset: calc(var(--intake-group-border-inset) * 0.29);
-  --intake-group-shade: 15.5%;
-  --intake-group-fill-mauve: color-mix(
-    in srgb,
-    color-mix(in srgb, black var(--intake-group-shade), var(--color-mauve-900))
-      5.5%,
-    transparent
-  );
-  --intake-group-fill-indigo: color-mix(
-    in srgb,
-    color-mix(in srgb, black var(--intake-group-shade), var(--color-indigo-950))
-      18%,
-    transparent
-  );
-  --intake-group-fill-purple: color-mix(
-    in srgb,
-    color-mix(in srgb, black var(--intake-group-shade), var(--color-purple-800))
-      14%,
-    transparent
-  );
-  --intake-group-color-stack:
-    linear-gradient(var(--intake-group-fill-purple) 0 0),
-    linear-gradient(var(--intake-group-fill-indigo) 0 0),
-    linear-gradient(var(--intake-group-fill-mauve) 0 0);
 }
 /* Extend the painted boxes. The measured join follows their new outer edges. */
 .group > :global(.intake-group-glass) {
@@ -40,97 +16,6 @@
     calc(8px + var(--intake-group-border-outset));
   min-height: calc(24px + 2 * var(--intake-group-border-outset));
   border-radius: calc(9px + var(--intake-group-border-outset));
-}
-.blur,
-.colors {
-  position: absolute;
-  inset: var(--intake-group-border-width);
-  border-radius: calc(
-    var(--intake-card-radius) - var(--intake-group-border-inset)
-  );
-  pointer-events: none;
-  opacity: var(--group-layer-opacity);
-}
-.blur {
-  --group-layer-opacity: 1;
-  z-index: 0;
-  background-color: color-mix(
-    in srgb,
-    black var(--intake-group-shade),
-    color-mix(in srgb, var(--color-mauve-950, #0c090c) 13%, transparent)
-  );
-  -webkit-backdrop-filter: blur(48px);
-  backdrop-filter: blur(48px);
-}
-.colors {
-  --group-layer-opacity: 1;
-  --intake-group-wash-opacity: 0.67;
-  z-index: 1;
-}
-.colors::before,
-.colors::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-}
-.colors::before {
-  background: var(--intake-group-color-stack);
-  opacity: var(--intake-group-wash-opacity);
-}
-.colors::after {
-  background: color-mix(in srgb, var(--color-purple-300) 24%, transparent);
-}
-/* Keep the label's material independent: its 84% wash never stacks on 67%. */
-.group :global(.intake-group-glass) > :is(.blur, .colors) {
-  -webkit-mask-image:
-    linear-gradient(
-      to bottom,
-      #000
-        calc(
-          100% - var(--intake-group-join-bottom, 12px) +
-            var(--intake-group-border-width)
-        ),
-      transparent 0
-    ),
-    linear-gradient(
-      to right,
-      #000
-        calc(
-          var(--intake-group-notch-left, 0px) - var(--intake-group-border-width)
-        ),
-      transparent 0
-        calc(
-          var(--intake-group-notch-right, 100%) -
-            var(--intake-group-border-width)
-        ),
-      #000 0
-    );
-  mask-image:
-    linear-gradient(
-      to bottom,
-      #000
-        calc(
-          100% - var(--intake-group-join-bottom, 12px) +
-            var(--intake-group-border-width)
-        ),
-      transparent 0
-    ),
-    linear-gradient(
-      to right,
-      #000
-        calc(
-          var(--intake-group-notch-left, 0px) - var(--intake-group-border-width)
-        ),
-      transparent 0
-        calc(
-          var(--intake-group-notch-right, 100%) -
-            var(--intake-group-border-width)
-        ),
-      #000 0
-    );
-  -webkit-mask-composite: source-over;
-  mask-composite: add;
 }
 /* Replace the notch's full stroke width, rather than layering two translucent
    borders on top of one another at the join. */
@@ -206,29 +91,4 @@
     #000 0
   );
   pointer-events: none;
-}
-.buttonSurface {
-  position: absolute;
-  z-index: 0;
-  inset: var(--intake-group-border-width);
-  border-radius: calc(9px - var(--intake-group-border-inset));
-  transform-origin: center;
-  pointer-events: none;
-}
-.buttonSurface > :is(.blur, .colors) {
-  inset: 0;
-  border-radius: inherit;
-}
-.buttonSurface > .colors {
-  --intake-group-wash-opacity: 0.84;
-}
-.group :global(.intake-group-label) > :not(.buttonSurface) {
-  position: relative;
-  z-index: 1;
-}
-@media (prefers-reduced-transparency: reduce) {
-  .blur {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
