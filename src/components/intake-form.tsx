@@ -321,10 +321,13 @@ export function IntakeForm({
     previewHint = "Choose how you took this medication to complete your card.";
   } else if (intake && intake.medicationId !== medicationId) {
     previewHint =
-      "Saving replaces the original entry with this medication and updates both totals.";
+      "Saving replaces the original intake. The dose moves to this medication’s total and counts just once.";
+  } else if (intake) {
+    previewHint =
+      "Saving updates the entry you opened. This dose counts just once. Your day’s total uses the revised amount.";
   } else {
     previewHint =
-      "Saving updates the entry you opened. This dose counts just once.";
+      "Saving adds one intake to your log. The total above includes this dose. The time you chose sets which day it counts toward.";
   }
 
   const footerActions = (
@@ -882,7 +885,9 @@ export function IntakeForm({
                   To edit later, reopen this intake from your day.
                 </strong>
               )}
-              {previewHint}
+              <span className={hasPreview ? styles.saveCaption : undefined}>
+                {previewHint}
+              </span>
             </p>
           </div>
         </CheckInSection>

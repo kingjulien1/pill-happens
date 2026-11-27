@@ -92,11 +92,6 @@
   --summary-type: 15.5px;
   --summary-copy-size: calc(var(--summary-type) * 0.75);
   --summary-ink-base: var(--color-violet-100, #ede9fe);
-  --preview-totals-ink: color-mix(
-    in srgb,
-    var(--color-purple-200, #e9d5ff),
-    var(--color-purple-300, #d8b4fe)
-  );
   --footer-caption-ink: color-mix(
     in srgb,
     var(--color-purple-300),
@@ -143,6 +138,9 @@
 .receiptBody > dl {
   --lift: calc(var(--receipt-gap) * 0.4);
   margin-block: calc(-1 * var(--lift)) var(--lift);
+}
+.receiptBody:has(> .savePreviewHint) {
+  padding-block-end: clamp(17px, 4.25vw, 23px);
 }
 .receiptStamp {
   display: block;
@@ -254,11 +252,6 @@
       var(--color-purple-900) 35%,
       var(--muted-foreground)
     );
-    --preview-totals-ink: color-mix(
-      in srgb,
-      var(--color-purple-800, #6b21a8) 35%,
-      var(--muted-foreground)
-    );
   }
 }
 
@@ -279,15 +272,31 @@
   text-wrap: balance;
 }
 .savePreviewHint {
-  color: var(--preview-totals-ink);
-  opacity: 0.51;
-  justify-self: center;
-  max-inline-size: 48ch;
+  --stamp-ink: color-mix(
+    in srgb,
+    var(--checkin-line) calc(3 * var(--intake-section-edge-opacity)),
+    transparent
+  );
+  padding-inline: clamp(4px, 1.5vw, 10px);
+  color: color-mix(in srgb, var(--stamp-ink) 67%, var(--foreground));
+}
+.savePreviewHint .receiptStamp {
+  width: 2.5em;
+  height: 2.5em;
+  margin-block-end: 8px;
 }
 .hintLead {
   display: block;
-  margin-block-end: 4px;
+  margin-block-end: 6px;
   font-weight: 600;
+}
+.saveCaption {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  color: var(--foreground);
+  opacity: 0.37;
 }
 .editFootnote {
   max-inline-size: min(40ch, 78%);
