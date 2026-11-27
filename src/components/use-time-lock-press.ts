@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
 
 const chargeDelay = 300;
-const readyAfter = 2000;
+const readyAfter = 1350;
 type PressSource = number | " " | "Enter";
 
 /** Keep the native click for taps and assistive technology. A hold commits only on release. */

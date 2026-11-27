@@ -13,6 +13,44 @@
   row-gap: 6px;
 }
 
+.fieldLabel {
+  justify-content: space-between;
+  gap: 3px;
+}
+
+.fieldLabel svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+  color: var(--color-rose-500, #f43f5e);
+  stroke-width: 2;
+}
+
+.fields[data-timing-pinned="true"] .field :is(.dateInput, .timeInput) {
+  --pin-accent: var(--color-rose-500, #f43f5e);
+  border-color: color-mix(in srgb, var(--input), var(--pin-accent) 46%);
+  background-image:
+    linear-gradient(90deg, transparent, var(--pin-accent) 24%, transparent 94%),
+    linear-gradient(
+      112deg,
+      color-mix(in srgb, var(--pin-accent) 12%, transparent),
+      transparent 68%
+    );
+  background-repeat: no-repeat;
+  background-size:
+    calc(100% - 18px) 1px,
+    100% 100%;
+  background-position:
+    center calc(100% - 2px),
+    center;
+}
+
+.fields[data-timing-pinned="true"] .field .input:focus-visible {
+  border-color: var(--ring);
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
 .field .input {
   display: flex;
   align-items: center;
@@ -45,11 +83,18 @@
 
 @media (max-width: 359px) {
   .fields {
+    margin-inline: -4px;
     column-gap: 6px;
     grid-template-columns: minmax(98px, 1.16fr) repeat(2, minmax(0, 1fr));
   }
   .field label {
+    gap: 1px;
+    font-size: 0.72rem;
     letter-spacing: normal;
+  }
+  .fieldLabel svg {
+    width: 0.72rem;
+    height: 0.72rem;
   }
   .field :is(.dateInput, .timeInput) {
     padding-inline: 3px;
@@ -137,7 +182,7 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  border: 1px solid color-mix(in srgb, var(--rose) 50%, #efc5ff);
+  border: 1px solid var(--color-rose-900, #881337);
   border-radius: inherit;
   background:
     radial-gradient(ellipse at 12% -12%, #ffa9b780, transparent 51%),
@@ -215,9 +260,7 @@
 .clock {
   opacity: 0;
 }
-.clock .arrow,
-.clock .head,
-.clock .stem {
+.clock .arrow {
   transform-origin: 12px 19px;
 }
 .clock .arrow {
@@ -250,6 +293,9 @@
     opacity: 0.7;
   }
 }
+.fields .field .resetButton:is([aria-pressed="true"], [data-state="ready"]) {
+  border-color: var(--color-rose-900, #881337);
+}
 .resetButton[data-state="ready"] .rim {
   opacity: 0.66;
 }
@@ -280,13 +326,55 @@
   width: 10px;
   height: 10px;
 }
-.hint {
+.notice {
   grid-column: 1 / -1;
-  justify-self: end;
-  font-size: 11px;
-  color: var(--muted-foreground);
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--muted-foreground) 7%, transparent);
+  border-inline-start: 2px solid
+    color-mix(in srgb, var(--muted-foreground) 42%, transparent);
+  border-radius: 3px 11px 11px 3px;
+  color: var(--foreground);
+}
+.fields[data-timing-pinned="true"] .notice {
+  background: color-mix(
+    in srgb,
+    var(--color-rose-500, #f43f5e) 8%,
+    transparent
+  );
+  border-inline-start-color: var(--color-rose-500, #f43f5e);
+}
+.noticeHeader,
+.noticeHeader strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.noticeHeader {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
   line-height: 1.35;
-  text-align: end;
+}
+.noticeHeader svg {
+  width: 1em;
+  height: 1em;
+  color: var(--color-rose-500, #f43f5e);
+  stroke-width: 2.3;
+}
+.noticeHeader span {
+  font-size: 0.68rem;
+  color: var(--muted-foreground);
+}
+.notice p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin: 5px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  opacity: 0.67;
 }
 .resetButton:disabled {
   cursor: wait;
@@ -301,46 +389,43 @@
     & .face {
       animation: press-in var(--arrival) ease-in-out both;
     }
+    & .wash {
+      animation: deepen var(--arrival) cubic-bezier(0.65, 0, 0.88, 0.48) both;
+    }
     & .wash::after {
-      animation: kindle var(--arrival) ease-out both;
+      animation: kindle var(--arrival) ease-in both;
     }
     & .chargeArc {
       animation: wind-dial var(--arrival) linear both;
     }
     & .refresh {
-      animation: turn-out var(--arrival) ease-out both;
+      animation: turn-out 85ms ease-in both;
     }
     & .clock {
-      animation: turn-in var(--arrival) ease-out both;
+      animation: wind-arrow var(--arrival) cubic-bezier(0.44, 0.06, 0.38, 1)
+        both;
     }
     & .arrow {
-      animation: dock-arrow var(--arrival) cubic-bezier(0.35, 0, 0.2, 1) both;
+      transform: none;
     }
-    & .stem {
-      animation: shorten-stem var(--arrival) ease-in-out both;
-    }
-    & .head {
-      animation: open-head var(--arrival) ease-in-out both;
-    }
-    & .dial {
-      animation: draw-clock var(--arrival) ease-out both;
-    }
-    & .hands {
-      animation: set-hands var(--arrival) ease-out both;
+    & :is(.hands, .dial) {
+      opacity: 0;
     }
   }
-  .resetButton[data-fixed-start] .refresh {
+  .resetButton[aria-pressed="true"][data-state="charging"] .wash {
     animation: none;
   }
-  .resetButton[data-fixed-start][data-state="charging"] {
-    & .clock {
-      animation: rewind var(--arrival) ease-out both;
+  /* Keep the same reveal running when the user lifts at the threshold. */
+  .resetButton:is([data-state="ready"], [data-state="settling"]) {
+    & .arrow {
+      animation: dock-arrow var(--reveal-duration)
+        cubic-bezier(0.24, 0.8, 0.28, 1) both;
     }
     & .dial {
-      animation: redraw var(--arrival) ease-out both;
+      animation: draw-clock var(--reveal-duration) ease-out both;
     }
-    & .arrow {
-      animation: redock var(--arrival) ease-in-out both;
+    & .hands {
+      animation: set-hands var(--reveal-duration) ease-out both;
     }
   }
   .resetButton[data-state="ready"] .face {
@@ -422,21 +507,26 @@
     transform: scale(1.035);
   }
 }
+@keyframes deepen {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 @keyframes kindle {
   0% {
     opacity: 0;
   }
-  22% {
-    opacity: 0.96;
-    background-color: var(--rose);
+  75% {
+    opacity: 0.24;
   }
-  55% {
-    opacity: 0.86;
-    background-color: var(--wine);
+  86% {
+    opacity: 0.65;
   }
   100% {
     opacity: 0;
-    background-color: var(--plum);
   }
 }
 @keyframes wind-dial {
@@ -516,106 +606,51 @@
   }
 }
 @keyframes turn-out {
-  0% {
+  from {
     opacity: 1;
-    transform: none;
+    transform: scale(1);
   }
-  22%,
-  100% {
+  to {
     opacity: 0;
-    transform: rotate(-105deg) scale(0.5);
+    transform: scale(0.16);
   }
 }
-@keyframes turn-in {
+@keyframes wind-arrow {
   0%,
-  9% {
+  5% {
     opacity: 0;
-    transform: rotate(42deg) scale(0.55);
+    transform: rotate(-335deg) scale(0.18);
   }
-  28%,
+  32% {
+    opacity: 1;
+  }
+  83% {
+    transform: rotate(13deg) scale(1.13);
+  }
   100% {
     opacity: 1;
-    transform: none;
-  }
-}
-@keyframes rewind {
-  0%,
-  32%,
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-  14% {
-    opacity: 0.8;
-    transform: rotate(-20deg) scale(0.88);
-  }
-}
-@keyframes redraw {
-  0%,
-  100% {
-    stroke-dashoffset: 0;
-  }
-  20%,
-  56% {
-    stroke-dashoffset: 1;
-  }
-}
-@keyframes redock {
-  0%,
-  95%,
-  100% {
-    transform: translate(6px, 3px) scale(0.57143);
-  }
-  24%,
-  31% {
-    transform: translateY(3px);
-  }
-  46%,
-  60% {
     transform: none;
   }
 }
 @keyframes dock-arrow {
   0%,
-  31% {
-    transform: translateY(3px);
-  }
-  46%,
-  60% {
+  42% {
     transform: none;
   }
-  95%,
+  80% {
+    transform: translate(6.3px, 3.6px) scale(0.54);
+  }
   100% {
     transform: translate(6px, 3px) scale(0.57143);
   }
 }
-@keyframes shorten-stem {
-  0%,
-  31% {
-    transform: scaleY(1.42857);
-  }
-  46%,
-  100% {
-    transform: none;
-  }
-}
-@keyframes open-head {
-  0%,
-  31% {
-    transform: scale(0.57143);
-  }
-  46%,
-  100% {
-    transform: none;
-  }
-}
 @keyframes draw-clock {
   0%,
-  56% {
+  37% {
     stroke-dashoffset: 1;
     opacity: 0;
   }
-  59% {
+  42% {
     opacity: 1;
   }
   100% {
@@ -749,5 +784,11 @@
   }
   .resetButton[data-state="charging"] .chargeArc {
     stroke-dashoffset: 0.5;
+  }
+  .resetButton[data-state="charging"] .arrow {
+    transform: none;
+  }
+  .resetButton[data-state="charging"] :is(.dial, .hands) {
+    opacity: 0;
   }
 }

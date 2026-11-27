@@ -2195,8 +2195,8 @@ export function DeveloperGuidePage() {
                 Manual date/time changes use the shared, journal-scoped
                 intake:timing draft. Saving an intake preserves the pin.
                 Manual edits show the lock animation after the picker closes.
-                Holding Time Lock starts feedback at 300ms and arms it at two
-                seconds. Releasing then fixes the time. A second hold fixes the
+                Hold Time Lock for a bit more than a second. When the arrow
+                straightens, release to lock the time. A second hold fixes the
                 current instant. Tapping returns to now after the animation.
                 Closing mid-reset still honors that reset. Fresh current-day
                 forms and explicitly reset forms use the existing minute clock

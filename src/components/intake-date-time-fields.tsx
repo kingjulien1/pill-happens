@@ -8,7 +8,15 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { RotateCcw } from "lucide-react";
+import {
+  CalendarDays,
+  Clock3,
+  ClockArrowDown,
+  Info,
+  LockKeyhole,
+  LockKeyholeOpen,
+  RotateCcw,
+} from "lucide-react";
 import { lunarStarPath, lunarSparkPath } from "./lunar-star-paths";
 import { useTimeLockPress } from "./use-time-lock-press";
 import { Input, inputSurface } from "@/components/ui/input";
@@ -35,6 +43,20 @@ const reducedMotion = () =>
 
 // Leave a gap under the arrow like the open dial on the sleep score.
 const chargeArc = "M9.39 30.61a15 15 0 1 1 21.22 0";
+// Matching control points let the shaft unroll without detaching from its tip.
+const curvedShaft = "M4.5 10 C4.5 0 21 1 18.5 10 C17.2 14.6 12 13.8 12 19";
+const straightShaft = "M12 2 C12 5 12 8 12 10 C12 13 12 16 12 19";
+const revealDuration = 580;
+const noticeHeadings = {
+  idle: ["Time unlocked", "Tap for now"],
+  fixed: ["Time locked", "Tap to unlock"],
+  charging: ["Keep holding", "Release to cancel"],
+  ready: ["Ready to lock", "Release to lock"],
+} as const;
+
+function unrollArrow(animation: SVGAnimateElement | null) {
+  if (animation && !reducedMotion()) animation.beginElement();
+}
 
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
 export function IntakeDateTimeFields({
@@ -144,7 +166,7 @@ export function IntakeDateTimeFields({
   useEffect(() => {
     const durations = {
       entering: chargeDuration,
-      settling: 420,
+      settling: revealDuration,
       resetting: 540,
       refreshing: 460,
     };
@@ -176,16 +198,16 @@ export function IntakeDateTimeFields({
     };
   }, [state]);
 
-  const hint =
-    hold.stage === "ready"
-      ? pinned
-        ? "Release to lock the current time."
-        : "Release to lock this date and time."
-      : hold.stage === "charging"
-        ? "Keep holding to lock. Release early to cancel."
-        : pinned
-          ? "Tap to unlock · Hold 2s to lock a new time"
-          : "Tap for now · Hold 2s to lock this time";
+  const winding = state === "charging" || state === "entering";
+  const revealing = state === "ready" || state === "settling";
+  const StartIcon =
+    hold.stage === "charging" && pinned ? ClockArrowDown : RotateCcw;
+  const LockIcon = pinned ? LockKeyhole : LockKeyholeOpen;
+  const [status, action] =
+    noticeHeadings[hold.stage ?? (pinned ? "fixed" : "idle")];
+  const instructions = pinned
+    ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
+    : "Hold for a bit more than a second, then release. Both values carry over. Editing either field locks both.";
 
   return (
     <div
@@ -194,7 +216,9 @@ export function IntakeDateTimeFields({
       data-timing-pinned={pinned}
     >
       <div className={styles.field}>
-        <Label htmlFor={`${id}-date`}>Date Taken</Label>
+        <Label htmlFor={`${id}-date`} className={styles.fieldLabel}>
+          Date Taken <CalendarDays aria-hidden="true" />
+        </Label>
         <Input
           id={`${id}-date`}
           name="takenAtDate"
@@ -221,7 +245,9 @@ export function IntakeDateTimeFields({
         />
       </div>
       <div className={styles.field}>
-        <Label htmlFor={`${id}-time`}>Time Taken</Label>
+        <Label htmlFor={`${id}-time`} className={styles.fieldLabel}>
+          Time Taken <Clock3 aria-hidden="true" />
+        </Label>
         <Input
           id={`${id}-time`}
           name="takenAtTime"
@@ -248,7 +274,9 @@ export function IntakeDateTimeFields({
         />
       </div>
       <div className={styles.field}>
-        <Label htmlFor={`${id}-lock`}>Time Lock</Label>
+        <Label htmlFor={`${id}-lock`} className={styles.fieldLabel}>
+          Time Lock <LockIcon aria-hidden="true" />
+        </Label>
         <button
           ref={button}
           id={`${id}-lock`}
@@ -257,8 +285,7 @@ export function IntakeDateTimeFields({
           {...hold.handlers}
           disabled={locked}
           aria-pressed={pinned}
-          aria-describedby={`${id}-timing-status`}
-          title={hint}
+          aria-describedby={`${id}-timing-status ${id}-timing-help`}
           data-intake-time-reset
           data-state={state}
           data-clock-face={
@@ -267,9 +294,11 @@ export function IntakeDateTimeFields({
               state !== "refreshing") ||
             undefined
           }
-          data-fixed-start={(pinned && hold.stage) || undefined}
           style={
-            { "--charge-duration": `${chargeDuration}ms` } as CSSProperties
+            {
+              "--charge-duration": `${chargeDuration}ms`,
+              "--reveal-duration": `${revealDuration}ms`,
+            } as CSSProperties
           }
         >
           <span key={motionKey} className={styles.face} aria-hidden="true">
@@ -319,7 +348,7 @@ export function IntakeDateTimeFields({
               <circle className={styles.echo} cx="20" cy="20" r="15" />
             </svg>
             <span className={styles.glyph}>
-              <RotateCcw
+              <StartIcon
                 className={styles.refresh}
                 size={20}
                 strokeWidth={2.15}
@@ -340,8 +369,23 @@ export function IntakeDateTimeFields({
                 />
                 <path className={styles.hands} d="M12 6v6l2 1" />
                 <g className={styles.arrow}>
-                  <path className={styles.stem} d="M12 5v14" />
-                  <path className={styles.head} d="m5 12 7 7 7-7" />
+                  <path d={winding ? curvedShaft : straightShaft}>
+                    {revealing && (
+                      <animate
+                        ref={unrollArrow}
+                        attributeName="d"
+                        from={curvedShaft}
+                        to={straightShaft}
+                        begin="indefinite"
+                        dur="0.21s"
+                        calcMode="spline"
+                        keyTimes="0;1"
+                        keySplines=".24 0 .22 1"
+                        fill="freeze"
+                      />
+                    )}
+                  </path>
+                  <path d="m5 12 7 7 7-7" />
                 </g>
               </svg>
             </span>
@@ -368,14 +412,21 @@ export function IntakeDateTimeFields({
           </span>
         </button>
       </div>
-      <span
-        className={styles.hint}
-        id={`${id}-timing-status`}
-        role="status"
-        aria-atomic="true"
-      >
-        {hint}
-      </span>
+      <aside className={styles.notice} aria-label="Timing help">
+        <div
+          className={styles.noticeHeader}
+          role="status"
+          aria-atomic="true"
+          id={`${id}-timing-status`}
+        >
+          <strong>
+            <Info aria-hidden="true" />
+            {status}
+          </strong>
+          <span>{action}</span>
+        </div>
+        <p id={`${id}-timing-help`}>{instructions}</p>
+      </aside>
     </div>
   );
 }
