@@ -225,9 +225,9 @@ export function GuidePage() {
                   time first when recording an earlier intake.
                   Hold Time Lock until the ring fills, then release to keep
                   the displayed date and time across new and edited intakes.
-                  You can also choose <strong>Lock this time</strong> below the
-                  Timing section. Tap the clock to unlock, or hold it again to
-                  lock the current time.
+                  Choose <strong>Show lock gesture</strong> inside Timing to
+                  highlight the clock. Once locked, tap the clock to unlock or
+                  hold and release to lock the current time.
                 </p>
                 <PageLink href="/">Go To Today</PageLink>
               </div>

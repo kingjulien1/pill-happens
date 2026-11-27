@@ -1,3 +1,9 @@
+.timingBody {
+  display: grid;
+  gap: clamp(22px, 5vw, 28px);
+  padding: 1rem;
+}
+
 .fields {
   --control-height: 40px;
   --indicator-color: var(--primary);
@@ -172,6 +178,43 @@
 .resetButton {
   touch-action: manipulation;
   -webkit-touch-callout: none;
+  scroll-margin-block: 3.25rem 1rem;
+}
+.resetButton[data-guided],
+.gestureHint {
+  --cue-color: color-mix(in srgb, var(--color-rose-400) 55%, var(--ring));
+}
+.resetButton[data-guided] {
+  outline: 2px solid var(--cue-color);
+  outline-offset: 3px;
+}
+.gestureHint {
+  position: absolute;
+  z-index: 2;
+  inset-inline-end: 0;
+  bottom: calc(100% + 10px);
+  padding: 4px 9px;
+  border: 1px solid var(--cue-color);
+  border-radius: 8px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  font-size: 0.73rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.gestureHint::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: calc(var(--section-action-size) / 2 - 3px);
+  bottom: -4px;
+  width: 6px;
+  height: 6px;
+  border: solid var(--cue-color);
+  border-width: 0 1px 1px 0;
+  background: inherit;
+  transform: rotate(45deg);
 }
 .face {
   display: grid;
@@ -194,7 +237,6 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
   gap: 10px;
-  margin-inline: 6px;
   padding: 13px 15px;
   border: 1px solid color-mix(in srgb, var(--guide-accent) 29%, var(--border));
   border-radius: var(--dialog-radius-control, 12px);
@@ -269,6 +311,25 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
+  .resetButton[data-guided]::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--cue-color);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: point-out 680ms ease-out 2 both;
+  }
+  @keyframes point-out {
+    from {
+      opacity: 0.72;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.38);
+    }
+  }
   /* The outgoing glyph clears the centre while the next springs into its place. */
   .glyph {
     transform: translateY(-3px) rotate(-12deg) scale(0.68);

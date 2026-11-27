@@ -104,7 +104,6 @@ export function useTimeLockPress(
     );
   }
   return {
-    cancel,
     feedback,
     stage: feedback === "charging" || feedback === "ready" ? feedback : null,
     chargeDuration: TIME_LOCK_HOLD_MS - chargeDelay,
