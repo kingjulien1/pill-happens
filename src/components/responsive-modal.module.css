@@ -250,9 +250,7 @@
 }
 
 .checkInSurface [data-intake-form] [data-dialog-fade-footer] {
-  padding-bottom: calc(
-    max(10px, env(safe-area-inset-bottom)) + var(--dialog-anchor-clearance, 0px)
-  );
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
   background: none;
 }
 .checkInSurface [data-intake-form] [data-intake-rim-fade] {
@@ -336,7 +334,5 @@
 .checkInSurface
   [data-intake-form]
   [data-dialog-fade-footer]:has([data-dialog-footer-navigation]) {
-  padding-bottom: calc(
-    max(27px, env(safe-area-inset-bottom)) + var(--dialog-anchor-clearance, 0px)
-  );
+  padding-bottom: max(27px, env(safe-area-inset-bottom));
 }

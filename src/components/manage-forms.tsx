@@ -23,7 +23,6 @@ import dialogButtonStyles from "./dialog-primary-button.module.css";
 import { MedicationAppearanceFields } from "@/components/medication-appearance-fields";
 import type { SymbolSourceFilter } from "@/lib/medication-symbol-browser";
 import { MedicationActionButton } from "@/components/medication-action-button";
-import { isSaveAndStay, SaveOptions } from "@/components/save-options";
 import { sameDraftRevision } from "@/lib/journal-drafts";
 import {
   ChoiceMenuHeader,
@@ -201,7 +200,7 @@ export function MedicationForm({
   onDraftAvailabilityChange?: (state: MedicationDraftAvailability) => void;
 }) {
   const { data, mutate, busy } = useJournal();
-  const { openDialog, store } = useJournalWorkspace();
+  const { store } = useJournalWorkspace();
   const saving = useRef(false);
   const id = useId();
   const draftKey = medication ? `med:edit:${medication.id}` : "med:new";
@@ -260,12 +259,6 @@ export function MedicationForm({
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy || saving.current) return;
-    const stay = isSaveAndStay(event);
-    const viewportTop = stay
-      ? event.currentTarget
-          .querySelector("[data-medication-submit]")
-          ?.getBoundingClientRect().top
-      : undefined;
     setError(null);
     const strengthMg = Number(strength);
     const quantity = Number(defaultQuantity);
@@ -347,14 +340,7 @@ export function MedicationForm({
       );
       store.synchronize();
       if (sameDraftRevision(submitted, store.getSnapshot().drafts[draftKey])) {
-        if (stay && medication && savedMedication) {
-          draft.resetDraft({
-            ...medicationDefaults(savedMedication),
-            searchQuery,
-            symbolSource,
-            previewMotion,
-          });
-        } else draft.clearDraft();
+        draft.clearDraft();
       }
       toast.success(medication ? "Medication updated." : "Medication added.", {
         journalScope: saved.notificationScope,
@@ -408,14 +394,7 @@ export function MedicationForm({
             }
           : {}),
       });
-      if (stay && savedMedication && viewportTop !== undefined) {
-        if (!medication) {
-          openDialog(
-            { kind: "medication-edit", id: savedMedication.id },
-            { selector: "[data-medication-submit]", viewportTop },
-          );
-        }
-      } else onSaved();
+      onSaved();
     } catch (cause) {
       setError({
         message:
@@ -619,21 +598,13 @@ export function MedicationForm({
         data-medication-save-footer
         data-draft-action-footer
       >
-        <div className={dialogButtonStyles.group}>
-          <MedicationActionButton
-            intent="save"
-            type="submit"
-            pending={busy}
-            data-save-action
-            data-medication-submit
-          />
-          <SaveOptions
-            kind={medication ? "medication-edit" : "medication-new"}
-            formId={id}
-            disabled={busy}
-          />
-        </div>
-        <DraftStatus {...draft} scope="medication" />
+        <MedicationActionButton
+          intent="save"
+          type="submit"
+          pending={busy}
+          data-medication-submit
+        />
+        <DraftStatus {...draft} />
       </div>
     </form>
   );

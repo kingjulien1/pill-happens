@@ -11,7 +11,6 @@ import {
   Fragment,
   useCallback,
   useEffect,
-  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -23,7 +22,6 @@ import { ArrowUpRight, FlaskConical, Leaf, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import dialogButtonStyles from "./dialog-primary-button.module.css";
-import { isSaveAndStay, SaveOptions } from "@/components/save-options";
 import { sameDraftRevision } from "@/lib/journal-drafts";
 import { toast } from "@/components/ui/journal-toast";
 import {
@@ -171,7 +169,7 @@ function usagePercent(total: number, maximum: number) {
 
 function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
   const { data, mutate } = useJournal();
-  const { store, openingAnchor } = useJournalWorkspace();
+  const { store } = useJournalWorkspace();
   // A successful mutation immediately removes the source row from the timeline.
   // Retain only this editor's entry while its review closes and its sheet exits.
   const [deletion, setDeletion] = useState<{
@@ -307,7 +305,6 @@ function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
       }
       onOpenChange={(v) => !v && close()}
       scrollKey={`intake:edit:${intake.id}`}
-      openingAnchor={openingAnchor}
       title="Edit Intake"
       headerVariant="intake"
       showFooterNavigation={false}
@@ -636,7 +633,6 @@ export function MedicationsPage() {
     dialog,
     openDialog,
     closeDialog,
-    openingAnchor,
     ready: workspaceReady,
   } = useJournalWorkspace();
   const medicationDialog =
@@ -933,7 +929,6 @@ export function MedicationsPage() {
           if (!next && medicationDialog) closeDialog(medicationDialog);
         }}
         scrollKey={editing ? `med:edit:${editing.id}` : "med:new"}
-        openingAnchor={openingAnchor}
         returnFocus={() => {
           const opener = medicationOpener.current;
           // Status changes can reorder a card; keep a stable keyboard target.
@@ -1270,7 +1265,6 @@ export function GoalsPage() {
 
 function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
   const { data, mutate, busy } = useJournal();
-  const formId = useId();
   const saving = useRef(false);
   const { store } = useJournalWorkspace();
   const draft = usePersistentDraft(
@@ -1280,13 +1274,11 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
   );
   return (
     <form
-      id={formId}
       className="space-y-4"
       onSubmit={async (event) => {
         event.preventDefault();
         if (busy || saving.current) return;
         saving.current = true;
-        const stay = isSaveAndStay(event);
         const submitted = store.getSnapshot().drafts.preferences;
         const beforePreview = data
           ? { kind: "timezone" as const, timeZone: data.settings.timezone }
@@ -1298,9 +1290,10 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
             "PATCH",
           );
           store.synchronize();
-          if (sameDraftRevision(submitted, store.getSnapshot().drafts.preferences)) {
-            if (stay) draft.resetDraft({ timezone: saved.data.settings.timezone });
-            else draft.clearDraft();
+          if (
+            sameDraftRevision(submitted, store.getSnapshot().drafts.preferences)
+          ) {
+            draft.clearDraft();
           }
           toast.success("Timezone updated for your journal.", {
             journalScope: saved.notificationScope,
@@ -1336,7 +1329,7 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
                 }
               : {}),
           });
-          if (!stay) onSaved();
+          onSaved();
         } catch {
           /* The provider displays the error; the draft stays available. */
         } finally {
@@ -1377,20 +1370,15 @@ function JournalPreferencesForm({ onSaved }: { onSaved: () => void }) {
       </div>
 
       <div className={dialogButtonStyles.formFooter} data-draft-action-footer>
-        <div className={dialogButtonStyles.group}>
-          <DialogPrimaryButton
-            data-save-action
-            className="w-full"
-            type="submit"
-            disabled={busy}
-            pending={busy}
-          >
-            {busy ? "Saving preferences…" : "Save preferences"}
-          </DialogPrimaryButton>
-          <SaveOptions kind="preferences" formId={formId} disabled={busy} />
-        </div>
+        <DialogPrimaryButton
+          className="w-full"
+          type="submit"
+          disabled={busy}
+          pending={busy}
+        >
+          {busy ? "Saving preferences…" : "Save preferences"}
+        </DialogPrimaryButton>
         <DraftStatus
-          scope="preferences"
           hasDraft={draft.hasDraft}
           status={draft.status}
           restored={draft.restored}

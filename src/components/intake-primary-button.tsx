@@ -1,6 +1,5 @@
 "use client";
 
-import { SaveOptions, type SaveOptionsProps } from "./save-options";
 import type { ReactNode } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import type { PrimaryButtonProps } from "@/components/primary-button";
@@ -16,7 +15,6 @@ type IntakePrimaryButtonProps = Omit<
   PrimaryButtonProps,
   "decoration" | "radius" | "surface"
 > & {
-  saveOptions?: SaveOptionsProps;
   symbol: ReactNode;
   secondaryText?: ReactNode;
 };
@@ -24,7 +22,6 @@ type IntakePrimaryButtonProps = Omit<
 /** The main Log Intake face, content rail and outboard frame, shared unchanged. */
 export function IntakePrimaryButton({
   children,
-  saveOptions,
   symbol,
   secondaryText,
   className,
@@ -40,7 +37,6 @@ export function IntakePrimaryButton({
   return (
     <div className="intake-action-shell">
       <SpecularCardBorder desktop />
-      {saveOptions && <SaveOptions {...saveOptions} placement="top-edge" />}
       <TodayActionButton
         {...props}
         pending={pending}
@@ -51,7 +47,6 @@ export function IntakePrimaryButton({
             ? (state) => ({ ...paint, ...style(state) })
             : { ...paint, ...style }
         }
-        data-save-action={saveOptions ? "" : undefined}
         data-intake-paint="satin"
         data-log-intake-rim
         decoration={<SpecularCardBorder />}

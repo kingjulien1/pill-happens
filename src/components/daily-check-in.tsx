@@ -17,7 +17,6 @@ import { checkInNotificationSnapshot } from "@/lib/notification-change-preview";
 import { ActionIcon } from "@/components/action-icon";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { DialogErrorPanel } from "./dialog-error-panel";
-import { isSaveAndStay } from "@/components/save-options";
 import { MedicationCardBase } from "@/components/medication-card-base";
 import { CheckInCardBorder as SpecularCardBorder } from "@/components/check-in-card-border";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
@@ -149,7 +148,6 @@ export function DailyCheckInSection({
   const timeZone = data?.settings.timezone ?? "";
   const logged = saved ? getCheckInUpdatedTime(checkIn, timeZone) : null;
   const previewId = useId();
-  const formId = useId();
   const journal = useMemo(
     () => dailyJournalForDay(data?.dailyCheckIns, day),
     [data?.dailyCheckIns, day],
@@ -411,7 +409,6 @@ export function DailyCheckInSection({
         {open && (
           <CheckInForm
             key={checkInDraftKey(targetDay, period)}
-            formId={formId}
             day={targetDay}
             period={period}
             checkIn={editing}
@@ -424,13 +421,11 @@ export function DailyCheckInSection({
 }
 
 function CheckInForm({
-  formId,
   day,
   period,
   checkIn,
   onSaved,
 }: {
-  formId: string;
   day: string;
   period: DailyCheckInPeriod;
   checkIn?: DailyCheckIn;
@@ -511,7 +506,7 @@ function CheckInForm({
   const sleepError =
     issue === "sleep" ? parseMorningSleepDraft(morningSleep).error : null;
 
-  async function save(stayOpen = false) {
+  async function save() {
     if (locked || saveInFlight.current) return;
     const parsedMorning = morning ? parseMorningSleepDraft(morningSleep) : null;
     if (parsedMorning?.error) {
@@ -600,15 +595,7 @@ function CheckInForm({
           store.getSnapshot().drafts[key],
         )
       ) {
-        if (stayOpen) {
-          // Keep the raw fields/editor state and advance the confirmed writing
-          // base. Clearing alone would restore this form's pre-save defaults.
-          draft.resetDraft({
-            ...draft.value,
-            dailyWriting: true,
-            note: "",
-          });
-        } else draft.clearDraft();
+        draft.clearDraft();
       }
       toast.success(
         checkIn
@@ -636,9 +623,7 @@ function CheckInForm({
                 }
               : {}),
             paragraphs: [
-              stayOpen
-                ? "Your writing and check-in details are saved for this tracking day. This dialog stays open; keep editing and save again whenever you’re ready."
-                : "Your writing and check-in details are saved for this tracking day. Reopen the check-in whenever you want to add or change something.",
+              "Your writing and check-in details are saved for this tracking day. Reopen the check-in whenever you want to add or change something.",
             ],
             facts: [
               { label: "Tracking day", value: formatDay(day) },
@@ -665,7 +650,7 @@ function CheckInForm({
           },
         },
       );
-      if (!stayOpen) onSaved();
+      onSaved();
     } catch (error) {
       // Server conflicts and concurrent local edits both keep the full draft.
       setIssue({
@@ -676,7 +661,7 @@ function CheckInForm({
       });
     } finally {
       saveInFlight.current = false;
-      if (!saved || stayOpen) {
+      if (!saved) {
         reflectionSave.resume();
         setSubmitting(false);
       }
@@ -685,11 +670,10 @@ function CheckInForm({
 
   return (
     <form
-      id={formId}
       className={styles.form}
       onSubmit={(event) => {
         event.preventDefault();
-        void save(isSaveAndStay(event));
+        void save();
       }}
       aria-busy={locked}
       data-check-in-form={period}
@@ -853,7 +837,6 @@ function CheckInForm({
       >
         <div className="flex w-full flex-col" data-draft-action-footer>
           <IntakePrimaryButton
-            saveOptions={{ kind: "check-in", period, formId, disabled: locked }}
             type="submit"
             disabled={locked}
             pending={locked}
@@ -877,7 +860,6 @@ function CheckInForm({
               (draft.hasDraft && draft.restored) ||
               Boolean(writing.draft && writing.draft === openingWritingDraft)
             }
-            scope={checkInDraftKey(day, period)}
             copy={{
               idle: checkIn
                 ? "Saved to this day. Edit anytime."

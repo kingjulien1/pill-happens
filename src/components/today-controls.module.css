@@ -540,26 +540,3 @@
     background: var(--control-face);
   }
 }
-
-/* Forms with an in-face options control reserve its touch target on the left. */
-.action[data-dialog-primary-button][data-save-action][type="submit"] {
-  padding-inline-start: 57px;
-}
-@media (max-width: 389px) {
-  .action[data-slot="button"][data-save-action]
-    :is(:global(.intake-primary-label), :global(.intake-primary-row)) {
-    column-gap: 6px;
-  }
-  .action[data-slot="button"][data-save-action] :global(.intake-primary-copy) {
-    column-gap: 3px;
-  }
-}
-@media (max-width: 359px) {
-  .action[data-dialog-primary-button][data-save-action][type="submit"] {
-    padding-inline: 53px 12px;
-  }
-  .action[data-slot="button"][data-save-action] :global(.intake-primary-row) {
-    column-gap: 3px;
-    padding-inline-end: 0;
-  }
-}

@@ -3077,11 +3077,9 @@ export function DeveloperGuidePage() {
                   ReflectionDialog and independent saving controls retain their
                   launcher ref. The daily page can hold two full-length legacy reflections. Done
                   returns to the check-in with the draft; Save Check-In saves
-                  all responses and closes the dialog. The Save options tab
-                  sits above the save button’s upper-left edge. Save and stay
-                  keeps the form open after saving. Keep editing returns to the draft. The
-                  successful-save cleanup advances the writing baseline and
-                  resumes autosave; newer concurrent drafts remain untouched.
+                  all responses and closes the dialog. A successful save clears
+                  the submitted draft and preserves edits made in another tab
+                  while the request was in progress.
                   The compact writer header has no heading icon or fade, and a
                   larger description clamped to three lines. Its
                   context row above the heading shows the full weekday,

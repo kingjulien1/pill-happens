@@ -19,7 +19,6 @@ import {
 } from "./dialog-error-panel";
 import Link from "next/link";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
-import { isSaveAndStay } from "@/components/save-options";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
@@ -46,11 +45,7 @@ import {
   medicationQuantityControls,
 } from "@/lib/medication-types";
 import { useJournal } from "@/components/journal-provider";
-import {
-  DraftStatus,
-  useJournalWorkspace,
-  usePersistentDraft,
-} from "@/components/journal-drafts";
+import { DraftStatus, usePersistentDraft } from "@/components/journal-drafts";
 import {
   intakeDraftDisplayTime,
   intakeDraftTimestamp,
@@ -103,7 +98,6 @@ export function IntakeForm({
 }) {
   const { data: liveData, mutate, busy, derived, now } = useJournal();
   const data = deletionSnapshot ?? liveData;
-  const { openDialog } = useJournalWorkspace();
   const formId = useId();
   const submitPending = useRef(false);
   const medications = useMemo(
@@ -389,7 +383,7 @@ export function IntakeForm({
             render={<Link href="/medications" />}
             onClick={onSaved}
           />
-          <DraftStatus {...draftFeedback} scope="intake" />
+          <DraftStatus {...draftFeedback} />
           {footerActions}
         </div>
       </form>
@@ -398,11 +392,7 @@ export function IntakeForm({
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy || timingResetting || submitPending.current) return;
-    const stay = isSaveAndStay(event);
     const form = event.currentTarget;
-    const viewportTop = stay
-      ? form.querySelector("[data-intake-submit]")?.getBoundingClientRect().top
-      : undefined;
     setError(null);
     try {
       if (!medication && !fallbackIntake) {
@@ -565,22 +555,8 @@ export function IntakeForm({
             : {}),
         },
       );
-      if (stay && savedEntry && viewportTop !== undefined) {
-        if (intake?.id === savedEntry.id) {
-          draft.resetDraft(
-            newIntakeFormDraft({ intake: savedEntry, medications, timezone }),
-          );
-        } else {
-          draft.clearDraft();
-        }
-        openDialog(
-          { kind: "intake-edit", id: savedEntry.id },
-          { selector: "[data-intake-submit]", viewportTop },
-        );
-      } else {
-        draft.clearDraft();
-        onSaved();
-      }
+      draft.clearDraft();
+      onSaved();
     } catch (err) {
       setError({
         message:
@@ -918,16 +894,11 @@ export function IntakeForm({
               </span>
             }
             secondaryText={busy ? undefined : intake ? "Update!" : "Log it!"}
-            saveOptions={{
-              kind: intake ? "edit" : "intake",
-              formId,
-              disabled: busy || timingResetting,
-            }}
             data-intake-submit
           >
             {busy ? "Saving…" : intake ? "Save Edits" : "Save Intake"}
           </IntakePrimaryButton>
-          <DraftStatus {...draftFeedback} scope="intake" />
+          <DraftStatus {...draftFeedback} />
           {footerActions}
         </div>
       </div>

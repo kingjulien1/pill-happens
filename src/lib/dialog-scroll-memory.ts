@@ -1,7 +1,5 @@
 import { safeWorkspacePath } from "@/lib/journal-drafts";
 
-export type DialogScrollAnchor = { selector: string; viewportTop: number };
-
 export type DialogScrollPosition = { top: number; left: number };
 
 /** A real close/open cycle discards positions; pane/layout changes do not. */

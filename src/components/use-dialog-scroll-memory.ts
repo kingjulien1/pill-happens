@@ -5,7 +5,6 @@ import {
   clampDialogScroll,
   createDialogScrollSession,
   type PublicDialogScrollKey,
-  type DialogScrollAnchor,
 } from "@/lib/dialog-scroll-memory";
 
 /** Reuse pane positions only while this dialog remains open; every new visit starts at zero. */
@@ -17,7 +16,6 @@ export function useDialogScrollMemory<T extends HTMLElement>({
   pane = "body",
   layout,
   restorePosition = true,
-  openingAnchor,
 }: {
   open: boolean;
   /** Keep a writing dialog's source/preview panes in the same open session. */
@@ -28,7 +26,6 @@ export function useDialogScrollMemory<T extends HTMLElement>({
   layout?: string | boolean;
   /** Explicit section navigation starts at zero before applying its own target. */
   restorePosition?: boolean;
-  openingAnchor?: DialogScrollAnchor;
 }) {
   const elementRef = useRef<T | null>(null);
   const lastElementRef = useRef<T | null>(null);
@@ -79,31 +76,9 @@ export function useDialogScrollMemory<T extends HTMLElement>({
       timer = undefined;
       persist();
     };
-    let extraSpace = 0;
     const restore = () => {
       if (disposed || touched || !visible()) return;
       restoring = true;
-      const anchor =
-        openingAnchor &&
-        element.querySelector<HTMLElement>(openingAnchor.selector);
-      if (anchor && openingAnchor) {
-        const top =
-          element.scrollTop +
-          anchor.getBoundingClientRect().top -
-          openingAnchor.viewportTop;
-        target = { top, left: 0 };
-        // A restored draft can have a taller footer than its saved entry.
-        const needed = Math.max(
-          0,
-          Math.ceil(
-            top - (element.scrollHeight - element.clientHeight - extraSpace),
-          ),
-        );
-        if (needed !== extraSpace) {
-          extraSpace = needed;
-          element.style.setProperty("--dialog-anchor-clearance", `${needed}px`);
-        }
-      }
       applied = clampDialogScroll(target, {
         height: element.scrollHeight - element.clientHeight,
         width: element.scrollWidth - element.clientWidth,
@@ -154,14 +129,6 @@ export function useDialogScrollMemory<T extends HTMLElement>({
       characterData: true,
     });
     if (!restorePosition) intent();
-    const popup = element.closest<HTMLElement>('[role="dialog"]');
-    const finishEntry = (event: Event) => {
-      if (event.target === popup) scheduleRestore();
-    };
-    if (openingAnchor) {
-      popup?.addEventListener("animationend", finishEntry);
-      popup?.addEventListener("transitionend", finishEntry);
-    }
     void document.fonts?.ready.then(scheduleRestore);
     element.addEventListener("scroll", scroll, { passive: true });
     element.addEventListener("wheel", intent, { passive: true });
@@ -178,24 +145,13 @@ export function useDialogScrollMemory<T extends HTMLElement>({
       cancelAnimationFrame(settleFrame);
       observer.disconnect();
       mutations.disconnect();
-      popup?.removeEventListener("animationend", finishEntry);
-      popup?.removeEventListener("transitionend", finishEntry);
-      element.style.removeProperty("--dialog-anchor-clearance");
       element.removeEventListener("scroll", scroll);
       element.removeEventListener("wheel", intent);
       element.removeEventListener("touchstart", intent);
       element.removeEventListener("pointerdown", intent);
       element.removeEventListener("keydown", intent);
     };
-  }, [
-    revision,
-    key,
-    layout,
-    open,
-    sessionOpen,
-    restorePosition,
-    openingAnchor,
-  ]);
+  }, [revision, key, layout, open, sessionOpen, restorePosition]);
 
   const setScrollElement = useCallback((node: T | null) => {
     elementRef.current = node;

@@ -37,7 +37,6 @@ import {
   createSnapshotSelector,
   shallowEqual,
 } from "@/lib/external-store-selector";
-import type { DialogScrollAnchor } from "@/lib/dialog-scroll-memory";
 import { Button } from "@/components/ui/button";
 
 export type { RememberedDialog } from "@/lib/journal-drafts";
@@ -53,8 +52,7 @@ type WorkspaceContext = {
   store: DraftWorkspace;
   ready: boolean;
   dialog: RememberedDialog | null;
-  openingAnchor?: DialogScrollAnchor;
-  openDialog: (dialog: RememberedDialog, anchor?: DialogScrollAnchor) => void;
+  openDialog: (dialog: RememberedDialog) => void;
   closeDialog: (expected?: RememberedDialog) => void;
   rememberDestination: (path: string) => void;
 };
@@ -274,31 +272,9 @@ export function JournalDraftProvider({
     () => storedDialog && safeRememberedDialog(storedDialog, path),
     [path, storedDialog],
   );
-  const [handoff, setHandoff] = useState<{
-    path: string;
-    instance: number;
-    anchor: DialogScrollAnchor;
-  } | null>(null);
-  const openingAnchor =
-    handoff?.path === path && handoff.instance === instance
-      ? handoff.anchor
-      : undefined;
   const openDialog = useCallback(
-    (next: RememberedDialog, anchor?: DialogScrollAnchor) => {
-      if (
-        anchor &&
-        store.getSnapshot().screens[path]?.dialogInstance !== instance
-      )
-        return;
-      store.openDialog(path, next);
-      const screen = store.getSnapshot().screens[path];
-      setHandoff(
-        anchor && screen
-          ? { path, instance: screen.dialogInstance, anchor }
-          : null,
-      );
-    },
-    [instance, path, store],
+    (next: RememberedDialog) => store.openDialog(path, next),
+    [path, store],
   );
   const closeDialog = useCallback(
     (expected?: RememberedDialog) =>
@@ -310,7 +286,6 @@ export function JournalDraftProvider({
     () => ({
       store,
       ready: snapshot.ready,
-      openingAnchor,
       dialog,
       openDialog,
       closeDialog,
@@ -319,7 +294,6 @@ export function JournalDraftProvider({
     [
       store,
       snapshot.ready,
-      openingAnchor,
       dialog,
       openDialog,
       closeDialog,
@@ -484,7 +458,6 @@ export function DraftStatus({
   onReset,
   action,
   copy,
-  scope,
 }: {
   hasDraft: boolean;
   status: DraftStorageStatus;
@@ -492,7 +465,6 @@ export function DraftStatus({
   onReset?: () => void;
   action?: ReactNode;
   copy?: { idle?: string; saved?: string; restored?: string };
-  scope?: string;
 }) {
   const durable = status === "saved";
   const restoredDraft = durable && hasDraft && restored;
@@ -512,11 +484,7 @@ export function DraftStatus({
       data-draft-status={status}
       data-restored={restoredDraft ? "" : undefined}
     >
-      <SaveStatusLine
-        text={text}
-        tone={durable ? draftTone : "warning"}
-        scope={scope}
-      />
+      <SaveStatusLine text={text} tone={durable ? draftTone : "warning"} />
       {action ??
         (hasDraft && onReset && (
           <Button

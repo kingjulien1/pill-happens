@@ -1,8 +1,3 @@
-.group {
-  position: relative;
-  width: 100%;
-}
-
 .formFooter {
   --draft-action-leading-gap: calc(4 * var(--spacing));
   display: flex;
@@ -41,10 +36,8 @@
   white-space: nowrap;
 }
 
-:global([data-slot="dialog-content"])
-  :is(.group, .button[data-dialog-primary-button]:not(.group > *)),
-:global([data-slot="drawer-popup"])
-  :is(.group, .button[data-dialog-primary-button]:not(.group > *)) {
+:global([data-slot="dialog-content"]) .button[data-dialog-primary-button],
+:global([data-slot="drawer-popup"]) .button[data-dialog-primary-button] {
   margin-block-start: var(--dialog-primary-margin, 24px);
 }
 
