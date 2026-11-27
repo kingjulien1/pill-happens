@@ -661,7 +661,7 @@ export function IntakeForm({
                 continue this draft.
               </p>
             )}
-            <div className="form-field">
+            <div className={`form-field ${styles.amountControls}`}>
               <div className={styles.amountHeading}>
                 <Label id="intake-quantity-label" htmlFor="intake-quantity">
                   Amount Taken
