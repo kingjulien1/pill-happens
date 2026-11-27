@@ -2201,8 +2201,8 @@ export function DeveloperGuidePage() {
                 Closing mid-reset still honors that reset. Fresh current-day
                 forms and explicitly reset forms use the existing minute clock
                 without draft writes. Untouched edits retain their recorded instant.
-                Ambient sparkle scheduling pauses offscreen and when hidden, with
-                reduced-motion alternatives and no frame loop.
+                The Time Lock icon pauses its loop offscreen or when the app is
+                hidden. Reduced motion shows each state as a still icon.
                 Native number spinners and date/time icons are hidden. Intake
                 context inputs and card notes are removed; saved historical
                 notes remain in storage and backups. Medication choices and the

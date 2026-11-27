@@ -126,7 +126,7 @@
 .field .resetButton {
   position: relative;
   display: grid;
-  place-items: center;
+  place-content: center;
   padding: 0;
   color: inherit;
   cursor: pointer;
@@ -134,58 +134,38 @@
   -webkit-touch-callout: none;
   user-select: none;
 }
+.fields .field button.resetButton,
+.fields .field button.resetButton:focus-visible {
+  background: var(--lock-fill, #503142);
+  color: var(--color-rose-50, #fff1f2);
+}
+.resetButton:is(
+  [data-state="waiting"],
+  [data-state="entering"],
+  [data-state="charging"]
+) {
+  --lock-fill: #80334e;
+}
+.resetButton:is([data-state="ready"], [data-state="settling"]) {
+  --lock-fill: var(--color-rose-800, #9f1239);
+}
+.resetButton[data-state="fixed"] {
+  --lock-fill: var(--color-rose-900, #881337);
+}
 .face {
-  position: absolute;
-  inset: 0;
-  isolation: isolate;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  border-radius: inherit;
   pointer-events: none;
 }
-.wash {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background:
-    linear-gradient(var(--lock-veil, transparent) 0 0),
-    radial-gradient(ellipse at 12% -12%, #ffa9b780, transparent 51%),
-    radial-gradient(ellipse at 88% 105%, #bd80ff75, transparent 48%),
-    linear-gradient(117deg, #8f1238 8%, #64183f 49%, #581c87);
+.glyph {
+  grid-area: 1 / 1;
+  display: grid;
+  visibility: hidden;
   opacity: 0;
 }
-.fields[data-timing-pinned="true"] .wash {
-  --lock-veil: color-mix(
-    in srgb,
-    var(--color-mauve-950, #0c090c) 31%,
-    transparent
-  );
-}
-.resetButton:is([aria-pressed="true"], [data-state="ready"]) .face {
-  color: var(--color-rose-100, #ffe4e6);
-}
-.resetButton:is([aria-pressed="true"], [data-state="ready"]) .wash {
+.glyph[data-current] {
+  visibility: visible;
   opacity: 1;
-}
-.star {
-  position: absolute;
-  width: 13px;
-  height: 13px;
-  overflow: visible;
-  opacity: 0;
-  color: #ffe9cd;
-}
-.star[data-star="near"] {
-  left: 15%;
-  top: 8%;
-}
-.star[data-star="far"] {
-  right: 11%;
-  bottom: 7%;
-  color: #f1dbff;
-  width: 10px;
-  height: 10px;
 }
 .notice {
   grid-column: 1 / -1;
@@ -246,85 +226,200 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .resetButton[data-state="charging"] .wash {
-    animation: charge-fill var(--charge-duration) ease-in both;
+  .field .resetButton {
+    transition: background-color 220ms ease-out;
   }
-  .resetButton[data-state="charging"]:not([aria-pressed="true"]) .face {
-    animation: charge-ink var(--charge-duration) ease-in both;
+  .field .resetButton[data-state="charging"] {
+    transition: background-color var(--charge-duration) ease-in;
   }
-  .resetButton[aria-pressed="true"][data-state="charging"] .wash {
-    animation: none;
+  /* The outgoing glyph clears the centre while the next springs into its place. */
+  .glyph {
+    transform: translateY(-3px) rotate(-12deg) scale(0.68);
+    transition:
+      opacity 95ms ease-in,
+      transform 145ms ease-in,
+      visibility 0s 145ms;
   }
-  .resetButton[data-state="resetting"] .wash {
-    animation: charge-fill var(--unlock-duration) ease-in reverse both;
+  .glyph[data-current] {
+    transform: none;
+    transition:
+      opacity 125ms ease-out,
+      transform 230ms cubic-bezier(0.16, 1.48, 0.38, 1),
+      visibility 0s;
   }
-  .resetButton[data-state="resetting"] .face {
-    animation: charge-ink var(--unlock-duration) ease-in reverse both;
+  .glyph[data-current][data-glyph="idle"] svg {
+    transform-origin: 50% 60%;
+    animation: tick-tock 2.8s ease-in-out infinite;
   }
-  .resetButton:is(
-      [data-state="entering"],
-      [data-state="settling"],
-      [data-state="refreshing"]
-    )
-    .star[data-star="near"] {
-    animation: confirm-glint 420ms ease-out both;
+  .glyph[data-current][data-glyph="charging"] svg {
+    animation: flip-glass var(--charge-duration)
+      cubic-bezier(0.45, 0.02, 0.27, 1) both;
   }
-  .resetButton:is([data-state="fixed"], [data-state="ready"]) .star {
-    animation: glint 7s ease-out infinite paused;
+  .glyph[data-current][data-glyph="ready"] svg {
+    animation: ready-beat 1.4s cubic-bezier(0.22, 0.72, 0.35, 1) infinite;
   }
-  .resetButton[data-playing="true"] .star {
-    animation-play-state: running;
+  .glyph[data-current][data-glyph="settling"] svg {
+    transform-origin: 50% 92%;
+    animation: stamp-down var(--settle-duration) ease-out both;
   }
-  .resetButton .star[data-star="far"] {
-    animation-delay: 3.4s;
+  .glyph[data-current][data-glyph="fixed"] svg {
+    transform-origin: 50% 18%;
+    animation: latch-tug 3.4s ease-in-out infinite;
+  }
+  .glyph[data-current][data-glyph="waiting"] svg {
+    transform-origin: 22% 14%;
+    animation: turn-page 3s ease-in-out infinite;
+  }
+  .glyph[data-current][data-glyph="entering"] svg {
+    transform-origin: 75% 25%;
+    animation: turn-key var(--charge-duration) ease-in-out both;
+  }
+  .glyph[data-current][data-glyph="resetting"] svg {
+    animation: unlatch var(--unlock-duration) cubic-bezier(0.22, 0.75, 0.31, 1)
+      both;
+  }
+  .glyph[data-current][data-glyph="refreshing"] svg {
+    animation: rewind var(--refresh-duration) ease-out both;
+  }
+  .resetButton:not([data-playing="true"]) .glyph[data-current] svg,
+  .resetButton:disabled:is([data-state="idle"], [data-state="fixed"])
+    .glyph[data-current]
+    svg {
+    animation-play-state: paused;
   }
 }
-@keyframes charge-fill {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes charge-ink {
-  from {
-    color: inherit;
-  }
-  to {
-    color: var(--color-rose-100, #ffe4e6);
-  }
-}
-@keyframes confirm-glint {
+@keyframes tick-tock {
   0%,
+  52%,
   100% {
-    opacity: 0;
+    transform: none;
   }
-  45% {
-    opacity: 0.95;
+  12% {
+    transform: rotate(-15deg);
+  }
+  21% {
+    transform: rotate(9deg) translateY(-1px);
+  }
+  32% {
+    transform: rotate(-5deg);
+  }
+  43% {
+    transform: rotate(2deg);
   }
 }
-@keyframes glint {
-  0%,
-  76%,
+@keyframes flip-glass {
+  0% {
+    transform: rotate(-16deg) scale(0.88);
+  }
+  28% {
+    transform: rotate(-32deg) scale(0.96);
+  }
+  76% {
+    transform: translateY(-2px) rotate(193deg) scale(1.09);
+  }
   100% {
-    opacity: 0;
-    transform: translateY(2px) scale(0.2) rotate(-22deg);
+    transform: rotate(180deg);
+  }
+}
+@keyframes ready-beat {
+  0%,
+  67%,
+  100% {
+    transform: none;
+  }
+  24% {
+    transform: translateY(-1.6px) scale(1.12);
+  }
+  42% {
+    transform: scale(0.97);
+  }
+}
+@keyframes stamp-down {
+  0% {
+    transform: translateY(-4px) rotate(-10deg);
+  }
+  33% {
+    transform: scale(1.17, 0.78);
+  }
+  56% {
+    transform: translateY(-1.5px) scale(0.96, 1.07);
+  }
+  76% {
+    transform: scale(1.025, 0.97);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes latch-tug {
+  0%,
+  11%,
+  55%,
+  100% {
+    transform: none;
+  }
+  22% {
+    transform: translateY(1.5px) rotate(-11deg);
+  }
+  32% {
+    transform: rotate(8deg);
+  }
+  43% {
+    transform: rotate(-3deg);
+  }
+}
+@keyframes turn-page {
+  0%,
+  48%,
+  100% {
+    transform: none;
+  }
+  19% {
+    transform: rotate(-8deg);
+  }
+  32% {
+    transform: rotate(4deg);
+  }
+}
+@keyframes turn-key {
+  0% {
+    transform: translate(-2px, 2px) rotate(-15deg);
+  }
+  62% {
+    transform: rotate(42deg);
   }
   82% {
-    opacity: 0.85;
-    transform: translateY(0) scale(0.9);
+    transform: rotate(24deg);
   }
-  88% {
-    opacity: 0.65;
-    transform: translateY(-1px) scale(0.72) rotate(9deg);
+  100% {
+    transform: rotate(30deg);
   }
-  90% {
-    opacity: 1;
-    transform: translateY(-2px) scale(1.3) rotate(16deg);
+}
+@keyframes unlatch {
+  0% {
+    transform: translateY(1px) scale(1.05, 0.92);
   }
-  96% {
-    opacity: 0;
-    transform: translateY(-3px) scale(1.45) rotate(20deg);
+  30% {
+    transform: translateY(-3px) rotate(14deg);
+  }
+  52% {
+    transform: rotate(-7deg);
+  }
+  77% {
+    transform: rotate(3deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes rewind {
+  0% {
+    transform: rotate(24deg) scale(0.9);
+  }
+  73% {
+    transform: rotate(-104deg) scale(1.09);
+  }
+  100% {
+    transform: none;
   }
 }

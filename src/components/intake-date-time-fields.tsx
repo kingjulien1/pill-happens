@@ -8,8 +8,19 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { ClockArrowDown, Info, RotateCcw } from "lucide-react";
-import { lunarStarPath } from "./lunar-star-paths";
+import {
+  CalendarClock,
+  ClockCheck,
+  Hourglass,
+  Info,
+  KeyRound,
+  LockKeyhole,
+  LockKeyholeOpen,
+  Stamp,
+  Timer,
+  TimerReset,
+  type LucideIcon,
+} from "lucide-react";
 import { useTimeLockPress } from "./use-time-lock-press";
 import { Input, inputSurface } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +29,17 @@ import styles from "./intake-date-time-fields.module.css";
 
 type Phase =
   "idle" | "waiting" | "entering" | "settling" | "resetting" | "refreshing";
+const timeLockIcons = Object.entries({
+  idle: Timer,
+  waiting: CalendarClock,
+  charging: Hourglass,
+  ready: ClockCheck,
+  entering: KeyRound,
+  settling: Stamp,
+  fixed: LockKeyhole,
+  resetting: LockKeyholeOpen,
+  refreshing: TimerReset,
+} satisfies Record<Phase | "charging" | "ready" | "fixed", LucideIcon>);
 type IntakeDateTimeFieldsProps = {
   value: string;
   onChange: (combined: string) => void;
@@ -35,12 +57,14 @@ const reducedMotion = () =>
 
 const revealDuration = 580;
 const unlockDuration = 820;
+const refreshDuration = 460;
 const noticeHeadings = {
   idle: ["Time unlocked", "Tap for now"],
   fixed: ["Time locked", "Tap to unlock"],
   charging: ["Keep holding", "Release to cancel"],
   ready: ["Ready to lock", "Release to lock"],
   resetting: ["Unlocking time", "Returning to now"],
+  refreshing: ["Refreshing time", "Returning to now"],
 } as const;
 
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
@@ -153,7 +177,7 @@ export function IntakeDateTimeFields({
       entering: chargeDuration,
       settling: revealDuration,
       resetting: unlockDuration,
-      refreshing: 460,
+      refreshing: refreshDuration,
     };
     if (phase === "idle" || phase === "waiting") return;
     const timer = setTimeout(() => {
@@ -165,7 +189,7 @@ export function IntakeDateTimeFields({
 
   useEffect(() => {
     const node = button.current;
-    if (!node || (state !== "fixed" && state !== "ready")) return;
+    if (!node) return;
     let visible = false;
     const sync = () => {
       node.dataset.playing = String(visible && !document.hidden);
@@ -181,12 +205,16 @@ export function IntakeDateTimeFields({
       document.removeEventListener("visibilitychange", sync);
       delete node.dataset.playing;
     };
-  }, [state]);
+  }, []);
 
   const [status, action] =
     noticeHeadings[
       hold.stage ??
-        (phase === "resetting" ? "resetting" : pinned ? "fixed" : "idle")
+        (phase === "resetting" || phase === "refreshing"
+          ? phase
+          : pinned
+            ? "fixed"
+            : "idle")
     ];
   const instructions =
     phase === "resetting"
@@ -201,7 +229,6 @@ export function IntakeDateTimeFields({
       data-intake-date-time-fields
       data-timing-pinned={pinned}
       data-timing-phase={state}
-      style={{ "--unlock-duration": `${unlockDuration}ms` } as CSSProperties}
     >
       <div className={styles.field} data-timing-field="date">
         <Label htmlFor={`${id}-date`}>Date Taken</Label>
@@ -270,24 +297,25 @@ export function IntakeDateTimeFields({
           aria-describedby={`${id}-timing-status ${id}-timing-help`}
           data-intake-time-reset
           data-state={state}
-          style={{ "--charge-duration": `${chargeDuration}ms` } as CSSProperties}
+          style={
+            {
+              "--charge-duration": `${chargeDuration}ms`,
+              "--settle-duration": `${revealDuration}ms`,
+              "--unlock-duration": `${unlockDuration}ms`,
+              "--refresh-duration": `${refreshDuration}ms`,
+            } as CSSProperties
+          }
         >
-          <span key={motionKey} className={styles.face} aria-hidden="true">
-            <span className={styles.wash} />
-            {state === "ready" || (pinned && state !== "resetting") ? (
-              <ClockArrowDown size={20} strokeWidth={2.15} />
-            ) : (
-              <RotateCcw size={20} strokeWidth={2.15} />
-            )}
-            {["near", "far"].map((position) => (
-              <svg
-                key={position}
-                className={styles.star}
-                data-star={position}
-                viewBox="-8 -8 16 16"
+          <span className={styles.face} aria-hidden="true">
+            {timeLockIcons.map(([phaseName, Icon]) => (
+              <span
+                key={phaseName}
+                className={styles.glyph}
+                data-glyph={phaseName}
+                data-current={phaseName === state || undefined}
               >
-                <path d={lunarStarPath} fill="currentColor" />
-              </svg>
+                <Icon size={22} strokeWidth={2.15} />
+              </span>
             ))}
           </span>
         </button>
