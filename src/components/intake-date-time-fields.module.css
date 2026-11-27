@@ -198,6 +198,10 @@
   outline: 2px solid var(--glint);
   outline-offset: 3px;
 }
+.lockControl
+  :is(:global(.lucide-lock-keyhole), :global(.lucide-lock-keyhole-open)) {
+  scale: 1.2;
+}
 .lockControl[aria-pressed="true"] [data-glyph="fixed"] rect,
 .lockGuide[data-pinned="true"] .lockControl :global(.lucide-lock-keyhole) rect {
   fill: color-mix(in srgb, var(--glint) 25%, transparent);
@@ -210,6 +214,7 @@
   position: absolute;
   inset-inline-end: -4px;
   bottom: -2px;
+  transform-origin: right bottom;
   color: var(--spark-tail);
   background: var(--enamel);
   border-radius: 3px;
