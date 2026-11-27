@@ -332,6 +332,15 @@ export function IntakeTimingSection({
       caption="Timing"
       headingId={headingId}
       context={context}
+      description={
+        <>
+          {pinned
+            ? "Your saved time carries over until you unlock it."
+            : "Choose the date and time you took this dose."}
+          <br />
+          Before 06:00, doses count toward the previous day.
+        </>
+      }
       action={
         <>
           <Button

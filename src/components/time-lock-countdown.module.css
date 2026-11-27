@@ -52,19 +52,6 @@
   line-height: 1.5;
   white-space: nowrap;
 }
-.caption:has(.captionDetails) {
-  padding: 7px 11px;
-  border-radius: var(--dialog-radius-control, 12px);
-}
-.captionDetails {
-  display: grid;
-  gap: 2px;
-  margin-block-start: 6px;
-  color: var(--muted-foreground);
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 1.6;
-}
 .countdown[data-lock-countdown="ready"] [data-caption="hold"] {
   display: none;
 }

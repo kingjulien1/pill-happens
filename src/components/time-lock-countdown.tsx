@@ -81,25 +81,11 @@ export function TimeLockCountdown({
       {(phase === "charging" || phase === "ready") && (
         <span className={styles.caption} data-caption="hold">
           {captions.charging}
-          <span className={styles.captionDetails}>
-            <span>Release early to cancel.</span>
-            <span>Your timing stays as it is.</span>
-          </span>
         </span>
       )}
       {phase !== "charging" && (
         <span className={styles.caption} data-caption="result">
           {timeLockCaption(phase, pinned)}
-          {phase === "ready" && (
-            <span className={styles.captionDetails}>
-              <span>
-                {pinned
-                  ? "Pins the time at release."
-                  : "Pins this date and time."}
-              </span>
-              <span>Your next log will use it.</span>
-            </span>
-          )}
         </span>
       )}
       <span className={styles.disc}>

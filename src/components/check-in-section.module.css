@@ -108,6 +108,23 @@
 .header[data-has-action] .description {
   grid-column: 1;
 }
+.header:has([data-intake-time-reset]) {
+  padding-block-start: clamp(7px, 2vw, 10px);
+
+  /* Align the trigger to the first title line when its context wraps below. */
+  .caption {
+    padding-block-start: calc(var(--section-action-size) * 0.6);
+  }
+  .labelRow {
+    min-height: 0;
+  }
+  .action {
+    top: -3px;
+  }
+  .description {
+    grid-column: 1 / -1;
+  }
+}
 .action {
   position: relative;
   display: flex;
