@@ -182,7 +182,8 @@
   --spark-reach: 1.46;
   --spark-period: 5.6s;
 }
-.lockControl[data-slot="button"] {
+.lockControl[data-slot="button"],
+.guideMark {
   box-sizing: border-box;
   overflow: visible;
   border: 3px solid var(--rim);
@@ -301,12 +302,15 @@
 .lockGuide[data-pinned="true"] {
   --guide-accent: var(--color-rose-400);
 }
-.guideHeading > svg {
-  flex: none;
-  width: 1.33em;
-  height: 1.33em;
-  color: color-mix(in srgb, var(--foreground) 45%, var(--guide-accent));
-  stroke-width: 2.35;
+.guideMark {
+  --enamel: color-mix(
+    in srgb,
+    var(--color-amber-900) 62%,
+    var(--color-mauve-900)
+  );
+  --rim: var(--color-amber-400);
+  --glint: var(--color-amber-200);
+  --icon-ink: var(--color-amber-50);
 }
 .guideHeading,
 .guideActions {
@@ -314,23 +318,25 @@
   align-items: center;
 }
 .guideHeading {
-  gap: clamp(6px, 1.7vw, 9px);
+  gap: clamp(8px, 2vw, 12px);
   min-width: 0;
-  font-size: 1.15rem;
-  text-wrap: balance;
 }
 .guideHeading h4 {
   margin: 0;
-  font-size: inherit;
+  font-size: 1.22rem;
   font-weight: 650;
-  line-height: 1.35;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  text-wrap: balance;
 }
-.guideHeading [role="status"] {
+.guideSubtitle {
+  margin: 3px 0 0;
   color: var(--muted-foreground);
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-wrap: pretty;
 }
-.lockGuide p {
+.guideHelp {
   grid-column: 1 / -1;
   margin: 0;
   color: var(--muted-foreground);
@@ -338,29 +344,32 @@
   line-height: 1.5;
 }
 .guideActions {
-  align-self: start;
   gap: 4px;
 }
-@container (max-width: 23.5rem) {
-  .guideHeading h4 span {
-    display: none;
-  }
+.guideStatus {
+  grid-column: 1 / -1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-block-start: 2px;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--guide-accent) 36%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--guide-accent) 10%, var(--popover));
+  color: color-mix(in srgb, var(--guide-accent) 38%, var(--foreground));
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.25;
 }
 @container (max-width: 17rem) {
-  .guideHeading {
-    display: grid;
-    grid-template-columns: auto auto minmax(0, 1fr);
-    row-gap: 2px;
-  }
-  .guideHeading > svg {
-    grid-row: span 2;
-  }
-  .guideHeading h4 {
-    grid-column: 2 / -1;
+  .guideActions {
+    flex-direction: column;
   }
 }
 @media (pointer: coarse) {
-  .guideActions button {
+  .guideActions button,
+  .guideMark {
     min-inline-size: 44px;
     min-block-size: 44px;
   }

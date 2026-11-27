@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  Anchor,
   CalendarClock,
   ClockCheck,
   Hourglass,
@@ -20,6 +21,7 @@ import {
   Stamp,
   Timer,
   TimerReset,
+  Wind,
   type LucideIcon,
 } from "lucide-react";
 import { TIME_LOCK_HOLD_MS, useTimeLockPress } from "./use-time-lock-press";
@@ -313,6 +315,7 @@ export function IntakeTimingSection({
             : "idle"
       ];
   const toggleGuideLabel = pinned ? "Show unlock gesture" : "Show lock gesture";
+  const StatusIcon = hold.stage ? Hourglass : pinned ? Anchor : Wind;
   const actionsDisabled = locked || hold.stage !== null || phase === "settling";
   const showGesture = (gesture: "tap" | "hold") => {
     const control = button.current;
@@ -472,14 +475,22 @@ export function IntakeTimingSection({
           aria-labelledby={`${id}-guide-title`}
         >
           <div className={styles.guideHeading}>
-            <Timer aria-hidden="true" />
-            <h4 id={`${id}-guide-title`} aria-label="How Time Lock works">
-              <span>How </span>Time Lock<span> works</span>
-            </h4>
-            <span aria-hidden="true" className={styles.labelDot} />
-            <span role="status" aria-atomic="true" id={`${id}-timing-status`}>
-              {status}
+            <span
+              className={`${styles.guideMark} inline-grid size-8 shrink-0 place-items-center rounded-lg`}
+              aria-hidden="true"
+            >
+              <Timer className="size-[1.2rem]" />
             </span>
+            <div>
+              <h4 id={`${id}-guide-title`}>
+                How <span className="whitespace-nowrap">Time Lock</span> works
+              </h4>
+              <p className={styles.guideSubtitle}>
+                {pinned
+                  ? "Pinned for your next log."
+                  : "Reuse a date and time."}
+              </p>
+            </div>
           </div>
           <div className={styles.guideActions} ref={guideActions}>
             <Button
@@ -518,11 +529,20 @@ export function IntakeTimingSection({
               </Button>
             )}
           </div>
-          <p id={`${id}-timing-help`}>
+          <p className={styles.guideHelp} id={`${id}-timing-help`}>
             {pinned
-              ? "Both values carry over to new and edited intakes. Tap Time Lock to unlock and use the current time, or hold it until the ring fills and release to relock at the current time."
-              : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds, then release when the ring fills. Your next intake will use this date and time. Editing either field also locks both values.`}
+              ? "Tap Time Lock to use the current time again. To pin a fresh timestamp, hold until the ring fills and release. You can still edit either field."
+              : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds, then release when the ring fills. Changing the date or time by hand also locks both values.`}
           </p>
+          <span
+            className={styles.guideStatus}
+            role="status"
+            aria-atomic="true"
+            id={`${id}-timing-status`}
+          >
+            <StatusIcon aria-hidden="true" size="1.15em" />
+            {status}
+          </span>
         </aside>
       </div>
     </CheckInSection>
