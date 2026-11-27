@@ -13,7 +13,6 @@ import {
   CalendarClock,
   ClockCheck,
   Hourglass,
-  Info,
   KeyRound,
   LockKeyhole,
   LockKeyholeOpen,
@@ -66,13 +65,13 @@ const revealDuration = 580;
 const manualEntryDuration = 700;
 const unlockDuration = 820;
 const refreshDuration = 460;
-const noticeHeadings = {
-  idle: ["Time unlocked", "Tap for now"],
-  fixed: ["Time locked", "Tap to unlock"],
-  charging: ["Keep holding", "Release to cancel"],
-  ready: ["Ready to lock", "Release to lock"],
-  resetting: ["Unlocking time", "Returning to now"],
-  refreshing: ["Refreshing time", "Returning to now"],
+const lockStatus = {
+  idle: "Unlocked",
+  fixed: "Locked",
+  charging: "Keep holding",
+  ready: "Release to lock",
+  resetting: "Unlocking…",
+  refreshing: "Refreshing…",
 } as const;
 
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
@@ -163,6 +162,7 @@ export function IntakeTimingSection({
     } else setPhase(pinned ? "resetting" : "refreshing");
   };
   const fixTiming = () => {
+    if (locked || resetting.current) return;
     cancelCommit();
     edited.current = false;
     onFix();
@@ -217,8 +217,8 @@ export function IntakeTimingSection({
     };
   }, []);
 
-  const [status, action] =
-    noticeHeadings[
+  const status =
+    lockStatus[
       hold.stage ??
         (phase === "resetting" || phase === "refreshing"
           ? phase
@@ -226,152 +226,187 @@ export function IntakeTimingSection({
             ? "fixed"
             : "idle")
     ];
-  const instructions =
-    phase === "resetting"
-      ? "The date and time return to now together. Your saved intakes keep their original timestamps."
-      : pinned
-        ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
-        : `Hold Time Lock for ${TIME_LOCK_HOLD_MS / 1000} seconds. Release when the ring fills to keep both values. Editing either field also locks them.`;
+  const ToggleIcon = pinned ? LockKeyholeOpen : LockKeyhole;
+  const actionsDisabled = locked || hold.stage !== null || phase === "settling";
+  const shortcut = (action: () => void) => {
+    hold.cancel();
+    action();
+  };
 
   return (
-    <CheckInSection
-      caption="Timing"
-      headingId={headingId}
-      context={context}
-      action={
-        <>
-          <Button
-            ref={button}
-            type="button"
-            variant="outline"
-            size="icon"
-            className={`${styles.resetButton} ${feedbackStyles.trigger}`}
-            aria-label="Time Lock"
-            title={
-              pinned
-                ? "Tap to unlock · Hold to lock the current time"
-                : "Tap for now · Hold to lock the time"
-            }
-            {...hold.handlers}
-            disabled={locked}
-            aria-pressed={pinned}
-            aria-describedby={`${id}-timing-status ${id}-timing-help`}
-            data-intake-time-reset
-            data-state={state}
-            data-feedback={hold.feedback ?? undefined}
-            style={
-              {
-                "--charge-duration": `${chargeDuration}ms`,
-                "--key-duration": `${manualEntryDuration}ms`,
-                "--settle-duration": `${revealDuration}ms`,
-                "--unlock-duration": `${unlockDuration}ms`,
-                "--refresh-duration": `${refreshDuration}ms`,
-              } as CSSProperties
-            }
-          >
-            <span className={styles.face} aria-hidden="true">
-              {timeLockIcons.map(([phaseName, Icon]) => (
-                <span
-                  key={phaseName}
-                  className={styles.glyph}
-                  data-glyph={phaseName}
-                  data-current={phaseName === state || undefined}
-                >
-                  <Icon strokeWidth={2.15} />
-                </span>
-              ))}
-            </span>
-          </Button>
-          {hold.feedback && (
-            <TimeLockCountdown
-              phase={hold.feedback}
-              chargeDuration={chargeDuration}
-            />
-          )}
-        </>
-      }
-      description="Use the time you took the dose, even if you’re logging it later. Intakes before 06:00 go on the previous tracking day."
-    >
-      <div className="form-field p-4">
-        <div
-          className={styles.fields}
-          data-intake-date-time-fields
-          data-timing-pinned={pinned}
-          data-timing-phase={state}
-        >
-          <div className={styles.field} data-timing-field="date">
-            <Label htmlFor={`${id}-date`}>Date Taken</Label>
-            <Input
-              id={`${id}-date`}
-              name="takenAtDate"
-              type="date"
-              value={date}
-              max={localNow.slice(0, 10)}
-              onChange={(event) => {
-                changeInput(`${event.target.value}T${time}`);
-                // Native pickers can commit without moving focus away from the field.
-                if (event.nativeEvent.type === "change") commitInput();
-              }}
-              onFocus={focusInput}
-              onBlur={commitInput}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  event.currentTarget.blur();
-                }
-              }}
-              disabled={locked}
-              required
-              className={styles.input}
-              data-intake-date
-            />
-          </div>
-          <div className={styles.field} data-timing-field="time">
-            <Label htmlFor={`${id}-time`}>Time Taken</Label>
-            <Input
-              id={`${id}-time`}
-              name="takenAtTime"
-              type="time"
-              value={time}
-              max={
-                date === localNow.slice(0, 10) ? localNow.slice(11) : undefined
+    <>
+      <CheckInSection
+        caption="Timing"
+        headingId={headingId}
+        context={context}
+        action={
+          <>
+            <Button
+              ref={button}
+              type="button"
+              variant="outline"
+              size="icon"
+              className={`${styles.resetButton} ${feedbackStyles.trigger}`}
+              aria-label="Time Lock"
+              title={
+                pinned
+                  ? "Tap to unlock · Hold to lock the current time"
+                  : "Tap for now · Hold to lock the time"
               }
-              step={60}
-              onChange={(event) => {
-                changeInput(`${date}T${event.target.value}`);
-                if (event.nativeEvent.type === "change") commitInput();
-              }}
-              onFocus={focusInput}
-              onBlur={commitInput}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  event.currentTarget.blur();
-                }
-              }}
+              {...hold.handlers}
               disabled={locked}
-              required
-              className={styles.input}
-              data-intake-clock
-            />
-          </div>
-          <aside className={styles.notice} aria-label="Timing help">
-            <div
-              className={styles.noticeHeader}
-              role="status"
-              aria-atomic="true"
-              id={`${id}-timing-status`}
+              aria-pressed={pinned}
+              aria-describedby={`${id}-timing-status ${id}-timing-help`}
+              data-intake-time-reset
+              data-state={state}
+              data-feedback={hold.feedback ?? undefined}
+              style={
+                {
+                  "--charge-duration": `${chargeDuration}ms`,
+                  "--key-duration": `${manualEntryDuration}ms`,
+                  "--settle-duration": `${revealDuration}ms`,
+                  "--unlock-duration": `${unlockDuration}ms`,
+                  "--refresh-duration": `${refreshDuration}ms`,
+                } as CSSProperties
+              }
             >
-              <strong>
-                <Info aria-hidden="true" />
-                {status}
-              </strong>
-              <span>{action}</span>
+              <span className={styles.face} aria-hidden="true">
+                {timeLockIcons.map(([phaseName, Icon]) => (
+                  <span
+                    key={phaseName}
+                    className={styles.glyph}
+                    data-glyph={phaseName}
+                    data-current={phaseName === state || undefined}
+                  >
+                    <Icon strokeWidth={2.15} />
+                  </span>
+                ))}
+              </span>
+            </Button>
+            {hold.feedback && (
+              <TimeLockCountdown
+                phase={hold.feedback}
+                chargeDuration={chargeDuration}
+              />
+            )}
+          </>
+        }
+        description="Use the time you took the dose, even if you’re logging it later. Intakes before 06:00 go on the previous tracking day."
+      >
+        <div className="form-field p-4">
+          <div
+            className={styles.fields}
+            data-intake-date-time-fields
+            data-timing-pinned={pinned}
+            data-timing-phase={state}
+          >
+            <div className={styles.field} data-timing-field="date">
+              <Label htmlFor={`${id}-date`}>Date Taken</Label>
+              <Input
+                id={`${id}-date`}
+                name="takenAtDate"
+                type="date"
+                value={date}
+                max={localNow.slice(0, 10)}
+                onChange={(event) => {
+                  changeInput(`${event.target.value}T${time}`);
+                  // Native pickers can commit without moving focus away from the field.
+                  if (event.nativeEvent.type === "change") commitInput();
+                }}
+                onFocus={focusInput}
+                onBlur={commitInput}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    event.currentTarget.blur();
+                  }
+                }}
+                disabled={locked}
+                required
+                className={styles.input}
+                data-intake-date
+              />
             </div>
-            <p id={`${id}-timing-help`}>{instructions}</p>
-          </aside>
+            <div className={styles.field} data-timing-field="time">
+              <Label htmlFor={`${id}-time`}>Time Taken</Label>
+              <Input
+                id={`${id}-time`}
+                name="takenAtTime"
+                type="time"
+                value={time}
+                max={
+                  date === localNow.slice(0, 10)
+                    ? localNow.slice(11)
+                    : undefined
+                }
+                step={60}
+                onChange={(event) => {
+                  changeInput(`${date}T${event.target.value}`);
+                  if (event.nativeEvent.type === "change") commitInput();
+                }}
+                onFocus={focusInput}
+                onBlur={commitInput}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    event.currentTarget.blur();
+                  }
+                }}
+                disabled={locked}
+                required
+                className={styles.input}
+                data-intake-clock
+              />
+            </div>
+          </div>
         </div>
-      </div>
-    </CheckInSection>
+      </CheckInSection>
+      <aside
+        className={styles.lockGuide}
+        data-pinned={pinned}
+        aria-labelledby={`${id}-guide-title`}
+      >
+        <Timer aria-hidden="true" />
+        <div>
+          <div className={styles.guideHeading}>
+            <h4 id={`${id}-guide-title`}>How Time Lock works</h4>
+            <span role="status" aria-atomic="true" id={`${id}-timing-status`}>
+              {status}
+            </span>
+          </div>
+          <p id={`${id}-timing-help`}>
+            {pinned
+              ? "This date and time carry over to new and edited intakes. Edit either field to adjust the lock. Hold the clock again to pin the current time, or tap it to unlock."
+              : `Hold the clock for ${TIME_LOCK_HOLD_MS / 1000} seconds, then release when the ring fills. Both values carry over to your next intake. Editing either field also locks them.`}
+          </p>
+          <div className={styles.guideActions}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={actionsDisabled}
+              focusableWhenDisabled={!disabled}
+              onClick={() => shortcut(pinned ? resetTiming : fixTiming)}
+            >
+              <ToggleIcon aria-hidden="true" className="size-4" />
+              {pinned ? "Unlock & use now" : "Lock this time"}
+            </Button>
+            {pinned && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={actionsDisabled}
+                focusableWhenDisabled={!disabled}
+                onClick={() => shortcut(fixTiming)}
+              >
+                <TimerReset aria-hidden="true" className="size-4" />
+                Relock to now
+              </Button>
+            )}
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

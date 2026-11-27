@@ -116,56 +116,78 @@
   visibility: visible;
   opacity: 1;
 }
-.notice {
-  grid-column: 1 / -1;
-  margin-top: 8px;
-  padding: 10px 12px;
-  background: color-mix(in srgb, var(--muted-foreground) 7%, transparent);
-  border-inline-start: 2px solid
-    color-mix(in srgb, var(--muted-foreground) 42%, transparent);
-  border-radius: 3px 11px 11px 3px;
+.lockGuide {
+  --guide-accent: var(--color-violet-400);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  margin-inline: 6px;
+  padding: 13px 15px;
+  border: 1px solid color-mix(in srgb, var(--guide-accent) 29%, var(--border));
+  border-radius: var(--dialog-radius-control, 12px);
+  background: color-mix(in srgb, var(--popover) 90%, var(--guide-accent));
   color: var(--foreground);
 }
-.fields[data-timing-pinned="true"] .notice {
-  background: color-mix(
-    in srgb,
-    var(--color-rose-500, #f43f5e) 8%,
-    transparent
-  );
-  border-inline-start-color: var(--color-rose-500, #f43f5e);
+.lockGuide[data-pinned="true"] {
+  --guide-accent: var(--color-rose-400);
 }
-.noticeHeader,
-.noticeHeader strong {
+.lockGuide > svg {
+  width: 19px;
+  height: 19px;
+  color: color-mix(in srgb, var(--foreground) 45%, var(--guide-accent));
+  stroke-width: 2.35;
+}
+.guideHeading,
+.guideActions {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-.noticeHeader {
-  justify-content: space-between;
   flex-wrap: wrap;
-  font-size: 0.8rem;
+  gap: 4px 9px;
+}
+.guideHeading {
+  justify-content: space-between;
+}
+.guideHeading h4 {
+  margin: 0;
+  font-size: 0.89rem;
+  font-weight: 650;
   line-height: 1.35;
 }
-.noticeHeader svg {
-  width: 1em;
-  height: 1em;
-  color: var(--color-rose-500, #f43f5e);
-  stroke-width: 2.3;
-}
-.noticeHeader span {
-  font-size: 0.68rem;
+.guideHeading [role="status"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   color: var(--muted-foreground);
+  font-size: 0.72rem;
+  line-height: 1.4;
 }
-.notice p {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  margin: 5px 0 0;
-  font-size: 0.74rem;
-  line-height: 1.45;
-  opacity: 0.67;
+.guideHeading [role="status"]::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
 }
+.lockGuide[data-pinned="true"] [role="status"]::before {
+  border-color: var(--guide-accent);
+  background-color: var(--guide-accent);
+}
+.lockGuide p {
+  margin-block: 6px 10px;
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.guideActions button {
+  font-size: 0.76rem;
+}
+@media (pointer: coarse) {
+  .guideActions button {
+    min-height: 44px;
+  }
+}
+
 .resetButton:disabled {
   cursor: wait;
 }
