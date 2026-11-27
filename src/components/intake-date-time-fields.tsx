@@ -485,12 +485,7 @@ export function IntakeTimingSection({
           aria-labelledby={`${id}-guide-title`}
         >
           <div className={styles.guideHeading}>
-            <span
-              className={`${styles.guideMark} inline-grid size-8 shrink-0 place-items-center rounded-lg`}
-              aria-hidden="true"
-            >
-              <Timer className="size-[1.2rem]" />
-            </span>
+            <Timer aria-hidden="true" className="size-[1.2rem] shrink-0" />
             <div>
               <h4 id={`${id}-guide-title`}>
                 How <span className="whitespace-nowrap">Time Lock</span> works

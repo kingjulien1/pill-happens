@@ -182,8 +182,7 @@
   --spark-reach: 1.46;
   --spark-period: 5.6s;
 }
-.lockControl[data-slot="button"],
-.guideMark {
+.lockControl[data-slot="button"] {
   box-sizing: border-box;
   overflow: visible;
   border: 3px solid var(--rim);
@@ -302,16 +301,6 @@
 .lockGuide[data-pinned="true"] {
   --guide-accent: var(--color-rose-400);
 }
-.guideMark {
-  --enamel: color-mix(
-    in srgb,
-    var(--color-amber-900) 62%,
-    var(--color-mauve-900)
-  );
-  --rim: var(--color-amber-400);
-  --glint: var(--color-amber-200);
-  --icon-ink: var(--color-amber-50);
-}
 .guideHeading,
 .guideActions {
   display: flex;
@@ -368,8 +357,7 @@
   }
 }
 @media (pointer: coarse) {
-  .guideActions button,
-  .guideMark {
+  .guideActions button {
     min-inline-size: 44px;
     min-block-size: 44px;
   }
