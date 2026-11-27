@@ -136,7 +136,8 @@
       [data-slot="input"],
       [data-slot="textarea"],
       [data-slot="select-trigger"]
-    ):not([data-dialog-canvas], [aria-invalid="true"]) {
+    ):not([data-dialog-canvas], [aria-invalid="true"]),
+  [data-intake-time-reset] {
     background-color: color-mix(
       in srgb,
       var(--surface-reading) 90%,
@@ -152,6 +153,7 @@
       [data-slot="textarea"],
       [data-slot="select-trigger"]
     ):focus-visible:not([data-dialog-canvas], [aria-invalid="true"]),
+  [data-intake-time-reset]:focus-visible,
   /* WebKit can give the focused native date/time editor its own focus indicator. */
   [data-intake-date-time-fields] input:focus:not([aria-invalid="true"]) {
     background-color: var(--surface-reading);

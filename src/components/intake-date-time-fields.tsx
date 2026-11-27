@@ -94,8 +94,9 @@ function TimingField({
   );
   return (
     <div className={styles.field} data-timing-field={type}>
-      <Label htmlFor={id}>
+      <Label htmlFor={id} className={styles.fieldLabel}>
         {type === "date" ? "Date Taken" : "Time Taken"}
+        <span aria-hidden="true" className={styles.labelDot} />
         {indicator}
       </Label>
       <div className={styles.inputWrap}>
@@ -300,6 +301,7 @@ export function IntakeTimingSection({
               disabled={locked}
               aria-pressed={pinned}
               aria-describedby={`${id}-timing-status ${id}-timing-help`}
+              data-dialog-corner="control"
               data-intake-time-reset
               data-state={state}
               data-feedback={hold.feedback ?? undefined}

@@ -15,6 +15,17 @@
   grid-template-rows: subgrid;
   row-gap: 6px;
 }
+.fieldLabel {
+  column-gap: clamp(9px, calc(6px + 0.8vw), 14px);
+}
+.labelDot {
+  flex: none;
+  width: 0.22em;
+  height: 0.22em;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+}
 .indicator {
   width: calc(6em / 7);
   height: calc(6em / 7);
@@ -59,14 +70,47 @@
 .fields[data-timing-pinned="true"] {
   --indicator-color: var(--color-rose-500);
   --indicator-opacity: 0.83;
+  --lock-strength: 75%;
+}
+.resetButton[aria-pressed="true"] {
+  --lock-strength: calc(100% * 2 / 3);
+  color: color-mix(
+    in srgb,
+    var(--color-rose-500) var(--lock-strength),
+    var(--foreground)
+  );
+}
+.fields[data-timing-pinned="true"],
+.resetButton[aria-pressed="true"] {
   --lock-accent: var(--color-rose-400);
-  --lock-tint: color-mix(in srgb, var(--lock-accent) 25.5%, transparent);
-  --lock-focus: color-mix(in srgb, var(--lock-accent) 75%, var(--ring));
+  /* Full-strength locked fields originally carried a 34% rose wash. */
+  --lock-tint: color-mix(
+    in srgb,
+    var(--lock-accent) calc(0.34 * var(--lock-strength)),
+    transparent
+  );
+  --lock-edge: color-mix(
+    in srgb,
+    var(--lock-accent) var(--lock-strength),
+    var(--input)
+  );
+  --lock-focus: color-mix(
+    in srgb,
+    var(--lock-accent) var(--lock-strength),
+    var(--ring)
+  );
 }
 .fields[data-timing-pinned="true"] .field input.input {
   --ring: var(--lock-focus);
-  border-color: color-mix(in srgb, var(--lock-accent) 75%, var(--input));
+}
+.fields[data-timing-pinned="true"] .field input.input,
+.resetButton[aria-pressed="true"] {
+  border-color: var(--lock-edge);
   background-image: linear-gradient(var(--lock-tint), var(--lock-tint));
+}
+.resetButton[aria-pressed="true"]:focus-visible {
+  border-color: var(--lock-focus);
+  --tw-ring-color: color-mix(in srgb, var(--lock-focus) 50%, transparent);
 }
 .fields[data-timing-pinned="true"] .field input.input:focus {
   border-color: var(--ring);
