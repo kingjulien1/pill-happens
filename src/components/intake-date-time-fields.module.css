@@ -77,17 +77,6 @@
   --indicator-color: var(--color-rose-500);
   --indicator-opacity: 0.83;
   --lock-strength: 75%;
-}
-.resetButton[aria-pressed="true"] {
-  --lock-strength: calc(100% * 2 / 3);
-  color: color-mix(
-    in srgb,
-    var(--color-rose-500) var(--lock-strength),
-    var(--foreground)
-  );
-}
-.fields[data-timing-pinned="true"],
-.resetButton[aria-pressed="true"] {
   --lock-accent: var(--color-rose-400);
   /* Full-strength locked fields originally carried a 34% rose wash. */
   --lock-tint: color-mix(
@@ -108,15 +97,8 @@
 }
 .fields[data-timing-pinned="true"] .field input.input {
   --ring: var(--lock-focus);
-}
-.fields[data-timing-pinned="true"] .field input.input,
-.resetButton[aria-pressed="true"] {
   border-color: var(--lock-edge);
   background-image: linear-gradient(var(--lock-tint), var(--lock-tint));
-}
-.resetButton[aria-pressed="true"]:focus-visible {
-  border-color: var(--lock-focus);
-  --tw-ring-color: color-mix(in srgb, var(--lock-focus) 50%, transparent);
 }
 .fields[data-timing-pinned="true"] .field input.input:focus {
   border-color: var(--ring);
@@ -175,6 +157,73 @@
   line-height: 1.2;
 }
 
+.lockControl {
+  --enamel: color-mix(
+    in srgb,
+    var(--color-violet-900) 55%,
+    var(--color-mauve-800)
+  );
+  --rim: var(--color-violet-400);
+  --glint: var(--color-violet-200);
+  --spark-tail: var(--color-fuchsia-200);
+  --icon-ink: var(--color-violet-50);
+}
+.lockControl[aria-pressed="true"],
+.lockGuide[data-pinned="true"] .lockControl {
+  --enamel: color-mix(
+    in srgb,
+    var(--color-rose-900) 82%,
+    var(--color-mauve-900)
+  );
+  --rim: var(--color-rose-400);
+  --glint: var(--color-rose-200);
+  --spark-tail: var(--color-amber-200);
+  --icon-ink: var(--color-rose-50);
+  --spark-reach: 1.46;
+  --spark-period: 5.6s;
+}
+.lockControl[data-slot="button"] {
+  box-sizing: border-box;
+  overflow: visible;
+  border: 3px solid var(--rim);
+  border-block-start-color: color-mix(in srgb, var(--glint) 65%, var(--rim));
+  border-block-end-color: color-mix(in srgb, var(--rim) 65%, var(--enamel));
+  background: var(--enamel);
+  color: var(--icon-ink);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--glint) 28%, transparent),
+    0 2px 4px color-mix(in srgb, var(--enamel) 38%, transparent);
+}
+.lockControl:focus-visible {
+  outline: 2px solid var(--glint);
+  outline-offset: 3px;
+}
+.lockControl[aria-pressed="true"] [data-glyph="fixed"] rect,
+.lockGuide[data-pinned="true"] .lockControl :global(.lucide-lock-keyhole) rect {
+  fill: color-mix(in srgb, var(--glint) 25%, transparent);
+}
+.relockIcon {
+  position: relative;
+  display: grid;
+}
+.relockIcon > :last-child {
+  position: absolute;
+  inset-inline-end: -4px;
+  bottom: -2px;
+  color: var(--spark-tail);
+  background: var(--enamel);
+  border-radius: 3px;
+}
+.sparks {
+  display: none;
+  position: absolute;
+  inset: -3px;
+  width: calc(100% + 6px);
+  height: calc(100% + 6px);
+  overflow: visible;
+  pointer-events: none;
+  color: var(--glint);
+}
 .resetButton {
   touch-action: manipulation;
   -webkit-touch-callout: none;
@@ -312,6 +361,74 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
+  .lockControl[data-playing="true"],
+  .guideActions[data-playing="true"] {
+    --spark-play: running;
+  }
+  .lockControl:disabled,
+  .lockControl[aria-disabled="true"],
+  .lockControl:is([data-feedback="charging"], [data-feedback="ready"]) {
+    --spark-play: paused;
+  }
+  .sparks {
+    display: block;
+  }
+  .sparks > g {
+    transform-box: view-box;
+    transform-origin: center;
+    animation: cast-sparks var(--spark-period, 7.8s) var(--spark-delay, 0s)
+      infinite both;
+    animation-play-state: var(--spark-play, paused);
+  }
+  .sparks > g + g {
+    color: var(--spark-tail);
+    animation-delay: calc(var(--spark-delay, 0s) + 120ms);
+  }
+  .guideActions {
+    --spark-delay: 280ms;
+  }
+  .guideActions .lockControl + .lockControl {
+    --spark-delay: 2.1s;
+  }
+  .lockGuide[data-pinned="true"]
+    .lockControl
+    > :global(.lucide-lock-keyhole)
+    path {
+    animation: latch-shackle 420ms cubic-bezier(0.22, 0.76, 0.3, 1.16) both;
+  }
+  @keyframes latch-shackle {
+    from {
+      transform: translateY(-2.5px);
+    }
+    55% {
+      transform: translateY(1.1px);
+    }
+    78% {
+      transform: translateY(-0.4px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes cast-sparks {
+    0% {
+      opacity: 0;
+      transform: rotate(-7deg) scale(0.87);
+    }
+    4% {
+      opacity: 0.98;
+      transform: rotate(-2deg) scale(1.08);
+      animation-timing-function: ease-out;
+    }
+    11% {
+      opacity: 0.84;
+    }
+    18%,
+    100% {
+      opacity: 0;
+      transform: rotate(7deg) scale(var(--spark-reach, 1.32));
+    }
+  }
   .resetButton[data-guided]::after {
     content: "";
     position: absolute;

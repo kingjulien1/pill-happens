@@ -73,6 +73,35 @@ const lockStatus = {
   refreshing: "Refreshing…",
 } as const;
 
+const spark = "M0 -3 Q.5 -.6 2.5 0 Q.5 .5 0 3 Q-.5 .5 -2.5 0 Q-.5 -.6 0 -3Z";
+
+function TimeLockSparks() {
+  return (
+    <svg
+      className={`${styles.sparks} size-full`}
+      viewBox="-24 -24 48 48"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <g fill="currentColor">
+        <path d={spark} transform="translate(-14 -21)" />
+        <path d={spark} transform="translate(22 -6) scale(.8)" />
+        <path d={spark} transform="translate(11 21) scale(.85)" />
+        <path d={spark} transform="translate(-22 9) scale(.65)" />
+      </g>
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      >
+        <path d="m10 -21 1 -3 M21 13l2.5 1.5 M-9 21l-1 2.5 M-21 -12l-2.5 -1" />
+        <path d="M-2 -23v-.7 M23 1l.7 .1 M3 23l-.1 .7 M-23 0l-.7 -.15" />
+      </g>
+    </svg>
+  );
+}
+
 function TimingField({
   id,
   type,
@@ -144,6 +173,7 @@ export function IntakeTimingSection({
   const [motionKey, setMotionKey] = useState(0);
   const [guideGesture, setGuideGesture] = useState<"tap" | "hold" | null>(null);
   const button = useRef<HTMLButtonElement>(null);
+  const guideActions = useRef<HTMLDivElement>(null);
   const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const edited = useRef(false);
   const resetting = useRef(false);
@@ -246,22 +276,30 @@ export function IntakeTimingSection({
   }, [phase, motionKey, finishReset]);
 
   useEffect(() => {
-    const node = button.current;
-    if (!node) return;
-    let visible = false;
+    const control = button.current;
+    const actions = guideActions.current;
+    if (!control || !actions) return;
+    const visible = new Set<Element>();
     const sync = () => {
-      node.dataset.playing = String(visible && !document.hidden);
+      for (const node of [control, actions]) {
+        node.dataset.playing = String(visible.has(node) && !document.hidden);
+      }
     };
-    const observer = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target);
+        else visible.delete(entry.target);
+      }
       sync();
     });
-    observer.observe(node);
+    observer.observe(control);
+    observer.observe(actions);
     document.addEventListener("visibilitychange", sync);
     return () => {
       observer.disconnect();
       document.removeEventListener("visibilitychange", sync);
-      delete node.dataset.playing;
+      delete control.dataset.playing;
+      delete actions.dataset.playing;
     };
   }, []);
 
@@ -274,7 +312,6 @@ export function IntakeTimingSection({
             ? "fixed"
             : "idle"
       ];
-  const ToggleIcon = pinned ? LockKeyholeOpen : LockKeyhole;
   const toggleGuideLabel = pinned ? "Show unlock gesture" : "Show lock gesture";
   const actionsDisabled = locked || hold.stage !== null || phase === "settling";
   const showGesture = (gesture: "tap" | "hold") => {
@@ -301,7 +338,7 @@ export function IntakeTimingSection({
             type="button"
             variant="outline"
             size="icon"
-            className={`${styles.resetButton} ${feedbackStyles.trigger}`}
+            className={`${styles.lockControl} ${styles.resetButton} ${feedbackStyles.trigger}`}
             aria-label="Time Lock"
             title={
               pinned
@@ -356,6 +393,7 @@ export function IntakeTimingSection({
                 </span>
               ))}
             </span>
+            <TimeLockSparks key={String(pinned)} />
           </Button>
           {guideGesture && (
             <span
@@ -443,11 +481,12 @@ export function IntakeTimingSection({
               {status}
             </span>
           </div>
-          <div className={styles.guideActions}>
+          <div className={styles.guideActions} ref={guideActions}>
             <Button
               type="button"
               size="icon"
               variant="outline"
+              className={styles.lockControl}
               aria-label={toggleGuideLabel}
               title={toggleGuideLabel}
               disabled={actionsDisabled}
@@ -455,13 +494,15 @@ export function IntakeTimingSection({
               aria-controls={`${id}-lock`}
               onClick={() => showGesture(pinned ? "tap" : "hold")}
             >
-              <ToggleIcon aria-hidden="true" className="size-4" />
+              <LockKeyhole aria-hidden="true" className="size-4" />
+              <TimeLockSparks key={String(pinned)} />
             </Button>
             {pinned && (
               <Button
                 type="button"
                 size="icon"
                 variant="outline"
+                className={styles.lockControl}
                 aria-label="Show relock gesture"
                 title="Show relock gesture"
                 disabled={actionsDisabled}
@@ -469,7 +510,11 @@ export function IntakeTimingSection({
                 aria-controls={`${id}-lock`}
                 onClick={() => showGesture("hold")}
               >
-                <TimerReset aria-hidden="true" className="size-4" />
+                <span className={styles.relockIcon} aria-hidden="true">
+                  <TimerReset className="size-[18px]" />
+                  <LockKeyhole className="size-3" strokeWidth={2.5} />
+                </span>
+                <TimeLockSparks />
               </Button>
             )}
           </div>
