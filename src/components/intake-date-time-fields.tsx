@@ -541,6 +541,7 @@ export function IntakeTimingSection({
           </p>
           <span
             className={styles.guideStatus}
+            data-unlocked={status === lockStatus.idle || undefined}
             role="status"
             aria-atomic="true"
             id={`${id}-timing-status`}

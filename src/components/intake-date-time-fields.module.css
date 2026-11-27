@@ -351,6 +351,21 @@
   font-weight: 600;
   line-height: 1.25;
 }
+.guideStatus[data-unlocked] {
+  color: var(--color-fuchsia-800, #86198f);
+  background-color: var(--color-fuchsia-100, #fae8ff);
+  border-color: color-mix(in srgb, currentColor 44%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  .guideStatus[data-unlocked] {
+    color: var(--color-fuchsia-200, #f5d0fe);
+    background-color: color-mix(
+      in srgb,
+      var(--color-fuchsia-900, #701a75) 58%,
+      var(--popover)
+    );
+  }
+}
 @container (max-width: 17rem) {
   .guideActions {
     flex-direction: column;
