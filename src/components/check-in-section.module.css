@@ -92,16 +92,21 @@
 }
 .header[data-has-action] {
   --section-action-size: 2rem;
+  --action-gutter: var(--section-content-inset, 1rem);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  column-gap: clamp(6px, 2vw, 14px);
+  column-gap: var(--action-gutter);
+  padding-inline-end: var(--action-gutter);
 }
 .header[data-has-action] .labelRow {
   min-height: var(--section-action-size);
+  flex-wrap: wrap;
+  align-content: center;
+  row-gap: 2px;
 }
 .header[data-has-action] .description {
-  grid-column: 1 / -1;
+  grid-column: 1;
 }
 .action {
   display: flex;
@@ -192,8 +197,11 @@
 }
 
 @media (max-width: 767px) {
+  .section {
+    --section-content-inset: 18px;
+  }
   .section .frame > :first-child {
-    padding-inline: 18px;
+    padding-inline: var(--section-content-inset);
   }
   .section .frame > [data-evening-feelings] {
     padding-inline: 8px;
