@@ -6,6 +6,8 @@
   --launch-mark: #7a3954;
   --launch-arrow-face: #492d51;
   --launch-arrow-ink: #fff0dd;
+  --launch-icon-scale: 1.225;
+  --launch-wash: #954977;
   --launch-motion: paused;
   position: relative;
   display: grid;
@@ -31,6 +33,13 @@
   --launch-motion: running;
 }
 
+@media (max-width: 350px) {
+  .button {
+    padding-inline: 13px;
+    column-gap: 9px;
+  }
+}
+
 .button:focus-visible {
   outline: 3px solid var(--launch-arrow-ink);
   outline-offset: 3px;
@@ -43,8 +52,9 @@
 
 .button .mark {
   display: grid;
-  width: 29px;
-  height: 29px;
+  width: calc(29px * var(--launch-icon-scale));
+  aspect-ratio: 1;
+  height: auto;
   place-items: center;
   color: var(--launch-mark);
 }
@@ -57,8 +67,25 @@
 }
 
 .copy {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: 3px;
+}
+
+.copy::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -7px -3px -7px -8px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse closest-side at 48% 50%,
+    var(--launch-wash) 34%,
+    transparent 100%
+  );
+  opacity: 0.16;
+  transform-origin: left center;
 }
 
 .title {
@@ -77,12 +104,17 @@
 
 .arrow {
   display: grid;
-  width: 35px;
-  height: 35px;
+  width: calc(35px * var(--launch-icon-scale));
+  aspect-ratio: 1;
   place-items: center;
   border-radius: 50%;
   background-color: var(--launch-arrow-face);
   color: var(--launch-arrow-ink);
+}
+
+.arrow svg {
+  width: calc(19px * var(--launch-icon-scale));
+  height: auto;
 }
 
 @media (prefers-color-scheme: light) {
@@ -93,6 +125,49 @@
     --launch-mark: #ffccaa;
     --launch-arrow-face: #efdaef;
     --launch-arrow-ink: #432b48;
+    --launch-wash: #ffcdab;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .copy {
+    animation: label-drift 7s ease-in-out infinite;
+  }
+  .copy::before {
+    animation: fill-label 7s cubic-bezier(0.32, 0, 0.24, 1) infinite;
+  }
+  .copy,
+  .copy::before {
+    animation-play-state: var(--launch-motion);
+  }
+}
+
+@keyframes fill-label {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0.05);
+  }
+  38%,
+  58% {
+    opacity: 0.16;
+    transform: scaleX(1);
+  }
+  86% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes label-drift {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  36%,
+  45% {
+    transform: translateX(2px);
   }
 }
 
@@ -101,7 +176,7 @@
     transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   .button:hover .arrow svg {
-    transform: translateX(2px);
+    transform: translateX(calc(2px * var(--launch-icon-scale)));
   }
 }
 
@@ -109,6 +184,12 @@
   .button,
   .arrow {
     border: 1px solid ButtonText;
+  }
+  .arrow {
+    border-width: calc(1px * var(--launch-icon-scale));
+  }
+  .copy::before {
+    display: none;
   }
   .button:focus-visible {
     outline-color: Highlight;
