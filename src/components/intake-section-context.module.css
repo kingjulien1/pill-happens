@@ -4,10 +4,6 @@
   justify-content: flex-end;
   min-width: 0;
   gap: clamp(5px, 1.4vw, 8px);
-  color: var(--muted-foreground);
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 1.4;
   text-align: end;
   white-space: nowrap;
 }
@@ -25,8 +21,8 @@
   background: color-mix(in srgb, currentColor 48%, transparent);
 }
 .label > svg {
-  width: 11px;
-  height: 11px;
+  width: 14px;
+  height: 14px;
   flex: none;
 }
 .value {
@@ -34,14 +30,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.label strong,
 .value strong {
   color: var(--foreground);
   font-size: 11px;
   font-weight: 650;
-  font-variant-numeric: tabular-nums;
-}
-.value time {
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 359px) {

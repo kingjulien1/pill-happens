@@ -1,6 +1,6 @@
 "use client";
 
-import { Import, Stamp } from "lucide-react";
+import { CalendarClock, Import, PillBottle, Stamp } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
 import { sortMedicationsByUsage } from "@/lib/medication-usage";
@@ -27,7 +27,10 @@ import {
   IntakePreviewChangeRow,
   IntakePreviewSummary,
 } from "./intake-preview-summary";
-import { IntakeSectionContext } from "./intake-section-context";
+import {
+  IntakeSectionContext,
+  MedicationSectionDescription,
+} from "./intake-section-context";
 import { priorMedicationIntake } from "@/lib/intake-context";
 import { IntakeQuantityShortcuts } from "./intake-quantity-shortcuts";
 import { IntakeAmountField } from "@/components/intake-amount-field";
@@ -79,7 +82,7 @@ import {
   formatQuantityShortcut,
 } from "@/lib/intake-quantity";
 
-import { CheckInSection } from "./check-in-section";
+import { CheckInSection, CheckInSectionHeader } from "./check-in-section";
 import checkStyles from "./daily-check-in.module.css";
 import styles from "./intake-form.module.css";
 
@@ -364,12 +367,20 @@ export function IntakeForm({
       <form
         id={formId}
         data-intake-form="new"
-        className={`${styles.closingSurface} ${styles.emptySurface} pt-4 text-center`}
+        className={`${checkStyles.form} ${styles.closingSurface} ${styles.emptySurface}`}
       >
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Add the name and strength from your medication packaging, then come
-          back to log your first intake.
-        </p>
+        <CheckInSectionHeader
+          caption="Medication"
+          context="Set up"
+          headingId={`${formId}-medication-heading`}
+          detail={
+            <span className="inline-flex items-center gap-1.5">
+              <PillBottle size={14} aria-hidden="true" />
+              0 active
+            </span>
+          }
+          description="Add the name and strength from your medication packaging, then come back to log a dose."
+        />
         <div
           className={styles.footer}
           data-dialog-fade-footer
@@ -582,16 +593,26 @@ export function IntakeForm({
       className={`${checkStyles.form} ${styles.inputTypography}`}
       data-intake-form={intake ? "edit" : "new"}
     >
-      <fieldset disabled={busy} className="flex min-w-0 flex-col gap-7">
+      <fieldset
+        disabled={busy}
+        className="flex min-w-0 flex-col gap-[var(--form-row-gap)]"
+      >
         <CheckInSection
           caption="Medication"
           headingId={`${formId}-medication-heading`}
+          context="Dose & route"
+          description={
+            <MedicationSectionDescription
+              previous={previousIntake}
+              takenAt={contextTime}
+              timeZone={timezone}
+            />
+          }
           detail={
             <IntakeSectionContext
               kind="medication"
               previous={previousIntake}
               takenAt={contextTime}
-              timeZone={timezone}
               trackingDay={belongsTo}
               hasMedication={Boolean(medication || fallbackIntake)}
             />
@@ -714,15 +735,17 @@ export function IntakeForm({
             </div>
           </div>
         </CheckInSection>
+        <div className={checkStyles.sectionDivider} role="separator" />
         <CheckInSection
           caption="Timing"
           headingId={`${formId}-timing-heading`}
+          context={timing.pinned ? "Locked" : "Journal time"}
+          description="Use the time you took the dose, even if you’re logging it later. Intakes before 06:00 go on the previous tracking day."
           detail={
             <IntakeSectionContext
               kind="timing"
               previous={previousIntake}
               takenAt={contextTime}
-              timeZone={timezone}
               trackingDay={belongsTo}
               hasMedication={Boolean(medication || fallbackIntake)}
             />
@@ -762,20 +785,27 @@ export function IntakeForm({
           context={intake ? "Revision" : "New entry"}
           headingId={`${formId}-receipt`}
           detail={
-            previewTime ? (
-              <time
-                dateTime={previewTime}
-                title={`${formatDay(receiptDate)} · ${timezone}`}
-              >
-                {formatDay(receiptDate, { month: undefined, day: undefined })}
-                {" · "}
-                {takenAt.slice(11, 16)}
-              </time>
-            ) : (
-              "Time pending"
-            )
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarClock size={14} aria-hidden="true" />
+              {previewTime ? (
+                <time
+                  dateTime={previewTime}
+                  title={`${formatDay(receiptDate)} · ${timezone}`}
+                >
+                  {formatDay(receiptDate, { month: undefined, day: undefined })}
+                  {" · "}
+                  {takenAt.slice(11, 16)}
+                </time>
+              ) : (
+                "Time pending"
+              )}
+            </span>
           }
-          description="Check the dose, route and time before you save. Your future self has enough cold cases."
+          description={
+            intake
+              ? "Review the revised card before saving. The totals below already account for the entry you opened."
+              : "This is how the dose will appear in your log. Check the card and see how it changes the day’s total before saving."
+          }
         >
           <div className={styles.receiptBody}>
             <section

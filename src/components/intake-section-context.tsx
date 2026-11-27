@@ -10,19 +10,54 @@ import {
 import { formatIntakeGap } from "@/lib/intake-context";
 import styles from "./intake-section-context.module.css";
 
+export function MedicationSectionDescription({
+  previous,
+  takenAt,
+  timeZone,
+}: {
+  previous?: Intake;
+  takenAt: string;
+  timeZone: string;
+}) {
+  if (!previous) {
+    return (
+      <>
+        Choose how you took it, then enter the quantity in the units shown. The
+        dose in milligrams updates as you type.
+      </>
+    );
+  }
+  const local = toLocalInput(previous.takenAt, timeZone);
+  const date = formatDay(local.slice(0, 10), {
+    weekday: undefined,
+    month: "short",
+    year:
+      local.slice(0, 4) === toLocalInput(takenAt, timeZone).slice(0, 4)
+        ? undefined
+        : "numeric",
+  });
+  return (
+    <>
+      Your previous log for this medication was{" "}
+      <time dateTime={previous.takenAt}>
+        {date} at {local.slice(11, 16)}
+      </time>
+      . Enter the quantity you took this time to see the dose in milligrams.
+    </>
+  );
+}
+
 /** Compact, read-only checks beside the controls they help explain. */
 export function IntakeSectionContext({
   kind,
   previous,
   takenAt,
-  timeZone,
   trackingDay,
   hasMedication,
 }: {
   kind: "medication" | "timing";
   previous?: Intake;
   takenAt: string;
-  timeZone: string;
   trackingDay: string;
   hasMedication: boolean;
 }) {
@@ -31,34 +66,17 @@ export function IntakeSectionContext({
   let value: ReactNode;
   let description: string | undefined;
   if (kind === "medication") {
-    label = "Prior log";
-    if (!hasMedication) value = "Select a medication";
-    else if (!takenAt) value = "Set a valid time";
-    else if (!previous) value = "No earlier logs";
+    if (!hasMedication) label = "No selection";
+    else if (!takenAt) label = "Time needed";
+    else if (!previous) label = "No earlier logs";
     else {
-      const local = toLocalInput(previous.takenAt, timeZone);
-      const selected = toLocalInput(takenAt, timeZone);
-      const date = formatDay(local.slice(0, 10), {
-        weekday: undefined,
-        month: "short",
-        year:
-          local.slice(0, 4) === selected.slice(0, 4) ? undefined : "numeric",
-      });
+      label = "Prior log";
       const dose = doseMg(previous);
-      const amount = Number.isFinite(dose)
-        ? `${formatDose(dose)} mg`
-        : "Amount not set";
-      label = (
-        <>
-          Prior · <strong>{amount}</strong>
-        </>
+      value = Number.isFinite(dose) ? (
+        <strong>{formatDose(dose)} mg</strong>
+      ) : (
+        "Amount not set"
       );
-      value = (
-        <time dateTime={previous.takenAt}>
-          {date} · {local.slice(11, 16)}
-        </time>
-      );
-      description = `Previous recorded intake: ${amount}, ${formatDay(local.slice(0, 10), { year: "numeric" })} at ${local.slice(11, 16)} (${timeZone}).`;
     }
   } else if (hasMedication && previous && takenAt) {
     label = "Since prior log";
@@ -86,8 +104,12 @@ export function IntakeSectionContext({
         <Icon strokeWidth={2.25} aria-hidden="true" />
         <span>{label}</span>
       </span>
-      <span className={styles.divider} aria-hidden="true" />
-      <span className={styles.value}>{value}</span>
+      {value != null && (
+        <>
+          <span className={styles.divider} aria-hidden="true" />
+          <span className={styles.value}>{value}</span>
+        </>
+      )}
     </span>
   );
 }

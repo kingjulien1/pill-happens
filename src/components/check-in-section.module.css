@@ -81,22 +81,14 @@
   white-space: nowrap;
 }
 [data-intake-form] .caption {
-  gap: clamp(6px, 2vw, 14px);
-}
-[data-intake-form] .labelRow {
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  column-gap: clamp(6px, 2vw, 14px);
 }
 [data-intake-form] .detail {
   min-width: 0;
-  flex-shrink: 1;
-}
-@media (max-width: 359px) {
-  [data-intake-form] .header {
-    padding-inline: 2px;
-  }
-  [data-intake-form] .caption {
-    gap: 4px;
-  }
+  max-width: 100%;
+  margin-inline-start: auto;
 }
 .description {
   margin: 7px 0 0;
