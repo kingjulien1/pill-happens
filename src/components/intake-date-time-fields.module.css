@@ -1,6 +1,5 @@
 .fields {
   --control-height: 40px;
-  --timing-rose: var(--color-rose-400, #fb7185);
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
@@ -24,7 +23,6 @@
   max-width: 100%;
   height: var(--control-height);
   padding-block: 0;
-  padding-inline: 8px;
   border-radius: var(--dialog-radius-control, 12px);
   font-size: var(--intake-input-font-size, 16px);
   font-weight: var(--intake-input-font-weight, 400);
@@ -34,14 +32,12 @@
   appearance: none;
 }
 
-/* Keep the picker’s control geometry and keyboard focus ring in both appearances. */
-.fields .field input.input {
-  --ring: var(--timing-rose);
-  border-color: var(--timing-rose);
-}
-.fields .field input.input,
-.fields .field input.input:focus-visible {
-  background-color: color-mix(in srgb, var(--timing-rose) 34%, transparent);
+/* Unlocked fields inherit the dialog surface and focus ring alongside the medication picker. */
+.fields[data-timing-pinned="true"] .field input.input,
+.fields[data-timing-pinned="true"] .field input.input:focus-visible {
+  --ring: var(--color-rose-400, #fb7185);
+  border-color: var(--ring);
+  background-color: color-mix(in srgb, var(--ring) 34%, transparent);
 }
 .fields[data-timing-phase="resetting"] input.input {
   color: var(--foreground);

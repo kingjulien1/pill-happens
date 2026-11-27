@@ -87,6 +87,9 @@ export function IntakeTimingSection({
   disabled = false,
 }: IntakeTimingSectionProps) {
   const id = useId();
+  const timingInputClass = pinned
+    ? styles.input
+    : `${styles.input} focus:border-ring focus:ring-3 focus:ring-ring/50 dark:enabled:hover:bg-input/50`;
   const separator = value.indexOf("T");
   const date = separator < 0 ? value : value.slice(0, separator);
   const time = separator < 0 ? "" : value.slice(separator + 1);
@@ -322,7 +325,7 @@ export function IntakeTimingSection({
                 }}
                 disabled={locked}
                 required
-                className={styles.input}
+                className={timingInputClass}
                 data-intake-date
               />
             </div>
@@ -353,7 +356,7 @@ export function IntakeTimingSection({
                 }}
                 disabled={locked}
                 required
-                className={styles.input}
+                className={timingInputClass}
                 data-intake-clock
               />
             </div>

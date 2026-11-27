@@ -151,7 +151,9 @@
       [data-slot="input"],
       [data-slot="textarea"],
       [data-slot="select-trigger"]
-    ):focus-visible:not([data-dialog-canvas], [aria-invalid="true"]) {
+    ):focus-visible:not([data-dialog-canvas], [aria-invalid="true"]),
+  /* WebKit can give the focused native date/time editor its own focus indicator. */
+  [data-timing-pinned="false"] input:focus:not([aria-invalid="true"]) {
     background-color: var(--surface-reading);
     border-color: var(--ring);
   }

@@ -24,8 +24,8 @@
   gap: 16px;
   padding: 1rem;
 }
-.medicationSection [data-compact-choice-trigger] {
-  padding-inline-end: 8.75px;
+.inputTypography :is([data-compact-choice-trigger], [data-intake-date-time-fields] input) {
+  padding-inline: calc(var(--content-min-gap-secondary, 6.5px) + 6px) 8.75px;
 }
 
 .amountControls {
