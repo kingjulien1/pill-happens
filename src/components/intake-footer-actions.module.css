@@ -1,5 +1,7 @@
 .tools {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   align-items: start;
   justify-content: center;
   gap: clamp(8px, 4vw, 28px);
@@ -13,9 +15,11 @@
   --ink: var(--color-rose-200, #fecdd3);
 }
 .tool {
-  min-width: 62px;
   border-radius: 10px;
   color: color-mix(in srgb, var(--ink) 75%, var(--muted-foreground));
+}
+.toolLabel {
+  max-inline-size: min-content;
 }
 .tile {
   display: grid;

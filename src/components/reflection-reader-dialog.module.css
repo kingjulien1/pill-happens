@@ -113,12 +113,14 @@
   line-height: 1.9;
 }
 .footer {
+  --dialog-scroll-gutter: 28px;
   position: relative;
   display: flex;
   flex: none;
   flex-direction: column;
   gap: 12px;
-  padding: 20px 28px max(24px, env(safe-area-inset-bottom));
+  padding: 20px var(--dialog-scroll-gutter)
+    max(24px, env(safe-area-inset-bottom));
   background:
     radial-gradient(
       ellipse at 18% 115%,
@@ -169,7 +171,7 @@
     padding-block: 24px 32px;
   }
   .footer {
-    padding-inline: 18px;
+    --dialog-scroll-gutter: 18px;
   }
   .footer::before {
     inset-inline: 18px;

@@ -28,7 +28,7 @@ export function DialogFooterNavigation({
           <PanelsTopLeft className={styles.window} />
           <X className={styles.cross} />
         </span>
-        <span>Close Dialog</span>
+        <span>Close</span>
       </DialogClose>
       {children}
       <button
@@ -60,7 +60,7 @@ export function DialogFooterNavigation({
         <span className={styles.face} aria-hidden="true">
           <ArrowUpToLine className={styles.arrow} />
         </span>
-        <span>Back to Top</span>
+        <span>To Top</span>
       </button>
     </div>
   );

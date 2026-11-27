@@ -72,7 +72,7 @@ export function FooterActionTile({
           <i className={tools.strip} aria-hidden="true" />
         )}
       </span>
-      {label}
+      <span className={tools.toolLabel}>{label}</span>
     </button>
   );
 }
