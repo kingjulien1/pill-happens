@@ -1,7 +1,5 @@
 "use client";
 
-import { DialogFooterNavigation } from "./dialog-footer-navigation";
-
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import {
   BedDouble,
@@ -899,7 +897,6 @@ function CheckInForm({
             onReviewChange={setReviewingReset}
             onReset={reset}
           />
-          <DialogFooterNavigation />
         </div>
       </div>
     </form>

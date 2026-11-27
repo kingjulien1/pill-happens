@@ -1,19 +1,25 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { ArrowUpToLine, PanelsTopLeft, X } from "lucide-react";
 import { DialogClose } from "./ui/dialog";
 import styles from "./dialog-footer-navigation.module.css";
 
 export function DialogFooterNavigation({
+  children,
   disabled = false,
 }: {
+  children?: ReactNode;
   disabled?: boolean;
 }) {
   return (
-    <div className={styles.row} data-dialog-footer-navigation>
+    <div
+      className={children ? `${styles.row} ${styles.withActions}` : styles.row}
+      data-dialog-footer-navigation
+    >
       <DialogClose
         type="button"
-        className={styles.control}
+        className={`${styles.labeledControl} ${styles.control} ${styles.close}`}
         aria-label="Close dialog"
         title="Close dialog"
         disabled={disabled}
@@ -22,10 +28,12 @@ export function DialogFooterNavigation({
           <PanelsTopLeft className={styles.window} />
           <X className={styles.cross} />
         </span>
+        <span>Close Dialog</span>
       </DialogClose>
+      {children}
       <button
         type="button"
-        className={styles.control}
+        className={`${styles.labeledControl} ${styles.control} ${styles.top}`}
         aria-label="Back to top"
         title="Back to top"
         disabled={disabled}
@@ -52,6 +60,7 @@ export function DialogFooterNavigation({
         <span className={styles.face} aria-hidden="true">
           <ArrowUpToLine className={styles.arrow} />
         </span>
+        <span>Back to Top</span>
       </button>
     </div>
   );

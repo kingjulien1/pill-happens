@@ -4,6 +4,7 @@ import { useId, useRef, useState } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { ArrowRight, BrushCleaning, Shredder, Sparkles, X } from "lucide-react";
 import tools from "./intake-footer-actions.module.css";
+import navigation from "./dialog-footer-navigation.module.css";
 import styles from "./draft-reset-footer.module.css";
 
 type Action = "reset" | "delete";
@@ -48,7 +49,7 @@ export function FooterActionTile({
     <button
       ref={buttonRef}
       type="button"
-      className={tools.tool}
+      className={`${navigation.labeledControl} ${tools.tool}`}
       data-tone={action}
       data-reset-tool={action === "reset" ? "" : undefined}
       data-guidance={state ?? undefined}

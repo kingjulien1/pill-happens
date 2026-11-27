@@ -14,6 +14,7 @@ import {
   useFooterGuide,
 } from "./intake-footer-actions";
 import { ResponsiveModal } from "./responsive-modal";
+import { DialogFooterNavigation } from "./dialog-footer-navigation";
 import { DialogResetSweep } from "./dialog-reset-sweep";
 import { DialogErrorPanel } from "./dialog-error-panel";
 import tools from "./intake-footer-actions.module.css";
@@ -133,10 +134,12 @@ export function DraftResetFooter({
   }
   return (
     <div className={styles.footer} data-draft-reset-footer>
-      <div className={tools.tools} role="group" aria-label="Draft actions">
-        <FooterActionTile {...resetProps} />
-        {deletion && <FooterActionTile {...deleteProps} />}
-      </div>
+      <DialogFooterNavigation>
+        <div className={tools.tools} role="group" aria-label="Draft actions">
+          <FooterActionTile {...resetProps} />
+          {deletion && <FooterActionTile {...deleteProps} />}
+        </div>
+      </DialogFooterNavigation>
       <div className={styles.notes}>
         <p className={styles.help}>
           {hasDraft && durable

@@ -1,7 +1,5 @@
 "use client";
 
-import { DialogFooterNavigation } from "./dialog-footer-navigation";
-
 import { Import, Stamp } from "lucide-react";
 import { getMedicationColor } from "@/lib/medication-appearance";
 import { getMedicationCategories } from "@/lib/medication-categories";
@@ -393,7 +391,6 @@ export function IntakeForm({
           />
           <DraftStatus {...draftFeedback} scope="intake" />
           {footerActions}
-          <DialogFooterNavigation />
         </div>
       </form>
     );
@@ -932,7 +929,6 @@ export function IntakeForm({
           </IntakePrimaryButton>
           <DraftStatus {...draftFeedback} scope="intake" />
           {footerActions}
-          <DialogFooterNavigation />
         </div>
       </div>
     </form>
