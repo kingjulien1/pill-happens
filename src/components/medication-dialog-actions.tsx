@@ -1,6 +1,12 @@
 "use client";
 
 import { DialogErrorPanel } from "./dialog-error-panel";
+import {
+  ReviewButton,
+  ReviewDetails,
+  ReviewTitle,
+} from "./entry-action-review";
+import reviewStyles from "./entry-action-review.module.css";
 
 import { useEffect, useId, useRef, useState } from "react";
 import { ActionIcon } from "@/components/action-icon";
@@ -181,7 +187,7 @@ export function MedicationDialogActions({
           showCloseButton={false}
           initialFocus={cancelRef}
           finalFocus={returnFocus}
-          className={styles.confirmation}
+          className={reset ? reviewStyles.sheet : styles.confirmation}
           data-medication-confirmation={
             reset ? "reset" : archived ? "restore" : "archive"
           }
@@ -189,19 +195,17 @@ export function MedicationDialogActions({
         >
           <DialogHeader>
             <DialogTitle className={styles.title}>
-              {reset
-                ? "Reset This Draft?"
-                : archived
-                  ? "Restore This Medication?"
-                  : "Archive This Medication?"}
+              {reset ? (
+                <ReviewTitle action="reset" />
+              ) : archived ? (
+                "Restore This Medication?"
+              ) : (
+                "Archive This Medication?"
+              )}
             </DialogTitle>
             <DialogDescription className={styles.description}>
               {reset ? (
-                <>
-                  Discard the unsaved edits for <strong>{name}</strong> and
-                  return this form to its starting values. Saved medications and
-                  past intakes stay unchanged.
-                </>
+                "Discard the edits waiting in this draft."
               ) : archived ? (
                 <>
                   Return <strong>{name}</strong> to your active medications so
@@ -217,6 +221,13 @@ export function MedicationDialogActions({
               )}
             </DialogDescription>
           </DialogHeader>
+          {reset && (
+            <ReviewDetails
+              subject={medicationName.trim() || "New medication"}
+              resetDetail="The medication form returns to its starting values."
+              keptDetail="Your saved medications and past intakes stay in your journal."
+            />
+          )}
           {error && (
             <DialogErrorPanel
               title={
@@ -227,37 +238,63 @@ export function MedicationDialogActions({
               message={error}
             />
           )}
-          <div className={styles.footer}>
-            <DialogClose
-              disabled={pending}
-              render={
-                <Button
-                  ref={cancelRef}
-                  type="button"
-                  variant="outline"
-                  disabled={pending}
-                  className={styles.action}
-                  data-medication-confirm-cancel
+          {reset ? (
+            <div className={reviewStyles.buttons}>
+              <DialogClose
+                disabled={pending}
+                render={
+                  <ReviewButton
+                    action="keep"
+                    ref={cancelRef}
+                    disabled={pending}
+                    data-medication-confirm-cancel
+                  />
+                }
+              >
+                Keep editing
+              </DialogClose>
+              <ReviewButton
+                action="reset"
+                onClick={() => void confirmAction()}
+                disabled={pending || resetDisabled}
+                data-medication-confirm-action
+              >
+                {pending ? "Resetting…" : "Reset Draft"}
+              </ReviewButton>
+            </div>
+          ) : (
+            <div className={styles.footer}>
+              <DialogClose
+                disabled={pending}
+                render={
+                  <Button
+                    ref={cancelRef}
+                    type="button"
+                    variant="outline"
+                    disabled={pending}
+                    className={styles.action}
+                    data-medication-confirm-cancel
+                  />
+                }
+              >
+                Keep Editing
+              </DialogClose>
+              <Button
+                type="button"
+                pending={pending}
+                disabled={archiveDisabled || !onArchive}
+                className={styles.action}
+                onClick={() => void confirmAction()}
+                data-medication-confirm-action
+              >
+                <ActionIcon
+                  name={pending ? "loading" : statusIcon}
+                  className={cn("size-3.5", pending && styles.spinner)}
                 />
-              }
-            >
-              Keep Editing
-            </DialogClose>
-            <Button
-              type="button"
-              pending={pending}
-              disabled={reset ? resetDisabled : archiveDisabled || !onArchive}
-              className={styles.action}
-              onClick={() => void confirmAction()}
-              data-medication-confirm-action
-            >
-              <ActionIcon
-                name={pending ? "loading" : reset ? "retry" : statusIcon}
-                className={cn("size-3.5", pending && styles.spinner)}
-              />
-              {pending ? "Working…" : action}
-            </Button>
-          </div>
+                {pending ? "Working…" : action}
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </span>
