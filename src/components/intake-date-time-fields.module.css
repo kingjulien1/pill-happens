@@ -1,6 +1,6 @@
 .fields {
   --control-height: 40px;
-  --lock-cycle: 4.8s;
+  --timing-rose: var(--color-rose-400, #fb7185);
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(104px, 1.18fr) repeat(2, minmax(0, 1fr));
@@ -14,62 +14,6 @@
   grid-template-rows: subgrid;
   row-gap: 6px;
 }
-.field[data-timing-field] {
-  position: relative;
-  --field-lag: 0ms;
-}
-.field[data-timing-field="date"] {
-  --field-lag: 75ms;
-}
-
-.fieldLabel {
-  justify-content: space-between;
-  gap: 3px;
-}
-
-.fieldLabel svg {
-  width: 0.9rem;
-  height: 0.9rem;
-  flex: none;
-  color: var(--color-rose-500, #f43f5e);
-  stroke-width: 2;
-}
-
-.fields[data-timing-pinned="true"] {
-  --lock-shade: var(--color-mauve-950, #0c090c);
-  --lock-veil: color-mix(in srgb, var(--lock-shade) 31%, transparent);
-}
-.fields[data-timing-pinned="true"] .field :is(.dateInput, .timeInput) {
-  --pin-accent: var(--color-rose-500, #f43f5e);
-  --pin-edge: color-mix(in srgb, var(--input), var(--pin-accent) 46%);
-  border-color: color-mix(in srgb, var(--pin-edge), var(--lock-shade) 31%);
-  background-image:
-    linear-gradient(
-      90deg,
-      transparent,
-      color-mix(in srgb, var(--pin-accent), var(--lock-shade) 31%) 24%,
-      transparent 94%
-    ),
-    linear-gradient(
-      112deg,
-      color-mix(in srgb, var(--pin-accent) 12%, transparent),
-      transparent 68%
-    );
-  background-repeat: no-repeat;
-  background-size:
-    calc(100% - 18px) 1px,
-    100% 100%;
-  background-position:
-    center calc(100% - 2px),
-    center;
-}
-
-.fields[data-timing-pinned="true"] .field .input:focus-visible {
-  border-color: var(--ring);
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
-}
-
 .field .input {
   display: flex;
   align-items: center;
@@ -88,6 +32,21 @@
   text-align: left;
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Keep the picker’s control geometry and keyboard focus ring in both appearances. */
+.fields .field :is(input, button).input {
+  --ring: var(--timing-rose);
+  border-color: var(--timing-rose);
+}
+.fields .field input.input,
+.fields .field input.input:focus-visible {
+  background-color: color-mix(in srgb, var(--timing-rose) 34%, transparent);
+}
+.fields[data-timing-phase="resetting"] input.input {
+  color: var(--foreground);
+  -webkit-text-fill-color: currentColor;
+  opacity: 1;
 }
 
 .field .dateInput {
@@ -110,10 +69,6 @@
     gap: 1px;
     font-size: 0.72rem;
     letter-spacing: normal;
-  }
-  .fieldLabel svg {
-    width: 0.72rem;
-    height: 0.72rem;
   }
   .field :is(.dateInput, .timeInput) {
     padding-inline: 3px;
@@ -180,20 +135,12 @@
   user-select: none;
 }
 .face {
-  --rose: var(--color-rose-500, #f43f5e);
-  --wine: color-mix(
-    in srgb,
-    var(--color-rose-800, #9f1239),
-    var(--color-rose-900, #881337)
-  );
-  --plum: var(--color-purple-900, #581c87);
-  --pearl: var(--color-rose-100, #ffe4e6);
-  --arrival: var(--charge-duration);
   position: absolute;
-  inset: -1px;
+  inset: 0;
   isolation: isolate;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
 }
@@ -201,145 +148,25 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  border: 1px solid var(--color-rose-900, #881337);
-  border-radius: inherit;
   background:
     linear-gradient(var(--lock-veil, transparent) 0 0),
     radial-gradient(ellipse at 12% -12%, #ffa9b780, transparent 51%),
     radial-gradient(ellipse at 88% 105%, #bd80ff75, transparent 48%),
-    linear-gradient(117deg, var(--wine) 8%, #64183f 49%, var(--plum));
-  box-shadow:
-    inset 0 1px 0 #ffe4e642,
-    0 2px 8px #4c093954;
-  opacity: 0;
-  transition: opacity 200ms ease;
-}
-.wash::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--rose);
+    linear-gradient(117deg, #8f1238 8%, #64183f 49%, #581c87);
   opacity: 0;
 }
-.gauge {
-  position: absolute;
-  width: 38px;
-  height: 38px;
-  overflow: visible;
-  stroke-linecap: round;
+.fields[data-timing-pinned="true"] .wash {
+  --lock-veil: color-mix(
+    in srgb,
+    var(--color-mauve-950, #0c090c) 31%,
+    transparent
+  );
 }
-.ticks {
-  stroke: #ffdfeb;
-  stroke-width: 0.9;
-  opacity: 0.65;
+.resetButton:is([aria-pressed="true"], [data-state="ready"]) .face {
+  color: var(--color-rose-100, #ffe4e6);
 }
-.track {
-  stroke: #f7dbff;
-  stroke-width: 1.6;
-  opacity: 0.2;
-}
-.chargeArc {
-  stroke-dasharray: 1;
-}
-.rim {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke: #ffd4e5;
-  stroke-width: 1.1;
-  stroke-linecap: round;
-  opacity: 0;
-}
-.rim rect {
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 24 76;
-}
-.rim .innerSeam {
-  stroke: #d5b2e5;
-  stroke-width: 0.8;
-  stroke-dasharray: 8 92;
-  stroke-dashoffset: 37;
-  opacity: 0;
-}
-.glyph {
-  position: relative;
-  width: 20px;
-  height: 20px;
-}
-.releaseBurst {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  translate: -50% -50%;
-  width: 68px;
-  height: 50px;
-  overflow: visible;
-  pointer-events: none;
-}
-.releaseBurst > g {
-  opacity: 0;
-  transform-origin: center;
-  transform-box: view-box;
-}
-.refresh,
-.clock {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.clock {
-  opacity: 0;
-}
-.clock .arrow {
-  transform-origin: 12px 19px;
-  transform: translate(6px, 3px) scale(0.57143);
-}
-.timepiece {
-  transform-origin: 12px 12px;
-}
-.clock .arrow path {
-  vector-effect: non-scaling-stroke;
-  stroke-width: 1.8px;
-}
-.dial {
-  stroke-dasharray: 1;
-}
-.hands {
-  transform-origin: 12px 12px;
-}
-.resetButton[data-clock-face] {
-  & .face {
-    color: var(--pearl);
-  }
-  & :is(.wash, .clock) {
-    opacity: 1;
-  }
-  & .refresh {
-    opacity: 0;
-  }
-  & .rim {
-    opacity: 0.34;
-  }
-}
-.fields .field .resetButton:is([aria-pressed="true"], [data-state="ready"]) {
-  border-color: var(--color-rose-900, #881337);
-}
-.resetButton[data-state="ready"] .rim {
-  opacity: 0.66;
-}
-.resetButton[data-state="fixed"] {
-  & .clock {
-    overflow: visible;
-  }
-  & .rim {
-    opacity: 0.51;
-  }
-  & .innerSeam {
-    opacity: 0.63;
-  }
+.resetButton:is([aria-pressed="true"], [data-state="ready"]) .wash {
+  opacity: 1;
 }
 .star {
   position: absolute;
@@ -419,209 +246,40 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .resetButton:is([data-state="charging"], [data-state="entering"]) {
-    & .face {
-      animation: press-in var(--arrival) ease-in-out both;
-    }
-    & .wash {
-      animation: deepen var(--arrival) cubic-bezier(0.65, 0, 0.88, 0.48) both;
-    }
-    & .wash::after {
-      animation: kindle var(--arrival) ease-in both;
-    }
-    & .chargeArc {
-      animation: wind-dial var(--arrival) linear both;
-    }
-    & .refresh {
-      animation: turn-out 85ms ease-in both;
-    }
-    & .clock {
-      animation: wind-arrow var(--arrival) cubic-bezier(0.44, 0.06, 0.38, 1)
-        both;
-    }
-    & .arrow {
-      transform: none;
-    }
-    & :is(.hands, .dial) {
-      opacity: 0;
-    }
+  .resetButton[data-state="charging"] .wash {
+    animation: charge-fill var(--charge-duration) ease-in both;
+  }
+  .resetButton[data-state="charging"]:not([aria-pressed="true"]) .face {
+    animation: charge-ink var(--charge-duration) ease-in both;
   }
   .resetButton[aria-pressed="true"][data-state="charging"] .wash {
     animation: none;
   }
-  /* Keep the same reveal running when the user lifts at the threshold. */
-  .resetButton:is([data-state="ready"], [data-state="settling"]) {
-    & .arrow {
-      animation: dock-arrow var(--reveal-duration)
-        cubic-bezier(0.24, 0.8, 0.28, 1) both;
-    }
-    & .dial {
-      animation: draw-clock var(--reveal-duration) ease-out both;
-    }
-    & .hands {
-      animation: set-hands var(--reveal-duration) ease-out both;
-    }
+  .resetButton[data-state="resetting"] .wash {
+    animation: charge-fill var(--unlock-duration) ease-in reverse both;
   }
-  .resetButton[data-state="ready"] .face {
-    animation: poised 1.45s ease-in-out infinite;
+  .resetButton[data-state="resetting"] .face {
+    animation: charge-ink var(--unlock-duration) ease-in reverse both;
   }
-  .resetButton[data-state="ready"] .wash::after {
-    animation: heartbeat 1.45s ease-in-out infinite;
-  }
-  .resetButton[data-state="settling"] .face {
-    --burst-duration: 420ms;
-    animation: land 420ms ease-out both;
-  }
-  .resetButton[data-state="fixed"] {
-    & .timepiece {
-      animation: clock-recoil var(--lock-cycle)
-        cubic-bezier(0.24, 0.75, 0.35, 1) infinite;
-    }
-    & .arrow {
-      animation: arrow-tap var(--lock-cycle) cubic-bezier(0.32, 0.03, 0.28, 1)
-        infinite;
-    }
-    & .rim rect {
-      animation: perimeter var(--lock-cycle) ease-in-out infinite;
-    }
-    & .rim .innerSeam {
-      animation-name: seam-return;
-    }
+  .resetButton:is(
+      [data-state="entering"],
+      [data-state="settling"],
+      [data-state="refreshing"]
+    )
+    .star[data-star="near"] {
+    animation: confirm-glint 420ms ease-out both;
   }
   .resetButton:is([data-state="fixed"], [data-state="ready"]) .star {
-    animation: glint 7s ease-out infinite;
+    animation: glint 7s ease-out infinite paused;
   }
-  .resetButton:is([data-state="fixed"], [data-state="ready"])
-    .star[data-star="far"] {
-    animation-delay: 3.4s;
-  }
-  .resetButton:is([data-state="fixed"], [data-state="ready"]) .sparks {
-    animation: scatter 7s ease-out infinite;
-    animation-delay: inherit;
-  }
-  .resetButton[data-state="ready"] .star[data-star="near"],
-  .resetButton[data-state="settling"] .star[data-star="far"] {
-    animation: comet var(--burst-duration, 620ms)
-      cubic-bezier(0.2, 0.72, 0.3, 1) both;
-  }
-  .resetButton[data-state="ready"]
-    .star[data-star="near"]
-    :is(.starCore, .sparks),
-  .resetButton[data-state="settling"]
-    .star[data-star="far"]
-    :is(.starCore, .sparks) {
-    transform-origin: 0 0;
-    animation: ignite var(--burst-duration, 620ms) ease-out both;
-  }
-  .resetButton[data-state="ready"] .star[data-star="near"] .sparks,
-  .resetButton[data-state="settling"] .star[data-star="far"] .sparks {
-    animation-name: shed-sparks;
-  }
-  .resetButton[data-state="fixed"]:not([data-playing="true"])
-    :is(.timepiece, .arrow, .rim rect, .star, .sparks),
-  .resetButton[data-state="ready"]:not([data-playing="true"])
-    :is(.face, .star, .sparks),
-  .resetButton[data-state="ready"]:not([data-playing="true"]) .wash::after {
-    animation-play-state: paused;
-  }
-  .resetButton[data-state="resetting"] {
-    & .face {
-      animation: release-spring var(--unlock-duration) ease-in-out both;
-    }
-    & .wash {
-      animation: release-wash var(--unlock-duration) ease-out both;
-    }
-    & .wash::after {
-      background: radial-gradient(ellipse, #ffda96, #f472b6 40%, #a78bfa 78%);
-      animation: release-light var(--unlock-duration) ease-out both;
-    }
-    & .clock {
-      overflow: visible;
-      animation: clock-pop var(--unlock-duration)
-        cubic-bezier(0.19, 0.72, 0.28, 1) both;
-    }
-    & .arrow {
-      animation: free-arrow var(--unlock-duration) ease-out both;
-    }
-    & .rays,
-    & .releaseStars {
-      animation: release-sparks var(--unlock-duration)
-        cubic-bezier(0.15, 0.74, 0.22, 1) both;
-    }
-    & .releaseStars {
-      --burst-turn: 18deg;
-      animation-delay: 55ms;
-    }
-    & .refresh {
-      animation: return-clock var(--unlock-duration)
-        cubic-bezier(0.2, 0.8, 0.28, 1) both;
-    }
-  }
-  /* The light travels from the button to Time Taken and then Date Taken. */
-  .fields:is([data-timing-phase="settling"], [data-timing-phase="resetting"])
-    [data-timing-field]::before {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    inset: auto 0 0;
-    height: var(--control-height);
-    border: 1px solid currentColor;
-    border-radius: var(--dialog-radius-control, 12px);
-    color: #f9a8d4;
-    background: linear-gradient(
-      100deg,
-      transparent 42%,
-      #f472b631 77%,
-      #fde4ac45
-    );
-    transform-origin: right center;
-    pointer-events: none;
-    animation: field-latch 390ms cubic-bezier(0.23, 0.72, 0.24, 1)
-      var(--field-lag) both;
-  }
-  .fields[data-timing-phase="resetting"] [data-timing-field]::before {
-    color: #e9cdff;
-    animation: field-release 420ms cubic-bezier(0.18, 0.75, 0.26, 1)
-      calc(180ms + var(--field-lag)) both;
-  }
-  .fields[data-timing-phase="resetting"] [data-timing-field] input:disabled {
-    color: var(--foreground);
-    -webkit-text-fill-color: var(--foreground);
-    opacity: 1;
-  }
-  .fields[data-timing-phase="fixed"] [data-timing-field]::after {
-    content: "";
-    position: absolute;
-    inset: auto 18% 2px auto;
-    width: 24%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #f6b8d9, transparent);
-    pointer-events: none;
-    animation: pinned-edge var(--lock-cycle) ease-in-out var(--field-lag)
-      infinite both paused;
-  }
-  .fields:has(.resetButton[data-playing="true"]) [data-timing-field]::after {
+  .resetButton[data-playing="true"] .star {
     animation-play-state: running;
   }
-  .resetButton[data-state="refreshing"] .refresh {
-    animation: refresh 460ms cubic-bezier(0.24, 0.8, 0.3, 1) both;
+  .resetButton .star[data-star="far"] {
+    animation-delay: 3.4s;
   }
 }
-@keyframes press-in {
-  0% {
-    transform: scale(1);
-  }
-  27% {
-    transform: scale(0.955);
-  }
-  78% {
-    transform: scale(1.015);
-  }
-  100% {
-    transform: scale(1.035);
-  }
-}
-@keyframes deepen {
+@keyframes charge-fill {
   from {
     opacity: 0;
   }
@@ -629,230 +287,21 @@
     opacity: 1;
   }
 }
-@keyframes kindle {
-  0% {
-    opacity: 0;
+@keyframes charge-ink {
+  from {
+    color: inherit;
   }
-  75% {
-    opacity: 0.24;
+  to {
+    color: var(--color-rose-100, #ffe4e6);
   }
-  86% {
-    opacity: 0.65;
-  }
+}
+@keyframes confirm-glint {
+  0%,
   100% {
     opacity: 0;
   }
-}
-@keyframes wind-dial {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-@keyframes comet {
-  0% {
-    opacity: 0;
-    transform: translate(4px, 3px) scale(0.3) rotate(-18deg);
-  }
-  24% {
+  45% {
     opacity: 0.95;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-2px, -2px) scale(1.14) rotate(15deg);
-  }
-}
-@keyframes ignite {
-  0% {
-    transform: scale(0.35);
-  }
-  56% {
-    transform: scale(1.15);
-  }
-  83%,
-  100% {
-    transform: scale(0.12);
-  }
-}
-@keyframes shed-sparks {
-  0%,
-  50% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  67% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.36);
-  }
-}
-@keyframes turn-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.16);
-  }
-}
-@keyframes wind-arrow {
-  0%,
-  5% {
-    opacity: 0;
-    transform: rotate(-335deg) scale(0.18);
-  }
-  32% {
-    opacity: 1;
-  }
-  83% {
-    transform: rotate(13deg) scale(1.13);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes dock-arrow {
-  0%,
-  42% {
-    transform: none;
-  }
-  80% {
-    transform: translate(6.3px, 3.6px) scale(0.54);
-  }
-  100% {
-    transform: translate(6px, 3px) scale(0.57143);
-  }
-}
-@keyframes draw-clock {
-  0%,
-  37% {
-    stroke-dashoffset: 1;
-    opacity: 0;
-  }
-  42% {
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-}
-@keyframes set-hands {
-  0%,
-  69% {
-    opacity: 0;
-    transform: rotate(-70deg);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes poised {
-  0%,
-  100% {
-    transform: scale(1.035);
-  }
-  50% {
-    transform: scale(1.055);
-  }
-}
-@keyframes heartbeat {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.24;
-  }
-}
-@keyframes land {
-  0% {
-    transform: scale(1.04);
-  }
-  32% {
-    transform: scale(0.965);
-  }
-  71% {
-    transform: scale(1.012);
-  }
-  100% {
-    transform: none;
-  }
-}
-@keyframes perimeter {
-  to {
-    stroke-dashoffset: -100;
-  }
-}
-/* The arrow lifts out of its notch. Its landing nudges the clock and lights the inset seam. */
-@keyframes arrow-tap {
-  0%,
-  16%,
-  61%,
-  100% {
-    translate: 0 0;
-    rotate: 0deg;
-  }
-  32% {
-    translate: 0.4px -3.4px;
-    rotate: -9deg;
-  }
-  39% {
-    translate: 0 -2.8px;
-    rotate: -3deg;
-  }
-  44% {
-    translate: -0.4px 1.6px;
-    rotate: 4deg;
-  }
-  50% {
-    translate: 0 -0.65px;
-    rotate: -2deg;
-  }
-}
-@keyframes clock-recoil {
-  0%,
-  18%,
-  63%,
-  100% {
-    transform: none;
-  }
-  34%,
-  42% {
-    transform: translate(-0.6px, -0.4px) rotate(-7deg);
-  }
-  46% {
-    transform: translate(0.5px, 0.9px) rotate(9deg);
-  }
-  53% {
-    transform: translate(0, -0.2px) rotate(-3deg);
-  }
-}
-@keyframes seam-return {
-  0% {
-    stroke-dashoffset: 37;
-    opacity: 0.45;
-  }
-  43% {
-    stroke-dashoffset: 71;
-    opacity: 0.45;
-  }
-  48% {
-    opacity: 0.95;
-  }
-  100% {
-    stroke-dashoffset: 137;
-    opacity: 0.45;
   }
 }
 @keyframes glint {
@@ -877,200 +326,5 @@
   96% {
     opacity: 0;
     transform: translateY(-3px) scale(1.45) rotate(20deg);
-  }
-}
-@keyframes scatter {
-  0%,
-  88%,
-  100% {
-    opacity: 0;
-  }
-  91% {
-    opacity: 1;
-  }
-  96% {
-    opacity: 0;
-  }
-}
-@keyframes release-spring {
-  0%,
-  100% {
-    transform: none;
-  }
-  21% {
-    transform: scale(0.94, 0.91);
-  }
-  33% {
-    transform: scale(1.04, 1.09);
-  }
-  52% {
-    transform: scale(0.99, 0.97);
-  }
-  70% {
-    transform: scale(1, 1.015);
-  }
-}
-@keyframes release-wash {
-  0%,
-  35% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-@keyframes release-light {
-  0%,
-  13%,
-  80%,
-  100% {
-    opacity: 0;
-  }
-  29% {
-    opacity: 0.72;
-  }
-}
-@keyframes clock-pop {
-  0% {
-    opacity: 1;
-    transform: none;
-  }
-  21% {
-    transform: scale(0.68) rotate(-16deg);
-  }
-  36% {
-    opacity: 1;
-    color: #ffe0a8;
-    transform: scale(1.65) rotate(9deg);
-  }
-  61%,
-  100% {
-    opacity: 0;
-    transform: translate(-2px, -2px) scale(1.9) rotate(16deg);
-  }
-}
-@keyframes free-arrow {
-  0%,
-  21% {
-    translate: 0 0;
-  }
-  49%,
-  100% {
-    translate: 4px 5px;
-    rotate: -13deg;
-  }
-}
-@keyframes release-sparks {
-  0%,
-  23% {
-    opacity: 0;
-    transform: scale(0.16) rotate(-9deg);
-  }
-  34% {
-    opacity: 1;
-    transform: scale(0.7);
-  }
-  54% {
-    opacity: 0.92;
-  }
-  88%,
-  100% {
-    opacity: 0;
-    transform: scale(1.1) rotate(var(--burst-turn, 4deg));
-  }
-}
-@keyframes return-clock {
-  0%,
-  39% {
-    opacity: 0;
-    transform: rotate(112deg) scale(0.3);
-  }
-  65% {
-    opacity: 1;
-    color: #edbbff;
-    transform: rotate(-15deg) scale(1.19);
-  }
-  81% {
-    transform: rotate(5deg) scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    color: var(--foreground);
-    transform: none;
-  }
-}
-@keyframes field-latch {
-  0% {
-    opacity: 0;
-    transform: scaleX(0.08);
-  }
-  46% {
-    opacity: 0.73;
-  }
-  72% {
-    transform: scaleX(1);
-  }
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-}
-@keyframes field-release {
-  0% {
-    opacity: 0;
-    transform: none;
-  }
-  28% {
-    opacity: 0.85;
-  }
-  43% {
-    transform: scale(1.012, 1.045);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.18, 0.95);
-  }
-}
-@keyframes pinned-edge {
-  0%,
-  35%,
-  65%,
-  100% {
-    opacity: 0;
-  }
-  35% {
-    transform: translateX(0);
-  }
-  46% {
-    opacity: 0.56;
-  }
-  65%,
-  100% {
-    transform: translateX(-140%);
-  }
-}
-@keyframes refresh {
-  0% {
-    transform: none;
-  }
-  20% {
-    transform: scale(0.85) rotate(22deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .wash {
-    transition: none;
-  }
-  .resetButton[data-state="charging"] .chargeArc {
-    stroke-dashoffset: 0.5;
-  }
-  .resetButton[data-state="charging"] .arrow {
-    transform: none;
-  }
-  .resetButton[data-state="charging"] :is(.dial, .hands) {
-    opacity: 0;
   }
 }

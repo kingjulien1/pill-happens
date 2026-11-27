@@ -8,16 +8,8 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import {
-  CalendarDays,
-  Clock3,
-  ClockArrowDown,
-  Info,
-  LockKeyhole,
-  LockKeyholeOpen,
-  RotateCcw,
-} from "lucide-react";
-import { lunarStarPath, lunarSparkPath } from "./lunar-star-paths";
+import { ClockArrowDown, Info, RotateCcw } from "lucide-react";
+import { lunarStarPath } from "./lunar-star-paths";
 import { useTimeLockPress } from "./use-time-lock-press";
 import { Input, inputSurface } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,11 +33,6 @@ type IntakeDateTimeFieldsProps = {
 const reducedMotion = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// Leave a gap under the arrow like the open dial on the sleep score.
-const chargeArc = "M9.39 30.61a15 15 0 1 1 21.22 0";
-// Matching control points let the shaft unroll without detaching from its tip.
-const curvedShaft = "M4.5 10 C4.5 0 21 1 18.5 10 C17.2 14.6 12 13.8 12 19";
-const straightShaft = "M12 2 C12 5 12 8 12 10 C12 13 12 16 12 19";
 const revealDuration = 580;
 const unlockDuration = 820;
 const noticeHeadings = {
@@ -55,10 +42,6 @@ const noticeHeadings = {
   ready: ["Ready to lock", "Release to lock"],
   resetting: ["Unlocking time", "Returning to now"],
 } as const;
-
-function unrollArrow(animation: SVGAnimateElement | null) {
-  if (animation && !reducedMotion()) animation.beginElement();
-}
 
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
 export function IntakeDateTimeFields({
@@ -200,11 +183,6 @@ export function IntakeDateTimeFields({
     };
   }, [state]);
 
-  const winding = state === "charging" || state === "entering";
-  const revealing = state === "ready" || state === "settling";
-  const StartIcon =
-    hold.stage === "charging" && pinned ? ClockArrowDown : RotateCcw;
-  const LockIcon = pinned ? LockKeyhole : LockKeyholeOpen;
   const [status, action] =
     noticeHeadings[
       hold.stage ??
@@ -215,7 +193,7 @@ export function IntakeDateTimeFields({
       ? "The date and time return to now together. Your saved intakes keep their original timestamps."
       : pinned
         ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
-        : "Hold for a bit more than a second, then release. Both values carry over. Editing either field locks both.";
+        : "Hold for one second, then release. Both values carry over. Editing either field locks both.";
 
   return (
     <div
@@ -226,9 +204,7 @@ export function IntakeDateTimeFields({
       style={{ "--unlock-duration": `${unlockDuration}ms` } as CSSProperties}
     >
       <div className={styles.field} data-timing-field="date">
-        <Label htmlFor={`${id}-date`} className={styles.fieldLabel}>
-          Date Taken <CalendarDays aria-hidden="true" />
-        </Label>
+        <Label htmlFor={`${id}-date`}>Date Taken</Label>
         <Input
           id={`${id}-date`}
           name="takenAtDate"
@@ -255,9 +231,7 @@ export function IntakeDateTimeFields({
         />
       </div>
       <div className={styles.field} data-timing-field="time">
-        <Label htmlFor={`${id}-time`} className={styles.fieldLabel}>
-          Time Taken <Clock3 aria-hidden="true" />
-        </Label>
+        <Label htmlFor={`${id}-time`}>Time Taken</Label>
         <Input
           id={`${id}-time`}
           name="takenAtTime"
@@ -284,9 +258,7 @@ export function IntakeDateTimeFields({
         />
       </div>
       <div className={styles.field}>
-        <Label htmlFor={`${id}-lock`} className={styles.fieldLabel}>
-          Time Lock <LockIcon aria-hidden="true" />
-        </Label>
+        <Label htmlFor={`${id}-lock`}>Time Lock</Label>
         <button
           ref={button}
           id={`${id}-lock`}
@@ -298,158 +270,15 @@ export function IntakeDateTimeFields({
           aria-describedby={`${id}-timing-status ${id}-timing-help`}
           data-intake-time-reset
           data-state={state}
-          data-clock-face={
-            (state !== "idle" &&
-              state !== "waiting" &&
-              state !== "refreshing") ||
-            undefined
-          }
-          style={
-            {
-              "--charge-duration": `${chargeDuration}ms`,
-              "--reveal-duration": `${revealDuration}ms`,
-            } as CSSProperties
-          }
+          style={{ "--charge-duration": `${chargeDuration}ms` } as CSSProperties}
         >
           <span key={motionKey} className={styles.face} aria-hidden="true">
             <span className={styles.wash} />
-            <svg
-              className={styles.rim}
-              viewBox="0 0 100 40"
-              preserveAspectRatio="none"
-            >
-              <rect
-                x="2"
-                y="2"
-                width="96"
-                height="36"
-                rx="10"
-                pathLength="100"
-              />
-              <rect
-                className={styles.innerSeam}
-                x="4.5"
-                y="4.5"
-                width="91"
-                height="31"
-                rx="8"
-                pathLength="100"
-              />
-            </svg>
-            {winding && (
-              <svg className={styles.gauge} viewBox="0 0 40 40" fill="none">
-                <defs>
-                  <linearGradient
-                    id={`${id}-arc`}
-                    x1="0%"
-                    y1="90%"
-                    x2="100%"
-                    y2="10%"
-                  >
-                    <stop stopColor="#fda4af" />
-                    <stop offset=".48" stopColor="#ffe4ed" />
-                    <stop offset="1" stopColor="#c4a9ff" />
-                  </linearGradient>
-                </defs>
-                <path
-                  className={styles.ticks}
-                  d="M20 1v2M6.56 6.56l1.42 1.42M1 20h2M33.44 6.56l-1.42 1.42M39 20h-2"
-                />
-                <path className={styles.track} d={chargeArc} />
-                <g className={styles.chargeArc} stroke={`url(#${id}-arc)`}>
-                  <path
-                    pathLength="1"
-                    d={chargeArc}
-                    strokeWidth="5"
-                    opacity=".18"
-                  />
-                  <path pathLength="1" d={chargeArc} strokeWidth="1.85" />
-                </g>
-              </svg>
+            {state === "ready" || (pinned && state !== "resetting") ? (
+              <ClockArrowDown size={20} strokeWidth={2.15} />
+            ) : (
+              <RotateCcw size={20} strokeWidth={2.15} />
             )}
-            <span className={styles.glyph}>
-              {state === "resetting" && (
-                <svg
-                  className={styles.releaseBurst}
-                  viewBox="-34 -25 68 50"
-                  fill="none"
-                >
-                  <g
-                    className={styles.rays}
-                    strokeLinecap="round"
-                    strokeWidth="2.2"
-                  >
-                    <path
-                      d="m-17 -5 -10 -4m39 -4 5 -6m-12 33 3 6"
-                      stroke="#fda4af"
-                    />
-                    <path
-                      d="m18 1 12 -2m-41 12 -6 7m11 -31 -3 -7"
-                      stroke="#fcd58d"
-                    />
-                    <path d="m14 8 9 6m-39 -13 -12 3" stroke="#c4b5fd" />
-                  </g>
-                  <g className={styles.releaseStars}>
-                    <path
-                      d={lunarStarPath}
-                      transform="translate(-22 -10)"
-                      fill="#fde7b4"
-                    />
-                    <path
-                      d={lunarStarPath}
-                      transform="translate(19 10) scale(.78)"
-                      fill="#ffb8ea"
-                    />
-                    <path
-                      d="m6 -17 1.6 -2.2 1.6 2.2 -1.6 2.2zM-8 14l1.3 -1.8 1.3 1.8 -1.3 1.8z"
-                      fill="#b9edff"
-                    />
-                  </g>
-                </svg>
-              )}
-              <StartIcon
-                className={styles.refresh}
-                size={20}
-                strokeWidth={2.15}
-              />
-              <svg
-                className={styles.clock}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.15"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <g className={styles.timepiece}>
-                  <path
-                    className={styles.dial}
-                    pathLength="1"
-                    d="M12.337 21.994a10 10 0 1 1 9.588-8.767"
-                  />
-                  <path className={styles.hands} d="M12 6v6l2 1" />
-                </g>
-                <g className={styles.arrow}>
-                  <path d={winding ? curvedShaft : straightShaft}>
-                    {revealing && (
-                      <animate
-                        ref={unrollArrow}
-                        attributeName="d"
-                        from={curvedShaft}
-                        to={straightShaft}
-                        begin="indefinite"
-                        dur="0.21s"
-                        calcMode="spline"
-                        keyTimes="0;1"
-                        keySplines=".24 0 .22 1"
-                        fill="freeze"
-                      />
-                    )}
-                  </path>
-                  <path d="m5 12 7 7 7-7" />
-                </g>
-              </svg>
-            </span>
             {["near", "far"].map((position) => (
               <svg
                 key={position}
@@ -457,17 +286,7 @@ export function IntakeDateTimeFields({
                 data-star={position}
                 viewBox="-8 -8 16 16"
               >
-                <path
-                  className={styles.starCore}
-                  d={lunarStarPath}
-                  fill="currentColor"
-                />
-                <path
-                  className={styles.sparks}
-                  d={lunarSparkPath}
-                  fill="none"
-                  stroke="currentColor"
-                />
+                <path d={lunarStarPath} fill="currentColor" />
               </svg>
             ))}
           </span>
