@@ -100,13 +100,7 @@
   --action-focus-base: var(--color-amber-950);
 }
 
-:global([data-intake-entry-part="button"]) .action[data-intake-paint="satin"] {
-  --action-surround: transparent;
-  --action-reduced-surround: transparent;
-}
-
-/* Main Log Intake: retain the outboard rim and its 3px gap. The face reaches
-   the host edge, so there is no extra outline or painted band between them. */
+/* Intake and check-in submissions use the dialog’s inset satin face. */
 .action[data-intake-paint="satin"][data-log-intake-rim] {
   --action-face-inset: 0px;
   --action-outer-line: 0px;
@@ -128,21 +122,6 @@
     var(--color-mauve-900) 50%
   );
   --control-secondary: var(--color-mauve-700);
-}
-
-:global([data-intake-entry-part="button"]) .action[data-log-intake-rim] {
-  --control-ink: var(--color-mauve-900);
-  --control-secondary: color-mix(
-    in oklab,
-    var(--color-mauve-700) 70%,
-    var(--color-mauve-600)
-  );
-  --control-face-edge: color-mix(
-    in oklab,
-    var(--color-orange-300) 50%,
-    color-mix(in oklab, var(--color-taupe-700) 50%, var(--color-taupe-800))
-  );
-  --action-inner-detail-width: calc(var(--action-inner-line) * 17 / 12);
 }
 
 .action[data-slot="button"][data-button-system="daily"][data-control-style="satin"] {
@@ -187,13 +166,6 @@
       var(--action-inner-detail-color);
 }
 
-:global([data-intake-entry-part="button"]) .action[data-log-intake-rim]::before {
-  /* Leave the page visible between the middle rim and the satin face. */
-  padding: calc(var(--action-inner-line) + var(--action-inner-detail-width));
-  background-clip: content-box;
-  box-shadow: inset 0 0 0 var(--action-inner-line) var(--control-face-edge);
-}
-
 .action[data-control-style="satin"] :global(.intake-primary-row) {
   grid-template-columns: minmax(0, 1fr) 23px;
   column-gap: 12px;
@@ -217,9 +189,6 @@
 .action[data-control-style="satin"] :global(.intake-primary-dot) {
   color: var(--control-secondary);
   opacity: 0.55;
-}
-:global([data-intake-entry-part="button"]) .action :global(.intake-primary-dot) {
-  opacity: 1;
 }
 .action[data-control-style="satin"] :global(.intake-primary-aside) {
   font-size: 0.86em;

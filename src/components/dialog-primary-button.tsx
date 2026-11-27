@@ -10,11 +10,11 @@ import { cn } from "@/lib/utils";
 import styles from "./dialog-primary-button.module.css";
 
 type DialogPrimaryButtonProps = Omit<AccentButtonProps, "radius" | "finish"> & {
-  /** Optional short aside, using the main Log Intake button's separator rail. */
+  /** Optional short aside after the dialog action label and dot. */
   secondaryText?: ReactNode;
 };
 
-/** Submission content uses the same satin host and fixed geometry as Log Intake. */
+/** Dialog submissions share the satin host and intake-card geometry. */
 export function DialogPrimaryButton({
   children,
   className,

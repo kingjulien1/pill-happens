@@ -971,16 +971,11 @@ export function DeveloperGuidePage() {
               open
             >
               <p>
-                Today’s Log Intake action matches the 80px/21px intake-card
-                reference. Log Intake uses a pale lilac face and a Mauve 900
-                label in both modes. The short aside, dot and both icons use
-                a mix of 70% Mauve 700 and 30% Mauve 600.
-                Dialog submissions keep their shared specular adapter, with
-                mode-aware Rose rim stops and readable secondary ink. The inspectable button
-                reference below reports its source-defined layer values.
-                Primary, Accent and dialog submission adapters opt into the
-                main-action family. Small controls keep their semantic variants,
-                while SecondaryButton stays quiet and tonal.
+                Today’s Log Intake button pairs the Layers Arrow Up icon with
+                the label and a short dose-and-time description. A warm pearl
+                face brightens the dark theme. The light theme uses deep plum.
+                Both carry one multicolor outer stroke with a moving reflection.
+                Dialog submissions use the satin buttons shown in the reference.
               </p>
               <p>
                 The{" "}
@@ -1205,54 +1200,20 @@ export function DeveloperGuidePage() {
                 the text color.
               </p>
               <p>
-                TodayActionButton gives prominent page actions and dialog
-                submissions a satin surface while retaining the native
-                PrimaryButton host, 80px height and intake-card 21px corners.
-                The independent skin turns off both old moving-rim renderers. A
-                10px inward frosted surround doubles the original 5px band
-                without enlarging the measured hit target. The inner face
-                follows the outer curve with an 11px radius and a fine Pink400
-                border at 29% opacity. Its former bright reflections are
-                replaced by restrained Violet400 at 5% in the upper left and
-                Pink500 at 6% in the lower right. Soft directional contact
-                shadows retain the raised face. Main Log Intake leaves a
-                5.90px transparent gap between its satin face and the 4.17px
-                rim, which mixes 50% Orange 300, 25% Taupe 700 and 25% Taupe 800. Its outer
-                SpecularCardBorder shares the Morning and Evening cards’ 3px
-                gap, 3.733px purple/pink rim, three brighter stops and glow. That
-                outside rim stays fixed; matching concentric curves keep the 3px
-                clear gap equal along all sides and corners. Other satin actions
-                keep their existing inset. Mobile uses a static CSS rim through
-                PrimaryButton’s decoration slot; desktop uses a static sibling
-                SVG to avoid Safari clipping. Neither creates a canvas or
-                repeating animation. The transparent surround remains
-                independent of that outer border.
+                IntakeLaunchButton opens the intake dialog from Today. It keeps
+                the 80px footprint and 21px corners of the timeline cards. Its
+                Layers Arrow Up mark, two lines of copy and trailing arrow share
+                a three-column layout. The specular edge moves with the face on
+                press. One seven-second reflection follows the same SVG path as
+                the colored rim. It pauses out of view and stays still with
+                reduced motion.
               </p>
               <p>
-                IntakePrimaryButton owns the complete Log Intake button and is
-                also used by Save Check-In, Save Intake and Save Edits. They share
-                the same face, concentric borders, outboard rim, icon rail,
-                separator, secondary copy and arrow. Only the Log Intake
-                launcher exposes the page background along its inner edge.
+                IntakePrimaryButton supplies the satin face and outboard frame
+                for Save Check-In, Save Intake and Save Edits.
               </p>
               <p>
-                TODAY_CONTROL_PAINT owns explicit light/dark pigment pairs. Dark
-                mode uses a pale lilac face with deep plum text; light mode uses
-                a rich plum face with pale lilac text. Supporting copy and the
-                arrow use a quieter, readable ink in the same family. The Layers
-                Arrow Up icon and the trailing arrow use 3.25px strokes and the
-                same secondary ink. A 24px gap, reduced to 20px on the narrowest
-                screens, gives the leading glyph about thirty percent more
-                visible space before the label; its former background well is
-                removed. The icon entrance and the content entrance retain
-                independent transform owners. Mobile keeps one centered content
-                row down to 320px and no hover feedback. Fine-pointer desktop
-                hover adjusts only luminance and shadow; reduced motion removes
-                those transitions, and reduced transparency replaces the frosted
-                base with opaque paint.
-              </p>
-              <p>
-                MedicationActionButton reuses this exact component for Add
+                MedicationActionButton uses TodayActionButton for Add
                 Medication with its existing creation symbol, label, dot, Set Up
                 aside and arrow. DialogPrimaryButton composes the same satin
                 component, 80px height, 21px corners, inset icon well and
@@ -1272,10 +1233,8 @@ export function DeveloperGuidePage() {
                 two rendered frames for the responsive portal to stabilize and
                 raises the summary over 740ms. The button follows after 140ms
                 for 1060ms; the footer follows after 620ms for 760ms. Count
-                details join in short overlapping steps, while the Tablets mark
-                spins into a small scale rebound and the arrow glides forward
-                into place. The whole button frame only translates and fades,
-                preserving measured rim thickness and the exterior shadow. No
+                details join in short overlapping steps. The button translates
+                and fades as a unit, preserving its rim and shadow. No
                 fixed dock ancestor is transformed, filtered or clipped for this
                 entrance.
               </p>

@@ -410,7 +410,7 @@ export function GuideButtons() {
       <p className={styles.intro}>
         Share native behavior, choose visual emphasis. Button defaults to
         standard semantic controls; Primary and Accent explicitly opt into the
-        Log Intake surface for main actions. Secondary stays quiet and tonal.
+        shared satin surface for main actions. Secondary stays quiet and tonal.
         Compare the real adapters in both themes, then choose the smallest
         useful size and emphasis.
       </p>
@@ -1243,10 +1243,8 @@ export function GuideButtons() {
             <p>
               The explicit intake appearance owns the opaque dark-pink face,
               Pink600 inner band at 74% and thirty-percent pink perimeter. Its
-              CSS rim stays still. Today and Add Medication use the same CSS/SVG
-              edge without mounting the retired SpecularRim renderer. The main
-              CTA’s icons and “Jot it!” use full-opacity Pink200, independently
-              of its primary label. Accent keeps its default icon slots and
+              CSS rim stays still. Today’s IntakeLaunchButton has its own SVG
+              edge with a moving highlight. Accent keeps its default icon slots and
               pending spinner, but no separate aura, gradient field or finish
               renderer. The paint-only AccentButtonSurface remains available for
               journal artwork. Visual truncation never removes the full

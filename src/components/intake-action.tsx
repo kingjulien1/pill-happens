@@ -10,8 +10,7 @@ import { Sparkles } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
-import { IntakePrimaryButton } from "@/components/intake-primary-button";
-import { IntakeLogSymbol } from "@/components/intake-log-symbol";
+import { IntakeLaunchButton } from "@/components/intake-launch-button";
 import { PageActionDock } from "@/components/page-action-dock";
 
 // Temporary visibility switch: set true to restore the unchanged amounts bar.
@@ -243,14 +242,7 @@ export function IntakeAction({
         className="intake-action-entry-button"
         data-intake-entry-part="button"
       >
-        <IntakePrimaryButton
-          type="button"
-          symbol={<IntakeLogSymbol variant="layers-arrow-up" />}
-          secondaryText="Jot it!"
-          onClick={onClick}
-        >
-          Log Intake
-        </IntakePrimaryButton>
+        <IntakeLaunchButton onClick={onClick} />
       </div>
       <p
         className="intake-action-note"

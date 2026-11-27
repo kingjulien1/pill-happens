@@ -19,7 +19,7 @@ type IntakePrimaryButtonProps = Omit<
   secondaryText?: ReactNode;
 };
 
-/** The main Log Intake face, content rail and outboard frame, shared unchanged. */
+/** Shared submission button for intake and check-in dialogs. */
 export function IntakePrimaryButton({
   children,
   symbol,

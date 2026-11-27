@@ -20,6 +20,51 @@
   display: none;
 }
 
+.launchRim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  pointer-events: none;
+}
+
+.launchRim rect {
+  --half-stroke: 1.5px;
+  x: var(--half-stroke);
+  y: var(--half-stroke);
+  width: calc(100% - 2 * var(--half-stroke));
+  height: calc(100% - 2 * var(--half-stroke));
+  rx: calc(var(--launch-radius) - var(--half-stroke));
+  stroke-width: calc(2 * var(--half-stroke));
+}
+
+.launchGlint {
+  stroke: #fff3dd;
+  stroke-dasharray: 8 92;
+  stroke-dashoffset: -5;
+  stroke-linecap: round;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .launchGlint {
+    animation: trace-launch-rim 7s linear infinite;
+    animation-play-state: var(--launch-motion, paused);
+  }
+}
+
+@keyframes trace-launch-rim {
+  to {
+    stroke-dashoffset: -105;
+  }
+}
+
+@media (forced-colors: active) {
+  .launchRim {
+    display: none;
+  }
+}
+
 .frame {
   --intake-rim-base: var(--rim-color);
   --intake-rim-stop-1: color-mix(in srgb, var(--intake-rim-base) 92%, black);
