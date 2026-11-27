@@ -717,7 +717,6 @@ export function IntakeForm({
         <CheckInSection
           caption="Timing"
           headingId={`${formId}-timing-heading`}
-          headingAtEnd
           detail={
             <IntakeSectionContext
               kind="timing"
