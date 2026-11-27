@@ -316,37 +316,47 @@ export function IntakeDateTimeFields({
                 rx="10"
                 pathLength="100"
               />
-            </svg>
-            <svg className={styles.gauge} viewBox="0 0 40 40" fill="none">
-              <defs>
-                <linearGradient
-                  id={`${id}-arc`}
-                  x1="0%"
-                  y1="90%"
-                  x2="100%"
-                  y2="10%"
-                >
-                  <stop stopColor="#fda4af" />
-                  <stop offset=".48" stopColor="#ffe4ed" />
-                  <stop offset="1" stopColor="#c4a9ff" />
-                </linearGradient>
-              </defs>
-              <path
-                className={styles.ticks}
-                d="M20 1v2M6.56 6.56l1.42 1.42M1 20h2M33.44 6.56l-1.42 1.42M39 20h-2"
+              <rect
+                className={styles.innerSeam}
+                x="4.5"
+                y="4.5"
+                width="91"
+                height="31"
+                rx="8"
+                pathLength="100"
               />
-              <path className={styles.track} d={chargeArc} />
-              <g className={styles.chargeArc} stroke={`url(#${id}-arc)`}>
-                <path
-                  pathLength="1"
-                  d={chargeArc}
-                  strokeWidth="5"
-                  opacity=".18"
-                />
-                <path pathLength="1" d={chargeArc} strokeWidth="1.85" />
-              </g>
-              <circle className={styles.echo} cx="20" cy="20" r="15" />
             </svg>
+            {winding && (
+              <svg className={styles.gauge} viewBox="0 0 40 40" fill="none">
+                <defs>
+                  <linearGradient
+                    id={`${id}-arc`}
+                    x1="0%"
+                    y1="90%"
+                    x2="100%"
+                    y2="10%"
+                  >
+                    <stop stopColor="#fda4af" />
+                    <stop offset=".48" stopColor="#ffe4ed" />
+                    <stop offset="1" stopColor="#c4a9ff" />
+                  </linearGradient>
+                </defs>
+                <path
+                  className={styles.ticks}
+                  d="M20 1v2M6.56 6.56l1.42 1.42M1 20h2M33.44 6.56l-1.42 1.42M39 20h-2"
+                />
+                <path className={styles.track} d={chargeArc} />
+                <g className={styles.chargeArc} stroke={`url(#${id}-arc)`}>
+                  <path
+                    pathLength="1"
+                    d={chargeArc}
+                    strokeWidth="5"
+                    opacity=".18"
+                  />
+                  <path pathLength="1" d={chargeArc} strokeWidth="1.85" />
+                </g>
+              </svg>
+            )}
             <span className={styles.glyph}>
               <StartIcon
                 className={styles.refresh}
@@ -362,12 +372,14 @@ export function IntakeDateTimeFields({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path
-                  className={styles.dial}
-                  pathLength="1"
-                  d="M12.337 21.994a10 10 0 1 1 9.588-8.767"
-                />
-                <path className={styles.hands} d="M12 6v6l2 1" />
+                <g className={styles.timepiece}>
+                  <path
+                    className={styles.dial}
+                    pathLength="1"
+                    d="M12.337 21.994a10 10 0 1 1 9.588-8.767"
+                  />
+                  <path className={styles.hands} d="M12 6v6l2 1" />
+                </g>
                 <g className={styles.arrow}>
                   <path d={winding ? curvedShaft : straightShaft}>
                     {revealing && (
