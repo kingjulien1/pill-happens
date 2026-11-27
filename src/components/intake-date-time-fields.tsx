@@ -47,11 +47,13 @@ const chargeArc = "M9.39 30.61a15 15 0 1 1 21.22 0";
 const curvedShaft = "M4.5 10 C4.5 0 21 1 18.5 10 C17.2 14.6 12 13.8 12 19";
 const straightShaft = "M12 2 C12 5 12 8 12 10 C12 13 12 16 12 19";
 const revealDuration = 580;
+const unlockDuration = 820;
 const noticeHeadings = {
   idle: ["Time unlocked", "Tap for now"],
   fixed: ["Time locked", "Tap to unlock"],
   charging: ["Keep holding", "Release to cancel"],
   ready: ["Ready to lock", "Release to lock"],
+  resetting: ["Unlocking time", "Returning to now"],
 } as const;
 
 function unrollArrow(animation: SVGAnimateElement | null) {
@@ -167,7 +169,7 @@ export function IntakeDateTimeFields({
     const durations = {
       entering: chargeDuration,
       settling: revealDuration,
-      resetting: 540,
+      resetting: unlockDuration,
       refreshing: 460,
     };
     if (phase === "idle" || phase === "waiting") return;
@@ -204,18 +206,26 @@ export function IntakeDateTimeFields({
     hold.stage === "charging" && pinned ? ClockArrowDown : RotateCcw;
   const LockIcon = pinned ? LockKeyhole : LockKeyholeOpen;
   const [status, action] =
-    noticeHeadings[hold.stage ?? (pinned ? "fixed" : "idle")];
-  const instructions = pinned
-    ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
-    : "Hold for a bit more than a second, then release. Both values carry over. Editing either field locks both.";
+    noticeHeadings[
+      hold.stage ??
+        (phase === "resetting" ? "resetting" : pinned ? "fixed" : "idle")
+    ];
+  const instructions =
+    phase === "resetting"
+      ? "The date and time return to now together. Your saved intakes keep their original timestamps."
+      : pinned
+        ? "New and edited intakes share this time. Both fields stay editable. Hold again to lock the current time."
+        : "Hold for a bit more than a second, then release. Both values carry over. Editing either field locks both.";
 
   return (
     <div
       className={styles.fields}
       data-intake-date-time-fields
       data-timing-pinned={pinned}
+      data-timing-phase={state}
+      style={{ "--unlock-duration": `${unlockDuration}ms` } as CSSProperties}
     >
-      <div className={styles.field}>
+      <div className={styles.field} data-timing-field="date">
         <Label htmlFor={`${id}-date`} className={styles.fieldLabel}>
           Date Taken <CalendarDays aria-hidden="true" />
         </Label>
@@ -244,7 +254,7 @@ export function IntakeDateTimeFields({
           data-intake-date
         />
       </div>
-      <div className={styles.field}>
+      <div className={styles.field} data-timing-field="time">
         <Label htmlFor={`${id}-time`} className={styles.fieldLabel}>
           Time Taken <Clock3 aria-hidden="true" />
         </Label>
@@ -358,6 +368,45 @@ export function IntakeDateTimeFields({
               </svg>
             )}
             <span className={styles.glyph}>
+              {state === "resetting" && (
+                <svg
+                  className={styles.releaseBurst}
+                  viewBox="-34 -25 68 50"
+                  fill="none"
+                >
+                  <g
+                    className={styles.rays}
+                    strokeLinecap="round"
+                    strokeWidth="2.2"
+                  >
+                    <path
+                      d="m-17 -5 -10 -4m39 -4 5 -6m-12 33 3 6"
+                      stroke="#fda4af"
+                    />
+                    <path
+                      d="m18 1 12 -2m-41 12 -6 7m11 -31 -3 -7"
+                      stroke="#fcd58d"
+                    />
+                    <path d="m14 8 9 6m-39 -13 -12 3" stroke="#c4b5fd" />
+                  </g>
+                  <g className={styles.releaseStars}>
+                    <path
+                      d={lunarStarPath}
+                      transform="translate(-22 -10)"
+                      fill="#fde7b4"
+                    />
+                    <path
+                      d={lunarStarPath}
+                      transform="translate(19 10) scale(.78)"
+                      fill="#ffb8ea"
+                    />
+                    <path
+                      d="m6 -17 1.6 -2.2 1.6 2.2 -1.6 2.2zM-8 14l1.3 -1.8 1.3 1.8 -1.3 1.8z"
+                      fill="#b9edff"
+                    />
+                  </g>
+                </svg>
+              )}
               <StartIcon
                 className={styles.refresh}
                 size={20}
