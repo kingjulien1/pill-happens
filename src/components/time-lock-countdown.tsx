@@ -12,6 +12,10 @@ const captions = {
   canceled: "Canceled",
 } as const;
 
+export function timeLockCaption(phase: TimeLockFeedback, pinned: boolean) {
+  return phase === "ready" && pinned ? "Release to relock" : captions[phase];
+}
+
 // Stagger the short sparks among longer ribbons so the burst opens in two beats.
 const confetti = Array.from(
   { length: 15 },
@@ -26,9 +30,11 @@ const confetti = Array.from(
 
 export function TimeLockCountdown({
   phase,
+  pinned,
   chargeDuration,
 }: {
   phase: TimeLockFeedback;
+  pinned: boolean;
   chargeDuration: number;
 }) {
   const gradientId = useId();
@@ -44,8 +50,8 @@ export function TimeLockCountdown({
       pane?.getBoundingClientRect().top ?? 0,
       window.visualViewport?.offsetTop ?? 0,
     );
-    // If the control is against the scrollport's top edge, unfold towards the fields.
-    if (anchor.getBoundingClientRect().top + node.offsetTop < visibleTop + 6)
+    // Leave room for the outgoing label's upward arc above the dial.
+    if (anchor.getBoundingClientRect().top + node.offsetTop < visibleTop + 40)
       node.dataset.side = "below";
   }, []);
 
@@ -57,7 +63,16 @@ export function TimeLockCountdown({
       style={{ "--charge-duration": `${chargeDuration}ms` } as CSSProperties}
       aria-hidden="true"
     >
-      <span className={styles.caption}>{captions[phase]}</span>
+      {(phase === "charging" || phase === "ready") && (
+        <span className={styles.caption} data-caption="hold">
+          {captions.charging}
+        </span>
+      )}
+      {phase !== "charging" && (
+        <span className={styles.caption} data-caption="result">
+          {timeLockCaption(phase, pinned)}
+        </span>
+      )}
       <span className={styles.disc}>
         <svg className={styles.ring} viewBox="0 0 52 52" fill="none">
           <defs>

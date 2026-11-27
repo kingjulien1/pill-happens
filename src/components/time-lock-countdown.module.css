@@ -24,6 +24,8 @@
 }
 
 .countdown {
+  --disc-size: 50px;
+  --caption-gap: 5px;
   --lift: 28px;
   --gap: 14px;
   --gather: 500ms;
@@ -31,9 +33,9 @@
   z-index: 4;
   bottom: calc(100% + var(--gap));
   left: 50%;
-  width: 50px;
-  height: 50px;
-  margin-left: -25px;
+  width: var(--disc-size);
+  height: var(--disc-size);
+  margin-left: calc(var(--disc-size) / -2);
   color: #fff1f2;
   pointer-events: none;
   user-select: none;
@@ -60,8 +62,10 @@
 .caption {
   position: absolute;
   top: 50%;
-  right: calc(100% + 5px);
-  transform: translateY(-50%);
+  right: calc(100% + var(--caption-gap));
+  translate: 0 -50%;
+  /* Both labels pivot on the dial center, even when their widths differ. */
+  transform-origin: calc(100% + var(--caption-gap) + var(--disc-size) / 2) 50%;
   padding: 3px 8px;
   border: 1px solid #d691ab;
   border-radius: 100px;
@@ -71,6 +75,9 @@
   font-weight: 650;
   line-height: 1.5;
   white-space: nowrap;
+}
+.countdown[data-lock-countdown="ready"] [data-caption="hold"] {
+  display: none;
 }
 .disc {
   position: relative;
@@ -153,6 +160,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .countdown[data-lock-countdown="ready"] [data-caption="hold"] {
+    display: block;
+    animation: caption-rise-out 320ms cubic-bezier(0.34, 0.05, 0.78, 0.55) both;
+  }
+  .countdown[data-lock-countdown="ready"] [data-caption="result"] {
+    animation: caption-rise-in 460ms cubic-bezier(0.18, 0.75, 0.25, 1) 100ms
+      both;
+  }
   .trigger[data-feedback="charging"]::before {
     animation: wind-up var(--charge-duration)
       cubic-bezier(0.45, 0.03, 0.65, 0.82) both;
@@ -220,6 +235,30 @@
   .burst i {
     animation: scatter 570ms cubic-bezier(0.13, 0.77, 0.24, 1)
       calc(var(--gather) + var(--delay)) both;
+  }
+}
+@keyframes caption-rise-out {
+  from {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(26deg);
+  }
+}
+@keyframes caption-rise-in {
+  from {
+    opacity: 0;
+    transform: rotate(-26deg);
+  }
+  72% {
+    opacity: 1;
+    transform: rotate(1.5deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg);
   }
 }
 @media (prefers-reduced-motion: reduce) {

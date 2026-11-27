@@ -22,7 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { TIME_LOCK_HOLD_MS, useTimeLockPress } from "./use-time-lock-press";
-import { TimeLockCountdown } from "./time-lock-countdown";
+import { TimeLockCountdown, timeLockCaption } from "./time-lock-countdown";
 import feedbackStyles from "./time-lock-countdown.module.css";
 import { CheckInSection } from "./check-in-section";
 import { Button } from "@/components/ui/button";
@@ -68,8 +68,6 @@ const refreshDuration = 460;
 const lockStatus = {
   idle: "Unlocked",
   fixed: "Locked",
-  charging: "Keep holding",
-  ready: "Release to lock",
   resetting: "Unlocking…",
   refreshing: "Refreshing…",
 } as const;
@@ -217,15 +215,15 @@ export function IntakeTimingSection({
     };
   }, []);
 
-  const status =
-    lockStatus[
-      hold.stage ??
-        (phase === "resetting" || phase === "refreshing"
+  const status = hold.stage
+    ? timeLockCaption(hold.stage, pinned)
+    : lockStatus[
+        phase === "resetting" || phase === "refreshing"
           ? phase
           : pinned
             ? "fixed"
-            : "idle")
-    ];
+            : "idle"
+      ];
   const ToggleIcon = pinned ? LockKeyholeOpen : LockKeyhole;
   const actionsDisabled = locked || hold.stage !== null || phase === "settling";
   const shortcut = (action: () => void) => {
@@ -286,6 +284,7 @@ export function IntakeTimingSection({
             {hold.feedback && (
               <TimeLockCountdown
                 phase={hold.feedback}
+                pinned={pinned}
                 chargeDuration={chargeDuration}
               />
             )}
