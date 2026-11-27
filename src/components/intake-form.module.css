@@ -24,8 +24,10 @@
   gap: 16px;
   padding: 1rem;
 }
-.inputTypography :is([data-compact-choice-trigger], [data-intake-date-time-fields] input) {
-  padding-inline: calc(var(--content-min-gap-secondary, 6.5px) + 6px) 8.75px;
+.inputTypography
+  :is([data-compact-choice-trigger], [data-intake-date-time-fields] input) {
+  padding-inline: calc(var(--content-min-gap-secondary, 6.5px) + 6px)
+    var(--intake-field-end-inset);
 }
 
 .amountControls {
@@ -304,6 +306,7 @@
 }
 /* Timing owns the reference scale; all editable intake fields share it. */
 .inputTypography {
+  --intake-field-end-inset: 8.75px;
   --intake-input-font-size: 16px;
   --intake-input-font-weight: 400;
 }

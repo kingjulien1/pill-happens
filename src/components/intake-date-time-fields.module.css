@@ -1,5 +1,7 @@
 .fields {
   --control-height: 40px;
+  --indicator-color: var(--primary);
+  --indicator-opacity: 0.24;
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
@@ -12,6 +14,28 @@
   grid-row: span 2;
   grid-template-rows: subgrid;
   row-gap: 6px;
+}
+.indicator {
+  width: calc(6em / 7);
+  height: calc(6em / 7);
+  flex: none;
+  color: var(--indicator-color);
+  opacity: var(--indicator-opacity);
+  pointer-events: none;
+}
+.inputWrap {
+  position: relative;
+  min-width: 0;
+  font-size: var(--intake-input-font-size, 1rem);
+}
+.inputWrap > .indicator {
+  position: absolute;
+  inset-inline-end: var(--intake-field-end-inset);
+  top: 50%;
+  translate: 0 -50%;
+}
+.field .inputWrap input.input {
+  padding-inline-end: calc(var(--intake-field-end-inset) + 6em / 7 + 4px);
 }
 .field .input {
   display: flex;
@@ -32,12 +56,20 @@
   appearance: none;
 }
 
-/* Unlocked fields inherit the dialog surface and focus ring alongside the medication picker. */
-.fields[data-timing-pinned="true"] .field input.input,
-.fields[data-timing-pinned="true"] .field input.input:focus-visible {
-  --ring: var(--color-rose-400, #fb7185);
+.fields[data-timing-pinned="true"] {
+  --indicator-color: var(--color-rose-500);
+  --indicator-opacity: 0.83;
+  --lock-accent: var(--color-rose-400);
+  --lock-tint: color-mix(in srgb, var(--lock-accent) 25.5%, transparent);
+  --lock-focus: color-mix(in srgb, var(--lock-accent) 75%, var(--ring));
+}
+.fields[data-timing-pinned="true"] .field input.input {
+  --ring: var(--lock-focus);
+  border-color: color-mix(in srgb, var(--lock-accent) 75%, var(--input));
+  background-image: linear-gradient(var(--lock-tint), var(--lock-tint));
+}
+.fields[data-timing-pinned="true"] .field input.input:focus {
   border-color: var(--ring);
-  background-color: color-mix(in srgb, var(--ring) 34%, transparent);
 }
 .fields[data-timing-phase="resetting"] input.input {
   color: var(--foreground);

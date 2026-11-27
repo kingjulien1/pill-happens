@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  type ComponentProps,
   type CSSProperties,
   type ReactNode,
 } from "react";
@@ -72,6 +73,50 @@ const lockStatus = {
   refreshing: "Refreshing…",
 } as const;
 
+function TimingField({
+  id,
+  type,
+  pinned,
+  ...inputProps
+}: Omit<ComponentProps<typeof Input>, "className" | "children" | "onKeyDown"> & {
+  id: string;
+  type: "date" | "time";
+  pinned: boolean;
+}) {
+  const Icon = pinned ? LockKeyhole : LockKeyholeOpen;
+  const indicator = (
+    <Icon
+      className={styles.indicator}
+      strokeWidth={1.75}
+      aria-hidden="true"
+      focusable="false"
+    />
+  );
+  return (
+    <div className={styles.field} data-timing-field={type}>
+      <Label htmlFor={id}>
+        {type === "date" ? "Date Taken" : "Time Taken"}
+        {indicator}
+      </Label>
+      <div className={styles.inputWrap}>
+        <Input
+          {...inputProps}
+          id={id}
+          type={type}
+          className={`${styles.input} focus:border-ring focus:ring-3 focus:ring-ring/50 dark:enabled:hover:bg-input/50`}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              event.currentTarget.blur();
+            }
+          }}
+        />
+        {indicator}
+      </div>
+    </div>
+  );
+}
+
 /** Pin immediately; celebrate only after leaving the native date/time controls. */
 export function IntakeTimingSection({
   headingId,
@@ -87,9 +132,6 @@ export function IntakeTimingSection({
   disabled = false,
 }: IntakeTimingSectionProps) {
   const id = useId();
-  const timingInputClass = pinned
-    ? styles.input
-    : `${styles.input} focus:border-ring focus:ring-3 focus:ring-ring/50 dark:enabled:hover:bg-input/50`;
   const separator = value.indexOf("T");
   const date = separator < 0 ? value : value.slice(0, separator);
   const time = separator < 0 ? "" : value.slice(separator + 1);
@@ -302,64 +344,48 @@ export function IntakeTimingSection({
             data-timing-pinned={pinned}
             data-timing-phase={state}
           >
-            <div className={styles.field} data-timing-field="date">
-              <Label htmlFor={`${id}-date`}>Date Taken</Label>
-              <Input
-                id={`${id}-date`}
-                name="takenAtDate"
-                type="date"
-                value={date}
-                max={localNow.slice(0, 10)}
-                onChange={(event) => {
-                  changeInput(`${event.target.value}T${time}`);
-                  // Native pickers can commit without moving focus away from the field.
-                  if (event.nativeEvent.type === "change") commitInput();
-                }}
-                onFocus={focusInput}
-                onBlur={commitInput}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    event.currentTarget.blur();
-                  }
-                }}
-                disabled={locked}
-                required
-                className={timingInputClass}
-                data-intake-date
-              />
-            </div>
-            <div className={styles.field} data-timing-field="time">
-              <Label htmlFor={`${id}-time`}>Time Taken</Label>
-              <Input
-                id={`${id}-time`}
-                name="takenAtTime"
-                type="time"
-                value={time}
-                max={
-                  date === localNow.slice(0, 10)
-                    ? localNow.slice(11)
-                    : undefined
-                }
-                step={60}
-                onChange={(event) => {
-                  changeInput(`${date}T${event.target.value}`);
-                  if (event.nativeEvent.type === "change") commitInput();
-                }}
-                onFocus={focusInput}
-                onBlur={commitInput}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    event.currentTarget.blur();
-                  }
-                }}
-                disabled={locked}
-                required
-                className={timingInputClass}
-                data-intake-clock
-              />
-            </div>
+            <TimingField
+              id={`${id}-date`}
+              name="takenAtDate"
+              type="date"
+              value={date}
+              max={localNow.slice(0, 10)}
+              onChange={(event) => {
+                changeInput(`${event.target.value}T${time}`);
+                // Native pickers can commit without moving focus away from the field.
+                if (event.nativeEvent.type === "change") commitInput();
+              }}
+              onFocus={focusInput}
+              onBlur={commitInput}
+              disabled={locked}
+              required
+              pinned={pinned}
+              aria-describedby={`${id}-timing-status`}
+              data-intake-date
+            />
+            <TimingField
+              id={`${id}-time`}
+              name="takenAtTime"
+              type="time"
+              value={time}
+              max={
+                date === localNow.slice(0, 10)
+                  ? localNow.slice(11)
+                  : undefined
+              }
+              step={60}
+              onChange={(event) => {
+                changeInput(`${date}T${event.target.value}`);
+                if (event.nativeEvent.type === "change") commitInput();
+              }}
+              onFocus={focusInput}
+              onBlur={commitInput}
+              disabled={locked}
+              required
+              pinned={pinned}
+              aria-describedby={`${id}-timing-status`}
+              data-intake-clock
+            />
           </div>
         </div>
       </CheckInSection>
