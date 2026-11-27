@@ -84,7 +84,7 @@
 }
 
 @media (min-width: 768px) {
-  .dialog.intakeSurface:has([data-intake-form="new"]) {
+  .dialog.intakeSurface {
     max-width: min(600px, calc(100% - 2rem));
   }
   .title {
