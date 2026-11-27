@@ -1,19 +1,28 @@
 .context {
-  display: inline-grid;
-  max-width: 96px;
-  gap: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  gap: clamp(5px, 1.4vw, 8px);
   color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 400;
   line-height: 1.4;
   text-align: end;
-  white-space: normal;
+  white-space: nowrap;
 }
 .label {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
+  flex: none;
+}
+.divider {
+  flex: none;
+  width: 1px;
+  height: 1em;
+  background: color-mix(in srgb, currentColor 48%, transparent);
 }
 .label > svg {
   width: 11px;
@@ -22,7 +31,8 @@
 }
 .value {
   min-width: 0;
-  text-wrap: pretty;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .label strong,
 .value strong {
@@ -33,4 +43,10 @@
 }
 .value time {
   font-variant-numeric: tabular-nums;
+}
+@media (max-width: 359px) {
+  .context,
+  .label {
+    gap: 3px;
+  }
 }

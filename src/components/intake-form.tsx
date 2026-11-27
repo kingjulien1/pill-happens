@@ -584,7 +584,8 @@ export function IntakeForm({
     >
       <fieldset disabled={busy} className="flex min-w-0 flex-col gap-7">
         <CheckInSection
-          caption="Medication & Amount"
+          caption="Medication"
+          headingId={`${formId}-medication-heading`}
           detail={
             <IntakeSectionContext
               kind="medication"
@@ -715,6 +716,8 @@ export function IntakeForm({
         </CheckInSection>
         <CheckInSection
           caption="Timing"
+          headingId={`${formId}-timing-heading`}
+          headingAtEnd
           detail={
             <IntakeSectionContext
               kind="timing"

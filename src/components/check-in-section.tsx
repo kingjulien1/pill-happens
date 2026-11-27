@@ -6,6 +6,7 @@ type CheckInSectionHeaderProps = {
   context?: string;
   detail: ReactNode;
   headingId?: string;
+  headingAtEnd?: boolean;
   description?: ReactNode;
 };
 
@@ -14,27 +15,32 @@ export function CheckInSectionHeader({
   context,
   detail,
   headingId,
+  headingAtEnd = false,
   description,
 }: CheckInSectionHeaderProps) {
+  const heading = (
+    <div className={styles.labelRow}>
+      {headingId ? (
+        <h3 id={headingId} className={styles.title}>
+          {caption}
+        </h3>
+      ) : (
+        <strong className={styles.title}>{caption}</strong>
+      )}
+      {context && (
+        <span className={styles.contextGroup}>
+          <span aria-hidden="true">/</span>
+          <span className={styles.context}>{context}</span>
+        </span>
+      )}
+    </div>
+  );
   return (
     <div className={styles.header}>
       <div className={styles.caption}>
-        <div className={styles.labelRow}>
-          {headingId ? (
-            <h3 id={headingId} className={styles.title}>
-              {caption}
-            </h3>
-          ) : (
-            <strong className={styles.title}>{caption}</strong>
-          )}
-          {context && (
-            <span className={styles.contextGroup}>
-              <span aria-hidden="true">/</span>
-              <span className={styles.context}>{context}</span>
-            </span>
-          )}
-        </div>
+        {!headingAtEnd && heading}
         <span className={styles.detail}>{detail}</span>
+        {headingAtEnd && heading}
       </div>
       {description && <p className={styles.description}>{description}</p>}
     </div>

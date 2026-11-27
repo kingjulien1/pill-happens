@@ -86,6 +86,7 @@ export function IntakeSectionContext({
         <Icon strokeWidth={2.25} aria-hidden="true" />
         <span>{label}</span>
       </span>
+      <span className={styles.divider} aria-hidden="true" />
       <span className={styles.value}>{value}</span>
     </span>
   );
