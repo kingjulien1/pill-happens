@@ -87,6 +87,9 @@
   stroke-linecap: round;
   stroke-dasharray: 100;
 }
+.rimHighlight {
+  display: none;
+}
 .countdown:not([data-medication-dial]) {
   --start-rim: var(--time-lock-open-rim);
 }
@@ -102,8 +105,11 @@
   );
   background: color-mix(in oklab, var(--color-mauve-950) 78%, var(--dial-rim));
 }
+.countdown:not([data-medication-dial]) .ring {
+  color: var(--dial-rim);
+}
 .countdown:not([data-medication-dial]) :is(.arc, .track) {
-  stroke: var(--dial-rim);
+  stroke: currentColor;
 }
 .countdown:not([data-medication-dial]) .track {
   opacity: 0.42;
@@ -117,10 +123,11 @@
     --progress: calc(
       1 - (1 - var(--time-lock-elapsed, 0)) * (1 - var(--time-lock-pull, 0))
     );
+    /* The two round caps cover the remaining 4% of the path. */
+    --filled-arc: calc(96 * var(--progress));
   }
   .arc {
-    /* The two round caps cover about 4% of this path. They meet at the threshold. */
-    stroke-dashoffset: calc(100 - 96 * var(--progress));
+    stroke-dashoffset: calc(100 - var(--filled-arc));
   }
 }
 .latch {
@@ -220,6 +227,27 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .countdown:not([data-medication-dial], [data-pinned]):is(
+      [data-lock-countdown="charging"],
+      [data-lock-countdown="canceled"]
+    ) {
+    .ring {
+      /* Seek the palette with the same gesture progress that draws the arc. */
+      animation: charge-colors 1s ease-in-out calc(-1s * var(--progress)) both
+        paused;
+    }
+    .rimHighlight {
+      display: initial;
+      transform-origin: 26px 26px;
+      transform: rotate(calc(3.6deg * var(--filled-arc)));
+      /* Wait until the filled arc can hold the 45-degree highlight, then fade it into rose. */
+      opacity: clamp(
+        0,
+        min((var(--progress) - 0.135) * 5, (1 - var(--progress)) * 4),
+        0.85
+      );
+    }
+  }
   .countdown[data-lock-countdown="ready"] [data-caption="hold"] {
     display: block;
     animation: caption-rise-out 320ms cubic-bezier(0.34, 0.05, 0.78, 0.55) both;
@@ -337,6 +365,33 @@
   .burst[data-impact] i {
     animation: scatter 495ms cubic-bezier(0.16, 0.73, 0.26, 1)
       calc(78ms + var(--delay)) both;
+  }
+}
+@keyframes charge-colors {
+  0% {
+    color: var(--time-lock-open-rim);
+  }
+  22% {
+    color: var(--color-indigo-400);
+  }
+  41% {
+    color: var(--color-purple-400);
+  }
+  60% {
+    color: var(--color-fuchsia-500);
+  }
+  76% {
+    color: var(--color-pink-400);
+  }
+  87% {
+    color: color-mix(
+      in oklab,
+      var(--color-orange-300) 60%,
+      var(--time-lock-fixed-rim)
+    );
+  }
+  100% {
+    color: var(--time-lock-fixed-rim);
   }
 }
 @keyframes recoil {

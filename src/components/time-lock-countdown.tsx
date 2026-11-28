@@ -80,6 +80,7 @@ export function HoldCountdown({
 }) {
   const gradientId = useId();
   const atThreshold = phase === "ready" || phase === "released";
+  const showRimHighlight = !medication && !pinned && !atThreshold;
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
     const dial = ref.current;
@@ -165,6 +166,26 @@ export function HoldCountdown({
               </linearGradient>
             </defs>
           )}
+          {showRimHighlight && (
+            <defs>
+              <linearGradient
+                id={gradientId}
+                gradientUnits="userSpaceOnUse"
+                x1="10.8"
+                y1="10.8"
+                x2="26"
+                y2="4.5"
+              >
+                <stop stopColor="var(--color-purple-200)" stopOpacity="0" />
+                <stop
+                  offset=".65"
+                  stopColor="var(--color-fuchsia-200)"
+                  stopOpacity=".46"
+                />
+                <stop offset="1" stopColor="var(--color-pink-100)" />
+              </linearGradient>
+            </defs>
+          )}
           <circle className={styles.track} cx="26" cy="26" r="21.5" />
           <circle
             className={styles.arc}
@@ -175,6 +196,14 @@ export function HoldCountdown({
             stroke={medication ? `url(#${gradientId})` : "currentColor"}
             transform="rotate(-90 26 26)"
           />
+          {showRimHighlight && (
+            <path
+              className={styles.rimHighlight}
+              d="M10.797 10.797 A21.5 21.5 0 0 1 26 4.5"
+              stroke={`url(#${gradientId})`}
+              strokeLinecap="round"
+            />
+          )}
         </svg>
         {medication ? (
           <RefreshCw className={styles.latch} strokeWidth={2.35} />
