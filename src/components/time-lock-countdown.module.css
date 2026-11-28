@@ -26,6 +26,9 @@
   bottom: auto;
   top: calc(100% + var(--gap));
 }
+.countdown[data-lock-countdown="canceled"] {
+  --charge-play-state: paused;
+}
 .countdown::before {
   content: "";
   position: absolute;
@@ -84,8 +87,41 @@
   stroke-linecap: round;
   stroke-dasharray: 100;
 }
-.countdown:not([data-medication-dial]) .arc {
-  stroke: var(--color-rose-300);
+.countdown:not([data-medication-dial]) {
+  --start-rim: var(--time-lock-open-rim);
+}
+.countdown[data-pinned] {
+  --start-rim: var(--time-lock-fixed-rim);
+}
+.countdown:not([data-medication-dial]) .disc {
+  --progress: 1;
+  --dial-rim: color-mix(
+    in oklab,
+    var(--start-rim),
+    var(--time-lock-fixed-rim) calc(100% * var(--progress))
+  );
+  background: color-mix(in oklab, var(--color-mauve-950) 78%, var(--dial-rim));
+}
+.countdown:not([data-medication-dial]) :is(.arc, .track) {
+  stroke: var(--dial-rim);
+}
+.countdown:not([data-medication-dial]) .track {
+  opacity: 0.42;
+}
+.countdown:not([data-medication-dial]):is(
+    [data-lock-countdown="charging"],
+    [data-lock-countdown="canceled"]
+  ) {
+  .disc {
+    /* Pulling covers a fraction of the remaining time. Either endpoint fills the ring. */
+    --progress: calc(
+      1 - (1 - var(--time-lock-elapsed, 0)) * (1 - var(--time-lock-pull, 0))
+    );
+  }
+  .arc {
+    /* The two round caps cover about 4% of this path. They meet at the threshold. */
+    stroke-dashoffset: calc(100 - 96 * var(--progress));
+  }
 }
 .latch {
   width: 44%;
@@ -140,29 +176,38 @@
   .countdown {
     animation: lift-out 300ms cubic-bezier(0.16, 0.94, 0.22, 1.16) both;
   }
-  .countdown:is(
+  .countdown[data-medication-dial]:is(
       [data-lock-countdown="charging"],
       [data-lock-countdown="canceled"]
     )
     .arc {
     animation: sweep var(--charge-duration) linear both;
-    stroke-dashoffset: min(
-      var(--hold-ring-remaining),
-      calc(100 * (1 - var(--time-lock-pull, 0)))
-    );
+    animation-play-state: var(--charge-play-state, running);
+    stroke-dashoffset: var(--hold-ring-remaining);
   }
-  .countdown:is(
+  .countdown[data-medication-dial]:is(
       [data-lock-countdown="charging"],
       [data-lock-countdown="canceled"]
     )
     .disc {
     animation: charge-disc var(--charge-duration)
       cubic-bezier(0.32, 0.05, 0.35, 1) both;
+    animation-play-state: var(--charge-play-state, running);
   }
-  .countdown[data-lock-countdown="canceled"] :is(.disc, .arc) {
-    animation-play-state: paused;
+  .countdown:not([data-medication-dial]):is(
+      [data-lock-countdown="charging"],
+      [data-lock-countdown="canceled"]
+    ) {
+    .disc {
+      transform: scale(calc(0.69 + 0.31 * var(--progress)));
+    }
+    .latch {
+      opacity: calc(0.14 + 0.86 * var(--progress));
+      transform: scale(calc(0.48 + 0.52 * var(--progress)))
+        rotate(calc(-14deg * (1 - var(--progress))));
+    }
   }
-  .countdown[data-lock-countdown="charging"] .latch {
+  .countdown[data-medication-dial][data-lock-countdown="charging"] .latch {
     animation: develop var(--charge-duration) ease-out both;
   }
   .countdown[data-lock-countdown="ready"] .latch {
@@ -221,8 +266,8 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .countdown[data-lock-countdown="charging"] .arc {
-    stroke-dashoffset: calc(100 * (1 - var(--time-lock-pull, 0)));
+  .countdown[data-medication-dial][data-lock-countdown="charging"] .arc {
+    stroke-dashoffset: 100;
   }
   .countdown[data-lock-countdown="released"],
   .countdown[data-lock-countdown="canceled"] {

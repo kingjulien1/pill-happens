@@ -372,6 +372,7 @@ export function IntakeTimingSection({
               phase={hold.feedback}
               pinned={pinned}
               chargeDuration={chargeDuration}
+              getChargeElapsed={hold.getChargeElapsed}
             />
           )}
         </>

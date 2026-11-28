@@ -217,7 +217,7 @@
     var(--color-violet-900) 55%,
     var(--color-mauve-800)
   );
-  --rim: var(--color-violet-400);
+  --rim: var(--time-lock-open-rim);
   --icon-ink: var(--color-violet-50);
 }
 .lockControl[aria-pressed="true"] {
@@ -226,7 +226,7 @@
     var(--color-rose-900) 82%,
     var(--color-mauve-900)
   );
-  --rim: var(--color-rose-400);
+  --rim: var(--time-lock-fixed-rim);
   --icon-ink: var(--color-rose-50);
 }
 .lockCaption {

@@ -33,15 +33,30 @@ export function HoldCountdown({
   pinned = false,
   medication = false,
   chargeDuration,
+  getChargeElapsed,
 }: {
   phase: HoldFeedback;
   pinned?: boolean;
   medication?: boolean;
   chargeDuration: number;
+  getChargeElapsed?: () => number;
 }) {
   const gradientId = useId();
   const Glyph = medication ? RefreshCw : LockKeyhole;
   const ref = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const dial = ref.current;
+    if (!dial || phase !== "charging" || !getChargeElapsed) return;
+    let frame = 0;
+    // Sample the gesture's clock so a late mount or dropped frame cannot delay the dial.
+    const paint = () => {
+      const elapsed = Math.min(1, getChargeElapsed() / chargeDuration);
+      dial.style.setProperty("--time-lock-elapsed", String(elapsed));
+      if (elapsed < 1) frame = requestAnimationFrame(paint);
+    };
+    paint();
+    return () => cancelAnimationFrame(frame);
+  }, [phase, chargeDuration, getChargeElapsed]);
   useLayoutEffect(() => {
     const node = ref.current;
     const anchor = node?.parentElement;
@@ -84,6 +99,7 @@ export function HoldCountdown({
       className={styles.countdown}
       data-lock-countdown={phase}
       data-medication-dial={medication || undefined}
+      data-pinned={pinned || undefined}
       style={{ "--charge-duration": `${chargeDuration}ms` } as CSSProperties}
       aria-hidden="true"
     >
@@ -103,16 +119,15 @@ export function HoldCountdown({
       )}
       <span className={styles.disc}>
         <svg className={styles.ring} viewBox="0 0 52 52" fill="none">
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="1" x2="1" y2="0">
-              <stop stopColor={medication ? "#e9d4ff" : "#c4b5fd"} />
-              <stop
-                offset=".55"
-                stopColor={medication ? "#a855f7" : "#fda4af"}
-              />
-              <stop offset="1" stopColor={medication ? "#f0abfc" : "#fde68a"} />
-            </linearGradient>
-          </defs>
+          {medication && (
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="1" x2="1" y2="0">
+                <stop stopColor="#e9d4ff" />
+                <stop offset=".55" stopColor="#a855f7" />
+                <stop offset="1" stopColor="#f0abfc" />
+              </linearGradient>
+            </defs>
+          )}
           <circle className={styles.track} cx="26" cy="26" r="21.5" />
           <circle
             className={styles.arc}
@@ -120,7 +135,7 @@ export function HoldCountdown({
             cy="26"
             r="21.5"
             pathLength="100"
-            stroke={`url(#${gradientId})`}
+            stroke={medication ? `url(#${gradientId})` : "currentColor"}
             transform="rotate(-90 26 26)"
           />
         </svg>

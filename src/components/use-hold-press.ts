@@ -42,6 +42,10 @@ export function useHoldPress(
   } | null>(null);
   const swallowClick = useRef(false);
   const listeners = useRef<AbortController | null>(null);
+  const getChargeElapsed = useCallback(() => {
+    const held = press.current;
+    return held ? Math.max(0, performance.now() - held.started - delay) : 0;
+  }, [delay]);
 
   const clear = useCallback(() => {
     listeners.current?.abort();
@@ -165,6 +169,7 @@ export function useHoldPress(
     feedback,
     stage: feedback === "charging" || feedback === "ready" ? feedback : null,
     chargeDuration: duration - delay,
+    getChargeElapsed,
     handlers: {
       onPointerDown(event: PointerEvent<HTMLButtonElement>) {
         if (!event.isPrimary || event.button !== 0 || press.current || disabled)

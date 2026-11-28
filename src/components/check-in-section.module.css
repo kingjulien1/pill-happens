@@ -110,6 +110,8 @@
   grid-column: 1;
 }
 .header:has([data-intake-time-reset]) {
+  --time-lock-open-rim: var(--color-violet-400);
+  --time-lock-fixed-rim: var(--color-rose-400);
   --time-lock-size: calc(var(--section-action-size) * 0.9225);
   --lock-clearance: 4.625px;
   grid-template-columns: minmax(0, 1fr) auto auto;
