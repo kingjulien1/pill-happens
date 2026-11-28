@@ -111,6 +111,7 @@
 .header:has([data-intake-time-reset]) {
   --time-lock-size: calc(var(--section-action-size) * 1.23);
   column-gap: 6px;
+  padding-block-start: 3px;
   .caption {
     align-self: stretch;
     align-items: start;
@@ -123,6 +124,7 @@
   }
   .description {
     grid-column: 1 / -1;
+    margin-block-start: 4px;
   }
 }
 @media (max-width: 400px) {
