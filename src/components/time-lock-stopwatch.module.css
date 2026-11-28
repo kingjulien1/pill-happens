@@ -1,29 +1,18 @@
 .watch {
   --watch-accent: color-mix(in srgb, var(--guide-accent) 67%, currentColor);
-  position: relative;
   display: block;
   flex: none;
-  width: 3.5rem;
+  width: 2.875rem;
 }
 @container (max-width: 16.5rem) {
   .watch {
-    width: 4.75rem;
+    width: 3.875rem;
   }
 }
 .drawing {
   display: block;
   width: 100%;
   height: auto;
-}
-.lock {
-  position: absolute;
-  top: 0;
-  right: 0;
-  translate: 50% -50%;
-  width: 1.125rem;
-  height: 1.125rem;
-  color: var(--color-rose-500);
-  pointer-events: none;
 }
 .indices {
   stroke: var(--watch-accent);
@@ -81,9 +70,6 @@
   }
   .echo {
     animation-name: release-wave;
-  }
-  .lock {
-    animation: seat-lock 340ms ease-out;
   }
 }
 
@@ -204,13 +190,5 @@
   99% {
     opacity: 0;
     transform: scale(1.23);
-  }
-}
-@keyframes seat-lock {
-  28% {
-    transform: translateY(1px) rotate(-7deg) scale(0.94);
-  }
-  62% {
-    transform: rotate(3deg) scale(1.03);
   }
 }

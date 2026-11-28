@@ -1,6 +1,5 @@
 "use client";
 
-import { LockKeyhole } from "lucide-react";
 import { useVisibleMotion } from "./use-visible-motion";
 import styles from "./time-lock-stopwatch.module.css";
 
@@ -58,13 +57,6 @@ export function TimeLockStopwatch({ pinned }: { pinned: boolean }) {
           />
         </g>
       </svg>
-      {pinned && (
-        <LockKeyhole
-          className={styles.lock}
-          strokeWidth={2.5}
-          aria-hidden="true"
-        />
-      )}
     </span>
   );
 }

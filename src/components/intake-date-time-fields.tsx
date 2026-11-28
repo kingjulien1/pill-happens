@@ -11,16 +11,15 @@ import {
   type ReactNode,
 } from "react";
 import {
-  Anchor,
   CalendarClock,
   ClockCheck,
   Hourglass,
   KeyRound,
+  Layers2,
   LockKeyhole,
   Stamp,
   Timer,
   TimerReset,
-  Wind,
   type LucideIcon,
 } from "lucide-react";
 import { useHoldPress } from "./use-hold-press";
@@ -287,8 +286,6 @@ export function IntakeTimingSection({
             ? "fixed"
             : "idle"
       ];
-  const StatusIcon = hold.stage ? Hourglass : pinned ? Anchor : Wind;
-
   return (
     <CheckInSection
       caption="Timing"
@@ -437,46 +434,58 @@ export function IntakeTimingSection({
           />
         </div>
         <aside
-          className={styles.lockGuide}
-          data-pinned={pinned}
+          className={styles.guideGroup}
           aria-labelledby={`${id}-guide-title`}
         >
-          <div className={styles.guideHeading}>
-            <TimeLockStopwatch pinned={pinned} />
-            <div>
-              <h4 id={`${id}-guide-title`}>
-                How <span className="whitespace-nowrap">Time Lock</span> works
-              </h4>
-              <p
-                key={String(pinned)}
-                className={`${styles.guideSubtitle} ${styles.changingCopy}`}
-              >
-                {pinned
-                  ? "Pinned for your next log."
-                  : "Reuse a date and time."}
-              </p>
+          <div className={styles.lockGuide} data-pinned={pinned}>
+            <div className={styles.guideHeading}>
+              <TimeLockStopwatch pinned={pinned} />
+              <div>
+                <h4 id={`${id}-guide-title`}>
+                  How <span className="whitespace-nowrap">Time Lock</span> works
+                </h4>
+                <p
+                  key={String(pinned)}
+                  className={`${styles.guideSubtitle} ${styles.changingCopy}`}
+                >
+                  {pinned
+                    ? "Date and time pinned on this device."
+                    : "Reuse a date and time."}
+                </p>
+              </div>
+              {pinned && (
+                <LockKeyhole
+                  className={styles.guideLock}
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+              )}
             </div>
+            <p
+              key={String(pinned)}
+              className={`${styles.guideHelp} ${styles.changingCopy}`}
+              id={`${id}-timing-help`}
+            >
+              {pinned
+                ? "Tap Time Lock to return to now. To pin the current time again, hold or pull down, then release. You can still edit either field."
+                : "Hold for about 2⅓ seconds, or pull the button down to its stop. Release to lock the date and time. Editing either field also locks both."}
+            </p>
           </div>
-          <p
-            key={String(pinned)}
-            className={`${styles.guideHelp} ${styles.changingCopy}`}
-            id={`${id}-timing-help`}
-          >
-            {pinned
-              ? "Tap to use the current time again. To pin a fresh timestamp, hold or pull the button down to its stop, then release. You can still edit either field."
-              : "Hold for about 2⅓ seconds, or pull the button down to its stop. Release to lock the date and time. Editing either field also locks both."}
+          <p className={styles.guideNote}>
+            <Layers2 aria-hidden="true" />
+            <span key={String(pinned)} className={styles.changingCopy}>
+              {pinned
+                ? "Only the timestamp carries over. Choose the medication, route, and amount for each intake you log at this time."
+                : "Logging doses taken together? Pin their shared time once, then save each medication as a separate intake."}
+            </span>
           </p>
           <span
-            className={styles.guideStatus}
-            data-unlocked={status === lockStatus.idle || undefined}
+            className="sr-only"
             role="status"
             aria-atomic="true"
             id={`${id}-timing-status`}
           >
-            <span key={status} className={styles.statusContent}>
-              <StatusIcon aria-hidden="true" size="1.15em" />
-              {status}
-            </span>
+            {status}
           </span>
         </aside>
       </div>
