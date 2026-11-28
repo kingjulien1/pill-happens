@@ -326,7 +326,6 @@ export function IntakeTimingSection({
             disabled={locked}
             aria-pressed={pinned}
             aria-describedby={`${id}-timing-status ${id}-timing-help`}
-            data-dialog-corner="compact"
             data-intake-time-reset
             data-state={state}
             data-feedback={hold.feedback ?? undefined}
@@ -348,7 +347,7 @@ export function IntakeTimingSection({
                   data-glyph={phaseName}
                   data-current={phaseName === state || undefined}
                 >
-                  <Icon className="size-[1.5625rem]" strokeWidth={2.15} />
+                  <Icon className="size-[1.171875rem]" strokeWidth={2.15} />
                 </span>
               ))}
             </span>

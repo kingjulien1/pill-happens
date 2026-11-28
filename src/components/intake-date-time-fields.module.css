@@ -258,13 +258,27 @@
   background: var(--color-rose-500);
 }
 .lockControl[data-slot="button"] {
+  /* Scale the Today brand button's 46px shell, 14px corners and inset face together. */
+  --brand-unit: calc(var(--time-lock-size) / 46);
+  --lock-radius: calc(14 * var(--brand-unit));
+  --rim-width: calc(1.42 * var(--brand-unit));
+  --face-inset: calc(6.75 * var(--brand-unit) - var(--rim-width));
+  position: relative;
   box-sizing: border-box;
   overflow: visible;
-  border: 3px solid var(--rim);
-  border-radius: var(--dialog-radius-compact, 8px);
-  background: var(--enamel);
+  border: 0;
+  border-radius: var(--lock-radius);
+  background: color-mix(in srgb, var(--enamel) 67%, var(--rim));
   color: var(--icon-ink);
-  box-shadow: none;
+  box-shadow: inset 0 0 0 var(--rim-width) var(--rim);
+}
+@media (pointer: coarse) {
+  .lockControl::after {
+    content: "";
+    position: absolute;
+    inset: min(0px, calc((var(--time-lock-size) - 44px) / 2));
+    border-radius: inherit;
+  }
 }
 .lockControl:focus-visible {
   outline: 2px solid var(--ring);
@@ -282,8 +296,14 @@
   scroll-margin-block: 3.25rem 1rem;
 }
 .face {
+  position: absolute;
+  inset: var(--face-inset);
   display: grid;
   place-items: center;
+  border-radius: calc(var(--lock-radius) - var(--face-inset));
+  background: var(--enamel);
+  box-shadow: inset 0 0 0 var(--rim-width)
+    color-mix(in srgb, var(--rim) 64%, var(--enamel));
   pointer-events: none;
 }
 .glyph {
