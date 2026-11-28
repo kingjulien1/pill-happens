@@ -400,6 +400,18 @@
 .form {
   padding-top: 24px;
 }
+.form[data-intake-form] {
+  --intake-divider-extra: calc(var(--form-row-gap) * 0.4);
+}
+.form[data-intake-form]::before {
+  /* The header already contributes five spacing units above this line. */
+  margin-block: calc((5 * var(--spacing) + var(--form-row-gap)) * 0.4)
+    var(--intake-divider-extra);
+}
+.form[data-intake-form] > fieldset > .sectionDivider {
+  /* The card's outer frame occupies about 10px of the gap above the line. */
+  margin-block: 5.5px var(--intake-divider-extra);
+}
 .submitArea {
   --draft-action-leading-gap: var(--form-row-gap);
 }

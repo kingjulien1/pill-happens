@@ -7,6 +7,11 @@
   padding-block-end: 6px;
   text-align: center;
 }
+.footer > [data-draft-reset-footer] {
+  /* Include the footer grid's 10px gap in the clearance above its border. */
+  margin-block-start: 37.6px;
+  padding-block-start: 39.2px;
+}
 
 .previewHint {
   justify-self: center;
@@ -120,7 +125,8 @@
   --intake-rim-gain: 1.125;
 }
 .previewDivider {
-  margin-block-end: var(--form-row-gap);
+  /* The receipt region also supplies 8px of space above its divider. */
+  margin-block: 8.65px calc(var(--form-row-gap) + var(--intake-divider-extra));
 }
 .closingRegion > [data-dialog-error] {
   margin-block-start: 28px;
