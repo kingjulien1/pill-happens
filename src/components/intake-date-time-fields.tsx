@@ -34,7 +34,8 @@ import { Label } from "@/components/ui/label";
 import { toLocalInput } from "@/lib/domain";
 import styles from "./intake-date-time-fields.module.css";
 
-const TIME_LOCK_PRESS = { delay: 300, duration: 1750 };
+const TIME_LOCK_PRESS = { delay: 300, duration: 2333 };
+const TIME_LOCK_PULL_DISTANCE = 64;
 
 type Phase =
   "idle" | "waiting" | "entering" | "settling" | "resetting" | "refreshing";
@@ -211,7 +212,19 @@ export function IntakeTimingSection({
     onFix();
     setPhase(reducedMotion() ? "idle" : "settling");
   };
-  const hold = useHoldPress(locked, resetTiming, fixTiming, TIME_LOCK_PRESS);
+  const hold = useHoldPress(locked, resetTiming, fixTiming, {
+    ...TIME_LOCK_PRESS,
+    downwardPull: {
+      distance: TIME_LOCK_PULL_DISTANCE,
+      onProgress(progress) {
+        const anchor = button.current?.parentElement;
+        if (!anchor) return;
+        anchor.toggleAttribute("data-pulling", progress !== null);
+        if (progress === null) anchor.style.removeProperty("--time-lock-pull");
+        else anchor.style.setProperty("--time-lock-pull", String(progress));
+      },
+    },
+  });
   const { chargeDuration } = hold;
   const state =
     hold.stage ??
@@ -269,8 +282,6 @@ export function IntakeTimingSection({
             ? "fixed"
             : "idle"
       ];
-  const actionCaption =
-    hold.stage || locked ? status : pinned ? null : "Hold to lock";
   const StatusIcon = hold.stage ? Hourglass : pinned ? Anchor : Wind;
 
   return (
@@ -279,13 +290,12 @@ export function IntakeTimingSection({
       headingId={headingId}
       context={context}
       detail={
-        actionCaption && (
+        !pinned && (
           <span
-            key={actionCaption}
-            className={`${styles.lockCaption} ${styles.changingCopy}`}
-            data-pinned={pinned}
+            className={styles.lockCaption}
+            data-busy={hold.stage || locked || undefined}
           >
-            {actionCaption}
+            Hold to lock
           </span>
         )
       }
@@ -323,14 +333,15 @@ export function IntakeTimingSection({
             aria-label="Time Lock"
             title={
               pinned
-                ? "Use current time · Hold to relock"
-                : "Tap for now · Hold to lock the time"
+                ? "Use current time · Hold or pull down to relock"
+                : "Tap for now · Hold or pull down to lock"
             }
             {...hold.handlers}
             disabled={locked}
             aria-pressed={pinned}
             aria-describedby={`${id}-timing-status ${id}-timing-help`}
             data-intake-time-reset
+            data-base-ui-swipe-ignore=""
             data-state={state}
             data-feedback={hold.feedback ?? undefined}
             style={
@@ -442,8 +453,8 @@ export function IntakeTimingSection({
             id={`${id}-timing-help`}
           >
             {pinned
-              ? "Tap Time Lock to use the current time again. To pin a fresh timestamp, hold until the ring fills and release. You can still edit either field."
-              : `Hold Time Lock for ${TIME_LOCK_PRESS.duration / 1000} seconds, then release when the ring fills. Changing the date or time by hand also locks both values.`}
+              ? "Tap to use the current time again. To pin a fresh timestamp, hold or pull the button down to its stop, then release. You can still edit either field."
+              : "Hold for about 2⅓ seconds, or pull the button down to its stop. Release to lock the date and time. Editing either field also locks both."}
           </p>
           <span
             className={styles.guideStatus}

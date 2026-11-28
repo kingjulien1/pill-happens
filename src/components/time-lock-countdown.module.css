@@ -1,3 +1,8 @@
+@property --hold-ring-remaining {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 100;
+}
 .countdown {
   /* Reserve the fully grown dial so the connector and caption pivot stay put. */
   --disc-size: 72px;
@@ -141,6 +146,10 @@
     )
     .arc {
     animation: sweep var(--charge-duration) linear both;
+    stroke-dashoffset: min(
+      var(--hold-ring-remaining),
+      calc(100 * (1 - var(--time-lock-pull, 0)))
+    );
   }
   .countdown:is(
       [data-lock-countdown="charging"],
@@ -213,7 +222,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .countdown[data-lock-countdown="charging"] .arc {
-    stroke-dashoffset: 100;
+    stroke-dashoffset: calc(100 * (1 - var(--time-lock-pull, 0)));
   }
   .countdown[data-lock-countdown="released"],
   .countdown[data-lock-countdown="canceled"] {
@@ -242,10 +251,10 @@
 }
 @keyframes sweep {
   from {
-    stroke-dashoffset: 100;
+    --hold-ring-remaining: 100;
   }
   to {
-    stroke-dashoffset: 0;
+    --hold-ring-remaining: 0;
   }
 }
 @keyframes develop {

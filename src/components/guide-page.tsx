@@ -223,10 +223,10 @@ export function GuidePage() {
                   medication, actual quantity and intake route. Check the
                   calculated mg and Date &amp; Time Taken, then save. Change the
                   time first when recording an earlier intake.
-                  Hold Time Lock until the ring fills, then release to keep
-                  the displayed date and time across new and edited intakes.
-                  Once locked, tap Time Lock to
-                  unlock or hold and release to lock the current time.
+                  Hold Time Lock until the ring fills, or pull it down to its
+                  stop. Release to keep the displayed date and time across new
+                  and edited intakes. Once locked, tap to unlock or repeat
+                  either gesture to pin the current time.
                 </p>
                 <PageLink href="/">Go To Today</PageLink>
               </div>
