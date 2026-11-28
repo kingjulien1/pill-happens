@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useHoldPress } from "./use-hold-press";
 import { HoldCountdown, timeLockCaption } from "./time-lock-countdown";
+import { TimeLockStopwatch } from "./time-lock-stopwatch";
 import { CheckInSection } from "./check-in-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -417,12 +418,7 @@ export function IntakeTimingSection({
           aria-labelledby={`${id}-guide-title`}
         >
           <div className={styles.guideHeading}>
-            <span className={styles.guideIcon} aria-hidden="true">
-              <Timer strokeWidth={1.8} />
-              {pinned && (
-                <LockKeyhole className={styles.guideLock} strokeWidth={2.5} />
-              )}
-            </span>
+            <TimeLockStopwatch pinned={pinned} />
             <div>
               <h4 id={`${id}-guide-title`}>
                 How <span className="whitespace-nowrap">Time Lock</span> works

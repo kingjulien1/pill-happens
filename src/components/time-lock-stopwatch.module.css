@@ -1,0 +1,216 @@
+.watch {
+  --watch-accent: color-mix(in srgb, var(--guide-accent) 67%, currentColor);
+  position: relative;
+  display: block;
+  flex: none;
+  width: 3.5rem;
+}
+@container (max-width: 16.5rem) {
+  .watch {
+    width: 4.75rem;
+  }
+}
+.drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.lock {
+  position: absolute;
+  top: 0;
+  right: 0;
+  translate: 50% -50%;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-rose-500);
+  pointer-events: none;
+}
+.indices {
+  stroke: var(--watch-accent);
+  opacity: 0.65;
+}
+.splitHand,
+.trail,
+.echo {
+  stroke: var(--watch-accent);
+}
+.trail,
+.echo {
+  opacity: 0;
+}
+.trail {
+  stroke-dasharray: 1;
+}
+.case,
+.rotor,
+.echo {
+  transform-box: view-box;
+  transform-origin: 16px 18px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .watch[data-active="true"] {
+    --watch-play-state: running;
+  }
+  /* One clock keeps the wind-up, sweep, catch and return in phase. */
+  .case,
+  .crown,
+  .rotor,
+  .trail,
+  .indices,
+  .echo {
+    animation-duration: 6.4s;
+    animation-iteration-count: infinite;
+    animation-play-state: var(--watch-play-state, paused);
+    animation-timing-function: cubic-bezier(0.33, 0, 0.25, 1);
+  }
+  .case {
+    animation-name: recoil;
+  }
+  .crown {
+    animation-name: press-crown;
+  }
+  .rotor {
+    animation-name: sweep;
+  }
+  .trail {
+    animation-name: sweep-trail;
+  }
+  .indices {
+    animation-name: catch-light;
+  }
+  .echo {
+    animation-name: release-wave;
+  }
+  .lock {
+    animation: seat-lock 340ms ease-out;
+  }
+}
+
+@keyframes press-crown {
+  0%,
+  5%,
+  21%,
+  100% {
+    transform: none;
+  }
+  12% {
+    transform: translateY(2px);
+  }
+  16.5% {
+    transform: translateY(-0.6px);
+  }
+}
+@keyframes recoil {
+  0%,
+  5%,
+  26%,
+  55%,
+  76%,
+  100% {
+    transform: none;
+  }
+  12% {
+    transform: translateY(0.65px) rotate(-4deg);
+  }
+  18% {
+    transform: rotate(2deg);
+  }
+  62% {
+    transform: rotate(3deg);
+  }
+  68% {
+    transform: rotate(-1deg);
+  }
+}
+@keyframes sweep {
+  0%,
+  6% {
+    transform: rotate(0);
+  }
+  13% {
+    transform: rotate(-14deg);
+    animation-timing-function: cubic-bezier(0.48, 0.03, 0.23, 1);
+  }
+  48% {
+    transform: rotate(181deg);
+  }
+  60% {
+    transform: rotate(257deg);
+  }
+  65%,
+  73% {
+    transform: rotate(250deg);
+  }
+  90% {
+    transform: rotate(365deg);
+  }
+  95% {
+    transform: rotate(358.5deg);
+  }
+  98%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes sweep-trail {
+  0%,
+  13%,
+  65%,
+  73%,
+  96%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -1;
+  }
+  24%,
+  50% {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+  }
+  60%,
+  85% {
+    opacity: 0.55;
+    stroke-dashoffset: -0.38;
+  }
+}
+@keyframes catch-light {
+  0%,
+  12%,
+  73%,
+  100% {
+    opacity: 0.65;
+  }
+  43% {
+    opacity: 0.43;
+  }
+  60%,
+  64% {
+    opacity: 1;
+  }
+}
+@keyframes release-wave {
+  0%,
+  56%,
+  100% {
+    opacity: 0;
+    transform: scale(0.24);
+  }
+  61% {
+    opacity: 0.62;
+    transform: scale(0.55);
+  }
+  75%,
+  99% {
+    opacity: 0;
+    transform: scale(1.23);
+  }
+}
+@keyframes seat-lock {
+  28% {
+    transform: translateY(1px) rotate(-7deg) scale(0.94);
+  }
+  62% {
+    transform: rotate(3deg) scale(1.03);
+  }
+}

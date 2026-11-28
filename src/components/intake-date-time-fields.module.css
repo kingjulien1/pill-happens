@@ -329,32 +329,6 @@
   gap: clamp(8px, 2vw, 12px);
   min-width: 0;
 }
-.guideIcon {
-  position: relative;
-  display: block;
-  flex: none;
-  width: 3.5rem;
-}
-.guideIcon > :first-child {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.guideLock {
-  position: absolute;
-  top: 0;
-  right: 0;
-  translate: 50% -50%;
-  width: 1.125rem;
-  height: 1.125rem;
-  color: var(--color-rose-500);
-  pointer-events: none;
-}
-@container (max-width: 16.5rem) {
-  .guideIcon {
-    width: 4.75rem;
-  }
-}
 .guideHeading h4 {
   margin: 0;
   font-size: 1.22rem;
@@ -432,17 +406,6 @@
   }
   .field[data-timing-field="time"] {
     --latch-delay: 55ms;
-  }
-  .guideLock {
-    animation: seat-lock 340ms ease-out;
-  }
-  @keyframes seat-lock {
-    28% {
-      transform: translateY(1px) rotate(-7deg) scale(0.94);
-    }
-    62% {
-      transform: rotate(3deg) scale(1.03);
-    }
   }
   .labelStatus,
   .labelStatus .indicator,
