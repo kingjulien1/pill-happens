@@ -972,9 +972,9 @@ export function DeveloperGuidePage() {
             >
               <p>
                 Today’s Log Intake button pairs the Layers Arrow Up icon with
-                the label and a short dose-and-time description. A warm pearl
-                face brightens the dark theme. The light theme uses deep plum.
-                Both carry one multicolor outer stroke with a moving reflection.
+                the label and a short dose-and-time description. The page shows
+                through a 50%-opacity Violet300 gradient. The moving outer rim
+                picks up the five accent colors from the page background.
                 Dialog submissions use the satin buttons shown in the reference.
               </p>
               <p>
@@ -1204,9 +1204,9 @@ export function DeveloperGuidePage() {
                 the 80px footprint and 21px corners of the timeline cards. Its
                 Layers Arrow Up mark, two lines of copy and trailing arrow share
                 a three-column layout. The specular edge moves with the face on
-                press. One seven-second reflection follows the same SVG path as
-                the colored rim. It pauses out of view and stays still with
-                reduced motion.
+                press. The shared check-in renderer carries two reflections
+                around the perimeter. An SVG stroke takes over when WebGL is
+                unavailable. The rim stays still with reduced motion.
               </p>
               <p>
                 IntakePrimaryButton supplies the satin face and outboard frame

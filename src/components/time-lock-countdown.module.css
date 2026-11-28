@@ -62,10 +62,7 @@
   height: 100%;
   place-items: center;
   border-radius: 50%;
-  background: radial-gradient(at 35% 20%, #663451, #321d37 70%);
-  box-shadow:
-    0 0 0 1px #43243c,
-    0 3px 10px #220e2955;
+  background: #43253f;
 }
 .ring {
   position: absolute;
@@ -82,6 +79,9 @@
   stroke-linecap: round;
   stroke-dasharray: 100;
 }
+.countdown:not([data-medication-dial]) .arc {
+  stroke: var(--color-rose-300);
+}
 .latch {
   width: 44%;
   height: 44%;
@@ -90,8 +90,6 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(closest-side, #fff7ed, #fda4af80 42%, transparent)
-    center / 0 0 no-repeat;
 }
 .burst::before,
 .burst::after {
@@ -119,16 +117,6 @@
   height: 7px;
   margin: -3.5px;
   background: #fde68a;
-  clip-path: polygon(
-    50% 0%,
-    65% 35%,
-    100% 50%,
-    65% 65%,
-    50% 100%,
-    35% 65%,
-    0 50%,
-    35% 35%
-  );
 }
 .burst i:nth-child(3n + 2) {
   height: 4px;
@@ -188,7 +176,7 @@
   .burst::after {
     animation: ripple 490ms cubic-bezier(0.13, 0.77, 0.21, 1) var(--gather) both;
   }
-  .burst {
+  .countdown[data-medication-dial] .burst {
     animation: flash 220ms ease-out var(--gather) both;
   }
   .burst::after {
@@ -281,9 +269,7 @@
 @keyframes beacon {
   50% {
     transform: scale(1.025);
-    box-shadow:
-      0 0 0 2px var(--dial-edge, #fecdd350),
-      0 0 12px var(--dial-glow, #fb718560);
+    box-shadow: var(--ready-shadow, none);
   }
 }
 @keyframes gather {
@@ -357,8 +343,7 @@
   --gap: 10px;
   --lift: 50px;
   --gather: 300ms;
-  --dial-glow: #d879f569;
-  --dial-edge: #dfb6ff88;
+  --ready-shadow: 0 0 0 2px #dfb6ff88, 0 0 12px #d879f569;
   color: #f6e7ff;
 }
 .countdown[data-medication-dial][data-side="below"] {
@@ -369,6 +354,9 @@
 }
 .countdown[data-medication-dial] .disc {
   background: radial-gradient(at 32% 18%, #723aa1, #372044 75%);
+  box-shadow:
+    0 0 0 1px #43243c,
+    0 3px 10px #220e2955;
 }
 .countdown[data-medication-dial] .track {
   stroke: #b38bd1;
@@ -383,12 +371,8 @@
   transform-origin: calc(0px - var(--caption-gap) - var(--disc-size) / 2) 50%;
 }
 .countdown[data-medication-dial] .burst {
-  background-image: radial-gradient(
-    closest-side,
-    #f5eaff,
-    #dd97f588 42%,
-    transparent
-  );
+  background: radial-gradient(closest-side, #f5eaff, #dd97f588 42%, transparent)
+    center / 0 0 no-repeat;
 }
 .countdown[data-medication-dial] .burst::before {
   border-color: #e9c4ff;
@@ -398,6 +382,16 @@
 }
 .countdown[data-medication-dial] .burst i:nth-child(3n + 1) {
   background: #f5c9ff;
+  clip-path: polygon(
+    50% 0%,
+    65% 35%,
+    100% 50%,
+    65% 65%,
+    50% 100%,
+    35% 65%,
+    0 50%,
+    35% 35%
+  );
 }
 @media (prefers-reduced-motion: no-preference) {
   .countdown[data-medication-dial]:is(

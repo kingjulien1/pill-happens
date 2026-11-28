@@ -20,6 +20,13 @@
   height: 1em;
   background: color-mix(in srgb, currentColor 48%, transparent);
 }
+.context[data-intake-section-context="timing"] .divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
 .label > svg {
   width: 14px;
   height: 14px;
@@ -35,6 +42,18 @@
   font-size: 11px;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .context[data-intake-section-context="timing"] .value strong {
+    display: inline-block;
+    animation: readout 220ms ease-out;
+  }
+  @keyframes readout {
+    from {
+      opacity: 0.55;
+      transform: translateY(0.2em);
+    }
+  }
 }
 @media (max-width: 359px) {
   .context,

@@ -4,9 +4,14 @@
   flex: none;
   align-self: stretch;
   align-items: start;
+  justify-items: center;
   min-inline-size: 0;
   margin-inline: calc(-1 * var(--dialog-scroll-gutter, 0px));
   margin-block-start: clamp(36px, 5.5vh, 56px);
+  padding-inline: max(
+    env(safe-area-inset-left, 0px),
+    env(safe-area-inset-right, 0px)
+  );
 }
 .withActions {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -34,13 +39,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 .close {
-  justify-self: start;
-  margin-inline-start: max(5px, env(safe-area-inset-left));
   color: color-mix(in srgb, var(--foreground) 86%, var(--color-rose-400));
 }
 .top {
-  justify-self: end;
-  margin-inline-end: max(5px, env(safe-area-inset-right));
   color: color-mix(in srgb, var(--foreground) 86%, var(--color-violet-400));
 }
 .control:disabled {

@@ -1,13 +1,36 @@
+.timingTicks {
+  display: block;
+  width: clamp(16px, 5vw, 28px);
+  height: 12px;
+  margin-inline: clamp(1px, 5vw - 15px, 10px);
+  color: var(--color-violet-300);
+}
+
+@property --intake-time-lock-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
 .timingBody {
+  --intake-time-lock-progress: 0;
+  --section-content-bg: color-mix(
+    in srgb,
+    var(--color-pink-700) calc(8% * var(--intake-time-lock-progress)),
+    transparent
+  );
   display: grid;
   gap: clamp(22px, 5vw, 28px);
   padding: 1rem;
+}
+.timingBody[data-pinned="true"] {
+  --intake-time-lock-progress: 1;
 }
 
 .fields {
   --control-height: 40px;
   --indicator-color: var(--primary);
   --indicator-opacity: 0.24;
+  container-type: inline-size;
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
@@ -22,7 +45,44 @@
   row-gap: 6px;
 }
 .fieldLabel {
-  column-gap: clamp(9px, calc(6px + 0.8vw), 14px);
+  column-gap: clamp(6px, 12.5cqi - 34px, 14px);
+}
+.labelStatus {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 0.25em;
+  color: var(--indicator-color);
+}
+.labelStatus .indicator {
+  width: 1.48em;
+  height: 1.48em;
+  stroke-width: 2.5;
+}
+.labelStatus > span {
+  font-size: 0.8em;
+  font-weight: 500;
+  line-height: 1.2;
+}
+/* Reserve the locked label's footprint through the change of state. */
+.fields[data-timing-pinned="false"] .labelStatus .indicator {
+  scale: calc(1.15 / 1.48);
+}
+.fields[data-timing-pinned="false"] .labelStatus > span {
+  visibility: hidden;
+  opacity: 0;
+  translate: 0 3px;
+}
+@container (max-width: 20rem) {
+  .fieldLabel {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: 2px;
+  }
+  .labelDot {
+    display: none;
+  }
 }
 .labelDot {
   flex: none;
@@ -33,26 +93,26 @@
   opacity: 0.4;
 }
 .indicator {
-  width: calc(6em / 7);
-  height: calc(6em / 7);
   flex: none;
   color: var(--indicator-color);
   opacity: var(--indicator-opacity);
   pointer-events: none;
 }
-.inputWrap {
-  position: relative;
-  min-width: 0;
-  font-size: var(--intake-input-font-size, 1rem);
+/* Reveal the rest of the same shackle when the time is pinned. */
+.indicator path {
+  stroke-dasharray: 32;
+  stroke-dashoffset: 16;
 }
-.inputWrap > .indicator {
-  position: absolute;
-  inset-inline-end: var(--intake-field-end-inset);
-  top: 50%;
-  translate: 0 -50%;
+.fields[data-timing-pinned="true"] .indicator path {
+  stroke-dashoffset: 0;
 }
-.field .inputWrap input.input {
-  padding-inline-end: calc(var(--intake-field-end-inset) + 6em / 7 + 4px);
+.field input.input {
+  --lock-tint: color-mix(
+    in srgb,
+    var(--color-rose-400) calc(12.75% * var(--intake-time-lock-progress)),
+    transparent
+  );
+  background-image: linear-gradient(var(--lock-tint), var(--lock-tint));
 }
 .field .input {
   display: flex;
@@ -75,15 +135,9 @@
 
 .fields[data-timing-pinned="true"] {
   --indicator-color: var(--color-rose-500);
-  --indicator-opacity: 0.83;
-  --lock-strength: 75%;
+  --indicator-opacity: 1;
+  --lock-strength: 37.5%;
   --lock-accent: var(--color-rose-400);
-  /* Full-strength locked fields originally carried a 34% rose wash. */
-  --lock-tint: color-mix(
-    in srgb,
-    var(--lock-accent) calc(0.34 * var(--lock-strength)),
-    transparent
-  );
   --lock-edge: color-mix(
     in srgb,
     var(--lock-accent) var(--lock-strength),
@@ -98,12 +152,11 @@
 .fields[data-timing-pinned="true"] .field input.input {
   --ring: var(--lock-focus);
   border-color: var(--lock-edge);
-  background-image: linear-gradient(var(--lock-tint), var(--lock-tint));
 }
 .fields[data-timing-pinned="true"] .field input.input:focus {
   border-color: var(--ring);
 }
-.fields[data-timing-phase="resetting"] input.input {
+.timingBody[data-timing-phase="resetting"] input.input {
   color: var(--foreground);
   -webkit-text-fill-color: currentColor;
   opacity: 1;
@@ -157,118 +210,76 @@
   line-height: 1.2;
 }
 
-.lockControl {
+.lockControl,
+.lockCaption {
   --enamel: color-mix(
     in srgb,
     var(--color-violet-900) 55%,
     var(--color-mauve-800)
   );
   --rim: var(--color-violet-400);
-  --glint: var(--color-violet-200);
-  --spark-tail: var(--color-fuchsia-200);
+  --lock-light: var(--color-violet-200);
   --icon-ink: var(--color-violet-50);
 }
 .lockControl[aria-pressed="true"],
-.lockGuide[data-pinned="true"] .lockControl {
+.lockCaption[data-pinned="true"] {
   --enamel: color-mix(
     in srgb,
     var(--color-rose-900) 82%,
     var(--color-mauve-900)
   );
   --rim: var(--color-rose-400);
-  --glint: var(--color-rose-200);
-  --spark-tail: var(--color-amber-200);
+  --lock-light: var(--color-rose-200);
   --icon-ink: var(--color-rose-50);
-  --spark-reach: 1.46;
-  --spark-period: 5.6s;
+}
+.lockCaption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--enamel);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.lockCaption > span {
+  padding: 2px 6px;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(
+    in srgb,
+    var(--lock-light) 85%,
+    var(--muted-foreground)
+  );
+}
+.lockCaption::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-rose-500);
 }
 .lockControl[data-slot="button"] {
   box-sizing: border-box;
   overflow: visible;
   border: 3px solid var(--rim);
-  border-block-start-color: color-mix(in srgb, var(--glint) 65%, var(--rim));
-  border-block-end-color: color-mix(in srgb, var(--rim) 65%, var(--enamel));
+  border-radius: var(--dialog-radius-compact, 8px);
   background: var(--enamel);
   color: var(--icon-ink);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--glint) 28%, transparent),
-    0 2px 4px color-mix(in srgb, var(--enamel) 38%, transparent);
+  box-shadow: none;
 }
 .lockControl:focus-visible {
-  outline: 2px solid var(--glint);
+  outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
 .lockControl
   :is(:global(.lucide-lock-keyhole), :global(.lucide-lock-keyhole-open)) {
   scale: 1.2;
 }
-.lockControl[aria-pressed="true"] [data-glyph="fixed"] rect,
-.lockGuide[data-pinned="true"] .lockControl :global(.lucide-lock-keyhole) rect {
-  fill: color-mix(in srgb, var(--glint) 25%, transparent);
-}
-.relockIcon {
-  position: relative;
-  display: grid;
-}
-.relockIcon > :last-child {
-  position: absolute;
-  inset-inline-end: -4px;
-  bottom: -2px;
-  transform-origin: right bottom;
-  color: var(--spark-tail);
-  background: var(--enamel);
-  border-radius: 3px;
-}
-.sparks {
-  display: none;
-  position: absolute;
-  inset: -3px;
-  width: calc(100% + 6px);
-  height: calc(100% + 6px);
-  overflow: visible;
-  pointer-events: none;
-  color: var(--glint);
-}
 .resetButton {
+  width: var(--time-lock-size);
+  height: var(--time-lock-size);
   touch-action: manipulation;
   -webkit-touch-callout: none;
   scroll-margin-block: 3.25rem 1rem;
-}
-.resetButton[data-guided],
-.gestureHint {
-  --cue-color: color-mix(in srgb, var(--color-rose-400) 55%, var(--ring));
-}
-.resetButton[data-guided] {
-  outline: 2px solid var(--cue-color);
-  outline-offset: 3px;
-}
-.gestureHint {
-  position: absolute;
-  z-index: 2;
-  inset-inline-end: 0;
-  bottom: calc(100% + 10px);
-  padding: 4px 9px;
-  border: 1px solid var(--cue-color);
-  border-radius: 8px;
-  background: var(--popover);
-  color: var(--popover-foreground);
-  font-size: 0.73rem;
-  font-weight: 600;
-  line-height: 1.4;
-  white-space: nowrap;
-  pointer-events: none;
-}
-.gestureHint::after {
-  content: "";
-  position: absolute;
-  inset-inline-end: calc(var(--section-action-size) / 2 - 3px);
-  bottom: -4px;
-  width: 6px;
-  height: 6px;
-  border: solid var(--cue-color);
-  border-width: 0 1px 1px 0;
-  background: inherit;
-  transform: rotate(45deg);
 }
 .face {
   display: grid;
@@ -287,28 +298,62 @@
 }
 .lockGuide {
   --guide-accent: var(--color-violet-400);
+  --guide-idle: color-mix(in srgb, var(--popover) 92%, var(--color-violet-400));
+  --guide-pinned: color-mix(in srgb, var(--color-pink-800) 14%, transparent);
+  --guide-wash: color-mix(
+    in srgb,
+    var(--color-pink-500) calc(6% * var(--intake-time-lock-progress)),
+    transparent
+  );
   container-type: inline-size;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px 10px;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 8px;
   padding: 12px clamp(10px, 3vw, 15px);
   border: 1px solid color-mix(in srgb, var(--guide-accent) 29%, var(--border));
   border-radius: var(--dialog-radius-control, 12px);
-  background: color-mix(in srgb, var(--popover) 92%, var(--guide-accent));
+  background: linear-gradient(var(--guide-wash), var(--guide-wash))
+    color-mix(
+      in srgb,
+      var(--guide-pinned) calc(100% * var(--intake-time-lock-progress)),
+      var(--guide-idle)
+    );
   color: var(--foreground);
 }
 .lockGuide[data-pinned="true"] {
-  --guide-accent: var(--color-rose-400);
-}
-.guideHeading,
-.guideActions {
-  display: flex;
-  align-items: center;
+  --guide-accent: var(--color-pink-400);
 }
 .guideHeading {
+  display: flex;
+  align-items: center;
   gap: clamp(8px, 2vw, 12px);
   min-width: 0;
+}
+.guideIcon {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 3.5rem;
+}
+.guideIcon > :first-child {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.guideLock {
+  position: absolute;
+  top: 0;
+  right: 0;
+  translate: 50% -50%;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-rose-500);
+  pointer-events: none;
+}
+@container (max-width: 16.5rem) {
+  .guideIcon {
+    width: 4.75rem;
+  }
 }
 .guideHeading h4 {
   margin: 0;
@@ -326,30 +371,32 @@
   text-wrap: pretty;
 }
 .guideHelp {
-  grid-column: 1 / -1;
   margin: 0;
   color: var(--muted-foreground);
   font-size: 0.8rem;
   line-height: 1.5;
 }
-.guideActions {
-  gap: 4px;
-}
 .guideStatus {
-  grid-column: 1 / -1;
   justify-self: start;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
   margin-block-start: 2px;
   padding: 3px 8px;
   border: 1px solid color-mix(in srgb, var(--guide-accent) 36%, transparent);
-  border-radius: 999px;
+  border-radius: var(--dialog-radius-compact);
   background: color-mix(in srgb, var(--guide-accent) 10%, var(--popover));
   color: color-mix(in srgb, var(--guide-accent) 38%, var(--foreground));
   font-size: 0.76rem;
   font-weight: 600;
   line-height: 1.25;
+}
+.statusContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.changingCopy {
+  display: block;
 }
 .guideStatus[data-unlocked] {
   color: var(--color-fuchsia-800, #86198f);
@@ -366,18 +413,6 @@
     );
   }
 }
-@container (max-width: 17rem) {
-  .guideActions {
-    flex-direction: column;
-  }
-}
-@media (pointer: coarse) {
-  .guideActions button {
-    min-inline-size: 44px;
-    min-block-size: 44px;
-  }
-}
-
 .resetButton:disabled {
   cursor: wait;
 }
@@ -387,91 +422,62 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .lockControl[data-playing="true"],
-  .guideActions[data-playing="true"] {
-    --spark-play: running;
+  .timingBody {
+    transition: --intake-time-lock-progress 360ms
+      cubic-bezier(0.22, 0.68, 0.25, 1);
   }
-  .lockControl:disabled,
-  .lockControl[aria-disabled="true"],
-  .lockControl:is([data-feedback="charging"], [data-feedback="ready"]) {
-    --spark-play: paused;
+  .indicator path {
+    transition: stroke-dashoffset 320ms cubic-bezier(0.28, 0.84, 0.29, 1.13)
+      var(--latch-delay, 0ms);
   }
-  .sparks {
-    display: block;
+  .field[data-timing-field="time"] {
+    --latch-delay: 55ms;
   }
-  .sparks > g {
-    transform-box: view-box;
-    transform-origin: center;
-    animation: cast-sparks var(--spark-period, 7.8s) var(--spark-delay, 0s)
-      infinite both;
-    animation-play-state: var(--spark-play, paused);
+  .guideLock {
+    animation: seat-lock 340ms ease-out;
   }
-  .sparks > g + g {
-    color: var(--spark-tail);
-    animation-delay: calc(var(--spark-delay, 0s) + 120ms);
+  @keyframes seat-lock {
+    28% {
+      transform: translateY(1px) rotate(-7deg) scale(0.94);
+    }
+    62% {
+      transform: rotate(3deg) scale(1.03);
+    }
   }
-  .guideActions {
-    --spark-delay: 280ms;
+  .labelStatus,
+  .labelStatus .indicator,
+  .guideStatus,
+  .lockGuide {
+    transition:
+      color 240ms,
+      opacity 240ms,
+      border-color 260ms,
+      background-color 280ms;
   }
-  .guideActions .lockControl + .lockControl {
-    --spark-delay: 2.1s;
+  .changingCopy,
+  .statusContent {
+    animation: settle-copy 290ms cubic-bezier(0.18, 0.8, 0.28, 1.15) both;
   }
-  .lockGuide[data-pinned="true"]
-    .lockControl
-    > :global(.lucide-lock-keyhole)
-    path {
-    animation: latch-shackle 420ms cubic-bezier(0.22, 0.76, 0.3, 1.16) both;
+  .guideHelp {
+    animation-delay: 45ms;
   }
-  @keyframes latch-shackle {
+  .labelStatus > span {
+    transition:
+      opacity 190ms ease-out,
+      translate 280ms cubic-bezier(0.18, 0.8, 0.28, 1.2);
+  }
+  .timingBody[data-timing-phase="resetting"] .labelStatus > span {
+    opacity: 0;
+    translate: 0 -3px;
+  }
+  @keyframes settle-copy {
     from {
-      transform: translateY(-2.5px);
-    }
-    55% {
-      transform: translateY(1.1px);
-    }
-    78% {
-      transform: translateY(-0.4px);
+      opacity: 0.45;
+      transform: translateY(3px);
     }
     to {
+      opacity: 1;
       transform: none;
-    }
-  }
-  @keyframes cast-sparks {
-    0% {
-      opacity: 0;
-      transform: rotate(-7deg) scale(0.87);
-    }
-    4% {
-      opacity: 0.98;
-      transform: rotate(-2deg) scale(1.08);
-      animation-timing-function: ease-out;
-    }
-    11% {
-      opacity: 0.84;
-    }
-    18%,
-    100% {
-      opacity: 0;
-      transform: rotate(7deg) scale(var(--spark-reach, 1.32));
-    }
-  }
-  .resetButton[data-guided]::after {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border: 2px solid var(--cue-color);
-    border-radius: inherit;
-    pointer-events: none;
-    animation: point-out 680ms ease-out 2 both;
-  }
-  @keyframes point-out {
-    from {
-      opacity: 0.72;
-      transform: scale(0.96);
-    }
-    to {
-      opacity: 0;
-      transform: scale(1.38);
     }
   }
   /* The outgoing glyph clears the centre while the next springs into its place. */

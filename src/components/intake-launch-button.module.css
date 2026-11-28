@@ -1,15 +1,16 @@
 .button {
   --launch-radius: var(--intake-card-radius, 21px);
-  --launch-face: linear-gradient(108deg, #ffe3cb, #f5dced 46%, #decff5);
-  --launch-ink: #302035;
-  --launch-secondary: #62445e;
-  --launch-mark: #7a3954;
-  --launch-arrow-face: #492d51;
-  --launch-arrow-ink: #fff0dd;
+  --launch-violet: var(--color-violet-300, #c4b5fd);
+  --launch-ink: #100817;
+  --launch-secondary: #0d0711;
+  --launch-mark: #30203e;
+  --launch-arrow: #301b39;
+  --launch-focus: #fff0dd;
   --launch-icon-scale: 1.225;
-  --launch-wash: #954977;
+  --launch-wash: var(--launch-violet);
   --launch-motion: paused;
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -19,7 +20,7 @@
   padding: 14px clamp(17px, 4vw, 24px);
   border: 0;
   border-radius: var(--launch-radius);
-  background: var(--launch-face);
+  background: transparent;
   box-shadow: 0 6px 14px -6px #24102780;
   color: var(--launch-ink);
   font-family: inherit;
@@ -27,6 +28,70 @@
   cursor: pointer;
   touch-action: manipulation;
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--launch-violet) 40%, white),
+    color-mix(in srgb, var(--launch-violet) 68%, white) 58%,
+    var(--launch-violet) 81%,
+    color-mix(in srgb, var(--launch-violet) 85%, var(--app-canvas-iris))
+  );
+  opacity: 0.5;
+}
+
+.rim {
+  --intake-rim-base: var(--app-canvas-violet);
+  --intake-rim-stop-1: color-mix(in srgb, var(--app-canvas-orchid) 70%, white);
+  --intake-rim-stop-2: color-mix(in srgb, var(--app-canvas-rose) 70%, white);
+  --intake-rim-stop-3: color-mix(in srgb, var(--app-canvas-iris) 76%, white);
+  --intake-rim-stop-4: color-mix(in srgb, var(--app-canvas-lagoon) 66%, white);
+  --intake-rim-stop-5: color-mix(in srgb, var(--app-canvas-violet) 62%, white);
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  --rim-width: 3.5px;
+  padding: var(--rim-width);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.rim > canvas,
+.fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* This SVG only paints strokes, including on browsers without GPU compositing. */
+.fallback rect {
+  --half-stroke: calc(var(--rim-width) / 2);
+  x: var(--half-stroke);
+  y: var(--half-stroke);
+  width: calc(100% - var(--rim-width));
+  height: calc(100% - var(--rim-width));
+  rx: calc(var(--launch-radius) - var(--half-stroke));
+  fill: none;
+  stroke-width: var(--rim-width);
+}
+
+.reflections {
+  stroke: color-mix(in srgb, var(--intake-rim-stop-5) 38%, white);
+  stroke-dasharray: 8 43 3 46;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.rim > canvas[data-rendered="true"] + .fallback {
+  display: none;
 }
 
 .button[data-active="true"] {
@@ -41,9 +106,9 @@
 }
 
 .button:focus-visible {
-  outline: 3px solid var(--launch-arrow-ink);
+  outline: 3px solid var(--launch-focus);
   outline-offset: 3px;
-  box-shadow: 0 0 0 7px var(--launch-arrow-face);
+  box-shadow: 0 0 0 7px var(--launch-arrow);
 }
 
 .button:active {
@@ -107,9 +172,7 @@
   width: calc(35px * var(--launch-icon-scale));
   aspect-ratio: 1;
   place-items: center;
-  border-radius: 50%;
-  background-color: var(--launch-arrow-face);
-  color: var(--launch-arrow-ink);
+  color: var(--launch-arrow);
 }
 
 .arrow svg {
@@ -119,17 +182,23 @@
 
 @media (prefers-color-scheme: light) {
   .button {
-    --launch-face: linear-gradient(108deg, #502e44, #402944 48%, #33263f);
-    --launch-ink: #fff3e9;
-    --launch-secondary: #e1c8dd;
-    --launch-mark: #ffccaa;
-    --launch-arrow-face: #efdaef;
-    --launch-arrow-ink: #432b48;
-    --launch-wash: #ffcdab;
+    --launch-focus: #432b48;
+    --launch-arrow: #492d51;
+  }
+  .rim {
+    --intake-rim-base: color-mix(
+      in srgb,
+      var(--app-canvas-violet) 65%,
+      #402656
+    );
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .reflections {
+    animation: reflect-rim 5.46s linear infinite;
+    animation-play-state: var(--launch-motion);
+  }
   .copy {
     animation: label-drift 7s ease-in-out infinite;
   }
@@ -139,6 +208,12 @@
   .copy,
   .copy::before {
     animation-play-state: var(--launch-motion);
+  }
+}
+
+@keyframes reflect-rim {
+  to {
+    stroke-dashoffset: -100;
   }
 }
 
@@ -181,13 +256,14 @@
 }
 
 @media (forced-colors: active) {
-  .button,
-  .arrow {
+  .button {
     border: 1px solid ButtonText;
   }
   .arrow {
-    border-width: calc(1px * var(--launch-icon-scale));
+    color: ButtonText;
   }
+  .rim,
+  .button::before,
   .copy::before {
     display: none;
   }

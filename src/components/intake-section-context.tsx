@@ -80,11 +80,12 @@ export function IntakeSectionContext({
     }
   } else if (hasMedication && previous && takenAt) {
     label = "Since prior log";
-    value = <strong>{formatIntakeGap(previous.takenAt, takenAt)}</strong>;
+    const elapsed = formatIntakeGap(previous.takenAt, takenAt);
+    value = <strong key={elapsed}>{elapsed}</strong>;
   } else {
     label = "Tracking day";
     value = trackingDay ? (
-      <strong>
+      <strong key={trackingDay}>
         {formatDay(trackingDay, { weekday: "short", month: "short" })}
       </strong>
     ) : (

@@ -4,6 +4,7 @@ import styles from "./check-in-section.module.css";
 type CheckInSectionHeaderProps = {
   caption: ReactNode;
   context?: ReactNode;
+  contextSeparator?: ReactNode;
   detail?: ReactNode;
   action?: ReactNode;
   headingId?: string;
@@ -13,6 +14,7 @@ type CheckInSectionHeaderProps = {
 export function CheckInSectionHeader({
   caption,
   context,
+  contextSeparator = "/",
   detail,
   action,
   headingId,
@@ -31,7 +33,7 @@ export function CheckInSectionHeader({
           )}
           {context && (
             <span className={styles.contextGroup}>
-              <span aria-hidden="true">/</span>
+              <span aria-hidden="true">{contextSeparator}</span>
               <span className={styles.context}>{context}</span>
             </span>
           )}

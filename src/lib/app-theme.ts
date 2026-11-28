@@ -153,13 +153,18 @@ export const APP_CANVAS_ACCENT = Object.freeze({
 const canvasAccentCss = (mode: AppThemeMode) => {
   const [orchid, iris, rose, lagoon, violet] = APP_CANVAS_ACCENT[mode];
   return `
+  --app-canvas-orchid: ${orchid};
+  --app-canvas-iris: ${iris};
+  --app-canvas-rose: ${rose};
+  --app-canvas-lagoon: ${lagoon};
+  --app-canvas-violet: ${violet};
   --app-canvas-accent:
-    radial-gradient(ellipse 67% 49% at 6% 9%, ${orchid} 0%, ${orchid} 12%, transparent 78%),
-    radial-gradient(ellipse 61% 57% at 94% 8%, ${rose} 0%, transparent 77%),
-    radial-gradient(ellipse 59% 68% at 96% 38%, ${iris} 0%, transparent 76%),
-    radial-gradient(ellipse 81% 58% at 8% 94%, ${rose} 0%, transparent 77%),
-    radial-gradient(ellipse 42% 54% at 88% 86%, ${lagoon} 0%, transparent 74%),
-    radial-gradient(ellipse 59% 73% at 41% 39%, ${violet} 0%, transparent 82%);
+    radial-gradient(ellipse 67% 49% at 6% 9%, var(--app-canvas-orchid) 0%, var(--app-canvas-orchid) 12%, transparent 78%),
+    radial-gradient(ellipse 61% 57% at 94% 8%, var(--app-canvas-rose) 0%, transparent 77%),
+    radial-gradient(ellipse 59% 68% at 96% 38%, var(--app-canvas-iris) 0%, transparent 76%),
+    radial-gradient(ellipse 81% 58% at 8% 94%, var(--app-canvas-rose) 0%, transparent 77%),
+    radial-gradient(ellipse 42% 54% at 88% 86%, var(--app-canvas-lagoon) 0%, transparent 74%),
+    radial-gradient(ellipse 59% 73% at 41% 39%, var(--app-canvas-violet) 0%, transparent 82%);
   --app-canvas-accent-opacity: ${APP_CANVAS_ACCENT.opacity};
 `;
 };

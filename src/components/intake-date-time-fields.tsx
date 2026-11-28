@@ -76,39 +76,9 @@ const lockStatus = {
   refreshing: "Refreshing…",
 } as const;
 
-const spark = "M0 -3 Q.5 -.6 2.5 0 Q.5 .5 0 3 Q-.5 .5 -2.5 0 Q-.5 -.6 0 -3Z";
-
-function TimeLockSparks() {
-  return (
-    <svg
-      className={`${styles.sparks} size-full`}
-      viewBox="-24 -24 48 48"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <g fill="currentColor">
-        <path d={spark} transform="translate(-14 -21)" />
-        <path d={spark} transform="translate(22 -6) scale(.8)" />
-        <path d={spark} transform="translate(11 21) scale(.85)" />
-        <path d={spark} transform="translate(-22 9) scale(.65)" />
-      </g>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      >
-        <path d="m10 -21 1 -3 M21 13l2.5 1.5 M-9 21l-1 2.5 M-21 -12l-2.5 -1" />
-        <path d="M-2 -23v-.7 M23 1l.7 .1 M3 23l-.1 .7 M-23 0l-.7 -.15" />
-      </g>
-    </svg>
-  );
-}
-
 function TimingField({
   id,
   type,
-  pinned,
   ...inputProps
 }: Omit<
   ComponentProps<typeof Input>,
@@ -116,39 +86,32 @@ function TimingField({
 > & {
   id: string;
   type: "date" | "time";
-  pinned: boolean;
 }) {
-  const Icon = pinned ? LockKeyhole : LockKeyholeOpen;
-  const indicator = (
-    <Icon
-      className={styles.indicator}
-      strokeWidth={1.75}
-      aria-hidden="true"
-      focusable="false"
-    />
-  );
   return (
     <div className={styles.field} data-timing-field={type}>
       <Label htmlFor={id} className={styles.fieldLabel}>
-        {type === "date" ? "Date Taken" : "Time Taken"}
+        <span id={`${id}-label`}>
+          {type === "date" ? "Date Taken" : "Time Taken"}
+        </span>
         <span aria-hidden="true" className={styles.labelDot} />
-        {indicator}
+        <span aria-hidden="true" className={styles.labelStatus}>
+          <LockKeyhole className={styles.indicator} />
+          <span>Locked</span>
+        </span>
       </Label>
-      <div className={styles.inputWrap}>
-        <Input
-          {...inputProps}
-          id={id}
-          type={type}
-          className={`${styles.input} focus:border-ring focus:ring-3 focus:ring-ring/50 dark:enabled:hover:bg-input/50`}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              event.currentTarget.blur();
-            }
-          }}
-        />
-        {indicator}
-      </div>
+      <Input
+        {...inputProps}
+        id={id}
+        aria-labelledby={`${id}-label`}
+        type={type}
+        className={`${styles.input} focus:border-ring focus:ring-3 focus:ring-ring/50 dark:enabled:hover:bg-input/50`}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            event.currentTarget.blur();
+          }
+        }}
+      />
     </div>
   );
 }
@@ -174,9 +137,7 @@ export function IntakeTimingSection({
   const localNow = toLocalInput(new Date(), timezone);
   const [phase, setPhase] = useState<Phase>("idle");
   const [motionKey, setMotionKey] = useState(0);
-  const [guideGesture, setGuideGesture] = useState<"tap" | "hold" | null>(null);
   const button = useRef<HTMLButtonElement>(null);
-  const guideActions = useRef<HTMLDivElement>(null);
   const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const edited = useRef(false);
   const resetting = useRef(false);
@@ -280,29 +241,21 @@ export function IntakeTimingSection({
 
   useEffect(() => {
     const control = button.current;
-    const actions = guideActions.current;
-    if (!control || !actions) return;
-    const visible = new Set<Element>();
+    if (!control) return;
+    let visible = false;
     const sync = () => {
-      for (const node of [control, actions]) {
-        node.dataset.playing = String(visible.has(node) && !document.hidden);
-      }
+      control.dataset.playing = String(visible && !document.hidden);
     };
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) visible.add(entry.target);
-        else visible.delete(entry.target);
-      }
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
       sync();
     });
     observer.observe(control);
-    observer.observe(actions);
     document.addEventListener("visibilitychange", sync);
     return () => {
       observer.disconnect();
       document.removeEventListener("visibilitychange", sync);
       delete control.dataset.playing;
-      delete actions.dataset.playing;
     };
   }, []);
 
@@ -315,31 +268,42 @@ export function IntakeTimingSection({
             ? "fixed"
             : "idle"
       ];
-  const toggleGuideLabel = pinned ? "Show unlock gesture" : "Show lock gesture";
+  const actionCaption =
+    hold.stage || locked ? status : pinned ? "Tap to unlock" : "Hold to lock";
   const StatusIcon = hold.stage ? Hourglass : pinned ? Anchor : Wind;
-  const actionsDisabled = locked || hold.stage !== null || phase === "settling";
-  const showGesture = (gesture: "tap" | "hold") => {
-    const control = button.current;
-    if (!control || actionsDisabled) return;
-    setGuideGesture(gesture);
-    control.focus({ preventScroll: true });
-    control.scrollIntoView({
-      block: "nearest",
-      behavior: reducedMotion() ? "instant" : "smooth",
-    });
-  };
 
   return (
     <CheckInSection
       caption="Timing"
       headingId={headingId}
       context={context}
+      detail={
+        <span className={styles.lockCaption} data-pinned={pinned}>
+          <span key={actionCaption} className={styles.changingCopy}>
+            {actionCaption}
+          </span>
+        </span>
+      }
+      contextSeparator={
+        <svg
+          className={styles.timingTicks}
+          viewBox="0 0 26 12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        >
+          <path d="M2 5v2m5-4v6m12-6v6m5-4v2" opacity=".55" />
+          <path d="M13 1v10" />
+        </svg>
+      }
       description={
         <>
-          {pinned
-            ? "Your saved time carries over until you unlock it."
-            : "Choose the date and time you took this dose."}
-          <br />
+          <span key={String(pinned)} className={styles.changingCopy}>
+            {pinned
+              ? "Your saved time carries over until you unlock it."
+              : "Choose the date and time you took this dose."}
+          </span>
           Before 06:00, doses count toward the previous day.
         </>
       }
@@ -347,7 +311,6 @@ export function IntakeTimingSection({
         <>
           <Button
             ref={button}
-            id={`${id}-lock`}
             type="button"
             variant="outline"
             size="icon"
@@ -359,28 +322,10 @@ export function IntakeTimingSection({
                 : "Tap for now · Hold to lock the time"
             }
             {...hold.handlers}
-            onBlur={() => {
-              setGuideGesture(null);
-              hold.handlers.onBlur();
-            }}
-            onKeyDown={(event) => {
-              if (guideGesture && event.key === "Escape") {
-                event.preventDefault();
-                event.stopPropagation();
-                setGuideGesture(null);
-                return;
-              }
-              if (event.key === " " || event.key === "Enter")
-                setGuideGesture(null);
-              hold.handlers.onKeyDown(event);
-            }}
-            onPointerDownCapture={() => setGuideGesture(null)}
-            onClickCapture={() => setGuideGesture(null)}
             disabled={locked}
             aria-pressed={pinned}
-            aria-describedby={`${guideGesture ? `${id}-gesture ` : ""}${id}-timing-status ${id}-timing-help`}
-            data-guided={guideGesture || undefined}
-            data-dialog-corner="control"
+            aria-describedby={`${id}-timing-status ${id}-timing-help`}
+            data-dialog-corner="compact"
             data-intake-time-reset
             data-state={state}
             data-feedback={hold.feedback ?? undefined}
@@ -402,25 +347,11 @@ export function IntakeTimingSection({
                   data-glyph={phaseName}
                   data-current={phaseName === state || undefined}
                 >
-                  <Icon strokeWidth={2.15} />
+                  <Icon className="size-[1.5625rem]" strokeWidth={2.15} />
                 </span>
               ))}
             </span>
-            <TimeLockSparks key={String(pinned)} />
           </Button>
-          {guideGesture && (
-            <span
-              className={styles.gestureHint}
-              id={`${id}-gesture`}
-              role="tooltip"
-            >
-              {guideGesture === "tap"
-                ? "Tap to unlock"
-                : pinned
-                  ? "Hold to relock"
-                  : "Hold to lock"}
-            </span>
-          )}
           {hold.feedback && (
             <HoldCountdown
               phase={hold.feedback}
@@ -431,12 +362,15 @@ export function IntakeTimingSection({
         </>
       }
     >
-      <div className={styles.timingBody}>
+      <div
+        className={styles.timingBody}
+        data-pinned={pinned}
+        data-timing-phase={state}
+      >
         <div
           className={styles.fields}
           data-intake-date-time-fields
           data-timing-pinned={pinned}
-          data-timing-phase={state}
         >
           <TimingField
             id={`${id}-date`}
@@ -453,7 +387,6 @@ export function IntakeTimingSection({
             onBlur={commitInput}
             disabled={locked}
             required
-            pinned={pinned}
             aria-describedby={`${id}-timing-status`}
             data-intake-date
           />
@@ -474,7 +407,6 @@ export function IntakeTimingSection({
             onBlur={commitInput}
             disabled={locked}
             required
-            pinned={pinned}
             aria-describedby={`${id}-timing-status`}
             data-intake-clock
           />
@@ -485,56 +417,31 @@ export function IntakeTimingSection({
           aria-labelledby={`${id}-guide-title`}
         >
           <div className={styles.guideHeading}>
-            <Timer aria-hidden="true" className="size-[1.2rem] shrink-0" />
+            <span className={styles.guideIcon} aria-hidden="true">
+              <Timer strokeWidth={1.8} />
+              {pinned && (
+                <LockKeyhole className={styles.guideLock} strokeWidth={2.5} />
+              )}
+            </span>
             <div>
               <h4 id={`${id}-guide-title`}>
                 How <span className="whitespace-nowrap">Time Lock</span> works
               </h4>
-              <p className={styles.guideSubtitle}>
+              <p
+                key={String(pinned)}
+                className={`${styles.guideSubtitle} ${styles.changingCopy}`}
+              >
                 {pinned
                   ? "Pinned for your next log."
                   : "Reuse a date and time."}
               </p>
             </div>
           </div>
-          <div className={styles.guideActions} ref={guideActions}>
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              className={styles.lockControl}
-              aria-label={toggleGuideLabel}
-              title={toggleGuideLabel}
-              disabled={actionsDisabled}
-              focusableWhenDisabled={!disabled}
-              aria-controls={`${id}-lock`}
-              onClick={() => showGesture(pinned ? "tap" : "hold")}
-            >
-              <LockKeyhole aria-hidden="true" className="size-4" />
-              <TimeLockSparks key={String(pinned)} />
-            </Button>
-            {pinned && (
-              <Button
-                type="button"
-                size="icon"
-                variant="outline"
-                className={styles.lockControl}
-                aria-label="Show relock gesture"
-                title="Show relock gesture"
-                disabled={actionsDisabled}
-                focusableWhenDisabled={!disabled}
-                aria-controls={`${id}-lock`}
-                onClick={() => showGesture("hold")}
-              >
-                <span className={styles.relockIcon} aria-hidden="true">
-                  <TimerReset className="size-[18px]" />
-                  <LockKeyhole className="size-3" strokeWidth={2.5} />
-                </span>
-                <TimeLockSparks />
-              </Button>
-            )}
-          </div>
-          <p className={styles.guideHelp} id={`${id}-timing-help`}>
+          <p
+            key={String(pinned)}
+            className={`${styles.guideHelp} ${styles.changingCopy}`}
+            id={`${id}-timing-help`}
+          >
             {pinned
               ? "Tap Time Lock to use the current time again. To pin a fresh timestamp, hold until the ring fills and release. You can still edit either field."
               : `Hold Time Lock for ${TIME_LOCK_PRESS.duration / 1000} seconds, then release when the ring fills. Changing the date or time by hand also locks both values.`}
@@ -546,8 +453,10 @@ export function IntakeTimingSection({
             aria-atomic="true"
             id={`${id}-timing-status`}
           >
-            <StatusIcon aria-hidden="true" size="1.15em" />
-            {status}
+            <span key={status} className={styles.statusContent}>
+              <StatusIcon aria-hidden="true" size="1.15em" />
+              {status}
+            </span>
           </span>
         </aside>
       </div>

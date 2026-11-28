@@ -2,18 +2,43 @@
 :root {
   color-scheme: light;
 
+  --app-canvas-orchid: #f0abfc;
+  --app-canvas-iris: #a5b4fc;
+  --app-canvas-rose: #fda4af;
+  --app-canvas-lagoon: #99f6e4;
+  --app-canvas-violet: #c4b5fd;
   --app-canvas-accent:
     radial-gradient(
       ellipse 67% 49% at 6% 9%,
-      #f0abfc 0%,
-      #f0abfc 12%,
+      var(--app-canvas-orchid) 0%,
+      var(--app-canvas-orchid) 12%,
       transparent 78%
     ),
-    radial-gradient(ellipse 61% 57% at 94% 8%, #fda4af 0%, transparent 77%),
-    radial-gradient(ellipse 59% 68% at 96% 38%, #a5b4fc 0%, transparent 76%),
-    radial-gradient(ellipse 81% 58% at 8% 94%, #fda4af 0%, transparent 77%),
-    radial-gradient(ellipse 42% 54% at 88% 86%, #99f6e4 0%, transparent 74%),
-    radial-gradient(ellipse 59% 73% at 41% 39%, #c4b5fd 0%, transparent 82%);
+    radial-gradient(
+      ellipse 61% 57% at 94% 8%,
+      var(--app-canvas-rose) 0%,
+      transparent 77%
+    ),
+    radial-gradient(
+      ellipse 59% 68% at 96% 38%,
+      var(--app-canvas-iris) 0%,
+      transparent 76%
+    ),
+    radial-gradient(
+      ellipse 81% 58% at 8% 94%,
+      var(--app-canvas-rose) 0%,
+      transparent 77%
+    ),
+    radial-gradient(
+      ellipse 42% 54% at 88% 86%,
+      var(--app-canvas-lagoon) 0%,
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 59% 73% at 41% 39%,
+      var(--app-canvas-violet) 0%,
+      transparent 82%
+    );
   --app-canvas-accent-opacity: 0.39;
 
   --app-canvas-base: #f1e5f4;
@@ -128,18 +153,43 @@
   :root {
     color-scheme: dark;
 
+    --app-canvas-orchid: #a21caf;
+    --app-canvas-iris: #4338ca;
+    --app-canvas-rose: #be123c;
+    --app-canvas-lagoon: #0f766e;
+    --app-canvas-violet: #7c3aed;
     --app-canvas-accent:
       radial-gradient(
         ellipse 67% 49% at 6% 9%,
-        #a21caf 0%,
-        #a21caf 12%,
+        var(--app-canvas-orchid) 0%,
+        var(--app-canvas-orchid) 12%,
         transparent 78%
       ),
-      radial-gradient(ellipse 61% 57% at 94% 8%, #be123c 0%, transparent 77%),
-      radial-gradient(ellipse 59% 68% at 96% 38%, #4338ca 0%, transparent 76%),
-      radial-gradient(ellipse 81% 58% at 8% 94%, #be123c 0%, transparent 77%),
-      radial-gradient(ellipse 42% 54% at 88% 86%, #0f766e 0%, transparent 74%),
-      radial-gradient(ellipse 59% 73% at 41% 39%, #7c3aed 0%, transparent 82%);
+      radial-gradient(
+        ellipse 61% 57% at 94% 8%,
+        var(--app-canvas-rose) 0%,
+        transparent 77%
+      ),
+      radial-gradient(
+        ellipse 59% 68% at 96% 38%,
+        var(--app-canvas-iris) 0%,
+        transparent 76%
+      ),
+      radial-gradient(
+        ellipse 81% 58% at 8% 94%,
+        var(--app-canvas-rose) 0%,
+        transparent 77%
+      ),
+      radial-gradient(
+        ellipse 42% 54% at 88% 86%,
+        var(--app-canvas-lagoon) 0%,
+        transparent 74%
+      ),
+      radial-gradient(
+        ellipse 59% 73% at 41% 39%,
+        var(--app-canvas-violet) 0%,
+        transparent 82%
+      );
     --app-canvas-accent-opacity: 0.39;
 
     --app-canvas-base: #29213b;

@@ -285,6 +285,49 @@
   height: 2.5em;
   margin-block-end: 8px;
 }
+@media (prefers-reduced-motion: no-preference) {
+  .savePreviewHint .receiptStamp {
+    overflow: visible;
+  }
+  /* The handle and base move together. The last path is the ink impression. */
+  .savePreviewHint .receiptStamp path:not(:last-of-type) {
+    transform-origin: 12px 18px;
+    animation: receiptStampPress 3.2s ease-in-out infinite;
+  }
+  .savePreviewHint .receiptStamp path:last-of-type {
+    transform-origin: 12px 22px;
+    animation: receiptStampInk 3.2s ease-in-out infinite;
+  }
+}
+@keyframes receiptStampPress {
+  0%,
+  100% {
+    transform: none;
+  }
+  42% {
+    transform: translateY(-2.5px) rotate(-7deg);
+    animation-timing-function: cubic-bezier(0.48, 0, 0.84, 0.36);
+  }
+  56% {
+    transform: translateY(3px) scale(1.045, 0.94);
+    animation-timing-function: ease-out;
+  }
+  68% {
+    transform: translateY(-0.75px) rotate(2deg);
+  }
+}
+@keyframes receiptStampInk {
+  0%,
+  48%,
+  100% {
+    transform: scaleX(0.78);
+    opacity: 0.55;
+  }
+  58% {
+    transform: scaleX(1.12);
+    opacity: 1;
+  }
+}
 .hintLead {
   display: block;
   margin-block-end: 6px;

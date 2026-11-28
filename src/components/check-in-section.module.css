@@ -109,11 +109,30 @@
   grid-column: 1;
 }
 .header:has([data-intake-time-reset]) {
+  --time-lock-size: calc(var(--section-action-size) * 1.23);
+  column-gap: 6px;
+  .caption {
+    align-self: stretch;
+    align-items: start;
+  }
+  .detail {
+    align-self: center;
+  }
   .labelRow {
     min-height: 0;
   }
   .description {
     grid-column: 1 / -1;
+  }
+}
+@media (max-width: 400px) {
+  .header:has([data-intake-time-reset]) .caption {
+    align-content: start;
+  }
+}
+@media (max-width: 359px) {
+  .header:has([data-intake-time-reset]) {
+    padding-inline-end: 12px;
   }
 }
 .action {
