@@ -6,13 +6,15 @@ import {
 } from "@/lib/page-entry-readiness";
 
 import { useCallback, useRef } from "react";
-import { Sparkles } from "lucide-react";
+import { HeartPulse } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
 import type { MedicationColor } from "@/lib/medication-appearance";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
 import { IntakeLaunchButton } from "@/components/intake-launch-button";
 import { PageActionDock } from "@/components/page-action-dock";
+import { useVisibleMotion } from "@/components/use-visible-motion";
+import styles from "./journal-pace-note.module.css";
 
 // Temporary visibility switch: set true to restore the unchanged amounts bar.
 const SHOW_INTAKE_AMOUNTS = false;
@@ -179,6 +181,24 @@ function CountSeparator() {
   );
 }
 
+function JournalPaceNote() {
+  const ref = useVisibleMotion<HTMLParagraphElement>(true);
+  return (
+    <p
+      ref={ref}
+      className={`intake-action-note ${styles.note}`}
+      data-intake-action-note
+      data-intake-entry-part="footer"
+    >
+      <span className={styles.heart} aria-hidden="true">
+        <HeartPulse className={styles.glyph} strokeWidth={3.3} />
+        <HeartPulse className={styles.signal} strokeWidth={3.3} />
+      </span>
+      <span>Your journal, your pace, your way.</span>
+    </p>
+  );
+}
+
 export function IntakeAction({
   onClick,
   ritalinColor,
@@ -247,14 +267,7 @@ export function IntakeAction({
       >
         <IntakeLaunchButton onClick={onClick} ritalinColor={ritalinColor} />
       </div>
-      <p
-        className="intake-action-note"
-        data-intake-action-note
-        data-intake-entry-part="footer"
-      >
-        <Sparkles strokeWidth={2.75} aria-hidden="true" />
-        <span>Your journal, your pace, your way.</span>
-      </p>
+      <JournalPaceNote />
     </div>
   );
 

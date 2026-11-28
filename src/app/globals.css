@@ -3733,11 +3733,6 @@ input[type="time"] {
   text-align: center;
   text-shadow: none;
 }
-.intake-action-note > svg {
-  width: 1em;
-  height: 1em;
-  flex: none;
-}
 .intake-action-note > span {
   min-width: 0;
 }

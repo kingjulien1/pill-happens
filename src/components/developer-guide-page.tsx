@@ -1192,12 +1192,11 @@ export function DeveloperGuidePage() {
                 padding and two 1px edges. Reduced transparency uses an opaque
                 semantic fallback. The row remains 7px above the 80px Log Intake
                 button, with the plain “Your journal, your pace, your way.”
-                footer 22.5px below it. It has no link, uses 9px type at 500
-                weight and Violet400 at 74% opacity, with a matching Sparkles
-                icon. Natural wrapping still
-                participates in the dock’s existing ResizeObserver measurement
-                and page clearance; its entry animation remains independent of
-                the text color.
+                footer 22.5px below it. The 10.4px caption and Heart Pulse icon
+                share Violet 200 at 67% opacity. A double beat sends a trace
+                across the heart. Reduced motion shows the still glyph. Natural
+                wrapping participates in the dock’s existing ResizeObserver
+                measurement and page clearance.
               </p>
               <p>
                 IntakeLaunchButton opens the intake dialog from Today. It keeps
