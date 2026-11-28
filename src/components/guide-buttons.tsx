@@ -1244,7 +1244,7 @@ export function GuideButtons() {
               The explicit intake appearance owns the opaque dark-pink face,
               Pink600 inner band at 74% and thirty-percent pink perimeter. Its
               CSS rim stays still. Today’s IntakeLaunchButton uses the check-in
-              specular rim in the page’s accent colors. Accent keeps its default icon slots and
+              frame with a sky-to-indigo rim. Accent keeps its default icon slots and
               pending spinner, but no separate aura, gradient field or finish
               renderer. The paint-only AccentButtonSurface remains available for
               journal artwork. Visual truncation never removes the full

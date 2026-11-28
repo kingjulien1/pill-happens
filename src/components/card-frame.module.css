@@ -2,6 +2,7 @@
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card],
+    [data-intake-launch],
     [data-medication-library-card],
     [data-history-day-link]
   ) {
@@ -23,6 +24,7 @@
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card],
+    [data-intake-launch],
     [data-medication-library-card],
     [data-history-day-link]
   )::before {
@@ -37,6 +39,7 @@
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card],
+    [data-intake-launch],
     [data-medication-library-card],
     [data-history-day-link]
   ) {
@@ -84,6 +87,7 @@
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card],
+    [data-intake-launch],
     [data-medication-library-card],
     [data-history-day-link]
   ) {
@@ -236,6 +240,7 @@
 .card:global(.intake-log-card):is(
     [data-intake-card],
     [data-check-in-card],
+    [data-intake-launch],
     [data-medication-library-card],
     [data-history-day-link]
   )::after {
@@ -348,4 +353,20 @@
     -webkit-backdrop-filter: blur(96px);
     backdrop-filter: blur(96px);
   }
+}
+
+/* The timeline check-ins and Today launcher use the same layered edge. */
+.card.checkInBands:global(.intake-log-card) {
+  --check-in-outer-gap: 3px;
+  --check-in-outer-width: calc(var(--entry-inner-rim-width) * 1.4);
+  --entry-edge-color: color-mix(
+    in srgb,
+    var(--check-in-outer-color) 41%,
+    transparent
+  );
+  --entry-inner-rim-color: color-mix(
+    in srgb,
+    var(--check-in-outer-color) 47%,
+    transparent
+  );
 }

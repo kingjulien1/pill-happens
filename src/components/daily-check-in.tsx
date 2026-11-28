@@ -18,6 +18,7 @@ import { ActionIcon } from "@/components/action-icon";
 import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { DialogErrorPanel } from "./dialog-error-panel";
 import { MedicationCardBase } from "@/components/medication-card-base";
+import frameStyles from "./card-frame.module.css";
 import { CheckInCardBorder as SpecularCardBorder } from "@/components/check-in-card-border";
 import { SavedCheckInHeading } from "@/components/saved-check-in-heading";
 import {
@@ -270,7 +271,7 @@ export function DailyCheckInSection({
           decoration={<SpecularCardBorder />}
           icon={morning ? "sun" : "moon-star"}
           leadingArtwork={<CheckInCardArtwork period={period} day={day} />}
-          className={styles.card}
+          className={cn(styles.card, frameStyles.checkInBands)}
           data-check-in-card
           data-check-in-dialog-open={ownDialogOpen}
           data-filled={saved}

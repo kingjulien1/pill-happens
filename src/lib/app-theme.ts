@@ -85,6 +85,19 @@ export function mixAppColors(
   return `#${channels.join("")}`;
 }
 
+function luminance(hex: string) {
+  const channels = [1, 3, 5].map((offset) => {
+    const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+}
+
+export function colorContrast(first: string, second: string) {
+  const values = [luminance(first), luminance(second)].sort((a, b) => a - b);
+  return (values[1] + 0.05) / (values[0] + 0.05);
+}
+
 export function withAppAlpha(color: AppThemeHex, opacity: number): AppThemeHex {
   return `#${color.slice(1, 7)}${Math.round(
     Math.max(0, Math.min(1, opacity)) * 255,

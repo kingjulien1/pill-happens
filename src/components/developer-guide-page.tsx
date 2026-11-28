@@ -1204,9 +1204,9 @@ export function DeveloperGuidePage() {
                 the 80px footprint and 21px corners of the timeline cards. Its
                 Layers Arrow Up mark, two lines of copy and trailing arrow share
                 a three-column layout. The specular edge moves with the face on
-                press. The shared check-in renderer carries two reflections
-                around the perimeter. An SVG stroke takes over when WebGL is
-                unavailable. The rim stays still with reduced motion.
+                press. The face mixes the saved Ritalin card color with white.
+                The check-in frame carries a sky, blue and indigo sweep with a
+                short purple glint. Reduced motion keeps the rim still.
               </p>
               <p>
                 IntakePrimaryButton supplies the satin face and outboard frame

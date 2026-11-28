@@ -56,18 +56,6 @@
 
 .section .card:global(.intake-log-card[data-check-in-card]) {
   --card-foreground: var(--check-in-ink);
-  --check-in-outer-gap: 3px;
-  --check-in-outer-width: calc(var(--entry-inner-rim-width) * 1.4);
-  --entry-edge-color: color-mix(
-    in srgb,
-    var(--check-in-outer-color) 41%,
-    transparent
-  );
-  --entry-inner-rim-color: color-mix(
-    in srgb,
-    var(--check-in-outer-color) 47%,
-    transparent
-  );
   color: var(--card-foreground);
   -webkit-tap-highlight-color: transparent;
 }

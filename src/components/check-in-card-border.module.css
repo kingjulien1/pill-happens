@@ -51,10 +51,13 @@
   border-radius: inherit;
   background: conic-gradient(
     from var(--specular-card-rim-angle, 0deg),
-    var(--intake-rim-stop-1),
-    var(--intake-rim-stop-2) 33%,
-    var(--intake-rim-stop-3) 67%,
-    var(--intake-rim-stop-1)
+    var(
+      --rim-stops,
+      var(--intake-rim-stop-1),
+      var(--intake-rim-stop-2) 33%,
+      var(--intake-rim-stop-3) 67%,
+      var(--intake-rim-stop-1)
+    )
   );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -127,5 +130,23 @@
 @keyframes specular-card-rim-turn {
   to {
     --specular-card-rim-angle: 360deg;
+  }
+}
+
+/* This sibling can paint the same outboard frame at either breakpoint. */
+.frame.skyIndigo {
+  display: block;
+  opacity: 1;
+  --rim-stops:
+    var(--color-sky-500, #00a6f4) 0%, var(--color-sky-300, #74d4ff) 17%,
+    var(--color-sky-100, #dff2fe) 25%, var(--color-purple-200, #e9d4ff) 26% 27%,
+    var(--color-blue-100, #dbeafe) 28%, var(--color-blue-400, #51a2ff) 43%,
+    var(--color-blue-600, #155dfc) 57%, var(--color-indigo-500, #615fff) 75%,
+    var(--color-indigo-400, #7c86ff) 88%, var(--color-sky-500, #00a6f4) 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skyIndigo::after {
+    animation: specular-card-rim-turn 5.46s linear infinite;
+    animation-play-state: var(--launch-motion, paused);
   }
 }

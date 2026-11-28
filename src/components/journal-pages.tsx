@@ -575,6 +575,9 @@ export function TodayPage() {
   const today = dayKey(now, data.settings.timezone);
   const todayEntries = dayIntakes(data, today);
   const pillCounts = countPills(todayEntries, data.medications);
+  const ritalin =
+    data.medications.find((med) => /^ritalin$/i.test(med.name.trim())) ??
+    data.medications.find((med) => /^ritalin\b/i.test(med.name.trim()));
   const openLog = () => openDialog({ kind: "intake-new" });
   return (
     <div className="flex flex-1 flex-col" data-today-layout>
@@ -589,6 +592,7 @@ export function TodayPage() {
       />
       <IntakeAction
         onClick={openLog}
+        ritalinColor={ritalin?.color}
         pillCounts={pillCounts}
         opioidCount={countOpioidPills(todayEntries, data.medications)}
         stimulantCount={countStimulantPills(todayEntries, data.medications)}

@@ -3,7 +3,21 @@ import { cn } from "@/lib/utils";
 import styles from "./check-in-card-border.module.css";
 
 /** Mobile paint belongs inside the button; desktop paint is its Safari-safe sibling. */
-export function CheckInCardBorder({ desktop = false }: { desktop?: boolean }) {
+export function CheckInCardBorder({
+  desktop = false,
+  palette,
+}: {
+  desktop?: boolean;
+  palette?: "sky-indigo";
+}) {
+  if (palette === "sky-indigo")
+    return (
+      <span
+        className={cn(styles.border, styles.frame, styles.skyIndigo)}
+        aria-hidden="true"
+      />
+    );
+
   if (desktop)
     return (
       <svg

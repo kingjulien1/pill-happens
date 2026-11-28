@@ -8,6 +8,7 @@ import {
 import { useCallback, useRef } from "react";
 import { Sparkles } from "lucide-react";
 import { MedicationIndicatorMark } from "@/components/medication-indicator-mark";
+import type { MedicationColor } from "@/lib/medication-appearance";
 import type { PillCounts } from "@/lib/pill-counts";
 import { formatDose } from "@/lib/domain";
 import { IntakeLaunchButton } from "@/components/intake-launch-button";
@@ -180,11 +181,13 @@ function CountSeparator() {
 
 export function IntakeAction({
   onClick,
+  ritalinColor,
   pillCounts,
   opioidCount,
   stimulantCount,
 }: {
   onClick: () => void;
+  ritalinColor?: MedicationColor;
   pillCounts: PillCounts;
   opioidCount: number;
   stimulantCount: number;
@@ -242,7 +245,7 @@ export function IntakeAction({
         className="intake-action-entry-button"
         data-intake-entry-part="button"
       >
-        <IntakeLaunchButton onClick={onClick} />
+        <IntakeLaunchButton onClick={onClick} ritalinColor={ritalinColor} />
       </div>
       <p
         className="intake-action-note"
