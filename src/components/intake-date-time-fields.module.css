@@ -220,7 +220,7 @@
   --rim: var(--time-lock-open-rim);
   --icon-ink: var(--color-violet-50);
 }
-.lockControl[aria-pressed="true"] {
+.lockControl[aria-pressed="true"]:not([data-state="resetting"]) {
   --enamel: color-mix(
     in srgb,
     var(--color-rose-900) 82%,
@@ -271,6 +271,13 @@
 .lockControl:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
+}
+.lockControl[data-state="resetting"] {
+  opacity: 1;
+}
+.lockControl[data-state="resetting"] .glyph {
+  visibility: hidden;
+  transition: none;
 }
 .lockControl
   :is(:global(.lucide-lock-keyhole), :global(.lucide-lock-keyhole-open)) {
@@ -520,9 +527,12 @@
     transform-origin: 75% 25%;
     animation: turn-key var(--key-duration) ease-in-out both;
   }
-  .glyph[data-current][data-glyph="resetting"] svg {
-    animation: unlatch var(--unlock-duration) cubic-bezier(0.22, 0.75, 0.31, 1)
-      both;
+  .lockControl[data-state="resetting"],
+  .lockControl[data-state="resetting"] .face {
+    transition:
+      background-color 420ms ease-out,
+      box-shadow 420ms ease-out,
+      color 320ms ease-out;
   }
   .glyph[data-current][data-glyph="refreshing"] svg {
     animation: rewind var(--refresh-duration) ease-out both;
@@ -713,23 +723,6 @@
   }
   100% {
     transform: rotate(30deg);
-  }
-}
-@keyframes unlatch {
-  0% {
-    transform: translateY(1px) scale(1.05, 0.92);
-  }
-  30% {
-    transform: translateY(-3px) rotate(14deg);
-  }
-  52% {
-    transform: rotate(-7deg);
-  }
-  77% {
-    transform: rotate(3deg);
-  }
-  100% {
-    transform: none;
   }
 }
 @keyframes rewind {

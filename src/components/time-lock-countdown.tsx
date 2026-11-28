@@ -1,7 +1,13 @@
 "use client";
 
 import { useId, useLayoutEffect, useRef, type CSSProperties } from "react";
-import { LockKeyhole, RefreshCw } from "lucide-react";
+import {
+  LockKeyhole,
+  LockKeyholeOpen,
+  RefreshCcw,
+  RefreshCw,
+  Timer,
+} from "lucide-react";
 import type { HoldFeedback } from "./use-hold-press";
 import styles from "./time-lock-countdown.module.css";
 
@@ -28,6 +34,37 @@ const confetti = Array.from(
     }) as CSSProperties,
 );
 
+function CountdownBurst({ impact = false }: { impact?: boolean }) {
+  return (
+    <span className={styles.burst} data-impact={impact || undefined}>
+      {confetti.map((style, index) => (
+        <i key={index} style={style} />
+      ))}
+    </span>
+  );
+}
+
+export function TimeLockImpact({ unlock = false }: { unlock?: boolean }) {
+  const Outgoing = unlock ? LockKeyholeOpen : RefreshCcw;
+  const Incoming = unlock ? Timer : LockKeyhole;
+  return (
+    <span
+      className={styles.impact}
+      data-unlock={unlock || undefined}
+      aria-hidden="true"
+    >
+      <CountdownBurst impact />
+      <span className={styles.impactGlyphs}>
+        <Outgoing className={styles.recoil} />
+        <Incoming
+          className={styles.arrival}
+          strokeWidth={unlock ? 2.15 : 2.35}
+        />
+      </span>
+    </span>
+  );
+}
+
 export function HoldCountdown({
   phase,
   pinned = false,
@@ -42,7 +79,7 @@ export function HoldCountdown({
   getChargeElapsed?: () => number;
 }) {
   const gradientId = useId();
-  const Glyph = medication ? RefreshCw : LockKeyhole;
+  const atThreshold = phase === "ready" || phase === "released";
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
     const dial = ref.current;
@@ -139,15 +176,19 @@ export function HoldCountdown({
             transform="rotate(-90 26 26)"
           />
         </svg>
-        <Glyph className={styles.latch} strokeWidth={2.35} />
+        {medication ? (
+          <RefreshCw className={styles.latch} strokeWidth={2.35} />
+        ) : (
+          !atThreshold && (
+            <span className={styles.chargeGlyphs}>
+              <Timer className={styles.timer} strokeWidth={2.15} />
+              <RefreshCcw className={styles.rotor} />
+            </span>
+          )
+        )}
       </span>
-      {phase === "released" && (
-        <span className={styles.burst}>
-          {confetti.map((style, index) => (
-            <i key={index} style={style} />
-          ))}
-        </span>
-      )}
+      {!medication && atThreshold && <TimeLockImpact />}
+      {phase === "released" && <CountdownBurst />}
     </span>
   );
 }

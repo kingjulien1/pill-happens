@@ -17,7 +17,6 @@ import {
   Hourglass,
   KeyRound,
   LockKeyhole,
-  LockKeyholeOpen,
   Stamp,
   Timer,
   TimerReset,
@@ -25,7 +24,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useHoldPress } from "./use-hold-press";
-import { HoldCountdown, timeLockCaption } from "./time-lock-countdown";
+import {
+  HoldCountdown,
+  TimeLockImpact,
+  timeLockCaption,
+} from "./time-lock-countdown";
 import { TimeLockStopwatch } from "./time-lock-stopwatch";
 import { CheckInSection } from "./check-in-section";
 import { Button } from "@/components/ui/button";
@@ -47,9 +50,11 @@ const timeLockIcons = Object.entries({
   entering: KeyRound,
   settling: Stamp,
   fixed: LockKeyhole,
-  resetting: LockKeyholeOpen,
   refreshing: TimerReset,
-} satisfies Record<Phase | "charging" | "ready" | "fixed", LucideIcon>);
+} satisfies Record<
+  Exclude<Phase, "resetting"> | "charging" | "ready" | "fixed",
+  LucideIcon
+>);
 type IntakeTimingSectionProps = {
   headingId: string;
   context: ReactNode;
@@ -349,7 +354,6 @@ export function IntakeTimingSection({
                 "--charge-duration": `${chargeDuration}ms`,
                 "--key-duration": `${manualEntryDuration}ms`,
                 "--settle-duration": `${revealDuration}ms`,
-                "--unlock-duration": `${unlockDuration}ms`,
                 "--refresh-duration": `${refreshDuration}ms`,
               } as CSSProperties
             }
@@ -360,12 +364,17 @@ export function IntakeTimingSection({
                   key={phaseName}
                   className={styles.glyph}
                   data-glyph={phaseName}
-                  data-current={phaseName === state || undefined}
+                  data-current={
+                    phaseName === state ||
+                    (phaseName === "idle" && state === "resetting") ||
+                    undefined
+                  }
                 >
                   <Icon className="size-[1.171875rem]" strokeWidth={2.15} />
                 </span>
               ))}
             </span>
+            {state === "resetting" && <TimeLockImpact unlock />}
           </Button>
           {hold.feedback && (
             <HoldCountdown
