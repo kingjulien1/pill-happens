@@ -270,7 +270,7 @@ export function IntakeTimingSection({
             : "idle"
       ];
   const actionCaption =
-    hold.stage || locked ? status : pinned ? "Tap to unlock" : "Hold to lock";
+    hold.stage || locked ? status : pinned ? null : "Hold to lock";
   const StatusIcon = hold.stage ? Hourglass : pinned ? Anchor : Wind;
 
   return (
@@ -279,11 +279,15 @@ export function IntakeTimingSection({
       headingId={headingId}
       context={context}
       detail={
-        <span className={styles.lockCaption} data-pinned={pinned}>
-          <span key={actionCaption} className={styles.changingCopy}>
+        actionCaption && (
+          <span
+            key={actionCaption}
+            className={`${styles.lockCaption} ${styles.changingCopy}`}
+            data-pinned={pinned}
+          >
             {actionCaption}
           </span>
-        </span>
+        )
       }
       contextSeparator={
         <svg
@@ -319,7 +323,7 @@ export function IntakeTimingSection({
             aria-label="Time Lock"
             title={
               pinned
-                ? "Tap to unlock · Hold to lock the current time"
+                ? "Use current time · Hold to relock"
                 : "Tap for now · Hold to lock the time"
             }
             {...hold.handlers}

@@ -218,7 +218,6 @@
     var(--color-mauve-800)
   );
   --rim: var(--color-violet-400);
-  --lock-light: var(--color-violet-200);
   --icon-ink: var(--color-violet-50);
 }
 .lockControl[aria-pressed="true"],
@@ -229,33 +228,23 @@
     var(--color-mauve-900)
   );
   --rim: var(--color-rose-400);
-  --lock-light: var(--color-rose-200);
   --icon-ink: var(--color-rose-50);
 }
 .lockCaption {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  padding: 2px 6px;
+  border-radius: var(--dialog-radius-compact);
+  background: color-mix(
+    in srgb,
+    var(--caption-tint, var(--color-violet-200)) 85%,
+    var(--muted-foreground)
+  );
   color: var(--enamel);
   font-size: 0.7rem;
   font-weight: 600;
   line-height: 1.35;
 }
-.lockCaption > span {
-  padding: 2px 6px;
-  border-radius: var(--dialog-radius-compact);
-  background: color-mix(
-    in srgb,
-    var(--lock-light) 85%,
-    var(--muted-foreground)
-  );
-}
-.lockCaption::after {
-  content: "";
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--color-rose-500);
+.lockCaption[data-pinned="true"] {
+  --caption-tint: var(--color-rose-200);
 }
 .lockControl[data-slot="button"] {
   /* Scale the Today brand button's 46px shell, 14px corners and inset face together. */
@@ -478,24 +467,51 @@
       transform 230ms cubic-bezier(0.16, 1.48, 0.38, 1),
       visibility 0s;
   }
+  .glyph[data-current][data-glyph="idle"] {
+    --tick-period: 3.6s;
+  }
   .glyph[data-current][data-glyph="idle"] svg {
     transform-origin: 50% 60%;
-    animation: tick-tock 2.8s ease-in-out infinite;
+    animation: tick-tock var(--tick-period) ease-in-out infinite;
+  }
+  /* The crown springs back just as the hand advances on its spindle. */
+  .glyph[data-current][data-glyph="idle"] line:first-of-type {
+    animation: press-crown var(--tick-period) ease-in-out infinite;
+  }
+  .glyph[data-current][data-glyph="idle"] line:last-of-type {
+    transform-box: view-box;
+    transform-origin: 12px 14px;
+    animation: advance-hand var(--tick-period) ease-in-out infinite;
   }
   .glyph[data-current][data-glyph="charging"] svg {
     animation: flip-glass var(--charge-duration)
       cubic-bezier(0.45, 0.02, 0.27, 1) both;
   }
   .glyph[data-current][data-glyph="ready"] svg {
-    animation: ready-beat 1.4s cubic-bezier(0.22, 0.72, 0.35, 1) infinite;
+    --ready-period: 1.6s;
+    animation: ready-beat var(--ready-period) cubic-bezier(0.22, 0.72, 0.35, 1)
+      infinite;
+  }
+  .glyph[data-current][data-glyph="ready"] path:last-of-type {
+    stroke-dasharray: 12;
+    animation: trace-check var(--ready-period) ease-in-out infinite;
   }
   .glyph[data-current][data-glyph="settling"] svg {
     transform-origin: 50% 92%;
     animation: stamp-down var(--settle-duration) ease-out both;
   }
   .glyph[data-current][data-glyph="fixed"] svg {
+    --latch-period: 4.2s;
     transform-origin: 50% 18%;
-    animation: latch-tug 3.4s ease-in-out infinite;
+    animation: latch-tug var(--latch-period) ease-in-out infinite;
+  }
+  .glyph[data-current][data-glyph="fixed"] path {
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    animation: seat-shackle var(--latch-period) ease-in-out infinite;
+  }
+  .glyph[data-current][data-glyph="fixed"] circle {
+    animation: keyhole-glint var(--latch-period) ease-in-out infinite;
   }
   .glyph[data-current][data-glyph="waiting"] svg {
     transform-origin: 22% 14%;
@@ -512,30 +528,104 @@
   .glyph[data-current][data-glyph="refreshing"] svg {
     animation: rewind var(--refresh-duration) ease-out both;
   }
-  .resetButton:not([data-playing="true"]) .glyph[data-current] svg,
+  .resetButton:not([data-playing="true"])
+    .glyph[data-current]
+    :is(svg, svg > *),
   .resetButton:disabled:is([data-state="idle"], [data-state="fixed"])
     .glyph[data-current]
-    svg {
+    :is(svg, svg > *) {
     animation-play-state: paused;
   }
 }
 @keyframes tick-tock {
   0%,
-  52%,
+  12%,
+  54%,
   100% {
     transform: none;
   }
-  12% {
-    transform: rotate(-15deg);
-  }
-  21% {
-    transform: rotate(9deg) translateY(-1px);
+  22% {
+    transform: translateY(0.65px) rotate(-7deg);
   }
   32% {
-    transform: rotate(-5deg);
+    transform: translateY(-0.8px) rotate(5deg);
   }
-  43% {
-    transform: rotate(2deg);
+  42% {
+    transform: rotate(-2deg);
+  }
+}
+@keyframes press-crown {
+  0%,
+  12%,
+  37%,
+  100% {
+    transform: none;
+  }
+  22% {
+    transform: translateY(1.8px);
+  }
+  29% {
+    transform: translateY(-0.6px);
+  }
+}
+@keyframes advance-hand {
+  0%,
+  22% {
+    transform: none;
+  }
+  35%,
+  47% {
+    transform: rotate(68deg);
+  }
+  60% {
+    transform: rotate(200deg);
+  }
+  75% {
+    transform: rotate(368deg);
+  }
+  85%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes trace-check {
+  0%,
+  46%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+  18% {
+    stroke-dashoffset: 6;
+  }
+}
+@keyframes seat-shackle {
+  0%,
+  11%,
+  51%,
+  100% {
+    transform: none;
+  }
+  22% {
+    transform: scaleY(1.13);
+  }
+  32% {
+    transform: scaleY(0.84);
+  }
+  40% {
+    transform: scaleY(1.05);
+  }
+}
+@keyframes keyhole-glint {
+  0%,
+  22%,
+  58%,
+  100% {
+    fill: transparent;
+    stroke: currentColor;
+  }
+  34% {
+    fill: var(--color-rose-200);
+    stroke: var(--color-rose-200);
   }
 }
 @keyframes flip-glass {
