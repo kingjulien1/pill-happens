@@ -157,7 +157,7 @@ export function safeDraftKey(key: unknown): key is string {
     ].includes(key)
   )
     return true;
-  const edit = /^(?:med|intake):edit:(.+)$/.exec(key)?.[1];
+  const edit = /^(?:(?:med|intake):edit|goal:checkpoint):(.+)$/.exec(key)?.[1];
   if (edit) return idPattern.test(edit);
   const day =
     /^(?:intake:new|checkin|journal):(\d{4}-\d{2}-\d{2})$/.exec(key)?.[1] ??
@@ -253,7 +253,8 @@ export function safeRememberedDialog(
     case "medication-edit":
       return path === "/medications" && id ? { kind: item.kind, id } : null;
     case "goal-new":
-      return path === "/goals" ? { kind: item.kind } : null;
+      if (path !== "/goals") return null;
+      return id ? { kind: item.kind, id } : { kind: item.kind };
     case "check-in":
       if (
         !daily ||

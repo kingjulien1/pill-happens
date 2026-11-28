@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, FlaskConical, PencilLine } from "lucide-react";
+import { ArrowUpRight, FlaskConical, PencilLine, Sprout } from "lucide-react";
 import { useJournal } from "@/components/journal-provider";
 import { PageHeading, PageSurface } from "@/components/page-heading";
 import { MedicationChoiceIcon } from "@/components/medication-choice-icon";
@@ -140,6 +140,12 @@ export function MedicationDetailPage({ id }: { id: string }) {
           },
         ]}
       />
+      {data.goals.some((goal) => goal.medicationId === id) && (
+        <Link href={`/goals?medication=${encodeURIComponent(id)}`} className={styles.entryLink}>
+          <span><Sprout size={16} aria-hidden="true" /> Your reduction goal</span>
+          <span>See progress <ArrowUpRight size={14} aria-hidden="true" /></span>
+        </Link>
+      )}
       {categories.length > 0 && (
         <section
           className={styles.section}

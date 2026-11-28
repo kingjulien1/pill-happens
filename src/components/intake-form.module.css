@@ -207,6 +207,9 @@
   margin: 0 auto;
   text-wrap: balance;
 }
+.preview [data-goal-reading] + .previewSummary {
+  margin-top: -12px;
+}
 .preview .previewSummaryHeading {
   display: block;
   margin: 0;

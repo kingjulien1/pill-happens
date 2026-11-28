@@ -22,6 +22,7 @@ import { IntakePrimaryButton } from "@/components/intake-primary-button";
 import { IntakeMedicationSelect } from "@/components/intake-medication-select";
 import { MedicationPreview } from "./notification-change-preview";
 import { IntakePreviewSkeleton } from "./intake-preview-skeleton";
+import { GoalReading } from "./goal-progress";
 import { FinalLookHeading } from "./final-look-heading";
 import {
   IntakePreviewChangeRow,
@@ -61,6 +62,7 @@ import {
   doseMg,
   formatDay,
   fromLocalInput,
+  goalForDay,
   totalsForDay,
   type AppData,
   type Intake,
@@ -307,6 +309,10 @@ export function IntakeForm({
       : Number((otherIntakes.totalMg + calculatedDose).toFixed(8));
   const includingDraftCount =
     includingDraftMg === null ? null : otherIntakes.count + 1;
+  const previewGoal =
+    data && belongsTo && medicationId
+      ? goalForDay(data, medicationId, belongsTo)
+      : undefined;
   const previewHintId = `${formId}-preview-hint`;
   const receiptDate = takenAt.slice(0, 10);
   let previewHint: string;
@@ -816,6 +822,14 @@ export function IntakeForm({
                 motion={false}
                 color={getMedicationColor(medication?.color ?? "tw-mauve-400")}
               />
+              {hasPreview && previewGoal && includingDraftMg !== null && (
+                <GoalReading
+                  name="This draft & your goal"
+                  totalMg={includingDraftMg}
+                  limitMg={previewGoal.dailyLimitMg}
+                  projected
+                />
+              )}
               {belongsTo && (medication || fallbackIntake) && (
                 <IntakePreviewSummary
                   newIntake={

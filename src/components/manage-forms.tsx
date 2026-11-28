@@ -159,6 +159,7 @@ function isMedicationDraft(value: unknown): value is MedicationDraft {
 }
 
 type GoalDraft = {
+  pace?: "open" | "dated";
   medicationId: string;
   limit: string;
   startsOn: string;
@@ -173,6 +174,9 @@ function isGoalDraft(value: unknown): value is GoalDraft {
     ["medicationId", "limit", "startsOn", "endsOn"].every(
       (key) => typeof draft[key] === "string" && draft[key].length <= 256,
     ) &&
+    (draft.pace === undefined ||
+      draft.pace === "open" ||
+      draft.pace === "dated") &&
     typeof draft.note === "string" &&
     draft.note.length <= 1000
   );
@@ -610,7 +614,13 @@ export function MedicationForm({
   );
 }
 
-export function GoalForm({ onSaved }: { onSaved: () => void }) {
+export function GoalForm({
+  onSaved,
+  initialMedicationId,
+}: {
+  onSaved: (medicationId: string) => void;
+  initialMedicationId?: string;
+}) {
   const { data, mutate, busy, derived } = useJournal();
   const id = useId();
   const medications =
@@ -621,15 +631,23 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
     derived?.medicationUsage,
   );
   const freshGoal = (): GoalDraft => ({
-    medicationId: medications[0]?.id ?? "",
+    medicationId: initialMedicationId ?? medications[0]?.id ?? "",
     limit: "",
     startsOn: dayKey(new Date(), data?.settings.timezone ?? "Europe/Vienna"),
     endsOn: "",
     note: "",
   });
-  const draft = usePersistentDraft("goal:new", freshGoal, isGoalDraft);
-  const { medicationId, limit, startsOn, endsOn, note } = draft.value;
-  const setField = (key: keyof GoalDraft, value: string) =>
+  const draft = usePersistentDraft(
+    initialMedicationId ? "goal:checkpoint:" + initialMedicationId : "goal:new",
+    freshGoal,
+    isGoalDraft,
+  );
+  const { medicationId, limit, startsOn, note } = draft.value;
+  const dated = draft.value.pace
+    ? draft.value.pace === "dated"
+    : Boolean(draft.value.endsOn);
+  const endsOn = dated ? draft.value.endsOn : "";
+  const setField = (key: Exclude<keyof GoalDraft, "pace">, value: string) =>
     draft.setValue((current) => ({ ...current, [key]: value }));
   const setMedicationId = (value: string) => setField("medicationId", value);
   const setLimit = (value: string) => setField("limit", value);
@@ -671,7 +689,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
       );
       return;
     }
-    if (!isValidDayKey(startsOn) || (endsOn && !isValidDayKey(endsOn))) {
+    if (!isValidDayKey(startsOn) || (dated && !isValidDayKey(endsOn))) {
       setError(
         fieldIssue(
           "Choose valid start and end dates.",
@@ -738,7 +756,10 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
             { label: "Ends", value: endsOn || "Open-ended" },
           ],
           links: [
-            { label: "Review Goals", href: "/goals" },
+            {
+              label: "Review goal",
+              href: `/goals?medication=${encodeURIComponent(medicationId)}`,
+            },
             { label: "Daily Log", href: "/" },
           ],
           footer: "Undo removes only this newly saved goal.",
@@ -753,7 +774,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
             }
           : {}),
       });
-      onSaved();
+      onSaved(medicationId);
     } catch (cause) {
       setError({
         message:
@@ -777,8 +798,9 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
         data-dialog-panel
         className="rounded-xl border border-primary/10 bg-primary/5 p-3.5 text-xs leading-relaxed text-muted-foreground"
       >
-        Set a daily maximum agreed with your clinician. This is a reference for
-        your journal; the app never creates an automatic taper.
+        Your daily total will appear beside this goal in Final Look and your
+        evening check-in. When you choose another checkpoint, your earlier goal
+        stays in the chart.
       </div>
 
       {medications.length === 0 && (
@@ -804,7 +826,7 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
                   setError(null);
               }
             }}
-            disabled={busy || medications.length === 0}
+            disabled={busy || medications.length === 0 || !!initialMedicationId}
             required
           >
             <SelectTrigger id={`${id}-medication`} className={selectClass}>
@@ -915,6 +937,26 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
           />
         </div>
 
+        <fieldset className="space-y-2">
+          <legend className="mb-2 text-sm font-semibold">
+            Choose your pace
+          </legend>
+          <div className="grid grid-cols-2 gap-2">
+            {(["open", "dated"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                aria-pressed={dated === (mode === "dated")}
+                onClick={() =>
+                  draft.setValue((current) => ({ ...current, pace: mode }))
+                }
+                className="min-h-10 rounded-xl border border-border bg-muted/30 px-2 text-sm font-semibold aria-pressed:border-primary aria-pressed:bg-primary/15"
+              >
+                {mode === "open" ? "At my pace" : "Set an end date"}
+              </button>
+            ))}
+          </div>
+        </fieldset>
         <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
           <div className="min-w-0 space-y-2">
             <Label htmlFor={`${id}-start`}>Starts On</Label>
@@ -928,28 +970,28 @@ export function GoalForm({ onSaved }: { onSaved: () => void }) {
               className={inputClass}
             />
           </div>
-          <div className="min-w-0 space-y-2">
-            <Label htmlFor={`${id}-end`}>
-              Ends On{" "}
-              <span className="font-normal text-muted-foreground">
-                (optional)
-              </span>
-            </Label>
-            <Input
-              id={`${id}-end`}
-              name="endsOn"
-              type="date"
-              value={endsOn}
-              min={startsOn || undefined}
-              onChange={(event) => setEndsOn(event.target.value)}
-              className={inputClass}
-            />
-          </div>
+          {dated && (
+            <div className="min-w-0 space-y-2">
+              <Label htmlFor={`${id}-end`}>Ends On</Label>
+              <Input
+                id={`${id}-end`}
+                name="endsOn"
+                type="date"
+                value={endsOn}
+                required
+                min={startsOn || undefined}
+                onChange={(event) => setEndsOn(event.target.value)}
+                className={inputClass}
+              />
+            </div>
+          )}
         </div>
         <p className="-mt-2 text-xs leading-relaxed text-muted-foreground">
           Each tracking day starts at 06:00 in{" "}
-          {data?.settings.timezone ?? "Europe/Vienna"}. Leave the end date empty
-          to keep this goal ongoing.
+          {data?.settings.timezone ?? "Europe/Vienna"}.{" "}
+          {dated
+            ? "The goal includes the end date you choose."
+            : "This checkpoint stays open until you choose a new one."}
         </p>
 
         <div className="space-y-2">

@@ -641,7 +641,11 @@ export function GuidePage() {
               <p>
                 When goals overlap, the latest start date takes over. When that
                 newer goal ends, an older goal does not restart automatically.
-                Add the next goal when you want another value to apply.
+                Add a checkpoint when you want another value to apply. Choose
+                “At my pace” to leave the timeline open. The Goals chart
+                compares recorded amounts with each day’s goal. Blank days stay
+                unlogged. You can also see the comparison in Final Look, your
+                day log and the evening check-in.
               </p>
               <p>
                 The app shows comparisons with your own entries. It does not

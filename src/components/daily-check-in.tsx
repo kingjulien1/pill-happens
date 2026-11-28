@@ -46,6 +46,7 @@ import { ArrowUpRight, LibraryBig } from "lucide-react";
 import { rememberJournalDestination } from "@/components/journal-drafts";
 import { CheckInSection } from "./check-in-section";
 import { DailyMoodIndicators } from "./daily-mood-icon";
+import { DayGoals } from "./goal-progress";
 import { EveningDayRatings } from "@/components/evening-day-ratings";
 import { SmallReminders } from "@/components/small-reminders";
 import {
@@ -791,6 +792,7 @@ function CheckInForm({
               disabled={locked}
             />
           </CheckInSection>
+          {data && <DayGoals data={data} day={day} evening />}
         </div>
       )}
 

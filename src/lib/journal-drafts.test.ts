@@ -1906,3 +1906,14 @@ test("legacy workspaces hydrate without scroll records and corrupt coordinates p
     "scroll writes preserve unrelated damaged-draft notices",
   );
 });
+
+test("medication checkpoints keep their own draft and reopen for the intended medication", () => {
+  assert.equal(safeDraftKey("goal:checkpoint:med-1"), true);
+  assert.equal(safeDraftKey("goal:checkpoint:../../bad"), false);
+  const dialog = { kind: "goal-new", id: "med-1" };
+  assert.deepEqual(safeRememberedDialog(dialog, "/goals"), dialog);
+  assert.equal(safeRememberedDialog(dialog, "/"), null);
+  assert.deepEqual(safeRememberedDialog({ kind: "goal-new" }, "/goals"), {
+    kind: "goal-new",
+  });
+});

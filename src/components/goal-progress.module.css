@@ -1,0 +1,155 @@
+.reading,
+.digest,
+.list {
+  min-width: 0;
+}
+.reading {
+  --goal-tone: #bbf7df;
+  padding: 11px 13px;
+  border: 1px solid #baa7d736;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #35253f, #261d32);
+  color: #f7efff;
+  text-align: start;
+}
+:is(.reading, .badge)[data-status="within"],
+:is(.reading, .badge)[data-status="at"] {
+  --goal-tone: #a9ecd6;
+}
+:is(.reading, .badge)[data-status="above"] {
+  --goal-tone: #ffd19b;
+}
+:is(.reading, .badge)[data-status="unlogged"] {
+  --goal-tone: #d4c6e3;
+}
+.top,
+.figures,
+.foot,
+.digest summary,
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.top,
+.figures,
+.foot {
+  justify-content: space-between;
+}
+.top strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.badge {
+  width: max-content;
+  max-width: 100%;
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  gap: 4px;
+  border-radius: 7px;
+  padding: 3px 6px;
+  color: var(--goal-tone);
+  background: color-mix(in srgb, var(--goal-tone) 11%, #241b30);
+}
+.badge svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+.figures {
+  flex-wrap: wrap;
+  margin-top: 6px;
+  color: #d3c5dd;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.figures b {
+  color: #fbf4ff;
+}
+.track {
+  background: #ffffff17;
+  height: 4px;
+  border-radius: 3px;
+  margin-top: 7px;
+  overflow: hidden;
+}
+.track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--goal-tone);
+}
+.list {
+  display: grid;
+  gap: 8px;
+}
+.foot {
+  flex-wrap: wrap;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 32px;
+  color: inherit;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.digest {
+  margin-block: 8px;
+  border: 1px solid #c9a9e342;
+  border-radius: 14px;
+  background: #281e37ed;
+  color: #f5eaff;
+}
+.digest summary {
+  padding: 10px 12px;
+  list-style: none;
+  cursor: pointer;
+}
+.digest summary::-webkit-details-marker {
+  display: none;
+}
+.digest summary svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: #bbebda;
+}
+.digest summary strong {
+  font-size: 12px;
+}
+.digest summary span {
+  margin-inline-start: auto;
+  text-align: end;
+  font-size: 10px;
+  color: #dfd1ed;
+}
+.digest[open] summary svg:last-child {
+  transform: rotate(180deg);
+}
+.digest .list {
+  border-top: 1px solid #c9a9e32b;
+  padding: 10px;
+}
+.digest .foot {
+  color: #dfd1ed;
+}
+
+.top strong a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: #ceb4ea50;
+  text-underline-offset: 3px;
+}
+.top strong svg {
+  display: inline;
+  margin-inline-start: 3px;
+  vertical-align: middle;
+}

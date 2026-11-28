@@ -17,8 +17,8 @@ import {
 } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
-import { ArrowUpRight, FlaskConical, Leaf, Pill, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FlaskConical, Pill, X } from "lucide-react";
 import { ActionIcon, type ActionIconName } from "@/components/action-icon";
 import { DialogPrimaryButton } from "@/components/dialog-primary-button";
 import dialogButtonStyles from "./dialog-primary-button.module.css";
@@ -43,23 +43,18 @@ import {
 import { IntakeDeletionExit } from "./intake-deletion-exit";
 import deletionStyles from "./intake-deletion-exit.module.css";
 import { ResponsiveModal } from "@/components/responsive-modal";
-import { PageEmptyState, PageHeading } from "@/components/page-heading";
+import { PageEmptyState } from "@/components/page-heading";
 import { JournalDialogSubheading } from "./journal-dialog-subheading";
-import goalStyles from "./goals-page.module.css";
+import { GoalDashboard } from "./goal-dashboard";
+import { DayGoals } from "./goal-progress";
 import {
   countOpioidPills,
   countPills,
   countStimulantPills,
 } from "@/lib/pill-counts";
-import { MedicationIcon } from "@/components/medication-icon";
 import { MedicationLibraryCard } from "@/components/medication-library-card";
 import { MedicationActionButton } from "@/components/medication-action-button";
 import { MedicationDialogActions } from "@/components/medication-dialog-actions";
-import {
-  MedicationClassBadges,
-  medicationClassHighlights,
-} from "@/components/medication-class-badge";
-import { getMedicationClassification } from "@/lib/medication-classification";
 import {
   MedicationListHeading,
   type RotationFilter,
@@ -96,10 +91,8 @@ import {
   dayKey,
   formatDay,
   formatDose,
-  goalForDay,
   isValidDayKey,
   shiftDayKey,
-  totalsForDay,
   type AppData,
   type Intake,
   type Medication,
@@ -162,10 +155,6 @@ function EmptyState({
       {children}
     </PageEmptyState>
   );
-}
-
-function usagePercent(total: number, maximum: number) {
-  return maximum > 0 ? (total / maximum) * 100 : total > 0 ? 100 : 0;
 }
 
 function EntryEditor({ entry, close }: { entry?: Intake; close: () => void }) {
@@ -512,6 +501,7 @@ function CheckInTimeline({
         day={day}
         checkIn={evening}
       />
+      {day <= trackingDay && <DayGoals data={data} day={day} />}
     </IntakeTimelineEntrance>
   );
 }
@@ -996,18 +986,14 @@ export function MedicationsPage() {
 }
 
 export function GoalsPage() {
+  const router = useRouter();
   const { data, now, mutate, busy } = useJournal();
   const { dialog, openDialog, closeDialog } = useJournalWorkspace();
   const open = dialog?.kind === "goal-new";
   const [deleting, setDeleting] = useState<string | null>(null);
   if (!data || !now) return null;
   const today = dayKey(now, data.settings.timezone);
-  const totals = totalsForDay(data, today);
-  const goals = [...data.goals].sort(
-    (a, b) =>
-      b.startsOn.localeCompare(a.startsOn) ||
-      b.createdAt.localeCompare(a.createdAt),
-  );
+  const goals = data.goals;
   async function remove() {
     if (!deleting) return;
     try {
@@ -1060,195 +1046,36 @@ export function GoalsPage() {
   }
   return (
     <>
-      <PageHeading
-        title="Goals"
-        context="Daily maximums"
-        icon={<ActionIcon name="goals" />}
-      >
-        Keep track of the targets agreed with your prescriber.
-      </PageHeading>
-      <DialogPrimaryButton
-        type="button"
-        className="mb-7 w-full"
-        leadingIcon={<ActionIcon name="goals" />}
-        trailingIcon={<ActionIcon name="next" />}
-        onClick={() => openDialog({ kind: "goal-new" })}
-      >
-        Set a Daily Goal
-      </DialogPrimaryButton>
-      {!goals.length ? (
-        <EmptyState icon="goals" title="A Little Direction, When You’re Ready.">
-          Add a daily maximum for one medication. Your journal will help you
-          keep sight of it.
-        </EmptyState>
-      ) : (
-        <div className={goalStyles.list}>
-          {goals.map((goal) => {
-            const med = data.medications.find(
-              (m) => m.id === goal.medicationId,
-            );
-            const current =
-              goalForDay(data, goal.medicationId, today)?.id === goal.id;
-            const taken =
-              totals.find((t) => t.medicationId === goal.medicationId)
-                ?.totalMg ?? 0;
-            const future = goal.startsOn > today;
-            return (
-              <article
-                key={goal.id}
-                className={`${goalStyles.card} ${medicationClassHighlights(med)}`}
-                data-benzodiazepine={
-                  med?.isBenzodiazepine === true || undefined
-                }
-                data-opioid={med?.isOpioid === true || undefined}
-                data-medication-classification={getMedicationClassification(
-                  med,
-                )}
-              >
-                <div className={goalStyles.header}>
-                  <MedicationIcon
-                    color={med?.color}
-                    icon={med?.icon}
-                    rotation={med?.iconRotation}
-                    isBenzodiazepine={med?.isBenzodiazepine === true}
-                    isOpioid={med?.isOpioid === true}
-                    small
-                  />
-                  <div className={goalStyles.identity}>
-                    <div className={goalStyles.name}>
-                      <h2>
-                        {med ? (
-                          <Link
-                            className={goalStyles.medicationLink}
-                            href={`/medications/${encodeURIComponent(med.id)}`}
-                          >
-                            <span>{med.name}</span>
-                            <ArrowUpRight size={13} aria-hidden="true" />
-                          </Link>
-                        ) : (
-                          "Medication"
-                        )}
-                      </h2>
-                      <MedicationClassBadges medication={med} />
-                    </div>
-                    <p className={goalStyles.context}>
-                      {current
-                        ? "Current daily maximum"
-                        : future
-                          ? "Upcoming goal"
-                          : "Previous goal"}
-                    </p>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    aria-label={`Remove ${med?.name ?? "medication"} goal`}
-                    className="flex size-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
-                    onClick={() => setDeleting(goal.id)}
-                  >
-                    <ActionIcon name="delete" />
-                  </Button>
-                </div>
-                <div className={goalStyles.amountRow}>
-                  <p className={goalStyles.amount}>
-                    {formatDose(goal.dailyLimitMg)}
-                    <span>mg / day</span>
-                  </p>
-                  <span
-                    className={goalStyles.status}
-                    data-current={current || undefined}
-                  >
-                    {current ? "Active" : future ? "Upcoming" : "Past"}
-                  </span>
-                </div>
-                {current && (
-                  <div className={goalStyles.progress}>
-                    <div className={goalStyles.progressLabel}>
-                      <span>
-                        <strong>{formatDose(taken)} mg</strong> logged today
-                      </span>
-                      <span>
-                        {goal.dailyLimitMg === 0
-                          ? taken > 0
-                            ? "Above maximum"
-                            : "No intake recorded"
-                          : `${Math.round(usagePercent(taken, goal.dailyLimitMg))}%`}
-                      </span>
-                    </div>
-                    <div
-                      className={goalStyles.track}
-                      role="progressbar"
-                      aria-label={`${med?.name ?? "Medication"} daily maximum`}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-valuenow={Math.min(
-                        Math.round(usagePercent(taken, goal.dailyLimitMg)),
-                        100,
-                      )}
-                      aria-valuetext={`${formatDose(taken)} mg recorded; daily maximum ${formatDose(goal.dailyLimitMg)} mg`}
-                    >
-                      <div
-                        style={{
-                          width: `${Math.min(usagePercent(taken, goal.dailyLimitMg), 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-                <dl className={goalStyles.dates}>
-                  <div>
-                    <dt>Starts</dt>
-                    <dd>
-                      <time dateTime={goal.startsOn}>
-                        {formatDay(goal.startsOn, {
-                          weekday: undefined,
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </time>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Ends</dt>
-                    <dd>
-                      {goal.endsOn ? (
-                        <time dateTime={goal.endsOn}>
-                          {formatDay(goal.endsOn, {
-                            weekday: undefined,
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </time>
-                      ) : (
-                        "Ongoing"
-                      )}
-                    </dd>
-                  </div>
-                </dl>
-                {goal.note && <p className={goalStyles.note}>{goal.note}</p>}
-              </article>
-            );
-          })}
-        </div>
-      )}
-      <div className="canvas-copy mt-7 flex gap-3 p-1">
-        <Leaf size={17} className="mt-1 shrink-0" />
-        <p className="text-[11px] leading-[1.9] text-canvas-muted-foreground">
-          This is a record of your own goals, not a taper plan. Always work with
-          your prescriber on dose changes. New goals can start on a future date.
-        </p>
-      </div>
+      <GoalDashboard
+        data={data}
+        today={today}
+        onAdd={(id) =>
+          openDialog(id ? { kind: "goal-new", id } : { kind: "goal-new" })
+        }
+        onRemove={setDeleting}
+      />
       <ResponsiveModal
         open={open}
         onOpenChange={(next) => {
           if (!next && dialog?.kind === "goal-new") closeDialog(dialog);
         }}
-        scrollKey="goal:new"
-        title="Set a Goal"
-        context="Daily Maximum"
-        description="Record a daily maximum you have chosen with your prescriber. This does not calculate a taper schedule."
+        scrollKey={dialog?.id ? "goal:checkpoint:" + dialog.id : "goal:new"}
+        title={dialog?.id ? "Add a checkpoint" : "Set a medication goal"}
+        context="Your reduction goals"
+        description="Choose the daily maximum you’ve agreed with your prescriber. You can stay here as long as you need or set an end date."
       >
-        {open && <GoalForm onSaved={() => closeDialog(dialog ?? undefined)} />}
+        {open && (
+          <GoalForm
+            initialMedicationId={dialog?.id}
+            onSaved={(medicationId) => {
+              closeDialog(dialog ?? undefined);
+              router.replace(
+                `/goals?medication=${encodeURIComponent(medicationId)}`,
+                { scroll: false },
+              );
+            }}
+          />
+        )}
       </ResponsiveModal>
       <ResponsiveModal
         open={Boolean(deleting)}

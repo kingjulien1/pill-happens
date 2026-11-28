@@ -200,6 +200,11 @@ function dayIntakeIndex(data: AppData): DayIntakeIndex {
   byZone.set(data.settings.timezone, result);
   return result;
 }
+/** Tracking days with saved intakes, in chronological order. */
+export function recordedIntakeDays(data: AppData): string[] {
+  return Array.from(dayIntakeIndex(data).days.keys()).sort();
+}
+
 export function dayIntakes(data: AppData, key: string): Intake[] {
   return [...(dayIntakeIndex(data).days.get(key) ?? [])];
 }
@@ -238,6 +243,13 @@ export function totalsForDay(data: AppData, key: string): DailyTotal[] {
 }
 
 const goalIndexes = new WeakMap<readonly Goal[], Map<string, Goal[]>>();
+export function compareGoalsNewestFirst(a: Goal, b: Goal): number {
+  return (
+    b.startsOn.localeCompare(a.startsOn) ||
+    Date.parse(b.createdAt) - Date.parse(a.createdAt) ||
+    b.id.localeCompare(a.id)
+  );
+}
 function indexedGoals(goals: readonly Goal[]) {
   const cached = goalIndexes.get(goals);
   if (cached) return cached;
@@ -248,12 +260,7 @@ function indexedGoals(goals: readonly Goal[]) {
     records.push(goal);
   }
   for (const records of index.values())
-    records.sort(
-      (a, b) =>
-        b.startsOn.localeCompare(a.startsOn) ||
-        Date.parse(b.createdAt) - Date.parse(a.createdAt) ||
-        b.id.localeCompare(a.id),
-    );
+    records.sort(compareGoalsNewestFirst);
   goalIndexes.set(goals, index);
   return index;
 }
