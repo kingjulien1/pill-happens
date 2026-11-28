@@ -453,13 +453,11 @@ export function IntakeTimingSection({
                     : "Reuse a date and time."}
                 </p>
               </div>
-              {pinned && (
-                <LockKeyhole
-                  className={styles.guideLock}
-                  strokeWidth={2.5}
-                  aria-hidden="true"
-                />
-              )}
+              <LockKeyhole
+                className={styles.guideLock}
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
             </div>
             <p
               key={String(pinned)}

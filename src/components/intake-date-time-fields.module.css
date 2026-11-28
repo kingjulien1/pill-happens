@@ -344,19 +344,21 @@
 }
 .guideHeading {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(8px, 2vw, 12px);
   min-width: 0;
-}
-.lockGuide[data-pinned="true"] .guideHeading {
-  grid-template-columns: auto minmax(0, 1fr) auto;
 }
 .guideLock {
   width: 1.45rem;
   height: 1.45rem;
   align-self: start;
+  color: var(--primary);
+  opacity: 0.27;
+}
+.lockGuide[data-pinned="true"] .guideLock {
   color: var(--color-rose-500);
+  opacity: 1;
 }
 .guideHeading h4 {
   margin: 0;
@@ -421,6 +423,7 @@
     --latch-delay: 55ms;
   }
   .labelStatus,
+  .guideLock,
   .lockGuide {
     transition:
       color 240ms,
@@ -431,7 +434,7 @@
   .changingCopy {
     animation: settle-copy 290ms cubic-bezier(0.18, 0.8, 0.28, 1.15) both;
   }
-  .guideLock {
+  .lockGuide[data-pinned="true"] .guideLock {
     animation: seat-lock 340ms ease-out;
   }
   @keyframes seat-lock {
